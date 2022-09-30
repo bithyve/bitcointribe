@@ -570,7 +570,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             setAcceptGiftModal( false ); 
             closeModal(); 
             dispatch( giftAccepted( '' ) );
-            navigation.navigate( 'ManageGifts' );
+            navigation.navigate( 'ManageGifts', {giftType : '0'} );
           } 
 
           }

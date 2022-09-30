@@ -36,7 +36,7 @@ function RequestKeyFromContact( props ) {
   const [ shareLink, setShareLink ] = useState( '' )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
-  const contact = props.contact
+  const contact = props.contact && props.contact.contactDetails && props.contact.contactDetails[0]
   const [ serviceType, setServiceType ] = useState(
     props.serviceType ? props.serviceType : '',
   )
@@ -68,7 +68,7 @@ function RequestKeyFromContact( props ) {
       const options = Platform.select( {
         default: {
           title,
-          message: `You have a new Hexa app ${props.isKeeper ? 'keeper' : 'Friends and Family'} request from ${walletName}\n\n${shareLink}`,
+          message: `${walletName} wants to add you as ${props.isKeeper ? 'keeper' : 'Friends and Family'} on Hexa. Click on the link below and follow the steps in your Hexa app \n\n${shareLink}`,
         },
       } )
 
@@ -153,7 +153,7 @@ function RequestKeyFromContact( props ) {
               {contact ? Object.keys( contact ).length !== 0 ? contact.imageAvailable ?
 
                 <Image
-                  source={contact.image}
+                  source={contact && contact.image}
                   style={{
                     ...styles.contactProfileImage
                   }}
@@ -202,7 +202,7 @@ function RequestKeyFromContact( props ) {
             <View style={{
               marginHorizontal: wp( 3 )
             }}>
-              {Object.keys( contact ).length !== 0 &&
+              {contact && Object.keys( contact ).length !== 0 &&
               <Text style={{
                 color: Colors.lightTextColor,
                 fontSize: RFValue( 10 ),
@@ -239,7 +239,7 @@ function RequestKeyFromContact( props ) {
                     {Contact && Contact.emails[ 0 ].email}
                   </Text>
 
-                ): Object.keys( contact ).length !== 0 && props.encryptLinkWith === DeepLinkEncryptionType.OTP ?
+                ): contact && Object.keys( contact ).length !== 0 && props.encryptLinkWith === DeepLinkEncryptionType.OTP ?
                   <Text style={{
                     color: Colors.blue,
                     fontSize: RFValue( 14 ),

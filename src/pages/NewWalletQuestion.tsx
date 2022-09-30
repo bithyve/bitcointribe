@@ -1516,7 +1516,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         <WalletInitKnowMore index={knowMoreIndex} closeModal={() => setKnowMore( false )} />
       </ModalContainerScroll>
     </View>
-  )
+  ) 
 }
 
 const styles = StyleSheet.create( {

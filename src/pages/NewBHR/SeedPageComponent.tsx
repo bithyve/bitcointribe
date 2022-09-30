@@ -172,7 +172,7 @@ const SeedPageComponent = ( props ) => {
 
   const getSecureData = ( text ) => {
     let secureText = ''
-    for( let i = 0; i< text.length;i++ ){
+    for( let i = 0; i< 8;i++ ){
       secureText+='*'
     }
     return secureText

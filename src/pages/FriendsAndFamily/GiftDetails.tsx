@@ -542,7 +542,7 @@ const GiftDetails = ( { navigation } ) => {
         {gift.status === GiftStatus.SENT && gift.type === GiftType.SENT ? (
           bottomButton( () => {
             dispatch( reclaimGift( gift.id ) )
-            navigation.navigate( 'ManageGifts' )
+            navigation.navigate( 'ManageGifts', {giftType : '1'})
           }, 'Reclaim' )
         ) : null}
         {/* Resend */}
@@ -636,7 +636,7 @@ const styles = StyleSheet.create( {
     borderRadius: wp( 9 ) / 2,
   },
   bottomButton: {
-    backgroundColor: Colors.lightBlue,
+    backgroundColor: Colors.darkBlue,
     height: wp( '13%' ),
     width: '40%',
     borderRadius: 10,

@@ -83,6 +83,32 @@ const WalletInitializationScreen = props => {
         </View>
         <TouchableOpacity
           onPress={async () => {
+            props.navigation.navigate( 'RestoreSeedWordsContent' )
+          }}
+          style={{
+            ...styles.NewWalletTouchableView, marginBottom: wp( '7%' )
+          }}
+        >
+          <Image
+            style={styles.iconImage}
+            source={require( '../assets/images/icons/seedwords.png' )}
+          />
+          <View style={styles.textView}>
+            <Text style={styles.touchableText}>Using Backup phrase</Text>
+          </View>
+          <View style={styles.arrowIconView}>
+            <MaterialIcons
+              name="arrow-forward-ios"
+              color={Colors.borderColor}
+              size={15}
+              style={{
+                alignSelf: 'center'
+              }}
+            />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={async () => {
             dispatch( setDownloadedBackupData( [] ) )
             dispatch( setCloudDataRecovery( null ) )
             dispatch( setIsFileReading( false ) )
@@ -98,32 +124,6 @@ const WalletInitializationScreen = props => {
           />
           <View style={styles.textView}>
             <Text style={styles.touchableText}>Using Recovery Keys</Text>
-          </View>
-          <View style={styles.arrowIconView}>
-            <MaterialIcons
-              name="arrow-forward-ios"
-              color={Colors.borderColor}
-              size={15}
-              style={{
-                alignSelf: 'center'
-              }}
-            />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={async () => {
-            props.navigation.navigate( 'RestoreSeedWordsContent' )
-          }}
-          style={{
-            ...styles.NewWalletTouchableView, marginBottom: wp( '7%' )
-          }}
-        >
-          <Image
-            style={styles.iconImage}
-            source={require( '../assets/images/icons/seedwords.png' )}
-          />
-          <View style={styles.textView}>
-            <Text style={styles.touchableText}>Using Backup phrase</Text>
           </View>
           <View style={styles.arrowIconView}>
             <MaterialIcons

@@ -509,7 +509,6 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
           } ) )
           return
         }
-
         Object.keys( trustedContacts ).forEach( channelKey => {
           const contact: TrustedContact = trustedContacts[ channelKey ]
           if( contact.isActive ){
@@ -573,6 +572,9 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
 
   if( !channelSyncUpdates.length ) {
     console.log( 'Exiting sync: no channels to update' )
+    yield put ( existingPermanentChannelsSynched( {
+      successful: true
+    } ) )
     return
   }
 

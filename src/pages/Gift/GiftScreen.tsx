@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  Alert,
   Image,
   ImageBackground,
   Platform,
@@ -582,14 +583,14 @@ class GiftScreen extends React.Component<
     this.setState( {
       showVerification: false
     }, async()=>{
-      // this.props.navigation.navigate( 'ClaimSats', {
-      //   fromClaimFlow: 1
-      // } )
       const { response, error } = await this.withModal( async ()=>{
         const cardData = await this.card.first_look()
-        const { addr:address } = await this.card.address( true, false, 0 )
+        const { addr:address } = await this.card.address( true, false, cardData.active_slot )
         const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
-        const { balance } = data
+        const { balance, unconfirmed_balance } = data
+        if( unconfirmed_balance > 0 ){
+          Alert.alert( 'There are unconfirmed balance on the current slot' )
+        }
         console.log( {
           num_slots:cardData.num_slots,
           active_slot:cardData.active_slot,
@@ -724,24 +725,27 @@ class GiftScreen extends React.Component<
             //   />
             // }
             contentContainerStyle={{
-              flex: 1, paddingHorizontal: 38, paddingBottom: 20
+              // flex: 1,
+              paddingHorizontal: 38, paddingBottom: 20
             }}
           >
             <GiftBoxComponent
               titleText={'Create New Gift'}
               subTitleText={this.strings[ 'giftSubTextF&F' ]}
-              onPress={() => this.props.navigation.navigate( 'CreateGift', {
+              onPress={() => {
+
+                this.props.navigation.navigate( 'CreateGift', {
                 // setActiveTab: buttonPress
-              } )}
+                } )}}
               image={<Add_gifts />}
             />
             <GiftBoxComponent
               titleText={'Available Gifts'}
-              subTitleText={'All the gifts you have created, not sent, and gifts you have received are shown here'}
-              onPress={() => this.props.navigation.navigate( 'ManageGifts' )}
+              subTitleText={'All the gifts you have created, not sent, \nand gifts you have received are shown here'}
+              onPress={() => this.props.navigation.navigate( 'ManageGifts',{giftType : '0'} )}
               image={<Gifts />}
             />
-            {/* <GiftBoxComponent
+            <GiftBoxComponent
               titleText={'Claim SATSCARD'}
               scTitleText={'TM'}
               subTitleText={'Move sats from your SATSCARD'}
@@ -751,7 +755,7 @@ class GiftScreen extends React.Component<
                 showVerification:true
               } )}
               image={<Sat_card/>}
-            /> */}
+            />
           </ScrollView>
         </View>
         {showLoader ? <Loader /> : null}
@@ -760,7 +764,7 @@ class GiftScreen extends React.Component<
         } ) }} visible={this.state.showAlertModal} closeBottomSheet={() => { }}>
           <AlertModalContents
             info={this.state.errorMessage != '' ? this.state.errorMessage : 'SatCards not detected'}
-            proceedButtonText={ this.state.errorMessage == 'Sorry, this device doesn\'t support NFC' ?'Ok' : 'Try again'}
+            proceedButtonText={ this.state.errorMessage == 'Sorry, this device doesn\'t support NFC' ?'Ok' : 'Ok'}
             onPressProceed={() => {
               this.setState( {
                 showAlertModal: false
