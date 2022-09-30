@@ -636,7 +636,7 @@ const styles = StyleSheet.create( {
     borderRadius: wp( 9 ) / 2,
   },
   bottomButton: {
-    backgroundColor: Colors.lightBlue,
+    backgroundColor: Colors.darkBlue,
     height: wp( '13%' ),
     width: '40%',
     borderRadius: 10,
