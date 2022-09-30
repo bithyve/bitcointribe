@@ -76,7 +76,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
   const [ selectedAccount, setSelectedAccount ]: [AccountShell, any] = useState( defaultGiftAccount )
   const account: Account = accountState.accounts[ selectedAccount.primarySubAccount.id ]
   const [ showErrorLoader, setShowErrorLoader ] = useState( false )
-  const [ spendCode, setSpendCode ] = useState( '304577' )
+  const [ spendCode, setSpendCode ] = useState( '' )
   const [ isExclusive, setIsExclusive ] = useState( true )
   const [ showGiftModal, setShowGiftModal ] = useState( false )
   const [ showGiftFailureModal, setShowGiftFailureModal ] = useState( false )
