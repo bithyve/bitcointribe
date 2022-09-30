@@ -57,7 +57,7 @@ export default function VerifySatModalContents( props ) {
                   fontSize: RFValue( 18 ),
                   fontFamily: Fonts.FiraSansRegular,
                   letterSpacing: 0.01,
-                  marginTop: RFValue( 20 )
+                  // marginTop: RFValue( 20 )
                 // width: wp( 65 )
                 }}
               >
