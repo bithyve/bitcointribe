@@ -539,8 +539,22 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
             <Text style={styles.contactText}>{common['knowMore']}</Text>
 
           </TouchableOpacity> */}
-          <TouchableOpacity onPress={() => showEncryptionPswd(false)}> 
-            <Text style={{fontSize: RFValue(18), alignSelf: 'flex-end', marginRight: 15}}>x</Text> 
+          <TouchableOpacity
+            style={{
+              justifyContent: 'center', alignItems: 'center',
+              backgroundColor: Colors.lightBlue,
+              height: 30,
+              width: 30,
+              borderRadius: 15,
+              padding: 4,
+              marginHorizontal: 10,
+              marginTop: 10,
+              alignSelf: 'flex-end'
+            }}
+            activeOpacity={10}
+            onPress={() => showEncryptionPswd(false)}
+          >
+            <FontAwesome name="close" color={Colors.white} size={19} />
           </TouchableOpacity>
           <Text style={{
             // marginBottom: wp( '%' ),

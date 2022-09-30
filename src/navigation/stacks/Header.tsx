@@ -473,10 +473,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           break
         case NotificationType.FNF_REQUEST:
         case NotificationType.FNF_REQUEST_ACCEPTED:
+          this.moveToContactDetails( message.additionalInfo.channelKey, 'Contact' )
+          break
         case NotificationType.FNF_REQUEST_REJECTED:
         case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
+          this.moveToContactDetails( message.additionalInfo.channelKey,'I am the Keeper of' )
+          break
         case NotificationType.FNF_KEEPER_REQUEST_REJECTED:
         case 'contact':
+          if (message.additionalInfo.txid !== undefined) {
+            this.moveToAccount(message.additionalInfo.type)
+          }
+          break
         case NotificationType.SECURE_XPUB:
         case NotificationType.APPROVE_KEEPER:
         case NotificationType.UPLOAD_SEC_SHARE:
@@ -485,8 +493,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case NotificationType.SM_UPLOADED_FOR_PK:
         case NotificationType.NEW_KEEPER_INFO:
         case NotificationType.GIFT_ACCEPTED:
+          this.closeBottomSheet();
+          this.props.navigation.navigate( 'ManageGifts', {giftType : '1'});
+          break
         case NotificationType.GIFT_REJECTED:
-          console.log( 'message.AdditionalInfo', message.additionalInfo )
+          // console.log( 'message.AdditionalInfo', message.additionalInfo )
           this.setState( {
             notificationTitle: message.title,
             notificationInfo: message.info,
@@ -497,7 +508,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             isIgnoreButton: false,
             notificationType: message.type
           }, () => {
-            this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
+            this.closeBottomSheet();
+            this.props.navigation.navigate( 'ManageGifts', {giftType : '1'});
           } )
           break
         case NotificationType.FNF_TRANSACTION:
@@ -511,7 +523,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             isIgnoreButton: false,
             notificationType: message.type
           }, () => {
-            this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
+            this.moveToAccount( message.additionalInfo.txid )
           } )
           break
         case NotificationType.RELEASE:
@@ -1349,6 +1361,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   moveToContactDetails = ( channelKey, type ) => {
+    this.closeBottomSheet();
     const contactData = makeContactRecipientDescription(
       channelKey,
       this.props.trustedContacts[ channelKey ],
@@ -1363,6 +1376,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   moveToAccount = ( txid ) => {
     if (txid !== undefined && txid !== null) {
+      this.closeBottomSheet();
       this.props.navigation.navigate( 'AccountDetails', {
         accountShellID: this.props.accountShells[txid].id,
         swanDeepLinkContent: this.props.swanDeepLinkContent
@@ -1378,6 +1392,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const accountShell = this.props.accountShells[1];
     let transaction = accountShell.primarySubAccount.transactions.find(tx => tx.txid === notificationAdditionalInfo.txid);
     console.log("primarySubAccountShell "+ JSON.stringify(transaction));
+    this.closeBottomSheet();
     // alert(JSON.stringify(accountShell.primarySubAccount));
 
     // console.log("bhumika " +JSON.stringify(this.props.accountShells))
@@ -1597,11 +1612,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       break
 
                       case NotificationType.GIFT_ACCEPTED:
-                        this.props.navigation.navigate( 'ManageGifts');
+                        this.closeBottomSheet();
+                        this.props.navigation.navigate( 'ManageGifts', {giftType : '1'});
                       break
 
                       case NotificationType.GIFT_REJECTED:
-                        this.props.navigation.navigate( 'ManageGifts');
+                        this.closeBottomSheet();
+                        this.props.navigation.navigate( 'ManageGifts', {giftType : '1'});
                       break
 
                     case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:

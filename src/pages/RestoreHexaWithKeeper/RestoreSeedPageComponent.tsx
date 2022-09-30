@@ -67,6 +67,8 @@ const RestoreSeedPageComponent = ( props ) => {
   const [ currentPosition, setCurrentPosition ] = useState( 0 )
   const [ showAlertModal, setShowAlertModal ] = useState( false )
   const [ extraSeeds, setExtraSeeds ]=useState( false )
+  const [ suggestedWords, setSuggestedWords ] = useState( [ ] )
+  const [ onChangeIndex, setOnChangeIndex ] = useState( -1 )
 
   const width = Dimensions.get( 'window' ).width
   const ref = React.useRef<PagerView>( null )
@@ -112,6 +114,11 @@ const RestoreSeedPageComponent = ( props ) => {
     const nextPosition = currentPosition+1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
+  }
+
+  const getSuggestedWords = ( text ) => {
+    const filteredData = props.mnemonicSuggestions.filter( data => data.toLowerCase().startsWith( text ) )
+    setSuggestedWords( filteredData )
   }
 
   const onCheckPressed = () => {
@@ -201,6 +208,24 @@ const RestoreSeedPageComponent = ( props ) => {
     return newIndex
   }
 
+  const getPosition = ( index ) => {
+    switch ( index ) {
+        case 0:
+        case 1:
+          return 1
+
+        case 2:
+        case 3:
+          return 2
+
+        case 4:
+        case 5:
+          return 3
+
+        default:
+          break
+    }
+  }
 
   const onPageScroll = useMemo(
     () =>
@@ -231,6 +256,7 @@ const RestoreSeedPageComponent = ( props ) => {
         {
           listener: ( { nativeEvent: { position } } ) => {
             setCurrentPosition( position )
+            setSuggestedWords( [] )
           },
           useNativeDriver: true,
         }
@@ -264,7 +290,7 @@ const RestoreSeedPageComponent = ( props ) => {
                   showsVerticalScrollIndicator={false}
                   numColumns={2}
                   contentContainerStyle={{
-                    marginStart:15
+                    marginStart:15, zIndex:-100
                   }}
                   renderItem={( { value, index } ) => {
                     return (
@@ -281,20 +307,32 @@ const RestoreSeedPageComponent = ( props ) => {
                           ]}
                           placeholder={`Enter ${getPlaceholder( getIndex( index, seedIndex ) )} word`}
                           placeholderTextColor={Colors.borderColor}
-                          // value={partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name}
-                          value={value?.name}
-                          autoCompleteType="off"
+                          value={partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name}
+                          // value={value}
+                          // autoCompleteType="off"
+                          keyboardType='ascii-capable'
                           textContentType="none"
                           returnKeyType="next"
                           autoCorrect={false}
                           // editable={isEditable}
                           autoCapitalize="none"
-                          // onSubmitEditing={() =>
-                          // }
+                          onSubmitEditing={() =>{
+                            setSuggestedWords( [] )
+                          }}
+                          onFocus={()=>{
+                            setSuggestedWords( [] )
+                            setOnChangeIndex( index )
+                          }}
                           onChangeText={( text ) => {
                             const data = [ ...partialSeedData ]
                             data[ currentPosition ][ getTextIndex( index ) ].name = text.trim()
                             setPartialSeedData( data )
+                            if( text.length > 1 ){
+                              setOnChangeIndex( index )
+                              getSuggestedWords( text.toLowerCase() )
+                            } else {
+                              setSuggestedWords( [] )
+                            }
                           }}
                         />
                       </TouchableOpacity>
@@ -310,6 +348,43 @@ const RestoreSeedPageComponent = ( props ) => {
                     } }>{'I have 24 seed words'}</Text>
                   </TouchableOpacity>}
                 />
+                {
+                  suggestedWords?.length > 0 ?
+                    <View style={{
+                      zIndex:1, position:'absolute',
+                      // width:'80%',
+                      flex:1,
+                      // minHeight:50,
+                      left:50,
+                      right:20,
+                      marginTop: ( getPosition( onChangeIndex ) ) * 65,
+                      flexDirection:'row',
+                      backgroundColor:'white',
+                      padding: 10,
+                      borderRadius: 10,
+                      flexWrap:'wrap'
+                    }}>
+                      {suggestedWords.map( ( word, wordIndex ) => {
+                        return(
+                          <TouchableOpacity key={wordIndex} style={{
+                            backgroundColor: Colors.lightBlue, padding: 5, borderRadius: 5,
+                            margin: 5
+                          }} onPress={() => {
+                            const data = [ ...partialSeedData ]
+                            data[ currentPosition ][ getTextIndex( onChangeIndex ) ].name = word
+                            console.log( 'skk seed data', JSON.stringify( data ) )
+                            setPartialSeedData( data )
+                            setSuggestedWords( [] )
+                          }}>
+                            <Text style={{
+                              color: Colors.white
+                            }}>{word}</Text>
+                          </TouchableOpacity>
+                        )
+                      } )}
+                    </View>
+                    :null
+                }
                 {/* <BottomInfoBox
                   backgroundColor={Colors.white}
                   title={props.infoBoxTitle}

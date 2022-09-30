@@ -11,6 +11,7 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import { ScrollView } from 'react-native-gesture-handler'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { translations } from '../../common/content/LocContext'
+import CrossButton from '../../assets/images/svgs/icons_close.svg'
 
 export default function DonationAccountKnowMoreSheetContents( props ) {
   const scrollViewRef = useRef<ScrollView>()
@@ -23,13 +24,24 @@ export default function DonationAccountKnowMoreSheetContents( props ) {
       <View style={{
         height: hp( 81 )
       }}>
-        <AppBottomSheetTouchableWrapper
+        <View
           style={styles.viewStyle}
-          activeOpacity={10}
-          onPress={() => props.titleClicked && props.titleClicked()}
         >
           <Text style={styles.headerText}>Donation Account</Text>
-        </AppBottomSheetTouchableWrapper>
+          <AppBottomSheetTouchableWrapper style={{
+            width: wp(8),
+            height: wp(8),
+            borderRadius: wp(4),
+            backgroundColor: Colors.lightBlue,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: wp(2),
+            marginLeft: -wp(10)
+          }}
+          onPress={() => props.titleClicked && props.titleClicked()}>
+            <CrossButton />
+          </AppBottomSheetTouchableWrapper>
+        </View>
 
         <View style={styles.headerSeparator} />
 
@@ -139,6 +151,8 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 20 ),
     marginTop: hp( '1%' ),
     marginBottom: hp( '1%' ),
+    textAlign: 'center',
+    flex: 1
   },
   headerSeparator: {
     backgroundColor: Colors.homepageButtonColor,
@@ -200,6 +214,7 @@ const styles = StyleSheet.create( {
   },
   viewStyle: {
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    flexDirection: 'row'
   },
 } )

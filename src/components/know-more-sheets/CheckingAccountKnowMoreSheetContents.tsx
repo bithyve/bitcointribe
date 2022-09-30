@@ -12,6 +12,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import openLink from '../../utils/OpenLink'
 import { ScrollView } from 'react-native-gesture-handler'
 import { translations } from '../../common/content/LocContext'
+import CrossButton from '../../assets/images/svgs/icons_close.svg'
 
 export default function CheckingAccountKnowMoreSheetContents( props ) {
   const scrollViewRef = useRef<ScrollView>()
@@ -24,15 +25,26 @@ export default function CheckingAccountKnowMoreSheetContents( props ) {
       <View style={{
         height: hp( 81 )
       }}>
-        <AppBottomSheetTouchableWrapper
+        <View
           style={{
-            justifyContent: 'center', alignItems: 'center'
+            flexDirection: 'row', justifyContent: 'center', alignItems: 'center'
           }}
-          activeOpacity={10}
-          onPress={() => props.titleClicked && props.titleClicked()}
         >
           <Text style={styles.headerText}>Checking Account</Text>
-        </AppBottomSheetTouchableWrapper>
+          <AppBottomSheetTouchableWrapper style={{
+            width: wp(8),
+            height: wp(8),
+            borderRadius: wp(4),
+            backgroundColor: Colors.lightBlue,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: wp(2),
+            marginLeft: -wp(10)
+          }}
+          onPress={() => props.titleClicked && props.titleClicked()}>
+            <CrossButton />
+          </AppBottomSheetTouchableWrapper>
+        </View>
         <View style={styles.headerSeparator} />
         <ScrollView
           ref={scrollViewRef}
@@ -194,6 +206,8 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 20 ),
     marginTop: hp( '2%' ),
     marginBottom: hp( '1%' ),
+    flex: 1,
+    textAlign: 'center'
   },
   headerSeparator: {
     backgroundColor: Colors.homepageButtonColor,

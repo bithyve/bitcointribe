@@ -68,11 +68,6 @@
       "Incorrect": "Code d'accès incorrect, réessayez !",
       "loaderMessages": [
           {
-              "heading": "Compte d'épargne",
-              "text": "Le compte d'épargne se déverrouille une fois que votre sauvegarde est au niveau 2. Configurez également votre code 2FA sur une application d'authentification",
-              "subText": ""
-          },
-          {
               "heading": "Achats non-custodial",
               "text": "Recevez des sats directement dans votre portefeuille à partir d'échanges compatibles",
               "subText": ""
@@ -80,11 +75,6 @@
           {
               "heading": "Amis & Famille",
               "text": "Ajoutez des contacts à Hexa et envoyez des sats sans demander leur adresse de portefeuille à chaque fois",
-              "subText": ""
-          },
-          {
-              "heading": "Comptes de dons",
-              "text": "Commencez à recevoir des dons directement dans votre portefeuille Hexa, de n'importe où dans le monde",
               "subText": ""
           },
           {
