@@ -97,6 +97,27 @@ This will work when Android development environment is setup correctly. Further 
 4. If Apple id or google id is not setup in the simulator then cloud backup will not work and cloud errors will be seen in the console.
 5. Scanner will not work in a simulator so a device will be required to test and debug scanner related features.
 
+## Reproducible builds
+
+You'll need Docker installed to be able to build the app this way:
+
+1. Clone Hexa git for the branch/tag that you want to build. For example: `git clone --depth 1 --branch v2.0.90 git@github.com:bithyve/hexa.git`
+    You can also remove the `--branch v2.0.90` parameter to build APKs for `master`.
+2. Change to the hexa directory: `cd hexa`
+3. Execute the build script: `./build.sh`
+4. If everything goes well, the script will print the SHA256 for the release APK. You can compare checksums with the ones provided on the [GitHub releases page](https://github.com/bithyve/hexa/releases)
+5. Download the oficial apk from [GitHub releases page](https://github.com/bithyve/hexa/releases)
+6. Compare both APKs with a suitable utility like `diffoscope`, `apksigcopier` or by unpacking apks and running `diff --brief --recursive ./unpacked_oficial_apk ./unpacked_built_apk`. You should only get differences for the certificates used to sign the official APK
+
+This procedure is primarily intended for confirming that the binaries that you can download from the [GitHub releases page](https://github.com/bithyve/hexa/releases) are produced from the sources at our repository. If you want to install the APK built this way onto your own smartphone, you'll need to sign it yourself (see next section). Note that the first time you install a build made using this procedure, you'll need to uninstall your current version of Hexa and then install the one built here because certificates will not match. CAUTION, because you'll need to make a backup of your wallets before uninstalling or you could lose funds!
+
+### Signing APKs
+
+1. Install signing utilities: `apt-get install -y apksigner`
+2. Create your certificate, if you haven't done so already. If you already have the certificate from previous builds, it's advised that you use the same one so you are able to upgrade from one APK to the next one without reinstalling first: `keytool -genkeypair -alias hexa -keystore hexa.pfx -v -storetype PKCS12 -keyalg RSA -keysize 2048 -storepass your_keystore_password -keypass your_key_password -validity 10000 -dname "cn=Unknown, ou=Unknown, o=Unknown, c=Unknown"`
+3. Sign the chosen APK file using this command: `java -jar /usr/bin/apksigner sign -v --ks hexa.pfx --ks-key-alias hexa --ks-pass pass:your_keystore_password --key-pass pass:your_key_password hexa-production.apk`
+4. Copy the signed APK to your smartphone and install it by tapping over the file. If you get an error, you'll have to uninstall your currently installed version of Hexa first. Note that you need to backup your wallets before uninstalling the previous version or you risk losing access to the wallet and losing funds.
+
 ## Verify Authenticity of Android APK
 
 Please download and keep all these files in the same location: `Android APK file, SHA256SUM.asc, HEXA_DETACHED_SIGN.sign`. Make a copy of `Android APK file` and rename it as `Android APK clone`.
