@@ -20,8 +20,6 @@ import ModalContainer from '../../components/home/ModalContainer'
 import CrossButton from '../../assets/images/svgs/icons_close.svg'
 import { toggleClipboardAccess } from '../../store/actions/misc'
 import { onPressKeeper } from '../../store/actions/BHR'
-import RestClient, { TorStatus } from '../../services/rest/RestClient'
-import { setTorEnabled } from '../../store/actions/preferences'
 
 export type Props = {
   navigation: any;
@@ -150,35 +148,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
   const [ modalVisible, setModalVisible ] = useState( false )
-  const [ isTorEnabled, setIsTorEnabled ] = useState<TorStatus>(RestClient.getTorStatus())
   const [ message, setMessage ] = useState( '' )
-  
-  const onChangeTorStatus = (status: TorStatus, message) => {
-    setIsTorEnabled(status);
-    if (status === TorStatus.ERROR) {
-      setMessage(message);
-    } else {
-      setMessage('');
-    }
-  };
-
-  useEffect(() => {
-    RestClient.subToTorStatus(onChangeTorStatus);
-    return () => {
-      RestClient.unsubscribe(onChangeTorStatus);
-    };
-  }, []);
-
-  const onToggleTor = () => {
-    if (isTorEnabled === TorStatus.CONNECTED) {
-      RestClient.setUseTor(false);
-      dispatch(setTorEnabled(false));
-    } else {
-      RestClient.setUseTor(true);
-      // showToast('Connecting to Tor');
-      dispatch(setTorEnabled(true));
-    }
-  };
 
   const defaultKeeperObj: {
     shareType: string
@@ -578,31 +548,6 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 resizeMode: 'contain',
                 marginLeft: 'auto'
               }}
-            />
-          </TouchableOpacity>
-          {/* enable tor toggle */}
-          <TouchableOpacity style={styles.otherCards}>
-            <Telegram />
-            <View style={{
-              marginLeft: 10,
-              flex: 1
-            }}>
-              <Text style={styles.addModalTitleText}>
-                {'Enable Tor'}
-              </Text>
-              <Text style={styles.addModalInfoText}>
-                {`Status: ${isTorEnabled}`}
-              </Text>
-
-            </View>
-             <Switch
-              value={isTorEnabled === TorStatus.CONNECTED}
-              onValueChange={onToggleTor}
-              thumbColor={isTorEnabled ? Colors.blue : Colors.white}
-              trackColor={{
-                false: Colors.borderColor, true: Colors.lightBlue
-              }}
-              onTintColor={Colors.blue}
             />
           </TouchableOpacity>
           {/* </View> */}

@@ -2,7 +2,7 @@ import { createAction } from 'redux-actions'
 import { UPDATE_APP_PREFERENCE } from '../constants'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { Action } from 'redux'
-import { TorStatus } from '../../services/rest/RestClient'
+// import { TorStatus } from '../../services/rest/RestClient'
 
 export const CARD_DATA = 'CARD_DATA'
 export const CURRENCY_CODE = 'CURRENCY_CODE'

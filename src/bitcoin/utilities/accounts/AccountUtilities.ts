@@ -13,7 +13,6 @@ import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import { BH_AXIOS, SIGNING_AXIOS } from '../../../services/api'
 import idx from 'idx'
 import { generateRandomString } from '../../../common/CommonFunctions'
-import RestClient from '../../../services/rest/RestClient'
 
 
 const { REQUEST_TIMEOUT } = config
@@ -408,7 +407,7 @@ export default class AccountUtilities {
     {
       balance: string
     }> => {
-    let res;
+    let res: AxiosResponse;
     try {
       const accountToAddressMapping = {
       }
@@ -421,12 +420,12 @@ export default class AccountUtilities {
       let usedFallBack = false
       try{
         if ( network === bitcoinJS.networks.testnet ) {
-          res = await RestClient.post(
+          res = await BH_AXIOS.post(
             config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
             accountToAddressMapping,
           )
         } else {
-          res = await RestClient.post(
+          res = await BH_AXIOS.post(
             config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
             accountToAddressMapping,
           )
@@ -547,7 +546,7 @@ export default class AccountUtilities {
     }
    }
   }> => {
-    let res;
+    let res: AxiosResponse;
     try {
       const accountToAddressMapping = {
       }
@@ -589,12 +588,12 @@ export default class AccountUtilities {
       let usedFallBack = false
       try{
         if ( network === bitcoinJS.networks.testnet ) {
-          res = await RestClient.post(
+          res = await BH_AXIOS.post(
             config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
             accountToAddressMapping,
           )
         } else {
-          res = await RestClient.post(
+          res = await BH_AXIOS.post(
             config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
             accountToAddressMapping,
           )
@@ -610,12 +609,12 @@ export default class AccountUtilities {
 
         usedFallBack = true
         if ( network === bitcoinJS.networks.testnet ) {
-          res = await RestClient.post(
+          res = await BH_AXIOS.post(
             config.BITHYVE_ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
             accountToAddressMapping,
           )
         } else {
-          res = await RestClient.post(
+          res = await BH_AXIOS.post(
             config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
             accountToAddressMapping,
           )
@@ -853,12 +852,12 @@ export default class AccountUtilities {
     let res
     try{
       if ( network === bitcoinJS.networks.testnet ) {
-        res = await RestClient.post(
+        res = await BH_AXIOS.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
           accountToAddressMapping,
         )
       } else {
-        res = await RestClient.post(
+        res = await BH_AXIOS.post(
           config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
           accountToAddressMapping,
         )
@@ -902,17 +901,17 @@ export default class AccountUtilities {
     const txCounts = {
     }
     try {
-      let res;
+      let res: AxiosResponse;
       try {
         if ( network === bitcoinJS.networks.testnet ) {
-          res = await RestClient.post(
+          res = await BH_AXIOS.post(
             config.ESPLORA_API_ENDPOINTS.TESTNET.MULTITXN,
             {
               addresses,
             },
           )
         } else {
-          res = await RestClient.post(
+          res = await BH_AXIOS.post(
             config.ESPLORA_API_ENDPOINTS.MAINNET.MULTITXN,
             {
               addresses,
@@ -973,10 +972,10 @@ export default class AccountUtilities {
   ): Promise<{
     txid: string;
   }> => {
-    let res;
+    let res: AxiosResponse;
     try {
       if ( network === bitcoinJS.networks.testnet ) {
-        res = await RestClient.post(
+        res = await BH_AXIOS.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
           txHex,
           {
@@ -986,7 +985,7 @@ export default class AccountUtilities {
           },
         )
       } else {
-        res = await RestClient.post(
+        res = await BH_AXIOS.post(
           config.ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX,
           txHex,
           {
@@ -1008,7 +1007,7 @@ export default class AccountUtilities {
         console.log( 'using Hexa node as fallback(tx-broadcast)' )
         try {
           if ( network === bitcoinJS.networks.testnet ) {
-            res = await RestClient.post(
+            res = await BH_AXIOS.post(
               config.BITHYVE_ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
               txHex,
               {
@@ -1018,7 +1017,7 @@ export default class AccountUtilities {
               },
             )
           } else {
-            res = await RestClient.post(
+            res = await BH_AXIOS.post(
               config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX,
               txHex,
               {
@@ -1052,7 +1051,7 @@ export default class AccountUtilities {
     }
     const amount = 10000 / SATOSHIS_IN_BTC
     try {
-      const res = await RestClient.post( `${config.RELAY}/testnetFaucet`, {
+      const res = await BH_AXIOS.post( `${config.RELAY}/testnetFaucet`, {
         HEXA_ID: config.HEXA_ID,
         recipientAddress,
         amount,
@@ -1208,9 +1207,9 @@ export default class AccountUtilities {
       xpubs.push( ( account as MultiSigAccount ).xpubs.bithyve )
     }
 
-    let res;
+    let res: AxiosResponse;
     try {
-      res = await RestClient.post( 'setupDonationAccount', {
+      res = await BH_AXIOS.post( 'setupDonationAccount', {
         HEXA_ID: config.HEXA_ID,
         donationId: account.id.slice( 0, 15 ),
         walletID: account.walletId,
@@ -1251,9 +1250,9 @@ export default class AccountUtilities {
     },
   ): Promise<{ updated: boolean, updatedAccount: DonationAccount }> => {
 
-    let res;
+    let res: AxiosResponse;
     try {
-      res = await RestClient.post( 'updatePreferences', {
+      res = await BH_AXIOS.post( 'updatePreferences', {
         HEXA_ID: config.HEXA_ID,
         donationId: account.id.slice( 0, 15 ),
         walletID: account.walletId,
@@ -1304,9 +1303,9 @@ export default class AccountUtilities {
   }> => {
     // syncs account via xpub-agent(relay)
 
-    let res;
+    let res: AxiosResponse;
     try {
-      res = await RestClient.post( 'fetchXpubInfo', {
+      res = await BH_AXIOS.post( 'fetchXpubInfo', {
         HEXA_ID: config.HEXA_ID,
         xpubId,
         accountType: DONATION_ACCOUNT,

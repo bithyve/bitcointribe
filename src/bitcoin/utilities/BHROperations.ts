@@ -13,7 +13,6 @@ import { BH_AXIOS } from '../../services/api'
 import { generateRandomString } from '../../common/CommonFunctions'
 import moment from 'moment'
 import Relay from './Relay'
-import RestClient from '../../services/rest/RestClient'
 const { HEXA_ID } = config
 
 export default class BHROperations {
@@ -206,9 +205,9 @@ export default class BHROperations {
         .encryptedDynamicNonPMDD,
     }
 
-    let res;
+    let res: AxiosResponse;
     try {
-      res = await RestClient.post( 'updateDynamicNonPMDD', {
+      res = await BH_AXIOS.post( 'updateDynamicNonPMDD', {
         HEXA_ID,
         walletID: walletId,
         encryptedDynamicNonPMDD,
@@ -218,7 +217,7 @@ export default class BHROperations {
       if ( err.code ) throw new Error( err.code )
     }
 
-    const { updated } = res.data || res.json;
+    const { updated } = res.data;
     if ( updated ) {
       return {
         updated,
@@ -233,9 +232,9 @@ export default class BHROperations {
   ): Promise<{
     encryptedDynamicNonPMDD: EncDynamicNonPMDD;
   }> => {
-    let res;
+    let res: AxiosResponse;
     try {
-      res = await RestClient.post( 'downloadDynamicNonPMDD', {
+      res = await BH_AXIOS.post( 'downloadDynamicNonPMDD', {
         HEXA_ID,
         walletID,
       } )
@@ -244,7 +243,7 @@ export default class BHROperations {
       if ( err.code ) throw new Error( err.code )
     }
 
-    const { encryptedDynamicNonPMDD } = res.data || res.json;
+    const { encryptedDynamicNonPMDD } = res.data;
     if ( encryptedDynamicNonPMDD ) {
       return {
         encryptedDynamicNonPMDD,
@@ -286,10 +285,10 @@ export default class BHROperations {
   ): Promise<{
     deleted: boolean;
   }> => {
-    let res;
+    let res: AxiosResponse;
 
     try {
-      res = await RestClient.post( 'affirmDecryption', {
+      res = await BH_AXIOS.post( 'affirmDecryption', {
         HEXA_ID,
         messageId,
       } )
@@ -299,7 +298,7 @@ export default class BHROperations {
     }
 
     return {
-      deleted: res.data.deleted || res.json.deleted
+      deleted: res.data.deleted
     }
   };
 
@@ -352,9 +351,9 @@ export default class BHROperations {
       key,
     )
 
-    let res;
+    let res: AxiosResponse;
     try {
-      res = await RestClient.post( 'uploadShare', {
+      res = await BH_AXIOS.post( 'uploadShare', {
         HEXA_ID,
         share: encryptedMetaShare,
         messageId,
@@ -365,7 +364,7 @@ export default class BHROperations {
       if ( err.code ) throw new Error( err.code )
     }
 
-    const { success } = res.data || res.json;
+    const { success } = res.data
     if ( !success ) {
       throw new Error( 'Unable to upload share' )
     }
@@ -585,9 +584,9 @@ export default class BHROperations {
         }
         levelInfo.push( obj )
       }
-      let res;
+      let res: AxiosResponse;
       try {
-        res = await RestClient.post( 'initLevels', {
+        res = await BH_AXIOS.post( 'initLevels', {
           HEXA_ID,
           walletID: walletId,
           level: _level,
@@ -603,7 +602,7 @@ export default class BHROperations {
       //     this.healthCheckInitializedKeeper = true
       //   }
       return {
-        success: res.data.updateSuccessful || res.json.updateSuccessful,
+        success: res.data.updateSuccessful,
         message: '',
       }
     }
