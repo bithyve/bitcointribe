@@ -8,6 +8,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
+import CrossButton from '../assets/images/svgs/icons_close.svg'
 
 export default function NotificationInfoContents( props ) {
 
@@ -29,51 +30,24 @@ export default function NotificationInfoContents( props ) {
           >
             {props.title}
           </Text>
-          {
-            props.cancelButtonText !== '' && (
-              <AppBottomSheetTouchableWrapper
-                style={{
-                  height: wp( '8%' ),
-                  width: wp( '20%' ),
-                  backgroundColor: Colors.lightBlue,
-                  borderWidth: 1,
-                  borderColor: Colors.borderColor,
-                  borderRadius: 7,
-                  marginLeft: 'auto',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                }}
-                onPress={() => {
-                  props.onPressClose()
-                }
-                }
-              >
-                <Text
-                  onPress={() => {
-                    props.onPressClose()
-                  }
-                  }
-                  style={{
-                    color: Colors.white,
-                    fontSize: RFValue( 12 ),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                    Close
-                </Text>
-                <Image
-                  style={{
-                    width: 12,
-                    height: 12,
-                    resizeMode: 'contain',
-                    marginLeft: 5,
-                  }}
-                  source={require( '../assets/images/icons/icon_remove.png' )}
-                />
-              </AppBottomSheetTouchableWrapper>
-            )
-          }
+          <AppBottomSheetTouchableWrapper
+            style={{
+              height: wp( '8%' ),
+              width: wp( '8%' ),
+              backgroundColor: Colors.lightBlue,
+              borderWidth: 1,
+              borderColor: Colors.borderColor,
+              borderRadius: wp(4),
+              marginLeft: 'auto',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexDirection: 'row',
+            }}
+            onPress={() => {
+              props.onPressClose()
+            }}>
+              <CrossButton />
+          </AppBottomSheetTouchableWrapper>
 
         </View>
 

@@ -68,7 +68,7 @@ function RequestKeyFromContact( props ) {
       const options = Platform.select( {
         default: {
           title,
-          message: `You have a new Hexa app ${props.isKeeper ? 'keeper' : 'Friends and Family'} request from ${walletName}\n\n${shareLink}`,
+          message: `${walletName} wants to add you as ${props.isKeeper ? 'keeper' : 'Friends and Family'} on Hexa. Click on the link below and follow the steps in your Hexa app \n\n${shareLink}`,
         },
       } )
 

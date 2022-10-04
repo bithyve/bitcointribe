@@ -68,11 +68,6 @@
       "Incorrect": "Código de acceso incorrecto, ¡inténtelo de nuevo!",
       "loaderMessages": [
           {
-              "heading": "Cuenta de ahorros",
-              "text": "La cuenta de ahorros se desbloquea una vez que su copia de seguridad está en el nivel 2. Además, configure su código 2FA en una aplicación de autenticación",
-              "subText": ""
-          },
-          {
               "heading": "Compras sin custodia",
               "text": "Obtenga sats directamente en su billetera desde intercambios compatibles",
               "subText": ""
@@ -80,11 +75,6 @@
           {
               "heading": "Amigos y familia",
               "text": "Agregue contactos a Hexa y envíe sats sin pedir la dirección de su billetera cada vez",
-              "subText": ""
-          },
-          {
-              "heading": "Cuentas de donación",
-              "text": "Comience a recibir donaciones directamente en su billetera Hexa, desde cualquier parte del mundo",
               "subText": ""
           },
           {

@@ -261,20 +261,20 @@ const HomeHeader = ( {
           }
         </View>
       }
-      { <Text ellipsizeMode="middle" numberOfLines={1} style={{
+      {/* { <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
-      }}>{ levelData[ 0 ].keeper1.shareType == '' ? 'Confirm backup phrase' : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Wallet backup confirmed' : 'Confirm backup phrase' )}</Text> }
+      }}>{ levelData[ 0 ].keeper1.shareType == '' ? 'Confirm backup phrase' : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Wallet backup confirmed' : 'Confirm backup phrase' )}</Text> } */}
 
-      {/* <Text ellipsizeMode="middle" numberOfLines={1} style={{
+      <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
       }}>{days > 180
-          ? 'Your wallet backup phase is expired'
+          ? 'Wallet backup phrase is expired'
           : days > 150
-            ? 'Wallet backup phase will expire soon'
+            ? 'Wallet backup phrase will expire soon'
             : levelData[ 0 ].keeper1.shareType == ''
               ? strings.Backupyour
               : ( levelData[ 0 ].keeper1.shareType == 'seed'
-                ? 'Wallet backup confirmed' : 'Confirm backup phrase to secure your wallet' )}</Text> */}
+                ? 'Wallet backup confirmed' : 'Confirm backup phrase' )}</Text>
 
       {/* {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
