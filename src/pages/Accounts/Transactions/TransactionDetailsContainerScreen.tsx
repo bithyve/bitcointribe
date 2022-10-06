@@ -106,11 +106,11 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ({ navigation, }: Pro
             isTestAccount={primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT}
             unitTextStyle={{
               ...ListStyles.listItemSubtitle, 
-              marginBottom: 4
+              // marginBottom: 4
             }}
             amountTextStyle={{
               ...ListStyles.listItemSubtitle, 
-              marginBottom: 3,
+              // marginBottom: 3,
               //  marginLeft: -2
             }}
             currencyImageStyle={{
@@ -141,16 +141,16 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ({ navigation, }: Pro
                       isTestAccount={primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT}
                       unitTextStyle={{
                         ...ListStyles.listItemSubtitle, 
-                        marginBottom: 3
+                        // marginBottom: 3
                       }}
                       amountTextStyle={{
                         ...ListStyles.listItemSubtitle, 
-                        marginBottom: -3,
-                         marginLeft: -2,
+                        // marginBottom: -3,
+                        marginLeft: 2,
 
                       }}
                       currencyImageStyle={{
-                        marginBottom: -3
+                        // marginBottom: -3
                       }}
                     />
                   </View>
@@ -183,15 +183,15 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ({ navigation, }: Pro
             isTestAccount={primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT}
             unitTextStyle={{
               ...ListStyles.listItemSubtitle, 
-              marginBottom: 1
+              // marginBottom: 1
             }}
             amountTextStyle={{
               ...ListStyles.listItemSubtitle, 
-              marginBottom: -3, 
-              marginLeft: -2
+              // marginBottom: -3, 
+              marginLeft: 2
             }}
             currencyImageStyle={{
-              marginBottom: -3
+              // marginBottom: -3
             }}
           />
         </View>

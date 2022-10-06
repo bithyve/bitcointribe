@@ -107,8 +107,8 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
       color: textColor,
       ...unitTextStyle,
       fontSize,
-      height: '70%',
-      paddingTop
+      // height: '70%',
+      // paddingTop
     }
   }, [ unitTextStyle ] )
 
@@ -167,7 +167,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
         {formattedBalanceText}
       </Text>
       <Text style={[unitTextStyles, {
-        textAlignVertical: verticalAlignUnit
+        // textAlignVertical: verticalAlignUnit
       }]}>{`${formattedUnitText}`}</Text>
     </View>
   )
