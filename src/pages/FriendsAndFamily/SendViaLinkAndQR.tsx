@@ -237,16 +237,16 @@ export default function SendViaLinkAndQR( props ) {
             message: 'Scan the QR and receive bitcoin in your Hexa 2.0 bitcoin wallet.',
             url: `file://${uri}`,
           },
-          ios: {
-            activityItemSources: [
-              {
-                placeholderItem: {
-                  type: 'url',
-                  content: `file://${uri}`,
-                },
-              }
-            ],
-          }
+          // ios: {
+          //   activityItemSources: [
+          //     {
+          //       placeholderItem: {
+          //         type: 'url',
+          //         content: `file://${uri}`,
+          //       },
+          //     }
+          //   ],
+          // }
         }, )
       )
         .then( ( res ) => {
