@@ -86,6 +86,11 @@
               "heading": "Satoshis oder Sats",
               "text": "1 Bitcoin = 100 Millionen Satoshis oder Sats",
               "subText": "Hexa nutzt sats, um die Verwendung von Bitcoin zu erleichtern"
+          },
+          {
+            "heading": "Nu gave med SATSCARD",
+            "text": "Brug SATSCARD til at sende og modtage gaver med dine kære",
+            "subText": ""
           }
       ],
       "Hello": "Hallo!",
