@@ -16,7 +16,9 @@ import {
   INITIAL_KNOW_MORE_SEND_SHEET_SHOWN,
   IS_PERMISSION_SET,
   UPDATE_LAST_SEEN,
-  SET_CONTACT_PERMISSION_ASKED
+  SET_CONTACT_PERMISSION_ASKED,
+  SET_TOR_ENABLED,
+
 } from '../actions/preferences'
 import { UPDATE_APP_PREFERENCE } from '../constants'
 import ip, { chain } from 'icepick'
@@ -47,6 +49,7 @@ const initialState = ip.freeze( {
   isPermissionSet: false,
   walletId: null,
   contactPermissionAsked: false,
+  torEnabled: false
 } )
 
 export default ( state = initialState, { type, payload } ) => {
@@ -160,6 +163,11 @@ export default ( state = initialState, { type, payload } ) => {
           ...state,
           walletId: payload.walletId,
         }
+        case SET_TOR_ENABLED:
+          return {
+            ...state,
+            torEnabled: payload.state,
+          }
       default:
         return state
   }

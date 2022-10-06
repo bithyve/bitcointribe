@@ -1,12 +1,11 @@
-import { AxiosResponse } from 'axios'
 import config from '../HexaConfig'
 import { Gift, GiftMetaData, INotification, NewWalletImage } from './Interface'
-import { BH_AXIOS } from '../../services/api'
 import idx from 'idx'
-import crypto from 'crypto'
 import TrustedContactsOperations from './TrustedContactsOperations'
+import { BH_AXIOS } from '../../services/api'
+import { AxiosResponse } from 'axios'
 
-const { HEXA_ID } = config
+const { HEXA_ID, RELAY } = config
 export default class Relay {
   public static checkCompatibility = async (
     method: string,
@@ -20,7 +19,7 @@ export default class Relay {
   }> => {
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post( 'checkCompatibility', {
+      res = await BH_AXIOS.post( `${RELAY}checkCompatibility`, {
         HEXA_ID,
         method,
         version,
@@ -42,7 +41,7 @@ export default class Relay {
   }> => {
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post( 'fetchReleases', {
+      res = await BH_AXIOS.post( `${RELAY}fetchReleases`, {
         HEXA_ID,
         build,
       } )
@@ -66,7 +65,7 @@ export default class Relay {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'updateFCMTokens', {
+        res = await BH_AXIOS.post( `${RELAY}updateFCMTokens`, {
           HEXA_ID,
           walletID,
           FCMs,
@@ -89,7 +88,7 @@ export default class Relay {
   }> => {
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post( 'fetchNotifications', {
+      res = await BH_AXIOS.post( `${RELAY}fetchNotifications`, {
         HEXA_ID,
         walletID,
       } )
@@ -120,7 +119,7 @@ export default class Relay {
         throw new Error( 'Failed to deliver notification: receivers missing' )
 
       try {
-        res = await BH_AXIOS.post( 'sendNotifications', {
+        res = await BH_AXIOS.post( `${RELAY}sendNotifications`, {
           HEXA_ID,
           receivers,
           notification,
@@ -155,7 +154,7 @@ export default class Relay {
       if ( !txNote || !txNote.txId || !txNote.note )
         throw new Error( 'Failed to send donation note: txid|note missing' )
 
-      const res: AxiosResponse = await BH_AXIOS.post( 'addDonationTxNote', {
+      const res: AxiosResponse = await BH_AXIOS.post( `${RELAY}addDonationTxNote`, {
         HEXA_ID,
         donationId,
         txNote,
@@ -177,9 +176,9 @@ export default class Relay {
     averageTxFees: any;
   }> => {
     try {
-      let res: AxiosResponse
+      let res
       try {
-        res = await BH_AXIOS.post( 'fetchFeeAndExchangeRates', {
+        res = await BH_AXIOS.post( `${RELAY}fetchFeeAndExchangeRates`, {
           HEXA_ID,
           currencyCode
         } )
@@ -194,6 +193,7 @@ export default class Relay {
         exchangeRates, averageTxFees
       }
     } catch ( err ) {
+      console.log( 'exrate', err )
       throw new Error( 'Failed fetch fee and exchange rates' )
     }
   };
@@ -206,7 +206,7 @@ export default class Relay {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'claimCampaignGift', {
+        res = await BH_AXIOS.post( `${RELAY}claimCampaignGift`, {
           HEXA_ID,
           campaignId: campaignId,
           walletID,
@@ -233,7 +233,7 @@ export default class Relay {
         notification,
       }
       try {
-        res = await BH_AXIOS.post( 'sendKeeperNotifications', {
+        res = await BH_AXIOS.post( `${RELAY}sendKeeperNotifications`, {
           HEXA_ID,
           receivers,
           notification,
@@ -261,7 +261,7 @@ export default class Relay {
   }> => {
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post( 'getMessages', {
+      res = await BH_AXIOS.post( `${RELAY}getMessages`, {
         HEXA_ID,
         walletID,
         timeStamp
@@ -289,7 +289,7 @@ export default class Relay {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'updateMessages', {
+        res = await BH_AXIOS.post( `${RELAY}updateMessages`, {
           HEXA_ID,
           walletID,
           data,
@@ -313,7 +313,7 @@ export default class Relay {
     exchangeRates: { [currency: string]: number };
     averageTxFees: any;
   }> => {
-    const res = await BH_AXIOS.post( 'v2/walletCheckIn', {
+    const res = await BH_AXIOS.post( `${RELAY}v2/walletCheckIn`, {
       HEXA_ID,
       ...currencyCode && {
         currencyCode
@@ -343,7 +343,7 @@ export default class Relay {
       message?: undefined;
     }  > => {
     try {
-      const res: AxiosResponse = await BH_AXIOS.post( 'v2/updateWalletImage', {
+      const res: AxiosResponse = await BH_AXIOS.post( `${RELAY}v2/updateWalletImage`, {
         HEXA_ID,
         walletID: walletImage.walletId,
         walletImage,
@@ -364,7 +364,7 @@ export default class Relay {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'v2/fetchWalletImage', {
+        res = await BH_AXIOS.post( `${RELAY}v2/fetchWalletImage`, {
           HEXA_ID,
           walletID: walletId,
         } )
@@ -389,7 +389,7 @@ export default class Relay {
       const encryptedGift = TrustedContactsOperations.encryptViaPsuedoKey( JSON.stringify( gift ), encryptionKey )
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'updateGiftChannel', {
+        res = await BH_AXIOS.post( `${RELAY}updateGiftChannel`, {
           HEXA_ID,
           channelAddress: gift.channelAddress,
           encryptedGift,
@@ -417,7 +417,7 @@ export default class Relay {
 
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'fetchGiftChannel', {
+        res = await BH_AXIOS.post( `${RELAY}fetchGiftChannel`, {
           HEXA_ID,
           channelAddress,
         } )
@@ -455,7 +455,7 @@ export default class Relay {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'syncGiftChannelsMetaData', {
+        res = await BH_AXIOS.post( `${RELAY}syncGiftChannelsMetaData`, {
           HEXA_ID,
           giftChannelsToSync,
         } )
