@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import useSendingState from '../hooks/state-selectors/sending/UseSendingState'
-
+import useSourceAccountShellForSending from '../hooks/state-selectors/sending/UseSourceAccountShellForSending'
 
 export default function useAccountSendST1CompletionEffect( callbacks: {
   onSuccess?: () => void;
@@ -13,6 +13,7 @@ export default function useAccountSendST1CompletionEffect( callbacks: {
       failedErrorMessage,
     },
   } = useSendingState()
+  const sourceAccountShell = useSourceAccountShellForSending()
 
   useEffect( () => {
     if ( isSuccessful && callbacks.onSuccess ) {
@@ -20,5 +21,5 @@ export default function useAccountSendST1CompletionEffect( callbacks: {
     } else if ( hasFailed && callbacks.onFailure ) {
       callbacks.onFailure( failedErrorMessage )
     }
-  }, [ hasFailed, isSuccessful ] )
+  }, [ hasFailed, isSuccessful, sourceAccountShell ] )
 }

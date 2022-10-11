@@ -11,7 +11,7 @@ const SherpaStack = createStackNavigator({
     }
   },
   InvitationCode: {
-    screen: SherpaInvitationCode,
+    screen: SherpaHome,
     navigationOptions: {
       header: null,
     }

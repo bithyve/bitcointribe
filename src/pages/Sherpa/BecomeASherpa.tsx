@@ -123,7 +123,8 @@ const BecomeASherpa: React.FC<IBecomeASherpaProps> = (props) => {
         icon={AddIcon}
         marginTop={wp(10)}
         onPress={() => props.navigation.navigate('InvitationCode', {
-          contact: props.navigation.state.params.params
+          contact: props.navigation.state.params.params,
+          id: 123
         })}
       />
       <ListItem

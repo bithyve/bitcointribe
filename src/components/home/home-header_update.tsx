@@ -236,45 +236,48 @@ const HomeHeader = ( {
           />
         </View>
         : <View style={{
-          backgroundColor: levelData[ 0 ].keeper1.shareType == '' ? Colors.white : ( levelData[ 0 ].keeper1.shareType == 'seed' ? Colors.green : Colors.red ),
+          backgroundColor: ( levelData[ 0 ].keeper1.shareType == 'seed' ? Colors.green : Colors.red ),
           // backgroundColor: isError ? currentLevel === 0 ? Colors.white : Colors.red : Colors.green,
           width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '4.7/2%' ),
           alignItems:'center',
           justifyContent: 'center'
         }}>
-          { levelData[ 0 ].keeper1.status == 'accessible' && levelData[ 0 ].keeper1.shareType == 'seed' ? <Image
+          {/* { levelData[ 0 ].keeper1.status == 'accessible' && levelData[ 0 ].keeper1.shareType == 'seed' ? 
+          <Image
             source={ require( '../../assets/images/icons/check_white.png' )}
             style={{
               width: wp( '2.7%' ), height: wp( '2.7%' ),
               tintColor: Colors.white
             }}
             resizeMode={'contain'}
-          /> :
+          /> : */}
             <Image
-              source={isError ? currentLevel === 0 ? require( '../../assets/images/icons/icon_backup.png' ) : require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
+              source={levelData[ 0 ].keeper1.shareType !== 'seed' ? require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
               style={{
                 width: wp( '2.7%' ), height: wp( '2.7%' ),
                 // tintColor: Colors.white
               }}
               resizeMode={'contain'}
             />
-          }
+          {/* } */}
         </View>
       }
-      { <Text ellipsizeMode="middle" numberOfLines={1} style={{
+      {/* { <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
-      }}>{ levelData[ 0 ].keeper1.shareType == '' ? 'Confirm backup phrase' : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Wallet backup confirmed' : 'Confirm backup phrase' )}</Text> }
+      }}>{ levelData[ 0 ].keeper1.shareType == '' ? 'Confirm backup phrase' : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Wallet backup confirmed' : 'Confirm backup phrase' )}</Text> } */}
 
-      {/* <Text ellipsizeMode="middle" numberOfLines={1} style={{
+      <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
       }}>{days > 180
-          ? 'Your wallet backup phase is expired'
+          ? 'Wallet backup phrase is expired'
           : days > 150
-            ? 'Wallet backup phase will expire soon'
+            ? 'Wallet backup phrase will expire soon'
             : levelData[ 0 ].keeper1.shareType == ''
-              ? strings.Backupyour
+              // ? strings.Backupyour
+              ? 'Confirm backup phrase'
               : ( levelData[ 0 ].keeper1.shareType == 'seed'
-                ? 'Wallet backup confirmed' : 'Confirm backup phrase to secure your wallet' )}</Text> */}
+                ? 'Wallet backup confirmed' : 'Confirm backup phrase' )}
+      </Text>
 
       {/* {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )

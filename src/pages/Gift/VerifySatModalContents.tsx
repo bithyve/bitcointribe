@@ -26,7 +26,7 @@ export default function VerifySatModalContents( props ) {
           <AppBottomSheetTouchableWrapper
             onPress={props.onCloseClick}
             style={{
-              marginTop: wp( '3%' ),
+              marginTop: wp( '6%' ),
               marginRight: wp( '3%' ),
               width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
               alignSelf: 'flex-end',
@@ -57,7 +57,7 @@ export default function VerifySatModalContents( props ) {
                   fontSize: RFValue( 18 ),
                   fontFamily: Fonts.FiraSansRegular,
                   letterSpacing: 0.01,
-                // marginTop: RFValue( 20 )
+                  // marginTop: RFValue( 20 )
                 // width: wp( 65 )
                 }}
               >

@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
+import { Avatar } from "react-native-elements";
+import { RFValue } from "react-native-responsive-fontsize";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp} from "react-native-responsive-screen";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import Colors from '../../common/Colors';
+import CommonStyles from "../../common/Styles/Styles";
 
 export type ISherpaHomeProps = {
   navigation: any;
@@ -13,6 +19,10 @@ export type SherpaDetails = {
 };
 
 const SherpaHome: React.FC<ISherpaHomeProps> = ({ navigation }) => {
+  useEffect(() => {
+    setData(getSherpaDependent(navigation.state.params.id));
+  }, [navigation.state.params.id]);
+
   const getSherpaDependent: (id: string) => null | SherpaDetails = (id: string) => {
     // a function to return the contact details of Sherpa Dependent using the ID.
 
@@ -22,7 +32,8 @@ const SherpaHome: React.FC<ISherpaHomeProps> = ({ navigation }) => {
 
     return {
       name: "Pam",
-      profile: "",
+      profile: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cmFuZG9tJTIwcGVvcGxlfGVufDB8fDB8fA%3D%3D&w=1000&q=80",
+      lastBackup: new Date(Date.UTC(2022, 7, 20, 16, 0)),
       txns: [
         {
           outgoing: true,
@@ -45,23 +56,80 @@ const SherpaHome: React.FC<ISherpaHomeProps> = ({ navigation }) => {
           amount: 140000,
         },
       ],
-      lastBackup: new Date(Date.UTC(2022, 7, 20, 16, 0)),
     };
   };
 
   const [data, setData] = useState<SherpaDetails | null>(null);
 
-  useEffect(() => {
-    setData(getSherpaDependent(navigation.state.params.id));
-  }, [navigation.state.params.id]);
+  const Header: React.FC<{}> = () => {
+    return (
+      <View style={styles.headerWrapper}>
+        <Avatar
+          title="P"
+          titleStyle={{ fontSize: RFValue(25) }}
+          imageProps={styles.dpCircle}
+          containerStyle={styles.dpCircle}
+          source={data !== null ? {uri: data.profile} : {}}
+        />
 
-  return <View></View>;
+        <View>
+          <View style={{flexDirection: 'row'}}>
+            <Text>Last Backup </Text>
+            <Text>2 months ago</Text>
+          </View>
+
+          <Text>Pam's Wallet</Text>
+        </View>
+      </View>
+    );
+  };
+
+  return (
+    <View style={styles.wrapper}>
+      <View
+        style={[
+          CommonStyles.headerContainer,
+          {
+            backgroundColor: Colors.backgroundColor,
+          },
+        ]}
+      >
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            navigation.goBack();
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      <Header />
+    </View>
+  );
 };
 
 export default SherpaHome;
 
 const styles = StyleSheet.create({
   wrapper: {
-    
-  }
+    flex: 1,
+    borderWidth: 2,
+    backgroundColor: Colors.backgroundColor,
+    borderColor: 'black'
+  },
+  headerWrapper: {
+    flexDirection: 'row',
+    marginHorizontal: Math.min(wp(10), 40),
+  },
+  dpCircle: {
+    height: wp(20),
+    width: wp(20),
+    borderRadius: wp(10),
+    backgroundColor: Colors.blue,
+    elevation: 5,
+    zIndex: 1,
+  },
 });

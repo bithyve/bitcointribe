@@ -148,6 +148,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
   const [ modalVisible, setModalVisible ] = useState( false )
+  const [ message, setMessage ] = useState( '' )
+
   const defaultKeeperObj: {
     shareType: string
     updatedAt: number;
@@ -419,8 +421,31 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             renderItem={( { item: menuOption }: { item: MenuOption } ) => {
               return <AppBottomSheetTouchableWrapper
                 onPress={() => handleOptionSelection( menuOption )}
-                style={styles.addModalView}
+                style={[ styles.addModalView,
+                  ( ( levelData[ 0 ].keeper1.status == 'notSetup' ||
+                   levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' ) &&
+                  menuOption.screenName == 'WalletBackup' ) && {
+                    borderColor: 'orange',
+                    borderWidth: 1
+                  } ]}
               >
+                {
+                  ( ( levelData[ 0 ].keeper1.status == 'notSetup' ||
+                   levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' ) &&
+                  menuOption.screenName == 'WalletBackup' ) &&
+                  <View style={{
+                    position:'absolute', zIndex: 999, right:5, top:5
+                  }}>
+                    <Image
+                      source={require( '../../assets/images/icons/exclamation_error.png' )}
+                      style={{
+                        width: heightPercentageToDP( 1.5 ), height: heightPercentageToDP( 1.5 ),
+                        tintColor: 'orange'
+                      }}
+                      resizeMode={'contain'}
+                    />
+                  </View>
+                }
                 <View style={styles.modalElementInfoView}>
                   <View style={{
                     justifyContent: 'center',

@@ -2,6 +2,7 @@ import { createAction } from 'redux-actions'
 import { UPDATE_APP_PREFERENCE } from '../constants'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { Action } from 'redux'
+// import { TorStatus } from '../../services/rest/RestClient'
 
 export const CARD_DATA = 'CARD_DATA'
 export const CURRENCY_CODE = 'CURRENCY_CODE'
@@ -23,6 +24,7 @@ export const IS_PERMISSION_SET = 'IS_PERMISSION_SET'
 export const SET_WALLET_ID = 'SET_WALLET_ID'
 export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN'
 export const SET_CONTACT_PERMISSION_ASKED = 'SET_CONTACT_PERMISSION_ASKED'
+export const SET_TOR_ENABLED = 'SET_TOR_ENABLED'
 
 export const setCurrencyCode = ( data ) => {
   return {
@@ -32,7 +34,6 @@ export const setCurrencyCode = ( data ) => {
     },
   }
 }
-
 export interface CurrencyKindSetAction extends Action {
   type: typeof CURRENCY_KIND_SET;
   payload: CurrencyKind,
@@ -176,5 +177,13 @@ export const setWalletId = ( data ) => {
     payload: {
       walletId: data
     }
+  }
+}
+export const setTorEnabled = ( state: boolean ) => {
+  return {
+    type: SET_TOR_ENABLED,
+    payload: {
+      state: state
+    },
   }
 }

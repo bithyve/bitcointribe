@@ -8,6 +8,7 @@ import {
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { translations } from '../../common/content/LocContext'
+import FinanceSecurityReceipt from '../../assets/images/svgs/Finance_security_receipt.svg'
 
 const HistoryHeaderComponent = ( props ) => {
   const strings  = translations[ 'bhr' ]
@@ -34,10 +35,11 @@ const HistoryHeaderComponent = ( props ) => {
           props.imageIcon()
         ) : (
           <View style={styles.headerImageView}>
-            <Image style={props.tintColor ? {
+            <FinanceSecurityReceipt/>
+            {/* <Image style={props.tintColor ? {
               ...styles.headerImage,
               tintColor: Colors.deepBlue
-            } : styles.headerImage} source={props.headerImage} />
+            } : styles.headerImage} source={props.headerImage} /> */}
           </View>
         )}
         <View style={styles.headerInfoView}>
@@ -99,8 +101,8 @@ const styles = StyleSheet.create( {
     height: wp( '15%' ),
     width: wp( '15%' ),
     borderRadius: wp( '15%' ) / 2,
-    borderColor: Colors.white,
-    borderWidth: 2.5,
+    borderColor: Colors.blue,
+    borderWidth: 1,
     shadowColor: Colors.textColorGrey,
     shadowOpacity: 0.5,
     shadowOffset: {

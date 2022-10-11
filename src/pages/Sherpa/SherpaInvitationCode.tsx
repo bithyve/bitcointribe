@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Button } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import CommonStyles from "../../common/Styles/Styles";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
@@ -131,47 +131,51 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
               fontFamily: Fonts.FiraSansRegular,
               color: Colors.lightTextColor,
               fontSize: RFValue(12),
+              lineHeight: RFValue(18),
             }}
           >
             {`This is a gift from me to you Pam. I hope you like it. Haha, xoxo.`}
           </Text>
-          <Text
-            style={{
-              fontFamily: Fonts.FiraSansRegular,
-              color: Colors.lightTextColor,
-              marginTop: wp(1),
-              fontSize: RFValue(12),
-            }}
-          >
-            {`This is to get you started.\nWelcome to Bitcoin`}
-          </Text>
 
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center'
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: Math.min(wp(5), 15),
             }}
           >
-            <Text
-              style={{
-                color: Colors.blue,
-                fontSize: RFValue(24),
-                fontFamily: Fonts.FiraSansRegular,
-                marginVertical: hp(1),
-              }}
-            >
-              {numberWithCommas(giftToSend.amount)}
+            <View>
               <Text
                 style={{
-                  color: Colors.lightTextColor,
-                  fontSize: RFValue(10),
                   fontFamily: Fonts.FiraSansRegular,
+                  color: Colors.lightTextColor,
+                  fontSize: RFValue(12),
+                  lineHeight: RFValue(18),
                 }}
               >
-                &ensp;sats
+                {`This is to get you started!\nWelcome to Bitcoin`}
               </Text>
-            </Text>
+              <Text
+                style={{
+                  color: Colors.blue,
+                  fontSize: RFValue(24),
+                  fontFamily: Fonts.FiraSansRegular,
+                  marginVertical: hp(1),
+                }}
+              >
+                {numberWithCommas(giftToSend.amount)}
+                <Text
+                  style={{
+                    color: Colors.lightTextColor,
+                    fontSize: RFValue(10),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  &ensp;sats
+                </Text>
+              </Text>
+            </View>
 
             <Card height={Math.max(wp(20), 75)} width={Math.max(wp(20), 75)} />
           </View>
@@ -223,7 +227,7 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
       />
 
       <View style={{ flex: 1, justifyContent: "center" }}>
-        <GiftContainer />
+        {giftToSend !== null && <GiftContainer />}
       </View>
 
       <View style={styles.footer}>

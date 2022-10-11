@@ -39,6 +39,7 @@ export default function SendGift( props ) {
 
   const giftId = props.navigation.getParam( 'giftId' )
   const note = props.navigation.getParam( 'note' )
+  const contactDetails = props.navigation.getParam( 'selectedContact' )
   const giftLinkEncryptionType: DeepLinkEncryptionType = props.navigation.getParam( 'encryptionType' )
 
   const secretPhrase = props.navigation.getParam( 'secretPhrase' )
@@ -161,8 +162,7 @@ export default function SendGift( props ) {
         encryptionKey={encryptionOTP}
         themeId={themeId}
         senderName={senderEditedName}
-        contact={{
-        }}
+        contact={contactDetails?{contactDetails}:{}}
         QR={giftQR}
         link={giftDeepLink}
         contactEmail={''}

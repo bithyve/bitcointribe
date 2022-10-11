@@ -571,8 +571,7 @@ class FriendsAndFamilyScreen extends React.Component<
                   isLoadContacts: true,
                 // addFnF: true
                 }, () => {
-                  navigation.navigate( 'AddContact' )
-
+                  navigation.navigate( 'AddContact',{fromScreen: "Invitation"} )
                 } )
               }}
               style={{
@@ -582,12 +581,7 @@ class FriendsAndFamilyScreen extends React.Component<
               <Text style={[ styles.contactText, {
                 fontSize: RFValue( 24 ), lineHeight:30
               } ]}>+</Text>
-              {/* <Image
-                    style={styles.addGrayImage}
-                    source={require( '../../assets/images/icons/icon_add_grey.png' )}
-                  /> */}
               <Text style={styles.contactText}>{this.strings[ 'AddNew' ]}</Text>
-
             </TouchableOpacity>
           </View>
           <ScrollView

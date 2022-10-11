@@ -105,13 +105,16 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ({ navigation, }: Pro
             balance={transaction.transactionType === TransactionType.RECEIVED ? transaction.amount : transaction.amount - Number(transaction.fee)}
             isTestAccount={primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT}
             unitTextStyle={{
-              ...ListStyles.listItemSubtitle, marginBottom: 3
+              ...ListStyles.listItemSubtitle, 
+              // marginBottom: 4
             }}
             amountTextStyle={{
-              ...ListStyles.listItemSubtitle, marginBottom: -3, marginLeft: -2
+              ...ListStyles.listItemSubtitle, 
+              // marginBottom: 3,
+              //  marginLeft: -2
             }}
             currencyImageStyle={{
-              marginBottom: -3
+              // marginBottom: -3
             }}
           />
         </View>
@@ -131,18 +134,23 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ({ navigation, }: Pro
                     <Text style={[ListStyles.listItemSubtitle, {
                       flex: 1,
                       marginLeft: widthPercentageToDP(2)
-                    }]}>{`${rec.name ? rec.name : transaction.recipientAddresses[index]}`}</Text>
+                    }]}>
+                      {`${rec.name ? rec.name : transaction.recipientAddresses[index]}`}</Text>
                     <LabeledBalanceDisplay
                       balance={rec.amount}
                       isTestAccount={primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT}
                       unitTextStyle={{
-                        ...ListStyles.listItemSubtitle, marginBottom: 3
+                        ...ListStyles.listItemSubtitle, 
+                        // marginBottom: 3
                       }}
                       amountTextStyle={{
-                        ...ListStyles.listItemSubtitle, marginBottom: -3, marginLeft: -2,
+                        ...ListStyles.listItemSubtitle, 
+                        // marginBottom: -3,
+                        marginLeft: 2,
+
                       }}
                       currencyImageStyle={{
-                        marginBottom: -3
+                        // marginBottom: -3
                       }}
                     />
                   </View>
@@ -174,13 +182,16 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ({ navigation, }: Pro
             balance={Number(transaction.fee)}
             isTestAccount={primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT}
             unitTextStyle={{
-              ...ListStyles.listItemSubtitle, marginBottom: 3
+              ...ListStyles.listItemSubtitle, 
+              // marginBottom: 1
             }}
             amountTextStyle={{
-              ...ListStyles.listItemSubtitle, marginBottom: -3, marginLeft: -2
+              ...ListStyles.listItemSubtitle, 
+              // marginBottom: -3, 
+              marginLeft: 2
             }}
             currencyImageStyle={{
-              marginBottom: -3
+              // marginBottom: -3
             }}
           />
         </View>
