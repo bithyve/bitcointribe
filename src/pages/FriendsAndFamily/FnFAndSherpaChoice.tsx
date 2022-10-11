@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import CommonStyles from "../../common/Styles/Styles";
 import Colors from "../../common/Colors";
@@ -8,6 +8,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { v4 as uuid } from 'uuid';
 import { RFValue } from "react-native-responsive-fontsize";
 import SettingGear from "../../assets/images/svgs/icon_settings_noborder.svg";
 import SherpaIcon from "../../assets/images/svgs/icon_sherpa.svg";
@@ -15,6 +16,8 @@ import UsersIcon from "../../assets/images/svgs/icon_users.svg";
 import NextIcon from "../../assets/images/svgs/icon_arrow_right.svg";
 import { Shadow } from "react-native-shadow-2";
 import { SvgProps } from "react-native-svg";
+import ModalContainer from "../../components/home/ModalContainer";
+import CreateFNFInvite from "../../components/friends-and-family/CreateFNFInvite";
 
 export type IFnFAndSherpaChoiceProps = {
   navigation: any;
@@ -88,6 +91,33 @@ const ListItem: React.FC<ListItemProps> = (props) => {
 };
 
 const FnFAndSherpaChoice: React.FC<IFnFAndSherpaChoiceProps> = (props) => {
+  const [createFNFInvite, setCreateFNFInvite] = useState(false);
+  
+  const sendRequestToContact = () => {
+    setCreateFNFInvite(false)
+    props.navigation.navigate('AddContactSendRequest', {
+          ...props.navigation.state.params,
+        })
+  }
+
+  const goCreateGifts = () => {
+    setCreateFNFInvite(false)
+    props.navigation.navigate( 'CreateGift',{
+      selectedContact: props.navigation.state.params.SelectedContact,
+      statusFlag: 'Invitation',
+      giftId: props.navigation.state.params?.giftId,
+    })
+  }
+
+  const onSkipContinue = () => {
+    const skippedContact = {
+      id: uuid(),
+    }
+    props.navigation.navigate('AddContactSendRequest', {
+      ...props.navigation.state.params,
+    })
+  }
+
   return (
     <View style={styles.wrapper}>
       <View
@@ -120,11 +150,13 @@ const FnFAndSherpaChoice: React.FC<IFnFAndSherpaChoiceProps> = (props) => {
         main={"Associate a contact"}
         sub={"Tap to add a contact"}
         icon={UsersIcon}
-        onPress={() =>
-          props.navigation.navigate("AddContactSendRequest", {
-            ...props.navigation.state.params,
-          })
-        }
+        onPress={() => {
+          if (props.navigation.state.params?.skipClicked) {
+            onSkipContinue();
+          } else {
+            setCreateFNFInvite(true);
+          }
+        }}
       />
 
       <ListItem
@@ -139,6 +171,18 @@ const FnFAndSherpaChoice: React.FC<IFnFAndSherpaChoiceProps> = (props) => {
           })
         }
       />
+
+      <ModalContainer
+        onBackground={() => setCreateFNFInvite(false)}
+        visible={createFNFInvite}
+        closeBottomSheet={() => {}}
+      >
+        <CreateFNFInvite
+          closeModal={async () => setCreateFNFInvite(false)}
+          sendRequestToContact={async () => sendRequestToContact()}
+          createGifts={async () => goCreateGifts()}
+        />
+      </ModalContainer>
     </View>
   );
 };

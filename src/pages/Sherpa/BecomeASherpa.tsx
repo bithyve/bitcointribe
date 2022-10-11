@@ -14,7 +14,6 @@ import { SvgProps } from "react-native-svg";
 import AddIcon from "../../assets/images/svgs/icon_send_sherpa.svg";
 import GiftAddIcon from "../../assets/images/svgs/icon_sherpa_with_gift.svg";
 import { StackActions } from "react-navigation";
-import { resetToHomeAction } from '../../navigation/actions/NavigationActions';
 
 export type IBecomeASherpaProps = { navigation: any };
 
@@ -137,9 +136,6 @@ const BecomeASherpa: React.FC<IBecomeASherpaProps> = (props) => {
         onPress={() => {
           // temporarily added already available gift, once taken care we can direct to Gift Sats Tab and from there pass this on
           props.navigation.navigate('CreateGift', {
-            // fromScreen: 'GiftDetails',
-            // giftId: "91dd4c21968c318e4400462e006c6caf35887c1d5b44680d8d9ea75b730c4f06", // currently a temporary Gift
-            // // senderName: name,
             fromScreen: "BecomeSherpa",
             contact: props.navigation.state.params
           });

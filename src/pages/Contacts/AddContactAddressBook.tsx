@@ -322,8 +322,17 @@ export default function AddContactAddressBook(props) {
 
       } else {
         if(props.navigation.state.params?.fromScreen === 'Invitation'){
-          setCreateFNFInvite(true)
-        }else{
+          props.navigation.navigate('FnFSherpaChoice', {
+            SelectedContact: selectedContacts,
+            giftId: props.navigation.state.params?.giftId,
+            headerText: strings.addContact,
+            subHeaderText: strings.send,
+            contactText: strings.adding,
+            senderName: props?.navigation?.state?.params?.senderName,
+            showDone: true,
+            note: props?.navigation?.state?.params?.note
+          })
+        } else {
           props.navigation.navigate('AddContactSendRequest', {
             SelectedContact: selectedContacts,
             giftId: props.navigation.state.params?.giftId,
@@ -334,9 +343,7 @@ export default function AddContactAddressBook(props) {
             showDone: true,
             note: props?.navigation?.state?.params?.note
           })
-         
         }
-        
       }
 
     }
@@ -762,7 +769,7 @@ export default function AddContactAddressBook(props) {
           {/* create FNF Invite */}
           <ModalContainer onBackground={() => setCreateFNFInvite(false)} visible={createFNFInvite} closeBottomSheet={() => { }}>
               <CreateFNFInvite 
-                closeModal={()=> setCreateFNFInvite(false)}
+                closeModal={() => setCreateFNFInvite(false)}
                 sendRequestToContact={()=> sendRequestToContact()}
                 createGifts={()=> goCreateGifts()}
               />

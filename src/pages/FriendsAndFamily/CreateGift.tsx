@@ -423,13 +423,13 @@ const CreateGift = ({ navigation }: Props) => {
                   });
                   break;
 
-                  case 'Sherpa':
-                    setGiftModal( false )
-                    navigation.navigate('InvitationCode', {
-                      contact: {...navigation.state.params.contact.params, giftId: ( createdGift as Gift ).id},
-                      setActiveTab: navigation.state.params.setActiveTab
-                    })
-                    break
+                case 'Sherpa':
+                  setGiftModal( false )
+                  navigation.navigate('InvitationCode', {
+                    contact: {...navigation.state.params.contact.params, giftId: ( createdGift as Gift ).id},
+                    setActiveTab: navigation.state.params.setActiveTab
+                  })
+                  break
               }
             }
           }}
@@ -591,7 +591,7 @@ const CreateGift = ({ navigation }: Props) => {
             flexDirection: "row",
           }}
         >
-          {renderButton("Send Gift", addfNf ? "Add F&F and Send" : "Send Gift")}
+          {renderButton("Send Gift", addfNf ? "Add F&F and Send" : fromScreen === "BecomeSherpa" ? "Sherpa" : "Send Gift")}
           {/* {renderButton( 'Add F&F and Send' )}   */}
         </View>
       </View>
