@@ -68,6 +68,33 @@ const WalletInitializationScreen = props => {
             />
           </View>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => props.navigation.navigate('CreateWalletWithSherpaCode')}
+          style={[styles.NewWalletTouchableView, {marginTop: wp( '7%' )}]}
+        >
+          <Image
+            style={{
+              ...styles.iconImage, width: wp( 7 ),
+              height: wp( 7 ), marginBottom: wp( 2 )
+            }}
+            source={require( '../assets/images/icons/icon_newwallet.png' )}
+          />
+          <View style={styles.textView}>
+            <Text style={styles.touchableText}>
+              {`${strings.CreateWithSherpa}`}
+            </Text>
+          </View>
+          <View style={styles.arrowIconView}>
+            <MaterialIcons
+              name="arrow-forward-ios"
+              color={Colors.borderColor}
+              size={15}
+              style={{
+                alignSelf: 'center'
+              }}
+            />
+          </View>
+        </TouchableOpacity>
       </View>
       <View style={{
         flex: 1,
