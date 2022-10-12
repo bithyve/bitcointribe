@@ -14,6 +14,9 @@ import RestoreSelectedContactsList from '../pages/Recovery/RestoreSelectedContac
 import NewWalletName from '../pages/NewWalletName'
 import AccountSelection from '../pages/AccountSelection'
 import NewWalletQuestion from '../pages/NewWalletQuestion'
+import CreateWalletWithSherpaCode from '../pages/CreateWalletWithSherpa/CreateWalletWithSherpaCode'
+import SherpaTermsAndCondition from '../pages/CreateWalletWithSherpa/SherpaTermsAndCondition'
+import EnterSherpaCode from '../pages/CreateWalletWithSherpa/EnterSherpaCode'
 import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice'
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts'
 import ReLogin from '../pages/ReLogin'
@@ -83,6 +86,9 @@ const SetupNavigator = createStackNavigator(
     NewWalletName,
     AccountSelection,
     NewWalletQuestion,
+    CreateWalletWithSherpaCode,
+    SherpaTermsAndCondition,
+    EnterSherpaCode,
     WalletInitialization: WalletInitializationScreen,
     RestoreSeedWordsContent,
     WalletNameRecovery,
