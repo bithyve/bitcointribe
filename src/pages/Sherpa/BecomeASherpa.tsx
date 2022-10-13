@@ -3,7 +3,6 @@ import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import CommonStyles from "../../common/Styles/Styles";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -13,9 +12,11 @@ import { Shadow } from "react-native-shadow-2";
 import { SvgProps } from "react-native-svg";
 import AddIcon from "../../assets/images/svgs/icon_send_sherpa.svg";
 import GiftAddIcon from "../../assets/images/svgs/icon_sherpa_with_gift.svg";
-import { StackActions } from "react-navigation";
+import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { NavigationActions } from "react-navigation";
 
-export type IBecomeASherpaProps = { navigation: any };
+export type IBecomeASherpaProps = { navigation: any; closeModal: () => void };
 
 type HeadingType = {
   title: string;
@@ -26,7 +27,15 @@ type HeadingType = {
 const Heading: React.FC<HeadingType> = (props) => {
   return (
     <View>
-      <Text style={[CommonStyles.headerTitles, { fontSize: props.titleFont }]}>
+      <Text
+        style={{
+          color: Colors.blue,
+          letterSpacing: 0.01,
+          marginLeft: 20,
+          fontFamily: Fonts.FiraSansRegular,
+          fontSize: props.titleFont,
+        }}
+      >
         {props.title}
       </Text>
       <Text
@@ -59,7 +68,7 @@ const ListItem: React.FC<ListItemProps> = (props) => {
         startColor={"rgba(0, 0, 0, 0.075)"}
         sides={["right", "bottom"]}
         corners={["topRight", "bottomRight", "bottomLeft"]}
-        offset={[5, 5]}
+        offset={[1, 1]}
       >
         <View style={styles.itemWrapper}>
           <View style={styles.icons}>
@@ -70,7 +79,12 @@ const ListItem: React.FC<ListItemProps> = (props) => {
             <Text
               style={[
                 CommonStyles.headerInfoText,
-                { marginLeft: 0, fontSize: RFValue(12), color: "#525252", marginRight: wp(10) },
+                {
+                  marginLeft: 0,
+                  fontSize: RFValue(12),
+                  color: "#525252",
+                  marginRight: wp(10),
+                },
               ]}
             >
               {props.sub}
@@ -83,36 +97,30 @@ const ListItem: React.FC<ListItemProps> = (props) => {
 };
 
 const BecomeASherpa: React.FC<IBecomeASherpaProps> = (props) => {
-
   return (
     <View style={styles.wrapper}>
-      <View
-        style={[
-          CommonStyles.headerContainer,
-          {
-            backgroundColor: Colors.backgroundColor,
-          },
-        ]}
+      <AppBottomSheetTouchableWrapper
+        onPress={() => props.closeModal()}
+        style={{
+          width: wp(7),
+          height: wp(7),
+          borderRadius: wp(7 / 2),
+          alignSelf: "flex-end",
+          backgroundColor: Colors.lightBlue,
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: wp(3),
+          marginRight: wp(3),
+        }}
       >
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            props.navigation.dispatch(StackActions.pop());
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </View>
-        </TouchableOpacity>
-      </View>
+        <FontAwesome
+          name="close"
+          color={Colors.white}
+          size={19}
+        />
+      </AppBottomSheetTouchableWrapper>
 
       <Heading title="Become a Sherpa" subTitle="" titleFont={RFValue(25)} />
-
-      <Heading
-        title="No link created"
-        titleFont={RFValue(20)}
-        subTitle="Create a link to be Sherpa.."
-      />
 
       <ListItem
         main={"Create Invitation code"}
@@ -120,11 +128,18 @@ const BecomeASherpa: React.FC<IBecomeASherpaProps> = (props) => {
           "Send Sherpa code to any of your dependent using the generated link"
         }
         icon={AddIcon}
-        marginTop={wp(10)}
-        onPress={() => props.navigation.navigate('InvitationCode', {
-          contact: props.navigation.state.params.params,
-          id: 123
-        })}
+        marginTop={wp(1)}
+        onPress={() => {
+          props.closeModal();
+          props.navigation.navigate("Sherpa", {}, NavigationActions.navigate({
+            routeName: 'InvitationCode',
+            params: {
+              contact: props.navigation.state.params,
+              id: 123,
+              key: props.navigation.state.key,
+            },
+          }));
+        }}
       />
       <ListItem
         main={"Create Invitation code with Gift"}
@@ -135,9 +150,10 @@ const BecomeASherpa: React.FC<IBecomeASherpaProps> = (props) => {
         marginTop={wp(5)}
         onPress={() => {
           // temporarily added already available gift, once taken care we can direct to Gift Sats Tab and from there pass this on
-          props.navigation.navigate('CreateGift', {
+          props.closeModal();
+          props.navigation.navigate("CreateGift", {
             fromScreen: "BecomeSherpa",
-            contact: props.navigation.state.params
+            contact: props.navigation.state.params,
           });
         }}
       />
@@ -149,15 +165,15 @@ export default BecomeASherpa;
 
 const styles = StyleSheet.create({
   wrapper: {
-    flex: 1,
     backgroundColor: Colors.backgroundColor,
+    height: hp(55),
   },
   titleWrapper: {
     flexDirection: "row",
   },
   itemWrapper: {
     flexDirection: "row",
-    width: wp(90),
+    width: wp(85),
     height: hp(15),
     backgroundColor: "white",
     borderRadius: 10,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Text, SafeAreaView, StatusBar } from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -24,7 +24,8 @@ const RestoreSherpaCode: React.FC<IRestoreSherpaCodeProps> = ({
   });
 
   return (
-    <View style={styles.wrapper}>
+    <SafeAreaView style={styles.wrapper}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View
         style={[
           CommonStyles.headerContainer,
@@ -83,7 +84,7 @@ const RestoreSherpaCode: React.FC<IRestoreSherpaCodeProps> = ({
           Restore Wallet
         </Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 

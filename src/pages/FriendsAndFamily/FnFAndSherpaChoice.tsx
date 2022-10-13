@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar } from "react-native";
 import CommonStyles from "../../common/Styles/Styles";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
@@ -18,6 +18,8 @@ import { Shadow } from "react-native-shadow-2";
 import { SvgProps } from "react-native-svg";
 import ModalContainer from "../../components/home/ModalContainer";
 import CreateFNFInvite from "../../components/friends-and-family/CreateFNFInvite";
+import { NavigationActions, SafeAreaView } from "react-navigation";
+import BecomeASherpa from "../Sherpa/BecomeASherpa";
 
 export type IFnFAndSherpaChoiceProps = {
   navigation: any;
@@ -92,6 +94,7 @@ const ListItem: React.FC<ListItemProps> = (props) => {
 
 const FnFAndSherpaChoice: React.FC<IFnFAndSherpaChoiceProps> = (props) => {
   const [createFNFInvite, setCreateFNFInvite] = useState(false);
+  const [sherpaModal, setSherpaModal] = useState(false);
   
   const sendRequestToContact = () => {
     setCreateFNFInvite(false)
@@ -119,7 +122,8 @@ const FnFAndSherpaChoice: React.FC<IFnFAndSherpaChoiceProps> = (props) => {
   }
 
   return (
-    <View style={styles.wrapper}>
+    <SafeAreaView style={styles.wrapper}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View
         style={[
           CommonStyles.headerContainer,
@@ -165,10 +169,7 @@ const FnFAndSherpaChoice: React.FC<IFnFAndSherpaChoiceProps> = (props) => {
         sub={"Tap to Create your Invitation code"}
         icon={SherpaIcon}
         onPress={() =>
-          props.navigation.navigate("Sherpa", {
-            screen: "BecomeASherpa",
-            params: { ...props.navigation.state.params },
-          })
+          setSherpaModal(true)
         }
       />
 
@@ -183,7 +184,18 @@ const FnFAndSherpaChoice: React.FC<IFnFAndSherpaChoiceProps> = (props) => {
           createGifts={async () => goCreateGifts()}
         />
       </ModalContainer>
-    </View>
+
+      <ModalContainer
+        onBackground={() => setSherpaModal(false)}
+        visible={sherpaModal}
+        closeBottomSheet={() => {}}
+      >
+        <BecomeASherpa 
+          navigation={props.navigation} 
+          closeModal={async () => setSherpaModal(false)}
+        />
+      </ModalContainer>
+    </SafeAreaView>
   );
 };
 

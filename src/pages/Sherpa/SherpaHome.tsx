@@ -6,6 +6,8 @@ import {
   Text,
   ScrollView,
   FlatList,
+  SafeAreaView,
+  StatusBar,
 } from "react-native";
 import { Avatar } from "react-native-elements";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -314,7 +316,8 @@ const SherpaHome: React.FC<ISherpaHomeProps> = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.wrapper}>
+    <SafeAreaView style={styles.wrapper}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View
         style={[
           CommonStyles.headerContainer,
@@ -453,7 +456,7 @@ const SherpaHome: React.FC<ISherpaHomeProps> = ({ navigation }) => {
       >
         <RestoreModal />
       </ModalContainer>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -483,7 +486,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: Colors.blue,
-    width: wp(33),
+    width: wp(40),
     height: hp(7),
     marginBottom: Math.min(hp(5), 40),
     marginHorizontal: wp(3),
