@@ -83,6 +83,7 @@ import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetT
 import { Shadow } from "react-native-shadow-2";
 import VerifySatModalContents from "../Gift/VerifySatModalContents";
 import { platform } from "process";
+import { NavigationActions } from "react-navigation";
 
 const { height } = Dimensions.get("window");
 
@@ -425,10 +426,14 @@ const CreateGift = ({ navigation }: Props) => {
 
                 case 'Sherpa':
                   setGiftModal( false )
-                  navigation.navigate('InvitationCode', {
-                    contact: {...navigation.state.params.contact.params, giftId: ( createdGift as Gift ).id},
-                    setActiveTab: navigation.state.params.setActiveTab
-                  })
+                  navigation.navigate('Sherpa', {}, NavigationActions.navigate({
+                    routeName: 'InvitationCode',
+                    params: {
+                      contact: {...navigation.state.params, giftId: ( createdGift as Gift ).id},
+                      setActiveTab: navigation.state.params.setActiveTab,
+                      key: navigation.state.key,
+                    }
+                  }))
                   break
               }
             }

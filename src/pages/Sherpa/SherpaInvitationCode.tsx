@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from "react-native";
 import CommonStyles from "../../common/Styles/Styles";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
@@ -80,8 +80,10 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
   const accountsState: AccountsState = useSelector((state) => state.accounts);
 
   const receivingContact = props.navigation.state.params.contact;
-  console.log(props.navigation.state.params)
-  const giftToSend = null;
+
+  const giftToSend = receivingContact.giftId
+    ? accountsState.gifts[receivingContact.giftId]
+    : null;
 
   const numberWithCommas = (x) => {
     return x ? x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
@@ -186,10 +188,10 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
     setCode("567908");
   }, []);
 
-  console.log("THE_CONTACT", props.navigation.state.params.contact);
+  console.log("THE_CONTACT", props.navigation.state.params);
 
   return (
-    <View style={styles.wrapper}>
+    <SafeAreaView style={styles.wrapper}>
       <View
         style={[
           CommonStyles.headerContainer,
@@ -275,7 +277,7 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
           </View>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

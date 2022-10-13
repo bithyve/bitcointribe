@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     backgroundColor: "#FAFAFA",
-    paddingHorizontal: wp(8),
+    marginHorizontal: wp(8),
   },
   headerWrapper: {
     flexDirection: "row",
