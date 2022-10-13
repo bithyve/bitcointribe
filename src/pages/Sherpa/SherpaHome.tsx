@@ -316,6 +316,7 @@ const SherpaHome: React.FC<ISherpaHomeProps> = ({ navigation }) => {
   };
 
   return (
+    <View style={{flex: 1, backgroundColor: "#FAFAFA", padding: wp(8)}}>
     <SafeAreaView style={styles.wrapper}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View
@@ -457,6 +458,7 @@ const SherpaHome: React.FC<ISherpaHomeProps> = ({ navigation }) => {
         <RestoreModal />
       </ModalContainer>
     </SafeAreaView>
+    </View>
   );
 };
 
@@ -466,7 +468,6 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     backgroundColor: "#FAFAFA",
-    paddingHorizontal: wp(8),
   },
   headerWrapper: {
     flexDirection: "row",
