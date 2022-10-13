@@ -80,10 +80,8 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
   const accountsState: AccountsState = useSelector((state) => state.accounts);
 
   const receivingContact = props.navigation.state.params.contact;
-
-  const giftToSend = receivingContact.giftId
-    ? accountsState.gifts[receivingContact.giftId]
-    : null;
+  console.log(props.navigation.state.params)
+  const giftToSend = null;
 
   const numberWithCommas = (x) => {
     return x ? x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
@@ -188,7 +186,7 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
     setCode("567908");
   }, []);
 
-  console.log("HUYVJHBKJK", props.navigation.state.params.contact);
+  console.log("THE_CONTACT", props.navigation.state.params.contact);
 
   return (
     <View style={styles.wrapper}>
@@ -203,7 +201,7 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.goBack();
+            props.navigation.goBack(props.navigation.state.params.key);
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
