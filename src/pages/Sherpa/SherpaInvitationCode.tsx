@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, Platform } from "react-native";
 import CommonStyles from "../../common/Styles/Styles";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
@@ -9,6 +9,8 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
+import Share from 'react-native-share';
+
 import MoreIcon from "../../assets/images/svgs/icon_more_gray.svg";
 import SendQR from "../../assets/images/svgs/link.svg";
 import { Avatar } from "react-native-elements";
@@ -188,6 +190,28 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
     setCode("567908");
   }, []);
 
+  const shareOption = async () => {
+    try {
+      // const url = 'https://awesome.contents.com/';
+      const title = 'Sherpa code'
+
+      const options = Platform.select( {
+        default: {
+          title,
+          message: `Share sherpa code: ${code}`,
+        },
+      } )
+      Share.open( options )
+        .then( ( res ) => {
+         console.log('res', res)
+        } )
+        .catch( ( err ) => {
+        } )
+    } catch ( error ) {
+      // console.log(error);
+
+    }
+  }
   console.log("THE_CONTACT", props.navigation.state.params);
 
   return (
@@ -247,6 +271,7 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
           }}
         >
           <TouchableOpacity
+            onPress={()=> shareOption()}
             style={{
               backgroundColor: Colors.blue,
               width: wp(35),
@@ -266,7 +291,7 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              &ensp;Share Code
+              &ensp;&ensp;Share Code
             </Text>
           </TouchableOpacity>
 
@@ -322,6 +347,7 @@ const styles = StyleSheet.create({
     borderColor: "white",
     elevation: 5,
     zIndex: 1,
+    marginRight: 2
   },
   footer: {
     marginBottom: wp(5),
