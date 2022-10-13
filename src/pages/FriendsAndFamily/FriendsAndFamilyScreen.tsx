@@ -10,7 +10,8 @@ import {
   ImageBackground,
   StatusBar,
   ActivityIndicator,
-  Image
+  Image,
+  Button
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -686,6 +687,14 @@ class FriendsAndFamilyScreen extends React.Component<
                     } ) }
                   </>
                 }
+                <View style={{width: 150, alignSelf: 'center'}}>
+                <Button
+                  title='Sherpa Child Placeholder'
+                  onPress={() => this.props.navigation.navigate('SherpaHome', {
+                    id: 1325267
+                  })}
+                />
+                </View>
               </View>
             </View>
             {

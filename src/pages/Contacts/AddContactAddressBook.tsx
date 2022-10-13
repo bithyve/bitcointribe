@@ -319,10 +319,20 @@ export default function AddContactAddressBook(props) {
           contact: selectedContacts,
           setActiveTab: props.navigation.state.params.setActiveTab
         })
+
       } else {
         if(props.navigation.state.params?.fromScreen === 'Invitation'){
-          setCreateFNFInvite(true)
-        }else{
+          props.navigation.navigate('FnFSherpaChoice', {
+            SelectedContact: selectedContacts,
+            giftId: props.navigation.state.params?.giftId,
+            headerText: strings.addContact,
+            subHeaderText: strings.send,
+            contactText: strings.adding,
+            senderName: props?.navigation?.state?.params?.senderName,
+            showDone: true,
+            note: props?.navigation?.state?.params?.note
+          })
+        } else {
           props.navigation.navigate('AddContactSendRequest', {
             SelectedContact: selectedContacts,
             giftId: props.navigation.state.params?.giftId,
@@ -333,9 +343,7 @@ export default function AddContactAddressBook(props) {
             showDone: true,
             note: props?.navigation?.state?.params?.note
           })
-         
         }
-        
       }
 
     }
@@ -369,7 +377,7 @@ export default function AddContactAddressBook(props) {
     const skippedContact = {
       id: uuid(),
     }
-    props.navigation.navigate('AddContactSendRequest', {
+    props.navigation.navigate('FnFSherpaChoice', {
       SelectedContact: [skippedContact],
       giftId: props.navigation.state.params?.giftId,
       headerText: strings.addContact,
@@ -690,7 +698,8 @@ export default function AddContactAddressBook(props) {
                 style={{
                   // height: wp( '8%' ),
                   marginTop: hp(1.8),
-                  width: wp('25%'),
+                  // width: wp('25%'),
+                  flex: 1,
                   alignSelf: 'flex-start',
                   paddingLeft: wp('8%'),
                 }}
@@ -760,7 +769,7 @@ export default function AddContactAddressBook(props) {
           {/* create FNF Invite */}
           <ModalContainer onBackground={() => setCreateFNFInvite(false)} visible={createFNFInvite} closeBottomSheet={() => { }}>
               <CreateFNFInvite 
-                closeModal={()=> setCreateFNFInvite(false)}
+                closeModal={() => setCreateFNFInvite(false)}
                 sendRequestToContact={()=> sendRequestToContact()}
                 createGifts={()=> goCreateGifts()}
               />
@@ -776,6 +785,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 'auto',
     marginHorizontal: wp('6%'),
+    marginRight: wp(10),
     marginBottom: hp(2)
   },
   statusIndicatorActiveView: {

@@ -4,7 +4,7 @@ export default {
   FiraSansMedium: 'FiraSans-Medium',
   FiraSansLight: 'FiraSans-Regular',
   FiraSansSemiBold: 'FiraSans-Medium',
-  // FiraSansLight: 'FiraSans-Light',
+  //FiraSansLight: 'FiraSans-Light',
   FiraSansMediumItalic: 'FiraSans-MediumItalic',
   OpenSans: 'OpenSans'
 }
