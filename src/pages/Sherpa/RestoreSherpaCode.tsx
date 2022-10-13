@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: Colors.blue,
-    width: wp(33),
+    width: wp(40),
     height: hp(7),
     marginBottom: Math.min(hp(5), 40),
     marginHorizontal: wp(8),
