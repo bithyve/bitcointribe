@@ -35,11 +35,14 @@ async function configureAPIHeaders() {
   } )
 }
 
+const store = makeStore();
+
+export type StoreType = ReturnType<typeof store.getState>;
+
 export default function AppWrapper() {
 
   // Creates and holds an instance of the store so only children in the `Provider`'s
   // context can have access to it. (see: https://stackoverflow.com/a/60329482/8859365)
-  const store = makeStore()
 
   function updare() {
 
