@@ -353,7 +353,6 @@ const CreateGift = ({ navigation }: Props) => {
             if (satCard) {
               setShowVerification(true);
             } else {
-              console.log("condn", condn);
               const giftInstances = Number(numbersOfGift);
               const giftAmountInSats = prefersBitcoin
                 ? Number(amount)
