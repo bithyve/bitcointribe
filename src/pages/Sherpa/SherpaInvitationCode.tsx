@@ -105,9 +105,9 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
     (state: StoreType) => state.accounts
   );
 
-  const params = props.navigation.state.params.contact;
+  const params = props.navigation && props.navigation.state.params.contact;
 
-  const receivingContact: Contacts = params.SelectedContact[0];
+  const receivingContact: Contacts = params &&  params.SelectedContact && params.SelectedContact[0];
 
   const giftToSend = params.giftId ? accountsState.gifts[params.giftId] : null;
 
@@ -256,7 +256,7 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
 
       <CodeTextBox
         code={code}
-        name={receivingContact.firstName + " " + receivingContact.lastName}
+        name={receivingContact && receivingContact.firstName + " " + receivingContact && receivingContact.lastName}
       />
 
       <Heading
