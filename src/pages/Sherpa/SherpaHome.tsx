@@ -309,7 +309,7 @@ const SherpaHome: React.FC<ISherpaHomeProps> = ({ navigation }) => {
             fontSize: RFValue(13),
           }}
         >
-          Restore Wallet
+          Help Restore Wallet
         </Text>
       </TouchableOpacity>
     );
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: Colors.blue,
-    width: wp(40),
+    width: wp(45),
     height: hp(7),
     marginBottom: Math.min(hp(5), 40),
     marginHorizontal: wp(3),

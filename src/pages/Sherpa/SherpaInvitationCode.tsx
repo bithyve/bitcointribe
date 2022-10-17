@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, Platform } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
+  Share,
+} from "react-native";
 import CommonStyles from "../../common/Styles/Styles";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
@@ -9,14 +16,17 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
-import Share from 'react-native-share';
+// import Share from 'react-native-share';
 
 import MoreIcon from "../../assets/images/svgs/icon_more_gray.svg";
 import SendQR from "../../assets/images/svgs/link.svg";
 import { Avatar } from "react-native-elements";
 import { AccountsState } from "../../store/reducers/accounts";
 import { useSelector } from "react-redux";
-import Card from '../../assets/images/svgs/card.svg';
+import Card from "../../assets/images/svgs/card.svg";
+import { StoreType } from "../../../App";
+import { Contacts } from "../../bitcoin/utilities/Interface";
+import Toast from "../../components/Toast";
 
 type IInvitationCodeProps = { navigation: any };
 
@@ -44,7 +54,7 @@ const Heading: React.FC<HeadingType> = (props) => {
   );
 };
 
-const CodeTextBox: React.FC<{ code: string }> = (props) => {
+const CodeTextBox: React.FC<{ code: string; name: string }> = (props) => {
   return (
     <View
       style={{
@@ -60,12 +70,24 @@ const CodeTextBox: React.FC<{ code: string }> = (props) => {
       />
       <View style={styles.codeText}>
         <View style={styles.codeWrapper}>
-          <Text style={{ fontSize: RFValue(12) }}>Sherpa code</Text>
+          <Text
+            style={{
+              fontSize: RFValue(12),
+              fontFamily: Fonts.FiraSansRegular,
+              marginHorizontal: RFValue(13),
+            }}
+          >
+            Sherpa code
+          </Text>
           <Text style={styles.code}>{props.code}</Text>
           <Text
-            style={{ fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}
+            style={{
+              fontSize: RFValue(12),
+              fontFamily: Fonts.FiraSansMedium,
+              marginHorizontal: RFValue(13),
+            }}
           >
-            Pam Angela
+            {props.name}
           </Text>
         </View>
         <TouchableOpacity style={styles.copyButton}>
@@ -79,13 +101,15 @@ const CodeTextBox: React.FC<{ code: string }> = (props) => {
 const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
   const [code, setCode] = useState("");
 
-  const accountsState: AccountsState = useSelector((state) => state.accounts);
+  const accountsState: AccountsState = useSelector(
+    (state: StoreType) => state.accounts
+  );
 
-  const receivingContact = props.navigation.state.params.contact;
+  const params = props.navigation.state.params.contact;
 
-  const giftToSend = receivingContact.giftId
-    ? accountsState.gifts[receivingContact.giftId]
-    : null;
+  const receivingContact: Contacts = params.SelectedContact[0];
+
+  const giftToSend = params.giftId ? accountsState.gifts[params.giftId] : null;
 
   const numberWithCommas = (x) => {
     return x ? x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
@@ -190,29 +214,17 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
     setCode("567908");
   }, []);
 
-  const shareOption = async () => {
+  const shareCode = async () => {
     try {
-      // const url = 'https://awesome.contents.com/';
-      const title = 'Sherpa code'
-
-      const options = Platform.select( {
-        default: {
-          title,
-          message: `Share sherpa code: ${code}`,
-        },
-      } )
-      Share.open( options )
-        .then( ( res ) => {
-         console.log('res', res)
-        } )
-        .catch( ( err ) => {
-        } )
-    } catch ( error ) {
-      // console.log(error);
-
+      await Share.share({
+        message: `Sherpa Code: ${code}`,
+        title: "Share Sherpa Code",
+      });
+    } catch (error) {
+      console.log("ShareCodeError", error);
+      Toast("Something went wrong");
     }
   }
-  console.log("THE_CONTACT", props.navigation.state.params);
 
   return (
     <SafeAreaView style={styles.wrapper}>
@@ -242,7 +254,10 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
         subTitle={"Your invitation code has been generated"}
       />
 
-      <CodeTextBox code={code} />
+      <CodeTextBox
+        code={code}
+        name={receivingContact.firstName + " " + receivingContact.lastName}
+      />
 
       <Heading
         title={""}
@@ -271,7 +286,6 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
           }}
         >
           <TouchableOpacity
-            onPress={()=> shareOption()}
             style={{
               backgroundColor: Colors.blue,
               width: wp(35),
@@ -282,6 +296,7 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
               borderRadius: 10,
               margin: wp(5),
             }}
+            onPress={shareCode}
           >
             <SendQR />
             <Text
@@ -334,6 +349,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(18),
     letterSpacing: RFValue(18),
+    marginHorizontal: wp(1),
   },
   copyButton: {
     alignSelf: "center",
