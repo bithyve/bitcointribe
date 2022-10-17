@@ -37,13 +37,13 @@ export default function SherpaTermsAndCondition(props) {
   const common = translations["common"];
 
   const selectAllTerms = () => {
-    setTransactions(true)
-    setFNF(true)
-    setChat(true)
-    setDetachWallet(true)
-    setGift(true)
-    setOthers(true)
-  }
+    setTransactions(true);
+    setFNF(true);
+    setChat(true);
+    setDetachWallet(true);
+    setGift(true);
+    setOthers(true);
+  };
 
   return (
     <SafeAreaView
@@ -90,58 +90,54 @@ export default function SherpaTermsAndCondition(props) {
             }}
           >
             <HeaderTitle1
-              secondLineBoldTitle={strings.createNewWallet}
+              secondLineBoldTitle={strings.sherpaTermCondition}
               secondLineTitle={""}
-              infoTextNormal={"Choose your preferences to enable what your Sherpa can oversee."}
+              infoTextNormal={strings.sherpaTermConditionParagraph}
               infoTextBold={""}
               infoTextNormal1={""}
               step={""}
             />
             {/* checkbox List */}
+            <View style={{flex: 0.8, marginTop: 20}}>
             <CheckBox
               checkStatus={Transactions}
-              setCheckStatus={() =>
-                setTransactions(!Transactions)
-              }
+              setCheckStatus={() => setTransactions(!Transactions)}
+              margin={false}
               titleText={"Transactions"}
             />
-             <CheckBox
+            <CheckBox
               checkStatus={Chat}
-              setCheckStatus={() =>
-                setChat(!Chat)
-              }
+              setCheckStatus={() => setChat(!Chat)}
+              margin={false}
               titleText={"Chat"}
             />
-             <CheckBox
+            <CheckBox
               checkStatus={FNF}
-              setCheckStatus={() =>
-                setFNF(!FNF)
-              }
+              setCheckStatus={() => setFNF(!FNF)}
+              margin={false}
               titleText={"Friends & Family"}
             />
-             <CheckBox
+            <CheckBox
               checkStatus={DetachWallet}
-              setCheckStatus={() =>
-                setDetachWallet(!DetachWallet)
-              }
+              setCheckStatus={() => setDetachWallet(!DetachWallet)}
+              margin={false}
               titleText={"Detach wallet"}
             />
             <CheckBox
               checkStatus={Gift}
-              setCheckStatus={() =>
-                setGift(!Gift)
-              }
+              setCheckStatus={() => setGift(!Gift)}
+              margin={false}
               titleText={"Gift"}
             />
             <CheckBox
               checkStatus={Others}
-              setCheckStatus={() =>
-                setOthers(!Others)
-              }
+              setCheckStatus={() => setOthers(!Others)}
+              margin={false}
               titleText={"Others"}
             />
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <View style={styles.bottomButtonView}>
+            </View>
+            <View style={{ flex: 0.2, flexDirection: "row", alignItems: "center"}}>
+              <View style={styles.bottomButtonView}>
                 <View
                   style={{
                     elevation: 10,
@@ -156,17 +152,17 @@ export default function SherpaTermsAndCondition(props) {
                   <TouchableOpacity
                     onPress={() => {
                       Keyboard.dismiss();
-                      props.navigation.navigate('EnterSherpaCode')
+                      // props.navigation.navigate("EnterSherpaCode");
                     }}
                     style={styles.buttonView}
                   >
                     <Text style={styles.buttonText}>{common.agree}</Text>
                   </TouchableOpacity>
                 </View>
-            </View>
-            <TouchableOpacity onPress={()=> selectAllTerms()}>
-              <Text style={styles.selectAllText}>Select all</Text>
-            </TouchableOpacity>
+              </View>
+              <TouchableOpacity onPress={() => selectAllTerms()}>
+                <Text style={styles.selectAllText}>Select all</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </KeyboardAvoidingView>
@@ -232,11 +228,11 @@ const styles = StyleSheet.create({
   bottomButtonView: {
     flexDirection: "row",
     paddingHorizontal: hp(2),
-    paddingVertical: DeviceInfo.hasNotch() ? hp(4) : hp(3),
+    // paddingVertical: DeviceInfo.hasNotch() ? hp(4) : hp(3),
   },
   selectAllText: {
     color: Colors.darkBlue,
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
-  }
+  },
 });

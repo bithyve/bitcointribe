@@ -13,7 +13,7 @@ import Colors from "../../common/Colors";
 
 export default function CheckBox(props) {
   return (
-    <View style={styles.checkBoxDirectionContainer}>
+    <View style={[styles.checkBoxDirectionContainer,{paddingVertical: !props.margin? wp(2) : wp(6)}]}>
       {props.checkStatus ? (
         <TouchableOpacity
           activeOpacity={1}
@@ -41,10 +41,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: wp(6),
-    paddingVertical: wp(6),
   },
   checkBoxBorderContainer: {
-    borderWidth: 1,
+    borderWidth: 4,
     borderColor: Colors.gray12,
     width: wp(5),
     height: 20,
