@@ -85,8 +85,17 @@ const RestoreSeedPageComponent = ( props ) => {
   } )
 
   useEffect( () => {
+    if (props.data.length !== 0) {
+      if (props.data.length === 24) {
+        setExtraSeeds(true);
+      }
+      setSeedData(props.data) 
+    }
+  }, [props.data] )
+
+  useEffect( () => {
     setPartialSeedDataFun( seedData )
-  }, [] )
+  }, [seedData] )
 
   const setPartialSeedDataFun = ( testingData ) =>{
     const tempData = []

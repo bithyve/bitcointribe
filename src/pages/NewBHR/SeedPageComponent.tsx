@@ -39,7 +39,7 @@ const SeedPageComponent = ( props ) => {
 
   const dbWallet = dbManager.getWallet()
   const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
-  const primaryMnemonic = walletObj.primaryMnemonic
+  const primaryMnemonic = walletObj.primaryMnemonic // Share with Social Media
   const seed = primaryMnemonic.split( ' ' )
   const seedData = seed.map( ( word, index ) => {
     return {
@@ -363,7 +363,7 @@ const SeedPageComponent = ( props ) => {
           {props.isChangeKeeperAllow ? (
             <TouchableOpacity
               disabled={props.disableChange ? props.disableChange : false}
-              onPress={() => { ( currentPosition * 12 ) != 0 ? onPreviousClick() : props.onPressChange() }}
+              onPress={() => { ( currentPosition * 12 ) != 0 ? onPreviousClick() : (props.sherpa ? props.onPressChange(primaryMnemonic) : props.onPressChange()) }}
               style={{
                 marginLeft: 10,
                 height: wp( '13%' ),

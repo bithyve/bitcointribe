@@ -5,9 +5,12 @@ import {
   SafeAreaView,
   StatusBar,
   Alert,
+  Text,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native'
 import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 import _ from 'underscore'
 import ModalContainer from '../../components/home/ModalContainer'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
@@ -23,12 +26,16 @@ import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Wallet } from '../../bitcoin/utilities/Interface'
-import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import LoaderModal from '../../components/LoaderModal'
 import { translations } from '../../common/content/LocContext'
 import AlertModalContents from '../../components/AlertModalContents'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { NavigationContext } from 'react-navigation'
+import Clipboard from '@react-native-clipboard/clipboard'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const RestoreSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
@@ -54,9 +61,34 @@ const RestoreSeedWordsContent = ( props ) => {
   const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
   const restoreSeedData = useSelector( ( state ) => state.bhr.loading.restoreSeedData )
   const [ mnemonic, setMnemonic ] = useState( null )
+  const [clipboard, setClipboard] = useState(false);
+  const [clipData, setClipData] = useState([]);
+  const [data, setData] = useState([]);
+
+  const fetchCopiedText = async () => {
+    const text = await Clipboard.getString();
+
+    const phrases = text.split(' ');
+
+    const regex = /^[a-zA-Z ]*$/;
+
+    if (regex.test(text) && (phrases.length === 12 || phrases.length === 24)) {
+      const ph = phrases.map((d, idx) => ({
+        id: idx + 1,
+        name: d,
+      }))
+
+      setClipData(ph);
+      return true;
+    }
+
+    return false;
+  };
 
   useEffect( () => {
     // console.log( 'skk sugg words', JSON.stringify( mnemonicSuggestions ) )
+    fetchCopiedText().then(setClipboard);
+
     return () => {
       dispatch( restoreSeedWordFailed( false ) )
     }
@@ -90,6 +122,104 @@ const RestoreSeedWordsContent = ( props ) => {
         onPressProceed={() => props.navigation.goBack()}
       />
     )
+  }
+
+  const ClipboardHasSeedWords = () => {
+    return (
+      <View style={{
+        height: hp(35),
+        backgroundColor: '#F8F8F8',
+      }}>
+        <AppBottomSheetTouchableWrapper
+          onPress={() => setClipboard(false)}
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 14,
+            alignSelf: "flex-end",
+            backgroundColor: "#77B9EB",
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: wp(3),
+            marginRight: wp(3),
+          }}
+        >
+          <FontAwesome name="close" color={Colors.white} size={RFValue(15)} />
+        </AppBottomSheetTouchableWrapper>
+
+        <Text
+          style={{
+            fontSize: RFValue(18),
+            color: "#006CB4",
+            fontFamily: Fonts.FiraSansRegular,
+            marginHorizontal: RFValue(40),
+          }}
+        >
+          Paste seed words?
+        </Text>
+
+        <Text
+          style={{
+            fontSize: RFValue(12),
+            color: "#8B8B8B",
+            fontFamily: Fonts.FiraSansRegular,
+            marginHorizontal: RFValue(40),
+            marginTop: hp(2),
+          }}
+        >
+          Various words were detected in your clipboard.
+        </Text>
+
+        <Text
+          style={{
+            fontSize: RFValue(12),
+            color: "#8B8B8B",
+            fontFamily: Fonts.FiraSansRegular,
+            marginHorizontal: RFValue(40),
+          }}
+        >
+          Would you like to paste these words in these fields?
+        </Text>
+
+        <View style={{flex: 1}} />
+
+        <View style={{
+          flexDirection: 'row',
+          marginHorizontal: RFValue(40),
+          marginBottom: hp(3),
+        }}>
+          <TouchableOpacity 
+            style={{
+              backgroundColor: '#006DB4',
+              paddingHorizontal: wp(5),
+              height: hp(6),
+              borderRadius: 10,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onPress={() => {
+              setData(clipData)
+              setClipboard(false)
+            }}
+          >
+            <Text style={{fontFamily: Fonts.FiraSansMedium, color: '#FAFAFA', fontSize: RFValue(13)}}>
+              Paste words
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              padding: wp(5),
+              marginHorizontal: wp(2),
+            }}
+            onPress={() => setClipboard(false)}
+          >
+            <Text style={{fontFamily: Fonts.FiraSansMedium, fontSize: RFValue(13)}}>
+              Enter Manually
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
   }
 
   const recoverWalletViaSeed = ( mnemonic: string ) => {
@@ -156,7 +286,7 @@ const RestoreSeedWordsContent = ( props ) => {
           // infoBoxInfo={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}
           onPressConfirm={recoverWalletViaSeed}
           mnemonicSuggestions={mnemonicSuggestions}
-          data={[]}
+          data={data}
           confirmButtonText={'Next'}
           proceedButtonText={'Proceed'}
           disableChange={false}
@@ -205,6 +335,13 @@ const RestoreSeedWordsContent = ( props ) => {
           isBottomImage={false}
         // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
+      </ModalContainer>
+      <ModalContainer
+        onBackground={() => setClipboard(false)}
+        visible={clipboard}
+        closeBottomSheet={() => {}}
+      >
+        <ClipboardHasSeedWords />
       </ModalContainer>
     </View>
   )

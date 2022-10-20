@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, StatusBar, View } from "react-native";
+import { SafeAreaView, Share, StatusBar, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import SeedPageComponent from "../NewBHR/SeedPageComponent";
 import RNPreventScreenshot from "react-native-screenshot-prevent";
@@ -9,6 +9,7 @@ import SeedBacupModalContents from "../NewBHR/SeedBacupModalContents";
 import ModalContainer from "../../components/home/ModalContainer";
 import Colors from "../../common/Colors";
 import SeedHeaderComponent from "../NewBHR/SeedHeaderComponent";
+import Toast from "../../components/Toast";
 
 export type ISeedBackupSherpaProps = { navigation: any };
 
@@ -39,6 +40,18 @@ const SeedBackupSherpa: React.FC<ISeedBackupSherpaProps> = (props) => {
     }
     setSeedRandomNumber(ranNums);
   }, []);
+
+  const shareCode = async (code) => {
+    try {
+      await Share.share({
+        message: `Send this backup phrases to your ward and paste them on the Seed backup Screen.\n\n${code}`,
+        title: "Share Sherpa Code",
+      });
+    } catch (error) {
+      console.log("SharePhrasesError", error);
+      Toast("Something went wrong");
+    }
+  }
 
   return (
     <View
@@ -89,50 +102,29 @@ const SeedBackupSherpa: React.FC<ISeedBackupSherpaProps> = (props) => {
           infoBoxInfo={
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt"
           }
-          onPressConfirm={(seed, seedData) => {
-            setSeedPosition(0);
-            setSeedData(seedData);
-
-            setTimeout(() => {
-              setConfirmSeedWordModal(true);
-            }, 500);
+          onPressConfirm={() => {
+            props.navigation.goBack();
           }}
           data={[]}
           confirmButtonText={"Next"}
           proceedButtonText={"Proceed"}
           disableChange={false}
           onPressReshare={() => {}}
-          onPressChange={() => {
+          onPressChange={(phrases) => {
             RNPreventScreenshot.enabled(false);
             // props.navigation.goBack()
-            props.navigation.pop();
+            // props.navigation.pop();
+
+            shareCode(phrases);
           }}
           showButton={true}
-          changeButtonText={"Back"}
+          changeButtonText={"Copy Words"}
           previousButtonText={"Previous"}
           isChangeKeeperAllow={true}
           setHeaderMessage={(message) => setHeaderTitle(message)}
+          sherpa
         />
       </KeyboardAwareScrollView>
-      <BottomInputModalContainer
-        onBackground={() => setConfirmSeedWordModal(false)}
-        visible={confirmSeedWordModal}
-        closeBottomSheet={() => {}}
-        showBlurView={true}
-      >
-        <ConfirmSeedWordsModal
-          proceedButtonText={"Next"}
-          seedNumber={seedRandomNumber ? seedRandomNumber[seedPosition] : 0}
-          onPressProceed={(word) => {}}
-          bottomBoxInfo={true}
-          onPressIgnore={() => {
-            setConfirmSeedWordModal(false);
-            props.navigation.goBack();
-          }}
-          isIgnoreButton={true}
-          cancelButtonText={"Start Over"}
-        />
-      </BottomInputModalContainer>
       <ModalContainer
         onBackground={() => setSeedWordModal(false)}
         visible={seedWordModal}
