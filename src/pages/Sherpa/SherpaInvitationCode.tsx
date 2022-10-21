@@ -16,6 +16,8 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
+// import Share from 'react-native-share';
+
 import MoreIcon from "../../assets/images/svgs/icon_more_gray.svg";
 import SendQR from "../../assets/images/svgs/link.svg";
 import { Avatar } from "react-native-elements";
@@ -103,9 +105,9 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
     (state: StoreType) => state.accounts
   );
 
-  const params = props.navigation.state.params.contact;
+  const params = props.navigation && props.navigation.state.params.contact;
 
-  const receivingContact: Contacts = params.SelectedContact[0];
+  const receivingContact: Contacts = params &&  params.SelectedContact && params.SelectedContact[0];
 
   const giftToSend = params.giftId ? accountsState.gifts[params.giftId] : null;
 
@@ -254,7 +256,7 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
 
       <CodeTextBox
         code={code}
-        name={receivingContact.firstName + " " + receivingContact.lastName}
+        name={receivingContact && receivingContact.firstName + " " + receivingContact && receivingContact.lastName}
       />
 
       <Heading
@@ -304,7 +306,7 @@ const SherpaInvitationCode: React.FC<IInvitationCodeProps> = (props) => {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              &ensp;Share Code
+              &ensp;&ensp;Share Code
             </Text>
           </TouchableOpacity>
 
@@ -361,6 +363,7 @@ const styles = StyleSheet.create({
     borderColor: "white",
     elevation: 5,
     zIndex: 1,
+    marginRight: 2
   },
   footer: {
     marginBottom: wp(5),
