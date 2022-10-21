@@ -27,6 +27,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import axios from 'axios'
 import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
+import nfcManager from 'react-native-nfc-manager'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import useAccountSendST1CompletionEffect from '../../utils/sending/UseAccountSendST1CompletionEffect'
 import useAccountSendST2CompletionEffect from '../../utils/sending/UseAccountSendST2CompletionEffect'
@@ -54,7 +55,6 @@ export default function SetUpSatNextCardScreen( props ) {
 
   const card = useRef( new CKTapCard() ).current
   const sourceAccountShell = useSourceAccountShellForSending()
-
   const [ stepsVerified, setStepsVerified ] = useState( 0 )
   const [ cardDetails, setCardDetails ] = useState<CKTapCard | null>(  )
   const [ showAlertModal, setShowAlertModal ] = useState( false )
@@ -136,6 +136,7 @@ export default function SetUpSatNextCardScreen( props ) {
     } catch ( error: any ) {
       console.log( error.toString() )
       setNFCModal( false )
+      nfcManager.setAlertMessageIOS( error.toString() )
       setErrorMessage( error.toString() )
       setShowAlertModal( true )
       return {
@@ -145,6 +146,7 @@ export default function SetUpSatNextCardScreen( props ) {
     }
   }
   async function getCardData() {
+    console.log( 'at callback' )
     const cardData = await card.first_look()
     setCardDetails( cardData )
     console.log( 'card details===>' + JSON.stringify( cardData ) )
@@ -213,6 +215,9 @@ export default function SetUpSatNextCardScreen( props ) {
           amount: giftAmount
         } ) )
         dispatch( addRecipientForSending( recipient ) )
+        console.log( {
+          sourceAccountShell, recipient
+        } )
         dispatch( executeSendStage1( {
           accountShell: sourceAccountShell
         } ) )
