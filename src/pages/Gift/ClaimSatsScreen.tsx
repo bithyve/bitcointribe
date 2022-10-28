@@ -177,6 +177,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
       dispatch( updateSatCardAccount( sourcePrimarySubAccount.id, privKey, address, selectedAccount ) )
       // For setup slot for next user
       // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
+      await card.first_look( )
       const setUpSlot = await card.setup( spendCode, undefined, true )
       console.log( 'setUpSlot for next user ===>' + JSON.stringify( setUpSlot ) )
     }else{

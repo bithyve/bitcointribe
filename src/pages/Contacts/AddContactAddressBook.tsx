@@ -320,7 +320,22 @@ export default function AddContactAddressBook(props) {
           setActiveTab: props.navigation.state.params.setActiveTab
         })
       } else {
-        setCreateFNFInvite(true)
+        if(props.navigation.state.params?.fromScreen === 'Invitation'){
+          setCreateFNFInvite(true)
+        }else{
+          props.navigation.navigate('AddContactSendRequest', {
+            SelectedContact: selectedContacts,
+            giftId: props.navigation.state.params?.giftId,
+            headerText: strings.addContact,
+            subHeaderText: strings.send,
+            contactText: strings.adding,
+            senderName: props?.navigation?.state?.params?.senderName,
+            showDone: true,
+            note: props?.navigation?.state?.params?.note
+          })
+         
+        }
+        
       }
 
     }
@@ -339,7 +354,6 @@ export default function AddContactAddressBook(props) {
         })
   }
   const goCreateGifts = () => {
-    console.log('goCreateGifts',props.navigation.state.params?.giftId)
     setCreateFNFInvite(false)
     props.navigation.navigate( 'CreateGift',{
       selectedContact: selectedContacts,

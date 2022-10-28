@@ -127,7 +127,7 @@
     "react-native-linear-gradient": "^2.5.6",
     "react-native-localize": "^1.4.1",
     "react-native-mail": "^6.1.0",
-    "react-native-nfc-manager": "^3.13.5",
+    "react-native-nfc-manager": "^3.14.0",
     "react-native-os": "^1.2.6",
     "react-native-pager-view": "^6.0.0-rc.1",
     "react-native-paper": "^4.8.1",
