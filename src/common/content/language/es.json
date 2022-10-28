@@ -81,6 +81,11 @@
               "heading": "Satoshis o Sats",
               "text": "1 bitcoin = 100 millones satoshis o sats",
               "subText": "La cuenta de ahorros se desbloquea una vez que su copia de seguridad está en el nivel 2. Además, configure su código 2FA en una aplicación de autenticación0"
+          },
+          {
+            "heading": "Nun donacu per SATSCARDO",
+            "text": "Uzu SATSCARD por sendi kaj ricevi donacojn kun viaj amatoj",
+            "subText": ""
           }
       ],
       "Hello": "¡Hola!",

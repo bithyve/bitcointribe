@@ -99,7 +99,12 @@
           "heading": "Backup phrase",
           "text": "New backup method: Now note down twelve-word phrase (seed words) to backup your wallet",
           "subText": ""
-      }
+      },
+      {
+        "heading": "Now gift with SATSCARD",
+        "text": "Use SATSCARD to send and receive gifts with your loved ones",
+        "subText": ""
+    }
     ],
     "Hello": "Hello!",
     "create": "Create a login",

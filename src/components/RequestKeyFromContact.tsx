@@ -152,12 +152,12 @@ function RequestKeyFromContact( props ) {
             <View style={styles.contactProfileImageContainer}>
               {contact ? Object.keys( contact ).length !== 0 ? contact.imageAvailable ?
 
-                <Image
+               <Image
                   source={contact && contact.image}
                   style={{
                     ...styles.contactProfileImage
                   }}
-                />
+                /> 
 
 
                 : (
@@ -239,7 +239,7 @@ function RequestKeyFromContact( props ) {
                     {Contact && Contact.emails[ 0 ].email}
                   </Text>
 
-                ): contact && Object.keys( contact ).length !== 0 && props.encryptLinkWith === DeepLinkEncryptionType.OTP ?
+                ): contact && Object.keys( contact ).length !== 0 && props.encryptLinkWith !== DeepLinkEncryptionType.OTP ?
                   <Text style={{
                     color: Colors.blue,
                     fontSize: RFValue( 14 ),
@@ -257,7 +257,7 @@ function RequestKeyFromContact( props ) {
               {contact && contact.name ?
                 <Text style={{
                   color: Colors.textColorGrey,
-                  fontSize: RFValue( 11 ),
+                  fontSize: RFValue( 12 ),
                   fontFamily: Fonts.FiraSansMediumItalic,
                 }}>
                   {contact.name}

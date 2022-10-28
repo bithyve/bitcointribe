@@ -148,6 +148,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
   const [ modalVisible, setModalVisible ] = useState( false )
+  const [ message, setMessage ] = useState( '' )
+
   const defaultKeeperObj: {
     shareType: string
     updatedAt: number;
