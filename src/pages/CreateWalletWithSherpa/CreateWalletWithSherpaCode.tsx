@@ -137,7 +137,7 @@ export default function CreateWalletWithSherpaCode(props) {
               }
               maxLength={10}
               onChangeText={(text) => {
-                text = text.replace(/[^A-Za-z]/g, "");
+                // text = text.replace(/[^A-Za-z]/g, "");
                 setSherpaCode(text);
               }}
               onFocus={() => {
