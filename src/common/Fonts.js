@@ -6,5 +6,9 @@ export default {
   FiraSansSemiBold: 'FiraSans-Medium',
   // FiraSansLight: 'FiraSans-Light',
   FiraSansMediumItalic: 'FiraSans-MediumItalic',
-  OpenSans: 'OpenSans'
+  OpenSans: 'OpenSans',
+  RobotoSlabRegular: 'RobotoSlab-Regular',
+  RobotoSlabMedium: 'RobotoSlab-Medium',
+  RobotoSlabBold: 'RobotoSlab-Bold',
+  RobotoSlabLight: 'RobotoSlab-Light',  
 }
