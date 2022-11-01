@@ -11,6 +11,7 @@ export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT'
 export const REJECT_TRUSTED_CONTACT = 'REJECT_TRUSTED_CONTACT'
 export const EDIT_TRUSTED_CONTACT = 'EDIT_TRUSTED_CONTACT'
 export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT'
+export const SEND_CHANNEL_MESSAGE = 'SEND_CHANNEL_MESSAGE'
 export const RESTORE_TRUSTED_CONTACTS = 'RESTORE_TRUSTED_CONTACTS'
 export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 export const UPDATE_WALLET_NAME_TO_CHANNEL = 'UPDATE_WALLET_NAME_TO_CHANNEL'
@@ -130,6 +131,15 @@ export const removeTrustedContact = ( { channelKey } : {channelKey: string} ) =>
     type: REMOVE_TRUSTED_CONTACT,
     payload: {
       channelKey
+    },
+  }
+}
+
+export const sendChannelMessage = ( { channelAddress, message } : {channelAddress: string, message: object} ) => {
+  return {
+    type: SEND_CHANNEL_MESSAGE,
+    payload: {
+      channelAddress, message
     },
   }
 }
