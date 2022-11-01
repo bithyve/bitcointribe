@@ -49,7 +49,7 @@ const ToggleContainer = ( ) => {
             />
             : null
         }
-        trackColor={Colors.lightBlue}
+        trackColor={'#4286F580'}
         thumbColor={Colors.blue}
         onpress={() => {
           dispatch( giftCurrencyKindSet(
