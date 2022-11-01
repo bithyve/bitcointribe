@@ -228,10 +228,12 @@ export default class TrustedContactsOperations {
     channelKey: string,
     instreamUpdates: StreamData,
     outStreamId: string,
+    messages: []
   ) => {
     let encryptedInstream =
       contact.permanentChannel[ instreamUpdates.streamId ] || {
       }
+    contact.messages = messages
     let unencryptedInstream =
       contact.unencryptedPermanentChannel[ instreamUpdates.streamId ] || {
       }
@@ -388,8 +390,9 @@ export default class TrustedContactsOperations {
         )
 
         const { channelInstreams } = res.data
+        console.log( 'channelInstreams', channelInstreams )
         for ( const permanentChannelAddress of Object.keys( channelInstreams ) ) {
-          const { updated, isActive, instream } =
+          const { updated, isActive, instream, messages } =
             channelInstreams[ permanentChannelAddress ]
           const { contact, channelKey } =
             channelMapping[ permanentChannelAddress ]
@@ -401,7 +404,7 @@ export default class TrustedContactsOperations {
             )
           if ( typeof isActive === 'boolean' )
             ( contact as TrustedContact ).isActive = isActive
-          if ( instream ) TrustedContactsOperations.cacheInstream( contact, channelKey, instream, outStreamId )
+          if ( instream ) TrustedContactsOperations.cacheInstream( contact, channelKey, instream, outStreamId, messages )
         }
 
         // consolidate contact updates/creation
@@ -412,7 +415,7 @@ export default class TrustedContactsOperations {
             channelMapping[ permanentChannelAddress ]
           updatedContacts[ channelKey ] = contact
         } )
-
+        console.log( 'updatedContacts', updatedContacts )
         return {
           updated: true, updatedContacts
         }
@@ -582,6 +585,28 @@ export default class TrustedContactsOperations {
        throw new Error( err.message )
      }
    };
+
+   static sendMessage = async ( {
+     walletId,
+     channelAddress,
+     message
+   }: {
+   walletId: string;
+   channelAddress: string;
+   message: object
+   } ) =>{
+     try {
+       const res: AxiosResponse = await BH_AXIOS.post( 'sendChannelMessage', {
+         HEXA_ID,
+         channelAddress,
+         sender: walletId,
+         message,
+       } )
+       return res.data
+     } catch ( error ) {
+       console.log( error )
+     }
+   }
 
    static restoreTrustedContacts = async ( {
      walletId,

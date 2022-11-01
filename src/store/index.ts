@@ -113,6 +113,7 @@ import {
   updateWalletNameToChannelWatcher,
   updateWalletNameWatcher,
   walletCheckInWatcher,
+  sendChannelMessageWatcher
 } from './sagas/trustedContacts'
 import {
   autoShareContactKeeperWatcher,
@@ -257,6 +258,7 @@ const rootSaga = function* () {
     syncGiftsStatusWatcher,
     rejectGiftWatcher,
     reclaimGiftWatcher,
+    sendChannelMessageWatcher,
 
     // bhr
     initHealthWatcher,

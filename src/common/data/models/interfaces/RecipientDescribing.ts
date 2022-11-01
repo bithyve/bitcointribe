@@ -24,6 +24,8 @@ export interface ContactRecipientDescribing extends RecipientDescribing {
   trustKind: ContactTrustKind;
   walletId?: string;
   streamId?: string;
+  messages?: [],
+  channelAddress?: string
 }
 
 export interface AccountRecipientDescribing extends RecipientDescribing {

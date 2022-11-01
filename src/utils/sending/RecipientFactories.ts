@@ -67,6 +67,8 @@ export function makeContactRecipientDescription(
   channelKey: string,
   contact: TrustedContact,
   trustKind: ContactTrustKind = ContactTrustKind.OTHER,
+  messages: [],
+  channelAddress: string
 ): ContactRecipientDescribing {
   const { contactDetails } = contact
   const contactName = contactDetails.contactName
@@ -97,6 +99,8 @@ export function makeContactRecipientDescription(
     lastSeenActive,
     walletId,
     streamId: instreamId,
+    messages: messages,
+    channelAddress: channelAddress
   }
 
   return contactRecipient

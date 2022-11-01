@@ -21,6 +21,7 @@ import {
   ASSOCIATE_GIFT,
   fetchGiftFromTemporaryChannel,
   RECLAIM_GIFT,
+  SEND_CHANNEL_MESSAGE
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -1226,6 +1227,27 @@ export function* restoreTrustedContactsWorker( { payload }: { payload: { walletI
   //   console.log( 'res.backupData.primaryMnemonicShard', res.backupData.primaryMnemonicShard )
   // }
 }
+
+function* sendChannelMessageWorker( { payload } ) {
+  try {
+    const { channelAddress, message } = payload
+    const wallet: Wallet = yield select(
+      ( state ) => state.storage.wallet,
+    )
+    const { walletId } = wallet
+    const response = yield call( TrustedContactsOperations.sendMessage, {
+      walletId, channelAddress, message
+    } )
+    console.log( 'response', response )
+  } catch ( error ) {
+    console.log( error )
+  }
+}
+
+export const sendChannelMessageWatcher = createWatcher(
+  sendChannelMessageWorker,
+  SEND_CHANNEL_MESSAGE,
+)
 
 export const restoreTrustedContactsWatcher = createWatcher(
   restoreTrustedContactsWorker,
