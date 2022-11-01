@@ -178,7 +178,6 @@ class FriendsAndFamilyScreen extends React.Component<
 
   updateAddressBook = async () => {
     const { trustedContacts, keeperInfo } = this.props
-
     const keepers = []
     const keeping = []
     const otherContacts = []
@@ -194,16 +193,22 @@ class FriendsAndFamilyScreen extends React.Component<
             channelKey,
             contact,
             ContactTrustKind.KEEPER_OF_USER,
+            contact.messages,
+            contact.permanentChannelAddress
           ) )
           if( isWard ) keeping.push( makeContactRecipientDescription(
             channelKey,
             contact,
             ContactTrustKind.USER_IS_KEEPING,
+            contact.messages,
+            contact.permanentChannelAddress
           ) )
         } else otherContacts.push( makeContactRecipientDescription(
           channelKey,
           contact,
           ContactTrustKind.OTHER,
+          contact.messages,
+          contact.permanentChannelAddress
         ) )
       } else {
         // TODO: inject in expired contacts list
@@ -572,17 +577,23 @@ class FriendsAndFamilyScreen extends React.Component<
                   isLoadContacts: true,
                 // addFnF: true
                 }, () => {
-                  navigation.navigate( 'AddContact',{fromScreen: "Invitation"} )
+                  navigation.navigate( 'AddContact' )
+
                 } )
               }}
               style={{
-                ...styles.selectedContactsView,backgroundColor: Colors.lightBlue,
+                ...styles.selectedContactsView, backgroundColor: Colors.lightBlue,
               }}
             >
               <Text style={[ styles.contactText, {
                 fontSize: RFValue( 24 ), lineHeight:30
               } ]}>+</Text>
+              {/* <Image
+                    style={styles.addGrayImage}
+                    source={require( '../../assets/images/icons/icon_add_grey.png' )}
+                  /> */}
               <Text style={styles.contactText}>{this.strings[ 'AddNew' ]}</Text>
+
             </TouchableOpacity>
           </View>
           <ScrollView

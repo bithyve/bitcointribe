@@ -1,44 +1,3 @@
-import React, { useState, useEffect, useMemo } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  Text,
-  StatusBar,
-  TextInput,
-  KeyboardAvoidingView,
-  ScrollView,
-  Image,
-  Dimensions,
-  Switch,
-  Platform,
-} from "react-native";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
-import { useDispatch, useSelector } from "react-redux";
-import Colors from "../../common/Colors";
-import Fonts from "../../common/Fonts";
-import { RFValue } from "react-native-responsive-fontsize";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import HeaderTitle from "../../components/HeaderTitle";
-import CommonStyles from "../../common/Styles/Styles";
-import CheckingAccount from "../../assets/images/accIcons/icon_checking.svg";
-import Dollar from "../../assets/images/svgs/icon_dollar.svg";
-import CheckMark from "../../assets/images/svgs/checkmark.svg";
-import ModalContainer from "../../components/home/ModalContainer";
-import DashedContainer from "./DashedContainer";
-import GiftCard from "../../assets/images/svgs/gift_icon_new.svg";
-import BottomInfoBox from "../../components/BottomInfoBox";
-import Illustration from "../../assets/images/svgs/illustration.svg";
-import {
-  generateGifts,
-  giftCreationSuccess,
-} from "../../store/actions/accounts";
-import { AccountsState } from "../../store/reducers/accounts";
 import {
   Account,
   AccountType,
@@ -47,170 +6,213 @@ import {
   GiftThemeId,
   TxPriority,
   Wallet,
-} from "../../bitcoin/utilities/Interface";
-import idx from "idx";
-import useSpendableBalanceForAccountShell from "../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell";
-import usePrimarySubAccountForShell from "../../utils/hooks/account-utils/UsePrimarySubAccountForShell";
-import useFormattedUnitText from "../../utils/hooks/formatting/UseFormattedUnitText";
-import BitcoinUnit from "../../common/data/enums/BitcoinUnit";
-import AccountShell from "../../common/data/models/AccountShell";
-import ToggleContainer from "./CurrencyToggle";
+} from '../../bitcoin/utilities/Interface'
+import {
+  Dimensions,
+  Image,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import MaterialCurrencyCodeIcon, {
   materialIconCurrencyCodes,
-} from "../../components/MaterialCurrencyCodeIcon";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+} from '../../components/MaterialCurrencyCodeIcon'
+import React, { useEffect, useMemo, useState } from 'react'
+import { calculateSendMaxFee, sourceAccountSelectedForSending } from '../../store/actions/sending'
+import {
+  generateGifts,
+  giftCreationSuccess,
+} from '../../store/actions/accounts'
 import {
   getCurrencyImageByRegion,
   processRequestQR,
-} from "../../common/CommonFunctions/index";
-import useCurrencyCode from "../../utils/hooks/state-selectors/UseCurrencyCode";
-import CurrencyKind from "../../common/data/enums/CurrencyKind";
-import useCurrencyKind from "../../utils/hooks/state-selectors/UseCurrencyKind";
-import { UsNumberFormat } from "../../common/utilities";
-import { SATOSHIS_IN_BTC } from "../../common/constants/Bitcoin";
-import { translations } from "../../common/content/LocContext";
-import FormStyles from "../../common/Styles/FormStyles";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import { updateUserName } from "../../store/actions/storage";
-import getAvatarForSubAccount from "../../utils/accounts/GetAvatarForSubAccountKind";
-import Loader from "../../components/loader";
-import useActiveAccountShells from "../../utils/hooks/state-selectors/accounts/UseActiveAccountShells";
-import ErrorLoader from "../../components/ErrorLoader";
-import LoaderModal from "../../components/LoaderModal";
-import Toast from "../../components/Toast";
-import { calculateSendMaxFee } from "../../store/actions/sending";
-import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
-import { Shadow } from "react-native-shadow-2";
-import VerifySatModalContents from "../Gift/VerifySatModalContents";
-import { platform } from "process";
-import { NavigationActions } from "react-navigation";
+} from '../../common/CommonFunctions/index'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
 
-const { height } = Dimensions.get("window");
+import AccountShell from '../../common/data/models/AccountShell'
+import { AccountsState } from '../../store/reducers/accounts'
+import AntDesign from 'react-native-vector-icons/AntDesign'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import CheckMark from '../../assets/images/svgs/checkmark.svg'
+import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
+import Colors from '../../common/Colors'
+import CommonStyles from '../../common/Styles/Styles'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import DashedContainer from './DashedContainer'
+import Dollar from '../../assets/images/svgs/icon_dollar.svg'
+import ErrorLoader from '../../components/ErrorLoader'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Fonts from '../../common/Fonts'
+import FormStyles from '../../common/Styles/FormStyles'
+import GiftCard from '../../assets/images/svgs/gift_icon_new.svg'
+import HeaderTitle from '../../components/HeaderTitle'
+import Illustration from '../../assets/images/svgs/illustration.svg'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import Loader from '../../components/loader'
+import LoaderModal from '../../components/LoaderModal'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import ModalContainer from '../../components/home/ModalContainer'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import { Shadow } from 'react-native-shadow-2'
+import Toast from '../../components/Toast'
+import ToggleContainer from './CurrencyToggle'
+import { UsNumberFormat } from '../../common/utilities'
+import VerifySatModalContents from '../Gift/VerifySatModalContents'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import idx from 'idx'
+import { platform } from 'process'
+import { translations } from '../../common/content/LocContext'
+import { updateUserName } from '../../store/actions/storage'
+import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
+
+const { height } = Dimensions.get( 'window' )
 
 export type Props = {
   navigation: any;
 };
 
-const CreateGift = ({ navigation }: Props) => {
-  const { selectedContact, statusFlag } = navigation?.state?.params;
-  const dispatch = useDispatch();
+const CreateGift = ( { navigation }: Props ) => {
+  const { selectedContact, statusFlag } = navigation?.state?.params
+  const dispatch = useDispatch()
   const activeAccounts = useActiveAccountShells().filter(
-    (shell) => shell?.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT
-  );
+    ( shell ) => shell?.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT
+  )
   const currencyKind: CurrencyKind = useSelector(
-    (state) => state.preferences.giftCurrencyKind || CurrencyKind.BITCOIN
-  );
-  const strings = translations["accounts"];
-  const prefersBitcoin = useMemo(() => {
-    return currencyKind === CurrencyKind.BITCOIN;
-  }, [currencyKind]);
-  const fiatCurrencyCode = useCurrencyCode();
-  const accountsState: AccountsState = useSelector((state) => state.accounts);
-  const currencyCode = useSelector((state) => state.preferences.currencyCode);
-  const exchangeRates = useSelector((state) => state.accounts.exchangeRates);
-  const [amount, setAmount] = useState("");
-  const [showKeyboard, setKeyboard] = useState(false);
-  const [numbersOfGift, setNumbersOfGift] = useState(1);
-  const [initGiftCreation, setInitGiftCreation] = useState(false);
-  const [includeFees, setFees] = useState(false);
-  const [addfNf, setAddfNf] = useState(false);
-  const [giftModal, setGiftModal] = useState(false);
-  const [createdGift, setCreatedGift] = useState(null);
-  const accountState: AccountsState = useSelector((state) =>
-    idx(state, (_) => _.accounts)
-  );
+    ( state ) => state.preferences.giftCurrencyKind || CurrencyKind.BITCOIN
+  )
+  const strings = translations[ 'accounts' ]
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
+  const fiatCurrencyCode = useCurrencyCode()
+  const accountsState: AccountsState = useSelector( ( state ) => state.accounts )
+  const currencyCode = useSelector( ( state ) => state.preferences.currencyCode )
+  const exchangeRates = useSelector( ( state ) => state.accounts.exchangeRates )
+  const [ amount, setAmount ] = useState( '' )
+  const [ showKeyboard, setKeyboard ] = useState( false )
+  const [ numbersOfGift, setNumbersOfGift ] = useState( 1 )
+  const [ initGiftCreation, setInitGiftCreation ] = useState( false )
+  const [ includeFees, setFees ] = useState( false )
+  const [ addfNf, setAddfNf ] = useState( false )
+  const [ giftModal, setGiftModal ] = useState( false )
+  const [ createdGift, setCreatedGift ] = useState( null )
+  const accountState: AccountsState = useSelector( ( state ) =>
+    idx( state, ( _ ) => _.accounts )
+  )
   const giftCreationStatus = useSelector(
-    (state) => state.accounts.giftCreationStatus
-  );
-  const sendMaxFee = useSelector((state) =>
-    idx(state, (_) => _.sending.sendMaxFee)
-  );
-  const [isSendMax, setIsSendMax] = useState(false);
-  const accountShells: AccountShell[] = accountState.accountShells;
-  const [showLoader, setShowLoader] = useState(false);
-  const [accountListModal, setAccountListModal] = useState(false);
-  const [advanceModal, setAdvanceModal] = useState(false);
+    ( state ) => state.accounts.giftCreationStatus
+  )
+  const sendMaxFee = useSelector( ( state ) =>
+    idx( state, ( _ ) => _.sending.sendMaxFee )
+  )
+  const [ isSendMax, setIsSendMax ] = useState( false )
+  const accountShells: AccountShell[] = accountState.accountShells
+  const [ showLoader, setShowLoader ] = useState( false )
+  const [ accountListModal, setAccountListModal ] = useState( false )
+  const [ advanceModal, setAdvanceModal ] = useState( false )
   const defaultGiftAccount = accountShells.find(
-    (shell) =>
+    ( shell ) =>
       shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT &&
       shell.primarySubAccount.instanceNumber === 0
-  );
-  const [selectedAccount, setSelectedAccount]: [AccountShell, any] =
-    useState(defaultGiftAccount);
-  const spendableBalance = useSpendableBalanceForAccountShell(selectedAccount);
+  )
+  const [ selectedAccount, setSelectedAccount ]: [AccountShell, any] =
+    useState( defaultGiftAccount )
+  const spendableBalance = useSpendableBalanceForAccountShell( selectedAccount )
   const account: Account =
-    accountState.accounts[selectedAccount.primarySubAccount.id];
-  const [averageLowTxFee, setAverageLowTxFee] = useState(0);
-  const [isExclusive, setIsExclusive] = useState(true);
-  const [minimumGiftValue, setMinimumGiftValue] = useState(1000);
-  const [showErrorLoader, setShowErrorLoader] = useState(false);
-  const [satCard, setSatCard] = useState(false);
-  const [showVerification, setShowVerification] = useState(false);
-  const fromScreen = navigation.state.params.fromScreen;
+    accountState.accounts[ selectedAccount.primarySubAccount.id ]
+  const [ averageLowTxFee, setAverageLowTxFee ] = useState( 0 )
+  const [ isExclusive, setIsExclusive ] = useState( true )
+  const [ minimumGiftValue, setMinimumGiftValue ] = useState( 1000 )
+  const [ showErrorLoader, setShowErrorLoader ] = useState( false )
+  const [ satCard, setSatCard ] = useState( false )
+  const [ showVerification, setShowVerification ] = useState( false )
 
-  const [name, setName] = useState("");
-  const wallet: Wallet = useSelector((state) => state.storage.wallet);
+  const [ name, setName ] = useState( '' )
+  const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
 
-  const currentSatsAmountFormValue = useMemo(() => {
-    return Number(amount);
-  }, [amount]);
+  const currentSatsAmountFormValue = useMemo( () => {
+    return Number( amount )
+  }, [ amount ] )
 
-  const [dropdownBoxValue, setDropdownBoxValue] = useState({
+  const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
-    title: "Gift Sats",
-    subText: "Something that appreciates with time",
+    title: 'Gift Sats',
+    subText: 'Something that appreciates with time',
     avatar: <GiftCard />,
     color: Colors.darkBlue,
-  });
+  } )
 
-  useEffect(() => {
-    let minimumGiftVal = 1000;
-    if (includeFees) minimumGiftVal += averageLowTxFee;
-    setMinimumGiftValue(minimumGiftVal);
-  }, [includeFees]);
 
-  useEffect(() => {
-    if (numbersOfGift) setFees(false);
-  }, [numbersOfGift]);
+  useEffect( () => {
+    dispatch( sourceAccountSelectedForSending( defaultGiftAccount ) )
+  }, [ defaultGiftAccount ] )
 
-  useEffect(() => {
-    setName(wallet.userName ? wallet.userName : wallet.walletName);
-  }, [wallet.walletName, wallet.userName]);
+  useEffect( () => {
+    let minimumGiftVal = 1000
+    if ( includeFees ) minimumGiftVal += averageLowTxFee
+    setMinimumGiftValue( minimumGiftVal )
+  }, [ includeFees ] )
 
-  function convertFiatToSats(fiatAmount: number) {
+  useEffect( () => {
+    if ( numbersOfGift ) setFees( false )
+  }, [ numbersOfGift ] )
+
+  useEffect( () => {
+    setName( wallet.userName ? wallet.userName : wallet.walletName )
+  }, [ wallet.walletName, wallet.userName ] )
+
+  function convertFiatToSats( fiatAmount: number ) {
     return accountsState.exchangeRates &&
-      accountsState.exchangeRates[currencyCode]
+      accountsState.exchangeRates[ currencyCode ]
       ? Math.trunc(
-          (fiatAmount / accountsState.exchangeRates[currencyCode].last) *
+        ( fiatAmount / accountsState.exchangeRates[ currencyCode ].last ) *
             SATOSHIS_IN_BTC
-        )
-      : 0;
+      )
+      : 0
   }
 
-  function convertSatsToFiat(sats) {
+  function convertSatsToFiat( sats ) {
     return accountsState.exchangeRates &&
-      accountsState.exchangeRates[currencyCode]
+      accountsState.exchangeRates[ currencyCode ]
       ? (
-          (sats / SATOSHIS_IN_BTC) *
-          accountsState.exchangeRates[currencyCode].last
-        ).toFixed(2)
-      : "0";
+        ( sats / SATOSHIS_IN_BTC ) *
+          accountsState.exchangeRates[ currencyCode ].last
+      ).toFixed( 2 )
+      : '0'
   }
 
-  const isAmountInvalid = useMemo(() => {
-    let giftAmount = currentSatsAmountFormValue;
-    console.log(giftAmount);
+  const isAmountInvalid = useMemo( () => {
+    let giftAmount = currentSatsAmountFormValue
+    console.log( giftAmount )
 
-    const numberOfGifts = numbersOfGift ? Number(numbersOfGift) : 1;
-    if (prefersBitcoin) {
-      if (!includeFees && averageLowTxFee) giftAmount += averageLowTxFee;
-      return giftAmount * numberOfGifts > spendableBalance;
+    const numberOfGifts = numbersOfGift ? Number( numbersOfGift ) : 1
+    if ( prefersBitcoin ) {
+      if ( !includeFees && averageLowTxFee ) giftAmount += averageLowTxFee
+      return giftAmount * numberOfGifts > spendableBalance
     } else {
-      const giftAmountInFiat = giftAmount ? giftAmount : 1;
+      const giftAmountInFiat = giftAmount ? giftAmount : 1
       const spendableBalanceInFiat = parseFloat(
-        convertSatsToFiat(spendableBalance)
-      );
-      return giftAmountInFiat * numberOfGifts > spendableBalanceInFiat;
+        convertSatsToFiat( spendableBalance )
+      )
+      return giftAmountInFiat * numberOfGifts > spendableBalanceInFiat
     }
   }, [
     currentSatsAmountFormValue,
@@ -220,262 +222,250 @@ const CreateGift = ({ navigation }: Props) => {
     prefersBitcoin,
     numbersOfGift,
     currencyKind,
-  ]);
+  ] )
 
-  useEffect(() => {
+  useEffect( () => {
     if (
       accountsState.selectedGiftId &&
       initGiftCreation &&
       giftCreationStatus
     ) {
       const createdGift = accountsState.gifts
-        ? accountsState.gifts[accountsState.selectedGiftId]
-        : null;
-      if (createdGift) {
-        setCreatedGift(createdGift);
-        setGiftModal(true);
-        setInitGiftCreation(false);
-        setShowLoader(false);
-        setShowErrorLoader(false);
-        dispatch(giftCreationSuccess(null));
+        ? accountsState.gifts[ accountsState.selectedGiftId ]
+        : null
+      if ( createdGift ) {
+        setCreatedGift( createdGift )
+        setGiftModal( true )
+        setInitGiftCreation( false )
+        setShowLoader( false )
+        setShowErrorLoader( false )
+        dispatch( giftCreationSuccess( null ) )
       }
     }
-  }, [accountsState.selectedGiftId, initGiftCreation, giftCreationStatus]);
+  }, [ accountsState.selectedGiftId, initGiftCreation, giftCreationStatus ] )
 
-  useEffect(() => {
-    if (statusFlag == "Invitation") {
+  useEffect( () => {
+    if ( statusFlag == 'Invitation' ) {
       if (
         accountsState.selectedGiftId &&
         initGiftCreation &&
         giftCreationStatus
       ) {
         const createdGift = accountsState.gifts
-          ? accountsState.gifts[accountsState.selectedGiftId]
-          : null;
-        if (createdGift) {
-          setCreatedGift(createdGift);
-          setShowLoader(false);
-          navigation.replace("SendGift", {
-            fromScreen: "Gift",
+          ? accountsState.gifts[ accountsState.selectedGiftId ]
+          : null
+        if ( createdGift ) {
+          setCreatedGift( createdGift )
+          setShowLoader( false )
+          navigation.replace( 'SendGift', {
+            fromScreen: 'Gift',
             selectedContact: selectedContact,
-            giftId: (createdGift as Gift).id,
+            giftId: ( createdGift as Gift ).id,
             encryptionType: DeepLinkEncryptionType.OTP,
-            note: "Bitcoin is a new type of money that is not controlled by any government or company",
+            note: 'Bitcoin is a new type of money that is not controlled by any government or company',
             contact: selectedContact,
             senderName: name,
             themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
             setActiveTab: navigation.state.params.setActiveTab,
-          });
+          } )
         }
       }
     }
-  }, [accountsState.selectedGiftId, giftCreationStatus, initGiftCreation]);
+  }, [ accountsState.selectedGiftId, giftCreationStatus, initGiftCreation ] )
 
-  useEffect(() => {
-    setInitGiftCreation(false);
-    setShowLoader(false);
-    if (giftCreationStatus) {
-      dispatch(giftCreationSuccess(null));
-    } else if (giftCreationStatus === false) {
+  useEffect( () => {
+    setInitGiftCreation( false )
+    setShowLoader( false )
+    if ( giftCreationStatus ) {
+      dispatch( giftCreationSuccess( null ) )
+    } else if ( giftCreationStatus === false ) {
       // failed to create gift
-      setShowLoader(false);
-      setShowErrorLoader(true);
-      dispatch(giftCreationSuccess(null));
+      setShowLoader( false )
+      setShowErrorLoader( true )
+      dispatch( giftCreationSuccess( null ) )
     }
-  }, [giftCreationStatus]);
+  }, [ giftCreationStatus ] )
 
-  useEffect(() => {
-    if (isSendMax && sendMaxFee) setAverageLowTxFee(sendMaxFee);
-    else if (account && accountState.averageTxFees)
+  useEffect( () => {
+    if ( isSendMax && sendMaxFee ) setAverageLowTxFee( sendMaxFee )
+    else if ( account && accountState.averageTxFees )
       setAverageLowTxFee(
-        accountState.averageTxFees[account.networkType][TxPriority.LOW]
+        accountState.averageTxFees[ account.networkType ][ TxPriority.LOW ]
           .averageTxFee
-      );
-  }, [account, accountState.averageTxFees, isSendMax, sendMaxFee]);
+      )
+  }, [ account, accountState.averageTxFees, isSendMax, sendMaxFee ] )
 
-  useEffect(() => {
-    if (isSendMax && sendMaxFee) setAverageLowTxFee(sendMaxFee);
-    else if (account && accountState.averageTxFees)
+  useEffect( () => {
+    if ( isSendMax && sendMaxFee ) setAverageLowTxFee( sendMaxFee )
+    else if ( account && accountState.averageTxFees )
       setAverageLowTxFee(
-        accountState.averageTxFees[account.networkType][TxPriority.LOW]
+        accountState.averageTxFees[ account.networkType ][ TxPriority.LOW ]
           .averageTxFee
-      );
-  }, [account, accountState.averageTxFees, isSendMax, sendMaxFee]);
+      )
+  }, [ account, accountState.averageTxFees, isSendMax, sendMaxFee ] )
 
-  const numberWithCommas = (x) => {
-    return x ? x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
-  };
+  const numberWithCommas = ( x ) => {
+    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  }
 
-  useEffect(() => {
-    if (isSendMax) setAmount(`${spendableBalance - sendMaxFee}`);
-  }, [sendMaxFee, isSendMax]);
+  useEffect( () => {
+    if ( isSendMax ) setAmount( `${spendableBalance - sendMaxFee}` )
+  }, [ sendMaxFee, isSendMax ] )
 
-  useEffect(() => {
-    if (currencyKind == CurrencyKind.BITCOIN) {
-      const newAmount = convertFiatToSats(parseFloat(amount)).toString();
-      setAmount(newAmount == "NaN" ? "" : newAmount);
-    } else if (currencyKind == CurrencyKind.FIAT) {
-      const newAmount = convertSatsToFiat(parseFloat(amount)).toString();
-      setAmount(newAmount == "NaN" ? "" : newAmount);
+  useEffect( () => {
+    if ( currencyKind == CurrencyKind.BITCOIN ) {
+      const newAmount = convertFiatToSats( parseFloat( amount ) ).toString()
+      setAmount( newAmount == 'NaN' ? '' : newAmount )
+    } else if ( currencyKind == CurrencyKind.FIAT ) {
+      const newAmount = convertSatsToFiat( parseFloat( amount ) ).toString()
+      setAmount( newAmount == 'NaN' ? '' : newAmount )
     }
-  }, [currencyKind]);
+  }, [ currencyKind ] )
 
   function handleSendMaxPress() {
     dispatch(
-      calculateSendMaxFee({
-        numberOfRecipients: Number(numbersOfGift),
+      calculateSendMaxFee( {
+        numberOfRecipients: Number( numbersOfGift ),
         accountShell: selectedAccount,
-      })
-    );
-    setIsSendMax(true);
+      } )
+    )
+    setIsSendMax( true )
   }
 
-  const renderButton = (text, condn) => {
+  const renderButton = ( text, condn ) => {
     const availableToSpend =
       selectedAccount && selectedAccount.primarySubAccount?.balances?.confirmed
         ? selectedAccount.primarySubAccount?.balances?.confirmed
-        : 0;
+        : 0
 
-    let isDisabled = isAmountInvalid;
-    if (!isDisabled) {
-      if (prefersBitcoin) {
-        isDisabled = currentSatsAmountFormValue < minimumGiftValue;
+    let isDisabled = isAmountInvalid
+    if ( !isDisabled ) {
+      if ( prefersBitcoin ) {
+        isDisabled = currentSatsAmountFormValue < minimumGiftValue
       } else {
         isDisabled =
           currentSatsAmountFormValue <
-          parseFloat(convertSatsToFiat(minimumGiftValue));
+          parseFloat( convertSatsToFiat( minimumGiftValue ) )
       }
     }
 
     return (
-      <Shadow distance={2} startColor={Colors.shadowBlue} offset={[8, 8]}>
+      <Shadow distance={2} startColor={Colors.shadowBlue} offset={[ 8, 8 ]}>
         <TouchableOpacity
           disabled={isDisabled}
           onPress={() => {
-            if (satCard) {
-              setShowVerification(true);
+            if ( satCard ) {
+              setShowVerification( true )
             } else {
-              console.log("condn", condn);
-              const giftInstances = Number(numbersOfGift);
+              console.log( 'condn', condn )
+              const giftInstances = Number( numbersOfGift )
               const giftAmountInSats = prefersBitcoin
-                ? Number(amount)
-                : convertFiatToSats(parseFloat(amount));
-              const giftAmountsInSats = [];
-              for (let int = 0; int < giftInstances; int++) {
-                giftAmountsInSats.push(giftAmountInSats);
+                ? Number( amount )
+                : convertFiatToSats( parseFloat( amount ) )
+              const giftAmountsInSats = []
+              for ( let int = 0; int < giftInstances; int++ ) {
+                giftAmountsInSats.push( giftAmountInSats )
               }
-              switch (condn) {
-                case "Invitation":
-                  if (giftAmountsInSats.length) {
-                    setInitGiftCreation(true);
-                    setShowLoader(true);
-                    dispatch(
-                      generateGifts({
-                        amounts: giftAmountsInSats,
-                        accountId:
+              switch ( condn ) {
+                  case 'Invitation':
+                    if ( giftAmountsInSats.length ) {
+                      setInitGiftCreation( true )
+                      setShowLoader( true )
+                      dispatch(
+                        generateGifts( {
+                          amounts: giftAmountsInSats,
+                          accountId:
                           selectedAccount &&
                           selectedAccount.primarySubAccount &&
                           selectedAccount.primarySubAccount.id
                             ? selectedAccount.primarySubAccount.id
-                            : "",
-                        includeFee: includeFees,
-                        exclusiveGifts:
+                            : '',
+                          includeFee: includeFees,
+                          exclusiveGifts:
                           giftAmountsInSats.length === 1 ? false : isExclusive,
-                      })
-                    );
-                  }
-                  break;
-                case "Create Gift":
-                  // creating multiple gift instances(based on giftInstances) of the same amount
-                  if (giftAmountsInSats.length) {
-                    setInitGiftCreation(true);
-                    setShowLoader(true);
-                    dispatch(
-                      generateGifts({
-                        amounts: giftAmountsInSats,
-                        accountId:
-                          selectedAccount &&
-                          selectedAccount.primarySubAccount &&
-                          selectedAccount.primarySubAccount.id
-                            ? selectedAccount.primarySubAccount.id
-                            : "",
-                        includeFee: includeFees,
-                        exclusiveGifts:
-                          giftAmountsInSats.length === 1 ? false : isExclusive,
-                      })
-                    );
-                  }
-                  break;
-
-                case "Add F&F and Send":
-                  setGiftModal(false);
-                  navigation.navigate("AddContact", {
-                    fromScreen: "Gift",
-                    giftId: (createdGift as Gift).id,
-                    setActiveTab: navigation.state.params.setActiveTab,
-                  });
-                  break;
-
-                case "Send Gift":
-                  setGiftModal(false);
-                  navigation.navigate("EnterGiftDetails", {
-                    giftId: (createdGift as Gift).id,
-                    setActiveTab: navigation.state.params.setActiveTab,
-                  });
-                  break;
-
-                case 'Sherpa':
-                  setGiftModal( false )
-                  navigation.navigate('Sherpa', {}, NavigationActions.navigate({
-                    routeName: 'InvitationCode',
-                    params: {
-                      contact: {...navigation.state.params, giftId: ( createdGift as Gift ).id},
-                      setActiveTab: navigation.state.params.setActiveTab,
-                      key: navigation.state.key,
+                        } )
+                      )
                     }
-                  }))
-                  break
+                    break
+                  case 'Create Gift':
+                  // creating multiple gift instances(based on giftInstances) of the same amount
+                    if ( giftAmountsInSats.length ) {
+                      setInitGiftCreation( true )
+                      setShowLoader( true )
+                      dispatch(
+                        generateGifts( {
+                          amounts: giftAmountsInSats,
+                          accountId:
+                          selectedAccount &&
+                          selectedAccount.primarySubAccount &&
+                          selectedAccount.primarySubAccount.id
+                            ? selectedAccount.primarySubAccount.id
+                            : '',
+                          includeFee: includeFees,
+                          exclusiveGifts:
+                          giftAmountsInSats.length === 1 ? false : isExclusive,
+                        } )
+                      )
+                    }
+                    break
+
+                  case 'Add F&F and Send':
+                    setGiftModal( false )
+                    navigation.navigate( 'AddContact', {
+                      fromScreen: 'Gift',
+                      giftId: ( createdGift as Gift ).id,
+                      setActiveTab: navigation.state.params.setActiveTab,
+                    } )
+                    break
+
+                  case 'Send Gift':
+                    setGiftModal( false )
+                    navigation.navigate( 'EnterGiftDetails', {
+                      giftId: ( createdGift as Gift ).id,
+                      setActiveTab: navigation.state.params.setActiveTab,
+                    } )
+                    break
               }
             }
           }}
           style={
             isDisabled
               ? {
-                  ...styles.disabledButtonView,
-                }
+                ...styles.disabledButtonView,
+              }
               : {
-                  ...styles.buttonView,
-                }
+                ...styles.buttonView,
+              }
           }
         >
           <Text style={styles.buttonText}>{text}</Text>
         </TouchableOpacity>
       </Shadow>
-    );
-  };
+    )
+  }
 
   const onCloseClick = () => {
-    setShowVerification(false);
-  };
+    setShowVerification( false )
+  }
 
   const onVerifyClick = () => {
-    setShowVerification(false);
-    navigation.navigate("SetUpSatNextCard", {
-      giftAmount: includeFees ? JSON.stringify(parseInt(amount) - 226) : amount,
+    setShowVerification( false )
+    navigation.navigate( 'SetUpSatNextCard', {
+      giftAmount: includeFees ? JSON.stringify( parseInt( amount ) - 226 ) : amount,
       fromClaimFlow: 0,
-    });
-  };
+    } )
+  }
 
-  function onPressNumber(text) {
-    let tmpPasscode = amount;
-    if (text != "x") {
-      tmpPasscode += text;
-      setAmount(tmpPasscode);
+  function onPressNumber( text ) {
+    let tmpPasscode = amount
+    if ( text != 'x' ) {
+      tmpPasscode += text
+      setAmount( tmpPasscode )
     }
-    if (amount && text == "x") {
-      setAmount(amount.slice(0, -1));
+    if ( amount && text == 'x' ) {
+      setAmount( amount.slice( 0, -1 ) )
     }
-    if (isSendMax) setIsSendMax(false);
+    if ( isSendMax ) setIsSendMax( false )
   }
 
   const renderCreateGiftModal = () => {
@@ -483,11 +473,11 @@ const CreateGift = ({ navigation }: Props) => {
       <View style={styles.modalContentContainer}>
         <View
           style={{
-            marginTop: "auto",
+            marginTop: 'auto',
             right: 0,
             bottom: 0,
-            position: "absolute",
-            marginLeft: "auto",
+            position: 'absolute',
+            marginLeft: 'auto',
           }}
         >
           <Illustration />
@@ -495,19 +485,19 @@ const CreateGift = ({ navigation }: Props) => {
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => {
-            setGiftModal(false);
-            navigation.goBack();
+            setGiftModal( false )
+            navigation.goBack()
           }}
           style={{
-            width: wp(7),
-            height: wp(7),
-            borderRadius: wp(7 / 2),
-            alignSelf: "flex-end",
+            width: wp( 7 ),
+            height: wp( 7 ),
+            borderRadius: wp( 7 / 2 ),
+            alignSelf: 'flex-end',
             backgroundColor: Colors.lightBlue,
-            alignItems: "center",
-            justifyContent: "center",
-            marginTop: wp(3),
-            marginRight: wp(3),
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: wp( 3 ),
+            marginRight: wp( 3 ),
           }}
         >
           <FontAwesome
@@ -524,7 +514,7 @@ const CreateGift = ({ navigation }: Props) => {
         <View>
           <View
             style={{
-              marginLeft: wp(7),
+              marginLeft: wp( 7 ),
             }}
           >
             <Text style={styles.modalTitleText}>Gift Created</Text>
@@ -533,30 +523,30 @@ const CreateGift = ({ navigation }: Props) => {
                 ...styles.modalInfoText,
               }}
             >
-              {"You're ready to elate!"}
+              {'You\'re ready to elate!'}
             </Text>
           </View>
           <DashedContainer
-            titleText={"Available Gift"}
-            subText={"Someone's about to feel extra special"}
+            titleText={'Available Gift'}
+            subText={'Someone\'s about to feel extra special'}
             amt={
               prefersBitcoin
-                ? numberWithCommas(createdGift.amount)
-                : convertSatsToFiat(createdGift.amount)
+                ? numberWithCommas( createdGift.amount )
+                : convertSatsToFiat( createdGift.amount )
             }
             date={new Date()}
             image={<GiftCard />}
-            currencyCode={prefersBitcoin ? "" : currencyCode}
+            currencyCode={prefersBitcoin ? '' : currencyCode}
           />
 
           <BottomInfoBox
             containerStyle={{
-              paddingRight: wp(15),
-              backgroundColor: "transparent",
-              marginTop: hp(-1),
+              paddingRight: wp( 15 ),
+              backgroundColor: 'transparent',
+              marginTop: hp( -1 ),
             }}
             infoText={
-              "The Gift is ready to be sent to anyone you choose. If unaccepted, the sats would revert to your wallet."
+              'The Gift is ready to be sent to anyone you choose. If unaccepted, the sats would revert to your wallet.'
             }
           />
         </View>
@@ -592,68 +582,70 @@ const CreateGift = ({ navigation }: Props) => {
         </View> */}
         <View
           style={{
-            marginLeft: wp(4),
-            flexDirection: "row",
+            marginLeft: wp( 4 ),
+            flexDirection: 'row',
           }}
         >
-          {renderButton("Send Gift", addfNf ? "Add F&F and Send" : fromScreen === "BecomeSherpa" ? "Sherpa" : "Send Gift")}
+          {renderButton( 'Send Gift', addfNf ? 'Add F&F and Send' : fromScreen === "BecomeSherpa" ? "Sherpa" : 'Send Gift' )}
           {/* {renderButton( 'Add F&F and Send' )}   */}
         </View>
       </View>
-    );
-  };
+    )
+  }
 
   const BalanceCurrencyIcon = () => {
-    const style = {};
+    const style = {
+    }
 
-    if (prefersBitcoin) {
+    if ( prefersBitcoin ) {
       return (
         <Image
           style={{
-            height: RFValue(14),
-            width: RFValue(14),
-            resizeMode: "contain",
+            height: RFValue( 14 ),
+            width: RFValue( 14 ),
+            resizeMode: 'contain',
           }}
-          source={require("../../assets/images/currencySymbols/icon_bitcoin_gray.png")}
+          source={require( '../../assets/images/currencySymbols/icon_bitcoin_gray.png' )}
         />
-      );
+      )
     }
 
-    if (materialIconCurrencyCodes.includes(fiatCurrencyCode)) {
+    if ( materialIconCurrencyCodes.includes( fiatCurrencyCode ) ) {
       return (
         <MaterialCurrencyCodeIcon
           currencyCode={fiatCurrencyCode}
           color={Colors.gray2}
-          size={RFValue(16)}
-          style={{}}
+          size={RFValue( 16 )}
+          style={{
+          }}
         />
-      );
+      )
     } else {
       return (
         <Image
           style={style}
-          source={getCurrencyImageByRegion(fiatCurrencyCode, "gray")}
+          source={getCurrencyImageByRegion( fiatCurrencyCode, 'gray' )}
         />
-      );
+      )
     }
-  };
+  }
 
   const renderAccountList = () => {
     return (
       <ScrollView
         style={{
-          height: "auto",
+          height: 'auto',
         }}
       >
-        {activeAccounts.map((item, index) => {
+        {activeAccounts.map( ( item, index ) => {
           if (
-            [AccountType.TEST_ACCOUNT, AccountType.SWAN_ACCOUNT].includes(
+            [ AccountType.TEST_ACCOUNT, AccountType.SWAN_ACCOUNT ].includes(
               item.primarySubAccount.type
             ) ||
             !item.primarySubAccount.isUsable ||
             item.primarySubAccount.isTFAEnabled
           )
-            return;
+            return
           return (
             <View
               key={index}
@@ -661,86 +653,86 @@ const CreateGift = ({ navigation }: Props) => {
                 backgroundColor: Colors.white,
               }}
             >
-              {accountElement(item, () => {
-                setSelectedAccount(item);
-                setAccountListModal(false);
-              })}
+              {accountElement( item, () => {
+                setSelectedAccount( item )
+                setAccountListModal( false )
+              } )}
             </View>
-          );
-        })}
+          )
+        } )}
       </ScrollView>
-    );
-  };
+    )
+  }
 
-  const AdvanceGiftOptions = ({ title, stateToUpdate, imageToShow }) => {
-    const [timer, SetTimer] = useState(null);
-    const [counter, SetCounter] = useState(numbersOfGift);
-    const [timeLock, setTimeLock] = useState(1);
-    const [limitedValidity, setLimitedValidity] = useState(1);
+  const AdvanceGiftOptions = ( { title, stateToUpdate, imageToShow } ) => {
+    const [ timer, SetTimer ] = useState( null )
+    const [ counter, SetCounter ] = useState( numbersOfGift )
+    const [ timeLock, setTimeLock ] = useState( 1 )
+    const [ limitedValidity, setLimitedValidity ] = useState( 1 )
 
-    let flag = null;
+    let flag = null
 
     const handleTimer = () => {
-      flag == true ? plus() : flag == false && minus();
-      flag !== null && SetTimer(() => setTimeout(() => handleTimer(), 500));
-    };
+      flag == true ? plus() : flag == false && minus()
+      flag !== null && SetTimer( () => setTimeout( () => handleTimer(), 500 ) )
+    }
     const stopTimer = () => {
-      flag = null;
-      SetTimer(null);
-      clearTimeout(timer);
-      setNumbersOfGift(counter);
-    };
+      flag = null
+      SetTimer( null )
+      clearTimeout( timer )
+      setNumbersOfGift( counter )
+    }
 
     const plus = () => {
-      if (stateToUpdate == "gift") {
-        SetCounter((prev) => prev + 1);
-      } else if (stateToUpdate == "timeLock") {
-        setTimeLock(timeLock + 1);
-      } else if (stateToUpdate == "limitedValidity") {
-        setLimitedValidity(limitedValidity + 1);
+      if ( stateToUpdate == 'gift' ) {
+        SetCounter( ( prev ) => prev + 1 )
+      } else if ( stateToUpdate == 'timeLock' ) {
+        setTimeLock( timeLock + 1 )
+      } else if ( stateToUpdate == 'limitedValidity' ) {
+        setLimitedValidity( limitedValidity + 1 )
       }
-    };
+    }
 
     const minus = () => {
-      if (stateToUpdate == "gift") {
-        if (counter > 1) SetCounter((prev) => prev - 1);
-      } else if (stateToUpdate == "timeLock") {
-        if (timeLock > 1) setTimeLock(timeLock - 1);
-      } else if (stateToUpdate == "limitedValidity") {
-        if (limitedValidity > 1) setLimitedValidity(limitedValidity - 1);
+      if ( stateToUpdate == 'gift' ) {
+        if ( counter > 1 ) SetCounter( ( prev ) => prev - 1 )
+      } else if ( stateToUpdate == 'timeLock' ) {
+        if ( timeLock > 1 ) setTimeLock( timeLock - 1 )
+      } else if ( stateToUpdate == 'limitedValidity' ) {
+        if ( limitedValidity > 1 ) setLimitedValidity( limitedValidity - 1 )
       }
-    };
+    }
 
     return (
       <View>
         <View
           style={{
-            flexDirection: "row",
-            marginTop: wp("5%"),
-            marginBottom: wp("5%"),
-            justifyContent: "center",
+            flexDirection: 'row',
+            marginTop: wp( '5%' ),
+            marginBottom: wp( '5%' ),
+            justifyContent: 'center',
           }}
         >
           <Image
             source={imageToShow}
             style={{
-              width: wp("10%"),
-              height: wp("6%"),
-              resizeMode: "contain",
-              alignSelf: "center",
+              width: wp( '10%' ),
+              height: wp( '6%' ),
+              resizeMode: 'contain',
+              alignSelf: 'center',
             }}
           />
           <View
             style={{
-              marginLeft: wp("4%"),
+              marginLeft: wp( '4%' ),
               flex: 1,
-              marginRight: wp("2%"),
+              marginRight: wp( '2%' ),
             }}
           >
             <Text
               style={{
                 color: Colors.blue,
-                fontSize: RFValue(13),
+                fontSize: RFValue( 13 ),
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
@@ -749,64 +741,64 @@ const CreateGift = ({ navigation }: Props) => {
             <Text
               style={{
                 color: Colors.gray3,
-                fontSize: RFValue(11),
+                fontSize: RFValue( 11 ),
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
               Gift Sats created will be of the
               <Text
                 style={{
-                  fontWeight: "bold",
+                  fontWeight: 'bold',
                   fontFamily: Fonts.FiraSansItalic,
                 }}
               >
-                {" "}
+                {' '}
                 same amount
-              </Text>{" "}
+              </Text>{' '}
               and can be
               <Text
                 style={{
-                  fontWeight: "bold",
+                  fontWeight: 'bold',
                   fontFamily: Fonts.FiraSansItalic,
                 }}
               >
-                {" "}
+                {' '}
                 sent separately
               </Text>
             </Text>
           </View>
           <View
             style={{
-              flexDirection: "row",
-              alignItems: "center",
+              flexDirection: 'row',
+              alignItems: 'center',
             }}
           >
             <TouchableOpacity
               onPressIn={() => {
-                flag = false;
-                handleTimer();
+                flag = false
+                handleTimer()
               }}
               onPressOut={() => stopTimer()}
               style={{
-                width: wp("5%"),
-                height: wp("5%"),
-                borderRadius: wp("5%") / 2,
+                width: wp( '5%' ),
+                height: wp( '5%' ),
+                borderRadius: wp( '5%' ) / 2,
                 backgroundColor: Colors.lightBlue,
-                justifyContent: "center",
-                alignItems: "center",
-                marginRight: wp("4%"),
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: wp( '4%' ),
               }}
             >
               <AntDesign name="minus" size={12} color={Colors.white} />
             </TouchableOpacity>
             <View
               style={{
-                height: wp("12%"),
-                width: wp("12%"),
+                height: wp( '12%' ),
+                width: wp( '12%' ),
                 borderRadius: 10,
                 backgroundColor: Colors.white,
-                justifyContent: "center",
-                alignItems: "center",
+                justifyContent: 'center',
+                alignItems: 'center',
                 shadowColor: Colors.borderColor,
                 shadowOpacity: 0.6,
                 shadowOffset: {
@@ -821,30 +813,30 @@ const CreateGift = ({ navigation }: Props) => {
                 style={{
                   color: Colors.black,
                   fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(18),
+                  fontSize: RFValue( 18 ),
                 }}
               >
-                {stateToUpdate == "gift"
+                {stateToUpdate == 'gift'
                   ? counter
-                  : stateToUpdate == "timeLock"
-                  ? timeLock
-                  : limitedValidity}
+                  : stateToUpdate == 'timeLock'
+                    ? timeLock
+                    : limitedValidity}
               </Text>
             </View>
             <TouchableOpacity
               onPressIn={() => {
-                flag = true;
-                handleTimer();
+                flag = true
+                handleTimer()
               }}
               onPressOut={() => stopTimer()}
               style={{
-                width: wp("5%"),
-                height: wp("5%"),
-                borderRadius: wp("5%") / 2,
+                width: wp( '5%' ),
+                height: wp( '5%' ),
+                borderRadius: wp( '5%' ) / 2,
                 backgroundColor: Colors.lightBlue,
-                justifyContent: "center",
-                alignItems: "center",
-                marginLeft: wp("4%"),
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginLeft: wp( '4%' ),
               }}
             >
               <AntDesign name="plus" size={12} color={Colors.white} />
@@ -852,9 +844,9 @@ const CreateGift = ({ navigation }: Props) => {
           </View>
         </View>
         <TouchableOpacity
-          onPress={() => setIsExclusive(!isExclusive)}
+          onPress={() => setIsExclusive( !isExclusive )}
           style={{
-            flexDirection: "row",
+            flexDirection: 'row',
             marginVertical: 7,
           }}
         >
@@ -871,50 +863,50 @@ const CreateGift = ({ navigation }: Props) => {
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontSize: RFValue(13),
+              fontSize: RFValue( 13 ),
               fontFamily: Fonts.FiraSansRegular,
-              marginHorizontal: wp(3),
+              marginHorizontal: wp( 3 ),
             }}
           >
-            <Text>{"Make each gift exclusive\n"}</Text>
+            <Text>{'Make each gift exclusive\n'}</Text>
             <Text
               style={{
-                fontSize: RFValue(11),
+                fontSize: RFValue( 11 ),
               }}
             >
-              (Restricts the gift to{" "}
+              (Restricts the gift to{' '}
               <Text
                 style={{
-                  fontWeight: "bold",
+                  fontWeight: 'bold',
                   fontFamily: Fonts.FiraSansItalic,
                 }}
               >
                 one per Hexa app
-              </Text>{" "}
+              </Text>{' '}
               )
             </Text>
           </Text>
         </TouchableOpacity>
       </View>
-    );
-  };
+    )
+  }
 
   const renderAdvanceModal = () => {
     return (
       <View
         style={{
           backgroundColor: Colors.bgColor,
-          padding: wp("5%"),
+          padding: wp( '5%' ),
         }}
       >
         <View
           style={{
-            flexDirection: "row",
+            flexDirection: 'row',
           }}
         >
           <TouchableOpacity
             activeOpacity={1}
-            onPress={() => setAdvanceModal(false)}
+            onPress={() => setAdvanceModal( false )}
             style={styles.modalCrossButton}
           >
             <FontAwesome name="close" color={Colors.white} size={19} />
@@ -923,13 +915,13 @@ const CreateGift = ({ navigation }: Props) => {
 
         <View
           style={{
-            flexDirection: "column",
+            flexDirection: 'column',
           }}
         >
           <Text
             style={{
               color: Colors.blue,
-              fontSize: RFValue(20),
+              fontSize: RFValue( 20 ),
               fontFamily: Fonts.FiraSansRegular,
             }}
           >
@@ -940,10 +932,10 @@ const CreateGift = ({ navigation }: Props) => {
         }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text> */}
         </View>
         <AdvanceGiftOptions
-          title={"No. of Gifts"}
+          title={'No. of Gifts'}
           // infoText={'Gift Sats created will be of the same amount and can be sent separately'}
-          stateToUpdate={"gift"}
-          imageToShow={require("../../assets/images/icons/gift.png")}
+          stateToUpdate={'gift'}
+          imageToShow={require( '../../assets/images/icons/gift.png' )}
         />
         {/* <View>
         <Text style={{
@@ -966,8 +958,8 @@ const CreateGift = ({ navigation }: Props) => {
         imageToShow={require( '../../assets/images/icons/validity.png' )}
       /> */}
       </View>
-    );
-  };
+    )
+  }
 
   // gift creation failure UI
 
@@ -976,18 +968,18 @@ const CreateGift = ({ navigation }: Props) => {
       <View
         style={{
           backgroundColor: Colors.white,
-          padding: wp("8"),
+          padding: wp( '8' ),
         }}
       >
         <View
           style={{
-            flexDirection: "row",
+            flexDirection: 'row',
           }}
         >
           <TouchableOpacity
             activeOpacity={1}
             onPress={() => {
-              setShowErrorLoader(false);
+              setShowErrorLoader( false )
             }}
             style={styles.modalCrossButton}
           >
@@ -997,16 +989,16 @@ const CreateGift = ({ navigation }: Props) => {
 
         <View
           style={{
-            flexDirection: "column",
-            justifyContent: "space-between",
+            flexDirection: 'column',
+            justifyContent: 'space-between',
           }}
         >
           <Text
             style={{
               color: Colors.blue,
-              fontSize: RFValue(18),
-              width: "60%",
-              fontWeight: "200",
+              fontSize: RFValue( 18 ),
+              width: '60%',
+              fontWeight: '200',
               marginBottom: 30,
               fontFamily: Fonts.FiraSansRegular,
               letterSpacing: 0.54,
@@ -1018,7 +1010,7 @@ const CreateGift = ({ navigation }: Props) => {
             style={{
               color: Colors.gray3,
               marginBottom: 10,
-              fontSize: RFValue(12),
+              fontSize: RFValue( 12 ),
               fontFamily: Fonts.FiraSansRegular,
             }}
           >
@@ -1027,57 +1019,57 @@ const CreateGift = ({ navigation }: Props) => {
 
           <View
             style={{
-              justifyContent: "flex-start",
-              marginStart: wp(-4),
+              justifyContent: 'flex-start',
+              marginStart: wp( -4 ),
             }}
           >
             {accountElement(
               selectedAccount,
               () => {},
               1,
-              "90%",
-              "Bitcoin not deducted"
+              '90%',
+              'Bitcoin not deducted'
             )}
           </View>
 
           <View
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
             }}
           >
             <TouchableOpacity
               style={styles.buttonView}
               onPress={() => {
-                setShowErrorLoader(false);
+                setShowErrorLoader( false )
               }}
             >
               <Text style={styles.buttonText}>Try again</Text>
             </TouchableOpacity>
             <Image
-              source={require("../../assets/images/loader.gif")}
+              source={require( '../../assets/images/loader.gif' )}
               style={{
-                width: wp("40%"),
-                height: wp("35%"),
-                resizeMode: "stretch",
-                marginBottom: wp(-8),
-                marginRight: wp(-8),
+                width: wp( '40%' ),
+                height: wp( '35%' ),
+                resizeMode: 'stretch',
+                marginBottom: wp( -8 ),
+                marginRight: wp( -8 ),
               }}
             />
           </View>
         </View>
       </View>
-    );
-  };
+    )
+  }
 
   const accountElement = (
     item,
     onPressCallBack,
     activeOpacity = 0,
-    width = "90%",
+    width = '90%',
     message = `${
-      currencyKind === CurrencyKind.BITCOIN ? "Sats" : "Money"
+      currencyKind === CurrencyKind.BITCOIN ? 'Sats' : 'Money'
     } would be deducted from`
   ) => {
     return (
@@ -1091,37 +1083,37 @@ const CreateGift = ({ navigation }: Props) => {
       >
         <View
           style={{
-            borderRadius: wp(2),
+            borderRadius: wp( 2 ),
           }}
         >
           <View
             style={{
-              flexDirection: "row",
-              width: "100%",
-              paddingVertical: hp(2),
-              paddingHorizontal: wp(2),
-              alignItems: "center",
+              flexDirection: 'row',
+              width: '100%',
+              paddingVertical: hp( 2 ),
+              paddingHorizontal: wp( 2 ),
+              alignItems: 'center',
             }}
           >
             <View
               style={{
-                width: wp(13),
-                height: "100%",
-                marginTop: hp(0.5),
+                width: wp( 13 ),
+                height: '100%',
+                marginTop: hp( 0.5 ),
               }}
             >
-              {getAvatarForSubAccount(item.primarySubAccount, false, true)}
+              {getAvatarForSubAccount( item.primarySubAccount, false, true )}
             </View>
             <View
               style={{
-                marginHorizontal: wp(3),
+                marginHorizontal: wp( 3 ),
                 flex: 1,
               }}
             >
               <Text
                 style={{
                   color: Colors.gray4,
-                  fontSize: RFValue(10),
+                  fontSize: RFValue( 10 ),
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
@@ -1130,7 +1122,7 @@ const CreateGift = ({ navigation }: Props) => {
               <Text
                 style={{
                   color: Colors.black,
-                  fontSize: RFValue(14),
+                  fontSize: RFValue( 14 ),
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
@@ -1138,22 +1130,22 @@ const CreateGift = ({ navigation }: Props) => {
                   item.primarySubAccount.defaultTitle}
               </Text>
               <Text style={styles.availableToSpendText}>
-                {"Available to spend: "}
+                {'Available to spend: '}
                 <Text style={styles.balanceText}>
                   {prefersBitcoin
                     ? UsNumberFormat(
-                        item.primarySubAccount?.balances?.confirmed
-                      )
+                      item.primarySubAccount?.balances?.confirmed
+                    )
                     : accountsState.exchangeRates &&
-                      accountsState.exchangeRates[currencyCode]
-                    ? (
-                        (item.primarySubAccount?.balances?.confirmed /
-                          SATOSHIS_IN_BTC) *
-                        accountsState.exchangeRates[currencyCode].last
-                      ).toFixed(2)
-                    : 0}
+                      accountsState.exchangeRates[ currencyCode ]
+                      ? (
+                        ( item.primarySubAccount?.balances?.confirmed /
+                          SATOSHIS_IN_BTC ) *
+                        accountsState.exchangeRates[ currencyCode ].last
+                      ).toFixed( 2 )
+                      : 0}
                 </Text>
-                <Text>{prefersBitcoin ? " sats" : ` ${fiatCurrencyCode}`}</Text>
+                <Text>{prefersBitcoin ? ' sats' : ` ${fiatCurrencyCode}`}</Text>
               </Text>
             </View>
             {activeOpacity === 0 && (
@@ -1162,15 +1154,15 @@ const CreateGift = ({ navigation }: Props) => {
                 size={24}
                 color="gray"
                 style={{
-                  alignSelf: "center",
+                  alignSelf: 'center',
                 }}
               />
             )}
           </View>
         </View>
       </TouchableOpacity>
-    );
-  };
+    )
+  }
 
   return (
     <ScrollView
@@ -1186,7 +1178,7 @@ const CreateGift = ({ navigation }: Props) => {
         />
         {giftModal && (
           <ModalContainer
-            onBackground={() => setGiftModal(false)}
+            onBackground={() => setGiftModal( false )}
             visible={giftModal}
             closeBottomSheet={() => {}}
           >
@@ -1198,15 +1190,15 @@ const CreateGift = ({ navigation }: Props) => {
             CommonStyles.headerContainer,
             {
               backgroundColor: Colors.backgroundColor,
-              marginRight: wp(4),
-              marginVertical: height < 720 ? wp(0) : "auto",
+              marginRight: wp( 4 ),
+              marginVertical: height < 720 ? wp( 0 ) : 'auto',
             },
           ]}
         >
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              navigation.goBack();
+              navigation.goBack()
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -1221,8 +1213,8 @@ const CreateGift = ({ navigation }: Props) => {
         </View>
         <View
           style={{
-            flexDirection: "row",
-            alignItems: "center",
+            flexDirection: 'row',
+            alignItems: 'center',
           }}
         >
           <View
@@ -1232,93 +1224,93 @@ const CreateGift = ({ navigation }: Props) => {
           >
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
+                flexDirection: 'row',
+                alignItems: 'center',
               }}
             >
               <Text
                 style={{
                   color: Colors.blue,
-                  fontSize: height < 720 ? RFValue(20) : RFValue(24),
+                  fontSize: height < 720 ? RFValue( 20 ) : RFValue( 24 ),
                   letterSpacing: 0.01,
                   marginLeft: 20,
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                {"Create Gift"}
+                {'Create Gift'}
               </Text>
               <TouchableOpacity
                 style={{
-                  marginLeft: "auto",
+                  marginLeft: 'auto',
                 }}
-                onPress={() => setAdvanceModal(true)}
+                onPress={() => setAdvanceModal( true )}
               >
                 <Image
                   style={{
-                    width: wp("5%"),
-                    height: wp("5%"),
-                    resizeMode: "contain",
-                    marginRight: wp("5%"),
+                    width: wp( '5%' ),
+                    height: wp( '5%' ),
+                    resizeMode: 'contain',
+                    marginRight: wp( '5%' ),
                   }}
-                  source={require("../../assets/images/icons/icon_settings_blue.png")}
+                  source={require( '../../assets/images/icons/icon_settings_blue.png' )}
                 />
               </TouchableOpacity>
             </View>
           </View>
         </View>
-        {accountElement(selectedAccount, () =>
-          setAccountListModal(!accountListModal)
+        {accountElement( selectedAccount, () =>
+          setAccountListModal( !accountListModal )
         )}
         <View
           style={{
-            flexDirection: "row",
+            flexDirection: 'row',
           }}
         >
           <View
             style={{
               ...styles.inputBox,
-              flexDirection: "row",
-              alignItems: "center",
+              flexDirection: 'row',
+              alignItems: 'center',
               borderColor: Colors.white,
               marginTop: 10,
               backgroundColor: Colors.white,
-              paddingHorizontal: wp(3),
+              paddingHorizontal: wp( 3 ),
               height: 50,
               flex: 2,
-              marginRight: numbersOfGift == 1 ? wp("5%") : wp("2%"),
+              marginRight: numbersOfGift == 1 ? wp( '5%' ) : wp( '2%' ),
             }}
           >
             <BalanceCurrencyIcon />
             <View
               style={{
-                width: wp(0.5),
+                width: wp( 0.5 ),
                 backgroundColor: Colors.borderColor,
-                height: hp(2.5),
-                marginHorizontal: wp(4),
+                height: hp( 2.5 ),
+                marginHorizontal: wp( 4 ),
               }}
             />
             <Text
               style={[
                 styles.modalInputBox,
                 {
-                  color: amount !== "" ? Colors.textColorGrey : Colors.gray1,
+                  color: amount !== '' ? Colors.textColorGrey : Colors.gray1,
                 },
               ]}
-              onPress={() => setKeyboard(true)}
+              onPress={() => setKeyboard( true )}
             >
               {currencyKind == CurrencyKind.FIAT
                 ? amount
-                : UsNumberFormat(amount) === "0"
-                ? ""
-                : UsNumberFormat(amount)}
+                : UsNumberFormat( amount ) === '0'
+                  ? ''
+                  : UsNumberFormat( amount )}
               {!showKeyboard && !amount && (
                 <Text
                   style={{
-                    fontSize: RFValue(12),
+                    fontSize: RFValue( 12 ),
                   }}
                 >
                   {`Enter amount in ${
-                    prefersBitcoin ? "sats" : `${fiatCurrencyCode}`
+                    prefersBitcoin ? 'sats' : `${fiatCurrencyCode}`
                   }`}
                 </Text>
               )}
@@ -1326,7 +1318,7 @@ const CreateGift = ({ navigation }: Props) => {
                 <Text
                   style={{
                     color: Colors.lightBlue,
-                    fontSize: RFValue(18),
+                    fontSize: RFValue( 18 ),
                   }}
                 >
                   |
@@ -1334,7 +1326,7 @@ const CreateGift = ({ navigation }: Props) => {
               )}
             </Text>
 
-            {Number(numbersOfGift) === 1 && (
+            {Number( numbersOfGift ) === 1 && (
               <AppBottomSheetTouchableWrapper
                 onPress={handleSendMaxPress}
                 style={{
@@ -1345,9 +1337,9 @@ const CreateGift = ({ navigation }: Props) => {
                 <Text
                   style={{
                     color: Colors.blue,
-                    textAlign: "center",
+                    textAlign: 'center',
                     // paddingHorizontal: 10,
-                    fontSize: RFValue(10),
+                    fontSize: RFValue( 10 ),
                     fontFamily: Fonts.FiraSansItalic,
                   }}
                 >
@@ -1361,12 +1353,12 @@ const CreateGift = ({ navigation }: Props) => {
             <View
               style={{
                 ...styles.inputBox,
-                flexDirection: "row",
-                alignItems: "center",
+                flexDirection: 'row',
+                alignItems: 'center',
                 borderColor: Colors.gray9,
                 marginTop: 10,
                 backgroundColor: Colors.backgroundColor,
-                paddingHorizontal: wp(3),
+                paddingHorizontal: wp( 3 ),
                 height: 50,
                 marginLeft: 0,
                 flex: 1,
@@ -1375,11 +1367,11 @@ const CreateGift = ({ navigation }: Props) => {
               <Text
                 style={[
                   {
-                    fontSize: RFValue(15),
+                    fontSize: RFValue( 15 ),
                     color: Colors.textColorGrey,
                     fontFamily: Fonts.FiraSansRegular,
                     backgroundColor: Colors.backgroundColor,
-                    alignSelf: "center",
+                    alignSelf: 'center',
                     flex: 1,
                   },
                   {
@@ -1391,10 +1383,10 @@ const CreateGift = ({ navigation }: Props) => {
                   style={{
                     color: Colors.black,
                     fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(12),
+                    fontSize: RFValue( 12 ),
                   }}
                 >
-                  x{" "}
+                  x{' '}
                 </Text>
                 {numbersOfGift}
               </Text>
@@ -1402,9 +1394,9 @@ const CreateGift = ({ navigation }: Props) => {
                 style={{
                   color: Colors.black,
                   fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12),
-                  marginLeft: "auto",
-                  marginTop: hp("0.5%"),
+                  fontSize: RFValue( 12 ),
+                  marginLeft: 'auto',
+                  marginTop: hp( '0.5%' ),
                 }}
               >
                 gifts
@@ -1416,17 +1408,17 @@ const CreateGift = ({ navigation }: Props) => {
           <View
             style={{
               flex: 1,
-              flexDirection: "row",
-              alignItems: "center",
-              marginLeft: wp("5%"),
-              marginRight: wp("5%"),
-              marginTop: wp("3%"),
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginLeft: wp( '5%' ),
+              marginRight: wp( '5%' ),
+              marginTop: wp( '3%' ),
             }}
           >
             <Text
               style={{
                 color: Colors.greyTextColor,
-                fontSize: RFValue(12),
+                fontSize: RFValue( 12 ),
                 fontFamily: Fonts.FiraSansMedium,
               }}
             >
@@ -1434,37 +1426,37 @@ const CreateGift = ({ navigation }: Props) => {
             </Text>
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginLeft: "auto",
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginLeft: 'auto',
               }}
             >
               {prefersBitcoin ? (
                 <Image
                   style={{
                     ...CommonStyles.homepageAmountImage,
-                    marginTop: hp(0.2),
+                    marginTop: hp( 0.2 ),
                   }}
-                  source={require("../../assets/images/icons/icon_bitcoin_gray.png")}
+                  source={require( '../../assets/images/icons/icon_bitcoin_gray.png' )}
                 />
-              ) : materialIconCurrencyCodes.includes(fiatCurrencyCode) ? (
+              ) : materialIconCurrencyCodes.includes( fiatCurrencyCode ) ? (
                 <MaterialCurrencyCodeIcon
                   currencyCode={fiatCurrencyCode}
                   color={Colors.white}
-                  size={RFValue(16)}
+                  size={RFValue( 16 )}
                   style={{
-                    marginRight: wp(1),
+                    marginRight: wp( 1 ),
                     marginLeft: [
-                      "SEK",
-                      "BRL",
-                      "DKK",
-                      "ISK",
-                      "KRW",
-                      "PLN",
-                      "SEK",
-                    ].includes(fiatCurrencyCode)
+                      'SEK',
+                      'BRL',
+                      'DKK',
+                      'ISK',
+                      'KRW',
+                      'PLN',
+                      'SEK',
+                    ].includes( fiatCurrencyCode )
                       ? 0
-                      : -wp(1),
+                      : -wp( 1 ),
                   }}
                 />
               ) : (
@@ -1472,32 +1464,32 @@ const CreateGift = ({ navigation }: Props) => {
                   style={{
                     ...styles.cardBitCoinImage,
                   }}
-                  source={getCurrencyImageByRegion(fiatCurrencyCode, "light")}
+                  source={getCurrencyImageByRegion( fiatCurrencyCode, 'light' )}
                 />
               )}
               <Text style={styles.homeHeaderAmountText}>
                 {prefersBitcoin
-                  ? UsNumberFormat(parseInt(amount) * numbersOfGift)
-                  : exchangeRates && exchangeRates[currencyCode]
-                  ? (
-                      ((parseInt(amount) * numbersOfGift) / SATOSHIS_IN_BTC) *
-                      exchangeRates[currencyCode].last
-                    ).toFixed(2)
-                  : ""}
+                  ? UsNumberFormat( parseInt( amount ) * numbersOfGift )
+                  : exchangeRates && exchangeRates[ currencyCode ]
+                    ? (
+                      ( ( parseInt( amount ) * numbersOfGift ) / SATOSHIS_IN_BTC ) *
+                      exchangeRates[ currencyCode ].last
+                    ).toFixed( 2 )
+                    : ''}
               </Text>
               <Text style={styles.homeHeaderAmountUnitText}>
-                {prefersBitcoin ? "sats" : fiatCurrencyCode}
+                {prefersBitcoin ? 'sats' : fiatCurrencyCode}
               </Text>
             </View>
           </View>
         ) : null}
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
+            flexDirection: 'row',
+            justifyContent: 'space-between',
             // backgroundColor:'red',
-            marginHorizontal: wp(5),
-            alignItems: "center",
+            marginHorizontal: wp( 5 ),
+            alignItems: 'center',
           }}
         >
           {/* <View style={{
@@ -1506,29 +1498,29 @@ const CreateGift = ({ navigation }: Props) => {
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontSize: RFValue(11),
+              fontSize: RFValue( 11 ),
               fontFamily: Fonts.FiraSansRegular,
               // marginHorizontal: wp( 3 ),
             }}
           >
-            <Text>{"Minimum gift value "}</Text>
+            <Text>{'Minimum gift value '}</Text>
             <Text
               style={{
-                fontWeight: "bold",
+                fontWeight: 'bold',
                 fontFamily: Fonts.FiraSansItalic,
               }}
             >
               {prefersBitcoin
                 ? minimumGiftValue
-                : convertSatsToFiat(minimumGiftValue)}{" "}
-              {prefersBitcoin ? "sats" : currencyCode}
+                : convertSatsToFiat( minimumGiftValue )}{' '}
+              {prefersBitcoin ? 'sats' : currencyCode}
             </Text>
           </Text>
           {/* </View> */}
           <View
             style={{
-              flexDirection: "row",
-              alignItems: "center",
+              flexDirection: 'row',
+              alignItems: 'center',
             }}
           >
             <Switch
@@ -1536,51 +1528,51 @@ const CreateGift = ({ navigation }: Props) => {
               style={{
                 transform: [
                   {
-                    scaleX: Platform.OS == "ios" ? 0.4 : 0.7,
+                    scaleX: Platform.OS == 'ios' ? 0.4 : 0.7,
                   },
                   {
-                    scaleY: Platform.OS == "ios" ? 0.4 : 0.7,
+                    scaleY: Platform.OS == 'ios' ? 0.4 : 0.7,
                   },
                 ],
               }}
               trackColor={{
-                false: "#C4C4C4",
-                true: "#81b0ff",
+                false: '#C4C4C4',
+                true: '#81b0ff',
               }}
-              thumbColor={includeFees ? "#fff" : "#fff"}
+              thumbColor={includeFees ? '#fff' : '#fff'}
               ios_backgroundColor="#3e3e3e"
-              onValueChange={(value) => {
-                setFees(value);
+              onValueChange={( value ) => {
+                setFees( value )
               }}
             />
             <Text
               style={{
                 color: Colors.gray13,
-                fontSize: RFValue(10),
+                fontSize: RFValue( 10 ),
                 fontFamily: Fonts.FiraSansRegular,
                 letterSpacing: 0.5,
                 // marginTop: wp( '1.5%' )
               }}
             >
-              {"Include "}
+              {'Include '}
               <Text
                 style={{
                   fontFamily: Fonts.FiraSansSemiBold,
                 }}
               >
-                {"Fee"}
+                {'Fee'}
               </Text>
             </Text>
           </View>
         </View>
         <View
           style={{
-            marginLeft: wp("5%"),
-            marginTop: wp("3%"),
+            marginLeft: wp( '5%' ),
+            marginTop: wp( '3%' ),
           }}
         >
           <Text style={FormStyles.errorText}>
-            {isAmountInvalid ? strings.Insufficient : ""}
+            {isAmountInvalid ? strings.Insufficient : ''}
           </Text>
         </View>
         {
@@ -1620,17 +1612,17 @@ const CreateGift = ({ navigation }: Props) => {
         }
         <View
           style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginHorizontal: wp(6),
-            justifyContent: "space-between",
-            marginVertical: height < 720 ? hp(1) : hp(3),
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginHorizontal: wp( 6 ),
+            justifyContent: 'space-between',
+            marginVertical: height < 720 ? hp( 1 ) : hp( 3 ),
           }}
         >
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontSize: RFValue(14),
+              fontSize: RFValue( 14 ),
               fontFamily: Fonts.FiraSansMedium,
             }}
           >
@@ -1640,74 +1632,74 @@ const CreateGift = ({ navigation }: Props) => {
             <Text
               style={{
                 color: Colors.black,
-                fontSize: RFValue(20),
+                fontSize: RFValue( 20 ),
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              {Number(amount) * numbersOfGift}
+              {Number( amount ) * numbersOfGift}
             </Text>
             <Text
               style={{
                 color: Colors.textColorGrey,
-                fontSize: RFValue(11),
+                fontSize: RFValue( 11 ),
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              {prefersBitcoin ? " sats" : ` ${currencyCode}`}
+              {prefersBitcoin ? ' sats' : ` ${currencyCode}`}
             </Text>
           </Text>
         </View>
         <View
           style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginHorizontal: wp(6),
-            marginBottom: height < 720 ? wp(1) : wp(7),
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginHorizontal: wp( 6 ),
+            marginBottom: height < 720 ? wp( 1 ) : wp( 7 ),
           }}
         >
           {statusFlag
-            ? renderButton("Create Gifts", "Invitation")
+            ? renderButton( 'Create Gifts', 'Invitation' )
             : renderButton(
-                numbersOfGift > 1 ? "Create Gifts" : "Create Gift",
-                "Create Gift"
-              )}
+              numbersOfGift > 1 ? 'Create Gifts' : 'Create Gift',
+              'Create Gift'
+            )}
         </View>
         {showKeyboard && (
           <View
             style={{
-              marginTop: "auto",
+              marginTop: 'auto',
             }}
           >
             <View style={styles.keyPadRow}>
               <TouchableOpacity
-                onPress={() => onPressNumber("1")}
+                onPress={() => onPressNumber( '1' )}
                 style={styles.keyPadElementTouchable}
               >
                 <Text
                   style={styles.keyPadElementText}
-                  onPress={() => onPressNumber("1")}
+                  onPress={() => onPressNumber( '1' )}
                 >
                   1
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => onPressNumber("2")}
+                onPress={() => onPressNumber( '2' )}
                 style={styles.keyPadElementTouchable}
               >
                 <Text
                   style={styles.keyPadElementText}
-                  onPress={() => onPressNumber("2")}
+                  onPress={() => onPressNumber( '2' )}
                 >
                   2
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => onPressNumber("3")}
+                onPress={() => onPressNumber( '3' )}
                 style={styles.keyPadElementTouchable}
               >
                 <Text
                   style={styles.keyPadElementText}
-                  onPress={() => onPressNumber("3")}
+                  onPress={() => onPressNumber( '3' )}
                 >
                   3
                 </Text>
@@ -1715,34 +1707,34 @@ const CreateGift = ({ navigation }: Props) => {
             </View>
             <View style={styles.keyPadRow}>
               <TouchableOpacity
-                onPress={() => onPressNumber("4")}
+                onPress={() => onPressNumber( '4' )}
                 style={styles.keyPadElementTouchable}
               >
                 <Text
                   style={styles.keyPadElementText}
-                  onPress={() => onPressNumber("4")}
+                  onPress={() => onPressNumber( '4' )}
                 >
                   4
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => onPressNumber("5")}
+                onPress={() => onPressNumber( '5' )}
                 style={styles.keyPadElementTouchable}
               >
                 <Text
                   style={styles.keyPadElementText}
-                  onPress={() => onPressNumber("5")}
+                  onPress={() => onPressNumber( '5' )}
                 >
                   5
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => onPressNumber("6")}
+                onPress={() => onPressNumber( '6' )}
                 style={styles.keyPadElementTouchable}
               >
                 <Text
                   style={styles.keyPadElementText}
-                  onPress={() => onPressNumber("6")}
+                  onPress={() => onPressNumber( '6' )}
                 >
                   6
                 </Text>
@@ -1750,34 +1742,34 @@ const CreateGift = ({ navigation }: Props) => {
             </View>
             <View style={styles.keyPadRow}>
               <TouchableOpacity
-                onPress={() => onPressNumber("7")}
+                onPress={() => onPressNumber( '7' )}
                 style={styles.keyPadElementTouchable}
               >
                 <Text
                   style={styles.keyPadElementText}
-                  onPress={() => onPressNumber("7")}
+                  onPress={() => onPressNumber( '7' )}
                 >
                   7
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => onPressNumber("8")}
+                onPress={() => onPressNumber( '8' )}
                 style={styles.keyPadElementTouchable}
               >
                 <Text
                   style={styles.keyPadElementText}
-                  onPress={() => onPressNumber("8")}
+                  onPress={() => onPressNumber( '8' )}
                 >
                   8
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => onPressNumber("9")}
+                onPress={() => onPressNumber( '9' )}
                 style={styles.keyPadElementTouchable}
               >
                 <Text
                   style={styles.keyPadElementText}
-                  onPress={() => onPressNumber("9")}
+                  onPress={() => onPressNumber( '9' )}
                 >
                   9
                 </Text>
@@ -1793,23 +1785,23 @@ const CreateGift = ({ navigation }: Props) => {
                 ></Text>
               </View>
               <TouchableOpacity
-                onPress={() => onPressNumber("0")}
+                onPress={() => onPressNumber( '0' )}
                 style={styles.keyPadElementTouchable}
               >
                 <Text
                   style={styles.keyPadElementText}
-                  onPress={() => onPressNumber("0")}
+                  onPress={() => onPressNumber( '0' )}
                 >
                   0
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => onPressNumber("x")}
+                onPress={() => onPressNumber( 'x' )}
                 style={styles.keyPadElementTouchable}
               >
                 <Text
                   style={styles.keyPadElementText}
-                  onPress={() => onPressNumber("x")}
+                  onPress={() => onPressNumber( 'x' )}
                 >
                   <Ionicons
                     name="ios-backspace"
@@ -1823,37 +1815,37 @@ const CreateGift = ({ navigation }: Props) => {
         )}
       </SafeAreaView>
       <ModalContainer
-        onBackground={() => setAccountListModal(false)}
+        onBackground={() => setAccountListModal( false )}
         visible={accountListModal}
-        closeBottomSheet={() => setAccountListModal(false)}
+        closeBottomSheet={() => setAccountListModal( false )}
       >
         {renderAccountList()}
       </ModalContainer>
       <ModalContainer
-        onBackground={() => setAdvanceModal(false)}
+        onBackground={() => setAdvanceModal( false )}
         visible={advanceModal}
-        closeBottomSheet={() => setAdvanceModal(false)}
+        closeBottomSheet={() => setAdvanceModal( false )}
       >
         {renderAdvanceModal()}
       </ModalContainer>
 
       <ModalContainer
-        onBackground={() => setShowLoader(false)}
+        onBackground={() => setShowLoader( false )}
         visible={showLoader}
-        closeBottomSheet={() => setShowLoader(false)}
+        closeBottomSheet={() => setShowLoader( false )}
       >
         <LoaderModal
-          headerText={"Packing Your Gift"}
+          headerText={'Packing Your Gift'}
           messageText={
-            "Once created, you can send the Gift Sats right away or keep them for later\nIf not accepted, you can reclaim your Gift Sats"
+            'Once created, you can send the Gift Sats right away or keep them for later\nIf not accepted, you can reclaim your Gift Sats'
           }
-          messageText2={""}
-          source={require("../../assets/images/gift.gif")}
+          messageText2={''}
+          source={require( '../../assets/images/gift.gif' )}
         />
       </ModalContainer>
 
       <ModalContainer
-        onBackground={() => setShowLoader(false)}
+        onBackground={() => setShowLoader( false )}
         visible={showErrorLoader}
       >
         {renderErrorModal()}
@@ -1864,70 +1856,70 @@ const CreateGift = ({ navigation }: Props) => {
         closeBottomSheet={onCloseClick}
       >
         <VerifySatModalContents
-          title={"Tap SATSCARD™"}
-          info={"Get your SATSCARD™ ready for verification"}
-          proceedButtonText={"Detect SATSCARD™"}
+          title={'Tap SATSCARD™'}
+          info={'Get your SATSCARD™ ready for verification'}
+          proceedButtonText={'Detect SATSCARD™'}
           subPoints={
-            "Touch your SATSCARD™ on your phone after clicking 'Detect SATSCARD™'"
+            'Touch your SATSCARD™ on your phone after clicking \'Detect SATSCARD™\''
           }
-          bottomImage={require("../../assets/images/satCards/illustration.png")}
+          bottomImage={require( '../../assets/images/satCards/illustration.png' )}
           onCloseClick={onCloseClick}
           onPressProceed={onVerifyClick}
           // closeModal
         />
       </ModalContainer>
     </ScrollView>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   keyPadRow: {
-    flexDirection: "row",
-    height: hp("8%"),
+    flexDirection: 'row',
+    height: hp( '8%' ),
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     color: Colors.red,
-    fontSize: RFValue(11, 812),
-    fontStyle: "italic",
+    fontSize: RFValue( 11, 812 ),
+    fontStyle: 'italic',
   },
   keyPadElementTouchable: {
     flex: 1,
-    height: hp("8%"),
-    fontSize: RFValue(18),
-    justifyContent: "center",
-    alignItems: "center",
+    height: hp( '8%' ),
+    fontSize: RFValue( 18 ),
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   keyPadElementText: {
     color: Colors.blue,
-    fontSize: RFValue(25),
+    fontSize: RFValue( 25 ),
     fontFamily: Fonts.FiraSansRegular,
-    fontStyle: "normal",
+    fontStyle: 'normal',
   },
   cardBitCoinImage: {
-    width: wp("3.5%"),
-    height: wp("3.5%"),
+    width: wp( '3.5%' ),
+    height: wp( '3.5%' ),
     marginRight: 5,
-    resizeMode: "contain",
+    resizeMode: 'contain',
     // marginBottom: wp( '0.7%' ),
   },
   modalTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansRegular,
     letterSpacing: 0.54,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginRight: wp(10),
+    marginRight: wp( 10 ),
     letterSpacing: 0.6,
-    marginBottom: hp(2),
+    marginBottom: hp( 2 ),
   },
   modalContentContainer: {
     backgroundColor: Colors.backgroundColor,
-    paddingBottom: hp(4),
+    paddingBottom: hp( 4 ),
   },
   viewContainer: {
     flex: 1,
@@ -1935,23 +1927,23 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   buttonView: {
-    height: wp("12%"),
-    width: wp("27%"),
-    paddingHorizontal: wp(2),
-    justifyContent: "center",
-    alignItems: "center",
+    height: wp( '12%' ),
+    width: wp( '27%' ),
+    paddingHorizontal: wp( 2 ),
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 8,
     backgroundColor: Colors.blue,
   },
   disabledButtonView: {
-    height: wp("12%"),
-    width: wp("27%"),
-    justifyContent: "center",
-    alignItems: "center",
+    height: wp( '12%' ),
+    width: wp( '27%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 8,
     backgroundColor: Colors.lightBlue,
   },
@@ -1960,8 +1952,8 @@ const styles = StyleSheet.create({
     height: 18,
     borderRadius: 9,
     backgroundColor: Colors.white,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     elevation: 6,
     shadowOpacity: 0.1,
     shadowOffset: {
@@ -1971,24 +1963,24 @@ const styles = StyleSheet.create({
   },
   modalInputBox: {
     flex: 1,
-    fontSize: RFValue(15),
+    fontSize: RFValue( 15 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     backgroundColor: Colors.white,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   inputBox: {
     borderWidth: 0.5,
     borderRadius: 10,
-    marginLeft: wp("5%"),
-    marginRight: wp("5%"),
+    marginLeft: wp( '5%' ),
+    marginRight: wp( '5%' ),
     backgroundColor: Colors.white,
   },
   inputBoxFocused: {
     borderWidth: 0.5,
     borderRadius: 10,
-    marginLeft: wp("5%"),
-    marginRight: wp("5%"),
+    marginLeft: wp( '5%' ),
+    marginRight: wp( '5%' ),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
@@ -1999,72 +1991,72 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   accImage: {
-    marginRight: wp(4),
+    marginRight: wp( 4 ),
   },
   availableToSpendText: {
     color: Colors.blue,
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansItalic,
     lineHeight: 15,
   },
   balanceText: {
     color: Colors.blue,
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansItalic,
   },
   proceedButtonText: {
     color: Colors.blue,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   selectedContactsView: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
     backgroundColor: Colors.blue,
-    borderRadius: wp(2),
-    height: hp(4),
-    paddingHorizontal: wp(2),
+    borderRadius: wp( 2 ),
+    height: hp( 4 ),
+    paddingHorizontal: wp( 2 ),
   },
   contactText: {
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
   },
   accountSelectionView: {
-    width: "90%",
+    width: '90%',
     // shadowOpacity: 0.06,
     // shadowOffset: {
     //   width: 10, height: 10
     // },
     // shadowRadius: 10,
     // elevation: 2,
-    alignSelf: "center",
-    marginTop: hp(2),
-    marginBottom: hp(2),
+    alignSelf: 'center',
+    marginTop: hp( 2 ),
+    marginBottom: hp( 2 ),
   },
   modalCrossButton: {
-    width: wp(7),
-    height: wp(7),
-    borderRadius: wp(7 / 2),
+    width: wp( 7 ),
+    height: wp( 7 ),
+    borderRadius: wp( 7 / 2 ),
     backgroundColor: Colors.lightBlue,
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: "auto",
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 'auto',
   },
   homeHeaderAmountText: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(20),
+    fontSize: RFValue( 20 ),
     marginRight: 5,
     color: Colors.black,
   },
   homeHeaderAmountUnitText: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     // marginBottom: 3,
     color: Colors.gray2,
-    marginTop: hp(0.7),
+    marginTop: hp( 0.7 ),
   },
-});
+} )
 
-export default CreateGift;
+export default CreateGift

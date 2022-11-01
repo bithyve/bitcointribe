@@ -9163,10 +9163,10 @@ react-native-measureme@0.0.2:
   resolved "https://registry.yarnpkg.com/react-native-measureme/-/react-native-measureme-0.0.2.tgz#7f54eeb0813d461ef6c49d921e42e253d649c47a"
   integrity sha512-m7Td7w1pVdIf7a3ejN7K/67AU+TtkZqTt9/ieKamirLRI3fjLToupmOKDtIOU3Y56oKojzTKz1lBbYSPN28HWA==
 
-react-native-nfc-manager@^3.13.5:
-  version "3.13.5"
-  resolved "https://registry.yarnpkg.com/react-native-nfc-manager/-/react-native-nfc-manager-3.13.5.tgz#40b28b1ac1a9ab40ef80e1bce79ce31647a59fe6"
-  integrity sha512-o+W1L97XWGrXqRu/sM7IVm9PgV6svO88J9a/76q6JYoInaSD/Wcwsxieqxs4vGf4ecJP5WRcPh5Ia2fnIcCdjA==
+react-native-nfc-manager@^3.14.0:
+  version "3.14.0"
+  resolved "https://registry.yarnpkg.com/react-native-nfc-manager/-/react-native-nfc-manager-3.14.0.tgz#b2b49f2896b4aab0c527ac3b9e6bcadfc52fd05a"
+  integrity sha512-aQDhryWsHKYmABnkQIfjpqxDQ5kTOlDtxD7ZhvAhK/yUUTCWebKqe++IymB5zTYIDB2k47nD2X6TNHnlcisKqA==
   dependencies:
     "@expo/config-plugins" "^4.0.16"
 

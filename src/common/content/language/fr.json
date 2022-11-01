@@ -81,6 +81,11 @@
               "heading": "Satoshis ou Sats",
               "text": "1 bitcoin = 100 millions de satoshis ou sats",
               "subText": "Hexa utilise les sats pour faciliter l'utilisation du bitcoin"
+          },
+          {
+            "heading": "Maintenant cadeau avec SATSCARD",
+            "text": "Utilisez SATSCARD pour envoyer et recevoir des cadeaux avec vos proches",
+            "subText": ""
           }
       ],
       "Hello": "Bonjour !",

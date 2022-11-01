@@ -627,6 +627,7 @@ export interface TrustedContact {
   timestamps: {
     created: number,
   }
+  messages?: []
 }
 export interface Trusted_Contacts {
   [channelKey: string]: TrustedContact
