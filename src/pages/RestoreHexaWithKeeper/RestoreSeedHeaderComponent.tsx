@@ -8,6 +8,7 @@ import {
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { translations } from '../../common/content/LocContext'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 const RestoreSeedHeaderComponent = ( props ) => {
   const strings  = translations[ 'bhr' ]
@@ -20,12 +21,7 @@ const RestoreSeedHeaderComponent = ( props ) => {
           height: wp( '10%' ), width: wp( '10%' ), alignItems: 'center'
         }}
       >
-        <Image
-          source={require( '../../assets/images/icons/icon_back.png' )}
-          style={{
-            width: wp( '5%' ), height: wp( '2%' )
-          }}
-        />
+        <FontAwesome name="chevron-left" color={"#4286F5"} size={20} />
       </TouchableOpacity>
       <Text style={styles.titleText}>{props.selectedTitle}</Text>
     </View>
@@ -53,9 +49,9 @@ const styles = StyleSheet.create( {
   },
   titleText: {
     marginLeft: wp( '4%' ),
-    color: Colors.blue,
-    fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    color: '#4286F5',
+    fontSize: RFValue( 25 ),
+    fontFamily: Fonts.RobotoSlabRegular,
   },
   headerImage: {
     width: wp( '9%' ),

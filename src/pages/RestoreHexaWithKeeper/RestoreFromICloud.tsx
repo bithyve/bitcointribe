@@ -161,7 +161,7 @@ export default function RestoreFromICloud( props ) {
             <Text
               style={{
                 ...styles.proceedButtonText,
-                color: Colors.blue,
+                color: '#4286F5',
               }}
             >
               {props.backButtonText}
@@ -179,20 +179,20 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
   },
   headerTitleText: {
-    color: Colors.blue,
+    color: '#4286F5',
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.RobotoSlabRegular,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     marginTop: wp( '1.5%' ),
   },
   bottomInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     marginBottom: hp( '1%' ),
     marginTop: 'auto',
   },
@@ -232,14 +232,14 @@ const styles = StyleSheet.create( {
     shadowOffset: {
       width: 15, height: 15
     },
-    backgroundColor: Colors.blue,
+    backgroundColor: '#4286F5',
     alignSelf: 'center',
     marginLeft: wp( '8%' ),
   },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.RobotoSlabMedium,
   },
   greyBox: {
     width: wp( '90%' ),
@@ -269,7 +269,7 @@ const styles = StyleSheet.create( {
   },
   greyBoxText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     fontSize: RFValue( 11 ),
   },
   arrowIconView: {

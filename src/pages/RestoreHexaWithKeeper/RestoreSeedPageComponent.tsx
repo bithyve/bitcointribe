@@ -342,9 +342,9 @@ const RestoreSeedPageComponent = ( props ) => {
                   <TouchableOpacity onPress={() => onCheckPressed()} style={{
                     flexDirection:'row', alignItems:'center'
                   }}>
-                    <Icon name={extraSeeds?'checkbox-marked':'checkbox-blank-outline'} size={24} color={Colors.blue} />
+                    <Icon name={extraSeeds?'checkbox-marked':'checkbox-blank-outline'} size={24} color={'#4286F5'} />
                     <Text style={ {
-                      color: Colors.blue, marginStart:10
+                      color: '#4286F5', marginStart:10
                     } }>{'I have 24 seed words'}</Text>
                   </TouchableOpacity>}
                 />
@@ -415,9 +415,9 @@ const RestoreSeedPageComponent = ( props ) => {
               onPress={() => { ( currentPosition + 1 ) * 6 < total ? onNextClick() : onProceedClick() }}
               style={{
                 ...styles.successModalButtonView,
-                backgroundColor: props.confirmDisable
-                  ? Colors.lightBlue
-                  : Colors.blue,
+                opacity: props.confirmDisable
+                  ? 0.6
+                  : 1,
               }}
               delayPressIn={0}
               disabled={props.confirmDisable ? props.confirmDisable : false}
@@ -478,7 +478,9 @@ const RestoreSeedPageComponent = ( props ) => {
           onPressProceed={() => {
             setShowAlertModal( false )
           }}
-          isBottomImage={false}
+          isBottomImage={false}          
+          headerTextColor={'#4286F5'}
+          buttonColor={'#4286F5'}
           // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>
@@ -502,13 +504,13 @@ const styles = StyleSheet.create( {
       width: 15,
       height: 15,
     },
-    backgroundColor: Colors.blue,
+    backgroundColor: '#4286F5',
     alignSelf: 'center',
   },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.RobotoSlabRegular,
   },
   selectedHistoryCard: {
     margin: wp( '3%' ),
@@ -620,14 +622,14 @@ const styles = StyleSheet.create( {
     width:25,
     height:5,
     borderRadius:5,
-    backgroundColor:Colors.blue,
+    backgroundColor: '#EA4335',
     marginEnd:5
   },
   unSelectedDot:{
     width:6,
     height:5,
     borderRadius:5,
-    backgroundColor:Colors.primaryAccentLighter2,
+    backgroundColor: '#EE8C84',
     marginEnd:5
   }
 } )
