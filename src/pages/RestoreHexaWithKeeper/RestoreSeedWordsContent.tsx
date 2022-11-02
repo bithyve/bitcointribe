@@ -189,6 +189,8 @@ const RestoreSeedWordsContent = ( props ) => {
             setShowAlertModal( false )
           }}
           isBottomImage={false}
+          headerTextColor={'#4286F5'}
+          buttonColor={'#4286F5'}
         // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>
@@ -203,6 +205,8 @@ const RestoreSeedWordsContent = ( props ) => {
             props.navigation.goBack()
           }}
           isBottomImage={false}
+          headerTextColor={'#4286F5'}
+          buttonColor={'#4286F5'}
         // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>

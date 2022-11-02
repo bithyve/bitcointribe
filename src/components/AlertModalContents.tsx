@@ -48,7 +48,7 @@ export default function AlertModalContents( props ) {
                 ? props.headerTextColor
                 : Colors.blue,
               fontSize: RFValue( 18 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.RobotoSlabRegular,
               letterSpacing: 0.54
               // width: wp( 65 )
             }}

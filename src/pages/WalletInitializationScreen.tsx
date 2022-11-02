@@ -28,33 +28,50 @@ const WalletInitializationScreen = props => {
   const strings = translations[ 'login' ]
   const dispatch = useDispatch()
   return (
-    <SafeAreaView style={{
-      flex: 1, backgroundColor: Colors.backgroundColor
-    }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: Colors.backgroundColor,
+      }}
+    >
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={{
-        marginBottom: wp( '5%' )
-      }}>
+      <View
+        style={{
+          marginBottom: wp("5%"),
+        }}
+      >
         <View style={styles.titleView}>
-          <Text style={styles.headerTitleText}>{`${strings.new} Wallet`}</Text>
-          <Text style={styles.headerInfoText}>
+          <Text
+            style={[
+              styles.headerTitleText,
+              { fontFamily: Fonts.RobotoSlabRegular, color: "#4286F5" },
+            ]}
+          >{`${strings.new} Wallet`}</Text>
+          <Text
+            style={[
+              styles.headerInfoText,
+              { fontFamily: Fonts.RobotoSlabRegular, color: "#6C6C6C" },
+            ]}
+          >
             {strings.appcreates}
           </Text>
         </View>
         <TouchableOpacity
-          onPress={() => props.navigation.navigate( 'NewWalletName' )}
+          onPress={() => props.navigation.navigate("NewWalletName")}
           style={styles.NewWalletTouchableView}
         >
           <Image
             style={{
-              ...styles.iconImage, width: wp( 7 ),
-              height: wp( 7 ), marginBottom: wp( 2 )
+              ...styles.iconImage,
+              width: wp(7),
+              height: wp(7),
+              marginBottom: wp(2),
             }}
-            source={require( '../assets/images/icons/icon_newwallet.png' )}
+            source={require("../assets/images/icons/icon_newwallet.png")}
           />
           <View style={styles.textView}>
             <Text style={styles.touchableText}>
-              {`${strings.Createanew} wallet`}
+              {`Start with a new Hexa Wallet`}
             </Text>
           </View>
           <View style={styles.arrowIconView}>
@@ -63,64 +80,48 @@ const WalletInitializationScreen = props => {
               color={Colors.borderColor}
               size={15}
               style={{
-                alignSelf: 'center'
+                alignSelf: "center",
               }}
             />
           </View>
         </TouchableOpacity>
       </View>
-      <View style={{
-        flex: 1,
-      }}>
-        <View style={{
-          ...styles.titleView, marginTop: wp( '2%' )
-        }}>
-          <Text style={styles.headerTitleText}>{`${strings.Existing} Wallet`}</Text>
-          <Text style={styles.headerInfoText}>
+      <View
+        style={{
+          flex: 1,
+        }}
+      >
+        <View
+          style={{
+            ...styles.titleView,
+            marginTop: wp("2%"),
+          }}
+        >
+          <Text
+            style={[styles.headerTitleText, {fontFamily: Fonts.RobotoSlabRegular, color: '#4286F5'}]}
+          >{`${strings.Existing} Wallet`}</Text>
+          <Text style={[styles.headerInfoText, {fontFamily: Fonts.RobotoSlabRegular,}]}>
             {/* {strings.previously} */}
-            {'Use Backup Phrase if you have 12/18/24 word seed phrase. Recovery Keys are for legacy users'}
+            {
+              "If you previously had a Hexa wallet you can recover it using the Recovery Keys with these options"
+            }
           </Text>
         </View>
         <TouchableOpacity
           onPress={async () => {
-            props.navigation.navigate( 'RestoreSeedWordsContent' )
+            dispatch(setDownloadedBackupData([]));
+            dispatch(setCloudDataRecovery(null));
+            dispatch(setIsFileReading(false));
+            props.navigation.navigate("RestoreWithICloud");
           }}
           style={{
-            ...styles.NewWalletTouchableView, marginBottom: wp( '7%' )
+            ...styles.NewWalletTouchableView,
+            marginBottom: wp("7%"),
           }}
         >
           <Image
             style={styles.iconImage}
-            source={require( '../assets/images/icons/seedwords.png' )}
-          />
-          <View style={styles.textView}>
-            <Text style={styles.touchableText}>Using Backup phrase</Text>
-          </View>
-          <View style={styles.arrowIconView}>
-            <MaterialIcons
-              name="arrow-forward-ios"
-              color={Colors.borderColor}
-              size={15}
-              style={{
-                alignSelf: 'center'
-              }}
-            />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={async () => {
-            dispatch( setDownloadedBackupData( [] ) )
-            dispatch( setCloudDataRecovery( null ) )
-            dispatch( setIsFileReading( false ) )
-            props.navigation.navigate( 'RestoreWithICloud' )
-          }}
-          style={{
-            ...styles.NewWalletTouchableView, marginBottom: wp( '7%' )
-          }}
-        >
-          <Image
-            style={styles.iconImage}
-            source={require( '../assets/images/icons/icon_secrets.png' )}
+            source={require("../assets/images/icons/icon_secrets.png")}
           />
           <View style={styles.textView}>
             <Text style={styles.touchableText}>Using Recovery Keys</Text>
@@ -131,7 +132,34 @@ const WalletInitializationScreen = props => {
               color={Colors.borderColor}
               size={15}
               style={{
-                alignSelf: 'center'
+                alignSelf: "center",
+              }}
+            />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={async () => {
+            props.navigation.navigate("RestoreSeedWordsContent");
+          }}
+          style={{
+            ...styles.NewWalletTouchableView,
+            marginBottom: wp("7%"),
+          }}
+        >
+          <Image
+            style={styles.iconImage}
+            source={require("../assets/images/icons/seedwords.png")}
+          />
+          <View style={styles.textView}>
+            <Text style={styles.touchableText}>Using Backup phrase</Text>
+          </View>
+          <View style={styles.arrowIconView}>
+            <MaterialIcons
+              name="arrow-forward-ios"
+              color={Colors.borderColor}
+              size={15}
+              style={{
+                alignSelf: "center",
               }}
             />
           </View>
@@ -180,26 +208,31 @@ const WalletInitializationScreen = props => {
           </View>
         </TouchableOpacity> */}
 
-        <View style={{
-          flex: 1,
-        }}>
-          <View style={{
-            marginTop: 'auto'
-          }}>
+        <View
+          style={{
+            flex: 1,
+          }}
+        >
+          <View
+            style={{
+              marginTop: "auto",
+            }}
+          >
             <BottomInfoBox
               backgroundColor={Colors.white}
               title={strings.TermsService}
-              infoText={
-                `${strings.proceeding} `
-              }
+              infoText={`${strings.proceeding} `}
               linkText={strings.TermsService}
-              onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
+              titleColor={'#4286F5'}
+              onPress={() =>
+                openLink("https://hexawallet.io/terms-of-service/")
+              }
             />
           </View>
         </View>
       </View>
     </SafeAreaView>
-  )
+  );
 }
 
 export default WalletInitializationScreen
@@ -252,9 +285,9 @@ let styles = StyleSheet.create( {
     justifyContent: 'center',
   },
   touchableText: {
-    color: Colors.blue,
+    color: '#4286F5',
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
   },
   arrowIconView: {
     marginLeft: 10,

@@ -84,9 +84,9 @@ class ScanRecoveryKey extends Component<
               style={styles.headerBackArrowView}
             >
               <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
+                name="chevron-left"
+                color={'#4286F5'}
+                size={20}
               />
             </TouchableOpacity>
             <View
@@ -340,14 +340,14 @@ const styles = StyleSheet.create( {
     marginRight: 20,
   },
   modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    color: '#4286F5',
+    fontSize: RFValue( 20 ),
+    fontFamily: Fonts.RobotoSlabMedium,
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     marginTop: hp( '0.7%' ),
     marginBottom: hp( '0.7%' ),
   },
@@ -375,7 +375,7 @@ const styles = StyleSheet.create( {
   },
   greyBoxText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     fontSize: RFValue( 20 ),
   },
 } )
