@@ -9,6 +9,7 @@ const Colors = {
   skyBlue: '#006DB42E',
   darkBlue: '#006DB4',
   blue: '#006CB4',
+  Blue: '#4286F5',
   green: '#70C1B3',
   purple: '#9D87E0',
   grayShade: '#53D592',

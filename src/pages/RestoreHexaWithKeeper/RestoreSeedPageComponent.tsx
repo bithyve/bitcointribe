@@ -342,9 +342,9 @@ const RestoreSeedPageComponent = ( props ) => {
                   <TouchableOpacity onPress={() => onCheckPressed()} style={{
                     flexDirection:'row', alignItems:'center'
                   }}>
-                    <Icon name={extraSeeds?'checkbox-marked':'checkbox-blank-outline'} size={24} color={'#4286F5'} />
+                    <Icon name={extraSeeds?'checkbox-marked':'checkbox-blank-outline'} size={24} color={Colors.Blue} />
                     <Text style={ {
-                      color: '#4286F5', marginStart:10
+                      color: Colors.Blue, marginStart:10
                     } }>{'I have 24 seed words'}</Text>
                   </TouchableOpacity>}
                 />
@@ -479,8 +479,8 @@ const RestoreSeedPageComponent = ( props ) => {
             setShowAlertModal( false )
           }}
           isBottomImage={false}          
-          headerTextColor={'#4286F5'}
-          buttonColor={'#4286F5'}
+          headerTextColor={Colors.Blue}
+          buttonColor={Colors.Blue}
           // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>
@@ -504,7 +504,7 @@ const styles = StyleSheet.create( {
       width: 15,
       height: 15,
     },
-    backgroundColor: '#4286F5',
+    backgroundColor: Colors.Blue,
     alignSelf: 'center',
   },
   proceedButtonText: {
