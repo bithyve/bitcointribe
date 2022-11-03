@@ -16,7 +16,17 @@ export default StyleSheet.create( {
   },
 
   headerLeftIconContainer: {
-    height: 54
+    height: 54,
+  },
+
+  headerCenterIconContainer: {
+    height: 54,
+    marginTop: 35,
+  },
+
+  headerRightIconContainer: {
+    height: 54,
+    marginTop: 28,
   },
 
   headerLeftIconInnerContainer: {
@@ -24,6 +34,17 @@ export default StyleSheet.create( {
     height: 54,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  headerCenterIconInnerContainer: {
+    // width: 54,
+    height: 54,
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: RFValue( 12 ),
+    fontWeight: '600',
+    color: 'white',
+    fontFamily: Fonts.RobotoSlabBold
   },
 
   headerTitles: {
