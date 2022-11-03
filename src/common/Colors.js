@@ -1,4 +1,6 @@
 const Colors = {
+  appPrimary: '#4286F5',
+
   borderColor: '#E3E3E3',
   black: '#2F2F2F',
   shadowBlue: '#DDECF5',

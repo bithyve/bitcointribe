@@ -57,11 +57,6 @@
 	<true/>
 	<key>NFCReaderUsageDescription</key>
 	<string>$(PRODUCT_NAME) would like to use NFC</string>
-	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
-	<array>
-		<string>D2760000850100</string>
-		<string>D2760000850101</string>
-	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -111,6 +106,10 @@
 	</dict>
 	<key>UIAppFonts</key>
 	<array>
+		<string>RobotoSlab-Bold.ttf</string>
+		<string>RobotoSlab-Light.ttf</string>
+		<string>RobotoSlab-Regular.ttf</string>
+		<string>RobotoSlab-Medium.ttf</string>
 		<string>FiraSans-Bold.ttf</string>
 		<string>FiraSans-BookItalic.ttf</string>
 		<string>FiraSans-Italic.ttf</string>
@@ -143,10 +142,6 @@
 		<string>SimpleLineIcons.ttf</string>
 		<string>Zocial.ttf</string>
 		<string>FiraSans-Light.ttf</string>
-		<string>RobotoSlab-Bold.ttf</string>
-		<string>RobotoSlab-Light.ttf</string>
-		<string>RobotoSlab-Medium.ttf</string>
-		<string>RobotoSlab-Regular.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
@@ -165,5 +160,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+	<array>
+		<string>D2760000850100</string>
+		<string>D2760000850101</string>
+	</array>
 </dict>
 </plist>
