@@ -935,7 +935,7 @@ class RestoreWithICloud extends Component<
             >
               <FontAwesome
                 name="chevron-left"
-                color={'#4286F5'}
+                color={Colors.Blue}
                 size={20}
               />
             </TouchableOpacity>
@@ -1073,7 +1073,7 @@ class RestoreWithICloud extends Component<
         <View
           style={{
             flexDirection: 'row',
-            backgroundColor: '#4286F5',
+            backgroundColor: Colors.Blue,
             height: 60,
             borderRadius: 10,
             marginLeft: 25,
@@ -1461,7 +1461,7 @@ const styles = StyleSheet.create( {
     marginRight: 20,
   },
   modalHeaderTitleText: {
-    color: '#4286F5',
+    color: Colors.Blue,
     fontSize: RFValue( 20 ),
     fontFamily: Fonts.RobotoSlabMedium,
   },
