@@ -161,7 +161,7 @@ export default function RestoreFromICloud( props ) {
             <Text
               style={{
                 ...styles.proceedButtonText,
-                color: Colors.Blue,
+                color: Colors.blue,
               }}
             >
               {props.backButtonText}
@@ -179,7 +179,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
   },
   headerTitleText: {
-    color: Colors.Blue,
+    color: Colors.blue,
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.RobotoSlabRegular,
   },
@@ -232,7 +232,7 @@ const styles = StyleSheet.create( {
     shadowOffset: {
       width: 15, height: 15
     },
-    backgroundColor: Colors.Blue,
+    backgroundColor: Colors.blue,
     alignSelf: 'center',
     marginLeft: wp( '8%' ),
   },

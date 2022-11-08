@@ -85,7 +85,7 @@ class ScanRecoveryKey extends Component<
             >
               <FontAwesome
                 name="chevron-left"
-                color={Colors.Blue}
+                color={Colors.blue}
                 size={20}
               />
             </TouchableOpacity>
@@ -340,7 +340,7 @@ const styles = StyleSheet.create( {
     marginRight: 20,
   },
   modalHeaderTitleText: {
-    color: Colors.Blue,
+    color: Colors.blue,
     fontSize: RFValue( 20 ),
     fontFamily: Fonts.RobotoSlabMedium,
   },
