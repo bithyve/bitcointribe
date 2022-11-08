@@ -44,7 +44,7 @@ const WalletInitializationScreen = props => {
           <Text
             style={[
               styles.headerTitleText,
-              { fontFamily: Fonts.RobotoSlabRegular, color: "#4286F5" },
+              { fontFamily: Fonts.RobotoSlabRegular, color: Colors.blue },
             ]}
           >{`${strings.new} Wallet`}</Text>
           <Text
@@ -98,7 +98,7 @@ const WalletInitializationScreen = props => {
           }}
         >
           <Text
-            style={[styles.headerTitleText, {fontFamily: Fonts.RobotoSlabRegular, color: '#4286F5'}]}
+            style={[styles.headerTitleText, {fontFamily: Fonts.RobotoSlabRegular, color: Colors.blue}]}
           >{`${strings.Existing} Wallet`}</Text>
           <Text style={[styles.headerInfoText, {fontFamily: Fonts.RobotoSlabRegular,}]}>
             {/* {strings.previously} */}
@@ -223,7 +223,7 @@ const WalletInitializationScreen = props => {
               title={strings.TermsService}
               infoText={`${strings.proceeding} `}
               linkText={strings.TermsService}
-              titleColor={'#4286F5'}
+              titleColor={Colors.blue}
               onPress={() =>
                 openLink("https://hexawallet.io/terms-of-service/")
               }
@@ -285,7 +285,7 @@ let styles = StyleSheet.create( {
     justifyContent: 'center',
   },
   touchableText: {
-    color: '#4286F5',
+    color: Colors.blue,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.RobotoSlabRegular,
   },
