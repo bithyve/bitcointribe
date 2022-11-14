@@ -60,6 +60,7 @@ import RestoreSeedWordsContent from '../pages/RestoreHexaWithKeeper/RestoreSeedW
 import GiftStack from './stacks/gift/GiftStack'
 import Filled_gift_tab from '../assets/images/satCards/filled_gift_tab.svg'
 import Gift_tab from '../assets/images/satCards/gift_tab.svg'
+import NewHome from '../pages/Home/NewHome'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -356,6 +357,13 @@ const Bottomtab = createBottomTabNavigator(
 )
 const HomeNavigator = createStackNavigator(
   {
+    NewHome: {
+      screen: NewHome,
+      navigationOptions: {
+        header:null
+      },
+
+    },
     Landing: {
       screen: Bottomtab,
       // navigationOptions: {
