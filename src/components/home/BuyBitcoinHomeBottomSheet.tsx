@@ -197,8 +197,8 @@ const styles = StyleSheet.create( {
     width: wp( 4 ), height: wp( 4 )
   },
   learnMore: {
-    fontFamily: Fonts.FiraSansMediumItalic,
-    color: Colors.blue
+    fontFamily: Fonts.RobotoSlabRegular,
+    color: Colors.backgroundYellow
   },
   linkContainer: {
     flexDirection: 'row',
@@ -208,10 +208,10 @@ const styles = StyleSheet.create( {
     paddingHorizontal: wp( 6 )
   },
   buyButton: {
-    margin: hp( 0.5 ), color: Colors.white, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
+    margin: hp( 0.5 ), color: Colors.white, fontSize: RFValue( 12 ), fontFamily: Fonts.RobotoSlabRegular
   },
   buyContainer: {
-    backgroundColor: Colors.blue,
+    backgroundColor: Colors.blueTextNew,
     borderRadius: wp( '2%' ),
     paddingHorizontal: wp( 2 ),
     paddingVertical: hp( 0.5 )

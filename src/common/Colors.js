@@ -29,6 +29,7 @@ const Colors = {
   homepageButtonColor: '#2C85C1',
   yellow: '#F7C910',
   shadowYellow: '#fff2cc',
+  backgroundYellow: '#FFC723',
   lightRed:'#FF78614D',
   backgroundColor1: '#FAFAFA', //'#FCFCFC',
   buttonText:'#626262',

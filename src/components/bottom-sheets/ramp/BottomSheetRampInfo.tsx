@@ -101,7 +101,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         style={{
           width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
           alignSelf: 'flex-end',
-          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+          backgroundColor: Colors.backgroundYellow, alignItems: 'center', justifyContent: 'center',
           marginTop: wp( 3 ), marginRight: wp( 3 )
         }}
       >
@@ -205,7 +205,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
             style={ListStyles.listItemSubtitle}
             numberOfLines={1}
           >
-            {strings.bitcoinWill}
+            Address for ramp transactions
           </ListItem.Subtitle>
 
           <ListItem.Title
@@ -329,8 +329,8 @@ const styles = StyleSheet.create( {
     // marginRight: wp( 16 ),
   },
   destinationTitleText: {
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue( 20 ),
+    fontFamily: Fonts.RobotoSlabRegular,
+    fontSize: RFValue( 16 ),
     color: Colors.black,
     alignContent: 'center',
     marginVertical: hp( 0.3 ),
@@ -343,7 +343,7 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     width: wp( 30 ),
     marginLeft: 10,
   },
@@ -351,11 +351,11 @@ const styles = StyleSheet.create( {
     marginLeft: wp( '7%' ),
     marginRight: wp( '12%' ),
     color: Colors.lightTextColor,
-    fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.RobotoSlabRegular,
     textAlign: 'justify',
-    letterSpacing: RFValue( 0.6 ),
-    lineHeight: RFValue( 18 ),
+    // letterSpacing: RFValue( 0.6 ),
+    lineHeight: RFValue( 15 ),
     marginTop: wp( 1.5 ),
     marginBottom: wp( 3 )
   },
@@ -371,7 +371,7 @@ const styles = StyleSheet.create( {
     shadowOffset: {
       width: 15, height: 15
     },
-    backgroundColor: Colors.blue,
+    backgroundColor: Colors.blueTextNew,
     alignSelf: 'flex-start',
     marginLeft: wp( '6%' ),
     marginTop: hp( 2 )
