@@ -414,7 +414,7 @@ const SeedBackupHistory = ( props ) => {
       <BottomInputModalContainer onBackground={() => setConfirmSeedWordModal( false )} visible={confirmSeedWordModal}
         closeBottomSheet={() => setConfirmSeedWordModal( false )} >
         <ConfirmSeedWordsModal
-          proceedButtonText={'Next'}
+          proceedButtonText={'Proceed'}
           seedNumber={seedRandomNumber ? seedRandomNumber[ seedPosition ] : 0}
           onPressProceed={( word ) => {
             setConfirmSeedWordModal( false )
@@ -454,8 +454,8 @@ const SeedBackupHistory = ( props ) => {
       <ModalContainer onBackground={() => setSeedWordModal( false )} visible={seedWordModal}
         closeBottomSheet={() => setSeedWordModal( false )}>
         <SeedBacupModalContents
-          title={'Backup phrase\nSuccessful'}
-          info={'You have successfully confirmed your backup\n\nMake sure you store the words in a safe place. The app will request you to confirm the words periodically to ensure you have the access'}
+          title={'Seed Words\nBackup Successful'}
+          info={'You have successfully confirmed your backup\n\n\nMake sure you store the words in a safe place. \n\nHexa will request you to confirm the words periodically to ensure you have the access'}
           proceedButtonText={'View Health'}
           onPressProceed={() => {
             setSeedWordModal( false )

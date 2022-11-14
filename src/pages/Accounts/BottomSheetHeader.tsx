@@ -8,7 +8,7 @@ import { heightPercentageToDP, widthPercentageToDP as wp } from 'react-native-re
 import ListStyles from '../../common/Styles/ListStyles'
 import { LocalizationContext } from '../../common/content/LocContext'
 
-const BottomSheetHeader = ( { title, onPress } ) => {
+const BottomSheetHeader = ( { font, title, onPress } ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'home' ].manyWays
   if ( !title )  { return null }
@@ -20,7 +20,7 @@ const BottomSheetHeader = ( { title, onPress } ) => {
         style={{
           width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
           alignSelf: 'flex-end',
-          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+          backgroundColor: Colors.golden, alignItems: 'center', justifyContent: 'center',
           marginTop: wp( 3 ), marginRight: wp( 3 )
         }}
       >
@@ -28,8 +28,12 @@ const BottomSheetHeader = ( { title, onPress } ) => {
         // marginTop: hp( 0.5 )
         }} />
       </TouchableOpacity>
-      <Text style={ListStyles.modalTitle}>{title}</Text>
-      <Text style={styles.modalInfoText}>
+      <Text style={[ ListStyles.modalTitle, font && {
+        fontFamily: font
+      } ]}>{title}</Text>
+      <Text style={[ styles.modalInfoText, font && {
+        fontFamily: font
+      } ]}>
         {strings}
       </Text>
     </View>
