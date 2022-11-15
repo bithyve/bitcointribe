@@ -5,7 +5,8 @@ import {
   Text,
   TextInput,
   Dimensions,
-  Keyboard
+  Keyboard,
+  TouchableOpacity
 } from 'react-native'
 import Fonts from '../../common/Fonts'
 import Colors from '../../common/Colors'
@@ -19,6 +20,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { LocalizationContext } from '../../common/content/LocContext'
 import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export default function ConfirmSeedWordsModal( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -60,6 +62,10 @@ export default function ConfirmSeedWordsModal( props ) {
     }
   }
 
+  const arr = props.number !== undefined ? ( props.number < 3 ? Array.from( Array( 3 ).keys() ) : Array.from( Array( 4 ).keys() ) ) : []
+
+  const n = props.number < 3 ? props.number : props.number - 3
+
   return (
     <View style={{
       // flex: 1,
@@ -79,68 +85,108 @@ export default function ConfirmSeedWordsModal( props ) {
       <View style={{
         // height: hp( '72%' ),
         paddingHorizontal:8,
-        paddingTop:8
+        paddingTop:8,
+        backgroundColor: 'white'
       }}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={props.onPressIgnore}
+          style={{
+            width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+            alignSelf: 'flex-end',
+            backgroundColor: Colors.golden, alignItems: 'center', justifyContent: 'center',
+            marginTop: wp( 3 ), marginRight: wp( 3 )
+          }}
+        >
+          <FontAwesome name="close" color={Colors.white} size={19} style={{
+          // marginTop: hp( 0.5 )
+          }} />
+        </TouchableOpacity>
+        <Text style={{
+          fontFamily: Fonts.RobotoSlabRegular,
+          fontSize: RFValue( 14 ),
+          color: Colors.textColorGrey,
+          lineHeight: RFValue( 30 ),
+          marginHorizontal: wp( '5%' ),
+        }}>
+          Backup Seed Words
+        </Text>
         <Text style={{
           // marginBottom: wp( '%' ),
           color: Colors.blue,
           fontSize: RFValue( 18 ),
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.RobotoSlabRegular,
+          lineHeight: RFValue( 30 ),
           marginHorizontal: wp( '5%' ),
-          marginTop: 30
-        }} >{'Confirm backup phrase'}</Text>
+          letterSpacing: RFValue( 0.01 )
+        }} >{'Confirm Seed Words'}</Text>
         <Text style={{
-          color: Colors.lightTextColor,
-          fontSize: RFValue( 11 ),
-          fontFamily: Fonts.FiraSansRegular,
+          color: Colors.textColorGrey,
+          fontSize: RFValue( 12 ),
+          fontFamily: Fonts.RobotoSlabRegular,
           marginHorizontal: wp( '5%' ),
-          marginTop: 5
+          marginTop: 5,
+          lineHeight: RFValue( 18 ),
+          letterSpacing: RFValue( 0.6 )
         }}>{'Key in the word exactly like it was displayed'}</Text>
         <Text style={{
-          color: Colors.lightTextColor,
-          fontSize: RFValue( 14 ),
-          fontFamily: Fonts.FiraSansRegular,
+          color: Colors.greyTextColor,
+          fontSize: RFValue( 12 ),
+          fontFamily: Fonts.RobotoSlabRegular,
           marginHorizontal: wp( '5%' ),
-          marginTop: RFValue( 25 )
+          marginTop: RFValue( 25 ),
+          letterSpacing: RFValue( 0.48 ),
+          lineHeight: RFValue( 12 ),
         }}>{'Enter the '}
           <Text style={{
-            fontFamily: Fonts.FiraSansMedium
+            fontFamily: Fonts.RobotoSlabMedium,
+            color: Colors.greyTextColor,
           }}>{getSeedNumber( props.seedNumber ) + ' word'}</Text></Text>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingRight: 15,
-            borderColor: Colors.borderColor,
-            marginTop: 10,
+        <Shadow
+          containerViewStyle={{
+            marginTop: hp( 3 ),
             marginHorizontal: wp( '5%' ),
-            backgroundColor: Colors.white,
-            borderWidth: 1,
-            borderRadius: 10
+            alignSelf: 'center'
           }}
+          offset={ [ 7, 7 ] }
+          distance={7}
+          startColor={'rgba( 108, 108, 108, 0.07 )'}
         >
-          <TextInput
-            style={styles.modalInputBox}
-            placeholder={`Enter ${getHint( props.seedNumber )} word`}
-            placeholderTextColor={Colors.borderColor}
-            value={word}
-            // autoCompleteType="off"
-            textContentType="none"
-            returnKeyType='done'
-            autoCorrect={false}
-            // editable={isEditable}
-            autoCapitalize="none"
-            onSubmitEditing={() => Keyboard.dismiss()}
-            onChangeText={( text ) => {
-              setWord( text.trim() )
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingRight: 15,
+              // borderColor: Colors.borderColor,
+              backgroundColor: Colors.white,
+              // borderWidth: 1,
+              borderRadius: 10,
+              width: wp( 79 ),
             }}
-            // onFocus={() => {
-            //   if ( word.length > 0 ) {
-            //     setWord( '' )
-            //   }
-            // }}
-          />
-        </View>
+          >
+            <TextInput
+              style={styles.modalInputBox}
+              placeholder={`Enter ${getHint( props.seedNumber )} word`}
+              placeholderTextColor={Colors.borderColor}
+              value={word}
+              // autoCompleteType="off"
+              textContentType="none"
+              returnKeyType='done'
+              autoCorrect={false}
+              // editable={isEditable}
+              autoCapitalize="none"
+              onSubmitEditing={() => Keyboard.dismiss()}
+              onChangeText={( text ) => {
+                setWord( text.trim() )
+              }}
+              // onFocus={() => {
+              //   if ( word.length > 0 ) {
+              //     setWord( '' )
+              //   }
+              // }}
+            />
+          </View>
+        </Shadow>
 
         { props.bottomBoxInfo && <View style={{
           marginTop: hp( '2%' ),
@@ -155,9 +201,28 @@ export default function ConfirmSeedWordsModal( props ) {
           />
         </View>
         }
+        <View style={{
+          display: props.number === undefined ? 'none' : 'flex',
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+          marginHorizontal: wp( '8%' ),
+          marginTop: 15
+        }}>
+          {
+            arr.map( ( x ) => (
+              <View key={x} style={{
+                width: x === n ? RFValue( 25 ) : RFValue( 6 ),
+                height: RFValue( 5 ),
+                backgroundColor: x === n ? '#EA4335' : '#EA433566',
+                marginRight: RFValue( 5 ),
+                borderRadius: 2.5,
+              }}/>
+            ) )
+          }
+        </View>
         <View
           style={{
-            height: hp( '12%' ),
+            height: hp( '14%' ),
             flexDirection: 'row',
             marginTop: 'auto',
             alignItems: 'flex-end',
@@ -172,7 +237,7 @@ export default function ConfirmSeedWordsModal( props ) {
           startColor={props.buttonShadowColor
             ? props.buttonShadowColor
             : Colors.shadowBlue }
-          offset={[ 42, 14 ]}>
+          offset={[ 40, 10 ]}>
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressProceed( word )}
               style={{
@@ -180,7 +245,6 @@ export default function ConfirmSeedWordsModal( props ) {
                 shadowColor: props.buttonShadowColor
                   ? props.buttonShadowColor
                   : Colors.shadowBlue,
-
               }}
               delayPressIn={0}
             >
@@ -201,11 +265,9 @@ export default function ConfirmSeedWordsModal( props ) {
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressIgnore()}
               style={{
-                height: wp( '12%' ),
+                height: wp( '13%' ),
                 width: wp( '27%' ),
-                justifyContent: 'center',
                 alignItems: 'center',
-                alignSelf: 'center',
                 // position: 'absolute',
                 // left: wp( 53 )
               }}
@@ -216,7 +278,7 @@ export default function ConfirmSeedWordsModal( props ) {
                   ...styles.proceedButtonText,
                   color: props.buttonTextColor
                     ? props.buttonTextColor
-                    : Colors.blue,
+                    : Colors.golden,
                 }}
               >
                 {props.cancelButtonText ? props.cancelButtonText : common.ignore}
@@ -281,7 +343,7 @@ const styles = StyleSheet.create( {
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     paddingLeft: 15,
 
   },
@@ -298,8 +360,8 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
   },
   successModalButtonView: {
-    height: wp( '12%' ),
-    minWidth: wp( '40%' ),
+    height: wp( '13%' ),
+    width: wp( '30%' ),
     paddingLeft: wp( '5%' ),
     paddingRight: wp( '5%' ),
     justifyContent: 'center',
@@ -313,6 +375,8 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.RobotoSlabMedium,
+    textAlignVertical: 'center',
+    lineHeight: RFValue( 13 )
   },
 } )

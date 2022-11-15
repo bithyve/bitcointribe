@@ -21,6 +21,10 @@ import { newAccountsInfo } from '../../../store/sagas/accounts'
 import { addNewAccountShells } from '../../../store/actions/accounts'
 import DropDown from '../../../utils/Dropdown'
 import { LocalizationContext } from '../../../common/content/LocContext'
+import CheckingAcc from '../../../assets/images/svgs/icon_checking.svg'
+import AccountShell from '../../../common/data/models/AccountShell'
+import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+
 
 type Props = {
   rampDeepLinkContent: string | null;
@@ -53,6 +57,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
     if( !hasButtonBeenPressed && rampFromBuyMenu ){dispatch( fetchRampReservation( rampReceiveAddress ) )}
     setHasButtonBeenPressed( true )
   }
+  const accShell = useActiveAccountShells()
 
   useRampReservationFetchEffect( {
     onSuccess: () => {
@@ -75,6 +80,8 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
       } else setPickReceiveAddressFrom( AccountType.DEPOSIT_ACCOUNT )
     }
   }, [ pickReceiveAddressFrom, wallet ] )
+
+  const checkingBal = AccountShell.getTotalBalance( accShell[ 1 ] )
 
   // eslint-disable-next-line quotes
   let rampMessage = strings.rampMessage
@@ -101,7 +108,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         style={{
           width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
           alignSelf: 'flex-end',
-          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+          backgroundColor: Colors.golden, alignItems: 'center', justifyContent: 'center',
           marginTop: wp( 3 ), marginRight: wp( 3 )
         }}
       >
@@ -109,10 +116,18 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         // marginTop: hp( 0.5 )
         }} />
       </TouchableOpacity>
-      <Text style={ListStyles.modalTitle}>{rampTitle}</Text>
-      <Text style={{
-        ...styles.modalInfoText
-      }}>{rampMessage}</Text>
+      <Text style={[
+        ListStyles.modalTitle,
+        {
+          fontFamily: Fonts.RobotoSlabRegular,
+          fontSize: RFValue( 18 ),
+          letterSpacing: RFValue( 0.27 ),
+          lineHeight: RFValue( 22 ),
+          marginBottom: hp( 3 )
+        }
+      ]}>{rampTitle}</Text>
+      <Text style={styles.modalInfoText}>{rampMessage.split( '\n\n' )[ 0 ]}</Text>
+      <Text style={styles.modalInfoText1}>{rampMessage.split( '\n\n' )[ 1 ]}</Text>
       {/* <TouchableOpacity
       onPress={() => showDropdown( true )}
       style={styles.containerStyle}>
@@ -153,16 +168,14 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
       <View style={styles.containerStyle}>
         <View style={styles.headerImageView}>
           <View style={styles.headerImageInitials}>
-            <Image
-              source={require( '../../../assets/images/icons/ramp_logo_notext.png' )}
+            <CheckingAcc
               style={styles.headerImage}
-              resizeMode="contain"
             />
           </View>
         </View>
 
         <ListItem.Content style={{
-          height: wp( '14%' )
+          height: wp( '14%' ),
         }}>
           <ListItem.Subtitle
             style={ListStyles.infoHeaderSubtitleText}
@@ -177,25 +190,34 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           >
               Checking Account
           </ListItem.Title>
-          {/* <ListItem.Subtitle
-          style={[ ListStyles.infoHeaderSubtitleText, {
-            alignSelf: 'baseline', color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic
-          } ]}
-          numberOfLines={1}
-        >
-              Lorem ipsum dolor amet
-        </ListItem.Subtitle> */}
+          <ListItem.Subtitle
+            style={[ ListStyles.infoHeaderSubtitleText, {
+              alignSelf: 'baseline', color: '#269640', fontFamily: Fonts.RobotoSlabRegular
+            } ]}
+            numberOfLines={1}
+          >
+              Balance {checkingBal} sats
+          </ListItem.Subtitle>
         </ListItem.Content>
       </View>
 
       <View style={styles.containerStyle}>
         <View style={styles.headerImageView}>
           <View style={styles.headerImageInitials}>
-            <Image
+            {/* <Image
               source={require( '../../../assets/images/icons/icon_address_type.png' )}
               style={styles.headerImage}
               resizeMode="contain"
-            />
+            /> */}
+            <Text style={{
+              color: '#4D4D4D',
+              fontSize: RFValue( 27 ),
+              textAlign: 'center',
+              fontFamily: Fonts.RobotoSlabMedium,
+              lineHeight: RFValue( 27 )
+            }}>
+                @
+            </Text>
           </View>
         </View>
         <ListItem.Content style={{
@@ -260,8 +282,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
             source={require( '../../../assets/images/icons/ramp_logo_large.png' )}
             style={{
               marginLeft: 5,
-              width: 62,
-              height: 27,
+
             }}
           />
         </View>
@@ -274,13 +295,15 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
 
 const styles = StyleSheet.create( {
   containerStyle: {
+    marginVertical: wp( 1 ),
     flexDirection: 'row',
-    marginLeft: wp( '3%' ),
-    // alignSelf: 'center',
-    width: wp( '85%' ),
-    height: hp( '11%' ),
+    marginEnd: wp( '4 %' ),
+    paddingHorizontal: wp( 5 ),
+    paddingVertical: wp( 3 ),
+    width: wp( '80%' ),
     backgroundColor: Colors.white,
     alignItems: 'center',
+    alignSelf: 'center',
     marginBottom: hp( 3 ),
     borderRadius: wp( 2 ),
     // elevation: 10,
@@ -293,23 +316,22 @@ const styles = StyleSheet.create( {
   headerImageView: {
     width: wp( '17%' ),
     height: wp( '17%' ),
-    borderColor: 'red',
-    elevation: 10,
-    shadowColor: Colors.bgColor,
-    shadowOpacity: 10,
-    shadowOffset: {
-      width: 2, height: 2
-    },
-    backgroundColor: Colors.white,
+    // elevation: 10,
+    // shadowColor: Colors.bgColor,
+    // shadowOpacity: 10,
+    // shadowOffset: {
+    //   width: 2, height: 2
+    // },
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: wp( '17%' ) / 2,
     margin: 5
   },
   headerImage: {
-    width: wp( '7%' ),
-    height: wp( '7%' ),
-    borderRadius: wp( '7%' ) / 2,
+    width: wp( 10 ),
+    height: wp( 10 ),
+    borderRadius: wp( '10%' ) / 2,
+    resizeMode: 'contain'
   },
   headerImageInitials: {
     alignItems: 'center',
@@ -352,11 +374,23 @@ const styles = StyleSheet.create( {
     marginRight: wp( '12%' ),
     color: Colors.lightTextColor,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 ),
     marginTop: wp( 1.5 ),
+    marginBottom: wp( 1 )
+  },
+  modalInfoText1: {
+    marginLeft: wp( '7%' ),
+    marginRight: wp( '12%' ),
+    color: '#6C6C6C',
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.RobotoSlabRegular,
+    textAlign: 'justify',
+    letterSpacing: RFValue( 0.6 ),
+    lineHeight: RFValue( 18 ),
+    marginTop: wp( 0 ),
     marginBottom: wp( 3 )
   },
   successModalButtonView: {
@@ -385,7 +419,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.RobotoSlabRegular
   },
 } )
 

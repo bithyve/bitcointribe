@@ -15,6 +15,7 @@ import { LocalizationContext } from '../../common/content/LocContext'
 import BottomInfoBox from '../BottomInfoBox'
 import Ramp from '../../assets/images/svgs/ramp.svg'
 import Wyre from  '../../assets/images/svgs/wyre.svg'
+import { Shadow } from 'react-native-shadow-2'
 
 export type Props = {
   onMenuItemSelected: ( menuItem: BuyBitcoinBottomSheetMenuItem ) => void;
@@ -108,48 +109,88 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
 
   const renderItem = ( { item: menuItem }: { item: BuyBitcoinBottomSheetMenuItem } ) => {
     return (
-      <View
-        style={styles.rootContainer}
-      >
-        <ListItem
-          containerStyle={menuItem.disabled ? ListStyles.disabledContainer : [ ListStyles.container, styles.mainCardContainer ]}
-        >
-          {menuItem.getImage()}
+      <Shadow viewStyle={styles.rootContainer}
+        startColor={Colors.shadowColor}
+        offset={[ 5, 5 ]}
+        distance={5}>
+        <View style={{
+          backgroundColor: Colors.white,
+          borderRadius: wp( 2 ),
+        }}>
+          <ListItem
+            containerStyle={
+              menuItem.disabled
+                ? ListStyles.disabledContainer
+                : [ ListStyles.container, styles.mainCardContainer ]
+            }
+          >
+            {menuItem.getImage()}
 
-          <ListItem.Content style={styles.cardMiddle}>
-            <ListItem.Title style={menuItem.disabled ? ListStyles.disabledListItemTitle : [ ListStyles.listItemTitle, styles.CardText ]}>{menuItem.title}</ListItem.Title>
-            <ListItem.Subtitle style={ListStyles.listItemSubtitle}>{menuItem.subtitle}</ListItem.Subtitle>
-          </ListItem.Content>
+            <ListItem.Content style={styles.cardMiddle}>
+              <ListItem.Title
+                style={[
+                  ...( menuItem.disabled
+                    ? ListStyles.disabledListItemTitle
+                    : [ ListStyles.listItemTitle, styles.CardText ] ),
+                  {
+                    fontFamily: Fonts.RobotoSlabRegular,
+                    fontSize: RFValue( 13 ),
+                    lineHeight: RFValue( 18 ),
+                  },
+                ]}
+              >
+                {menuItem.title.replace( /\w+[.!?]?$/, '' )}
+                <Text
+                  style={{
+                    color: '#269640',
+                  }}
+                >
+                  {menuItem.title.split( ' ' ).splice( -1 )}
+                </Text>
+              </ListItem.Title>
+              <ListItem.Subtitle
+                style={[
+                  ListStyles.listItemSubtitle,
+                  {
+                    fontFamily: Fonts.RobotoSlabRegular,
+                    fontSize: RFValue( 12 ),
+                    letterSpacing: RFValue( 0.24 ),
+                    lineHeight: RFValue( 18 ),
+                  },
+                ]}
+              >
+                {menuItem.subtitle}
+              </ListItem.Subtitle>
+            </ListItem.Content>
 
-
+            <TouchableOpacity
+              onPress={() => {
+                onMenuItemSelected( menuItem )
+              }}
+              disabled={menuItem.disabled}
+              style={styles.buyContainer}
+            >
+              <Text style={styles.buyButton}>{strings.buyBitCoin}</Text>
+            </TouchableOpacity>
+          </ListItem>
           <TouchableOpacity
-            onPress={() => { onMenuItemSelected( menuItem ) }}
-            disabled={menuItem.disabled}
-            style={styles.buyContainer}>
-            <Text style={styles.buyButton}>
-              {strings.buyBitCoin}
+            style={styles.linkContainer}
+            onPress={() => {
+              onPress()
+              Linking.openURL( menuItem.link )
+            }}
+          >
+            <Text style={[ ListStyles.listItemSubtitle, styles.linkText ]}>
+              {strings.fees}
+              <Text style={styles.learnMore}>{` ${strings.learnMore}   `}</Text>
             </Text>
+            <Image
+              style={styles.imageStyle}
+              source={require( '../../assets/images/icons/openlink.png' )}
+            />
           </TouchableOpacity>
-        </ListItem>
-        <TouchableOpacity style={styles.linkContainer}
-          onPress={() => {
-            onPress()
-            Linking.openURL( menuItem.link )
-          }
-          }
-        >
-          <Text style={[ ListStyles.listItemSubtitle, styles.linkText ]}>
-            {strings.fees}
-            <Text style={styles.learnMore}>
-              {` ${strings.learnMore} `}
-            </Text>
-          </Text>
-          <Image
-            style={styles.imageStyle}
-            source={require( '../../assets/images/icons/openlink.png' )}
-          />
-        </TouchableOpacity>
-      </View>
+        </View>
+      </Shadow>
     )
   }
 
@@ -190,15 +231,17 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
   },
   linkText:{
+    fontFamily: Fonts.RobotoSlabRegular,
     paddingBottom: wp( 1 ),
-    color: Colors.textColorGrey
+    color: Colors.textColorGrey,
+    letterSpacing: -RFValue( 0.11 )
   },
   imageStyle: {
-    width: wp( 4 ), height: wp( 4 )
+    width: RFValue( 11 ), height: RFValue( 11 )
   },
   learnMore: {
-    fontFamily: Fonts.FiraSansMediumItalic,
-    color: Colors.blue
+    fontFamily: Fonts.RobotoSlabRegular,
+    color: '#FABC05'
   },
   linkContainer: {
     flexDirection: 'row',
@@ -208,7 +251,11 @@ const styles = StyleSheet.create( {
     paddingHorizontal: wp( 6 )
   },
   buyButton: {
-    margin: hp( 0.5 ), color: Colors.white, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
+    margin: hp( 0.5 ),
+    color: Colors.white,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.RobotoSlabRegular,
+    lineHeight: RFValue( 16 )
   },
   buyContainer: {
     backgroundColor: Colors.blue,
@@ -221,17 +268,17 @@ const styles = StyleSheet.create( {
     paddingHorizontal: 0,
   },
   rootContainer: {
-    backgroundColor: Colors.white,
-    marginBottom: hp( 1.5 ),
+    // backgroundColor: Colors.white,
+    marginBottom: hp( 2 ),
     width: wp( 90 ),
     borderRadius: wp( 2 ),
     alignSelf: 'center',
-    shadowColor: Colors.shadowColor,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 10, height: 10
-    },
-    elevation: 6
+    // shadowColor: Colors.shadowColor,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 10, height: 10
+    // },
+    // elevation: 1
   },
   modelHeight: {
     height: 'auto',
