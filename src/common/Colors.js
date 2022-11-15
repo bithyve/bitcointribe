@@ -88,6 +88,7 @@ const Colors = {
   gray14:'#313131',
   gray15: '#727272',
 
-  cream: '#FFE09D'
+  cream: '#FFE09D',
+  blue1: '#94B4F2'
 }
 export default Colors

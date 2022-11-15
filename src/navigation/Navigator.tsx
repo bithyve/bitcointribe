@@ -357,13 +357,6 @@ const Bottomtab = createBottomTabNavigator(
 )
 const HomeNavigator = createStackNavigator(
   {
-    NewHome: {
-      screen: NewHome,
-      navigationOptions: {
-        header:null
-      },
-
-    },
     Landing: {
       screen: Bottomtab,
       // navigationOptions: {
@@ -399,9 +392,24 @@ const HomeNavigator = createStackNavigator(
   }
 )
 
+const NewHomeNavigator = createStackNavigator( {
+  NewHome: {
+    screen: NewHome,
+    navigationOptions: {
+      header:null
+    },
+  },
+  Friends: {
+    screen: FriendsAndFamily,
+    navigationOptions: {
+      header:null
+    },
+  }
+} )
+
 const Navigator = createSwitchNavigator( {
   SetupNav: SetupNavigator,
-  HomeNav: HomeNavigator,
+  HomeNav: NewHomeNavigator,
 } )
 
 

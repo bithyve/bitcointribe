@@ -7,7 +7,8 @@ import {
   SafeAreaView,
   FlatList,
   Image,
-  Text
+  Text,
+  TouchableOpacity
 } from 'react-native'
 import {
   heightPercentageToDP,
@@ -288,27 +289,39 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationNote: null,
       notificationAdditionalInfo: null,
       notificationProceedText: null,
-      notificationIgnoreText:null,
+      notificationIgnoreText: null,
       isIgnoreButton: false,
       currentMessage: null,
       notificationType: null,
       releaseNotes: '',
       giftRequest: null,
       homeData: [ {
+        name: 'Gift and tips',
+        type: 1
       }, {
+        name: 'Create group',
+        type: 2
       }, {
+        name: 'Broadcast message',
+        type: 3
       }, {
+        name: 'Settings',
+        type: 4
       }, {
+        name: 'Buy bitcoin',
+        type: 5
       }, {
+        name: 'Coming soon',
+        type: 6
       } ]
     }
-    this.currentNotificationId= ''
+    this.currentNotificationId = ''
   }
 
-  componentDidMount = async() => {
-    if( this.props.levelHealth.length && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && this.props.cloudPermissionGranted === true && this.props.updateWIStatus === false && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' && this.props.currentLevel == 0 ) {
-      if( Platform.OS === 'android' ) {
-        if( !this.props.isGoogleLoginCancelled ) {
+  componentDidMount = async () => {
+    if ( this.props.levelHealth.length && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && this.props.cloudPermissionGranted === true && this.props.updateWIStatus === false && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' && this.props.currentLevel == 0 ) {
+      if ( Platform.OS === 'android' ) {
+        if ( !this.props.isGoogleLoginCancelled ) {
           this.props.setCloudData()
         }
       } else {
@@ -329,7 +342,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
           break
         case BuyMenuItemKind.SWAN:
           const swanAccountActive = false
-          if( !swanAccountActive ){
+          if ( !swanAccountActive ) {
             this.props.clearSwanCache()
             this.props.updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED )
           }
@@ -445,7 +458,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
       kind: BuyMenuItemKind.SWAN
     }
 
-    if( swanAccountClicked ) this.handleBuyBitcoinBottomSheetSelection( tempMenuItem )
+    if ( swanAccountClicked ) this.handleBuyBitcoinBottomSheetSelection( tempMenuItem )
 
     this.setState(
       {
@@ -556,9 +569,9 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }, 500 )
     this.notificationCheck()
     this.openBottomSheetOnLaunch( BottomSheetKind.NOTIFICATIONS_LIST )
-    const notificationRejection = this.props.messages.find( value=>value.type == notificationType.FNF_KEEPER_REQUEST_REJECTED && value.additionalInfo && value.additionalInfo.wasExistingContactRequest && value.additionalInfo.channelKey )
+    const notificationRejection = this.props.messages.find( value => value.type == notificationType.FNF_KEEPER_REQUEST_REJECTED && value.additionalInfo && value.additionalInfo.wasExistingContactRequest && value.additionalInfo.channelKey )
     console.log( 'notificationRejection', notificationRejection )
-    if( notificationRejection ) {
+    if ( notificationRejection ) {
       this.props.rejectedExistingContactRequest( notificationRejection.additionalInfo.channelKey )
     }
   };
@@ -572,10 +585,10 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }, BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY )
   }
 
-  notificationCheck = () =>{
+  notificationCheck = () => {
     const { messages } = this.props
-    console.log( 'notificationCheck '+JSON.stringify( messages ) )
-    if( messages && messages.length ){
+    console.log( 'notificationCheck ' + JSON.stringify( messages ) )
+    if ( messages && messages.length ) {
       this.updateBadgeCounter()
       messages.sort( function ( left, right ) {
         return moment.utc( right.timeStamp ).unix() - moment.utc( left.timeStamp ).unix()
@@ -584,41 +597,41 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
         notificationData: messages,
         notificationDataChange: !this.state.notificationDataChange,
       } )
-      if( this.currentNotificationId !== '' ) {
+      if ( this.currentNotificationId !== '' ) {
         const message = messages.find( message => message.notificationId === this.currentNotificationId )
-        if( message ){
+        if ( message ) {
           this.handleNotificationBottomSheetSelection( message )
         }
         this.currentNotificationId = ''
       } else {
-        const message = messages.find( message => message.additionalInfo === null &&  message.status === 'unread' )
-        if( message ){
+        const message = messages.find( message => message.additionalInfo === null && message.status === 'unread' )
+        if ( message ) {
           this.handleNotificationBottomSheetSelection( message )
         }
       }
     }
-    const notificationRejection = messages.find( value=>value.type == notificationType.FNF_KEEPER_REQUEST_REJECTED && value.additionalInfo && value.additionalInfo.wasExistingContactRequest && value.additionalInfo.channelKey )
+    const notificationRejection = messages.find( value => value.type == notificationType.FNF_KEEPER_REQUEST_REJECTED && value.additionalInfo && value.additionalInfo.wasExistingContactRequest && value.additionalInfo.channelKey )
     console.log( 'notificationRejection', notificationRejection )
-    if( notificationRejection ) {
+    if ( notificationRejection ) {
       this.props.rejectedExistingContactRequest( notificationRejection.additionalInfo.channelKey )
     }
   }
 
-  readAllNotifications= () => {
+  readAllNotifications = () => {
     const { messages } = this.props
     const arr = []
     messages.forEach( message => {
-      if( message.status === 'unread' ) {
+      if ( message.status === 'unread' ) {
         arr.push(
           {
             notificationId: message.notificationId,
-            status : 'read'
+            status: 'read'
           }
         )
         this.props.updateMessageStatusInApp( message.notificationId )
       }
     } )
-    if( arr.length > 0 ) {
+    if ( arr.length > 0 ) {
       this.props.updateMessageStatus( arr )
     }
   }
@@ -654,7 +667,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
     const statusValue = [ {
       notificationId: message.notificationId,
-      status : 'read'
+      status: 'read'
     } ]
     this.props.updateMessageStatus( statusValue )
     this.props.updateMessageStatusInApp( message.notificationId )
@@ -663,7 +676,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.setState( {
             trustedContactRequest: {
               walletName: message.additionalInfo.walletName,
-              encryptedChannelKeys: message.additionalInfo.channelKey+'-'+message.additionalInfo.contactsSecondaryChannelKey,
+              encryptedChannelKeys: message.additionalInfo.channelKey + '-' + message.additionalInfo.contactsSecondaryChannelKey,
               isExistingContact: true,
               isQR: true,
               type: QRCodeTypes.EXISTING_CONTACT,
@@ -699,11 +712,11 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case NotificationType.GIFT_ACCEPTED:
           this.closeBottomSheet()
           this.props.navigation.navigate( 'ManageGifts', {
-            giftType : '1'
+            giftType: '1'
           } )
           break
         case NotificationType.GIFT_REJECTED:
-          // console.log( 'message.AdditionalInfo', message.additionalInfo )
+        // console.log( 'message.AdditionalInfo', message.additionalInfo )
           this.setState( {
             notificationTitle: message.title,
             notificationInfo: message.info,
@@ -716,7 +729,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }, () => {
             this.closeBottomSheet()
             this.props.navigation.navigate( 'ManageGifts', {
-              giftType : '1'
+              giftType: '1'
             } )
           } )
           break
@@ -737,7 +750,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case NotificationType.RELEASE:
           const current = DeviceInfo.getBuildNumber()
           const { build, mandatoryFor } = message.additionalInfo
-          if( Number( current ) <= Number( mandatoryFor ) || Number( current ) <  Number( build ) ) {
+          if ( Number( current ) <= Number( mandatoryFor ) || Number( current ) < Number( build ) ) {
             this.setState( {
               notificationTitle: message.title,
               notificationInfo: message.info,
@@ -746,7 +759,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
               notificationProceedText: 'Upgrade',
               notificationIgnoreText: Number( current ) <= Number( mandatoryFor ) ? '' : 'Remind me later',
               isIgnoreButton: true,
-              releaseNotes: Platform.OS === 'android' ?  message.additionalInfo.notes.android : message.additionalInfo.notes.ios,
+              releaseNotes: Platform.OS === 'android' ? message.additionalInfo.notes.android : message.additionalInfo.notes.ios,
               notificationType: message.type
             }, () => {
               this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
@@ -758,7 +771,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onCodeScanned = async ( qrData ) => {
     const { trustedContactRequest, giftRequest, link } = await processRequestQR( qrData )
-    if( trustedContactRequest ){
+    if ( trustedContactRequest ) {
       this.setState( {
         trustedContactRequest
       },
@@ -778,10 +791,10 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
       )
     }
-    if( giftRequest ){
+    if ( giftRequest ) {
       this.setState( {
         giftRequest
-      },  () => {
+      }, () => {
         this.openBottomSheetOnLaunch(
           BottomSheetKind.GIFT_REQUEST,
           1
@@ -790,28 +803,41 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   }
 
+  onItemClick = ( item ) => {
+    switch ( item.type ) {
+        //Gift and tips
+        case 1:
+          this.props.navigation.navigate( 'Friends' )
+          break
+
+        case 2:
+
+          break
+    }
+  }
+
   renderHomeItem = ( { item, index } ) => {
-    return(
-      <View style={{
-        width:wp( 95 ), height: hp( 120 ), marginEnd:wp( 18 ),
+    return (
+      <TouchableOpacity style={{
+        width: wp( 95 ), height: hp( 120 ), marginEnd: wp( 18 ),
         backgroundColor: Colors.cream, paddingHorizontal: wp( 12 ),
-        borderRadius:10, marginBottom: 18
-      }}>
+        borderRadius: 10, marginBottom: 18
+      }} activeOpacity={1} onPress={() => this.onItemClick( item )}>
         <Image source={require( '../../assets/images/icons/settings.png' )}
           style={{
             width: wp( 31 ), height: wp( 31 ), marginTop: ( 36 )
           }} />
         <Text style={{
-          fontSize:RFValue( 12 ), fontFamily:Fonts.RobotoSlabMedium,
-          letterSpacing: 0.6, lineHeight: ( 16 )
-        }}>Gift and Tips</Text>
-      </View>
+          fontSize: RFValue( 12 ), fontFamily: Fonts.RobotoSlabMedium,
+          letterSpacing: 0.6, lineHeight: ( 16 ), marginTop: 7
+        }}>{item.name}</Text>
+      </TouchableOpacity>
     )
   }
 
   navigateToQRScreen = () => {
     this.props.navigation.navigate( 'QRScanner', {
-      onCodeScanned:  this.onCodeScanned,
+      onCodeScanned: this.onCodeScanned,
     } )
   };
   render() {
@@ -829,11 +855,11 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }}>
         <StatusBar backgroundColor={Colors.appPrimary} barStyle="dark-content" />
         <ModalContainer
-          onBackground={()=>this.setState( {
-            currentBottomSheetKind:null
+          onBackground={() => this.setState( {
+            currentBottomSheetKind: null
           } )}
           visible={this.state.currentBottomSheetKind !== null}
-          closeBottomSheet={() => {}}
+          closeBottomSheet={() => { }}
         >
           {this.renderBottomSheetContent()}
         </ModalContainer>
@@ -853,25 +879,25 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
               CurrencyCode={currencyCode}
               navigation={navigation}
               currentLevel={currentLevel}
-              //  onSwitchToggle={this.onSwitchToggle}
-              // setCurrencyToggleValue={this.setCurrencyToggleValue}
-              // navigation={this.props.navigation}
-              // overallHealth={overallHealth}
+            //  onSwitchToggle={this.onSwitchToggle}
+            // setCurrencyToggleValue={this.setCurrencyToggleValue}
+            // navigation={this.props.navigation}
+            // overallHealth={overallHealth}
             />
             <View>
               <View style={{
                 borderBottomStartRadius: hp( 40 ),
-                height: hp( 30 ), backgroundColor:Colors.appPrimary,
-                position:'absolute', zIndex: -1, width:'100%'
+                height: hp( 30 ), backgroundColor: Colors.appPrimary,
+                position: 'absolute', zIndex: -1, width: '100%'
               }} />
               <FlatList
                 contentContainerStyle={{
-                  marginStart: wp( 27 ), marginEnd:wp( 9 )
+                  marginStart: wp( 27 ), marginEnd: wp( 9 )
                 }}
                 data={this.state.homeData}
                 numColumns={3}
                 renderItem={this.renderHomeItem}
-                keyExtractor={( item, index ) => item.id }
+                keyExtractor={( item, index ) => item.id}
               />
             </View>
             <ModalContainer
@@ -894,7 +920,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 }
               }}
               visible={this.state.currentBottomSheetKind != null}
-              closeBottomSheet={() => {}}
+              closeBottomSheet={() => { }}
             >
             </ModalContainer>
           </View>
@@ -997,7 +1023,7 @@ const styles = StyleSheet.create( {
     marginHorizontal: widthPercentageToDP( 5 ),
     alignSelf: 'center',
     flexDirection: 'row',
-    paddingHorizontal: widthPercentageToDP ( 2 )
+    paddingHorizontal: widthPercentageToDP( 2 )
   },
   // accountCardsSectionContainer: {
   //   height: hp( '71.46%' ),

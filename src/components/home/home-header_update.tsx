@@ -45,7 +45,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { currencyKindSet } from '../../store/actions/preferences'
-import { LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { LevelData, LevelHealthInterface, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import MaterialCurrencyCodeIcon, {
@@ -62,6 +62,8 @@ import BitcoinUnit, { displayNameForBitcoinUnit } from '../../common/data/enums/
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import AccountShell from '../../common/data/models/AccountShell'
 import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -117,6 +119,7 @@ const HomeHeader = ( {
     ( state ) => state.preferences.currencyCode
   )
   const cloudErrorMessage: string = useSelector( ( state ) => state.cloud.cloudErrorMessage )
+  const trustedContacts = useSelector( ( state ) => state.trustedContacts.contacts )
   const stringsBhr = translations[ 'bhr' ]
   const common = translations[ 'common' ]
   const iCloudErrors = translations[ 'iCloudErrors' ]
@@ -126,10 +129,7 @@ const HomeHeader = ( {
   const [ cloudErrorModal, setCloudErrorModal ] = useState( false )
   const [ errorMsg, setErrorMsg ] = useState( '' )
   const [ days, setDays ] = useState( 0 )
-  const [ familyData, setFamilyData ] = useState( [ {
-  }, {
-  }, {
-  } ] )
+  const [ familyData, setFamilyData ] = useState( [] )
 
   const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
   const [ modalVisible, setModalVisible ] = useState( false )
@@ -182,6 +182,47 @@ const HomeHeader = ( {
     : useFormattedUnitText( {
       bitcoinUnit, currencyKind
     } )
+
+  useEffect( ()=>{
+    // const keepers = []
+    const otherContacts = []
+
+    for( const channelKey of Object.keys( trustedContacts ) ){
+      const contact = trustedContacts[ channelKey ]
+
+      const isGuardian =[ TrustedContactRelationTypes.KEEPER,
+        TrustedContactRelationTypes.KEEPER_WARD,
+        TrustedContactRelationTypes.PRIMARY_KEEPER ].includes( contact.relationType )
+      const isWard = [ TrustedContactRelationTypes.WARD,
+        TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
+      // console.log( 'skk isGuardian', JSON.stringify( isGuardian ) )
+      // console.log( 'skk isWard', JSON.stringify( isWard ) )
+
+      if( contact.isActive ){
+        if( isGuardian || isWard ){
+          if( isGuardian && ( contact.contactDetails.contactName != 'Personal Copy' && contact.contactDetails.contactName != 'Personal Device 1' && contact.contactDetails.contactName != 'Personal Device 2' && contact.contactDetails.contactName != 'Personal Device 3' ) ){
+            // keepers.push(  makeContactRecipientDescription(
+            //   channelKey,
+            //   contact,
+            //   ContactTrustKind.KEEPER_OF_USER,
+            //   contact.messages,
+            //   contact.permanentChannelAddress
+            // ) )
+          }
+        } else otherContacts.push( makeContactRecipientDescription(
+          channelKey,
+          contact,
+          ContactTrustKind.OTHER,
+          contact.messages,
+          contact.permanentChannelAddress
+        ) )
+      } else {
+        // TODO: inject in expired contacts list
+      }
+    }
+    console.log( 'skk otherContacts', JSON.stringify( otherContacts ) )
+    setFamilyData( otherContacts )
+  }, [] )
 
   useEffect( () => {
     if ( navigationObj.selectedKeeper && onKeeperButtonClick ) {
@@ -447,6 +488,15 @@ const HomeHeader = ( {
     }
   }
 
+  const firstNamePieceText = ( item ) => {
+    // console.log( 'skk display name ', item?.displayedName?.split( ' ' )[ 0 ]?.slice( 0, 1 ) )
+    return item?.displayedName?.split( ' ' )[ 0 ]?.slice( 0, 1 )
+  }
+
+  const secondNamePieceText = ( item ) => {
+    return item?.displayedName?.split( ' ' )[ 1 ]?.slice( 0, 1 ) || ''
+  }
+
   const renderItems = ( { item, index } ) => {
     return (
       <View style={{
@@ -457,12 +507,35 @@ const HomeHeader = ( {
           justifyContent: 'center', alignItems: 'center'
         }}>
           <View style={{
-            width: wp( 38 ), height: wp( 38 ), borderRadius: wp( 19 ), backgroundColor: Colors.red
+            width: wp( 38 ), height: wp( 38 ),
+            borderRadius: wp( 19 ), backgroundColor:Colors.blue1,
+            justifyContent:'center', alignItems:'center'
           }}>
-
+            {
+              item?.avatarImageSource ?
+                <Image
+                  source={item.avatarImageSource ? item.avatarImageSource : item.image}
+                  style={{
+                    width: wp( 38 ), height: wp( 38 ),
+                  }}
+                  resizeMode="contain"
+                />
+                : <View style={{
+                  flexDirection:'row'
+                }}>
+                  <Text style={{
+                    fontSize:RFValue( 13 ),
+                    fontFamily:Fonts.RobotoSlabRegular,
+                    color: Colors.backgroundColor1,
+                    letterSpacing: 2.6
+                  }}>
+                    {firstNamePieceText( item ) + secondNamePieceText( item )}
+                  </Text>
+                </View>
+            }
           </View>
         </View>
-        <Text style={styles.familyText}>BitBot</Text>
+        <Text numberOfLines={3} style={styles.familyText}>{item.displayedName}</Text>
       </View>
     )
   }
@@ -577,7 +650,17 @@ const HomeHeader = ( {
         <BalanceCurrencyIcon />
         <Text style={styles.amountText}>40,005</Text>
       </View>
-
+      {/* {keepers.length > 0 &&
+                  <>
+                    {keepers.length && keepers.map( ( item, index ) => {
+                      return this.renderContactListItem( {
+                        contactDescription: item,
+                        index,
+                        contactsType: 'Keeper',
+                      } )
+                    } ) }
+                  </>
+      } */}
       <FlatList
         style={{
           marginTop: hp( 130 )
@@ -625,7 +708,7 @@ const styles = StyleSheet.create( {
     paddingTop: hp( 30 ),
     paddingStart: wp( 25 ),
     paddingEnd: wp( 25 ),
-    paddingBottom:hp( 30 ),
+    paddingBottom:hp( 10 ),
     backgroundColor: Colors.appPrimary,
   },
   headerTitleText: {
@@ -701,6 +784,8 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.RobotoSlabBold,
     fontSize: RFValue( 10 ),
     letterSpacing: RFValue( 0.2 ),
-    marginTop: hp( 10 )
+    marginTop: hp( 10 ),
+    width: wp( 50 ),
+    textAlign:'center'
   }
 } )
