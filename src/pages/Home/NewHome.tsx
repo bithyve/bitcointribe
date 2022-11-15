@@ -99,6 +99,7 @@ import { makeContactRecipientDescription } from '../../utils/sending/RecipientFa
 import { getCurrencyImageByRegion, processRequestQR } from '../../common/CommonFunctions'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from './../../common/Fonts'
+import CustomToolbar from '../../components/home/CustomToolbar'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -807,12 +808,34 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
     switch ( item.type ) {
         //Gift and tips
         case 1:
-          this.props.navigation.navigate( 'Friends' )
+          this.props.navigation.navigate( 'ManageGifts' )
           break
+
+        case 4:
+          this.props.navigation.navigate( 'MoreOptions' )
+          break
+    }
+  }
+
+  getIconPath = ( item ) => {
+    switch ( item.type ) {
+        case 1:
+          return require( '../../assets/images/newHome/gift.png' )
 
         case 2:
+          return require( '../../assets/images/newHome/group.png' )
 
-          break
+        case 3:
+          return require( '../../assets/images/newHome/broadcast.png' )
+
+        case 4:
+          return require( '../../assets/images/newHome/contacts.png' )
+
+        case 5:
+          return require( '../../assets/images/newHome/bitcoin.png' )
+
+        case 6:
+          return require( '../../assets/images/newHome/payments.png' )
     }
   }
 
@@ -823,7 +846,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
         backgroundColor: Colors.cream, paddingHorizontal: wp( 12 ),
         borderRadius: 10, marginBottom: 18
       }} activeOpacity={1} onPress={() => this.onItemClick( item )}>
-        <Image source={require( '../../assets/images/icons/settings.png' )}
+        <Image source={this.getIconPath( item )}
           style={{
             width: wp( 31 ), height: wp( 31 ), marginTop: ( 36 )
           }} />
@@ -854,6 +877,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
         backgroundColor: Colors.appPrimary
       }}>
         <StatusBar backgroundColor={Colors.appPrimary} barStyle="dark-content" />
+        {/* <CustomToolbar toolbarTitle={'Title'} onBackPressed={()=>{}}/> */}
         <ModalContainer
           onBackground={() => this.setState( {
             currentBottomSheetKind: null

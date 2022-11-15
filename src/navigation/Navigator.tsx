@@ -61,6 +61,12 @@ import GiftStack from './stacks/gift/GiftStack'
 import Filled_gift_tab from '../assets/images/satCards/filled_gift_tab.svg'
 import Gift_tab from '../assets/images/satCards/gift_tab.svg'
 import NewHome from '../pages/Home/NewHome'
+import ManageGifts from '../pages/FriendsAndFamily/ManageGifts'
+import CreateGift from '../pages/FriendsAndFamily/CreateGift'
+import ClaimSatsScreen from '../pages/Gift/ClaimSatsScreen'
+import GiftCreatedScreen from '../pages/Gift/GiftCreatedScreen'
+import GiftDetails from '../pages/FriendsAndFamily/GiftDetails'
+import MoreOptionsContainerScreen from '../pages/MoreOptions/MoreOptionsContainerScreen'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -399,17 +405,43 @@ const NewHomeNavigator = createStackNavigator( {
       header:null
     },
   },
-  Friends: {
-    screen: FriendsAndFamily,
+  ManageGifts: {
+    screen: ManageGifts,
     navigationOptions: {
       header:null
     },
-  }
+  },
+  CreateGift:{
+    screen: CreateGift,
+    navigationOptions: {
+      header:null
+    },
+  },
+  GiftCreated:{
+    screen: GiftCreatedScreen,
+    navigationOptions: {
+      header:null
+    }
+  },
+  GiftDetails:{
+    screen: GiftDetails,
+    navigationOptions: {
+      header:null
+    }
+  },
+  MoreOptions: {
+    screen: MoreOptionsContainerScreen,
+    navigationOptions: {
+      header: null,
+      // tabBarVisibl
+    },
+  },
 } )
 
 const Navigator = createSwitchNavigator( {
   SetupNav: SetupNavigator,
-  HomeNav: NewHomeNavigator,
+  // HomeNav: HomeNavigator,
+  HomeNav: NewHomeNavigator
 } )
 
 

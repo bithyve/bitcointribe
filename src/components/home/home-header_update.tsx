@@ -45,7 +45,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { currencyKindSet } from '../../store/actions/preferences'
-import { LevelData, LevelHealthInterface, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
+import { LevelData, LevelHealthInterface, TrustedContact, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import MaterialCurrencyCodeIcon, {
@@ -64,6 +64,8 @@ import AccountShell from '../../common/data/models/AccountShell'
 import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import RecipientKind from '../../common/data/enums/RecipientKind'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -183,14 +185,14 @@ const HomeHeader = ( {
       bitcoinUnit, currencyKind
     } )
 
-  useEffect( ()=>{
+  useEffect( () => {
     // const keepers = []
     const otherContacts = []
 
-    for( const channelKey of Object.keys( trustedContacts ) ){
+    for ( const channelKey of Object.keys( trustedContacts ) ) {
       const contact = trustedContacts[ channelKey ]
 
-      const isGuardian =[ TrustedContactRelationTypes.KEEPER,
+      const isGuardian = [ TrustedContactRelationTypes.KEEPER,
         TrustedContactRelationTypes.KEEPER_WARD,
         TrustedContactRelationTypes.PRIMARY_KEEPER ].includes( contact.relationType )
       const isWard = [ TrustedContactRelationTypes.WARD,
@@ -198,9 +200,9 @@ const HomeHeader = ( {
       // console.log( 'skk isGuardian', JSON.stringify( isGuardian ) )
       // console.log( 'skk isWard', JSON.stringify( isWard ) )
 
-      if( contact.isActive ){
-        if( isGuardian || isWard ){
-          if( isGuardian && ( contact.contactDetails.contactName != 'Personal Copy' && contact.contactDetails.contactName != 'Personal Device 1' && contact.contactDetails.contactName != 'Personal Device 2' && contact.contactDetails.contactName != 'Personal Device 3' ) ){
+      if ( contact.isActive ) {
+        if ( isGuardian || isWard ) {
+          if ( isGuardian && ( contact.contactDetails.contactName != 'Personal Copy' && contact.contactDetails.contactName != 'Personal Device 1' && contact.contactDetails.contactName != 'Personal Device 2' && contact.contactDetails.contactName != 'Personal Device 3' ) ) {
             // keepers.push(  makeContactRecipientDescription(
             //   channelKey,
             //   contact,
@@ -220,6 +222,21 @@ const HomeHeader = ( {
         // TODO: inject in expired contacts list
       }
     }
+    otherContacts.push( {
+      id: null,
+      channelKey: null,
+      isActive: false,
+      kind: RecipientKind.CONTACT,
+      trustKind: null,
+      displayedName: 'More',
+      walletName: null,
+      avatarImageSource: null,
+      lastSeenActive: null,
+      walletId: null,
+      streamId: null,
+      messages: null,
+      channelAddress: null
+    } )
     console.log( 'skk otherContacts', JSON.stringify( otherContacts ) )
     setFamilyData( otherContacts )
   }, [] )
@@ -502,40 +519,52 @@ const HomeHeader = ( {
       <View style={{
         marginEnd: wp( 16 ), alignItems: 'center'
       }}>
-        <View style={{
-          width: wp( 40 ), height: wp( 40 ), borderRadius: wp( 20 ), backgroundColor: Colors.white,
-          justifyContent: 'center', alignItems: 'center'
-        }}>
-          <View style={{
-            width: wp( 38 ), height: wp( 38 ),
-            borderRadius: wp( 19 ), backgroundColor:Colors.blue1,
-            justifyContent:'center', alignItems:'center'
-          }}>
-            {
-              item?.avatarImageSource ?
-                <Image
-                  source={item.avatarImageSource ? item.avatarImageSource : item.image}
-                  style={{
-                    width: wp( 38 ), height: wp( 38 ),
-                  }}
-                  resizeMode="contain"
-                />
-                : <View style={{
-                  flexDirection:'row'
+        {
+          item?.displayedName == 'More' ?
+            <>
+              <Image source={require( '../../assets/images/HomePageIcons/more.png' )} style={{
+                width: wp( 40 ), height: wp( 40 ), borderRadius: wp( 20 ),
+              }} />
+              <Text numberOfLines={3} style={styles.familyText}>{item.displayedName}</Text>
+            </>
+            :
+            <>
+              <View style={{
+                width: wp( 40 ), height: wp( 40 ), borderRadius: wp( 20 ), backgroundColor: Colors.white,
+                justifyContent: 'center', alignItems: 'center'
+              }}>
+                <View style={{
+                  width: wp( 38 ), height: wp( 38 ),
+                  borderRadius: wp( 19 ), backgroundColor:Colors.blue1,
+                  justifyContent:'center', alignItems:'center'
                 }}>
-                  <Text style={{
-                    fontSize:RFValue( 13 ),
-                    fontFamily:Fonts.RobotoSlabRegular,
-                    color: Colors.backgroundColor1,
-                    letterSpacing: 2.6
-                  }}>
-                    {firstNamePieceText( item ) + secondNamePieceText( item )}
-                  </Text>
+                  {
+                    item?.avatarImageSource ?
+                      <Image
+                        source={item.avatarImageSource ? item.avatarImageSource : item.image}
+                        style={{
+                          width: wp( 38 ), height: wp( 38 ),
+                        }}
+                        resizeMode="contain"
+                      />
+                      : <View style={{
+                        flexDirection:'row'
+                      }}>
+                        <Text style={{
+                          fontSize:RFValue( 13 ),
+                          fontFamily:Fonts.RobotoSlabRegular,
+                          color: Colors.backgroundColor1,
+                          letterSpacing: 2.6
+                        }}>
+                          {firstNamePieceText( item ) + secondNamePieceText( item )}
+                        </Text>
+                      </View>
+                  }
                 </View>
-            }
-          </View>
-        </View>
-        <Text numberOfLines={3} style={styles.familyText}>{item.displayedName}</Text>
+              </View>
+              <Text numberOfLines={3} style={styles.familyText}>{item.displayedName}</Text>
+            </>
+        }
       </View>
     )
   }
@@ -552,8 +581,8 @@ const HomeHeader = ( {
           width: wp( 40 ),
           backgroundColor: Colors.white,
           borderRadius: wp( 20 ),
-          justifyContent:'center',
-          alignItems:'center'
+          justifyContent: 'center',
+          alignItems: 'center'
         }}>
           <View style={{
             height: wp( 38 ),
@@ -634,7 +663,7 @@ const HomeHeader = ( {
 
       <View style={{
         flexDirection: 'row', justifyContent: 'space-between',
-        marginTop: hp( 90 ), alignItems: 'center'
+        marginTop: hp( 70 ), alignItems: 'center'
       }}>
         <Text style={styles.walletBalanceText}>Wallet Balance</Text>
         <ToggleContainer />
@@ -663,7 +692,7 @@ const HomeHeader = ( {
       } */}
       <FlatList
         style={{
-          marginTop: hp( 130 )
+          marginTop: hp( 110 )
         }}
         keyExtractor={( item, index ) => item.id}
         data={familyData}
@@ -708,7 +737,7 @@ const styles = StyleSheet.create( {
     paddingTop: hp( 30 ),
     paddingStart: wp( 25 ),
     paddingEnd: wp( 25 ),
-    paddingBottom:hp( 10 ),
+    paddingBottom: hp( 10 ),
     backgroundColor: Colors.appPrimary,
   },
   headerTitleText: {
@@ -786,6 +815,6 @@ const styles = StyleSheet.create( {
     letterSpacing: RFValue( 0.2 ),
     marginTop: hp( 10 ),
     width: wp( 50 ),
-    textAlign:'center'
+    textAlign: 'center'
   }
 } )
