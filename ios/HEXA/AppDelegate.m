@@ -61,15 +61,15 @@
   
   self.moduleRegistryAdapter = [[UMModuleRegistryAdapter alloc] initWithModuleRegistryProvider:[[UMModuleRegistryProvider alloc] init]];
 
-  RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
-  RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
+  RCTBridge *bridge = [self.reactDelegate createBridgeWithDelegate:self launchOptions:launchOptions];
+  RCTRootView *rootView = [self.reactDelegate createRootViewWithBridge:bridge
                                                    moduleName:@"HEXA"
                                             initialProperties:nil];
 
   rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
 
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-  UIViewController *rootViewController = [UIViewController new];
+  UIViewController *rootViewController = [self.reactDelegate createRootViewController];
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
@@ -77,6 +77,7 @@
   //Calling iCloud restore on App launch to get the latest copy of backup from iCloud.
   iCloudRestore *restore = [[iCloudRestore alloc] init];
 
+  [super application:application didFinishLaunchingWithOptions:launchOptions];
   return YES;
 }
 
@@ -140,7 +141,7 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
     // application requires a password unlock when it retuns to the
     // foreground, present your lock screen or authentication view controller here.
  
-    //UIViewController *blankViewController = [UIViewController new];
+    //UIViewController *blankViewController = [self.reactDelegate createRootViewController];
     //blankViewController.view.backgroundColor = [UIColor redColor];
   BackgroundViewController *blankViewController = [BackgroundViewController new];
   //blankViewController.view.backgroundColor = [UIColor blueColor];

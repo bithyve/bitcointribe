@@ -6,7 +6,6 @@ import com.facebook.react.ReactApplication;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.rnfs.RNFSPackage;
-import com.rpt.reactnativecheckpackageinstallation.CheckPackageInstallationPackage;
 import com.reactcommunity.rnlocalize.RNLocalizePackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.gantix.JailMonkey.JailMonkeyPackage;
@@ -29,26 +28,11 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import io.hexawallet.hexa.generated.BasePackageList;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 
-import org.unimodules.adapters.react.ReactAdapterPackage;
-import org.unimodules.adapters.react.ModuleRegistryAdapter;
-import org.unimodules.adapters.react.ReactModuleRegistryProvider;
-import org.unimodules.core.interfaces.Package;
-import org.unimodules.core.interfaces.SingletonModule;
-import expo.modules.constants.ConstantsPackage;
-import expo.modules.permissions.PermissionsPackage;
-import expo.modules.filesystem.FileSystemPackage;
-
-// unimodule changes
-import io.hexawallet.hexa.generated.BasePackageList;
 import java.util.Arrays;
-import org.unimodules.adapters.react.ModuleRegistryAdapter;
-import org.unimodules.adapters.react.ReactModuleRegistryProvider;
-import org.unimodules.core.interfaces.SingletonModule;
 
 import java.util.List;
 
@@ -60,21 +44,21 @@ import com.facebook.react.PackageList;
 import com.facebook.react.ReactInstanceManager;
 import java.lang.reflect.InvocationTargetException;
 
+import com.facebook.react.config.ReactFeatureFlags;
 
-
+import android.content.res.Configuration;
+import expo.modules.ApplicationLifecycleDispatcher;
+import expo.modules.ReactNativeHostWrapper;
 
 public class MainApplication extends Application implements ShareApplication, ReactApplication {
-//    private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(
-//            new BasePackageList().getPackageList(), Arrays.<SingletonModule>asList());
 
-    private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(new BasePackageList().getPackageList(), null);
 
     @Override
     public String getFileProviderAuthority() {
         return BuildConfig.APPLICATION_ID + ".provider";
     }
 
-    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+    private final ReactNativeHost mReactNativeHost = new ReactNativeHostWrapper(this, new ReactNativeHost(this) {
         @Override
         public boolean getUseDeveloperSupport() {
             return BuildConfig.DEBUG;
@@ -89,11 +73,6 @@ public class MainApplication extends Application implements ShareApplication, Re
 
             packages.add(new PdfPasswordPackage());
             packages.add(new GoogleDrivePackage());
-            // Add unimodules
-            List<ReactPackage> unimodules = Arrays.<ReactPackage>asList(
-                    new ModuleRegistryAdapter(mModuleRegistryProvider)
-            );
-            packages.addAll(unimodules);
             return packages;
         }
 
@@ -101,16 +80,18 @@ public class MainApplication extends Application implements ShareApplication, Re
         protected String getJSMainModuleName() {
             return "index";
         }
-    };
+    });
 
     @Override
     public ReactNativeHost getReactNativeHost() {
+        ApplicationLifecycleDispatcher.onApplicationCreate(this);
         return mReactNativeHost;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        ReactFeatureFlags.useTurboModules = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
         SoLoader.init(this, /* native exopackage */ false);
         initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
     }
@@ -145,4 +126,10 @@ public class MainApplication extends Application implements ShareApplication, Re
         }
         }
     }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    ApplicationLifecycleDispatcher.onConfigurationChanged(this, newConfig);
+  }
 }

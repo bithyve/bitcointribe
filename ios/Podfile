@@ -1,8 +1,7 @@
+require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-#unimodules
-require_relative '../node_modules/react-native-unimodules/cocoapods.rb'
 
 platform :ios, '12.0'
 
@@ -10,7 +9,6 @@ def all_pods
     use_flipper!({'Flipper' => '0.140.0'})
     config = use_native_modules!
     use_react_native!(:path => config["reactNativePath"])
-    use_unimodules!
     pod 'PDFGenerator'
     pod 'QRCoder'
     pod 'Firebase/Crashlytics'
@@ -18,6 +16,14 @@ def all_pods
     pod 'Firebase/Analytics'
 end
 target 'HEXA' do
+  use_expo_modules!
+  post_integrate do |installer|
+    begin
+      expo_patch_react_imports!(installer)
+    rescue => e
+      Pod::UI.warn e
+    end
+  end
   all_pods
 end
 target 'HEXA Dev' do
