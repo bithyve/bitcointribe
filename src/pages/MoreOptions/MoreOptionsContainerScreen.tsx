@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect } from 'react'
 import {
   View,
   Text,
@@ -11,42 +11,43 @@ import {
   ImageSourcePropType,
   Dimensions,
   Switch,
-} from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
-import Colors from "../../common/Colors";
-import Fonts from "../../common/Fonts";
+  SafeAreaView,
+} from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 import {
   heightPercentageToDP,
   widthPercentageToDP,
-} from "react-native-responsive-screen";
-import { useDispatch, useSelector } from "react-redux";
-import { ScrollView } from "react-native-gesture-handler";
-import AccManagement from "../../assets/images/svgs/icon_accounts.svg";
-import Node from "../../assets/images/svgs/node.svg";
-import Wallet from "../../assets/images/svgs/icon_settings.svg";
-import AppInfo from "../../assets/images/svgs/icon_info.svg";
-import DocumentPad from "../../assets/images/svgs/icons_document_copy.svg";
-import QueActive from "../../assets/images/svgs/question_inactive.svg";
-import { LocalizationContext } from "../../common/content/LocContext";
+} from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
+import { ScrollView } from 'react-native-gesture-handler'
+import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
+import Node from '../../assets/images/svgs/node.svg'
+import Wallet from '../../assets/images/svgs/icon_settings.svg'
+import AppInfo from '../../assets/images/svgs/icon_info.svg'
+import DocumentPad from '../../assets/images/svgs/icons_document_copy.svg'
+import QueActive from '../../assets/images/svgs/question_inactive.svg'
+import { LocalizationContext } from '../../common/content/LocContext'
 import {
   LevelData,
   LevelHealthInterface,
-} from "../../bitcoin/utilities/Interface";
-import ModalContainer from "../../components/home/ModalContainer";
-import CrossButton from "../../assets/images/svgs/icons_close.svg";
-import { toggleClipboardAccess } from "../../store/actions/misc";
-import { onPressKeeper } from "../../store/actions/BHR";
-import CommonStyles from "../../common/Styles/Styles";
-import BackIcon from "../../assets/images/backWhite.svg";
-import BackupShield from "../../assets/images/icons/backupShield.svg";
-import AccountManagement from "../../assets/images/icons/accountManage.svg";
-import WalletSettings from "../../assets/images/icons/Walletsettings.svg";
-import AccountRead from "../../assets/images/icons/autoRead.svg";
-import FAQs from "../../assets/images/icons/faqs.svg";
-import Telegram from "../../assets/images/icons/telegram.svg";
+} from '../../bitcoin/utilities/Interface'
+import ModalContainer from '../../components/home/ModalContainer'
+import CrossButton from '../../assets/images/svgs/icons_close.svg'
+import { toggleClipboardAccess } from '../../store/actions/misc'
+import { onPressKeeper } from '../../store/actions/BHR'
+import CommonStyles from '../../common/Styles/Styles'
+import BackIcon from '../../assets/images/backWhite.svg'
+import BackupShield from '../../assets/images/icons/backupShield.svg'
+import AccountManagement from '../../assets/images/icons/accountManage.svg'
+import WalletSettings from '../../assets/images/icons/Walletsettings.svg'
+import AccountRead from '../../assets/images/icons/autoRead.svg'
+import FAQs from '../../assets/images/icons/faqs.svg'
+import Telegram from '../../assets/images/icons/telegram.svg'
 
-const { width, height: screenHeight } = Dimensions.get("window");
+const { width, height: screenHeight } = Dimensions.get( 'window' )
 
 export type Props = {
   navigation: any;
@@ -63,25 +64,25 @@ interface MenuOption {
   imageSource: ImageSourcePropType;
 }
 
-const listItemKeyExtractor = (item: MenuOption) => item.title;
+const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
-const { height } = Dimensions.get("window");
+const { height } = Dimensions.get( 'window' )
 
-const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
-  const dispatch = useDispatch();
-  const { translations } = useContext(LocalizationContext);
+const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
+  const dispatch = useDispatch()
+  const { translations } = useContext( LocalizationContext )
   // currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
-  const levelData: LevelData[] = useSelector((state) => state.bhr.levelData);
+  const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
   const levelHealth: LevelHealthInterface[] = useSelector(
-    (state) => state.bhr.levelHealth
-  );
-  const navigationObj: any = useSelector((state) => state.bhr.navigationObj);
-  const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
-  const currencyCode = useSelector((state) => state.preferences.currencyCode);
-  const strings = translations["settings"];
-  const bhrStrings = translations["bhr"];
-  const common = translations["common"];
+    ( state ) => state.bhr.levelHealth
+  )
+  const navigationObj: any = useSelector( ( state ) => state.bhr.navigationObj )
+  const [ isEnabled, setIsEnabled ] = useState( false )
+  const toggleSwitch = () => setIsEnabled( ( previousState ) => !previousState )
+  const currencyCode = useSelector( ( state ) => state.preferences.currencyCode )
+  const strings = translations[ 'settings' ]
+  const bhrStrings = translations[ 'bhr' ]
+  const common = translations[ 'common' ]
   const menuOptions: MenuOption[] = [
     // {
     //   title: 'Use FaceId',
@@ -111,7 +112,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
       title: strings.accountManagement,
       imageSource: require( '../../assets/images/icons/icon_account_management.png' ),
       subtitle: strings.accountManagementSub,
-      screenName: "AccountManagement",
+      screenName: 'AccountManagement',
     },
     /*
     Commenting this out as per https://github.com/bithyve/hexa/issues/2560
@@ -123,12 +124,12 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
       screenName: 'FriendsAndFamily',
     },
     */
-    // {
-    //   title: strings.node,
-    //   imageSource: require("../../assets/images/icons/own-node.png"),
-    //   subtitle: strings.nodeSub,
-    //   screenName: "NodeSettings",
-    // },
+    {
+      title: strings.node,
+      imageSource: require( '../../assets/images/icons/own-node.png' ),
+      subtitle: strings.nodeSub,
+      screenName: 'NodeSettings',
+    },
     /*
     Commenting this out as per https://github.com/bithyve/hexa/issues/2560
     leaving the option here so that it can be enabled in a future release.
@@ -152,17 +153,17 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
     //   },
     // },
     {
-      imageSource: require("../../assets/images/icons/settings.png"),
+      imageSource: require( '../../assets/images/icons/settings.png' ),
       subtitle: strings.walletSettingsSub,
       title: strings.walletSettings,
-      screenName: "WalletSettings",
+      screenName: 'WalletSettings',
     },
-    // {
-    //   title: strings.AppInfo,
-    //   imageSource: require("../../assets/images/icons/icon_info.png"),
-    //   subtitle: strings.AppInfoSub,
-    //   screenName: "AppInfo",
-    // },
+    {
+      title: strings.AppInfo,
+      imageSource: require( '../../assets/images/icons/icon_info.png' ),
+      subtitle: strings.AppInfoSub,
+      screenName: 'AppInfo',
+    },
     // {
     //   title: 'Enable Auto-Read from Clipboard',
     //   imageSource: require( '../../assets/images/svgs/icons_document_copy.svg' ),
@@ -171,11 +172,11 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
     //     setModalVisible( true )
     //   }
     // },
-  ];
+  ]
 
-  const [onKeeperButtonClick, setOnKeeperButtonClick] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [message, setMessage] = useState("");
+  const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
+  const [ modalVisible, setModalVisible ] = useState( false )
+  const [ message, setMessage ] = useState( '' )
 
   const defaultKeeperObj: {
     shareType: string;
@@ -187,16 +188,17 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
     data?: any;
     channelKey?: string;
   } = {
-    shareType: "",
+    shareType: '',
     updatedAt: 0,
-    status: "notAccessible",
-    shareId: "",
+    status: 'notAccessible',
+    shareId: '',
     reshareVersion: 0,
-    name: "",
-    data: {},
-    channelKey: "",
-  };
-  const [selectedKeeper, setSelectedKeeper]: [
+    name: '',
+    data: {
+    },
+    channelKey: '',
+  }
+  const [ selectedKeeper, setSelectedKeeper ]: [
     {
       shareType: string;
       updatedAt: number;
@@ -208,39 +210,39 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
       channelKey?: string;
     },
     any
-  ] = useState(defaultKeeperObj);
+  ] = useState( defaultKeeperObj )
 
-  const listItemKeyExtractor = (item: MenuOption) => item.title;
+  const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
-  useEffect(() => {
-    if (navigationObj.selectedKeeper && onKeeperButtonClick) {
-      setSelectedKeeper(navigationObj.selectedKeeper);
+  useEffect( () => {
+    if ( navigationObj.selectedKeeper && onKeeperButtonClick ) {
+      setSelectedKeeper( navigationObj.selectedKeeper )
       const navigationParams = {
         selectedTitle: navigationObj.selectedKeeper.name,
         SelectedRecoveryKeyNumber: 1,
         selectedKeeper: navigationObj.selectedKeeper,
-        selectedLevelId: levelData[0].id,
-      };
-      navigation.navigate("SeedBackupHistory", navigationParams);
+        selectedLevelId: levelData[ 0 ].id,
+      }
+      navigation.navigate( 'SeedBackupHistory', navigationParams )
     }
-  }, [navigationObj]);
+  }, [ navigationObj ] )
 
   //const [ strings, setstrings ] = useState( content.settings )
-  function handleOptionSelection(menuOption: MenuOption) {
-    if (typeof menuOption.onOptionPressed === "function") {
-      menuOption.onOptionPressed();
-    } else if (menuOption.screenName !== undefined) {
-      if (menuOption.screenName == "WalletBackup") {
+  function handleOptionSelection( menuOption: MenuOption ) {
+    if ( typeof menuOption.onOptionPressed === 'function' ) {
+      menuOption.onOptionPressed()
+    } else if ( menuOption.screenName !== undefined ) {
+      if ( menuOption.screenName == 'WalletBackup' ) {
         if (
-          levelData[0].keeper1ButtonText?.toLowerCase() == "seed" ||
-          levelData[0].keeper1ButtonText?.toLowerCase() ==
-            "write down seed-words"
+          levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed' ||
+          levelData[ 0 ].keeper1ButtonText?.toLowerCase() ==
+            'write down seed-words'
         ) {
           if (
             levelHealth.length == 0 ||
-            (levelHealth.length &&
-              levelHealth[0].levelInfo.length &&
-              levelHealth[0].levelInfo[0].status == "notSetup")
+            ( levelHealth.length &&
+              levelHealth[ 0 ].levelInfo.length &&
+              levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' )
           ) {
             // if( levelData[ 0 ].status == 'notSetup' )
             // navigation.navigate( 'BackupSeedWordsContent' )
@@ -248,53 +250,55 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
               selectedTitle: navigationObj?.selectedKeeper?.name,
               SelectedRecoveryKeyNumber: 1,
               selectedKeeper: navigationObj?.selectedKeeper,
-              selectedLevelId: levelData[0].id,
-            };
-            navigation.navigate("SeedBackupHistory", navigationParams);
+              selectedLevelId: levelData[ 0 ].id,
+            }
+            navigation.navigate( 'SeedBackupHistory', navigationParams )
           } else {
-            setSelectedKeeper(levelData[0].keeper1);
-            dispatch(onPressKeeper(levelData[0], 1));
-            setOnKeeperButtonClick(true);
+            setSelectedKeeper( levelData[ 0 ].keeper1 )
+            dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
+            setOnKeeperButtonClick( true )
           }
-        } else navigation.navigate(menuOption.screenName);
-      } else navigation.navigate(menuOption.screenName);
+        } else navigation.navigate( menuOption.screenName )
+      } else navigation.navigate( menuOption.screenName )
     }
   }
 
-  const findImage = (name) => {
-    switch (name) {
-      case strings.accountManagement:
-        return <AccountManagement />;
-      case strings.node:
-        return <Node />;
-      case strings.walletSettings:
-        return <WalletSettings />;
-      case strings.AppInfo:
-        return <AppInfo />;
-      case bhrStrings["WalletBackup"]:
-        return (
-          <Image
-            source={require("../../assets/images/icons/keeper_sheild.png")}
-            style={{
-              width: widthPercentageToDP(5),
-              height: widthPercentageToDP(6),
-            }}
-          />
-        );
-      case "Enable Auto-Read from Clipboard":
-        return <DocumentPad />;
-      default:
-        return null;
+  const findImage = ( name ) => {
+    switch ( name ) {
+        case strings.accountManagement:
+          return <AccountManagement />
+        case strings.node:
+          // return <Node />
+          return <WalletSettings />
+        case strings.walletSettings:
+          return <WalletSettings />
+        case strings.AppInfo:
+          // return <AppInfo />
+          return <WalletSettings />
+        case bhrStrings[ 'WalletBackup' ]:
+          return (
+            <Image
+              source={require( '../../assets/images/icons/keeper_sheild.png' )}
+              style={{
+                width: widthPercentageToDP( 5 ),
+                height: widthPercentageToDP( 6 ),
+              }}
+            />
+          )
+        case 'Enable Auto-Read from Clipboard':
+          return <DocumentPad />
+        default:
+          return null
     }
-  };
+  }
 
-  const enabled = useSelector((state) => state.misc.clipboardAccess);
+  const enabled = useSelector( ( state ) => state.misc.clipboardAccess )
 
-  const dispatcher = useDispatch();
+  const dispatcher = useDispatch()
 
   const changePermission = () => {
-    dispatcher(toggleClipboardAccess());
-  };
+    dispatcher( toggleClipboardAccess() )
+  }
 
   const ReadClipboardModal = () => {
     return (
@@ -310,53 +314,53 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
               width: 30,
               height: 30,
               borderRadius: 15,
-              justifyContent: "center",
-              alignItems: "center",
-              alignSelf: "flex-end",
-              margin: widthPercentageToDP(2),
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignSelf: 'flex-end',
+              margin: widthPercentageToDP( 2 ),
             }}
-            onPress={() => setModalVisible(false)}
+            onPress={() => setModalVisible( false )}
           >
             <CrossButton />
           </AppBottomSheetTouchableWrapper>
           <View
             style={{
-              marginHorizontal: widthPercentageToDP(10),
+              marginHorizontal: widthPercentageToDP( 10 ),
             }}
           >
             <Text
               style={{
                 color: Colors.blue,
                 fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(20),
+                fontSize: RFValue( 20 ),
               }}
             >
               Auto-Read from Clipboard
             </Text>
             <Text
               style={{
-                fontSize: RFValue(13),
+                fontSize: RFValue( 13 ),
                 fontFamily: Fonts.FiraSansRegular,
                 color: Colors.gray8,
-                lineHeight: RFValue(20),
+                lineHeight: RFValue( 20 ),
               }}
             >
               {
-                "Grant Hexa access to clipboard \nto copy and paste BTC addresses"
+                'Grant Hexa access to clipboard \nto copy and paste BTC addresses'
               }
             </Text>
             <View
               style={{
-                marginTop: "15%",
-                flexDirection: "row",
-                justifyContent: "space-between",
+                marginTop: '15%',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
               }}
             >
               <Text
                 style={{
-                  alignSelf: "center",
+                  alignSelf: 'center',
                   color: Colors.textColorGrey,
-                  fontSize: RFValue(16),
+                  fontSize: RFValue( 16 ),
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
@@ -374,15 +378,15 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
             </View>
             <TouchableOpacity
               style={{
-                marginTop: "20%",
+                marginTop: '20%',
                 backgroundColor: Colors.blue,
-                width: widthPercentageToDP(30),
-                height: heightPercentageToDP(7.5),
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: widthPercentageToDP(3),
+                width: widthPercentageToDP( 30 ),
+                height: heightPercentageToDP( 7.5 ),
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: widthPercentageToDP( 3 ),
               }}
-              onPress={() => setModalVisible(false)}
+              onPress={() => setModalVisible( false )}
             >
               <Text
                 style={{
@@ -396,18 +400,32 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
           </View>
         </View>
       </View>
-    );
-  };
+    )
+  }
 
   return (
-    <View>
+    <View
+      style={{
+        height: 'auto',
+        backgroundColor: Colors.white,
+      }}
+    >
+      <SafeAreaView
+        style={{
+          backgroundColor: Colors.blueTextNew,
+        }}
+      />
+      <StatusBar
+        backgroundColor={Colors.blueTextNew}
+        barStyle="dark-content"
+      />
       <View
         style={{
           width,
           borderBottomLeftRadius: 25,
           backgroundColor: Colors.blueTextNew,
           marginBottom: 20,
-          flexDirection: "column",
+          flexDirection: 'column',
         }}
       >
         <View
@@ -415,7 +433,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
             CommonStyles.headerContainer,
             {
               backgroundColor: Colors.blueTextNew,
-              flexDirection: "row",
+              flexDirection: 'row',
               marginRight: 10,
               marginBottom: 20,
             },
@@ -424,7 +442,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              navigation.goBack();
+              navigation.goBack()
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -440,17 +458,17 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
         <View
           style={{
             backgroundColor: Colors.blueTextNew,
-            flexDirection: "row",
+            flexDirection: 'row',
             marginHorizontal: 20,
             marginBottom: 40,
-            marginTop: heightPercentageToDP("8%"),
+            marginTop: heightPercentageToDP( '8%' ),
           }}
         >
           <View style={styles.modalElementInfoView}>
             <BackupShield />
             <View
               style={{
-                justifyContent: "center",
+                justifyContent: 'center',
                 marginLeft: 20,
               }}
             >
@@ -463,12 +481,12 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
             </View>
           </View>
           <Image
-            source={require("../../assets/images/icons/icon_arrow.png")}
+            source={require( '../../assets/images/icons/icon_arrow.png' )}
             style={{
-              width: widthPercentageToDP("2.5%"),
-              height: widthPercentageToDP("2.5%"),
-              alignSelf: "center",
-              resizeMode: "contain",
+              width: widthPercentageToDP( '2.5%' ),
+              height: widthPercentageToDP( '2.5%' ),
+              alignSelf: 'center',
+              resizeMode: 'contain',
             }}
           />
         </View>
@@ -476,12 +494,12 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingVertical: heightPercentageToDP(3),
+          paddingVertical: heightPercentageToDP( 3 ),
         }}
       >
-        <View
+        {/* <View
           style={{
-            flexDirection: "row",
+            flexDirection: 'row',
             marginHorizontal: 20,
           }}
         >
@@ -489,7 +507,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
             <AccountRead />
             <View
               style={{
-                justifyContent: "center",
+                justifyContent: 'center',
                 marginLeft: 20,
               }}
             >
@@ -499,7 +517,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
               </Text>
             </View>
           </View>
-        </View>
+        </View> */}
         <FlatList
           data={menuOptions}
           keyExtractor={listItemKeyExtractor}
@@ -510,53 +528,55 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
           //     <View style={styles.separatorView} />
           //   </View>
           // )}
-          renderItem={({ item: menuOption }: { item: MenuOption }) => {
+          renderItem={( { item: menuOption }: { item: MenuOption } ) => {
             return (
               <AppBottomSheetTouchableWrapper
-                onPress={() => handleOptionSelection(menuOption)}
+                onPress={() => handleOptionSelection( menuOption )}
                 style={[
                   styles.addModalView,
-                  (levelData[0].keeper1.status == "notSetup" ||
-                    levelData[0].keeper1ButtonText?.toLowerCase() != "seed") &&
-                    menuOption.screenName == "WalletBackup" && {
-                      borderColor: "orange",
-                      borderWidth: 1,
-                    },
+                  ( levelData[ 0 ].keeper1.status == 'notSetup' ||
+                    levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' ) &&
+                    menuOption.screenName == 'WalletBackup' && {
+                    borderColor: 'orange',
+                    borderWidth: 1,
+                  },
                 ]}
               >
-                {(levelData[0].keeper1.status == "notSetup" ||
-                  levelData[0].keeper1ButtonText?.toLowerCase() != "seed") &&
-                  menuOption.screenName == "WalletBackup" && (
-                    <View
-                      style={{
-                        position: "absolute",
-                        zIndex: 999,
-                        right: 5,
-                        top: 5,
-                      }}
-                    >
-                      <Image
-                        source={require("../../assets/images/icons/exclamation_error.png")}
-                        style={{
-                          width: heightPercentageToDP(1.5),
-                          height: heightPercentageToDP(1.5),
-                          tintColor: "orange",
-                        }}
-                        resizeMode={"contain"}
-                      />
-                    </View>
-                  )}
-                <View style={[styles.modalElementInfoView, {right: 20}]}>
+                {( levelData[ 0 ].keeper1.status == 'notSetup' ||
+                  levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' ) &&
+                  menuOption.screenName == 'WalletBackup' && (
                   <View
                     style={{
-                      justifyContent: "center",
+                      position: 'absolute',
+                      zIndex: 999,
+                      right: 5,
+                      top: 5,
                     }}
                   >
-                    {findImage(menuOption.title)}
+                    <Image
+                      source={require( '../../assets/images/icons/exclamation_error.png' )}
+                      style={{
+                        width: heightPercentageToDP( 1.5 ),
+                        height: heightPercentageToDP( 1.5 ),
+                        tintColor: 'orange',
+                      }}
+                      resizeMode={'contain'}
+                    />
+                  </View>
+                )}
+                <View style={[ styles.modalElementInfoView, {
+                  right: 20
+                } ]}>
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {findImage( menuOption.title )}
                   </View>
                   <View
                     style={{
-                      justifyContent: "center",
+                      justifyContent: 'center',
                       marginLeft: 20,
                     }}
                   >
@@ -569,21 +589,21 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
                   </View>
                 </View>
                 <Image
-                  source={require("../../assets/images/icons/icon_arrow.png")}
+                  source={require( '../../assets/images/icons/icon_arrow.png' )}
                   style={{
-                    width: widthPercentageToDP("2.5%"),
-                    height: widthPercentageToDP("2.5%"),
-                    alignSelf: "center",
-                    resizeMode: "contain",
+                    width: widthPercentageToDP( '2.5%' ),
+                    height: widthPercentageToDP( '2.5%' ),
+                    alignSelf: 'center',
+                    resizeMode: 'contain',
                   }}
                 />
               </AppBottomSheetTouchableWrapper>
-            );
+            )
           }}
         />
         <View
           style={{
-            flexDirection: "row",
+            flexDirection: 'row',
             marginHorizontal: 20,
           }}
         >
@@ -591,7 +611,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
             <FAQs />
             <View
               style={{
-                justifyContent: "center",
+                justifyContent: 'center',
                 marginLeft: 20,
               }}
             >
@@ -602,16 +622,16 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
             </View>
             <TouchableOpacity
               onPress={() => {
-                Linking.openURL("https://hexawallet.io/faq/")
-                  .then((_data) => {})
-                  .catch((_error) => {});
+                Linking.openURL( 'https://hexawallet.io/faq/' )
+                  .then( ( _data ) => {} )
+                  .catch( ( _error ) => {} )
               }}
             >
               <Image
-                source={require("../../assets/images/icons/link.png")}
+                source={require( '../../assets/images/icons/link.png' )}
                 style={{
-                  width: widthPercentageToDP(3),
-                  height: widthPercentageToDP(3),
+                  width: widthPercentageToDP( 3 ),
+                  height: widthPercentageToDP( 3 ),
                   marginLeft: 70,
                 }}
               />
@@ -620,15 +640,15 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
         </View>
         <View
           style={{
-            flexDirection: "row",
+            flexDirection: 'row',
             marginHorizontal: 20,
           }}
         >
           <View style={styles.modalElementInfoView}>
-           <Telegram />
+            <Telegram />
             <View
               style={{
-                justifyContent: "center",
+                justifyContent: 'center',
                 marginLeft: 20,
               }}
             >
@@ -641,16 +661,16 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
             </View>
             <TouchableOpacity
               onPress={() => {
-                Linking.openURL("https://t.me/HexaWallet")
-                  .then((_data) => {})
-                  .catch((_error) => {});
+                Linking.openURL( 'https://t.me/HexaWallet' )
+                  .then( ( _data ) => {} )
+                  .catch( ( _error ) => {} )
               }}
             >
               <Image
-                source={require("../../assets/images/icons/link.png")}
+                source={require( '../../assets/images/icons/link.png' )}
                 style={{
-                  width: widthPercentageToDP(3),
-                  height: widthPercentageToDP(3),
+                  width: widthPercentageToDP( 3 ),
+                  height: widthPercentageToDP( 3 ),
                   marginLeft: 50,
                 }}
               />
@@ -659,29 +679,29 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
         </View>
       </ScrollView>
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   accountCardsSectionContainer: {
-    height: heightPercentageToDP("71.46%"),
+    height: heightPercentageToDP( '71.46%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor1,
     borderTopLeftRadius: 25,
-    shadowColor: "black",
+    shadowColor: 'black',
     shadowOpacity: 0.4,
     shadowOffset: {
       width: 2,
       height: -1,
     },
-    flexDirection: "column",
-    justifyContent: "space-around",
+    flexDirection: 'column',
+    justifyContent: 'space-around',
   },
   modalContentContainer: {
     backgroundColor: Colors.white,
     padding: 10,
-    maxHeight: "80%",
-    minHeight: "60%",
+    maxHeight: '80%',
+    minHeight: '60%',
   },
 
   list: {
@@ -691,17 +711,17 @@ const styles = StyleSheet.create({
   },
 
   containerItem: {
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingHorizontal: 10,
     paddingVertical: 5,
-    alignItems: "center",
+    alignItems: 'center',
   },
 
   containerItemSelected: {
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingHorizontal: 10,
     paddingVertical: 5,
-    alignItems: "center",
+    alignItems: 'center',
     backgroundColor: Colors.lightBlue,
     borderRadius: 10,
   },
@@ -709,13 +729,13 @@ const styles = StyleSheet.create({
   textLanName: {
     fontSize: 18,
     flex: 1,
-    color: "black",
+    color: 'black',
   },
 
   flag: {
     fontSize: 35,
     paddingRight: 15,
-    color: "black",
+    color: 'black',
   },
 
   separatorView: {
@@ -726,15 +746,15 @@ const styles = StyleSheet.create({
   },
   otherCards: {
     flex: 1,
-    flexDirection: "row",
-    width: "90%",
-    alignSelf: "center",
-    borderRadius: widthPercentageToDP("2"),
+    flexDirection: 'row',
+    width: '90%',
+    alignSelf: 'center',
+    borderRadius: widthPercentageToDP( '2' ),
     backgroundColor: Colors.white,
-    paddingVertical: heightPercentageToDP(2),
-    paddingHorizontal: widthPercentageToDP(4),
-    marginTop: heightPercentageToDP("1.2%"),
-    alignItems: "center",
+    paddingVertical: heightPercentageToDP( 2 ),
+    paddingHorizontal: widthPercentageToDP( 4 ),
+    marginTop: heightPercentageToDP( '1.2%' ),
+    alignItems: 'center',
     shadowOpacity: 0.05,
     // shadowColor: Colors.shadowColor,
     shadowOffset: {
@@ -745,19 +765,19 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   extraHeight: {
-    marginTop: heightPercentageToDP("3%"),
+    marginTop: heightPercentageToDP( '3%' ),
   },
   addModalView: {
     // backgroundColor: Colors.gray7,
     // paddingVertical: 4,
-    paddingHorizontal: widthPercentageToDP(5),
-    flexDirection: "row",
-    display: "flex",
-    justifyContent: "space-between",
-    width: "90%",
-    alignSelf: "center",
-    borderRadius: widthPercentageToDP("2"),
-    marginBottom: heightPercentageToDP("1.2"),
+    paddingHorizontal: widthPercentageToDP( 5 ),
+    flexDirection: 'row',
+    display: 'flex',
+    justifyContent: 'space-between',
+    width: '90%',
+    alignSelf: 'center',
+    borderRadius: widthPercentageToDP( '2' ),
+    marginBottom: heightPercentageToDP( '1.2' ),
     shadowOpacity: 0.05,
     // shadowColor: Colors.shadowColor,
     shadowOffset: {
@@ -770,17 +790,17 @@ const styles = StyleSheet.create({
 
   addModalTitleText: {
     color: Colors.black,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.RobotoSlabRegular,
   },
   addModalTitleTextHeader: {
     color: Colors.white,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.RobotoSlabRegular,
   },
 
   textBeta: {
-    color: "white",
+    color: 'white',
     fontSize: 12,
   },
 
@@ -790,20 +810,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 1,
     borderRadius: 5,
-    overflow: "hidden",
-    justifyContent: "center",
-    alignItems: "center",
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   addModalInfoText: {
     color: Colors.black,
-    fontSize: RFValue(9),
+    fontSize: RFValue( 9 ),
     marginTop: 5,
     fontFamily: Fonts.RobotoSlabRegular,
   },
   addModalInfoTextHeader: {
     color: Colors.white,
-    fontSize: RFValue(9),
+    fontSize: RFValue( 9 ),
     marginTop: 5,
     fontFamily: Fonts.RobotoSlabRegular,
   },
@@ -811,31 +831,31 @@ const styles = StyleSheet.create({
   modalElementInfoView: {
     flex: 1,
     marginVertical: 10,
-    height: heightPercentageToDP("5%"),
-    flexDirection: "row",
+    height: heightPercentageToDP( '5%' ),
+    flexDirection: 'row',
     // justifyContent: 'center',
-    alignItems: "center",
+    alignItems: 'center',
   },
 
   webLinkBarContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     elevation: 10,
-    shadowColor: "#00000017",
+    shadowColor: '#00000017',
     shadowOpacity: 1,
     shadowRadius: 10,
     backgroundColor: Colors.white,
-    justifyContent: "space-around",
+    justifyContent: 'space-around',
     height: 40,
-    alignItems: "center",
+    alignItems: 'center',
     marginHorizontal: 16,
     paddingHorizontal: 10,
-    marginBottom: heightPercentageToDP(2),
+    marginBottom: heightPercentageToDP( 2 ),
     borderRadius: 10,
   },
   wrapper: {
-    height: height > 720 ? heightPercentageToDP(35) : heightPercentageToDP(50),
+    height: height > 720 ? heightPercentageToDP( 35 ) : heightPercentageToDP( 50 ),
     backgroundColor: Colors.backgroundColor,
   },
-});
+} )
 
-export default MoreOptionsContainerScreen;
+export default MoreOptionsContainerScreen

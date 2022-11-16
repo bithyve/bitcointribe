@@ -96,7 +96,7 @@ const HomeHeader = ( {
   currentLevel,
   isTestAccount = false,
   bitcoinUnit = BitcoinUnit.SATS,
-  textColor = Colors.currencyGray,
+  textColor = Colors.white,
 } ) => {
   const { translations, } = useContext( LocalizationContext )
   const strings = translations[ 'header' ]
@@ -480,7 +480,7 @@ const HomeHeader = ( {
 
     if ( prefersBitcoin || isTestAccount ) {
       return <Image style={{
-        ...style, marginLeft: wp( 1 )
+        ...style, marginStart: wp( 3 ), marginEnd:wp( 5 )
       }} source={bitcoinIconSource} />
     }
 
@@ -489,7 +489,7 @@ const HomeHeader = ( {
         <MaterialCurrencyCodeIcon
           currencyCode={fiatCurrencyCode}
           color={textColor}
-          size={RFValue( 16 )}
+          size={RFValue( 20 )}
           style={{
           }}
         />
@@ -530,7 +530,8 @@ const HomeHeader = ( {
             :
             <>
               <View style={{
-                width: wp( 40 ), height: wp( 40 ), borderRadius: wp( 20 ), backgroundColor: Colors.white,
+                width: wp( 40 ), height: wp( 40 ), borderRadius: wp( 20 ),
+                backgroundColor: Colors.white,
                 justifyContent: 'center', alignItems: 'center'
               }}>
                 <View style={{
@@ -587,7 +588,7 @@ const HomeHeader = ( {
           <View style={{
             height: wp( 38 ),
             width: wp( 38 ),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.appPrimary,
             borderRadius: wp( 20 )
           }}>
 
@@ -638,7 +639,7 @@ const HomeHeader = ( {
           }}
         >
           <ImageBackground
-            source={require( '../../assets/images/icons/settings.png' )}
+            source={require( '../../assets/images/icons/icon_notification.png' )}
             style={{
               height: wp( 23 ),
               width: wp( 21 )
@@ -662,8 +663,11 @@ const HomeHeader = ( {
       {/* {getMessage()} */}
 
       <View style={{
+        flex:1
+      }}/>
+      <View style={{
         flexDirection: 'row', justifyContent: 'space-between',
-        marginTop: hp( 70 ), alignItems: 'center'
+        marginTop: hp( 20 ), alignItems: 'center'
       }}>
         <Text style={styles.walletBalanceText}>Wallet Balance</Text>
         <ToggleContainer />
@@ -675,8 +679,20 @@ const HomeHeader = ( {
         <View style={{
           width: wp( 25 ), height: wp( 25 ), backgroundColor: Colors.white,
           borderRadius: wp( 14 )
-        }} />
-        <BalanceCurrencyIcon />
+        }} >
+          <Image
+            source={require( '../../assets/images/HomePageIcons/wallet.png' )}
+            style={{
+              width: wp( 25 ), height: wp( 25 ),
+            }}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={{
+          marginStart: wp( 11 )
+        }}>
+          <BalanceCurrencyIcon />
+        </View>
         <Text style={styles.amountText}>40,005</Text>
       </View>
       {/* {keepers.length > 0 &&
@@ -690,17 +706,21 @@ const HomeHeader = ( {
                     } ) }
                   </>
       } */}
-      <FlatList
-        style={{
-          marginTop: hp( 110 )
-        }}
-        keyExtractor={( item, index ) => item.id}
-        data={familyData}
-        // extraData={radioOnOff}
-        showsVerticalScrollIndicator={false}
-        renderItem={renderItems}
-        horizontal
-      />
+      <View style={{
+        flex:1
+      }}/>
+      <View style={{
+        marginTop: hp( 50 )
+      }}>
+        <FlatList
+          keyExtractor={( item, index ) => item.id}
+          data={familyData}
+          // extraData={radioOnOff}
+          showsHorizontalScrollIndicator={false}
+          renderItem={renderItems}
+          horizontal
+        />
+      </View>
       <ModalContainer onBackground={() => setCloudErrorModal( false )} visible={cloudErrorModal} closeBottomSheet={() => setCloudErrorModal( false )}>
         <ErrorModalContents
           title={Platform.OS == 'ios' ? stringsBhr[ 'CloudBackupError' ] : stringsBhr[ 'driveBackupError' ]}
@@ -737,8 +757,9 @@ const styles = StyleSheet.create( {
     paddingTop: hp( 30 ),
     paddingStart: wp( 25 ),
     paddingEnd: wp( 25 ),
-    paddingBottom: hp( 10 ),
+    paddingBottom: hp( 30 ),
     backgroundColor: Colors.appPrimary,
+    height: '100%'
   },
   headerTitleText: {
     color: Colors.white,
@@ -795,11 +816,11 @@ const styles = StyleSheet.create( {
     letterSpacing: RFValue( 0.6 )
   },
   currencyImage: {
-    width: wp( 3 ),
-    height: wp( 4 ),
+    width: wp( 12 ),
+    height: wp( 18 ),
     resizeMode: 'contain',
+    tintColor: Colors.white
     // marginTop: wp( 0.3 )
-    marginStart: wp( 3 )
   },
   amountText: {
     color: Colors.white,
