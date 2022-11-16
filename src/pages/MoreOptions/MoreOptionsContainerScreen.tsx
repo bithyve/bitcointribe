@@ -11,6 +11,7 @@ import {
   ImageSourcePropType,
   Dimensions,
   Switch,
+  Platform,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
@@ -109,7 +110,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
     // },
     {
       title: strings.accountManagement,
-      imageSource: require( '../../assets/images/icons/icon_account_management.png' ),
+      imageSource: require("../../assets/images/icons/icon_account_management.png"),
       subtitle: strings.accountManagementSub,
       screenName: "AccountManagement",
     },
@@ -498,6 +499,28 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
                 App will prompt send sats to copied address
               </Text>
             </View>
+            <View style = {{marginLeft: 10}}>
+              <Switch
+                value={enabled}
+                style={{
+                  transform: [
+                    {
+                      scaleX: Platform.OS == "ios" ? 0.8 : 1.0,
+                    },
+                    {
+                      scaleY: Platform.OS == "ios" ? 0.8 : 1.0,
+                    },
+                  ],
+                }}
+                trackColor={{
+                  false: Colors.seaBlue,
+                  true: Colors.seaBlue,
+                }}
+                thumbColor={isEnabled ? Colors.appPrimary : Colors.appPrimary}
+                ios_backgroundColor={Colors.seaBlue}
+                onValueChange={changePermission}
+              />
+            </View>
           </View>
         </View>
         <FlatList
@@ -546,7 +569,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
                       />
                     </View>
                   )}
-                <View style={[styles.modalElementInfoView, {right: 20}]}>
+                <View style={[styles.modalElementInfoView, { right: 20 }]}>
                   <View
                     style={{
                       justifyContent: "center",
@@ -612,7 +635,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
                 style={{
                   width: widthPercentageToDP(3),
                   height: widthPercentageToDP(3),
-                  marginLeft: 70,
+                  marginLeft: 60,
                 }}
               />
             </TouchableOpacity>
@@ -625,7 +648,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
           }}
         >
           <View style={styles.modalElementInfoView}>
-           <Telegram />
+            <Telegram />
             <View
               style={{
                 justifyContent: "center",
@@ -651,7 +674,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
                 style={{
                   width: widthPercentageToDP(3),
                   height: widthPercentageToDP(3),
-                  marginLeft: 50,
+                  marginLeft: 40,
                 }}
               />
             </TouchableOpacity>
