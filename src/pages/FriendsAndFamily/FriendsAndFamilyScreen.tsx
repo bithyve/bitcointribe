@@ -582,8 +582,7 @@ class FriendsAndFamilyScreen extends React.Component<
                   isLoadContacts: true,
                 // addFnF: true
                 }, () => {
-                  navigation.navigate( 'AddContact' )
-
+                  navigation.navigate( 'AddContact',{fromScreen: "Invitation"} )
                 } )
               }}
               style={{
