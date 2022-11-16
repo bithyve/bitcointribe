@@ -24,7 +24,7 @@ import { LocalizationContext } from '../../../common/content/LocContext'
 import CheckingAcc from '../../../assets/images/svgs/icon_checking.svg'
 import AccountShell from '../../../common/data/models/AccountShell'
 import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
-
+import { hp as hp1, wp as wp1 } from '../../../common/data/responsiveness/responsive'
 
 type Props = {
   wyreFromDeepLink: boolean | null;
@@ -138,7 +138,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
           />
         </TouchableOpacity>
         {/* <Text style={styles.modalTitleText}>{wyreTitle}</Text> */}
-        <View style={styles.successModalHeaderView}>
+        <View>
           <Text
             style={[
               ListStyles.modalTitle,
@@ -147,7 +147,9 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
                 fontSize: RFValue( 18 ),
                 letterSpacing: RFValue( 0.27 ),
                 lineHeight: RFValue( 22 ),
-                marginBottom: hp( 3 ),
+                marginBottom: hp1( 25 ),
+                marginLeft: wp1( 30 ),
+                marginRight: wp1( 48 ),
               },
             ]}
           >
@@ -209,7 +211,8 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
           </View>
           <ListItem.Content
             style={{
-              flex: 1,
+              height: hp1( 53 ),
+              marginVertical: hp1( 16 ),
             }}
           >
             <ListItem.Subtitle
@@ -341,15 +344,16 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
 const styles = StyleSheet.create( {
   containerStyle: {
     flexDirection: 'row',
-    marginEnd: wp( '4 %' ),
-    paddingHorizontal: wp( 5 ),
-    paddingVertical: wp( 3 ),
-    width: wp( '80%' ),
+    marginHorizontal: wp1( 30 ),
+    paddingHorizontal: wp1( 20 ),
+    paddingVertical: hp1( 19 ),
+    width: wp1( 295 ),
+    height: hp1( 100 ),
     backgroundColor: Colors.white,
     alignItems: 'center',
     alignSelf: 'center',
-    marginBottom: hp( 3 ),
-    borderRadius: wp( 2 ),
+    marginBottom: hp1( 20 ),
+    borderRadius: wp1( 10 ),
     // elevation: 10,
     // shadowColor: Colors.borderColor,
     // shadowOpacity: 10,
@@ -358,51 +362,47 @@ const styles = StyleSheet.create( {
     // },
   },
   headerImageView: {
-    width: wp( '17%' ),
-    height: wp( '17%' ),
-    // borderColor: 'red',
+    width: wp1( 46 ),
+    height: hp1( 44 ),
     // elevation: 10,
-    // shadowColor: Colors.borderColor,
+    // shadowColor: Colors.bgColor,
     // shadowOpacity: 10,
     // shadowOffset: {
     //   width: 2, height: 2
     // },
-    // backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'center',
-    borderRadius: wp( '17%' ) / 2,
-    margin: 5
+    borderRadius: wp1( 23 ),
+    marginRight: wp1( 9 ),
   },
   headerImage: {
-    width: wp( '10%' ),
-    height: wp( '10%' ),
-    borderRadius: wp( '10%' ) / 2,
+    width: wp1( 46 ),
+    height: hp1( 44 ),
+    borderRadius: wp1( 23 ),
     resizeMode: 'contain'
   },
   headerImageInitials: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F9F9F9',
-    width: wp( '15%' ),
-    height: wp( '15%' ),
-    borderRadius: wp( '15%' ) / 2,
+    // backgroundColor: Colors.backgroundColor,
+    width: wp1( 44 ),
+    height: hp1( 47 ),
+    borderRadius: wp1( 44 ) / 2,
   },
   modalContentContainer: {
     backgroundColor: Colors.backgroundColor1,
-
   },
   avatarImage: {
     ...ImageStyles.circledAvatarContainer,
     ...ImageStyles.thumbnailImageLarge,
-    marginRight: 14,
+    borderRadius: wp1( 14 )/2,
+    // marginRight: wp( 16 ),
   },
   destinationTitleText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     fontSize: RFValue( 20 ),
     color: Colors.black,
     alignContent: 'center',
-    marginVertical: hp( 0.3 ),
     letterSpacing: RFValue( 0.01 )
   },
   successModalHeaderView: {
@@ -416,37 +416,33 @@ const styles = StyleSheet.create( {
     marginLeft: 10
   },
   modalInfoText: {
-    marginLeft: wp( '7%' ),
-    marginRight: wp( '11%' ),
+    marginLeft: wp1( 30 ),
+    marginRight: wp1( 48 ),
     color: Colors.lightTextColor,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.RobotoSlabRegular,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 ),
-    marginTop: wp( 1.5 ),
-    marginBottom: wp( 1 )
+    marginBottom: hp1( 20 )
   },
   modalInfoText1: {
-    marginLeft: wp( '7%' ),
-    marginRight: wp( '12%' ),
+    marginLeft: wp1( 30 ),
+    marginRight: wp1( 48 ),
     color: '#6C6C6C',
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.RobotoSlabRegular,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 ),
-    marginTop: wp( 0 ),
-    marginBottom: wp( 3 )
+    marginBottom: hp1( 30 )
   },
   successModalButtonView: {
-    minHeight: 50,
-    minWidth: 110,
-    height: wp( '13%' ),
-    width: wp( '30%' ),
+    height: hp1( 60 ),
+    width: wp1( 120 ),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 11,
+    borderRadius: 10,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
@@ -455,8 +451,8 @@ const styles = StyleSheet.create( {
     },
     backgroundColor: Colors.blue,
     alignSelf: 'flex-start',
-    marginLeft: wp( '6%' ),
-    // marginTop: hp( 2 )
+    marginLeft: wp1( 30 ),
+    marginTop: hp1( 30 )
   },
   successModalImage: {
     width: wp( '25%' ),
@@ -467,6 +463,8 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
+    height: hp1( 18 ),
+    width: wp1( 70 ),
     fontFamily: Fonts.RobotoSlabRegular
   },
 } )
