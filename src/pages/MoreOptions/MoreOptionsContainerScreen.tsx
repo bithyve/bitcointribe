@@ -1,10 +1,26 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { View, Text, StyleSheet, Linking, FlatList, Image, TouchableOpacity, StatusBar, ImageSourcePropType, Dimensions, Switch } from 'react-native'
+import {
+  View,
+  Text,
+  StyleSheet,
+  Linking,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  StatusBar,
+  ImageSourcePropType,
+  Dimensions,
+  Switch,
+  SafeAreaView,
+} from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import {
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
 import { ScrollView } from 'react-native-gesture-handler'
 import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
@@ -13,24 +29,36 @@ import Wallet from '../../assets/images/svgs/icon_settings.svg'
 import AppInfo from '../../assets/images/svgs/icon_info.svg'
 import DocumentPad from '../../assets/images/svgs/icons_document_copy.svg'
 import QueActive from '../../assets/images/svgs/question_inactive.svg'
-import Telegram from '../../assets/images/svgs/icon_telegram.svg'
 import { LocalizationContext } from '../../common/content/LocContext'
-import { LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import {
+  LevelData,
+  LevelHealthInterface,
+} from '../../bitcoin/utilities/Interface'
 import ModalContainer from '../../components/home/ModalContainer'
 import CrossButton from '../../assets/images/svgs/icons_close.svg'
 import { toggleClipboardAccess } from '../../store/actions/misc'
 import { onPressKeeper } from '../../store/actions/BHR'
+import CommonStyles from '../../common/Styles/Styles'
+import BackIcon from '../../assets/images/backWhite.svg'
+import BackupShield from '../../assets/images/icons/backupShield.svg'
+import AccountManagement from '../../assets/images/icons/accountManage.svg'
+import WalletSettings from '../../assets/images/icons/Walletsettings.svg'
+import AccountRead from '../../assets/images/icons/autoRead.svg'
+import FAQs from '../../assets/images/icons/faqs.svg'
+import Telegram from '../../assets/images/icons/telegram.svg'
+
+const { width, height: screenHeight } = Dimensions.get( 'window' )
 
 export type Props = {
   navigation: any;
-  containerStyle: {}
+  containerStyle: {};
 };
 
 interface MenuOption {
   title: string;
   subtitle: string;
   screenName?: string;
-  name?: string,
+  name?: string;
   onOptionPressed?: () => void;
   // isSwitch: boolean;
   imageSource: ImageSourcePropType;
@@ -42,16 +70,16 @@ const { height } = Dimensions.get( 'window' )
 
 const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const dispatch = useDispatch()
-  const { translations, } = useContext( LocalizationContext )
+  const { translations } = useContext( LocalizationContext )
   // currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
   const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
-  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
+  const levelHealth: LevelHealthInterface[] = useSelector(
+    ( state ) => state.bhr.levelHealth
+  )
   const navigationObj: any = useSelector( ( state ) => state.bhr.navigationObj )
   const [ isEnabled, setIsEnabled ] = useState( false )
-  const toggleSwitch = () => setIsEnabled( previousState => !previousState )
-  const currencyCode = useSelector(
-    ( state ) => state.preferences.currencyCode,
-  )
+  const toggleSwitch = () => setIsEnabled( ( previousState ) => !previousState )
+  const currencyCode = useSelector( ( state ) => state.preferences.currencyCode )
   const strings = translations[ 'settings' ]
   const bhrStrings = translations[ 'bhr' ]
   const common = translations[ 'common' ]
@@ -70,16 +98,16 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     //   // screenName: 'FriendsAndFamily',
     //   isSwitch: true
     // },
-    {
-      imageSource: require( '../../assets/images/icons/icon_info.png' ),
-      subtitle: levelData[ 0 ].keeper1.status == 'notSetup'
-        ? 'Confirm backup phrase'
-        : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
-          ? 'Wallet backup confirmed'
-          :'Confirm backup phrase',
-      title: bhrStrings[ 'WalletBackup' ],
-      screenName: 'WalletBackup',
-    },
+    // {
+    //   imageSource: require( '../../assets/images/icons/icon_info.png' ),
+    //   subtitle: levelData[ 0 ].keeper1.status == 'notSetup'
+    //     ? 'Confirm backup phrase'
+    //     : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
+    //       ? 'Wallet backup confirmed'
+    //       :'Confirm backup phrase',
+    //   title: bhrStrings[ 'WalletBackup' ],
+    //   screenName: 'WalletBackup',
+    // },
     {
       title: strings.accountManagement,
       imageSource: require( '../../assets/images/icons/icon_account_management.png' ),
@@ -151,14 +179,14 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const [ message, setMessage ] = useState( '' )
 
   const defaultKeeperObj: {
-    shareType: string
+    shareType: string;
     updatedAt: number;
-    status: string
-    shareId: string
+    status: string;
+    shareId: string;
     reshareVersion: number;
-    name?: string
+    name?: string;
     data?: any;
-    channelKey?: string
+    channelKey?: string;
   } = {
     shareType: '',
     updatedAt: 0,
@@ -168,18 +196,21 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     name: '',
     data: {
     },
-    channelKey: ''
+    channelKey: '',
   }
-  const [ selectedKeeper, setSelectedKeeper ]: [{
-    shareType: string;
-    updatedAt: number;
-    status: string;
-    shareId: string;
-    reshareVersion: number;
-    name?: string;
-    data?: any;
-    channelKey?: string;
-  }, any] = useState( defaultKeeperObj )
+  const [ selectedKeeper, setSelectedKeeper ]: [
+    {
+      shareType: string;
+      updatedAt: number;
+      status: string;
+      shareId: string;
+      reshareVersion: number;
+      name?: string;
+      data?: any;
+      channelKey?: string;
+    },
+    any
+  ] = useState( defaultKeeperObj )
 
   const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
@@ -190,7 +221,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         selectedTitle: navigationObj.selectedKeeper.name,
         SelectedRecoveryKeyNumber: 1,
         selectedKeeper: navigationObj.selectedKeeper,
-        selectedLevelId: levelData[ 0 ].id
+        selectedLevelId: levelData[ 0 ].id,
       }
       navigation.navigate( 'SeedBackupHistory', navigationParams )
     }
@@ -201,17 +232,25 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     if ( typeof menuOption.onOptionPressed === 'function' ) {
       menuOption.onOptionPressed()
     } else if ( menuOption.screenName !== undefined ) {
-      if( menuOption.screenName == 'WalletBackup' ) {
-        if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
-        levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){
-          if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+      if ( menuOption.screenName == 'WalletBackup' ) {
+        if (
+          levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed' ||
+          levelData[ 0 ].keeper1ButtonText?.toLowerCase() ==
+            'write down seed-words'
+        ) {
+          if (
+            levelHealth.length == 0 ||
+            ( levelHealth.length &&
+              levelHealth[ 0 ].levelInfo.length &&
+              levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' )
+          ) {
             // if( levelData[ 0 ].status == 'notSetup' )
             // navigation.navigate( 'BackupSeedWordsContent' )
             const navigationParams = {
               selectedTitle: navigationObj?.selectedKeeper?.name,
               SelectedRecoveryKeyNumber: 1,
               selectedKeeper: navigationObj?.selectedKeeper,
-              selectedLevelId: levelData[ 0 ].id
+              selectedLevelId: levelData[ 0 ].id,
             }
             navigation.navigate( 'SeedBackupHistory', navigationParams )
           } else {
@@ -227,23 +266,27 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const findImage = ( name ) => {
     switch ( name ) {
         case strings.accountManagement:
-          return ( <AccManagement /> )
+          return <AccountManagement />
         case strings.node:
-          return ( <Node /> )
+          // return <Node />
+          return <WalletSettings />
         case strings.walletSettings:
-          return ( <Wallet /> )
+          return <WalletSettings />
         case strings.AppInfo:
-          return ( <AppInfo /> )
+          // return <AppInfo />
+          return <WalletSettings />
         case bhrStrings[ 'WalletBackup' ]:
-          return ( <Image
-            source={require( '../../assets/images/icons/keeper_sheild.png' )}
-            style={{
-              width: widthPercentageToDP( 5 ),
-              height: widthPercentageToDP( 6 ),
-            }}
-          /> )
+          return (
+            <Image
+              source={require( '../../assets/images/icons/keeper_sheild.png' )}
+              style={{
+                width: widthPercentageToDP( 5 ),
+                height: widthPercentageToDP( 6 ),
+              }}
+            />
+          )
         case 'Enable Auto-Read from Clipboard':
-          return ( <DocumentPad /> )
+          return <DocumentPad />
         default:
           return null
     }
@@ -260,9 +303,11 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const ReadClipboardModal = () => {
     return (
       <View style={styles.wrapper}>
-        <View style={{
-          flex: 1
-        }}>
+        <View
+          style={{
+            flex: 1,
+          }}
+        >
           <AppBottomSheetTouchableWrapper
             style={{
               backgroundColor: Colors.lightBlue,
@@ -278,9 +323,11 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           >
             <CrossButton />
           </AppBottomSheetTouchableWrapper>
-          <View style={{
-            marginHorizontal: widthPercentageToDP( 10 )
-          }}>
+          <View
+            style={{
+              marginHorizontal: widthPercentageToDP( 10 ),
+            }}
+          >
             <Text
               style={{
                 color: Colors.blue,
@@ -302,9 +349,13 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 'Grant Hexa access to clipboard \nto copy and paste BTC addresses'
               }
             </Text>
-            <View style={{
-              marginTop: '15%', flexDirection: 'row', justifyContent: 'space-between'
-            }}>
+            <View
+              style={{
+                marginTop: '15%',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}
+            >
               <Text
                 style={{
                   alignSelf: 'center',
@@ -318,7 +369,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               <Switch
                 onValueChange={changePermission}
                 trackColor={{
-                  false: Colors.gray1, true: Colors.blue
+                  false: Colors.gray1,
+                  true: Colors.blue,
                 }}
                 thumbColor={isEnabled ? Colors.textColorGrey : Colors.white}
                 value={enabled}
@@ -332,7 +384,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 height: heightPercentageToDP( 7.5 ),
                 justifyContent: 'center',
                 alignItems: 'center',
-                borderRadius: widthPercentageToDP( 3 )
+                borderRadius: widthPercentageToDP( 3 ),
               }}
               onPress={() => setModalVisible( false )}
             >
@@ -352,241 +404,280 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   }
 
   return (
-    <View style={{
-      backgroundColor: Colors.blue
-    }}>
-      <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-      {/* <Header from={'More'} /> */}
-      <ModalContainer visible={modalVisible} closeBottomSheet={() => setModalVisible( false )}>
-        {ReadClipboardModal()}
-      </ModalContainer>
-      <View style={styles.accountCardsSectionContainer}>
-        <Text style={{
-          color: Colors.blue,
-          fontSize: RFValue( 18 ),
-          letterSpacing: 0.54,
-          // marginLeft: 2,
-          fontFamily: Fonts.FiraSansMedium,
-          paddingTop: heightPercentageToDP( 4 ),
-          paddingLeft: widthPercentageToDP( 4 ),
-          paddingBottom: heightPercentageToDP( 1 )
-        }}>
-          {strings.settingsAndMore}
-        </Text>
-        {/* <View style={{
-            flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', margin: 15
-          }}>
-            <Image
-              source={require( '../../assets/images/icons/recurring_buy.png' )}
+    <View
+      style={{
+        height: 'auto',
+        backgroundColor: Colors.white,
+      }}
+    >
+      <SafeAreaView
+        style={{
+          backgroundColor: Colors.blueTextNew,
+        }}
+      />
+      <StatusBar
+        backgroundColor={Colors.blueTextNew}
+        barStyle="dark-content"
+      />
+      <View
+        style={{
+          width,
+          borderBottomLeftRadius: 25,
+          backgroundColor: Colors.blueTextNew,
+          marginBottom: 20,
+          flexDirection: 'column',
+        }}
+      >
+        <View
+          style={[
+            CommonStyles.headerContainer,
+            {
+              backgroundColor: Colors.blueTextNew,
+              flexDirection: 'row',
+              marginRight: 10,
+              marginBottom: 20,
+            },
+          ]}
+        >
+          <TouchableOpacity
+            style={CommonStyles.headerLeftIconContainer}
+            onPress={() => {
+              navigation.goBack()
+            }}
+          >
+            <View style={CommonStyles.headerLeftIconInnerContainer}>
+              <BackIcon />
+            </View>
+          </TouchableOpacity>
+          <View style={CommonStyles.headerCenterIconContainer}>
+            <Text style={CommonStyles.headerCenterIconInnerContainer}>
+              Wallet Settings
+            </Text>
+          </View>
+        </View>
+        <View
+          style={{
+            backgroundColor: Colors.blueTextNew,
+            flexDirection: 'row',
+            marginHorizontal: 20,
+            marginBottom: 40,
+            marginTop: heightPercentageToDP( '8%' ),
+          }}
+        >
+          <View style={styles.modalElementInfoView}>
+            <BackupShield />
+            <View
               style={{
-                width: widthPercentageToDP( 8 ),
-                height: widthPercentageToDP( 8 ),
+                justifyContent: 'center',
+                marginLeft: 20,
               }}
-            />
-            <View>
-              <Text style={styles.addModalTitleText}>
-          Show in Bitcoin
+            >
+              <Text style={styles.addModalTitleTextHeader}>
+                No backup created
               </Text>
-              <Text style={styles.addModalInfoText}>
-        Lorem ipsum dolor sit amet, consectetur
+              <Text style={styles.addModalInfoTextHeader}>
+                See your backup options
               </Text>
             </View>
-            <CurrencyKindToggleSwitch
-              fiatCurrencyCode={currencyCode}
-              onpress={() => {
-                dispatch(
-                  currencyKindSet(
-                    prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
-                  )
-                )
+          </View>
+          <Image
+            source={require( '../../assets/images/icons/icon_arrow.png' )}
+            style={{
+              width: widthPercentageToDP( '2.5%' ),
+              height: widthPercentageToDP( '2.5%' ),
+              alignSelf: 'center',
+              resizeMode: 'contain',
+            }}
+          />
+        </View>
+      </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingVertical: heightPercentageToDP( 3 ),
+        }}
+      >
+        {/* <View
+          style={{
+            flexDirection: 'row',
+            marginHorizontal: 20,
+          }}
+        >
+          <View style={styles.modalElementInfoView}>
+            <AccountRead />
+            <View
+              style={{
+                justifyContent: 'center',
+                marginLeft: 20,
               }}
-              isOn={prefersBitcoin}
-            />
-          </View> */}
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingVertical: heightPercentageToDP( 3 ),
-          }}>
-          <FlatList
-            data={menuOptions}
-            keyExtractor={listItemKeyExtractor}
-            // ItemSeparatorComponent={() => (
-            //   <View style={{
-            //     backgroundColor: Colors.white
-            //   }}>
-            //     <View style={styles.separatorView} />
-            //   </View>
-            // )}
-            renderItem={( { item: menuOption }: { item: MenuOption } ) => {
-              return <AppBottomSheetTouchableWrapper
+            >
+              <Text style={styles.addModalTitleText}>Enable Auto-Read</Text>
+              <Text style={styles.addModalInfoText}>
+                App will prompt send sats to copied address
+              </Text>
+            </View>
+          </View>
+        </View> */}
+        <FlatList
+          data={menuOptions}
+          keyExtractor={listItemKeyExtractor}
+          // ItemSeparatorComponent={() => (
+          //   <View style={{
+          //     backgroundColor: Colors.white
+          //   }}>
+          //     <View style={styles.separatorView} />
+          //   </View>
+          // )}
+          renderItem={( { item: menuOption }: { item: MenuOption } ) => {
+            return (
+              <AppBottomSheetTouchableWrapper
                 onPress={() => handleOptionSelection( menuOption )}
-                style={[ styles.addModalView,
-                  ( ( levelData[ 0 ].keeper1.status == 'notSetup' ||
-                   levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' ) &&
-                  menuOption.screenName == 'WalletBackup' ) && {
+                style={[
+                  styles.addModalView,
+                  ( levelData[ 0 ].keeper1.status == 'notSetup' ||
+                    levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' ) &&
+                    menuOption.screenName == 'WalletBackup' && {
                     borderColor: 'orange',
-                    borderWidth: 1
-                  } ]}
+                    borderWidth: 1,
+                  },
+                ]}
               >
-                {
-                  ( ( levelData[ 0 ].keeper1.status == 'notSetup' ||
-                   levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' ) &&
-                  menuOption.screenName == 'WalletBackup' ) &&
-                  <View style={{
-                    position:'absolute', zIndex: 999, right:5, top:5
-                  }}>
+                {( levelData[ 0 ].keeper1.status == 'notSetup' ||
+                  levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' ) &&
+                  menuOption.screenName == 'WalletBackup' && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      zIndex: 999,
+                      right: 5,
+                      top: 5,
+                    }}
+                  >
                     <Image
                       source={require( '../../assets/images/icons/exclamation_error.png' )}
                       style={{
-                        width: heightPercentageToDP( 1.5 ), height: heightPercentageToDP( 1.5 ),
-                        tintColor: 'orange'
+                        width: heightPercentageToDP( 1.5 ),
+                        height: heightPercentageToDP( 1.5 ),
+                        tintColor: 'orange',
                       }}
                       resizeMode={'contain'}
                     />
                   </View>
-                }
-                <View style={styles.modalElementInfoView}>
-                  <View style={{
-                    justifyContent: 'center',
-                  }}>
+                )}
+                <View style={[ styles.modalElementInfoView, {
+                  right: 20
+                } ]}>
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                    }}
+                  >
                     {findImage( menuOption.title )}
                   </View>
-                  <View style={{
-                    justifyContent: 'center', marginLeft: 10
-                  }}>
-                    <Text style={styles.addModalTitleText}>{menuOption.title}</Text>
-                    <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
-                  </View>
-                  {/* {menuOption.isSwitch &&
-                <View style={{
-                  alignItems: 'flex-end',
-                  marginLeft: 'auto'
-                }}>
-                  <Switch
-                    value={isEnabled}
-                    onValueChange={toggleSwitch}
-                    thumbColor={isEnabled ? Colors.blue : Colors.white}
-                    trackColor={{
-                      false: Colors.borderColor, true: Colors.lightBlue
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                      marginLeft: 20,
                     }}
-                    onTintColor={Colors.blue}
-                  />
+                  >
+                    <Text style={styles.addModalTitleText}>
+                      {menuOption.title}
+                    </Text>
+                    <Text style={styles.addModalInfoText}>
+                      {menuOption.subtitle}
+                    </Text>
+                  </View>
                 </View>
-                  } */}
-                </View>
-                <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
+                <Image
+                  source={require( '../../assets/images/icons/icon_arrow.png' )}
                   style={{
                     width: widthPercentageToDP( '2.5%' ),
                     height: widthPercentageToDP( '2.5%' ),
                     alignSelf: 'center',
-                    resizeMode: 'contain'
+                    resizeMode: 'contain',
                   }}
                 />
-
               </AppBottomSheetTouchableWrapper>
-            }}
-          />
-          <TouchableOpacity
-            onPress={() => {
-              Linking.openURL( 'https://hexawallet.io/faq/' )
-                .then( ( _data ) => { } )
-                .catch( ( _error ) => {
-                } )
-            }}
-            style={[ styles.otherCards, styles.extraHeight ]}
-          >
-            <QueActive />
-            <View style={{
-              marginLeft: 10
-            }}>
-              <Text style={styles.addModalTitleText}>
-                {strings.FAQ}
-              </Text>
-              <Text style={styles.addModalInfoText}>
-                {strings.yourQuestions}
-              </Text>
-            </View>
-            <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
-              style={{
-                width: widthPercentageToDP( '2.5%' ),
-                height: widthPercentageToDP( '2.5%' ),
-                alignSelf: 'center',
-                marginLeft: 'auto',
-                resizeMode: 'contain'
-              }}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              Linking.openURL( 'https://t.me/HexaWallet' )
-                .then( ( _data ) => { } )
-                .catch( ( _error ) => {
-                  alert( 'Make sure Telegram installed on your device' )
-                } )
-            }}
-            style={styles.otherCards}
-          >
-            <Telegram />
-            <View style={{
-              marginLeft: 10,
-              flex: 1
-            }}>
-              <Text style={styles.addModalTitleText}>
-                {strings.hexaCommunity}
-              </Text>
-              <Text style={styles.addModalInfoText}>
-                {strings.questionsFeedback}
-              </Text>
-
-            </View>
-            <Image
-              source={require( '../../assets/images/icons/link.png' )}
-              style={{
-                width: widthPercentageToDP( 4 ),
-                height: widthPercentageToDP( 4 ),
-                resizeMode: 'contain',
-                marginLeft: 'auto'
-              }}
-            />
-          </TouchableOpacity>
-          {/* </View> */}
-
-          {/* <View
-          style={styles.webLinkBarContainer}
+            )
+          }}
+        />
+        <View
+          style={{
+            flexDirection: 'row',
+            marginHorizontal: 20,
+          }}
         >
-          <AppBottomSheetTouchableWrapper
-            onPress={() => openLink( 'http://hexawallet.io/faq' )}
-          >
-            <Text style={styles.addModalTitleText}>FAQs</Text>
-          </AppBottomSheetTouchableWrapper>
-
-          <View
-            style={{
-              height: 20, width: 1, backgroundColor: Colors.borderColor
-            }}
-          />
-
-          <AppBottomSheetTouchableWrapper
-            onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
-          >
-            <Text style={styles.addModalTitleText}>Terms of Service</Text>
-          </AppBottomSheetTouchableWrapper>
-
-          <View
-            style={{
-              height: 20, width: 1, backgroundColor: Colors.borderColor
-            }}
-          />
-
-          <AppBottomSheetTouchableWrapper
-            onPress={() => openLink( 'http://hexawallet.io/privacy-policy' )}
-          >
-            <Text style={styles.addModalTitleText}>Privacy Policy</Text>
-          </AppBottomSheetTouchableWrapper>
-        </View> */}
-        </ScrollView>
-      </View>
+          <View style={styles.modalElementInfoView}>
+            <FAQs />
+            <View
+              style={{
+                justifyContent: 'center',
+                marginLeft: 20,
+              }}
+            >
+              <Text style={styles.addModalTitleText}>WeBitcoin FAQ's</Text>
+              <Text style={styles.addModalInfoText}>
+                Your most common questions answered
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                Linking.openURL( 'https://hexawallet.io/faq/' )
+                  .then( ( _data ) => {} )
+                  .catch( ( _error ) => {} )
+              }}
+            >
+              <Image
+                source={require( '../../assets/images/icons/link.png' )}
+                style={{
+                  width: widthPercentageToDP( 3 ),
+                  height: widthPercentageToDP( 3 ),
+                  marginLeft: 70,
+                }}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            marginHorizontal: 20,
+          }}
+        >
+          <View style={styles.modalElementInfoView}>
+            <Telegram />
+            <View
+              style={{
+                justifyContent: 'center',
+                marginLeft: 20,
+              }}
+            >
+              <Text style={styles.addModalTitleText}>
+                WeBitcoin Community Telegram
+              </Text>
+              <Text style={styles.addModalInfoText}>
+                Questions, feedback and more
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                Linking.openURL( 'https://t.me/HexaWallet' )
+                  .then( ( _data ) => {} )
+                  .catch( ( _error ) => {} )
+              }}
+            >
+              <Image
+                source={require( '../../assets/images/icons/link.png' )}
+                style={{
+                  width: widthPercentageToDP( 3 ),
+                  height: widthPercentageToDP( 3 ),
+                  marginLeft: 50,
+                }}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
     </View>
   )
 }
@@ -604,7 +695,7 @@ const styles = StyleSheet.create( {
       height: -1,
     },
     flexDirection: 'column',
-    justifyContent: 'space-around'
+    justifyContent: 'space-around',
   },
   modalContentContainer: {
     backgroundColor: Colors.white,
@@ -667,7 +758,8 @@ const styles = StyleSheet.create( {
     shadowOpacity: 0.05,
     // shadowColor: Colors.shadowColor,
     shadowOffset: {
-      width: 10, height: 10
+      width: 10,
+      height: 10,
     },
     shadowRadius: 6,
     elevation: 6,
@@ -676,8 +768,8 @@ const styles = StyleSheet.create( {
     marginTop: heightPercentageToDP( '3%' ),
   },
   addModalView: {
-    backgroundColor: Colors.gray7,
-    paddingVertical: 4,
+    // backgroundColor: Colors.gray7,
+    // paddingVertical: 4,
     paddingHorizontal: widthPercentageToDP( 5 ),
     flexDirection: 'row',
     display: 'flex',
@@ -689,16 +781,22 @@ const styles = StyleSheet.create( {
     shadowOpacity: 0.05,
     // shadowColor: Colors.shadowColor,
     shadowOffset: {
-      width: 10, height: 10
+      width: 10,
+      height: 10,
     },
     shadowRadius: 6,
     elevation: 6,
   },
 
   addModalTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular
+    color: Colors.black,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.RobotoSlabRegular,
+  },
+  addModalTitleTextHeader: {
+    color: Colors.white,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.RobotoSlabRegular,
   },
 
   textBeta: {
@@ -718,10 +816,16 @@ const styles = StyleSheet.create( {
   },
 
   addModalInfoText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    color: Colors.black,
+    fontSize: RFValue( 9 ),
     marginTop: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.RobotoSlabRegular,
+  },
+  addModalInfoTextHeader: {
+    color: Colors.white,
+    fontSize: RFValue( 9 ),
+    marginTop: 5,
+    fontFamily: Fonts.RobotoSlabRegular,
   },
 
   modalElementInfoView: {

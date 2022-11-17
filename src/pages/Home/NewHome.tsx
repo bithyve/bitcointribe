@@ -99,6 +99,8 @@ import { makeContactRecipientDescription } from '../../utils/sending/RecipientFa
 import { getCurrencyImageByRegion, processRequestQR } from '../../common/CommonFunctions'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from './../../common/Fonts'
+import CustomToolbar from '../../components/home/CustomToolbar'
+import NotificationListContent from '../../components/NotificationListContent'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -554,10 +556,28 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
             </>
           )
 
+        case BottomSheetKind.NOTIFICATIONS_LIST:
+          return (
+            <NotificationListContent
+              notificationLoading={this.state.notificationLoading}
+              NotificationData={this.state.notificationData}
+              onNotificationClicked={this.onNotificationClicked}
+              onPressBack={this.closeBottomSheet}
+              bottomSheetRef={this.bottomSheetRef}
+            />
+          )
+
         default:
           break
     }
   }
+
+  onNotificationClicked = async ( value ) => {
+    console.log( 'value', value )
+    // if( value.status === 'unread' || value.type === NotificationType.FNF_TRANSACTION )
+    // if( value.type !== NotificationType.FNF_KEEPER_REQUEST )
+    this.handleNotificationBottomSheetSelection( value )
+  };
 
 
   onPressNotifications = async () => {
@@ -807,29 +827,62 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
     switch ( item.type ) {
         //Gift and tips
         case 1:
-          this.props.navigation.navigate( 'Friends' )
+          this.props.navigation.navigate( 'ManageGifts' )
           break
+
+        //Friends and Family
+        case 2:
+          this.props.navigation.navigate( 'FriendsAndFamily' )
+          break
+
+          //Settings
+        case 4:
+          this.props.navigation.navigate( 'MoreOptions' )
+          break
+
+        //Buy BTC
+        case 5:
+          this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
+          break
+    }
+  }
+
+  getIconPath = ( item ) => {
+    switch ( item.type ) {
+        case 1:
+          return require( '../../assets/images/newHome/gift.png' )
 
         case 2:
+          return require( '../../assets/images/newHome/group.png' )
 
-          break
+        case 3:
+          return require( '../../assets/images/newHome/broadcast.png' )
+
+        case 4:
+          return require( '../../assets/images/newHome/contacts.png' )
+
+        case 5:
+          return require( '../../assets/images/newHome/bitcoin.png' )
+
+        case 6:
+          return require( '../../assets/images/newHome/payments.png' )
     }
   }
 
   renderHomeItem = ( { item, index } ) => {
     return (
       <TouchableOpacity style={{
-        width: wp( 95 ), height: hp( 120 ), marginEnd: wp( 18 ),
+        width: wp( 95 ), height: wp( 120 ), marginEnd: wp( 18 ),
         backgroundColor: Colors.cream, paddingHorizontal: wp( 12 ),
         borderRadius: 10, marginBottom: 18
       }} activeOpacity={1} onPress={() => this.onItemClick( item )}>
-        <Image source={require( '../../assets/images/icons/settings.png' )}
+        <Image source={this.getIconPath( item )}
           style={{
             width: wp( 31 ), height: wp( 31 ), marginTop: ( 36 )
           }} />
         <Text style={{
           fontSize: RFValue( 12 ), fontFamily: Fonts.RobotoSlabMedium,
-          letterSpacing: 0.6, lineHeight: ( 16 ), marginTop: 7
+          letterSpacing: 0.6, lineHeight: ( 16 ), marginTop: 7, color: Colors.greyText
         }}>{item.name}</Text>
       </TouchableOpacity>
     )
@@ -850,11 +903,15 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
       currentLevel,
     } = this.props
     return (
-      <SafeAreaView style={{
-        backgroundColor: Colors.appPrimary
+      <View style={{
+        backgroundColor: Colors.appPrimary, flex:1
       }}>
+        <SafeAreaView style={{
+          backgroundColor: Colors.appPrimary
+        }}/>
         <StatusBar backgroundColor={Colors.appPrimary} barStyle="dark-content" />
-        <ModalContainer
+        {/* <CustomToolbar toolbarTitle={'Title'} onBackPressed={()=>{}}/> */}
+        {/* <ModalContainer
           onBackground={() => this.setState( {
             currentBottomSheetKind: null
           } )}
@@ -862,28 +919,58 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
           closeBottomSheet={() => { }}
         >
           {this.renderBottomSheetContent()}
+        </ModalContainer> */}
+        <ModalContainer
+          onBackground={() => {
+            if ( this.state.currentBottomSheetKind === BottomSheetKind.GIFT_REQUEST ) {
+              console.log( 'bgState' )
+            } else if ( this.state.currentBottomSheetKind === BottomSheetKind.TRUSTED_CONTACT_REQUEST ) {
+              console.log( 'bgState' )
+            } else {
+              const perviousState = this.state.currentBottomSheetKind
+              this.setState( {
+                currentBottomSheetKind: null
+              } )
+              setTimeout( () => {
+                this.setState( {
+                  currentBottomSheetKind: perviousState
+                }
+                )
+              }, 200 )
+            }
+          }}
+          visible={this.state.currentBottomSheetKind != null}
+          closeBottomSheet={() => {}}
+        >
+          {this.renderBottomSheetContent()}
         </ModalContainer>
         <View style={{
-          backgroundColor: Colors.white
+          backgroundColor: Colors.white, flex:1
         }}>
-          <View>
+          <View style={{
+            flex:1
+          }}>
             {this.props.clipboardAccess && <ClipboardAutoRead navigation={this.props.navigation} />}
-            <HomeHeader
-              onPressNotifications={this.onPressNotifications}
-              navigateToQRScreen={this.navigateToQRScreen}
-              notificationData={this.props.messages}
-              walletName={walletName}
-              getCurrencyImageByRegion={getCurrencyImageByRegion}
-              netBalance={netBalance}
-              exchangeRates={exchangeRates}
-              CurrencyCode={currencyCode}
-              navigation={navigation}
-              currentLevel={currentLevel}
-            //  onSwitchToggle={this.onSwitchToggle}
-            // setCurrencyToggleValue={this.setCurrencyToggleValue}
-            // navigation={this.props.navigation}
-            // overallHealth={overallHealth}
-            />
+            <View style={{
+              flex:1
+            }}>
+              <HomeHeader
+                onPressNotifications={this.onPressNotifications}
+                navigateToQRScreen={this.navigateToQRScreen}
+                notificationData={this.props.messages}
+                walletName={walletName}
+                getCurrencyImageByRegion={getCurrencyImageByRegion}
+                netBalance={netBalance}
+                exchangeRates={exchangeRates}
+                CurrencyCode={currencyCode}
+                navigation={navigation}
+                currentLevel={currentLevel}
+                //  onSwitchToggle={this.onSwitchToggle}
+                // setCurrencyToggleValue={this.setCurrencyToggleValue}
+                // navigation={this.props.navigation}
+                // overallHealth={overallHealth}
+              />
+            </View>
             <View>
               <View style={{
                 borderBottomStartRadius: hp( 40 ),
@@ -925,7 +1012,10 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
             </ModalContainer>
           </View>
         </View>
-      </SafeAreaView>
+        <SafeAreaView style={{
+          backgroundColor: Colors.white
+        }}/>
+      </View>
     )
   }
 }
