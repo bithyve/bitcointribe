@@ -21,6 +21,7 @@ import { LocalizationContext } from '../../common/content/LocContext'
 import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { hp as hp1, wp as wp1 } from '../../common/data/responsiveness/responsive'
 
 export default function ConfirmSeedWordsModal( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -84,18 +85,16 @@ export default function ConfirmSeedWordsModal( props ) {
       > */}
       <View style={{
         // height: hp( '72%' ),
-        paddingHorizontal:8,
-        paddingTop:8,
         backgroundColor: 'white'
       }}>
         <TouchableOpacity
           activeOpacity={1}
           onPress={props.onPressIgnore}
           style={{
-            width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+            width: wp1( 28 ), height: wp1( 28 ), borderRadius: wp( 14 ),
             alignSelf: 'flex-end',
             backgroundColor: Colors.golden, alignItems: 'center', justifyContent: 'center',
-            marginTop: wp( 3 ), marginRight: wp( 3 )
+            marginTop: hp1( 10 ), marginRight: wp1( 10 )
           }}
         >
           <FontAwesome name="close" color={Colors.white} size={19} style={{
@@ -107,7 +106,7 @@ export default function ConfirmSeedWordsModal( props ) {
           fontSize: RFValue( 14 ),
           color: Colors.textColorGrey,
           lineHeight: RFValue( 30 ),
-          marginHorizontal: wp( '5%' ),
+          marginHorizontal: wp1( 30 ),
         }}>
           Backup Seed Words
         </Text>
@@ -117,24 +116,26 @@ export default function ConfirmSeedWordsModal( props ) {
           fontSize: RFValue( 18 ),
           fontFamily: Fonts.RobotoSlabRegular,
           lineHeight: RFValue( 30 ),
-          marginHorizontal: wp( '5%' ),
+          marginHorizontal: wp1( 30 ),
+          marginTop: hp1( 4 ),
           letterSpacing: RFValue( 0.01 )
         }} >{'Confirm Seed Words'}</Text>
         <Text style={{
           color: Colors.textColorGrey,
           fontSize: RFValue( 12 ),
           fontFamily: Fonts.RobotoSlabRegular,
-          marginHorizontal: wp( '5%' ),
-          marginTop: 5,
+          marginHorizontal: wp1( 30 ),
+          marginTop: hp1( 2 ),
           lineHeight: RFValue( 18 ),
           letterSpacing: RFValue( 0.6 )
         }}>{'Key in the word exactly like it was displayed'}</Text>
         <Text style={{
+          height: hp1( 16 ),
           color: Colors.greyTextColor,
           fontSize: RFValue( 12 ),
           fontFamily: Fonts.RobotoSlabRegular,
-          marginHorizontal: wp( '5%' ),
-          marginTop: RFValue( 25 ),
+          marginHorizontal: wp1( 30 ),
+          marginTop: hp1( 37 ),
           letterSpacing: RFValue( 0.48 ),
           lineHeight: RFValue( 12 ),
         }}>{'Enter the '}
@@ -144,9 +145,10 @@ export default function ConfirmSeedWordsModal( props ) {
           }}>{getSeedNumber( props.seedNumber ) + ' word'}</Text></Text>
         <Shadow
           containerViewStyle={{
-            marginTop: hp( 3 ),
-            marginHorizontal: wp( '5%' ),
-            alignSelf: 'center'
+            marginTop: hp1( 15 ),
+            marginLeft: wp1( 30 ),
+            marginRight: wp1( 35 ),
+            alignSelf: 'center',
           }}
           offset={ [ 7, 7 ] }
           distance={7}
@@ -206,16 +208,16 @@ export default function ConfirmSeedWordsModal( props ) {
           flexDirection: 'row',
           justifyContent: 'flex-end',
           marginHorizontal: wp( '8%' ),
-          marginTop: 15
+          marginTop: hp1( 23 )
         }}>
           {
             arr.map( ( x ) => (
               <View key={x} style={{
-                width: x === n ? RFValue( 25 ) : RFValue( 6 ),
-                height: RFValue( 5 ),
+                width: x === n ? wp1( 25 ) : wp1( 6 ),
+                height: hp1( 5 ),
                 backgroundColor: x === n ? '#EA4335' : '#EA433566',
-                marginRight: RFValue( 5 ),
-                borderRadius: 2.5,
+                marginRight: wp1( 5 ),
+                borderRadius: hp1( 2.5 ),
               }}/>
             ) )
           }
@@ -265,9 +267,11 @@ export default function ConfirmSeedWordsModal( props ) {
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressIgnore()}
               style={{
-                height: wp( '13%' ),
-                width: wp( '27%' ),
+                height: hp1( 50 ),
+                width: wp1( 120 ),
                 alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: hp1( 29 )
                 // position: 'absolute',
                 // left: wp( 53 )
               }}
@@ -340,7 +344,8 @@ const styles = StyleSheet.create( {
   },
   modalInputBox: {
     flex: 1,
-    height: 50,
+    height: hp1( 50 ),
+    width: wp1( 290 ),
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.RobotoSlabRegular,
@@ -360,23 +365,22 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
   },
   successModalButtonView: {
-    height: wp( '13%' ),
-    width: wp( '30%' ),
-    paddingLeft: wp( '5%' ),
-    paddingRight: wp( '5%' ),
+    height: hp1( 50 ),
+    width: wp1( 120 ),
+    paddingHorizontal: wp1( 36 ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
     backgroundColor: Colors.blue,
     alignSelf: 'center',
-    marginLeft: wp( '8%' ),
-    marginBottom:hp ( '3%' ),
+    marginLeft: wp1( 30 ),
+    marginBottom:hp1 ( 29 ),
   },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.RobotoSlabMedium,
     textAlignVertical: 'center',
-    lineHeight: RFValue( 13 )
+    lineHeight: RFValue( 16 )
   },
 } )
