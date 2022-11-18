@@ -7,7 +7,7 @@ import {
   Platform,
 } from 'react-native'
 import Colors from '../../common/Colors'
-import _ from 'underscore'
+// import _ from 'underscore'
 import ModalContainer from '../../components/home/ModalContainer'
 import BottomInputModalContainer from '../../components/home/BottomInputModalContainer'
 

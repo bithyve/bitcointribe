@@ -75,6 +75,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../common/Fonts'
 import AppInfo from '../pages/MoreOptions/AppInfo/Appinfo'
 import FriendsAndFamilyScreen from '../pages/FriendsAndFamily/FriendsAndFamilyScreen'
+import WalletBackupStack from './stacks/more-options/WalletBackupStack'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -491,6 +492,12 @@ const NewHomeNavigator = createStackNavigator( {
     navigationOptions: {
       header: null,
       // tabBarVisibl
+    },
+  },
+  SeedBackup: {
+    screen: WalletBackupStack,
+    navigationOptions: {
+      header: null,
     },
   },
 } )
