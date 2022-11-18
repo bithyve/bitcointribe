@@ -173,6 +173,16 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     //   }
     // },
   ]
+  const walletBackup: MenuOption = {
+    imageSource: require( '../../assets/images/icons/icon_info.png' ),
+    subtitle: levelData[ 0 ].keeper1.status == 'notSetup'
+      ? 'Confirm backup phrase'
+      : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
+        ? 'Wallet backup confirmed'
+        :'Confirm backup phrase',
+    title: bhrStrings[ 'WalletBackup' ],
+    screenName: 'WalletBackup',
+  }
 
   const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
   const [ modalVisible, setModalVisible ] = useState( false )
@@ -455,7 +465,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             </Text>
           </View>
         </View>
-        <View
+        <TouchableOpacity
           style={{
             backgroundColor: Colors.blueTextNew,
             flexDirection: 'row',
@@ -463,6 +473,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             marginBottom: 40,
             marginTop: heightPercentageToDP( '8%' ),
           }}
+          onPress={()=>handleOptionSelection( walletBackup )}
         >
           <View style={styles.modalElementInfoView}>
             <BackupShield />
@@ -473,10 +484,10 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               }}
             >
               <Text style={styles.addModalTitleTextHeader}>
-                No backup created
+                {walletBackup.title}
               </Text>
               <Text style={styles.addModalInfoTextHeader}>
-                See your backup options
+                {walletBackup.subtitle}
               </Text>
             </View>
           </View>
@@ -489,7 +500,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               resizeMode: 'contain',
             }}
           />
-        </View>
+        </TouchableOpacity>
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}

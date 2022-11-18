@@ -835,7 +835,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.props.navigation.navigate( 'FriendsAndFamily' )
           break
 
-          //Settings
+        //Settings
         case 4:
           this.props.navigation.navigate( 'MoreOptions' )
           break
@@ -1047,7 +1047,7 @@ const mapStateToProps = ( state ) => {
     levelHealth: idx( state, ( _ ) => _.bhr.levelHealth ),
     currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
     keeperInfo: idx( state, ( _ ) => _.bhr.keeperInfo ),
-    accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
+    // accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     newBHRFlowStarted: idx( state, ( _ ) => _.bhr.newBHRFlowStarted ),
     isGoogleLoginCancelled: idx( state, ( _ ) => _.cloud.isGoogleLoginCancelled ),
     cloudBackupStatus: idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
