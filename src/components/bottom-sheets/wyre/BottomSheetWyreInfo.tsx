@@ -7,7 +7,7 @@ import ListStyles from '../../../common/Styles/ListStyles'
 import ImageStyles from '../../../common/Styles/ImageStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+// import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
 import useWyreIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
 import { fetchWyreReservation } from '../../../store/actions/WyreIntegration'
@@ -24,7 +24,7 @@ import { LocalizationContext } from '../../../common/content/LocContext'
 import CheckingAcc from '../../../assets/images/svgs/icon_checking.svg'
 import AccountShell from '../../../common/data/models/AccountShell'
 import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
-import { hp as hp1, wp as wp1 } from '../../../common/data/responsiveness/responsive'
+import { hp, wp as wp } from '../../../common/data/responsiveness/responsive'
 
 type Props = {
   wyreFromDeepLink: boolean | null;
@@ -115,15 +115,15 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
           activeOpacity={1}
           onPress={onPress}
           style={{
-            width: wp( 7 ),
-            height: wp( 7 ),
-            borderRadius: wp( 7 / 2 ),
+            width: wp( 28 ),
+            height: wp( 28 ),
+            borderRadius: wp( 14 ),
             alignSelf: 'flex-end',
             backgroundColor: Colors.golden,
             alignItems: 'center',
             justifyContent: 'center',
-            marginTop: wp( 3 ),
-            marginRight: wp( 3 ),
+            marginTop: hp( 10 ),
+            marginRight: wp( 10 ),
           }}
         >
           <FontAwesome
@@ -147,9 +147,9 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
                 fontSize: RFValue( 18 ),
                 letterSpacing: RFValue( 0.27 ),
                 lineHeight: RFValue( 22 ),
-                marginBottom: hp1( 25 ),
-                marginLeft: wp1( 30 ),
-                marginRight: wp1( 48 ),
+                marginBottom: hp( 25 ),
+                marginLeft: wp( 30 ),
+                marginRight: wp( 48 ),
               },
             ]}
           >
@@ -211,8 +211,8 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
           </View>
           <ListItem.Content
             style={{
-              height: hp1( 53 ),
-              marginVertical: hp1( 16 ),
+              height: hp( 53 ),
+              marginVertical: hp( 16 ),
             }}
           >
             <ListItem.Subtitle
@@ -305,7 +305,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
             </Text>
           </AppBottomSheetTouchableWrapper>
         </View>
-        {wyreFromBuyMenu ? (
+        {/* {wyreFromBuyMenu ? (
           <View
             style={{
               alignSelf: 'flex-end',
@@ -335,7 +335,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
               }}
             />
           </View>
-        ) : null}
+        ) : null} */}
       </View>
     </View>
   )
@@ -344,16 +344,16 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
 const styles = StyleSheet.create( {
   containerStyle: {
     flexDirection: 'row',
-    marginHorizontal: wp1( 30 ),
-    paddingHorizontal: wp1( 20 ),
-    paddingVertical: hp1( 19 ),
-    width: wp1( 295 ),
-    height: hp1( 100 ),
+    marginHorizontal: wp( 30 ),
+    paddingHorizontal: wp( 20 ),
+    paddingVertical: hp( 19 ),
+    width: wp( 295 ),
+    height: hp( 100 ),
     backgroundColor: Colors.white,
     alignItems: 'center',
     alignSelf: 'center',
-    marginBottom: hp1( 20 ),
-    borderRadius: wp1( 10 ),
+    marginBottom: hp( 20 ),
+    borderRadius: wp( 10 ),
     // elevation: 10,
     // shadowColor: Colors.borderColor,
     // shadowOpacity: 10,
@@ -362,8 +362,8 @@ const styles = StyleSheet.create( {
     // },
   },
   headerImageView: {
-    width: wp1( 46 ),
-    height: hp1( 44 ),
+    width: wp( 46 ),
+    height: hp( 44 ),
     // elevation: 10,
     // shadowColor: Colors.bgColor,
     // shadowOpacity: 10,
@@ -372,22 +372,22 @@ const styles = StyleSheet.create( {
     // },
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: wp1( 23 ),
-    marginRight: wp1( 9 ),
+    borderRadius: wp( 23 ),
+    marginRight: wp( 9 ),
   },
   headerImage: {
-    width: wp1( 46 ),
-    height: hp1( 44 ),
-    borderRadius: wp1( 23 ),
+    width: wp( 46 ),
+    height: hp( 44 ),
+    borderRadius: wp( 23 ),
     resizeMode: 'contain'
   },
   headerImageInitials: {
     alignItems: 'center',
     justifyContent: 'center',
     // backgroundColor: Colors.backgroundColor,
-    width: wp1( 44 ),
-    height: hp1( 47 ),
-    borderRadius: wp1( 44 ) / 2,
+    width: wp( 44 ),
+    height: hp( 47 ),
+    borderRadius: wp( 44 ) / 2,
   },
   modalContentContainer: {
     backgroundColor: Colors.backgroundColor1,
@@ -395,7 +395,7 @@ const styles = StyleSheet.create( {
   avatarImage: {
     ...ImageStyles.circledAvatarContainer,
     ...ImageStyles.thumbnailImageLarge,
-    borderRadius: wp1( 14 )/2,
+    borderRadius: wp( 14 )/2,
     // marginRight: wp( 16 ),
   },
   destinationTitleText: {
@@ -405,41 +405,41 @@ const styles = StyleSheet.create( {
     alignContent: 'center',
     letterSpacing: RFValue( 0.01 )
   },
-  successModalHeaderView: {
-    marginRight: wp( '10%' ),
-  },
-  modalTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
-    width: wp( 30 ),
-    marginLeft: 10
-  },
+  // successModalHeaderView: {
+  //   marginRight: wp( '10%' ),
+  // },
+  // modalTitleText: {
+  //   color: Colors.blue,
+  //   fontSize: RFValue( 18 ),
+  //   fontFamily: Fonts.FiraSansRegular,
+  //   width: wp( 30 ),
+  //   marginLeft: 10
+  // },
   modalInfoText: {
-    marginLeft: wp1( 30 ),
-    marginRight: wp1( 48 ),
+    marginLeft: wp( 30 ),
+    marginRight: wp( 48 ),
     color: Colors.lightTextColor,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.RobotoSlabRegular,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 ),
-    marginBottom: hp1( 20 )
+    marginBottom: hp( 20 )
   },
   modalInfoText1: {
-    marginLeft: wp1( 30 ),
-    marginRight: wp1( 48 ),
+    marginLeft: wp( 30 ),
+    marginRight: wp( 48 ),
     color: '#6C6C6C',
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.RobotoSlabRegular,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 ),
-    marginBottom: hp1( 30 )
+    marginBottom: hp( 30 )
   },
   successModalButtonView: {
-    height: hp1( 60 ),
-    width: wp1( 120 ),
+    height: hp( 60 ),
+    width: wp( 120 ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
@@ -451,20 +451,20 @@ const styles = StyleSheet.create( {
     },
     backgroundColor: Colors.blue,
     alignSelf: 'flex-start',
-    marginLeft: wp1( 30 ),
-    marginTop: hp1( 30 )
+    marginLeft: wp( 30 ),
+    marginTop: hp( 30 )
   },
-  successModalImage: {
-    width: wp( '25%' ),
-    height: hp( '18%' ),
-    marginLeft: 'auto',
-    resizeMode: 'cover'
-  },
+  // successModalImage: {
+  //   width: wp( '25%' ),
+  //   height: hp( '18%' ),
+  //   marginLeft: 'auto',
+  //   resizeMode: 'cover'
+  // },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    height: hp1( 18 ),
-    width: wp1( 70 ),
+    height: hp( 18 ),
+    width: wp( 70 ),
     fontFamily: Fonts.RobotoSlabRegular
   },
 } )

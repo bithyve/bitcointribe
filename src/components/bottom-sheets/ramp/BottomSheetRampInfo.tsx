@@ -7,7 +7,7 @@ import ListStyles from '../../../common/Styles/ListStyles'
 import ImageStyles from '../../../common/Styles/ImageStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+// import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
 import useRampIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseRampIntegrationState'
 import { fetchRampReceiveAddress, fetchRampReservation } from '../../../store/actions/RampIntegration'
@@ -24,7 +24,7 @@ import { LocalizationContext } from '../../../common/content/LocContext'
 import CheckingAcc from '../../../assets/images/svgs/icon_checking.svg'
 import AccountShell from '../../../common/data/models/AccountShell'
 import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
-import { hp as hp1, wp as wp1 } from '../../../common/data/responsiveness/responsive'
+import { hp, wp } from '../../../common/data/responsiveness/responsive'
 
 
 type Props = {
@@ -105,13 +105,13 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         activeOpacity={1}
         onPress={onPress}
         style={{
-          width: wp1( 28 ), height: wp1( 28 ), borderRadius: wp1( 14 ),
+          width: wp( 28 ), height: wp( 28 ), borderRadius: wp( 14 ),
           alignSelf: 'flex-end',
           backgroundColor: Colors.golden, alignItems: 'center', justifyContent: 'center',
-          marginTop: wp1( 10 ), marginRight: wp1( 10 )
+          marginTop: wp( 10 ), marginRight: wp( 10 )
         }}
       >
-        <FontAwesome name="close" color={Colors.white} size={wp1( 19 )} />
+        <FontAwesome name="close" color={Colors.white} size={wp( 19 )} />
       </TouchableOpacity>
       <Text style={[
         ListStyles.modalTitle,
@@ -120,9 +120,9 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           fontSize: RFValue( 18 ),
           letterSpacing: RFValue( 0.27 ),
           lineHeight: RFValue( 22 ),
-          marginBottom: hp1( 25 ),
-          marginLeft: wp1( 30 ),
-          marginRight: wp1( 48 ),
+          marginBottom: hp( 25 ),
+          marginLeft: wp( 30 ),
+          marginRight: wp( 48 ),
         }
       ]}>{rampTitle}</Text>
       <Text style={styles.modalInfoText}>{rampMessage.split( '\n\n' )[ 0 ]}</Text>
@@ -174,7 +174,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         </View>
 
         <ListItem.Content style={{
-          height: hp1( 53 ),
+          height: hp( 53 ),
         }}>
           <ListItem.Subtitle
             style={ListStyles.infoHeaderSubtitleText}
@@ -220,7 +220,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           </View>
         </View>
         <ListItem.Content style={{
-          height: hp1( 46 )
+          height: hp( 46 )
         }}>
           <ListItem.Subtitle
             style={ListStyles.listItemSubtitle}
@@ -260,7 +260,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
 
         </AppBottomSheetTouchableWrapper>
       </View>
-      {rampFromBuyMenu
+      {/* {rampFromBuyMenu
         ? <View style={{
           alignSelf: 'flex-end',
           flexDirection: 'row',
@@ -286,7 +286,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           />
         </View>
         : null
-      }
+      } */}
     </View>
   </View>
   )
@@ -295,16 +295,16 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
 const styles = StyleSheet.create( {
   containerStyle: {
     flexDirection: 'row',
-    marginHorizontal: wp1( 30 ),
-    paddingHorizontal: wp1( 20 ),
-    paddingVertical: hp1( 19 ),
-    width: wp1( 295 ),
-    height: hp1( 100 ),
+    marginHorizontal: wp( 30 ),
+    paddingHorizontal: wp( 20 ),
+    paddingVertical: hp( 19 ),
+    width: wp( 295 ),
+    height: hp( 100 ),
     backgroundColor: Colors.white,
     alignItems: 'center',
     alignSelf: 'center',
-    marginBottom: hp1( 20 ),
-    borderRadius: wp1( 10 ),
+    marginBottom: hp( 20 ),
+    borderRadius: wp( 10 ),
     // elevation: 10,
     // shadowColor: Colors.borderColor,
     // shadowOpacity: 10,
@@ -313,8 +313,8 @@ const styles = StyleSheet.create( {
     // },
   },
   headerImageView: {
-    width: wp1( 46 ),
-    height: hp1( 44 ),
+    width: wp( 46 ),
+    height: hp( 44 ),
     // elevation: 10,
     // shadowColor: Colors.bgColor,
     // shadowOpacity: 10,
@@ -323,22 +323,22 @@ const styles = StyleSheet.create( {
     // },
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: wp1( 23 ),
-    marginRight: wp1( 9 ),
+    borderRadius: wp( 23 ),
+    marginRight: wp( 9 ),
   },
   headerImage: {
-    width: wp1( 46 ),
-    height: hp1( 44 ),
-    borderRadius: wp1( 23 ),
+    width: wp( 46 ),
+    height: hp( 44 ),
+    borderRadius: wp( 23 ),
     resizeMode: 'contain'
   },
   headerImageInitials: {
     alignItems: 'center',
     justifyContent: 'center',
     // backgroundColor: Colors.backgroundColor,
-    width: wp1( 44 ),
-    height: hp1( 47 ),
-    borderRadius: wp1( 44 ) / 2,
+    width: wp( 44 ),
+    height: hp( 47 ),
+    borderRadius: wp( 44 ) / 2,
   },
   modalContentContainer: {
     backgroundColor: Colors.bgColor,
@@ -346,7 +346,7 @@ const styles = StyleSheet.create( {
   avatarImage: {
     ...ImageStyles.circledAvatarContainer,
     ...ImageStyles.thumbnailImageLarge,
-    borderRadius: wp1( 14 )/2,
+    borderRadius: wp( 14 )/2,
     // marginRight: wp( 16 ),
   },
   destinationTitleText: {
@@ -356,38 +356,38 @@ const styles = StyleSheet.create( {
     alignContent: 'center',
     letterSpacing: RFValue( 0.01 )
   },
-  modalTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 18 ),
-    fontFamily: Fonts.RobotoSlabRegular,
-    width: wp( 30 ),
-    marginLeft: 10,
-  },
+  // modalTitleText: {
+  //   color: Colors.blue,
+  //   fontSize: RFValue( 18 ),
+  //   fontFamily: Fonts.RobotoSlabRegular,
+  //   width: wp( 30 ),
+  //   marginLeft: 10,
+  // },
   modalInfoText: {
-    marginLeft: wp1( 30 ),
-    marginRight: wp1( 48 ),
+    marginLeft: wp( 30 ),
+    marginRight: wp( 48 ),
     color: Colors.lightTextColor,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.RobotoSlabRegular,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 ),
-    marginBottom: hp1( 20 )
+    marginBottom: hp( 20 )
   },
   modalInfoText1: {
-    marginLeft: wp1( 30 ),
-    marginRight: wp1( 48 ),
+    marginLeft: wp( 30 ),
+    marginRight: wp( 48 ),
     color: '#6C6C6C',
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.RobotoSlabRegular,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 ),
-    marginBottom: hp1( 30 )
+    marginBottom: hp( 30 )
   },
   successModalButtonView: {
-    height: hp1( 60 ),
-    width: wp1( 120 ),
+    height: hp( 60 ),
+    width: wp( 120 ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 11,
@@ -399,15 +399,15 @@ const styles = StyleSheet.create( {
     },
     backgroundColor: Colors.blue,
     alignSelf: 'flex-start',
-    marginLeft: wp1( 30 ),
-    marginTop: hp1( 30 )
+    marginLeft: wp( 30 ),
+    marginTop: hp( 30 )
   },
-  successModalImage: {
-    width: wp( '25%' ),
-    height: hp( '18%' ),
-    marginLeft: 'auto',
-    resizeMode: 'cover'
-  },
+  // successModalImage: {
+  //   width: wp( '25%' ),
+  //   height: hp( '18%' ),
+  //   marginLeft: 'auto',
+  //   resizeMode: 'cover'
+  // },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
