@@ -117,11 +117,10 @@ const HomeHeader = ( {
     ( state ) => state.cloud.cloudBackupStatus
   )
 
-  const CurrencyCode = useSelector(
-    ( state ) => state.preferences.currencyCode
-  )
   const cloudErrorMessage: string = useSelector( ( state ) => state.cloud.cloudErrorMessage )
   const trustedContacts = useSelector( ( state ) => state.trustedContacts.contacts )
+  // const currencyCode = useSelector( ( state ) => state.preferences.currencyCode )
+
   const stringsBhr = translations[ 'bhr' ]
   const common = translations[ 'common' ]
   const iCloudErrors = translations[ 'iCloudErrors' ]
@@ -166,24 +165,24 @@ const HomeHeader = ( {
     channelKey?: string;
   }, any] = useState( defaultKeeperObj )
 
-  const accountShell = useSourceAccountShellForSending()
-  const balance = AccountShell.getTotalBalance( accountShell )
+  // const accountShell = useSourceAccountShellForSending()
+  // const balance = AccountShell.getTotalBalance( accountShell )
 
-  const amountToDisplay = useMemo( () => {
-    const divisor = [ BitcoinUnit.SATS, BitcoinUnit.TSATS ].includes( bitcoinUnit ) ? 1 : SATOSHIS_IN_BTC
+  // const amountToDisplay = useMemo( () => {
+  //   const divisor = [ BitcoinUnit.SATS, BitcoinUnit.TSATS ].includes( bitcoinUnit ) ? 1 : SATOSHIS_IN_BTC
 
-    return balance / divisor
-  }, [ balance, bitcoinUnit ] )
+  //   return balance / divisor
+  // }, [ balance, bitcoinUnit ] )
 
-  const formattedBalanceText = isTestAccount ?
-    UsNumberFormat( amountToDisplay )
-    : useFormattedAmountText( amountToDisplay )
+  // const formattedBalanceText = isTestAccount ?
+  //   UsNumberFormat( amountToDisplay )
+  //   : useFormattedAmountText( amountToDisplay )
 
-  const formattedUnitText = isTestAccount ?
-    displayNameForBitcoinUnit( BitcoinUnit.TSATS )
-    : useFormattedUnitText( {
-      bitcoinUnit, currencyKind
-    } )
+  // const formattedUnitText = isTestAccount ?
+  //   displayNameForBitcoinUnit( BitcoinUnit.TSATS )
+  //   : useFormattedUnitText( {
+  //     bitcoinUnit, currencyKind
+  //   } )
 
   useEffect( () => {
     // const keepers = []
@@ -570,6 +569,10 @@ const HomeHeader = ( {
     )
   }
 
+  const numberWithCommas = ( x ) => {
+    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+  }
+
   return (
     <View style={{
       ...styles.headerViewContainer
@@ -693,7 +696,10 @@ const HomeHeader = ( {
         }}>
           <BalanceCurrencyIcon />
         </View>
-        <Text style={styles.amountText}>40,005</Text>
+        <Text style={styles.amountText}>
+          {exchangeRates ?
+            numberWithCommas( exchangeRates[ fiatCurrencyCode ]?.last.toFixed( 2 ) )
+            : ''}</Text>
       </View>
       {/* {keepers.length > 0 &&
                   <>
