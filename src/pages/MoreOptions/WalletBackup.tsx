@@ -157,6 +157,7 @@ const WalletBackup = ( props, navigation ) => {
   const [ emptyAccountErrorModal, setEmptyAccountErrorModal ] = useState( false )
   const [ multipleAcccountModal, setMultipleAcccountModal ] = useState( false )
   const [ checkingAddress, setCheckingAddress ] = useState( null )
+  const fromHome = props.navigation.getParam( 'fromHome' )
 
   let localPrimarySubAccount = null
   let localAccountShell = null
@@ -201,7 +202,9 @@ const WalletBackup = ( props, navigation ) => {
 
   function handleBackButtonClick() {
     // props.navigation.navigate( 'Home' )
-    props.navigation.navigate( 'MoreOptions' )
+    if( fromHome )
+      props.navigation.navigate( 'NewHome' )
+    else props.navigation.navigate( 'MoreOptions' )
     return true
   }
 
@@ -808,7 +811,9 @@ const WalletBackup = ( props, navigation ) => {
           onPress={() => {
             // props.navigation.pop()
             // props.navigation.navigate( 'Home' )
-            props.navigation.navigate( 'MoreOptions' )
+            if( fromHome )
+              props.navigation.navigate( 'NewHome' )
+            else props.navigation.navigate( 'MoreOptions' )
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
