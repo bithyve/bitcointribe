@@ -21,6 +21,10 @@ import { newAccountsInfo } from '../../../store/sagas/accounts'
 import { addNewAccountShells } from '../../../store/actions/accounts'
 import DropDown from '../../../utils/Dropdown'
 import { LocalizationContext } from '../../../common/content/LocContext'
+import CheckingAcc from '../../../assets/images/svgs/icon_checking.svg'
+import AccountShell from '../../../common/data/models/AccountShell'
+import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+
 
 type Props = {
   wyreFromDeepLink: boolean | null;
@@ -89,35 +93,74 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
     wyreMessage = strings.wyreProcessed
     wyreTitle = strings.Ordersuccessful
   }
-  return ( <View style={{
-    ...styles.modalContentContainer
-  }}>
-    <View style={{
-      // height: hp( 74 )
-    }}>
 
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={onPress}
-        style={{
-          width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
-          alignSelf: 'flex-end',
-          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-          marginTop: wp( 3 ), marginRight: wp( 3 )
-        }}
+  const accShell = useActiveAccountShells()
+
+  const checkingBal = AccountShell.getTotalBalance( accShell[ 1 ] )
+
+  return (
+    <View
+      style={{
+        ...styles.modalContentContainer,
+      }}
+    >
+      <View
+        style={
+          {
+            // height: hp( 74 )
+          }
+        }
       >
-        <FontAwesome name="close" color={Colors.white} size={19} style={{
-          // marginTop: hp( 0.5 )
-        }} />
-      </TouchableOpacity>
-      {/* <Text style={styles.modalTitleText}>{wyreTitle}</Text> */}
-      <View style={styles.successModalHeaderView}>
-        <Text style={ListStyles.modalTitle}>{wyreTitle}</Text>
-        <Text style={{
-          ...styles.modalInfoText
-        }}>{wyreMessage}</Text>
-      </View>
-      {/* <TouchableOpacity
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={onPress}
+          style={{
+            width: wp( 7 ),
+            height: wp( 7 ),
+            borderRadius: wp( 7 / 2 ),
+            alignSelf: 'flex-end',
+            backgroundColor: Colors.golden,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: wp( 3 ),
+            marginRight: wp( 3 ),
+          }}
+        >
+          <FontAwesome
+            name="close"
+            color={Colors.white}
+            size={19}
+            style={
+              {
+                // marginTop: hp( 0.5 )
+              }
+            }
+          />
+        </TouchableOpacity>
+        {/* <Text style={styles.modalTitleText}>{wyreTitle}</Text> */}
+        <View style={styles.successModalHeaderView}>
+          <Text
+            style={[
+              ListStyles.modalTitle,
+              {
+                fontFamily: Fonts.RobotoSlabRegular,
+                fontSize: RFValue( 18 ),
+                letterSpacing: RFValue( 0.27 ),
+                lineHeight: RFValue( 22 ),
+                marginBottom: hp( 3 ),
+              },
+            ]}
+          >
+            {wyreTitle}
+          </Text>
+          <Text style={styles.modalInfoText}>
+            {wyreMessage.split( '\n\n' )[ 0 ]}
+          </Text>
+          <Text style={styles.modalInfoText1}>
+            {wyreMessage.split( '\n\n' )[ 1 ]}
+          </Text>
+        </View>
+        {/* <TouchableOpacity
       onPress={() => showDropdown( true )}
       style={styles.containerStyle}>
       <View style={styles.headerImageView}>
@@ -154,121 +197,158 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
         showDropdown( false ) }}
       dropdownBoxList={dropdownBoxList} />
     ) : null} */}
-      <View style={styles.containerStyle}>
-        <View style={styles.headerImageView}>
-          <View style={styles.headerImageInitials}>
-            <Image
-              source={require( '../../../assets/images/icons/wyre_notext_small.png' )}
-              style={styles.headerImage}
-              resizeMode="contain"
-            />
+        <View style={styles.containerStyle}>
+          <View style={styles.headerImageView}>
+            <View style={styles.headerImageInitials}>
+              <Image
+                source={require( '../../../assets/images/icons/wyre_notext_small.png' )}
+                style={styles.headerImage}
+                resizeMode="contain"
+              />
+            </View>
           </View>
+          <ListItem.Content
+            style={{
+              flex: 1,
+            }}
+          >
+            <ListItem.Subtitle
+              style={ListStyles.infoHeaderSubtitleText}
+              numberOfLines={1}
+            >
+              {strings.bitcoinWill}
+            </ListItem.Subtitle>
+
+            <ListItem.Title
+              style={styles.destinationTitleText}
+              numberOfLines={1}
+            >
+              Checking Account
+            </ListItem.Title>
+            <ListItem.Subtitle
+              style={[
+                ListStyles.infoHeaderSubtitleText,
+                {
+                  alignSelf: 'baseline',
+                  color: '#269640',
+                  fontFamily: Fonts.RobotoSlabRegular,
+                },
+              ]}
+              numberOfLines={1}
+            >
+              Balance {checkingBal} sats
+            </ListItem.Subtitle>
+          </ListItem.Content>
         </View>
-        <ListItem.Content style={{
-          flex: 1,
-        }}>
-          <ListItem.Subtitle
-            style={ListStyles.infoHeaderSubtitleText}
-            numberOfLines={1}
-          >
-            {strings.bitcoinWill}
-          </ListItem.Subtitle>
 
-          <ListItem.Title
-            style={styles.destinationTitleText}
-            numberOfLines={1}
-          >
-            Checking Account
-          </ListItem.Title>
-        </ListItem.Content>
-      </View>
-
-      <View style={styles.containerStyle}>
-        <View style={styles.headerImageView}>
-          <View style={styles.headerImageInitials}>
-            <Image
-              source={require( '../../../assets/images/icons/icon_address_type.png' )}
-              style={styles.headerImage}
-              resizeMode="contain"
-            />
+        <View style={styles.containerStyle}>
+          <View style={styles.headerImageView}>
+            <View style={styles.headerImageInitials}>
+              {/* <Image
+                source={require( '../../../assets/images/icons/icon_address_type.png' )}
+                style={styles.headerImage}
+                resizeMode="contain"
+              /> */}
+              <Text style={{
+                color: '#4D4D4D',
+                fontSize: RFValue( 27 ),
+                textAlign: 'center',
+                fontFamily: Fonts.RobotoSlabMedium,
+                lineHeight: RFValue( 27 )
+              }}>
+                @
+              </Text>
+            </View>
           </View>
+          <ListItem.Content
+            style={{
+              flex: 1,
+            }}
+          >
+            <ListItem.Subtitle
+              style={ListStyles.infoHeaderSubtitleText}
+              numberOfLines={1}
+            >
+              {strings.bitcoinWill}
+            </ListItem.Subtitle>
+
+            <ListItem.Title
+              style={styles.destinationTitleText}
+              numberOfLines={1}
+            >
+              {wyreReceiveAddress}
+            </ListItem.Title>
+          </ListItem.Content>
         </View>
-        <ListItem.Content style={{
-          flex: 1
-        }}>
-          <ListItem.Subtitle
-            style={ListStyles.infoHeaderSubtitleText}
-            numberOfLines={1}
-          >
-            {strings.bitcoinWill}
-          </ListItem.Subtitle>
 
-          <ListItem.Title
-            style={styles.destinationTitleText}
-            numberOfLines={1}
-          >
-            {wyreReceiveAddress}
-          </ListItem.Title>
-        </ListItem.Content>
-      </View>
-
-      <View style={{
-        flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start',
-      }} >
-        <AppBottomSheetTouchableWrapper
-          disabled={wyreFromBuyMenu ? hasButtonBeenPressed : false}
-          onPress={wyreFromBuyMenu ? handleProceedButtonPress : onClickSetting}
+        <View
           style={{
-            ...styles.successModalButtonView
+            flexDirection: 'column',
+            marginTop: 'auto',
+            alignItems: 'flex-start',
           }}
         >
-          <Text style={styles.proceedButtonText}>{wyreFromBuyMenu ? strings.buyBitCoin : common.ok}</Text>
-
-        </AppBottomSheetTouchableWrapper>
-      </View>
-      {wyreFromBuyMenu
-        ? <View style={{
-          alignSelf: 'flex-end',
-          flexDirection: 'row',
-          alignItems: 'center',
-          alignContent: 'center',
-          marginTop: hp( '1.5' ),
-          marginRight: wp( '5%' ),
-          marginBottom: hp( '2%' )
-        }}>
-          <Text style={{
-            fontStyle: 'italic',
-            fontSize: RFValue( 11 ),
-            color: Colors.textColorGrey
-          }}>
-            {strings.Poweredby}
-          </Text>
-          <Image
-            source={require( '../../../assets/images/icons/wyre_logo_large.png' )}
+          <AppBottomSheetTouchableWrapper
+            disabled={wyreFromBuyMenu ? hasButtonBeenPressed : false}
+            onPress={
+              wyreFromBuyMenu ? handleProceedButtonPress : onClickSetting
+            }
             style={{
-              marginLeft: 5,
-              width: 62,
-              height: 27,
+              ...styles.successModalButtonView,
             }}
-          />
+          >
+            <Text style={styles.proceedButtonText}>
+              {wyreFromBuyMenu ? strings.buyBitCoin : common.ok}
+            </Text>
+          </AppBottomSheetTouchableWrapper>
         </View>
-        : null
-      }
+        {wyreFromBuyMenu ? (
+          <View
+            style={{
+              alignSelf: 'flex-end',
+              flexDirection: 'row',
+              alignItems: 'center',
+              alignContent: 'center',
+              marginTop: hp( '1.5' ),
+              marginRight: wp( '5%' ),
+              marginBottom: hp( '2%' ),
+            }}
+          >
+            <Text
+              style={{
+                fontStyle: 'italic',
+                fontSize: RFValue( 11 ),
+                color: Colors.textColorGrey,
+              }}
+            >
+              {strings.Poweredby}
+            </Text>
+            <Image
+              source={require( '../../../assets/images/icons/wyre_logo_large.png' )}
+              style={{
+                marginLeft: 5,
+                width: 62,
+                height: 27,
+              }}
+            />
+          </View>
+        ) : null}
+      </View>
     </View>
-  </View>
   )
 }
 
 const styles = StyleSheet.create( {
   containerStyle: {
     flexDirection: 'row',
-    marginLeft: wp( '3%' ),
-    // alignSelf: 'center',
-    width: wp( '85%' ),
-    height: hp( '11%' ),
+    marginEnd: wp( '4 %' ),
+    paddingHorizontal: wp( 5 ),
+    paddingVertical: wp( 3 ),
+    width: wp( '80%' ),
     backgroundColor: Colors.white,
     alignItems: 'center',
-    marginBottom: hp ( 2 ),
+    alignSelf: 'center',
+    marginBottom: hp( 3 ),
     borderRadius: wp( 2 ),
     // elevation: 10,
     // shadowColor: Colors.borderColor,
@@ -280,28 +360,30 @@ const styles = StyleSheet.create( {
   headerImageView: {
     width: wp( '17%' ),
     height: wp( '17%' ),
-    borderColor: 'red',
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 10,
-    shadowOffset: {
-      width: 2, height: 2
-    },
-    backgroundColor: Colors.white,
+    // borderColor: 'red',
+    // elevation: 10,
+    // shadowColor: Colors.borderColor,
+    // shadowOpacity: 10,
+    // shadowOffset: {
+    //   width: 2, height: 2
+    // },
+    // backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
+    alignSelf: 'center',
     borderRadius: wp( '17%' ) / 2,
     margin: 5
   },
   headerImage: {
-    width: wp( '7%' ),
-    height: wp( '7%' ),
-    borderRadius: wp( '7%' ) / 2,
+    width: wp( '10%' ),
+    height: wp( '10%' ),
+    borderRadius: wp( '10%' ) / 2,
+    resizeMode: 'contain'
   },
   headerImageInitials: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.backgroundColor,
+    backgroundColor: '#F9F9F9',
     width: wp( '15%' ),
     height: wp( '15%' ),
     borderRadius: wp( '15%' ) / 2,
@@ -338,11 +420,23 @@ const styles = StyleSheet.create( {
     marginRight: wp( '11%' ),
     color: Colors.lightTextColor,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 ),
     marginTop: wp( 1.5 ),
+    marginBottom: wp( 1 )
+  },
+  modalInfoText1: {
+    marginLeft: wp( '7%' ),
+    marginRight: wp( '12%' ),
+    color: '#6C6C6C',
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.RobotoSlabRegular,
+    textAlign: 'justify',
+    letterSpacing: RFValue( 0.6 ),
+    lineHeight: RFValue( 18 ),
+    marginTop: wp( 0 ),
     marginBottom: wp( 3 )
   },
   successModalButtonView: {
@@ -373,7 +467,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.RobotoSlabRegular
   },
 } )
 

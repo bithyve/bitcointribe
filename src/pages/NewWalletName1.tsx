@@ -213,7 +213,7 @@ export default function NewWalletName( props ) {
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
-              <FontAwesome name="chevron-left" color={"#4286F5"} size={17} />
+              <FontAwesome name="chevron-left" color={Colors.blue} size={17} />
             </View>
           </TouchableOpacity>
         </View>
@@ -243,7 +243,7 @@ export default function NewWalletName( props ) {
               }}
               secondStyle={{
                 fontFamily: Fonts.RobotoSlabRegular,
-                color: "#4286F5",
+                color: Colors.blue,
               }}
             />
             <TextInput
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
-    backgroundColor: "#4286F5",
+    backgroundColor: Colors.blue,
     elevation: 10,
     shadowColor: '#4286F52E',
     shadowOpacity: 1,

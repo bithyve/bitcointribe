@@ -36,8 +36,8 @@ const ToggleContainer = ( ) => {
     <View style={styles.headerToggleSwitchContainer}>
       <CurrencyKindToggleSwitch
         fiatCurrencyCode={currencyCode}
-        activeOnImage={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
-        inactiveOnImage={require( '../../assets/images/icons/icon_bitcoin_dark.png' )}
+        activeOnImage={require( '../../assets/images/icons/icon_bitcoin_yellow.png' )}
+        inactiveOnImage={require( '../../assets/images/icons/icon_bitcoin_yellow.png' )}
         activeOffImage={
           materialIconCurrencyCodes.includes( currencyCode ) ?
             <MaterialCurrencyCodeIcon

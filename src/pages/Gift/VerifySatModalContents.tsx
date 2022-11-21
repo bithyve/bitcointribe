@@ -30,7 +30,7 @@ export default function VerifySatModalContents( props ) {
               marginRight: wp( '3%' ),
               width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
               alignSelf: 'flex-end',
-              backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+              backgroundColor: Colors.golden, alignItems: 'center', justifyContent: 'center',
               // marginTop: wp( 3 )
             }}
           >
@@ -55,7 +55,7 @@ export default function VerifySatModalContents( props ) {
                     ? props.headerTextColor
                     : Colors.blue,
                   fontSize: RFValue( 18 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.RobotoSlabRegular,
                   letterSpacing: 0.01,
                   // marginTop: RFValue( 20 )
                 // width: wp( 65 )
@@ -75,7 +75,8 @@ export default function VerifySatModalContents( props ) {
           </View>
           {props.info ? (
             <View style={{
-              flexDirection:'row', alignItems:'flex-start',
+              flexDirection:'row',
+              alignItems:'flex-start',
             }}>
               <Text
                 style={{
@@ -113,14 +114,15 @@ export default function VerifySatModalContents( props ) {
               width: RFValue( 203 ), height: RFValue( 136 ), marginTop:RFValue( 27 )
             }}/>
           <View style={{
-            flexDirection:'row', marginTop: RFValue( 25 )
+            flexDirection:'row', marginTop: RFValue( 25 ),
+            marginEnd: 50,
             // , alignItems:'flex-start',
           }}>
             {/* <View style={{
               width:RFValue( 5 ), height:RFValue( 5 ), borderRadius: RFValue( 5 ), backgroundColor: Colors.blue, marginTop: RFValue( 5 )
             }}/> */}
             <Text style={{
-              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, marginStart: RFValue( 5 ), textAlign: 'center'
+              fontSize: RFValue( 12 ), letterSpacing: RFValue( 0.6 ), lineHeight: RFValue( 18 ), color:Colors.textColorGrey, fontFamily: Fonts.RobotoSlabRegular, marginStart: RFValue( 5 ), textAlign: 'left'
             }}>
               {props.subPoints}
             </Text>
@@ -224,10 +226,10 @@ const styles = StyleSheet.create( {
     // marginTop: wp( '1%' ),
   },
   modalInfoText: {
-    color: Colors.textColorGrey,
+    color: Colors.lightTextColor,
     // opacity: 1,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     letterSpacing: 0.6
   },
   successModalAmountView: {
@@ -273,7 +275,7 @@ const styles = StyleSheet.create( {
     lineHeight:14,
     color: Colors.blue,
     letterSpacing: 0.7,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.RobotoSlabRegular,
   },
   scInfoText:{
     color: Colors.textColorGrey,

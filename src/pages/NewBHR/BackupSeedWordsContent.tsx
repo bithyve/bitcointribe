@@ -7,7 +7,7 @@ import {
   Platform,
 } from 'react-native'
 import Colors from '../../common/Colors'
-import _ from 'underscore'
+// import _ from 'underscore'
 import ModalContainer from '../../components/home/ModalContainer'
 import BottomInputModalContainer from '../../components/home/BottomInputModalContainer'
 
@@ -38,6 +38,7 @@ const BackupSeedWordsContent = ( props ) => {
   const [ seedData, setSeedData ] = useState( [] )
   const [ seedPosition, setSeedPosition ] = useState( 0 )
   const [ headerTitle, setHeaderTitle ]=useState( 'Backup phrase' )
+  const [ number, setNumber ] = useState( 1 )
   // const [ headerTitle, setHeaderTitle ]=useState( 'First 6 Seed Words' )
 
   const dispatch = useDispatch()
@@ -132,11 +133,13 @@ const BackupSeedWordsContent = ( props ) => {
       <BottomInputModalContainer onBackground={() => setConfirmSeedWordModal( false )} visible={confirmSeedWordModal}
         closeBottomSheet={() => {}} showBlurView={true}>
         <ConfirmSeedWordsModal
-          proceedButtonText={'Next'}
+          proceedButtonText={'Proceed'}
           seedNumber={seedRandomNumber ? seedRandomNumber[ seedPosition ] : 0}
           onPressProceed={( word ) => {
+            setNumber( cur => cur + 1 )
             setConfirmSeedWordModal( false )
             if( word == '' ){
+              setNumber( 1 )
               setTimeout( () => {
                 setInfo( 'Please enter backup phrase' )
                 setShowAlertModal( true )
@@ -153,6 +156,7 @@ const BackupSeedWordsContent = ( props ) => {
                 setConfirmSeedWordModal( true )
               }, 500 )
             }else {
+              setNumber( 1 )
               setSeedWordModal( true )
               const dbWallet =  dbManager.getWallet()
               if( dbWallet!=undefined && dbWallet!=null ){
@@ -175,16 +179,17 @@ const BackupSeedWordsContent = ( props ) => {
               }
               dispatch( updateSeedHealth() )
               AsyncStorage.setItem( 'walletBackupDate', JSON.stringify( moment( Date() ) ) )
-
               // dispatch(setSeedBackupHistory())
             }
           }}
-          bottomBoxInfo={true}
+          bottomBoxInfo={false}
           onPressIgnore={() => {
+            setNumber( 1 )
             setConfirmSeedWordModal( false )
             props.navigation.goBack()
 
           } }
+          number={ ( seedData.length === 24 ? 4 : 0 ) + number}
           isIgnoreButton={true}
           cancelButtonText={'Start Over'}
         />
@@ -192,9 +197,14 @@ const BackupSeedWordsContent = ( props ) => {
       <ModalContainer onBackground={() => setSeedWordModal( false )} visible={seedWordModal}
         closeBottomSheet={() => setSeedWordModal( false )}>
         <SeedBacupModalContents
-          title={'Backup phrase \nSuccessful'}
-          info={'You have successfully confirmed your backup\n\nMake sure you store the words in a safe place. The app will request you to confirm the words periodically to ensure you have the access'}
-          proceedButtonText={'View Health'}
+          closeModal={() => {
+            setNumber( 1 )
+            setSeedWordModal( false )
+            props.navigation.goBack()
+          }}
+          title={'Seed Words \nBackup Successful'}
+          info={'You have successfully confirmed your backup\n\n\nMake sure you store the words in a safe place.\n\nThe app will request you to confirm the words periodically to ensure you have the access'}
+          proceedButtonText={'Home'}
           onPressProceed={() => {
             RNPreventScreenshot.enabled( false )
             setSeedWordModal( false )

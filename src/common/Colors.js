@@ -10,9 +10,11 @@ const Colors = {
   lightBlue: '#77B9EB',
   skyBlue: '#006DB42E',
   darkBlue: '#006DB4',
-  blue: '#006CB4',
+  // blue: '#006CB4',
+  blue: '#4286F5',
   greyDrop: '#f2f0f4',
   goldenYellow: '#FABC05',
+  golden: '#F9C21F',
   green: '#70C1B3',
   purple: '#9D87E0',
   grayShade: '#53D592',
@@ -86,6 +88,9 @@ const Colors = {
   gray13: '#525252',
   black2: '#073B36',
   gray14:'#313131',
-  gray15: '#727272'
+  gray15: '#727272',
+
+  cream: '#FFE09D',
+  blue1: '#94B4F2'
 }
 export default Colors

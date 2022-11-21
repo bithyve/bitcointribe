@@ -200,7 +200,8 @@ const WalletBackup = ( props, navigation ) => {
   }, [] )
 
   function handleBackButtonClick() {
-    props.navigation.navigate( 'Home' )
+    // props.navigation.navigate( 'Home' )
+    props.navigation.navigate( 'MoreOptions' )
     return true
   }
 
@@ -806,7 +807,8 @@ const WalletBackup = ( props, navigation ) => {
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
             // props.navigation.pop()
-            props.navigation.navigate( 'Home' )
+            // props.navigation.navigate( 'Home' )
+            props.navigation.navigate( 'MoreOptions' )
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>

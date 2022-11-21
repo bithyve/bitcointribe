@@ -4,10 +4,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
+import { hp, wp } from '../../common/data/responsiveness/responsive'
 import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { LocalizationContext } from '../../common/content/LocContext'
@@ -27,10 +24,10 @@ export default function SeedBacupModalContents( props ) {
         <AppBottomSheetTouchableWrapper
           onPress={() => props.closeModal()}
           style={{
-            width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+            width: wp( 28 ), height: wp( 28 ), borderRadius: wp( 14 ),
             alignSelf: 'flex-end',
-            backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-            marginTop: wp( 3 ), marginRight: wp( 3 )
+            backgroundColor: Colors.golden, alignItems: 'center', justifyContent: 'center',
+            marginTop: wp( 13 ), marginRight: wp( 10 )
           }}
         >
           <FontAwesome name="close" color={Colors.white} size={19} style={{
@@ -39,7 +36,7 @@ export default function SeedBacupModalContents( props ) {
         </AppBottomSheetTouchableWrapper>
         }
         <View style={[ styles.successModalHeaderView, {
-          marginTop: props.closeModal ? wp( '1%' ) : wp( '8%' )
+          marginTop: props.closeModal ? wp( 10 ) : wp( 41 ),
         } ]}>
           <Text
             style={{
@@ -47,8 +44,9 @@ export default function SeedBacupModalContents( props ) {
                 ? props.headerTextColor
                 : Colors.blue,
               fontSize: RFValue( 18 ),
-              fontFamily: Fonts.FiraSansRegular,
-              letterSpacing: 0.54
+              fontFamily: Fonts.RobotoSlabRegular,
+              letterSpacing: 0.54,
+              lineHeight: RFValue( 22 )
               // width: wp( 65 )
             }}
           >
@@ -56,22 +54,21 @@ export default function SeedBacupModalContents( props ) {
             {props.titleNextLine ? '\n' + props.titleNextLine : null}
           </Text>
           {props.info ? (
-            <Text
-              style={{
-                ...styles.modalInfoText,
-                marginTop: wp( '1.5%' ),
-                // marginRight: wp( 9 )
-
-                color: Colors.lightTextColor,
-                fontSize: RFValue( 11 ),
-                fontFamily: Fonts.FiraSansRegular,
-                // marginHorizontal: wp( '5%' ),
-                // marginTop: 5
-              }}
-            >
-              {props.info}
-            </Text>
-          ) : null}
+            props.info.split( '\n\n\n' ).map( ( d, i ) => (
+              <Text
+                key={i}
+                style={{
+                  ...styles.modalInfoText,
+                  marginTop: wp( 5 ),
+                  color: i === 0 ? Colors.lightTextColor : Colors.textColorGrey,
+                  fontSize: RFValue( 12 ),
+                  fontFamily: Fonts.RobotoSlabRegular,
+                  marginBottom: i === 0 ? hp( 92 ) : 0
+                  // marginHorizontal: wp( '5%' ),
+                }}
+              >
+                {d}
+              </Text> ) ) ) : null}
           {props.errPoints &&
             <View style={{
               marginTop: hp( 3 ),
@@ -97,9 +94,9 @@ export default function SeedBacupModalContents( props ) {
           }
         </View>
         { props.bottomBoxInfo && <View style={{
-          marginTop: hp( '2%' ),
+          marginTop: hp( 10 ),
           marginBottom: hp( 1 ),
-          marginLeft: wp ( '2%' )
+          marginLeft: wp ( 3 )
         }}>
           <BottomInfoBox
             title={'Note:'}
@@ -157,7 +154,7 @@ export default function SeedBacupModalContents( props ) {
             <Text
               style={{
                 ...styles.modalInfoText,
-                marginBottom: hp( '1%' ),
+                marginBottom: hp( 5 ),
                 marginTop: 'auto',
                 marginRight: wp( 10 )
               }}
@@ -168,9 +165,9 @@ export default function SeedBacupModalContents( props ) {
         ) : null}
         <View
           style={{
-            height: hp( '12%' ),
+            height: wp( 103 ),
             flexDirection: 'row',
-            marginTop: 'auto',
+            marginTop: 10,
             alignItems: 'flex-end',
           }}
         >
@@ -191,7 +188,8 @@ export default function SeedBacupModalContents( props ) {
                 shadowColor: props.buttonShadowColor
                   ? props.buttonShadowColor
                   : Colors.shadowBlue,
-
+                width: wp( 120 ),
+                alignItems: 'center'
               }}
               delayPressIn={0}
             >
@@ -212,8 +210,8 @@ export default function SeedBacupModalContents( props ) {
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressIgnore()}
               style={{
-                height: wp( '12%' ),
-                width: wp( '27%' ),
+                height: wp( 18 ),
+                width: wp( 41 ),
                 justifyContent: 'center',
                 alignItems: 'center',
                 alignSelf: 'center',
@@ -255,11 +253,12 @@ const styles = StyleSheet.create( {
   modalContentContainer: {
     // height: '100%',
     backgroundColor: Colors.backgroundColor,
+    height: 'auto',
   },
   successModalHeaderView: {
-    marginRight: wp( '8%' ),
-    marginLeft: wp( '8%' ),
-    marginTop: wp( '1%' ),
+    marginRight: wp( 116 ),
+    marginLeft: wp( 30 ),
+    marginTop: hp( 41 ),
   },
   modalInfoText: {
     color: Colors.textColorGrey,
@@ -270,34 +269,29 @@ const styles = StyleSheet.create( {
   },
   successModalAmountView: {
     justifyContent: 'center',
-    marginRight: wp( '12%' ),
-    marginLeft: wp( '8%' ),
-    marginTop: hp( '2%' ),
+    marginRight: wp( 18 ),
+    marginLeft: wp( 12 ),
+    marginTop: hp( 10 ),
   },
   successModalButtonView: {
-    height: wp( '12%' ),
-    minWidth: wp( '22%' ),
-    paddingLeft: wp( '5%' ),
-    paddingRight: wp( '5%' ),
+    height: hp( 50 ),
+    minWidth: wp( 120 ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
     backgroundColor: Colors.blue,
     alignSelf: 'center',
-    marginLeft: wp( '8%' ),
-    marginBottom:hp ( '3%' ),
+    marginLeft: wp( 30 ),
+    marginBottom: hp ( 40 ),
   },
   successModalImage: {
-    width: wp( '30%' ),
-    height: wp( '30%' ),
+    width: wp( 103 ),
+    height: hp( 128 ),
     marginLeft: 'auto',
-    resizeMode: 'stretch',
-    marginRight: wp( -3 ),
-    marginBottom: wp( -3 ),
   },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.RobotoSlabRegular,
   },
 } )

@@ -21,7 +21,7 @@ const RestoreSeedHeaderComponent = ( props ) => {
           height: wp( '10%' ), width: wp( '10%' ), alignItems: 'center'
         }}
       >
-        <FontAwesome name="chevron-left" color={"#4286F5"} size={20} />
+        <FontAwesome name="chevron-left" color={Colors.blue} size={20} />
       </TouchableOpacity>
       <Text style={styles.titleText}>{props.selectedTitle}</Text>
     </View>
@@ -49,7 +49,7 @@ const styles = StyleSheet.create( {
   },
   titleText: {
     marginLeft: wp( '4%' ),
-    color: '#4286F5',
+    color: Colors.blue,
     fontSize: RFValue( 25 ),
     fontFamily: Fonts.RobotoSlabRegular,
   },

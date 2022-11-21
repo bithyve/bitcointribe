@@ -742,7 +742,9 @@ class GiftScreen extends React.Component<
             <GiftBoxComponent
               titleText={'Available Gifts'}
               subTitleText={'All the gifts you have created, not sent, \nand gifts you have received are shown here'}
-              onPress={() => this.props.navigation.navigate( 'ManageGifts',{giftType : '0'} )}
+              onPress={() => this.props.navigation.navigate( 'ManageGifts', {
+                giftType : '0'
+              } )}
               image={<Gifts />}
             />
             <GiftBoxComponent
@@ -780,10 +782,10 @@ class GiftScreen extends React.Component<
             scTitleText={'TM'}
             info={'Get your SATSCARD'}
             info1={'TM'}
-            info2={' ready for verification'}
+            info2={' ready to tap on your phone'}
             proceedButtonText={'Detect SATSCARD'}
             proceedButtonSubText={'TM'}
-            subPoints={'Touch your SATSCARD™ on your phone after clicking \'Detect SATSCARD™'}
+            subPoints={'Touch your SATSCARD™ on your phone after clicking \'Detect SATSCARD™\''}
             bottomImage={require( '../../assets/images/satCards/illustration.png' )}
             onCloseClick={this.onCloseClick}
             onPressProceed={this.onViewHealthClick}

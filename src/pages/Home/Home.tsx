@@ -83,6 +83,7 @@ import { credsAuthenticated } from '../../store/actions/setupAndAuth'
 import { setShowAllAccount } from '../../store/actions/accounts'
 import HomeContainer from './HomeContainer'
 import ModalContainer from '../../components/home/ModalContainer'
+import Fonts from '../../common/Fonts'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -453,7 +454,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BottomSheetKind.TAB_BAR_BUY_MENU:
           return (
             <>
-              <BottomSheetHeader title="Buy Bitcoin" onPress={this.closeBottomSheet} />
+              <BottomSheetHeader font={Fonts.RobotoSlabRegular} title="Buy Bitcoin" onPress={this.closeBottomSheet} />
 
               <BuyBitcoinHomeBottomSheet
                 onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
@@ -657,13 +658,13 @@ const styles = StyleSheet.create( {
     height: hp( '71.46%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor1,
-    borderTopLeftRadius: 25,
-    shadowColor: 'black',
-    shadowOpacity: 0.4,
-    shadowOffset: {
-      width: 2,
-      height: -1,
-    },
+    // borderTopLeftRadius: 25,
+    // shadowColor: 'black',
+    // shadowOpacity: 0.4,
+    // shadowOffset: {
+    //   width: 2,
+    //   height: -1,
+    // },
     flexDirection: 'column',
     justifyContent: 'space-around'
   },

@@ -186,9 +186,12 @@ class FriendsAndFamilyScreen extends React.Component<
 
       const isGuardian =[ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.KEEPER_WARD, TrustedContactRelationTypes.PRIMARY_KEEPER ].includes( contact.relationType )
       const isWard = [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
+      console.log( 'skk isGuardian1', JSON.stringify( isGuardian ) )
+      console.log( 'skk isWard1', JSON.stringify( isWard ) )
       if( contact.isActive ){
         if( isGuardian || isWard ){
-          if( isGuardian && ( contact.contactDetails.contactName != 'Personal Copy' && contact.contactDetails.contactName != 'Personal Device 1' && contact.contactDetails.contactName != 'Personal Device 2' && contact.contactDetails.contactName != 'Personal Device 3' ) ) keepers.push(  makeContactRecipientDescription(
+          if( isGuardian && ( contact.contactDetails.contactName != 'Personal Copy' && contact.contactDetails.contactName != 'Personal Device 1' && contact.contactDetails.contactName != 'Personal Device 2' && contact.contactDetails.contactName != 'Personal Device 3' ) ) 
+          keepers.push(  makeContactRecipientDescription(
             channelKey,
             contact,
             ContactTrustKind.KEEPER_OF_USER,
@@ -214,6 +217,9 @@ class FriendsAndFamilyScreen extends React.Component<
       }
     }
 
+    console.log( 'skk keepers1', JSON.stringify( keepers ) )
+    console.log( 'skk keeping', JSON.stringify( keeping ) )
+    console.log( 'skk otherContacts', JSON.stringify( otherContacts ) )
     this.setState( {
       keepers,
       keeping,
