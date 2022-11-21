@@ -768,8 +768,10 @@ const HomeHeader = ( {
         <ToggleContainer />
       </View>
 
-      <View style={{
+      <TouchableOpacity style={{
         flexDirection: 'row', alignItems: 'center', marginTop: hp( 10 )
+      }} activeOpacity={1} onPress={()=>{
+        navigation.navigate( 'MyWallets' )
       }}>
         <View style={{
           width: wp( 25 ), height: wp( 25 ), backgroundColor: Colors.white,
@@ -792,7 +794,7 @@ const HomeHeader = ( {
           {exchangeRates ?
             numberWithCommas( exchangeRates[ fiatCurrencyCode ]?.last.toFixed( 2 ) )
             : ''}</Text>
-      </View>
+      </TouchableOpacity>
       {/* {keepers.length > 0 &&
                   <>
                     {keepers.length && keepers.map( ( item, index ) => {

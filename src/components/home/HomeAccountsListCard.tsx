@@ -159,8 +159,8 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
 
 const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: Props ) => {
   const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
-  const opacityChange = cardDisabled || ( accountShell.primarySubAccount.visibility !== AccountVisibility.DEFAULT && showAllAccount === true )  ? true : false
-
+  const opacityChange = cardDisabled || ( accountShell?.primarySubAccount?.visibility !== AccountVisibility.DEFAULT && showAllAccount === true )  ? true : false
+  console.log( 'skk accountshell', JSON.stringify( accountShell ) )
   return (
     <Shadow  distance={10} startColor={Colors.shadowColor}  offset={[ 7, 7 ]}>
       <View style={opacityChange ? {

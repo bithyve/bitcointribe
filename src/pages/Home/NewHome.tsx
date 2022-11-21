@@ -835,6 +835,10 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.props.navigation.navigate( 'FriendsAndFamily' )
           break
 
+        //
+        case 3:
+          break
+
         //Settings
         case 4:
           this.props.navigation.navigate( 'MoreOptions' )

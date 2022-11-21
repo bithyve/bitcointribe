@@ -76,6 +76,8 @@ import Fonts from '../common/Fonts'
 import AppInfo from '../pages/MoreOptions/AppInfo/Appinfo'
 import FriendsAndFamilyScreen from '../pages/FriendsAndFamily/FriendsAndFamilyScreen'
 import WalletBackupStack from './stacks/more-options/WalletBackupStack'
+import MyWalletsContainer from '../pages/Home/MyWalletsContainer'
+import ScanNodeConfig from '../pages/lightningAccount/ScanNodeConfigScreen'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -499,6 +501,18 @@ const NewHomeNavigator = createStackNavigator( {
     navigationOptions: {
       header: null,
     },
+  },
+  MyWallets: {
+    screen: MyWalletsContainer,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  ScanNodeConfig: {
+    screen: ScanNodeConfig,
+    navigationOptions: {
+      header: null
+    }
   },
 } )
 
