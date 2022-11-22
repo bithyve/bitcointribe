@@ -18,8 +18,8 @@ export type Props = {
 const RadioButton: React.FC<Props> = ({
   isChecked = false,
   size = 20,
-  color = Colors.primaryAccentLighter1,
-  borderColor = Colors.borderColor,
+  color = Colors.appPrimary,
+  borderColor = Colors.appPrimary,
   ignoresTouch = false,
   onpress = () => {},
 }: Props) => {
@@ -37,8 +37,8 @@ const RadioButton: React.FC<Props> = ({
     return {
       backgroundColor: color,
       borderRadius: size / 2,
-      height: size - 5,
-      width: size - 5,
+      height: size,
+      width: size,
     };
   }, [color, size]);
 
