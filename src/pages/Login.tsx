@@ -9,7 +9,8 @@ import {
   BackHandler,
   Linking,
   Keyboard,
-  Alert
+  Alert,
+  SafeAreaView
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -450,9 +451,10 @@ export default function Login( props ) {
   // }, [] )
 
   return (
-    <View style={{
-      flex: 1
-    }}>
+    <SafeAreaView style={ {
+      flex: 1,
+      backgroundColor: Colors.blue
+    } }>
       <StatusBar />
       <View style={{
         flex: 1
@@ -622,11 +624,11 @@ export default function Login( props ) {
                 ...styles.proceedButtonView,
                 elevation: Elevation,
                 backgroundColor: isDisabledProceed
-                  ? Colors.lightBlue
-                  : Colors.blue,
+                  ? Colors.white
+                  : Colors.white,
               }}
             >
-              <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+              <Text style={styles.proceedButtonText}>{common.login}</Text>
             </TouchableOpacity>
 
             {
@@ -803,7 +805,7 @@ export default function Login( props ) {
                 style={styles.keyPadElementText}
                 onPress={() => onPressNumber( 'x' )}
               >
-                <Ionicons name="ios-backspace" size={30} color={Colors.blue} />
+                <Ionicons name="ios-backspace" size={30} color={Colors.white} />
               </Text>
             </TouchableOpacity>
           </View>
@@ -893,7 +895,7 @@ export default function Login( props ) {
           // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -915,11 +917,11 @@ const styles = StyleSheet.create( {
     borderRadius: 7,
     marginLeft: 20,
     elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 0, height: 3
-    },
+    // shadowColor: Colors.borderColor,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 0, height: 3
+    // },
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.white,
@@ -948,29 +950,29 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
   },
   keyPadElementText: {
-    color: Colors.blue,
+    color: Colors.white,
     fontSize: RFValue( 25 ),
     fontFamily: Fonts.FiraSansRegular,
     fontStyle: 'normal',
   },
   proceedButtonView: {
-    marginLeft: 20,
-    marginTop: hp( '15%' ),
+    marginLeft: wp(59),
+    marginTop: hp( '20%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
+    // shadowColor: Colors.shadowBlue,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 15, height: 15
+    // },
   },
   proceedButtonText: {
-    color: Colors.white,
+    color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.RobotoSlabRegular,
   },
   boldItalicText: {
     fontFamily: Fonts.FiraSansMediumItalic,
@@ -985,17 +987,17 @@ const styles = StyleSheet.create( {
     letterSpacing: 0.5
   },
   headerTitleText: {
-    color: Colors.blue,
+    color: Colors.white,
     fontSize: RFValue( 25 ),
     marginLeft: 20,
     marginTop: hp( '10%' ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
   },
   headerInfoText: {
-    color: Colors.textColorGrey,
+    color: Colors.white,
     fontSize: RFValue( 12 ),
     marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
   },
   passcodeTextInputText: {
     color: Colors.blue,
