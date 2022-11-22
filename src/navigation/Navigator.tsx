@@ -488,7 +488,7 @@ const NewHomeNavigator = createStackNavigator( {
     },
   },
   FriendsAndFamily: {
-    screen: FriendsAndFamilyScreen,
+    screen: FriendsAndFamily,
     navigationOptions: {
       header: null,
       // tabBarVisibl

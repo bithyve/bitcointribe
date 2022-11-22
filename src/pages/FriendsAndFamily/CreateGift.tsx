@@ -1094,7 +1094,7 @@ const CreateGift = ({ navigation }: Props) => {
               paddingVertical: hp(2),
               paddingHorizontal: wp(2),
               alignItems: "center",
-              backgroundColor: Colors.white
+              backgroundColor: Colors.white,
             }}
           >
             <View
@@ -1151,14 +1151,15 @@ const CreateGift = ({ navigation }: Props) => {
               </Text>
             </View>
             {activeOpacity === 0 && (
-              <MaterialCommunityIcons
-                name="dots-vertical"
-                size={24}
-                color="gray"
-                style={{
-                  alignSelf: "center",
-                }}
-              />
+              <Image
+              style={{
+                width: wp("10%"),
+                height: wp("10%"),
+                resizeMode: "contain",
+                marginRight: wp("2%"),
+              }}
+              source={require("../../assets/images/icons/icon_more.png")}
+            />
             )}
           </View>
         </View>
@@ -1263,7 +1264,7 @@ const CreateGift = ({ navigation }: Props) => {
                     resizeMode: "contain",
                     marginRight: wp("5%"),
                   }}
-                  source={require("../../assets/images/icons/icon_settings_blue.png")}
+                  source={require("../../assets/images/icons/icon_general.png")}
                 />
               </TouchableOpacity>
             </View>
@@ -1317,7 +1318,7 @@ const CreateGift = ({ navigation }: Props) => {
               {!showKeyboard && !amount && (
                 <Text
                   style={{
-                    fontSize: RFValue(12),
+                    fontSize: RFValue(10),
                   }}
                 >
                   {`Enter amount in ${
@@ -1337,7 +1338,7 @@ const CreateGift = ({ navigation }: Props) => {
               )}
             </Text>
 
-            {Number(numbersOfGift) === 1 && (
+            {/* {Number(numbersOfGift) === 1 && (
               <AppBottomSheetTouchableWrapper
                 onPress={handleSendMaxPress}
                 style={{
@@ -1357,7 +1358,7 @@ const CreateGift = ({ navigation }: Props) => {
                   {strings.SendMax}
                 </Text>
               </AppBottomSheetTouchableWrapper>
-            )}
+            )} */}
           </View>
 
           {numbersOfGift > 1 ? (
@@ -1414,6 +1415,48 @@ const CreateGift = ({ navigation }: Props) => {
               </Text>
             </View>
           ) : null}
+          <View
+            style={{
+              flexDirection: "column",
+              alignItems: "center",
+              marginRight: 20,
+              marginTop: 10
+            }}
+          >
+            <Switch
+              value={includeFees}
+              style={{
+                transform: [
+                  {
+                    scaleX: Platform.OS == "ios" ? 0.8 : 1.0,
+                  },
+                  {
+                    scaleY: Platform.OS == "ios" ? 0.8 : 1.0,
+                  },
+                ],
+              }}
+              trackColor={{
+                false: Colors.lightBlue,
+                true: Colors.blue,
+              }}
+              thumbColor={includeFees ? "#fff" : "#fff"}
+              ios_backgroundColor={Colors.lightBlue}
+              onValueChange={(value) => {
+                setFees(value);
+              }}
+            />
+            <Text
+              style={{
+                color: Colors.gray13,
+                fontSize: RFValue(8),
+                fontFamily: Fonts.RobotoSlabRegular,
+                letterSpacing: 0.5,
+                marginTop: wp("1.5%"),
+              }}
+            >
+              {"Include Fee"}
+            </Text>
+          </View>
         </View>
         {numbersOfGift < 1 ? (
           <View
@@ -1511,6 +1554,7 @@ const CreateGift = ({ navigation }: Props) => {
               color: Colors.red,
               fontSize: RFValue(9),
               fontFamily: Fonts.RobotoSlabRegular,
+              marginTop: hp(1),
               // marginHorizontal: wp( 3 ),
             }}
           >
@@ -1528,46 +1572,6 @@ const CreateGift = ({ navigation }: Props) => {
             </Text>
           </Text>
           {/* </View> */}
-          <View
-            style={{
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <Switch
-              value={includeFees}
-              style={{
-                transform: [
-                  {
-                    scaleX: Platform.OS == "ios" ? 0.8 : 1.0,
-                  },
-                  {
-                    scaleY: Platform.OS == "ios" ? 0.8 : 1.0,
-                  },
-                ],
-              }}
-              trackColor={{
-                false: Colors.lightBlue,
-                true: Colors.blue,
-              }}
-              thumbColor={includeFees ? "#fff" : "#fff"}
-              ios_backgroundColor={Colors.lightBlue}
-              onValueChange={(value) => {
-                setFees(value);
-              }}
-            />
-            <Text
-              style={{
-                color: Colors.gray13,
-                fontSize: RFValue(10),
-                fontFamily: Fonts.RobotoSlabRegular,
-                letterSpacing: 0.5,
-                marginTop: wp( '1.5%' )
-              }}
-            >
-              {"Include Fee"}
-            </Text>
-          </View>
         </View>
         <View
           style={{
