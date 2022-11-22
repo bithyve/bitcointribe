@@ -424,7 +424,7 @@ export default function AddContactSendRequest( props ) {
   }, [ OTP, renderTimer ] )
 
   return (
-    <View style = {{ flex: 1, }}>
+    <View style = {{ flex: 1, backgroundColor: Colors.backgroundColor}}>
     <SafeAreaView style={{
      backgroundColor: Colors.blueTextNew
     }}/>

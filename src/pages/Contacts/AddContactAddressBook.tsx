@@ -486,7 +486,7 @@ export default function AddContactAddressBook(props) {
         </TouchableOpacity>
       </View>
 
-      {selectedContacts.length !== 0 && (
+      {/* {selectedContacts.length !== 0 && (
         <View style={styles.selectedContactContent}>
           <View style={styles.selectedContact}>
             <Text style={styles.selectedContactText}>
@@ -509,7 +509,7 @@ export default function AddContactAddressBook(props) {
             </TouchableOpacity>
           </View>
         </View>
-      )}
+      )} */}
 
       <View
         style={{
@@ -617,7 +617,7 @@ export default function AddContactAddressBook(props) {
                       onPress={() => onContactSelect(index)}
                       style={{
                         ...styles.contactView,
-                        backgroundColor: selected ? Colors.appPrimary : null,
+                        backgroundColor: selected ? Colors.lightBlue : null,
                       }}
                       key={index}
                       activeOpacity={0.1}
@@ -632,15 +632,15 @@ export default function AddContactAddressBook(props) {
                       <View
                         style={{
                           backgroundColor: Colors.white,
-                          borderRadius: 25,
-                          height: 50,
-                          width: 50,
+                          borderRadius: 20,
+                          height: 40,
+                          width: 40,
                           marginLeft: 12,
                         }}
                       >
                         <Text style = {{
-                          fontSize: 18,
-                          marginTop: 12.5,
+                          fontSize: RFValue(12),
+                          marginTop: 12,
                           textAlign: 'center',
                           color: Colors.lightBlue,
                           fontWeight: '900',

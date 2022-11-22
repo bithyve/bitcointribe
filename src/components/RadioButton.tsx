@@ -47,7 +47,7 @@ const RadioButton: React.FC<Props> = ({
       onPress={onpress}
     >
       {isChecked && (
-        <View style={{ borderRadius: size / 2, height: size, width: size, justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ backgroundColor: Colors.appPrimary, borderRadius: size / 2, height: size, width: size, justifyContent: 'center', alignItems: 'center' }}>
           <FontAwesome name="check" color={Colors.white} size={11} />
         </View>
       )}
@@ -57,7 +57,7 @@ const RadioButton: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   rootContainer: {
-    borderWidth: 1,
+    // borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
   },
