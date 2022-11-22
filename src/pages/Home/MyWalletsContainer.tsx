@@ -291,9 +291,39 @@ export default function MyWalletsContainer( props ) {
           keyExtractor={keyExtractor}
           renderItem={renderItems} />
       </View>
-      <SafeAreaView style={{
-        backgroundColor: Colors.white
-      }} />
+      <View style={{
+        flex:1
+      }}></View>
+      <View style={{
+        flexDirection:'row', marginBottom: hp( 30 ), justifyContent:'center'
+      }}>
+        <TouchableOpacity style={{
+          alignItems:'center'
+        }}>
+          <Image source={require( '../../assets/images/icons/openlink.png' )} style={{
+            width:wp( 38 ), height:wp( 38 )
+          }}/>
+          <Text style={{
+            fontSize:RFValue( 10 ), color:Colors.black1,
+            fontFamily:Fonts.RobotoSlabRegular, marginTop:hp( 9 ),
+            marginHorizontal:wp( 30 )
+          }}>Send</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={{
+          alignItems:'center'
+        }}>
+          <Image source={require( '../../assets/images/icons/openlink.png' )} style={{
+            width:wp( 38 ), height:wp( 38 )
+          }}/>
+          <Text style={{
+            fontSize:RFValue( 10 ), color:Colors.black1,
+            fontFamily:Fonts.RobotoSlabRegular, marginTop:hp( 9 ),
+            marginHorizontal:wp( 30 )
+          }}>Receive</Text>
+        </TouchableOpacity>
+      </View>
+      <SafeAreaView/>
     </View>
   )
 }

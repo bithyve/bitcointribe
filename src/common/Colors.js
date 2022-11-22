@@ -96,5 +96,6 @@ const Colors = {
   gray17: '#4A4A4A',
   red1: '#EA433569',
   shadowGray: '#D98A0033',
+  black1: '#041513',
 }
 export default Colors
