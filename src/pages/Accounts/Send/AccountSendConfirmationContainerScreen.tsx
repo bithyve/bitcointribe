@@ -11,7 +11,6 @@ import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/Use
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
 import useSelectedRecipientsForSending from '../../../utils/hooks/state-selectors/sending/UseSelectedRecipientsForSending'
 import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
-import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import SendConfirmationCurrentTotalHeader from '../../../components/send/SendConfirmationCurrentTotalHeader'
 import TransactionPriorityMenu from './TransactionPriorityMenu'
 import { executeSendStage2, resetSendStage1, sendTxNotification } from '../../../store/actions/sending'
@@ -34,6 +33,13 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import HeadingAndSubHeading from '../../../components/HeadingAndSubHeading'
 import { AccountsState } from '../../../store/reducers/accounts'
 import LoaderModal from '../../../components/LoaderModal'
+import SelectAccount from '../../../components/SelectAccount'
+import { hp, wp } from '../../../common/data/responsiveness/responsive'
+import RecipientAvatar from '../../../components/RecipientAvatar'
+import ImageStyles from '../../../common/Styles/ImageStyles'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import CheckingAcc from '../../../assets/images/svgs/note.svg'
 
 export type NavigationParams = {
 };
@@ -46,7 +52,7 @@ export type Props = {
   navigation: NavigationProp;
 };
 
-const {height} = Dimensions.get('window')
+const { height } = Dimensions.get( 'window' )
 
 const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const dispatch = useDispatch()
@@ -57,7 +63,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const [ handleButton, setHandleButton ] = useState( true )
   const [ errorMessage, setError ] = useState( '' )
   const selectedRecipients = useSelectedRecipientsForSending()
-  const sourceAccountShell = useSourceAccountShellForSending()
+  const [ sourceAccountShell, setSourceShell ] = useState<AccountShell>( useSourceAccountShellForSending() )
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const accountState: AccountsState = useSelector(
     ( state ) => state.accounts,
@@ -222,6 +228,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     },
   } )
 
+  const [ noteModal, setnoteModal ] = useState( false )
 
   return (
     <KeyboardAwareScrollView
@@ -236,35 +243,75 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       <ModalContainer onBackground={()=>setFailure( false )} visible={sendFailureModal} closeBottomSheet={() => {}} >
         {showSendFailureBottomSheet()}
       </ModalContainer>
-      <View style={{
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 24,
-        marginBottom: height > 720 ? heightPercentageToDP( '1%' ) : 0,
-        marginTop: height > 720 ? heightPercentageToDP( '2%' ) : 5
-      }}>
-        <Text style={{
-          marginRight: RFValue( 4 )
-        }}>
-          {`${strings.SendingFrom}:`}
-        </Text>
-
-        <Text style={{
-          fontFamily: Fonts.FiraSansRegular,
-          fontSize: RFValue( 11 ),
-          fontStyle: 'italic',
-          color: Colors.blue,
-        }}>
-          {sourceAccountHeadlineText}
-        </Text>
-      </View>
-      <View style={styles.headerSection}>
+      <SelectAccount onSelect={( item ) => {
+        setSourceShell( item )
+      }} />
+      {/* <View style={styles.headerSection}>
         <SelectedRecipientsCarousel
           recipients={selectedRecipients}
           subAccountKind={sourcePrimarySubAccount.kind}
         />
+      </View> */}
+
+      <View
+        style={{
+          borderRadius: wp( 2 ),
+          width: '90%',
+          alignSelf: 'center',
+          marginTop: hp( 2 ),
+          marginBottom: hp( 2 ),
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            width: '100%',
+            paddingVertical: hp( 10 ),
+            paddingHorizontal: wp( 2 ),
+            alignItems: 'center',
+          }}
+        >
+          <View
+            style={{
+              width: wp( 38 ),
+              height: '100%',
+              marginTop: hp( 10 ),
+              marginRight: wp( 11 ),
+            }}
+          >
+            <RecipientAvatar
+              recipient={selectedRecipients[ 0 ]}
+              contentContainerStyle={styles.avatarImage}
+            />
+          </View>
+
+          <View
+            style={{
+              marginHorizontal: wp( 3 ),
+              flex: 1,
+            }}
+          >
+            <Text
+              style={{
+                color: Colors.black,
+                fontSize: RFValue( 14 ),
+                fontFamily: Fonts.RobotoSlabRegular,
+              }}
+            >
+                To {selectedRecipients[ 0 ].displayedName}
+            </Text>
+          </View>
+          <MaterialCommunityIcons
+            name="dots-horizontal"
+            size={24}
+            color="gray"
+            style={{
+              alignSelf: 'center',
+            }}
+          />
+        </View>
       </View>
+
       <SendConfirmationCurrentTotalHeader
         Unit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
       />
@@ -275,14 +322,60 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         onTransactionPriorityChanged={setTransactionPriority}
       />
       {selectedRecipients.length === 1 &&
-      <>
+      <TouchableOpacity style={{
+        marginHorizontal: wp( 26 ),
+        flexDirection: 'row',
+        marginVertical: hp( 10 )
+      }} onPress={() => setnoteModal( true )}>
+        <CheckingAcc />
         <HeadingAndSubHeading
           heading={common.addNote}
           subHeading={common.subNote}
         />
-        <View
-          style={[ styles.inputBox, styles.inputField ]}
+      </TouchableOpacity>
+      }
+      <View style={styles.footerSection}>
+        <TouchableOpacity
+          onPress={handleConfirmationButtonPress}
+          style={[ handleButton ? ButtonStyles.primaryActionButton : ButtonStyles.disabledNewPrimaryActionButton, {
+            alignSelf: 'flex-end'
+          } ]}
         >
+          <Text style={ButtonStyles.actionButtonText}>Send</Text>
+        </TouchableOpacity>
+      </View>
+      <ModalContainer visible={!handleButton} closeBottomSheet = {()=>{}} onBackground = {()=>{}}>
+        <LoaderModal
+          headerText={'Sending...'}
+        />
+      </ModalContainer>
+      <ModalContainer visible={noteModal} closeBottomSheet={() => {
+        setnoteModal( false )
+      }}>
+        <View
+          style={{
+            width: '100%',
+            height: 'auto',
+            backgroundColor: '#EAEAEA',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingBottom: hp( 20 ),
+          }}
+        >
+          <TouchableOpacity style={{
+            width: wp( 28 ),
+            height: wp( 28 ),
+            alignSelf: 'flex-end',
+            marginRight: wp( 10 ),
+            marginTop: hp( 10 ),
+            borderRadius: wp( 14 ),
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#FABC05'
+          }}
+          onPress={() => setnoteModal( false )}>
+            <FontAwesome name="close" color={'white'}/>
+          </TouchableOpacity>
           <TextInput
             style={styles.modalInputBox}
             multiline={true}
@@ -305,37 +398,16 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
               setNote( text )
             }}
           />
+          <TouchableOpacity style={[ ButtonStyles.primaryActionButton, {
+            alignSelf: 'flex-end', marginRight: wp( 30 )
+          } ]}
+          onPress={() => setnoteModal( false )}
+          >
+            <Text style={ButtonStyles.actionButtonText}>
+              Enter
+            </Text>
+          </TouchableOpacity>
         </View>
-      </>
-      }
-      <View style={styles.footerSection}>
-        <TouchableOpacity
-          onPress={handleConfirmationButtonPress}
-          style={handleButton ? ButtonStyles.primaryActionButton : ButtonStyles.disabledNewPrimaryActionButton}
-        >
-          <Text style={ButtonStyles.actionButtonText}>{strings.ConfirmSend}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={handleBackButtonPress}
-          style={{
-            ...ButtonStyles.primaryActionButton,
-            marginRight: 8,
-            backgroundColor: 'transparent',
-          }}
-        >
-          <Text style={{
-            ...ButtonStyles.actionButtonText,
-            color: Colors.blue,
-          }}>
-            {common.back}
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <ModalContainer visible={!handleButton} closeBottomSheet = {()=>{}} onBackground = {()=>{}}>
-        <LoaderModal
-          headerText={'Sending...'}
-        />
       </ModalContainer>
     </KeyboardAwareScrollView>
   )
@@ -371,14 +443,18 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.backgroundColor1,
   },
   modalInputBox: {
-    flex: 1,
-    height: height > 720 ? 50 : 40,
+    marginTop: hp( 5 ),
+    marginBottom: hp( 50 ),
     fontSize: RFValue( 13 ),
+    marginHorizontal: wp( 30 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     paddingLeft: 15,
-    width: '90%',
-    paddingTop: height > 720 ? 17 : 0
+    width: wp( 295 ),
+    height: hp( 50 ),
+    backgroundColor: '#FAFAFA',
+    borderRadius: wp( 10 ),
+    justifyContent: 'center',
   },
   modalInfoText: {
     width: widthPercentageToDP( 90 ),
@@ -397,26 +473,19 @@ const styles = StyleSheet.create( {
   headerSection: {
     paddingVertical: height > 720 ? heightPercentageToDP( '1%' ) : 0,
   },
-
   footerSection: {
     flexDirection: 'row',
     alignContent: 'center',
-    justifyContent: 'space-evenly',
+    justifyContent: 'flex-end',
     marginBottom: heightPercentageToDP( '2%' ),
-    paddingHorizontal:10,
+    marginVertical: hp( 10 ),
+    marginHorizontal: wp( 20 ),
   },
-
+  avatarImage: {
+    marginLeft: wp( 5 ),
+    ...ImageStyles.thumbnailImageMedium,
+    borderRadius: wp ( 19 ),
+  },
 } )
-
-
-AccountSendConfirmationContainerScreen.navigationOptions = ( { navigation } ): NavigationOptions => {
-  return {
-    ...defaultStackScreenNavigationOptions,
-
-    headerLeft: () => {
-      return <SmallNavHeaderBackButton onPress={navigation.getParam( 'handleBackButtonPress' )} />
-    },
-  }
-}
 
 export default AccountSendConfirmationContainerScreen

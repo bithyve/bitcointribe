@@ -5,17 +5,16 @@ import Fonts from '../../common/Fonts'
 import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText'
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import { RFValue } from 'react-native-responsive-fontsize'
-import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import useTotalSpendingAmount from '../../utils/hooks/sending-utils/UseTotalSpendingAmount'
-import { heightPercentageToDP } from 'react-native-responsive-screen'
+import { hp, wp } from '../../common/data/responsiveness/responsive'
 
 export type Props = {
   Unit
 };
 
-const {height} = Dimensions.get('window')
+const { height } = Dimensions.get( 'window' )
 
-const SendConfirmationCurrentTotalHeader: React.FC<Props> = ( {Unit}: Props ) => {
+const SendConfirmationCurrentTotalHeader: React.FC<Props> = ( { Unit }: Props ) => {
 
   const totalAmount = useTotalSpendingAmount()
 
@@ -28,18 +27,19 @@ const SendConfirmationCurrentTotalHeader: React.FC<Props> = ( {Unit}: Props ) =>
     <View style={styles.rootContainer}>
 
       <View style={styles.totalAmountRow}>
-        <Text style={styles.headingText}>Total Amount</Text>
+        <Text style={styles.headingText}>Amount</Text>
 
         <View style={{
           flexDirection: 'row',
-          alignItems: 'center'
+          alignItems: 'center',
+          height: hp( 26 )
         }}>
           <Image
             style={styles.currencyIcon}
             source={require( '../../assets/images/icons/icon_bitcoin_gray.png' )}
             resizeMode="contain"
           />
-          <Text style={styles.amountText}>{formattedAmountText}</Text>
+          <Text style={styles.amountText}> {formattedAmountText}</Text>
           <Text style={styles.unitText}>{formattedUnitText}</Text>
         </View>
       </View>
@@ -50,13 +50,16 @@ const SendConfirmationCurrentTotalHeader: React.FC<Props> = ( {Unit}: Props ) =>
 const styles = StyleSheet.create( {
   rootContainer: {
     paddingHorizontal: 24,
-    paddingVertical: height > 720 ? heightPercentageToDP( 2.5 ) : 0,
+    paddingTop: hp( 29 ),
+    paddingBottom: hp( 53 )
   },
 
   headingText: {
-    color: Colors.btextColorGreylue,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: 12,
+    color: '#041513',
+    fontFamily: Fonts.RobotoSlabRegular,
+    fontSize: RFValue( 12 ),
+    lineHeight: RFValue( 11 ),
+    letterSpacing: RFValue( 0.24 )
   },
 
   totalAmountRow: {
@@ -66,19 +69,23 @@ const styles = StyleSheet.create( {
   },
 
   currencyIcon: {
-    width: 20,
-    height: 20,
+    width: wp( 8 ),
+    height: hp( 11 ),
+    alignSelf: 'flex-end'
   },
 
   amountText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     fontSize: RFValue( 20 ),
     marginRight: 6,
+    lineHeight: RFValue( 26 ),
   },
 
   unitText: {
-    color: Colors.textColorGrey,
+    color: '#969696',
     fontSize: RFValue( 13 ),
+    lineHeight:RFValue( 17 ),
+    alignSelf: 'flex-end'
   },
 } )
 
