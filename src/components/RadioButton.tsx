@@ -1,16 +1,13 @@
-import React, { useMemo } from 'react';
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
-import Colors from '../common/Colors';
+import React, { useMemo } from "react";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
+import Colors from "../common/Colors";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export type Props = {
   isChecked: boolean;
   size?: number;
-  color? : string;
-  borderColor? : string;
+  color?: string;
+  borderColor?: string;
   ignoresTouch?: boolean;
   onpress?: () => void;
 };
@@ -49,18 +46,20 @@ const RadioButton: React.FC<Props> = ({
       disabled={ignoresTouch}
       onPress={onpress}
     >
-      {isChecked &&
-        <View style={innerCircleStyle} />
-      }
+      {isChecked && (
+        <View style={{ borderRadius: size / 2, height: size, width: size, justifyContent: 'center', alignItems: 'center' }}>
+          <FontAwesome name="check" color={Colors.white} size={11} />
+        </View>
+      )}
     </TouchableOpacity>
   );
-}
+};
 
 const styles = StyleSheet.create({
   rootContainer: {
     borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
