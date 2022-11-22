@@ -8,6 +8,7 @@ import {
 } from "react-native-responsive-screen";
 
 import Colors from "../../common/Colors";
+import Fonts from "../../common/Fonts";
 import { AppBottomSheetTouchableWrapper } from "../AppBottomSheetTouchableWrapper";
 import { LocalizationContext } from "../../common/content/LocContext";
 import Gifts from "../../assets/images/satCards/gifts.svg";
@@ -106,12 +107,14 @@ const styles = StyleSheet.create({
     color: Colors.blueText,
     fontWeight: "600",
     marginBottom: 5,
+    fontFamily: Fonts.RobotoSlabRegular,
   },
   paragraphTitleText: {
     fontSize: 12,
     color: Colors.gray3,
     textAlign: 'left',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    fontFamily: Fonts.RobotoSlabRegular,
   },
   cardBackView: {
     alignItems: 'center',
