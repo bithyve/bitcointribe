@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import React from 'react'
+import { View, Text, StyleSheet } from 'react-native'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -30,13 +30,17 @@ export default function BottomInfoBox( props ) {
             color: props.titleColor ? props.titleColor : Colors.blue,
             fontSize: RFValue( 13 ),
             marginBottom: 2,
-            fontFamily: Fonts.RobotoSlabRegular,
+            fontFamily: Fonts.RobotoSlabBold,
           }}
         >
           {props.title}
         </Text>
         }
-        <Text style={props.icon ? [ styles.bottomNoteInfoText, styles.extraPadding, {fontFamily: Fonts.RobotoSlabRegular} ] : {...styles.bottomNoteInfoText, width : props?.width, fontFamily: Fonts.RobotoSlabRegular}}>
+        <Text style={props.icon ? [ styles.bottomNoteInfoText, styles.extraPadding, {
+          fontFamily: Fonts.RobotoSlabRegular
+        } ] : {
+          ...styles.bottomNoteInfoText, width : props?.width, fontFamily: Fonts.RobotoSlabLight
+        }}>
           {props.infoText}
           {props.linkText ? (
             <Text
