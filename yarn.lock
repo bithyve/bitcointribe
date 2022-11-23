@@ -9983,14 +9983,15 @@ react-native-fs@^2.16.6:
     base-64 "^0.1.0"
     utf8 "^3.0.0"
 
-react-native-gesture-handler@1.7.0:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-1.7.0.tgz#0ef74a5ba836832e497dc49eb1ce58baa6c617e5"
-  integrity sha512-1CrjJf8Z6Iz2XWzfZknYtsm2sud5Lu/pLhhokkgBIKttxqGDtetDEVFDJOTJWJyKCrUPk0X5tnWi/diSF4q++w==
+react-native-gesture-handler@^2.8.0:
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-2.8.0.tgz#ef9857871c10663c95a51546225b6e00cd4740cf"
+  integrity sha512-poOSfz/w0IyD6Qwq7aaIRRfEaVTl1ecQFoyiIbpOpfNTjm2B1niY2FLrdVQIOtIOe+K9nH55Qal04nr4jGkHdQ==
   dependencies:
     "@egjs/hammerjs" "^2.0.17"
-    hoist-non-react-statics "^2.3.1"
+    hoist-non-react-statics "^3.3.0"
     invariant "^2.2.4"
+    lodash "^4.17.21"
     prop-types "^15.7.2"
 
 react-native-get-random-values@^1.4.0:
@@ -10510,10 +10511,10 @@ realm-network-transport@^0.7.2:
     abort-controller "^3.0.0"
     node-fetch "^2.6.0"
 
-realm@^10.4.2:
-  version "10.24.0"
-  resolved "https://registry.yarnpkg.com/realm/-/realm-10.24.0.tgz#2b6eccdd2dc2492139fe7affc576c1c97b373423"
-  integrity sha512-r+WCHMyRiNszHkWwmTG7+x2rdZNgdXXcEWoivei0Fh1DtXcwIBToo/qlAktjxt/9K9aLxCU9eIOeZcbeU+Utaw==
+realm@10.22.0:
+  version "10.22.0"
+  resolved "https://registry.yarnpkg.com/realm/-/realm-10.22.0.tgz#ebc416239423ef0535003fb4ec8506fe3e73d190"
+  integrity sha512-VkbBmqmAEKeliBUc4panP8GH/sec5Va1aBaWYmP+r+qjWUDVB+Dw2wZsdPuRNMXPgWvPxLynlXLvJ01pwxLQ1Q==
   dependencies:
     "@realm.io/common" "^0.1.4"
     bindings "^1.5.0"

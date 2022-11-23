@@ -4,11 +4,6 @@
 #import <React/RCTRootView.h>
 #import <React/RCTLinkingManager.h>
 
-// adding unimodules
-
-#import <UMCore/UMModuleRegistry.h>
-#import <UMReactNativeAdapter/UMNativeModulesProxy.h>
-#import <UMReactNativeAdapter/UMModuleRegistryAdapter.h>
 #import "BackgroundViewController.h"
 
 // react-native-push-notification-ios
@@ -16,12 +11,27 @@
 #import <UserNotifications/UserNotifications.h>
 #import <RNCPushNotificationIOS.h>
 
+#import <React/RCTAppSetupUtils.h>
 
-@interface AppDelegate () <RCTBridgeDelegate>
- 
-@property (nonatomic, strong) UMModuleRegistryAdapter *moduleRegistryAdapter;
- 
+#if RCT_NEW_ARCH_ENABLED
+#import <React/CoreModulesPlugins.h>
+#import <React/RCTCxxBridgeDelegate.h>
+#import <React/RCTFabricSurfaceHostingProxyRootView.h>
+#import <React/RCTSurfacePresenter.h>
+#import <React/RCTSurfacePresenterBridgeAdapter.h>
+#import <ReactCommon/RCTTurboModuleManager.h>
+
+#import <react/config/ReactNativeConfig.h>
+
+
+@interface AppDelegate () <RCTCxxBridgeDelegate, RCTTurboModuleManagerDelegate> {
+  RCTTurboModuleManager *_turboModuleManager;
+  RCTSurfacePresenterBridgeAdapter *_bridgeAdapter;
+  std::shared_ptr<const facebook::react::ReactNativeConfig> _reactNativeConfig;
+  facebook::react::ContextContainer::Shared _contextContainer;
+}
 @end
+#endif
 
 #import "HEXA-Swift.h"
 
@@ -40,43 +50,48 @@
  return [RCTLinkingManager application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
 }
 
-- (BOOL)application:(UIApplication *)application 
-  didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  if ([FIRApp defaultApp] == nil) {
-    [FIRApp configure];
-  }
-   // Define UNUserNotificationCenter
-  UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-  
-  [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge)completionHandler:^(BOOL granted, NSError * _Nullable error) {
-    if (granted) {
-      center.delegate = self; 
+  if (![[NSUserDefaults standardUserDefaults] objectForKey:@"FirstRun"]) {
+        // Delete values from keychain here
+        NSArray *secItemClasses = @[(__bridge id)kSecClassGenericPassword,
+                       (__bridge id)kSecClassInternetPassword,
+                       (__bridge id)kSecClassCertificate,
+                       (__bridge id)kSecClassKey,
+                       (__bridge id)kSecClassIdentity];
+for (id secItemClass in secItemClasses) {
+    NSDictionary *spec = @{(__bridge id)kSecClass: secItemClass};
+    SecItemDelete((__bridge CFDictionaryRef)spec);
+}
+        [[NSUserDefaults standardUserDefaults] setValue:@"1strun" forKey:@"FirstRun"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
     }
-  }];
-  
-//  #ifdef FB_SONARKIT_ENABLED
-//    InitializeFlipper(application);
-//  #endif
-  
-  self.moduleRegistryAdapter = [[UMModuleRegistryAdapter alloc] initWithModuleRegistryProvider:[[UMModuleRegistryProvider alloc] init]];
+  [FIRApp configure];
+  RCTAppSetupPrepareApp(application);
 
-  RCTBridge *bridge = [self.reactDelegate createBridgeWithDelegate:self launchOptions:launchOptions];
-  RCTRootView *rootView = [self.reactDelegate createRootViewWithBridge:bridge
-                                                   moduleName:@"HEXA"
-                                            initialProperties:nil];
+RCTBridge *bridge = [self.reactDelegate createBridgeWithDelegate:self launchOptions:launchOptions];
 
-  rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
+#if RCT_NEW_ARCH_ENABLED
+  _contextContainer = std::make_shared<facebook::react::ContextContainer const>();
+  _reactNativeConfig = std::make_shared<facebook::react::EmptyReactNativeConfig const>();
+  _contextContainer->insert("ReactNativeConfig", _reactNativeConfig);
+  _bridgeAdapter = [[RCTSurfacePresenterBridgeAdapter alloc] initWithBridge:bridge contextContainer:_contextContainer];
+  bridge.surfacePresenter = _bridgeAdapter.surfacePresenter;
+#endif
+
+  // UIView *rootView = RCTAppSetupDefaultRootView(bridge, @"hexa_keeper", nil);
+  UIView *rootView = [self.reactDelegate createRootViewWithBridge:bridge moduleName:@"HEXA" initialProperties:nil];
+  if (@available(iOS 13.0, *)) {
+    rootView.backgroundColor = [UIColor systemBackgroundColor];
+  } else {
+    rootView.backgroundColor = [UIColor whiteColor];
+  }
 
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   UIViewController *rootViewController = [self.reactDelegate createRootViewController];
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
-
-  //Calling iCloud restore on App launch to get the latest copy of backup from iCloud.
-  iCloudRestore *restore = [[iCloudRestore alloc] init];
-
   [super application:application didFinishLaunchingWithOptions:launchOptions];
   return YES;
 }
@@ -118,17 +133,10 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
  [RNCPushNotificationIOS didReceiveLocalNotification:notification];
 }
 
-- (NSArray<id<RCTBridgeModule>> *)extraModulesForBridge:(RCTBridge *)bridge
-{
-    NSArray<id<RCTBridgeModule>> *extraModules = [_moduleRegistryAdapter extraModulesForBridge:bridge];
-    // If you'd like to export some custom RCTBridgeModules that are not Expo modules, add them here!
-    return extraModules;
-}
-
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
 #if DEBUG
-  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
 #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
@@ -154,6 +162,45 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 {
     // This should be omitted if your application presented a lock screen
     // in -applicationDidEnterBackground:
-    [self.window.rootViewController dismissViewControllerAnimated:NO completion:NO];
+  [self.window.rootViewController dismissViewControllerAnimated:false completion:nil];
 }
+
+#if RCT_NEW_ARCH_ENABLED
+
+#pragma mark - RCTCxxBridgeDelegate
+
+- (std::unique_ptr<facebook::react::JSExecutorFactory>)jsExecutorFactoryForBridge:(RCTBridge *)bridge
+{
+  _turboModuleManager = [[RCTTurboModuleManager alloc] initWithBridge:bridge
+                                                             delegate:self
+                                                            jsInvoker:bridge.jsCallInvoker];
+  return RCTAppSetupDefaultJsExecutorFactory(bridge, _turboModuleManager);
+}
+
+#pragma mark RCTTurboModuleManagerDelegate
+
+- (Class)getModuleClassFromName:(const char *)name
+{
+  return RCTCoreModulesClassProvider(name);
+}
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const std::string &)name
+                                                      jsInvoker:(std::shared_ptr<facebook::react::CallInvoker>)jsInvoker
+{
+  return nullptr;
+}
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const std::string &)name
+                                                     initParams:
+                                                         (const facebook::react::ObjCTurboModule::InitParams &)params
+{
+  return nullptr;
+}
+
+- (id<RCTTurboModule>)getModuleInstanceFromClass:(Class)moduleClass
+{
+  return RCTAppSetupDefaultModuleFromClass(moduleClass);
+}
+
+#endif
 @end
