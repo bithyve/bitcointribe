@@ -33,6 +33,7 @@
 @end
 #endif
 
+#import "ExpoModulesCore-Swift.h"
 #import "HEXA-Swift.h"
 
 @implementation AppDelegate

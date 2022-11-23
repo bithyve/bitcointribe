@@ -7,6 +7,7 @@ platform :ios, '13.0'
 install! 'cocoapods', :deterministic_uuids => false
 
 def all_pods
+  use_expo_modules!
   config = use_native_modules!
 
   # Flags change depending on the env values.
@@ -27,14 +28,6 @@ def all_pods
     pod 'Firebase/Analytics'
 end
 target 'HEXA' do
-  use_expo_modules!
-  post_integrate do |installer|
-    begin
-      expo_patch_react_imports!(installer)
-    rescue => e
-      Pod::UI.warn e
-    end
-  end
   all_pods
 end
 target 'HEXA Dev' do
@@ -53,4 +46,11 @@ end
 post_install do |installer|
   react_native_post_install(installer)
   __apply_Xcode_12_5_M1_post_install_workaround(installer)
+end
+post_integrate do |installer|
+  begin
+    expo_patch_react_imports!(installer)
+  rescue => e
+    Pod::UI.warn e
+  end
 end
