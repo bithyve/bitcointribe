@@ -7,24 +7,25 @@ import SentAmountForContactFormScreen from '../../../pages/Accounts/Send/SentAmo
 import AccountSendConfirmationContainerScreen from '../../../pages/Accounts/Send/AccountSendConfirmationContainerScreen'
 import OTPAuthenticationScreen from '../../../pages/Accounts/Send/OTPAuthentication'
 import { translations } from '../../../common/content/LocContext'
+import NavHeaderNew from '../../../components/NavHeaderNew'
 
 const strings  = translations[ 'stackTitle' ]
+
+const name = {
+  SendRoot: 'Send',
+  SentAmountForContactForm: 'Send',
+  SendConfirmation: 'Send',
+  OTPAuthentication: 'Enter OTP to Authenticate'
+}
 
 const SendStack = createStackNavigator(
   {
     SendRoot: AccountSendContainerScreen,
     SentAmountForContactForm: {
       screen: SentAmountForContactFormScreen,
-      navigationOptions: {
-        title: 'Send To'
-      },
     },
     SendConfirmation: {
       screen: AccountSendConfirmationContainerScreen,
-      navigationOptions: {
-        title: 'Send Confirmation',
-
-      },
     },
     OTPAuthentication: {
       screen: OTPAuthenticationScreen,
@@ -38,8 +39,8 @@ const SendStack = createStackNavigator(
     defaultNavigationOptions: ( { navigation } ) => {
       return {
         ...defaultStackScreenNavigationOptions,
-        headerLeft: () => {
-          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+        header: navigation.state.routeName === 'OTPAuthentication' ? null : () => {
+          return <NavHeaderNew title={name[ navigation.state.routeName ]} onPress={() => { navigation.pop() }} />
         },
       }
     },

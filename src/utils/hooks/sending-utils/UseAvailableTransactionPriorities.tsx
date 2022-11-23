@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { TxPriority } from '../../../bitcoin/utilities/Interface'
 import useSendingState from '../state-selectors/sending/UseSendingState'
-const defaultTransactionPrioritiesAvailable = [ TxPriority.LOW, TxPriority.MEDIUM, TxPriority.HIGH ]
+const defaultTransactionPrioritiesAvailable = [ TxPriority.HIGH, TxPriority.MEDIUM, TxPriority.LOW ]
 
 export default function useAvailableTransactionPriorities() {
   const sendingState = useSendingState()

@@ -14,7 +14,7 @@ const ListStyles = StyleSheet.create( {
   infoHeaderTitleText: {
     fontSize: RFValue( 13 ),
     color: Colors.blue,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
   },
 
   infoHeaderSubtitleText: {

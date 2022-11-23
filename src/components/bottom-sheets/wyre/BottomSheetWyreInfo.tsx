@@ -7,7 +7,7 @@ import ListStyles from '../../../common/Styles/ListStyles'
 import ImageStyles from '../../../common/Styles/ImageStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+// import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
 import useWyreIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
 import { fetchWyreReservation } from '../../../store/actions/WyreIntegration'
@@ -24,7 +24,7 @@ import { LocalizationContext } from '../../../common/content/LocContext'
 import CheckingAcc from '../../../assets/images/svgs/icon_checking.svg'
 import AccountShell from '../../../common/data/models/AccountShell'
 import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
-
+import { hp, wp as wp } from '../../../common/data/responsiveness/responsive'
 
 type Props = {
   wyreFromDeepLink: boolean | null;
@@ -115,15 +115,15 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
           activeOpacity={1}
           onPress={onPress}
           style={{
-            width: wp( 7 ),
-            height: wp( 7 ),
-            borderRadius: wp( 7 / 2 ),
+            width: wp( 28 ),
+            height: wp( 28 ),
+            borderRadius: wp( 14 ),
             alignSelf: 'flex-end',
             backgroundColor: Colors.golden,
             alignItems: 'center',
             justifyContent: 'center',
-            marginTop: wp( 3 ),
-            marginRight: wp( 3 ),
+            marginTop: hp( 10 ),
+            marginRight: wp( 10 ),
           }}
         >
           <FontAwesome
@@ -138,7 +138,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
           />
         </TouchableOpacity>
         {/* <Text style={styles.modalTitleText}>{wyreTitle}</Text> */}
-        <View style={styles.successModalHeaderView}>
+        <View>
           <Text
             style={[
               ListStyles.modalTitle,
@@ -147,7 +147,9 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
                 fontSize: RFValue( 18 ),
                 letterSpacing: RFValue( 0.27 ),
                 lineHeight: RFValue( 22 ),
-                marginBottom: hp( 3 ),
+                marginBottom: hp( 25 ),
+                marginLeft: wp( 30 ),
+                marginRight: wp( 48 ),
               },
             ]}
           >
@@ -209,7 +211,8 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
           </View>
           <ListItem.Content
             style={{
-              flex: 1,
+              height: hp( 53 ),
+              marginVertical: hp( 16 ),
             }}
           >
             <ListItem.Subtitle
@@ -302,7 +305,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
             </Text>
           </AppBottomSheetTouchableWrapper>
         </View>
-        {wyreFromBuyMenu ? (
+        {/* {wyreFromBuyMenu ? (
           <View
             style={{
               alignSelf: 'flex-end',
@@ -332,7 +335,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
               }}
             />
           </View>
-        ) : null}
+        ) : null} */}
       </View>
     </View>
   )
@@ -341,15 +344,16 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
 const styles = StyleSheet.create( {
   containerStyle: {
     flexDirection: 'row',
-    marginEnd: wp( '4 %' ),
-    paddingHorizontal: wp( 5 ),
-    paddingVertical: wp( 3 ),
-    width: wp( '80%' ),
+    marginHorizontal: wp( 30 ),
+    paddingHorizontal: wp( 20 ),
+    paddingVertical: hp( 19 ),
+    width: wp( 295 ),
+    height: hp( 100 ),
     backgroundColor: Colors.white,
     alignItems: 'center',
     alignSelf: 'center',
-    marginBottom: hp( 3 ),
-    borderRadius: wp( 2 ),
+    marginBottom: hp( 20 ),
+    borderRadius: wp( 10 ),
     // elevation: 10,
     // shadowColor: Colors.borderColor,
     // shadowOpacity: 10,
@@ -358,95 +362,87 @@ const styles = StyleSheet.create( {
     // },
   },
   headerImageView: {
-    width: wp( '17%' ),
-    height: wp( '17%' ),
-    // borderColor: 'red',
+    width: wp( 46 ),
+    height: hp( 44 ),
     // elevation: 10,
-    // shadowColor: Colors.borderColor,
+    // shadowColor: Colors.bgColor,
     // shadowOpacity: 10,
     // shadowOffset: {
     //   width: 2, height: 2
     // },
-    // backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'center',
-    borderRadius: wp( '17%' ) / 2,
-    margin: 5
+    borderRadius: wp( 23 ),
+    marginRight: wp( 9 ),
   },
   headerImage: {
-    width: wp( '10%' ),
-    height: wp( '10%' ),
-    borderRadius: wp( '10%' ) / 2,
+    width: wp( 46 ),
+    height: hp( 44 ),
+    borderRadius: wp( 23 ),
     resizeMode: 'contain'
   },
   headerImageInitials: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F9F9F9',
-    width: wp( '15%' ),
-    height: wp( '15%' ),
-    borderRadius: wp( '15%' ) / 2,
+    // backgroundColor: Colors.backgroundColor,
+    width: wp( 44 ),
+    height: hp( 47 ),
+    borderRadius: wp( 44 ) / 2,
   },
   modalContentContainer: {
     backgroundColor: Colors.backgroundColor1,
-
   },
   avatarImage: {
     ...ImageStyles.circledAvatarContainer,
     ...ImageStyles.thumbnailImageLarge,
-    marginRight: 14,
+    borderRadius: wp( 14 )/2,
+    // marginRight: wp( 16 ),
   },
   destinationTitleText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     fontSize: RFValue( 20 ),
     color: Colors.black,
     alignContent: 'center',
-    marginVertical: hp( 0.3 ),
     letterSpacing: RFValue( 0.01 )
   },
-  successModalHeaderView: {
-    marginRight: wp( '10%' ),
-  },
-  modalTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
-    width: wp( 30 ),
-    marginLeft: 10
-  },
+  // successModalHeaderView: {
+  //   marginRight: wp( '10%' ),
+  // },
+  // modalTitleText: {
+  //   color: Colors.blue,
+  //   fontSize: RFValue( 18 ),
+  //   fontFamily: Fonts.FiraSansRegular,
+  //   width: wp( 30 ),
+  //   marginLeft: 10
+  // },
   modalInfoText: {
-    marginLeft: wp( '7%' ),
-    marginRight: wp( '11%' ),
+    marginLeft: wp( 30 ),
+    marginRight: wp( 48 ),
     color: Colors.lightTextColor,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.RobotoSlabRegular,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 ),
-    marginTop: wp( 1.5 ),
-    marginBottom: wp( 1 )
+    marginBottom: hp( 20 )
   },
   modalInfoText1: {
-    marginLeft: wp( '7%' ),
-    marginRight: wp( '12%' ),
+    marginLeft: wp( 30 ),
+    marginRight: wp( 48 ),
     color: '#6C6C6C',
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.RobotoSlabRegular,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 ),
-    marginTop: wp( 0 ),
-    marginBottom: wp( 3 )
+    marginBottom: hp( 30 )
   },
   successModalButtonView: {
-    minHeight: 50,
-    minWidth: 110,
-    height: wp( '13%' ),
-    width: wp( '30%' ),
+    height: hp( 60 ),
+    width: wp( 120 ),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 11,
+    borderRadius: 10,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
@@ -455,18 +451,20 @@ const styles = StyleSheet.create( {
     },
     backgroundColor: Colors.blue,
     alignSelf: 'flex-start',
-    marginLeft: wp( '6%' ),
-    // marginTop: hp( 2 )
+    marginLeft: wp( 30 ),
+    marginTop: hp( 30 )
   },
-  successModalImage: {
-    width: wp( '25%' ),
-    height: hp( '18%' ),
-    marginLeft: 'auto',
-    resizeMode: 'cover'
-  },
+  // successModalImage: {
+  //   width: wp( '25%' ),
+  //   height: hp( '18%' ),
+  //   marginLeft: 'auto',
+  //   resizeMode: 'cover'
+  // },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
+    height: hp( 18 ),
+    width: wp( 70 ),
     fontFamily: Fonts.RobotoSlabRegular
   },
 } )

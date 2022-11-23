@@ -7,7 +7,7 @@ import ListStyles from '../../../common/Styles/ListStyles'
 import ImageStyles from '../../../common/Styles/ImageStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+// import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
 import useRampIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseRampIntegrationState'
 import { fetchRampReceiveAddress, fetchRampReservation } from '../../../store/actions/RampIntegration'
@@ -24,6 +24,7 @@ import { LocalizationContext } from '../../../common/content/LocContext'
 import CheckingAcc from '../../../assets/images/svgs/icon_checking.svg'
 import AccountShell from '../../../common/data/models/AccountShell'
 import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+import { hp, wp } from '../../../common/data/responsiveness/responsive'
 
 
 type Props = {
@@ -99,22 +100,18 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
   return ( <View style={{
     ...styles.modalContentContainer,
   }}>
-    <View style={{
-      // height: hp( 74 )
-    }}>
+    <View>
       <TouchableOpacity
         activeOpacity={1}
         onPress={onPress}
         style={{
-          width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+          width: wp( 28 ), height: wp( 28 ), borderRadius: wp( 14 ),
           alignSelf: 'flex-end',
           backgroundColor: Colors.golden, alignItems: 'center', justifyContent: 'center',
-          marginTop: wp( 3 ), marginRight: wp( 3 )
+          marginTop: wp( 10 ), marginRight: wp( 10 )
         }}
       >
-        <FontAwesome name="close" color={Colors.white} size={19} style={{
-        // marginTop: hp( 0.5 )
-        }} />
+        <FontAwesome name="close" color={Colors.white} size={wp( 19 )} />
       </TouchableOpacity>
       <Text style={[
         ListStyles.modalTitle,
@@ -123,7 +120,9 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           fontSize: RFValue( 18 ),
           letterSpacing: RFValue( 0.27 ),
           lineHeight: RFValue( 22 ),
-          marginBottom: hp( 3 )
+          marginBottom: hp( 25 ),
+          marginLeft: wp( 30 ),
+          marginRight: wp( 48 ),
         }
       ]}>{rampTitle}</Text>
       <Text style={styles.modalInfoText}>{rampMessage.split( '\n\n' )[ 0 ]}</Text>
@@ -175,7 +174,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         </View>
 
         <ListItem.Content style={{
-          height: wp( '14%' ),
+          height: hp( 53 ),
         }}>
           <ListItem.Subtitle
             style={ListStyles.infoHeaderSubtitleText}
@@ -221,7 +220,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           </View>
         </View>
         <ListItem.Content style={{
-          height: wp( '14%' )
+          height: hp( 46 )
         }}>
           <ListItem.Subtitle
             style={ListStyles.listItemSubtitle}
@@ -261,7 +260,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
 
         </AppBottomSheetTouchableWrapper>
       </View>
-      {rampFromBuyMenu
+      {/* {rampFromBuyMenu
         ? <View style={{
           alignSelf: 'flex-end',
           flexDirection: 'row',
@@ -287,7 +286,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           />
         </View>
         : null
-      }
+      } */}
     </View>
   </View>
   )
@@ -295,17 +294,17 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
 
 const styles = StyleSheet.create( {
   containerStyle: {
-    marginVertical: wp( 1 ),
     flexDirection: 'row',
-    marginEnd: wp( '4 %' ),
-    paddingHorizontal: wp( 5 ),
-    paddingVertical: wp( 3 ),
-    width: wp( '80%' ),
+    marginHorizontal: wp( 30 ),
+    paddingHorizontal: wp( 20 ),
+    paddingVertical: hp( 19 ),
+    width: wp( 295 ),
+    height: hp( 100 ),
     backgroundColor: Colors.white,
     alignItems: 'center',
     alignSelf: 'center',
-    marginBottom: hp( 3 ),
-    borderRadius: wp( 2 ),
+    marginBottom: hp( 20 ),
+    borderRadius: wp( 10 ),
     // elevation: 10,
     // shadowColor: Colors.borderColor,
     // shadowOpacity: 10,
@@ -314,8 +313,8 @@ const styles = StyleSheet.create( {
     // },
   },
   headerImageView: {
-    width: wp( '17%' ),
-    height: wp( '17%' ),
+    width: wp( 46 ),
+    height: hp( 44 ),
     // elevation: 10,
     // shadowColor: Colors.bgColor,
     // shadowOpacity: 10,
@@ -324,22 +323,22 @@ const styles = StyleSheet.create( {
     // },
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: wp( '17%' ) / 2,
-    margin: 5
+    borderRadius: wp( 23 ),
+    marginRight: wp( 9 ),
   },
   headerImage: {
-    width: wp( 10 ),
-    height: wp( 10 ),
-    borderRadius: wp( '10%' ) / 2,
+    width: wp( 46 ),
+    height: hp( 44 ),
+    borderRadius: wp( 23 ),
     resizeMode: 'contain'
   },
   headerImageInitials: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.backgroundColor,
-    width: wp( '15%' ),
-    height: wp( '15%' ),
-    borderRadius: wp( '15%' ) / 2,
+    // backgroundColor: Colors.backgroundColor,
+    width: wp( 44 ),
+    height: hp( 47 ),
+    borderRadius: wp( 44 ) / 2,
   },
   modalContentContainer: {
     backgroundColor: Colors.bgColor,
@@ -351,51 +350,44 @@ const styles = StyleSheet.create( {
     // marginRight: wp( 16 ),
   },
   destinationTitleText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     fontSize: RFValue( 20 ),
     color: Colors.black,
     alignContent: 'center',
-    marginVertical: hp( 0.3 ),
     letterSpacing: RFValue( 0.01 )
   },
-  successModalHeaderView: {
-    marginRight: wp( '10%' ),
-    // marginLeft: wp( '6%' ),
-  },
-  modalTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
-    width: wp( 30 ),
-    marginLeft: 10,
-  },
+  // modalTitleText: {
+  //   color: Colors.blue,
+  //   fontSize: RFValue( 18 ),
+  //   fontFamily: Fonts.RobotoSlabRegular,
+  //   width: wp( 30 ),
+  //   marginLeft: 10,
+  // },
   modalInfoText: {
-    marginLeft: wp( '7%' ),
-    marginRight: wp( '12%' ),
+    marginLeft: wp( 30 ),
+    marginRight: wp( 48 ),
     color: Colors.lightTextColor,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.RobotoSlabRegular,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 ),
-    marginTop: wp( 1.5 ),
-    marginBottom: wp( 1 )
+    marginBottom: hp( 20 )
   },
   modalInfoText1: {
-    marginLeft: wp( '7%' ),
-    marginRight: wp( '12%' ),
+    marginLeft: wp( 30 ),
+    marginRight: wp( 48 ),
     color: '#6C6C6C',
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.RobotoSlabRegular,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 ),
-    marginTop: wp( 0 ),
-    marginBottom: wp( 3 )
+    marginBottom: hp( 30 )
   },
   successModalButtonView: {
-    height: wp( '13%' ),
-    width: wp( '30%' ),
+    height: hp( 60 ),
+    width: wp( 120 ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 11,
@@ -407,15 +399,15 @@ const styles = StyleSheet.create( {
     },
     backgroundColor: Colors.blue,
     alignSelf: 'flex-start',
-    marginLeft: wp( '6%' ),
-    marginTop: hp( 2 )
+    marginLeft: wp( 30 ),
+    marginTop: hp( 30 )
   },
-  successModalImage: {
-    width: wp( '25%' ),
-    height: hp( '18%' ),
-    marginLeft: 'auto',
-    resizeMode: 'cover'
-  },
+  // successModalImage: {
+  //   width: wp( '25%' ),
+  //   height: hp( '18%' ),
+  //   marginLeft: 'auto',
+  //   resizeMode: 'cover'
+  // },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
