@@ -8,7 +8,7 @@ const HeadingStyles = StyleSheet.create( {
   listSectionHeading: {
     fontSize: RFValue( 14 ),
     fontWeight: '300',
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     color: Colors.blue,
     paddingHorizontal: 16,
   },

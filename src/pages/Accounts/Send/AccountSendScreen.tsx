@@ -1,5 +1,5 @@
-import React, { ReactElement, useMemo } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import React, { ReactElement, useMemo, useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from 'react-native'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
@@ -15,9 +15,14 @@ import { makeAccountRecipientDescription } from '../../../utils/sending/Recipien
 import RecipientKind from '../../../common/data/enums/RecipientKind'
 import useSelectedRecipientsForSending from '../../../utils/hooks/state-selectors/sending/UseSelectedRecipientsForSending'
 import { translations } from '../../../common/content/LocContext'
+import { hp, wp } from '../../../common/data/responsiveness/responsive'
+import Colors from '../../../common/Colors'
+import Fonts from '../../../common/Fonts'
+import SelectAccount from '../../../components/SelectAccount'
 
 export type Props = {
   accountShell: AccountShell;
+  setAccountShell: any;
   sendableContacts: ContactRecipientDescribing[];
   sendableAccountShells: AccountShell[];
   onQRScanned: ( { data: barcodeDataString }: BarCodeReadEvent ) => void;
@@ -28,6 +33,7 @@ export type Props = {
 };
 
 export enum SectionKind {
+  CURRENT_ACCOUNT,
   SCAN_QR,
   ENTER_ADDRESS,
   SELECT_CONTACTS,
@@ -39,6 +45,7 @@ const sectionListItemKeyExtractor = ( index ) => String( index )
 
 const AccountSendScreen: React.FC<Props> = ( {
   accountShell,
+  setAccountShell,
   sendableContacts,
   sendableAccountShells,
   onQRScanned,
@@ -71,7 +78,7 @@ const AccountSendScreen: React.FC<Props> = ( {
   ): ReactElement | null {
     switch ( sectionKind ) {
         case SectionKind.SELECT_CONTACTS:
-          return <Text style={styles.listSectionHeading}>{strings.Sendtocontact}</Text>
+          return <Text style={styles.listSectionHeading}>{'or send to a contact'}</Text>
         case SectionKind.SELECT_ACCOUNT_SHELLS:
           return <Text style={styles.listSectionHeading}>{strings.Sendtoaccount}</Text>
     }
@@ -80,6 +87,17 @@ const AccountSendScreen: React.FC<Props> = ( {
   const sections = useMemo( () => {
     return [
       ...[
+        {
+          kind: SectionKind.CURRENT_ACCOUNT,
+          data: [ null ],
+          renderItem: () => {
+            return (
+              <SelectAccount onSelect={( item ) => {
+                setAccountShell( item )
+              }} />
+            )
+          }
+        },
         {
           kind: SectionKind.SCAN_QR,
           data: [ null ],
@@ -165,6 +183,10 @@ const AccountSendScreen: React.FC<Props> = ( {
 
   return (
     <View style={styles.rootContainer}>
+      <StatusBar
+        animated={true}
+        backgroundColor={Colors.blue} />
+
       <KeyboardAwareSectionList
         extraData={[
           sendableContacts,
@@ -222,6 +244,30 @@ const styles = StyleSheet.create( {
     marginRight: 0,
     marginBottom: 0,
     marginLeft: 0,
+  },
+  accountSelectionView: {
+    width: '90%',
+    // shadowOpacity: 0.06,
+    // shadowOffset: {
+    //   width: 10, height: 10
+    // },
+    // shadowRadius: 10,
+    // elevation: 2,
+    alignSelf: 'center',
+    marginTop: hp( 2 ),
+    marginBottom: hp( 2 ),
+  },
+  availableToSpendText: {
+    color: '#505050',
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.RobotoSlabLight,
+    lineHeight: 15,
+  },
+  balanceText: {
+    color: '#505050',
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.RobotoSlabLight,
+    lineHeight: 15,
   },
 } )
 

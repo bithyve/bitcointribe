@@ -28,6 +28,8 @@ import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUn
 import { TxPriority } from '../../../bitcoin/utilities/Interface'
 import AccountShell from '../../../common/data/models/AccountShell'
 import ModalContainer from '../../../components/home/ModalContainer'
+import { hp, wp } from '../../../common/data/responsiveness/responsive'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export type Props = {
   accountShell: AccountShell;
@@ -41,7 +43,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
   onTransactionPriorityChanged,
 }: Props ) => {
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
-  const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.LOW )
+  const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.HIGH )
   const [ customPriorityModel, showCustomPriorityModel ] = useState( false )
   const availableTransactionPriorities = useAvailableTransactionPriorities()
   const [ transactionPriorities, setTransactionPriorities ] = useState( availableTransactionPriorities )
@@ -119,19 +121,18 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
     <View style={styles.rootContainer}>
       <Text style={{
         ...HeadingStyles.listSectionHeading,
-        paddingHorizontal: 24,
-        marginBottom: 14,
+        paddingHorizontal: wp( 26 ),
       }}>
         Transaction Priority
       </Text>
 
       <View style={{
-        paddingHorizontal: 16
+        paddingHorizontal: wp( 28 )
       }}>
         <View style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
-          paddingVertical: 10,
+          paddingTop: hp( 23 ),
         }}>
           <Text style={styles.headingLabelText}>Priority</Text>
           <Text style={styles.headingLabelText}>Arrival Time</Text>
@@ -150,13 +151,12 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
               <View style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                paddingVertical: heightPercentageToDP( '2%' ),
                 flex: 1,
               }}>
                 <RadioButton
-                  size={20}
-                  color={Colors.lightBlue}
-                  borderColor={Colors.borderColor}
+                  size={wp( 12 )}
+                  color={Colors.white}
+                  borderColor={'#E3E3E3'}
                   isChecked={transactionPriority == priority}
                   onpress={() => {
                     setTransactionPriority( priority )
@@ -165,9 +165,9 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
                 />
                 <Text style={{
                   ...styles.priorityTableText,
-                  marginLeft: 12,
+                  marginLeft: wp( 15 ),
                 }}>
-                  {String( priority.toUpperCase() )}
+                  {String( priority[ 0 ].toUpperCase() + priority.slice( 1 ) )}
                 </Text>
               </View>
 
@@ -196,21 +196,37 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
         } )}
 
         <TouchableOpacity
-          style={styles.customPriorityGroupBox}
+          style={styles.priorityRowContainer}
           onPress={() => showCustomPriorityModel( true )}
         >
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingVertical: heightPercentageToDP( '1.5%' ),
-              paddingHorizontal: heightPercentageToDP( '1.5%' ),
+              marginBottom: hp( 20 )
             }}
           >
-            <Text style={styles.customPriorityGroupBoxLabel}>
+            <RadioButton
+              size={wp( 12 )}
+              color={Colors.white}
+              borderColor={'#E3E3E3'}
+              isChecked={transactionPriority == TxPriority.CUSTOM}
+              onpress={() => {
+                setTransactionPriority( TxPriority.CUSTOM )
+                onTransactionPriorityChanged( TxPriority.CUSTOM )
+              }}
+            />
+            <View style={{
+              flex: 1,
+            }}>
+              <Text style={{
+                ...styles.priorityTableText,
+                marginLeft: wp( 15 ),
+                marginRight: 'auto',
+              }}>
               Custom Priority
-            </Text>
+              </Text>
+            </View>
             <View
               style={{
                 paddingHorizontal: 5,
@@ -218,9 +234,9 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
                 justifyContent: 'center',
               }}
             >
-              <Ionicons
-                name="ios-arrow-forward"
-                color={Colors.textColorGrey}
+              <FontAwesome
+                name="chevron-right"
+                color={'#C4C4C4'}
                 size={12}
               />
             </View>
@@ -246,8 +262,10 @@ const styles = StyleSheet.create( {
 
   priorityTableText: {
     fontSize: RFValue( 12 ),
-    lineHeight: RFValue( 14 ),
-    color: Colors.textColorGrey,
+    lineHeight: RFValue( 16 ),
+    letterSpacing: RFValue( 0.24 ),
+    color: '#505050',
+    fontFamily: Fonts.RobotoSlabRegular,
     textAlign: 'right',
   },
 
@@ -275,9 +293,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderTopColor: Colors.borderColor,
-    borderTopWidth: 1,
-    paddingHorizontal: 25,
+    paddingTop: hp( 29 ),
   },
 
   priorityValueContainer: {
@@ -288,11 +304,8 @@ const styles = StyleSheet.create( {
   },
 
   customPriorityGroupBox: {
-    borderRadius: 8,
     marginVertical: heightPercentageToDP( '1.2%' ),
-    backgroundColor: Colors.secondaryBackgroundColor,
-    borderColor: Colors.backgroundColor,
-    borderWidth: 2,
+    flexDirection: 'row',
   },
 
   customPriorityGroupBoxLabel: {
@@ -302,8 +315,10 @@ const styles = StyleSheet.create( {
   },
 
   headingLabelText: {
-    fontSize: RFValue( 9 ),
-    fontWeight: '700',
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.RobotoSlabMedium,
+    lineHeight: RFValue( 13 ),
+    letterSpacing: RFValue( 0.2 ),
     flex: 1,
     textAlign: 'center'
   }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   View,
@@ -28,7 +28,7 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import BottomSheet from 'reanimated-bottom-sheet'
-
+import { hp as hp1, wp as wp1 } from '../../common/data/responsiveness/responsive'
 import {
   setReceiveHelper,
   setSavingWarning,
@@ -56,6 +56,15 @@ import { getNextFreeAddress } from '../../store/sagas/accounts'
 import { translations } from '../../common/content/LocContext'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { onPressKeeper } from '../../store/actions/BHR'
+import NewSwitch from '../../components/NewSwitch'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import { UsNumberFormat } from '../../common/utilities'
+import { AccountsState } from '../../store/reducers/accounts'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import IconBitcoin from  '../../assets/images/svgs/icon_bitcoin1.svg'
+import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 
 export default function Receive( props ) {
   const dispatch = useDispatch()
@@ -73,7 +82,7 @@ export default function Receive( props ) {
   const common = translations[ 'common' ]
   const [ SecureReceiveWarningBottomSheet ] = useState( React.createRef() )
   const [ amount, setAmount ] = useState( '' )
-  const accountShell: AccountShell = props.navigation.getParam( 'accountShell' )
+  const [ accountShell, setAccountShell ] = useState<AccountShell>( props.navigation.getParam( 'accountShell' ) )
   const account: Account = useAccountByAccountShell( accountShell )
   const [ receivingAddress, setReceivingAddress ] = useState( null )
   const [ paymentURI, setPaymentURI ] = useState( null )
@@ -204,8 +213,8 @@ export default function Receive( props ) {
     return (
 
       <ReceiveAmountContent
-        title={strings.Receivesats}
-        message={strings.Receivesatsinto}
+        title={'Enter Amount'}
+        message={'to receive sats into the selected account'}
         onPressConfirm={( amount ) => {
           setAmount( amount )
           setReceiveModal( false )
@@ -234,6 +243,151 @@ export default function Receive( props ) {
     } else if ( paymentURI ) setPaymentURI( null )
   }, [ amount ] )
 
+  const accountsState: AccountsState = useSelector( ( state ) => state.accounts )
+
+  const currencyCode = useSelector( ( state ) => state.preferences.currencyCode )
+
+  const currencyKind: CurrencyKind = useSelector(
+    ( state ) => state.preferences.giftCurrencyKind || CurrencyKind.BITCOIN
+  )
+
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
+
+  const fiatCurrencyCode = useCurrencyCode()
+
+  const [ accountListModal, setAccountListModal ] = useState( false )
+
+  const activeAccounts = useActiveAccountShells().filter(
+    ( shell ) => shell?.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT
+  )
+
+  const renderAccountList = () => {
+    return (
+      <ScrollView
+        style={{
+          height: 'auto',
+        }}
+      >
+        {activeAccounts.map( ( item, index ) => {
+          if (
+            [ AccountType.TEST_ACCOUNT, AccountType.SWAN_ACCOUNT ].includes(
+              item.primarySubAccount.type
+            ) ||
+            !item.primarySubAccount.isUsable ||
+            item.primarySubAccount.isTFAEnabled
+          )
+            return
+          return (
+            <View
+              key={index}
+              style={{
+                backgroundColor: Colors.white,
+              }}
+            >
+              {accountElement( item, () => {
+                setAccountShell( item )
+                setAccountListModal( false )
+              } )}
+            </View>
+          )
+        } )}
+      </ScrollView>
+    )
+  }
+
+  const accountElement = (
+    item,
+    onPressCallBack,
+    activeOpacity = 0,
+    width = '90%',
+  ) => {
+    return (
+      <TouchableOpacity
+        style={{
+          ...styles.accountSelectionView,
+          width: width,
+        }}
+        onPress={() => onPressCallBack()}
+        activeOpacity={activeOpacity}
+      >
+        <View
+          style={{
+            borderRadius: wp( 2 ),
+          }}
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              width: '100%',
+              paddingVertical: hp1( 10 ),
+              paddingHorizontal: wp1( 2 ),
+              alignItems: 'center',
+              backgroundColor: Colors.white,
+            }}
+          >
+            <View
+              style={{
+                width: wp1( 38 ),
+                height: '100%',
+                marginTop: hp1( 30 ),
+                marginRight: wp1( 11 ),
+              }}
+            >
+              {getAvatarForSubAccount( item.primarySubAccount, false, true )}
+            </View>
+            <View
+              style={{
+                marginHorizontal: wp1( 3 ),
+                flex: 1,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.black,
+                  fontSize: RFValue( 14 ),
+                  fontFamily: Fonts.RobotoSlabRegular,
+                }}
+              >
+                To {item.primarySubAccount.customDisplayName ??
+                  item.primarySubAccount.defaultTitle}
+              </Text>
+              <Text style={styles.availableToSpendText}>
+                {'Available '}
+                <Text style={styles.balanceText}>
+                  {prefersBitcoin
+                    ? UsNumberFormat(
+                      item.primarySubAccount?.balances?.confirmed
+                    )
+                    : accountsState.exchangeRates &&
+                      accountsState.exchangeRates[ currencyCode ]
+                      ? (
+                        ( item.primarySubAccount?.balances?.confirmed /
+                          SATOSHIS_IN_BTC ) *
+                        accountsState.exchangeRates[ currencyCode ].last
+                      ).toFixed( 2 )
+                      : 0}
+                </Text>
+                <Text>{prefersBitcoin ? ' sats' : ` ${fiatCurrencyCode}`}</Text>
+              </Text>
+            </View>
+            {activeOpacity === 0 && (
+              <MaterialCommunityIcons
+                name="dots-horizontal"
+                size={24}
+                color="gray"
+                style={{
+                  alignSelf: 'center',
+                }}
+              />
+            )}
+          </View>
+        </View>
+      </TouchableOpacity>
+    )
+  }
+
   return (
     <View style={{
       flex: 1
@@ -241,7 +395,7 @@ export default function Receive( props ) {
       <SafeAreaView style={{
         flex: 0
       }} />
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.blue} barStyle="dark-content" />
       <TouchableWithoutFeedback onPress={() => onPressTouchableWrapper()}>
         <KeyboardAvoidingView
           style={{
@@ -251,63 +405,51 @@ export default function Receive( props ) {
           enabled
         >
           <View style={NavStyles.modalContainer}>
-            <View style={NavStyles.modalHeaderTitleView}>
+            <View style={{
+              alignItems: 'center',
+              flexDirection: 'row',
+              backgroundColor: Colors.blue,
+              borderBottomLeftRadius: wp1( 25 ),
+              paddingHorizontal: wp1( 30 ),
+              height: hp1( 100 )
+            }}>
               <View
                 style={{
-                  flex: 1, flexDirection: 'row', alignItems: 'stretch'
+                  flexDirection: 'row', alignItems: 'stretch',
                 }}
               >
                 <TouchableOpacity
                   onPress={() => onPressBack()}
                   style={{
-                    height: 30, width: 30, justifyContent: 'center'
+                    marginRight: wp1( 31 ),
+                    justifyContent: 'center', alignItems:'center'
                   }}
                 >
                   <FontAwesome
-                    name="long-arrow-left"
-                    color={Colors.blue}
+                    name="chevron-left"
+                    color={Colors.white}
                     size={17}
                   />
                 </TouchableOpacity>
-                <Image
-                  source={
-                    getAccountIconByShell( accountShell )
-                  }
-                  style={{
-                    width: wp( '10%' ), height: wp( '10%' )
-                  }}
-                />
                 <View style={{
-                  marginLeft: wp( '2.5%' )
+                  marginLeft: wp( '2.5%' ),
+                  justifyContent: 'center',
+                  flex: 1
                 }}>
-                  <Text style={NavStyles.modalHeaderTitleText}>{common.receive}</Text>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue( 12 ),
-                    }}
-                  >
-                    {
-                      getAccountTitleByShell( accountShell )
-                    }
-                  </Text>
+                  <Text style={{
+                    ...NavStyles.modalHeaderTitleText, color: Colors.white
+                  }}>{common.receive}</Text>
                 </View>
+                <NewSwitch />
               </View>
-              {accountShell.primarySubAccount.type == AccountType.TEST_ACCOUNT ? (
-                <KnowMoreButton
-                  onpress={() => onPressKnowMore()}
-                  containerStyle={{
-                    marginTop: 'auto',
-                    marginBottom: 'auto',
-                    marginRight: 10,
-                  }}
-                />
-              ) : null}
             </View>
             <ScrollView>
+              {accountElement( accountShell, () =>
+                setAccountListModal( !accountListModal )
+              )}
+
               <View style={styles.QRView}>
-                <QRCode title={getAccountTitleByShell( accountShell ) === 'Test Account' ? 'Testnet address' : 'Bitcoin address'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp( '27%' )} />
+                <QRCode title={getAccountTitleByShell( accountShell ) === 'Test Account' ? 'Testnet address' : 'Bitcoin address'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp1( 230 )} />
               </View>
 
               <CopyThisText
@@ -319,10 +461,21 @@ export default function Receive( props ) {
                 onPress={() => { setReceiveModal( true ) }}
                 style={styles.selectedView}
               >
+                <View style={{
+                  backgroundColor: '#FABC05',
+                  width: wp1( 38 ),
+                  height: wp1( 38 ),
+                  borderRadius: wp1( 19 ),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                  <IconBitcoin />
+                </View>
                 <View
                   style={styles.text}
                 >
                   <Text style={styles.titleText}>{amount ? amount : strings.Enteramount}</Text>
+                  <Text style={styles.subText}>Enter amount to receive</Text>
                 </View>
 
                 <View style={{
@@ -330,25 +483,34 @@ export default function Receive( props ) {
                 }}>
                   <Ionicons
                     name="chevron-forward"
-                    color={Colors.textColorGrey}
+                    color={'#C4C4C4'}
                     size={15}
                     style={styles.forwardIcon}
                   />
                 </View>
               </AppBottomSheetTouchableWrapper>
 
+              <View style={{
+                marginBottom: hp1( 76 )
+              }}>
+                <BottomInfoBox
+                  title={common.note}
+                  infoText={strings.Itwouldtake}
+                  backgroundColor={'transparent'}
+                />
+              </View>
             </ScrollView>
-            <View style={{
-              marginBottom: hp( '2.5%' )
-            }}>
-              <BottomInfoBox
-                title={common.note}
-                infoText={strings.Itwouldtake}
-              />
-            </View>
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
+
+      <ModalContainer
+        onBackground={() => setAccountListModal( false )}
+        visible={accountListModal}
+        closeBottomSheet={() => setAccountListModal( false )}
+      >
+        {renderAccountList()}
+      </ModalContainer>
 
       <ModalContainer onBackground={() => showReceiveHelper( false )} visible={receiveHelper} closeBottomSheet={() => { showReceiveHelper( false ) }} >
         <ReceiveHelpContents
@@ -459,20 +621,25 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
   },
   QRView: {
-    height: hp( '30%' ),
     justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
     alignItems: 'center',
-    marginTop: hp( '3%' )
   },
   titleText: {
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.RobotoSlabRegular,
     color: Colors.textColorGrey,
+    lineHeight: RFValue( 16 ),
+    letterSpacing: RFValue( 0.6 )
   },
   text: {
     justifyContent: 'center', marginRight: 10, marginLeft: 10, flex: 1
+  },
+  subText: {
+    fontFamily: Fonts.RobotoSlabLight,
+    fontSize: RFValue( 11 ),
+    letterSpacing: RFValue( 0.22 ),
+    lineHeight: RFValue( 13 ),
+    paddingTop: hp1( 2 )
   },
   knowMoreTouchable: {
     color: Colors.textColorGrey,
@@ -488,8 +655,6 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     paddingTop: 15,
     paddingBottom: 20,
-    borderBottomColor: Colors.borderColor,
-    borderBottomWidth: 1,
   },
   forwardIcon: {
     marginLeft: wp( '3%' ),
@@ -500,5 +665,29 @@ const styles = StyleSheet.create( {
     marginLeft: wp( '5%' ),
     marginRight: wp( '5%' ),
     marginBottom: wp( '5%' )
+  },
+  accountSelectionView: {
+    width: '90%',
+    // shadowOpacity: 0.06,
+    // shadowOffset: {
+    //   width: 10, height: 10
+    // },
+    // shadowRadius: 10,
+    // elevation: 2,
+    alignSelf: 'center',
+    marginTop: hp1( 33 ),
+    marginBottom: hp1( 20 ),
+  },
+  availableToSpendText: {
+    color: '#505050',
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.RobotoSlabLight,
+    lineHeight: 15,
+  },
+  balanceText: {
+    color: '#505050',
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.RobotoSlabLight,
+    lineHeight: 15,
   },
 } )
