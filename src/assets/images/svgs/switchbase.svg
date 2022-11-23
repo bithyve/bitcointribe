@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="26" viewBox="0 0 48 26">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.149" y1="0.103" x2="0.354" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#cee0fd"/>
+      <stop offset="1" stop-color="#ffeabc"/>
+    </linearGradient>
+  </defs>
+  <rect id="switchbase" width="48" height="26" rx="13" fill="url(#linear-gradient)"/>
+</svg>

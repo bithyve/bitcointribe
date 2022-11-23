@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38">
+  <g id="note" transform="translate(-26 -664)">
+    <path id="icon_receive" d="M19,0A19,19,0,1,1,0,19,19,19,0,0,1,19,0Z" transform="translate(26 664)" fill="#fabc05"/>
+    <g id="file" transform="translate(38 674)">
+      <path id="Shape" d="M2.146,17.04A2.145,2.145,0,0,1,0,14.885V2.154A2.152,2.152,0,0,1,2.146,0H7.509V4.29A2.145,2.145,0,0,0,9.655,6.436h4.29v8.458A2.146,2.146,0,0,1,11.8,17.04ZM9.655,4.29V.078L13.868,4.29Z" transform="translate(0)" fill="#fff"/>
+    </g>
+  </g>
+</svg>

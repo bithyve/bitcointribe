@@ -1,18 +1,14 @@
 import React, { memo, useState } from 'react'
-import { View, Text, StyleSheet, FlatList, Image, TextInput, TouchableOpacity, Platform } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../common/Colors'
-import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
+import { wp as wp1, hp as hp1 } from '../../common/data/responsiveness/responsive'
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import Fonts from '../../common/Fonts'
-import BottomInfoBox from '../BottomInfoBox'
 import { translations } from '../../common/content/LocContext'
-
-
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 const ReceiveAmountContent = ( {
   title,
   message,
@@ -28,6 +24,24 @@ const ReceiveAmountContent = ( {
       <View style={{
         // flex: 1
       }}>
+        <TouchableOpacity style={{
+          backgroundColor: '#FABC05',
+          width: wp1( 28 ),
+          height: wp1( 28 ),
+          borderRadius: wp1( 14 ),
+          alignItems: 'center',
+          justifyContent: 'center',
+          alignSelf: 'flex-end',
+          marginTop: hp1( 10 ),
+          marginRight: wp1( 10 )
+        }}
+        onPress={onPressBack ? onPressBack : null}>
+          <FontAwesome
+            name={'close'}
+            color={'white'}
+            size={wp1( 15 )}
+          />
+        </TouchableOpacity>
         <View style={styles.successModalHeaderView}>
           <Text style={styles.modalTitleText}>{title}</Text>
           <Text style={{
@@ -35,17 +49,17 @@ const ReceiveAmountContent = ( {
           }}>{message}</Text>
         </View>
         <View style={styles.textBoxView}>
-          <View style={styles.amountInputImage}>
+          {/* <View style={styles.amountInputImage}>
             <Image
               style={styles.textBoxImage}
               source={require( '../../assets/images/icons/icon_bitcoin_gray.png' )}
             />
-          </View>
+          </View> */}
           <TextInput
             style={{
-              ...styles.textBox, paddingLeft: 10
+              ...styles.textBox
             }}
-            placeholder={'sats'}
+            placeholder={'Enter amount in sats'}
             value={amount}
             returnKeyLabel="Done"
             returnKeyType="done"
@@ -64,7 +78,9 @@ const ReceiveAmountContent = ( {
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              marginBottom: hp( '4%' ),
+              justifyContent: 'flex-end',
+              marginBottom: hp1( 30 ),
+              marginHorizontal: wp1( 20 )
             }}
           >
             <TouchableOpacity
@@ -74,16 +90,6 @@ const ReceiveAmountContent = ( {
               style={styles.successModalButtonView}
             >
               <Text style={styles.proceedButtonText}>{common.receive}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => onPressBack()}
-              style={styles.backButton}
-            >
-              <Text style={{
-                ...styles.proceedButtonText, color: Colors.blue
-              }}>
-                {common.back}
-              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -98,27 +104,30 @@ const styles = StyleSheet.create( {
   modalContentContainer: {
     // height: '100%',
     width: '100%',
-    backgroundColor: Colors.white,
+    backgroundColor: '#F5F5F5',
   },
   successModalHeaderView: {
-    marginRight: wp( '10%' ),
-    marginLeft: wp( '10%' ),
-    marginTop: wp( '5%' ),
+    marginHorizontal: wp1( 30 ),
+    marginTop: hp1( 9 )
   },
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.RobotoSlabMedium,
+    lineHeight: RFValue( 24 ),
+    letterSpacing: RFValue( 0.54 )
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
-    textAlign: 'justify'
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.RobotoSlabRegular,
+    textAlign: 'justify',
+    lineHeight: RFValue( 18 ),
+    letterSpacing: RFValue( 0.6 )
   },
   successModalButtonView: {
-    height: wp( '13%' ),
-    width: wp( '35%' ),
+    height: hp1( 50 ),
+    width: wp1( 120 ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
@@ -129,7 +138,7 @@ const styles = StyleSheet.create( {
       width: 15, height: 15
     },
     backgroundColor: Colors.blue,
-    alignSelf: 'center',
+    alignSelf: 'flex-end',
     marginLeft: wp( '8%' ),
   },
   proceedButtonText: {
@@ -145,14 +154,10 @@ const styles = StyleSheet.create( {
   },
   textBoxView: {
     flexDirection: 'row',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
     height: 50,
-    marginRight: wp( '10%' ),
-    marginLeft: wp( '10%' ),
-    marginBottom: hp( 4 ),
-    marginTop: hp( 4 ),
+    marginHorizontal: wp1( 20 ),
+    marginBottom: hp1( 41 ),
+    marginTop: hp1( 96 ),
   },
   textBoxImage: {
     width: wp( '6%' ),
@@ -174,5 +179,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansMedium,
     fontSize: RFValue( 13 ),
+    backgroundColor: Colors.white,
+    borderRadius: 10,
   },
 } )
