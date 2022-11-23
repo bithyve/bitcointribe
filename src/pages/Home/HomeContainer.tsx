@@ -146,7 +146,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     return (
       <View style={containerView}>
-
+        <View style={{
+          borderBottomLeftRadius: 25, height:50, backgroundColor:Colors.appPrimary
+        }}/>
         <View style={{
           flexDirection: 'row',
           justifyContent: 'space-between',

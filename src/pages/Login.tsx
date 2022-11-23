@@ -246,12 +246,12 @@ export default function Login( props ) {
       } else {
         setloaderModal( false )
         if( !creationFlag ) {
-          props.navigation.navigate( 'Home', {
-            screen: 'Home'
+          props.navigation.navigate( 'NewHome', {
+            screen: 'NewHome'
           } )
         } else if( processedLink ){
-          props.navigation.navigate( 'Home', {
-            screen: 'Home',
+          props.navigation.navigate( 'NewHome', {
+            screen: 'NewHome',
             params: {
               trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,
               giftRequest: processedLink ? processedLink.giftRequest: null,

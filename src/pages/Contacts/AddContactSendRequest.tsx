@@ -44,6 +44,7 @@ import * as ExpoContacts from 'expo-contacts'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { AccountsState } from '../../store/reducers/accounts'
 import ChangeSelection from '../FriendsAndFamily/ChangeSelection'
+import BackIcon from "../../assets/images/backWhite.svg";
 
 export default function AddContactSendRequest( props ) {
   const { translations, formatString } = useContext( LocalizationContext )
@@ -423,16 +424,32 @@ export default function AddContactSendRequest( props ) {
   }, [ OTP, renderTimer ] )
 
   return (
+    <View style = {{ flex: 1, }}>
     <SafeAreaView style={{
-      flex: 1, backgroundColor: Colors.backgroundColor
-    }}>
-      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
+     backgroundColor: Colors.blueTextNew
+    }}/>
+      <StatusBar backgroundColor={Colors.blueTextNew} barStyle="dark-content" />
       <ScrollView >
-        <View style={[ CommonStyles.headerContainer, {
-          backgroundColor: Colors.backgroundColor,
-          flexDirection: 'row',
-          justifyContent: 'space-between'
-        } ]}>
+        <View
+        style={{
+          // width,
+          borderBottomLeftRadius: 25,
+          backgroundColor: Colors.blueTextNew,
+          marginBottom: 20,
+          flexDirection: "column",
+        }}
+      >
+        <View
+          style={[
+            CommonStyles.headerContainer,
+            {
+              backgroundColor: Colors.blueTextNew,
+              flexDirection: "row",
+              marginRight: 10,
+              marginBottom: 20,
+            },
+          ]}
+        >
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
@@ -440,40 +457,16 @@ export default function AddContactSendRequest( props ) {
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
+              <BackIcon />
             </View>
           </TouchableOpacity>
-          {/* {giftId &&
-          <TouchableOpacity
-            onPress={() => props.navigation.pop( giftId ? 4 : 3 )}
-            style={{
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              backgroundColor: Colors.lightBlue,
-              paddingHorizontal: wp( 4 ),
-              paddingVertical: wp( 2 ),
-              marginRight: wp( 5 ),
-              borderRadius: wp( 2 )
-            }}
-          >
-            <Text
-              style={{
-                ...{
-                  color: Colors.backgroundColor1,
-                  fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                }
-              }}
-            >
-            Done
+          <View style={CommonStyles.headerCenterIconContainer}>
+            <Text style={CommonStyles.headerCenterIconInnerContainer}>
+              Add Contact
             </Text>
-          </TouchableOpacity>
-          } */}
+          </View>
         </View>
+      </View>
         <RequestKeyFromContact
           isModal={false}
           headerText={giftId ? 'Send Gift' : null}
@@ -683,7 +676,7 @@ export default function AddContactSendRequest( props ) {
           {renderShareOtpWithTrustedContactContent()}
         </ModalContainer>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   )
 }
 const styles = StyleSheet.create( {
