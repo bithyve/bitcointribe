@@ -104,6 +104,14 @@
 		F49AA81026A0284D0097D815 /* BackgroundViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F49AA80C26A0284D0097D815 /* BackgroundViewController.xib */; };
 		F49AA81126A0284D0097D815 /* BackgroundViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F49AA80C26A0284D0097D815 /* BackgroundViewController.xib */; };
 		F49AA81226A0284D0097D815 /* BackgroundViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F49AA80C26A0284D0097D815 /* BackgroundViewController.xib */; };
+		F49EDD65292E10E1007276AB /* RobotoSlab-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8648BA858C9141B3BBFAB364 /* RobotoSlab-Bold.ttf */; };
+		F49EDD66292E10E1007276AB /* RobotoSlab-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D429AD2560964C05AD3F309A /* RobotoSlab-Light.ttf */; };
+		F49EDD67292E10E1007276AB /* RobotoSlab-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C1BA7F44B5D545D5810E973D /* RobotoSlab-Medium.ttf */; };
+		F49EDD68292E10E1007276AB /* RobotoSlab-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 35ED8A8FF3F4423185F02AF0 /* RobotoSlab-Regular.ttf */; };
+		F49EDD69292E112E007276AB /* RobotoSlab-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8648BA858C9141B3BBFAB364 /* RobotoSlab-Bold.ttf */; };
+		F49EDD6A292E112E007276AB /* RobotoSlab-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D429AD2560964C05AD3F309A /* RobotoSlab-Light.ttf */; };
+		F49EDD6B292E112E007276AB /* RobotoSlab-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C1BA7F44B5D545D5810E973D /* RobotoSlab-Medium.ttf */; };
+		F49EDD6C292E112E007276AB /* RobotoSlab-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 35ED8A8FF3F4423185F02AF0 /* RobotoSlab-Regular.ttf */; };
 		FC9848DE447644B59209F6C3 /* OpenSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 39CE481CEF614843B40E1EC5 /* OpenSans-ExtraBold.ttf */; };
 /* End PBXBuildFile section */
 
@@ -550,6 +558,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F49EDD65292E10E1007276AB /* RobotoSlab-Bold.ttf in Resources */,
+				F49EDD66292E10E1007276AB /* RobotoSlab-Light.ttf in Resources */,
+				F49EDD67292E10E1007276AB /* RobotoSlab-Medium.ttf in Resources */,
+				F49EDD68292E10E1007276AB /* RobotoSlab-Regular.ttf in Resources */,
 				4D3833052600A08900F82BDB /* HexaWalletBackup.json in Resources */,
 				6182F77E250B23D7005B6ECE /* LaunchScreen.storyboard in Resources */,
 				6182F77F250B23D7005B6ECE /* Images.xcassets in Resources */,
@@ -579,6 +591,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F49EDD69292E112E007276AB /* RobotoSlab-Bold.ttf in Resources */,
+				F49EDD6A292E112E007276AB /* RobotoSlab-Light.ttf in Resources */,
+				F49EDD6B292E112E007276AB /* RobotoSlab-Medium.ttf in Resources */,
+				F49EDD6C292E112E007276AB /* RobotoSlab-Regular.ttf in Resources */,
 				4D3833092600BD1400F82BDB /* HexaWalletBackup.json in Resources */,
 				AA11C3A42548271A00B032D1 /* HEXA.Stage-Info.plist in Resources */,
 				6182F7AA250B2742005B6ECE /* LaunchScreen.storyboard in Resources */,
