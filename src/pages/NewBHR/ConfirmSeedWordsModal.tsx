@@ -10,10 +10,10 @@ import {
 } from 'react-native'
 import Fonts from '../../common/Fonts'
 import Colors from '../../common/Colors'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
+// import {
+//   widthPercentageToDP as wp,
+//   heightPercentageToDP as hp,
+// } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -21,6 +21,7 @@ import { LocalizationContext } from '../../common/content/LocContext'
 import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { hp, wp } from '../../common/data/responsiveness/responsive'
 
 export default function ConfirmSeedWordsModal( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -84,18 +85,16 @@ export default function ConfirmSeedWordsModal( props ) {
       > */}
       <View style={{
         // height: hp( '72%' ),
-        paddingHorizontal:8,
-        paddingTop:8,
         backgroundColor: 'white'
       }}>
         <TouchableOpacity
           activeOpacity={1}
           onPress={props.onPressIgnore}
           style={{
-            width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+            width: wp( 28 ), height: wp( 28 ), borderRadius: wp( 14 ),
             alignSelf: 'flex-end',
             backgroundColor: Colors.golden, alignItems: 'center', justifyContent: 'center',
-            marginTop: wp( 3 ), marginRight: wp( 3 )
+            marginTop: hp( 10 ), marginRight: wp( 10 )
           }}
         >
           <FontAwesome name="close" color={Colors.white} size={19} style={{
@@ -107,34 +106,35 @@ export default function ConfirmSeedWordsModal( props ) {
           fontSize: RFValue( 14 ),
           color: Colors.textColorGrey,
           lineHeight: RFValue( 30 ),
-          marginHorizontal: wp( '5%' ),
+          marginHorizontal: wp( 30 ),
         }}>
           Backup Seed Words
         </Text>
         <Text style={{
-          // marginBottom: wp( '%' ),
           color: Colors.blue,
           fontSize: RFValue( 18 ),
           fontFamily: Fonts.RobotoSlabRegular,
           lineHeight: RFValue( 30 ),
-          marginHorizontal: wp( '5%' ),
+          marginHorizontal: wp( 30 ),
+          marginTop: hp( 4 ),
           letterSpacing: RFValue( 0.01 )
         }} >{'Confirm Seed Words'}</Text>
         <Text style={{
           color: Colors.textColorGrey,
           fontSize: RFValue( 12 ),
           fontFamily: Fonts.RobotoSlabRegular,
-          marginHorizontal: wp( '5%' ),
-          marginTop: 5,
+          marginHorizontal: wp( 30 ),
+          marginTop: hp( 2 ),
           lineHeight: RFValue( 18 ),
           letterSpacing: RFValue( 0.6 )
         }}>{'Key in the word exactly like it was displayed'}</Text>
         <Text style={{
+          height: hp( 16 ),
           color: Colors.greyTextColor,
           fontSize: RFValue( 12 ),
           fontFamily: Fonts.RobotoSlabRegular,
-          marginHorizontal: wp( '5%' ),
-          marginTop: RFValue( 25 ),
+          marginHorizontal: wp( 30 ),
+          marginTop: hp( 37 ),
           letterSpacing: RFValue( 0.48 ),
           lineHeight: RFValue( 12 ),
         }}>{'Enter the '}
@@ -144,9 +144,10 @@ export default function ConfirmSeedWordsModal( props ) {
           }}>{getSeedNumber( props.seedNumber ) + ' word'}</Text></Text>
         <Shadow
           containerViewStyle={{
-            marginTop: hp( 3 ),
-            marginHorizontal: wp( '5%' ),
-            alignSelf: 'center'
+            marginTop: hp( 15 ),
+            marginLeft: wp( 30 ),
+            marginRight: wp( 35 ),
+            alignSelf: 'center',
           }}
           offset={ [ 7, 7 ] }
           distance={7}
@@ -161,7 +162,8 @@ export default function ConfirmSeedWordsModal( props ) {
               backgroundColor: Colors.white,
               // borderWidth: 1,
               borderRadius: 10,
-              width: wp( 79 ),
+              height: hp( 50 ),
+              width: wp( 290 ),
             }}
           >
             <TextInput
@@ -188,7 +190,7 @@ export default function ConfirmSeedWordsModal( props ) {
           </View>
         </Shadow>
 
-        { props.bottomBoxInfo && <View style={{
+        {/* { props.bottomBoxInfo && <View style={{
           marginTop: hp( '2%' ),
           marginBottom: hp( 1 ),
           marginLeft: wp ( '2%' )
@@ -200,31 +202,30 @@ export default function ConfirmSeedWordsModal( props ) {
             backgroundColor={Colors.white}
           />
         </View>
-        }
+        } */}
         <View style={{
           display: props.number === undefined ? 'none' : 'flex',
           flexDirection: 'row',
           justifyContent: 'flex-end',
-          marginHorizontal: wp( '8%' ),
-          marginTop: 15
+          marginHorizontal: wp( 43 ),
+          marginTop: hp( 23 )
         }}>
           {
             arr.map( ( x ) => (
               <View key={x} style={{
-                width: x === n ? RFValue( 25 ) : RFValue( 6 ),
-                height: RFValue( 5 ),
+                width: x === n ? wp( 25 ) : wp( 6 ),
+                height: hp( 5 ),
                 backgroundColor: x === n ? '#EA4335' : '#EA433566',
-                marginRight: RFValue( 5 ),
-                borderRadius: 2.5,
+                marginRight: wp( 5 ),
+                borderRadius: hp( 2.5 ),
               }}/>
             ) )
           }
         </View>
         <View
           style={{
-            height: hp( '14%' ),
             flexDirection: 'row',
-            marginTop: 'auto',
+            marginTop: hp( 22 ),
             alignItems: 'flex-end',
           }}
         >
@@ -265,9 +266,11 @@ export default function ConfirmSeedWordsModal( props ) {
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressIgnore()}
               style={{
-                height: wp( '13%' ),
-                width: wp( '27%' ),
+                height: hp( 50 ),
+                width: wp( 120 ),
                 alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: hp( 29 )
                 // position: 'absolute',
                 // left: wp( 53 )
               }}
@@ -307,31 +310,31 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     backgroundColor: Colors.white,
   },
-  buttonView: {
-    height: wp( '13%' ),
-    width: wp( '35%' ),
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
-    backgroundColor: Colors.blue,
-  },
+  // buttonView: {
+  //   height: wp( '13%' ),
+  //   width: wp( '35%' ),
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   borderRadius: 8,
+  //   shadowColor: Colors.shadowBlue,
+  //   shadowOpacity: 1,
+  //   shadowOffset: {
+  //     width: 15, height: 15
+  //   },
+  //   backgroundColor: Colors.blue,
+  // },
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
-  bottomButtonView: {
-    flexDirection: 'row',
-    paddingLeft: 30,
-    paddingRight: 30,
-    paddingBottom: hp( 2 ),
-    alignItems: 'center',
-  },
+  // bottomButtonView: {
+  //   flexDirection: 'row',
+  //   paddingLeft: 30,
+  //   paddingRight: 30,
+  //   paddingBottom: hp( 2 ),
+  //   alignItems: 'center',
+  // },
   inputBox: {
     borderWidth: 0.5,
     borderRadius: 10,
@@ -340,7 +343,6 @@ const styles = StyleSheet.create( {
   },
   modalInputBox: {
     flex: 1,
-    height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.RobotoSlabRegular,
@@ -360,23 +362,22 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
   },
   successModalButtonView: {
-    height: wp( '13%' ),
-    width: wp( '30%' ),
-    paddingLeft: wp( '5%' ),
-    paddingRight: wp( '5%' ),
+    height: hp( 50 ),
+    width: wp( 120 ),
+    paddingHorizontal: wp( 36 ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
     backgroundColor: Colors.blue,
     alignSelf: 'center',
-    marginLeft: wp( '8%' ),
-    marginBottom:hp ( '3%' ),
+    marginLeft: wp( 30 ),
+    marginBottom:hp ( 29 ),
   },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.RobotoSlabMedium,
     textAlignVertical: 'center',
-    lineHeight: RFValue( 13 )
+    lineHeight: RFValue( 16 )
   },
 } )

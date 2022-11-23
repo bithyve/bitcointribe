@@ -2,7 +2,6 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Alert } from 'react-native'
 import { useDispatch } from 'react-redux'
-import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import SendHelpContents from '../../../components/Helper/SendHelpContents'
 import { clearTransfer } from '../../../store/actions/accounts'
@@ -36,6 +35,7 @@ import AccountUtilities from '../../../bitcoin/utilities/accounts/AccountUtiliti
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import useWalletState from '../../../utils/hooks/state-selectors/storage/useWalletState'
+import AccountShell from '../../../common/data/models/AccountShell'
 
 export type Props = {
   navigation: any;
@@ -46,7 +46,7 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
   const [ isShowingKnowMoreSheet, setIsShowingKnowMoreSheet ] = useState( false )
 
-  const accountShell = useSourceAccountShellForSending()
+  const [ accountShell, setAccountShell ] = useState<AccountShell>( useSourceAccountShellForSending() )
   const account = useAccountByAccountShell( accountShell )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const sendableAccountShells = useSendableAccountShells( accountShell )
@@ -239,6 +239,7 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     <AccountSendScreen
       address={address}
       accountShell={accountShell}
+      setAccountShell={setAccountShell}
       sendableContacts={sendableContacts}
       sendableAccountShells={sendableAccountShells}
       onQRScanned={handleQRScan}
@@ -247,39 +248,6 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       onRecipientSelected={handleRecipientSelection}
     />
   )
-}
-
-
-AccountSendContainerScreen.navigationOptions = ( { navigation, } ) : NavigationScreenConfig<NavigationStackOptions, any> => {
-  const subAccountKind = navigation.getParam( 'subAccountKind' )
-
-  return {
-    ...defaultStackScreenNavigationOptions,
-
-    headerLeft: () => {
-      return (
-        <SmallNavHeaderBackButton
-          onPress={() => {
-            clearTransfer( subAccountKind )
-            navigation.popToTop()
-          }}
-        />
-      )
-    },
-
-    title: 'Send',
-
-    headerRight: () => {
-      if ( subAccountKind != SubAccountKind.TEST_ACCOUNT ) {
-        return null
-      } else {
-        return (
-          <KnowMoreButton onpress={() => {
-            navigation.getParam( 'toggleKnowMoreSheet' )()}} />
-        )
-      }
-    },
-  }
 }
 
 export default AccountSendContainerScreen

@@ -19,10 +19,12 @@ const NavStyles = StyleSheet.create( {
 
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue( 14 ),
+    fontFamily: Fonts.RobotoSlabMedium,
     textAlign: 'left',
     marginHorizontal: 0,
+    lineHeight: RFValue( 18 ),
+    letterSpacing: RFValue( 0.7 )
   },
 
   modalHeaderInfoText: {

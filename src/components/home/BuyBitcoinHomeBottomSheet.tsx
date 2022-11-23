@@ -4,10 +4,6 @@ import { ListItem } from 'react-native-elements'
 import * as RNLocalize from 'react-native-localize'
 import ListStyles from '../../common/Styles/ListStyles'
 import ImageStyles from '../../common/Styles/ImageStyles'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../common/Fonts'
@@ -16,6 +12,7 @@ import BottomInfoBox from '../BottomInfoBox'
 import Ramp from '../../assets/images/svgs/ramp.svg'
 import Wyre from  '../../assets/images/svgs/wyre.svg'
 import { Shadow } from 'react-native-shadow-2'
+import { hp, wp } from '../../common/data/responsiveness/responsive'
 
 export type Props = {
   onMenuItemSelected: ( menuItem: BuyBitcoinBottomSheetMenuItem ) => void;
@@ -52,7 +49,10 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
       title: Platform.OS == 'ios' ? strings.ramp : strings.ramp,
       subtitle: strings.rampSub,
       kind: BuyMenuItemKind.RAMP,
-      getImage: () => <Ramp />,
+      getImage: () => <Ramp style={{
+        height: hp( 46 ),
+        width: wp( 44 )
+      }}/>,
       disabled: false,
       hasButton: true,
       link: 'https://support.ramp.network/en/',
@@ -61,7 +61,10 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
       title: strings.wyre,
       subtitle: strings.wyreSub,
       kind: BuyMenuItemKind.WYRE,
-      getImage: () => <Wyre />,
+      getImage: () => <Wyre style={{
+        height: hp( 46 ),
+        width: wp( 44 )
+      }}/>,
       disabled: false,
       hasButton: false,
       link: 'https://support.sendwyre.com/hc/en-us',
@@ -111,22 +114,23 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
     return (
       <Shadow viewStyle={styles.rootContainer}
         startColor={Colors.shadowColor}
-        offset={[ 5, 5 ]}
-        distance={5}>
+        offset={[ 10, 10 ]}
+        distance={6}>
         <View style={{
           backgroundColor: Colors.white,
-          borderRadius: wp( 2 ),
+          borderRadius: wp( 10 ),
+          height: hp( 110 ),
+          width: wp( 325 ),
         }}>
           <ListItem
             containerStyle={
               menuItem.disabled
                 ? ListStyles.disabledContainer
-                : [ ListStyles.container, styles.mainCardContainer ]
-            }
+                : [ styles.mainCardContainer ]}
           >
             {menuItem.getImage()}
 
-            <ListItem.Content style={styles.cardMiddle}>
+            <ListItem.Content>
               <ListItem.Title
                 style={[
                   ...( menuItem.disabled
@@ -197,27 +201,28 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
   return (
     <View style={{
       backgroundColor: Colors.bgColor,
-
     }}>
-      <View style={styles.modelHeight}>
+      <View>
         <FlatList
-          // style={styles.rootContainer}
+
           data={menuItems}
           keyExtractor={listItemKeyExtractor}
           renderItem={renderItem}
           scrollEnabled={false}
         />
-        {RNLocalize.getCountry() == 'US' &&
-        <BottomInfoBox
-          backgroundColor={Colors.backgroundColor}
-          containerStyle={{
-            marginRight: wp( 3 )
-          }}
-          title={''}
-          infoText={
-            '* Some methods may not be available in the US states of Hawaii, Nebraska, New York and Texas'
-          }
-        />
+        {RNLocalize.getCountry() == 'US' ?
+          <BottomInfoBox
+            backgroundColor={Colors.backgroundColor}
+            containerStyle={{
+              alignSelf: 'center'
+            }}
+            title={''}
+            infoText={
+              '* Some methods may not be available in the US states of Hawaii, Nebraska, New York and Texas'
+            }
+          /> : <View style={{
+            marginBottom: hp( 93 )
+          }}/>
         }
       </View>
 
@@ -232,7 +237,6 @@ const styles = StyleSheet.create( {
   },
   linkText:{
     fontFamily: Fonts.RobotoSlabRegular,
-    paddingBottom: wp( 1 ),
     color: Colors.textColorGrey,
     letterSpacing: -RFValue( 0.11 )
   },
@@ -246,32 +250,34 @@ const styles = StyleSheet.create( {
   linkContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: hp( 1 ),
-    paddingBottom: hp( 2 ),
-    paddingHorizontal: wp( 6 )
+    paddingHorizontal: wp( 13 )
   },
   buyButton: {
-    margin: hp( 0.5 ),
     color: Colors.white,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.RobotoSlabRegular,
-    lineHeight: RFValue( 16 )
+    lineHeight: RFValue( 16 ),
+    textAlign: 'center'
   },
   buyContainer: {
     backgroundColor: Colors.blue,
-    borderRadius: wp( '2%' ),
-    paddingHorizontal: wp( 2 ),
-    paddingVertical: hp( 0.5 )
+    width: wp( 80 ),
+    height: hp( 28 ),
+    borderRadius: wp( 5 ),
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   mainCardContainer: {
-    marginTop: hp( 1.5 ),
+    marginTop: hp( 19 ),
+    marginBottom: hp( 15 ),
     paddingHorizontal: 0,
+    marginHorizontal: wp( 15 ),
+    height: hp( 46 )
   },
   rootContainer: {
     // backgroundColor: Colors.white,
-    marginBottom: hp( 2 ),
-    width: wp( 90 ),
-    borderRadius: wp( 2 ),
+    marginBottom: hp( 20 ),
+    borderRadius: wp( 10 ),
     alignSelf: 'center',
     // shadowColor: Colors.shadowColor,
     // shadowOpacity: 1,
@@ -280,15 +286,6 @@ const styles = StyleSheet.create( {
     // },
     // elevation: 1
   },
-  modelHeight: {
-    height: 'auto',
-    marginBottom: hp( 3 )
-  },
-  cardMiddle: {
-    // paddingLeft: 0,
-    marginRight: wp( -2 ),
-    marginLeft: wp( -1 ),
-  }
 } )
 
 export default BuyBitcoinHomeBottomSheet
