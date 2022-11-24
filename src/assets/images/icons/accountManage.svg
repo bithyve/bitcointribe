@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="31" height="31" viewBox="0 0 31 31">
+  <g id="account_management" data-name="account management" transform="translate(-25 -445)">
+    <circle id="Ellipse_1951" data-name="Ellipse 1951" cx="15.5" cy="15.5" r="15.5" transform="translate(25 445)" fill="#ea4335"/>
+    <g id="account" transform="translate(33.475 453.481)">
+      <path id="Shape" d="M12.018,12.015H1.722A1.723,1.723,0,0,1,0,10.3V1.717A1.717,1.717,0,0,1,1.71,0H5.787a1.468,1.468,0,0,1,.974.4L8.072,1.708l3.953.009a1.716,1.716,0,0,1,1.708,1.716V10.3a1.713,1.713,0,0,1-1.714,1.717ZM3.2,5.048a1.1,1.1,0,0,0-1.1,1.1V9.031a1.1,1.1,0,0,0,.321.774,1.089,1.089,0,0,0,.774.321H10.53a1.1,1.1,0,0,0,1.1-1.1V6.144a1.1,1.1,0,0,0-1.1-1.1Z" transform="translate(0.215 0.511)" fill="#fafafa"/>
+    </g>
+  </g>
+</svg>
