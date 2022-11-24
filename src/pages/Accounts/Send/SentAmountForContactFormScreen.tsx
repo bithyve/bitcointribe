@@ -26,7 +26,6 @@ import ImageStyles from '../../../common/Styles/ImageStyles'
 import SendConfirmationContent from '../SendConfirmationContent'
 import { clearTransfer } from '../../../store/actions/accounts'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
-import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import idx from 'idx'
@@ -43,6 +42,9 @@ import RecipientAvatar from '../../../components/RecipientAvatar'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import SelectAccount from '../../../components/SelectAccount'
 import useCurrencyKind from '../../../utils/hooks/state-selectors/UseCurrencyKind'
+import useExchangeRates from '../../../utils/hooks/state-selectors/UseExchangeRates'
+import useCurrencyCode from '../../../utils/hooks/state-selectors/UseCurrencyCode'
+import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 
 export type NavigationParams = {
 };
@@ -187,6 +189,17 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
     }
   }, [ sendingState.feeIntelMissing ] )
 
+  const exchangeRates = useExchangeRates()
+  const currencyCode = useCurrencyCode()
+
+  function convertFiatToSats( fiatAmount: number ) {
+    return exchangeRates && exchangeRates[ currencyCode ]
+      ? (
+        ( fiatAmount / exchangeRates[ currencyCode ].last ) * SATOSHIS_IN_BTC
+      )
+      : 0
+  }
+
   return (
     <View style={styles.rootContainer}>
       <ModalContainer onBackground={()=>setFailure( false )} visible={sendFailureModal} closeBottomSheet={() => {}} >
@@ -284,7 +297,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
               onChangeText={( value ) => {
                 if( !isNaN( Number( value ) ) ) {
                   setCurrentFiatAmountTextValue( value.split( '.' ).map( ( el, i )=>i?el.split( '' ).slice( 0, 2 ).join( '' ):el ).join( '.' ) )
-                  onAmountChanged( ( Number( value ) ?? 0 ) )
+                  onAmountChanged( currencyKind === CurrencyKind.FIAT ? convertFiatToSats( Number( value ) ) : Number( value ) )
                 }
               }}
               onFocus={() => {
