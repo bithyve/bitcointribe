@@ -224,6 +224,12 @@ export default function MyWalletsContainer( props ) {
 
   const handleGridCardLongPress = ( item ) => { }
 
+  const onViewAllClick = () => {
+    props.navigation.navigate( 'TransactionsList', {
+      accountShellID,
+    } )
+  }
+
   // { typeof innerItem === 'string' ?
   const renderItems = ( { item, index } ) => {
     return(
@@ -293,14 +299,40 @@ export default function MyWalletsContainer( props ) {
       </View>
       <View style={{
         flex:1
-      }}></View>
+      }}>
+        <View style={{
+          flexDirection:'row', marginTop: hp( 33 ), marginStart: wp( 33 ), marginEnd:wp( 30 )
+        }}>
+          <Text style={{
+            color:Colors.greyText, fontFamily:Fonts.RobotoSlabRegular, fontSize: RFValue( 16 ),
+            letterSpacing:1.28
+          }}>{'Transactions'}</Text>
+          <View style={{
+            flex:1
+          }}/>
+          <TouchableOpacity style={{
+            flexDirection:'row', alignItems:'center'
+          }} onPress={onViewAllClick}>
+            <Text style={{
+              color: Colors.appPrimary, fontFamily:Fonts.RobotoSlabBold, fontSize: RFValue( 11 ),
+              letterSpacing:1.28
+            }}>
+              View All
+            </Text>
+            <Image style={{
+              width:wp( 5 ), height:hp( 8 ), marginStart:wp( 4 ), tintColor:Colors.black3
+            }}
+            source={require( '../../assets/images/icons/icon_arrow.png' )}/>
+          </TouchableOpacity>
+        </View>
+      </View>
       <View style={{
         flexDirection:'row', marginBottom: hp( 30 ), justifyContent:'center'
       }}>
         <TouchableOpacity style={{
           alignItems:'center'
         }}>
-          <Image source={require( '../../assets/images/icons/openlink.png' )} style={{
+          <Image source={require( '../../assets/images/accIcons/send_blue.png' )} style={{
             width:wp( 38 ), height:wp( 38 )
           }}/>
           <Text style={{
@@ -313,7 +345,7 @@ export default function MyWalletsContainer( props ) {
         <TouchableOpacity style={{
           alignItems:'center'
         }}>
-          <Image source={require( '../../assets/images/icons/openlink.png' )} style={{
+          <Image source={require( '../../assets/images/accIcons/receive_red.png' )} style={{
             width:wp( 38 ), height:wp( 38 )
           }}/>
           <Text style={{
@@ -321,6 +353,18 @@ export default function MyWalletsContainer( props ) {
             fontFamily:Fonts.RobotoSlabRegular, marginTop:hp( 9 ),
             marginHorizontal:wp( 30 )
           }}>Receive</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{
+          alignItems:'center'
+        }}>
+          <Image source={require( '../../assets/images/accIcons/settings.png' )} style={{
+            width:wp( 38 ), height:wp( 38 )
+          }}/>
+          <Text style={{
+            fontSize:RFValue( 10 ), color:Colors.black1,
+            fontFamily:Fonts.RobotoSlabRegular, marginTop:hp( 9 ),
+            marginHorizontal:wp( 30 )
+          }}>Settings</Text>
         </TouchableOpacity>
       </View>
       <SafeAreaView/>
