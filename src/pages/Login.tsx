@@ -980,8 +980,8 @@ const styles = StyleSheet.create( {
     fontStyle: 'italic',
   },
   errorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
-    color: Colors.tomatoRed,
+    fontFamily: Fonts.RobotoSlabRegular,
+    color: Colors.errorPink,
     fontSize: RFValue( 10 ),
     fontStyle: 'italic',
     letterSpacing: 0.5
