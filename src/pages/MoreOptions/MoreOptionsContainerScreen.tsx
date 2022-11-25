@@ -47,6 +47,7 @@ import WalletSettings from '../../assets/images/icons/Walletsettings.svg'
 import AccountRead from '../../assets/images/icons/autoRead.svg'
 import FAQs from '../../assets/images/icons/faqs.svg'
 import Telegram from '../../assets/images/icons/telegram.svg'
+import { hp, wp } from '../../common/data/responsiveness/responsive'
 
 const { width, height: screenHeight } = Dimensions.get( 'window' )
 
@@ -127,7 +128,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     */
     {
       title: strings.node,
-      imageSource: require( '../../assets/images/icons/own-node.png' ),
+      imageSource: require( '../../../src/assets/images/icons/node.png' ),
       subtitle: strings.nodeSub,
       screenName: 'NodeSettings',
     },
@@ -161,7 +162,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     },
     {
       title: strings.AppInfo,
-      imageSource: require( '../../assets/images/icons/icon_info.png' ),
+      imageSource: require( '../../assets/images/icons/icon_info1.png' ),
       subtitle: strings.AppInfoSub,
       screenName: 'AppInfo',
     },
@@ -183,6 +184,18 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         :'Confirm backup phrase',
     title: bhrStrings[ 'WalletBackup' ],
     screenName: 'WalletBackup',
+  }
+
+  const editNameAndPicture: MenuOption = {
+    imageSource: require( '../../assets/images/icons/icon_info.png' ),
+    subtitle: 'Lorem ipsum dolor sit amet, conse ctetu r adip',
+    // levelData[ 0 ].keeper1.status == 'notSetup'
+    //   ? 'Confirm backup phrase'
+    //   : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
+    //     ? 'Wallet backup confirmed'
+    //     :'Confirm backup phrase',
+    title:  'Edit your name and picture' ,
+    // screenName: 'WalletBackup',
   }
 
   const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
@@ -472,35 +485,71 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             flexDirection: 'row',
             marginHorizontal: 20,
             marginBottom: 40,
-            marginTop: heightPercentageToDP( '8%' ),
+            marginTop: heightPercentageToDP( '6%' ),
           }}
           onPress={()=>handleOptionSelection( walletBackup )}
         >
-          <View style={styles.modalElementInfoView}>
-            <BackupShield />
-            <View
-              style={{
-                justifyContent: 'center',
-                marginLeft: 20,
-              }}
-            >
-              <Text style={styles.addModalTitleTextHeader}>
-                {walletBackup.title}
-              </Text>
-              <Text style={styles.addModalInfoTextHeader}>
-                {walletBackup.subtitle}
-              </Text>
+          <View style={styles.headerStyle} >
+            <View style={styles.headerComps}>
+              <BackupShield />
+              <View
+                style={{
+                  justifyContent: 'flex-start',
+                  marginLeft: wp(-130),
+                  // flexDirection:'column'
+                
+                }}
+              >
+                <View>
+                  <Text style={styles.addModalTitleTextHeader}>
+                    {walletBackup.title}
+                  </Text>
+                  <Text style={styles.addModalInfoTextHeader}>
+                    {walletBackup.subtitle}
+                  </Text>
+                </View>
+              </View>
+              <View>
+                <Image
+                source={require( '../../assets/images/icons/icon_arrow.png' )}
+                style={{
+                  width: widthPercentageToDP( '2.5%' ),
+                  height: widthPercentageToDP( '2.5%' ),
+                  alignSelf: 'center',
+                  resizeMode: 'contain',
+                }}
+                />
+              </View>
+            </View>
+            <View style={styles.headerComps}>
+              <BackupShield />
+              <View
+                style={{
+                  justifyContent: 'center',
+                  marginLeft: wp(-25),
+                }}
+              >
+                <Text style={styles.addModalTitleTextHeader}>
+                  {editNameAndPicture.title}
+                </Text>
+                <Text style={styles.addModalInfoTextHeader}>
+                  {editNameAndPicture.subtitle}
+                </Text>
+              </View>
+              <View>
+                <Image
+                source={require( '../../assets/images/icons/icon_arrow.png' )}
+                style={{
+                  width: widthPercentageToDP( '2.5%' ),
+                  height: widthPercentageToDP( '2.5%' ),
+                  alignSelf: 'center',
+                  resizeMode: 'contain',
+                }}
+                />
+              </View>
             </View>
           </View>
-          <Image
-            source={require( '../../assets/images/icons/icon_arrow.png' )}
-            style={{
-              width: widthPercentageToDP( '2.5%' ),
-              height: widthPercentageToDP( '2.5%' ),
-              alignSelf: 'center',
-              resizeMode: 'contain',
-            }}
-          />
+          
         </TouchableOpacity>
       </View>
       <ScrollView
@@ -578,7 +627,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               >
                 {( levelData[ 0 ].keeper1.status == 'notSetup' ||
                   levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' ) &&
-                  menuOption.screenName == 'WalletBackup' && (
+                  menuOption.screenName == 'WalletBackup' 
+                  && (
                   <View
                     style={{
                       position: 'absolute',
@@ -597,7 +647,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                       resizeMode={'contain'}
                     />
                   </View>
-                )}
+                )
+                }
                 <View style={[ styles.modalElementInfoView, {
                   right: 20
                 } ]}>
@@ -869,6 +920,23 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     // justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  headerStyle: {
+    flex: 1,
+    marginHorizontal: wp(5),
+    // marginLeft : wp(8),
+    // height: heightPercentageToDP( '5%' ),
+    // flexDirection: 'row',
+    // justifyContent: 'center',
+    // alignItems: 'center',
+  },
+
+  headerComps : {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: hp(14)
   },
 
   webLinkBarContainer: {
