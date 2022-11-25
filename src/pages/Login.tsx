@@ -983,7 +983,6 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.RobotoSlabRegular,
     color: Colors.errorPink,
     fontSize: RFValue( 10 ),
-    fontStyle: 'italic',
     letterSpacing: 0.5
   },
   headerTitleText: {
