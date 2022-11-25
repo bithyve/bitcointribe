@@ -12,7 +12,7 @@ export type Props = {
   size?: number;
   color? : string;
   borderColor? : string;
-  selectedColor? : string;
+  selectedBorder? : string;
   ignoresTouch?: boolean;
   onpress?: () => void;
 };
@@ -35,7 +35,7 @@ const RadioButton: React.FC<Props> = ( {
       height: size,
       width: size,
     }
-  }, [ borderColor, size ] )
+  }, [ borderColor, size, isChecked ] )
 
   const innerCircleStyle = useMemo( () => {
     return {
