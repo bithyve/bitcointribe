@@ -47,10 +47,6 @@ const ReceiveAmountContent = ( {
     }
   }
 
-  useEffect( () => {
-    console.log( value )
-  }, [ value ] )
-
   return (
     <View style={styles.modalContentContainer}>
       <View style={{
@@ -89,9 +85,10 @@ const ReceiveAmountContent = ( {
           </View> */}
           <Text
             style={{
-              ...styles.textBox
+              ...styles.textBox,
+              color: value === 0 ? '#CBCBCB' : Colors.textColorGrey,
             }}
-            s>
+          >
             {amount}
           </Text>
         </View>
@@ -205,7 +202,6 @@ const styles = StyleSheet.create( {
     flex: 1,
     height: hp1( 50 ),
     paddingLeft: 20,
-    color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansMedium,
     fontSize: RFValue( 13 ),
     backgroundColor: Colors.white,
