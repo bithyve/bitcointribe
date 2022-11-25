@@ -253,7 +253,7 @@ let styles = StyleSheet.create( {
     fontWeight: 'normal',
     marginTop: 3,
     fontFamily: Fonts.FiraSansRegular,
-    lineHeight: RFValue( 16 ),
+    lineHeight: RFValue( 18 ),
   },
   NewWalletTouchableView: {
     flexDirection: 'row',

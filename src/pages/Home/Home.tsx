@@ -658,13 +658,13 @@ const styles = StyleSheet.create( {
     height: hp( '71.46%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor1,
-    borderTopLeftRadius: 25,
-    shadowColor: 'black',
-    shadowOpacity: 0.4,
-    shadowOffset: {
-      width: 2,
-      height: -1,
-    },
+    // borderTopLeftRadius: 25,
+    // shadowColor: 'black',
+    // shadowOpacity: 0.4,
+    // shadowOffset: {
+    //   width: 2,
+    //   height: -1,
+    // },
     flexDirection: 'column',
     justifyContent: 'space-around'
   },

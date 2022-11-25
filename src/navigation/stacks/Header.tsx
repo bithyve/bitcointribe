@@ -1727,24 +1727,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // >
       <View
         style={{
-          height: heightPercentageToDP( Platform.OS == 'ios' ? '21.9%' : '20.3%' ),
-          backgroundColor: Colors.blue,
+          // height: heightPercentageToDP( Platform.OS == 'ios' ? '21.9%' : '20.3%' ),
+          backgroundColor: Colors.appPrimary,
           paddingTop:
                 Platform.OS == 'ios' && DeviceInfo.hasNotch
                   ? heightPercentageToDP( '4%' )
                   : 0,
         }}
       >
-        <ImageBackground
-          source={require( '../../assets/images/home-bg.png' )}
+        <View
+          // source={require( '../../assets/images/home-bg.png' )}
           style={{
             width: '100%',
             height: '100%',
             flex: 1,
           }}
-          imageStyle={{
-            resizeMode: 'stretch',
-          }}
+          // imageStyle={{
+          //   resizeMode: 'stretch',
+          // }}
         >
           {this.props.clipboardAccess && <ClipboardAutoRead navigation={this.props.navigation} />}
           <HomeHeader
@@ -1787,7 +1787,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           >
             {this.renderBottomSheetContent()}
           </ModalContainer>
-        </ImageBackground>
+        </View>
       </View>
     )
   }

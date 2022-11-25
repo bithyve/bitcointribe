@@ -60,6 +60,22 @@ import RestoreSeedWordsContent from '../pages/RestoreHexaWithKeeper/RestoreSeedW
 import GiftStack from './stacks/gift/GiftStack'
 import Filled_gift_tab from '../assets/images/satCards/filled_gift_tab.svg'
 import Gift_tab from '../assets/images/satCards/gift_tab.svg'
+import NewHome from '../pages/Home/NewHome'
+import ManageGifts from '../pages/FriendsAndFamily/ManageGifts'
+import CreateGift from '../pages/FriendsAndFamily/CreateGift'
+import ClaimSatsScreen from '../pages/Gift/ClaimSatsScreen'
+import GiftCreatedScreen from '../pages/Gift/GiftCreatedScreen'
+import GiftDetails from '../pages/FriendsAndFamily/GiftDetails'
+import MoreOptionsContainerScreen from '../pages/MoreOptions/MoreOptionsContainerScreen'
+import QRStack from './stacks/home/QRStack'
+import AccountManagementStack from './stacks/more-options/AccountManagementStack'
+import WalletSettingsStack from './stacks/more-options/WalletSettingsStack'
+import NodeSettingsContainerScreen from '../pages/MoreOptions/NodeSettings/NodeSettingsContainerScreen'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Fonts from '../common/Fonts'
+import AppInfo from '../pages/MoreOptions/AppInfo/Appinfo'
+import FriendsAndFamilyScreen from '../pages/FriendsAndFamily/FriendsAndFamilyScreen'
+import WalletBackupStack from './stacks/more-options/WalletBackupStack'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -391,9 +407,105 @@ const HomeNavigator = createStackNavigator(
   }
 )
 
+const NewHomeNavigator = createStackNavigator( {
+  NewHome: {
+    screen: NewHome,
+    navigationOptions: {
+      header:null
+    },
+  },
+  ManageGifts: {
+    screen: ManageGifts,
+    navigationOptions: {
+      header:null
+    },
+  },
+  CreateGift:{
+    screen: CreateGift,
+    navigationOptions: {
+      header:null
+    },
+  },
+  GiftCreated:{
+    screen: GiftCreatedScreen,
+    navigationOptions: {
+      header:null
+    }
+  },
+  GiftDetails:{
+    screen: GiftDetails,
+    navigationOptions: {
+      header:null
+    }
+  },
+  MoreOptions: {
+    screen: MoreOptionsContainerScreen,
+    navigationOptions: {
+      header: null,
+      // tabBarVisibl
+    },
+  },
+  QRScanner: {
+    screen: QRStack,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  AccountManagement: {
+    screen: AccountManagementStack,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  WalletSettings: {
+    screen: WalletSettingsStack,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  NodeSettings: {
+    screen: NodeSettingsContainerScreen,
+    navigationOptions: ( { navigation } ) => {
+      return {
+        title: 'Node Settings',
+        headerTitleStyle:{
+          color: Colors.blue,
+          fontSize: RFValue( 18 ),
+          fontFamily: Fonts.FiraSansMedium,
+          textAlign: 'left',
+          marginHorizontal: 0,
+        },
+        headerLeft: () => {
+          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+        },
+      }
+    },
+  },
+  AppInfo: {
+    screen: AppInfo,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  FriendsAndFamily: {
+    screen: FriendsAndFamily,
+    navigationOptions: {
+      header: null,
+      // tabBarVisibl
+    },
+  },
+  SeedBackup: {
+    screen: WalletBackupStack,
+    navigationOptions: {
+      header: null,
+    },
+  },
+} )
+
 const Navigator = createSwitchNavigator( {
   SetupNav: SetupNavigator,
-  HomeNav: HomeNavigator,
+  // HomeNav: HomeNavigator,
+  HomeNav: NewHomeNavigator
 } )
 
 
