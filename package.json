@@ -249,6 +249,9 @@
         "expo-error-recovery",
         "expo-font"
       ]
+    },
+    "ios": {
+      "bitcode": "Debug"
     }
   },
   "browser": {
