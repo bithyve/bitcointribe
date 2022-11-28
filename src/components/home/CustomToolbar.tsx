@@ -16,6 +16,7 @@ export type Props = {
   onBackPressed: () => void;
   toolbarTitle: string | null;
   toolbarIcon: string;
+  containerStyle: any | null;
   // cardData: AccountShell[];
   // prependsAddButton: boolean;
   // onAccountCardSelected: ( accountShell: AccountShell ) => void;
@@ -27,7 +28,8 @@ export type Props = {
 const CustomToolbar: React.FC<Props> = ( {
   onBackPressed,
   toolbarIcon,
-  toolbarTitle
+  toolbarTitle,
+  containerStyle
   // cardData,
   // prependsAddButton,
   // onAccountCardSelected,
@@ -36,7 +38,7 @@ const CustomToolbar: React.FC<Props> = ( {
   // currentLevel
 }: Props ) => {
   return (
-    <View style={styles.container}>
+    <View style={[ styles.container, containerStyle ]}>
       <TouchableOpacity onPress={onBackPressed} style={styles.backContainer}>
         <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
           style={styles.backImage} />
@@ -49,8 +51,10 @@ const CustomToolbar: React.FC<Props> = ( {
           }} style={styles.iconStyle}/>
         </View>
       }
-      <Text style={styles.titleText}>{toolbarTitle}</Text>
-      <ToggleContainer />
+      <Text numberOfLines={1} style={styles.titleText}>{toolbarTitle}</Text>
+      <View>
+        <ToggleContainer />
+      </View>
     </View>
   )
 }
@@ -84,7 +88,8 @@ const styles = StyleSheet.create( {
     color: Colors.backgroundColor1,
     fontSize: RFValue( 14 ),
     fontFamily: Fonts.RobotoSlabBold,
-    flex: 1
+    flex: 1,
+    marginEnd: wp( 10 ),
   },
   iconContainer : {
     backgroundColor: Colors.white,

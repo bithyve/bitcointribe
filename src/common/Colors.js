@@ -91,6 +91,14 @@ const Colors = {
   gray15: '#727272',
 
   cream: '#FFE09D',
-  blue1: '#94B4F2'
+  blue1: '#94B4F2',
+  gray16: '#66656565',
+  gray17: '#4A4A4A',
+  red1: '#EA433569',
+  shadowGray: '#D98A0033',
+  black1: '#041513',
+  black3: '#092C27',
+  goldenText:'#A27F29',
+  gray18: '#808685',
 }
 export default Colors

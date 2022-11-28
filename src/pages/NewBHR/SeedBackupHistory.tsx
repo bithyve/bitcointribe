@@ -79,6 +79,7 @@ const SeedBackupHistory = ( props ) => {
   const  keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
   const SelectedRecoveryKeyNumber = props.navigation.getParam( 'SelectedRecoveryKeyNumber' )
   const selectedKeeper = props.navigation.getParam( 'selectedKeeper' )
+  const fromHome = props.navigation.getParam( 'fromHome' )
   const [ seedWordModal, setSeedWordModal ] = useState( false )
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
   const [ seedRandomNumber, setSeedRandomNumber ] = useState( [] )
@@ -311,8 +312,11 @@ const SeedBackupHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => {
-          props.navigation.navigate( 'Home' )
+          // props.navigation.navigate( 'Home' )
           // props.navigation.popToTop()
+          if( fromHome )
+            props.navigation.navigate( 'NewHome' )
+          else props.navigation.navigate( 'MoreOptions' )
         }}
         selectedTitle={'Wallet backup'}
         selectedTime={selectedKeeper?.updatedAt
@@ -500,7 +504,10 @@ const SeedBackupHistory = ( props ) => {
           onPressIgnore={() => {
             setSeedBackupModal( false )
             // props.navigation.goBack()
-            props.navigation.navigate( 'Home' )
+            // props.navigation.navigate( 'Home' )
+            if( fromHome )
+              props.navigation.navigate( 'NewHome' )
+            else props.navigation.navigate( 'MoreOptions' )
           }}
           isIgnoreButton={true}
         />

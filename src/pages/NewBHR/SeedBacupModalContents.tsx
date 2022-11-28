@@ -210,13 +210,15 @@ export default function SeedBacupModalContents( props ) {
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressIgnore()}
               style={{
-                height: wp( 18 ),
-                width: wp( 41 ),
+                height: hp( 40 ),
+                width: wp( 100 ),
                 justifyContent: 'center',
                 alignItems: 'center',
                 alignSelf: 'center',
+                marginBottom: hp( 20 ),
                 // position: 'absolute',
                 // left: wp( 53 )
+                // backgroundColor:'red'
               }}
               delayPressIn={0}
             >
@@ -225,7 +227,7 @@ export default function SeedBacupModalContents( props ) {
                   ...styles.proceedButtonText,
                   color: props.buttonTextColor
                     ? props.buttonTextColor
-                    : Colors.blue,
+                    : Colors.goldenYellow,
                 }}
               >
                 {props.cancelButtonText ? props.cancelButtonText : common.ignore}

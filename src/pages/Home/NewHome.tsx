@@ -301,19 +301,19 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
         name: 'Gift and tips',
         type: 1
       }, {
-        name: 'Create group',
+        name: 'Add New F&F',
         type: 2
       }, {
-        name: 'Broadcast message',
+        name: 'Create group',
         type: 3
       }, {
         name: 'Settings',
         type: 4
       }, {
-        name: 'Buy bitcoin',
+        name: 'Buy Bitcoin',
         type: 5
       }, {
-        name: 'Coming soon',
+        name: 'Shepa Settings',
         type: 6
       } ]
     }
@@ -835,6 +835,10 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.props.navigation.navigate( 'FriendsAndFamily' )
           break
 
+        //
+        case 3:
+          break
+
         //Settings
         case 4:
           this.props.navigation.navigate( 'MoreOptions' )
@@ -876,9 +880,13 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
         backgroundColor: Colors.cream, paddingHorizontal: wp( 12 ),
         borderRadius: 10, marginBottom: 18
       }} activeOpacity={1} onPress={() => this.onItemClick( item )}>
+        { ( item.name == 'Shepa Settings' || item.name == '' ) && <Text style={{
+          fontSize: RFValue( 8 ), fontFamily: Fonts.RobotoSlabMedium,
+          letterSpacing: 0.8, lineHeight: ( 16 ), marginTop: 7, color: Colors.goldenText
+        }}>{'COMING SOON'}</Text>}
         <Image source={this.getIconPath( item )}
           style={{
-            width: wp( 31 ), height: wp( 31 ), marginTop: ( 36 )
+            width: wp( 31 ), height: wp( 31 ), marginTop: item.name == 'Shepa Settings' ? ( 14 ) : (36)
           }} />
         <Text style={{
           fontSize: RFValue( 12 ), fontFamily: Fonts.RobotoSlabMedium,
