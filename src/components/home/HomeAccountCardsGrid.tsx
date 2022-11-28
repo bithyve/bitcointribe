@@ -5,6 +5,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 import AccountCardColumn from './AccountCardColumn'
 import AddNewAccountCard from '../../pages/Home/AddNewAccountCard'
 import { AccountType } from '../../bitcoin/utilities/Interface'
+import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 
 export type Props = {
   accountShells: AccountShell[];

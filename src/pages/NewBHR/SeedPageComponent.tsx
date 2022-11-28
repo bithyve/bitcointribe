@@ -172,7 +172,7 @@ const SeedPageComponent = ( props ) => {
 
   const getSecureData = ( text ) => {
     let secureText = ''
-    for( let i = 0; i< 8;i++ ){
+    for( let i = 0; i< 6;i++ ){
       secureText+='*'
     }
     return secureText
@@ -260,20 +260,23 @@ const SeedPageComponent = ( props ) => {
                         onPress={() => SelectOption( value?.id )}
                         style={styles.historyCard}
                       >
-                        <View style={styles.numberContainer}>
-                          <View style={styles.numberInnerContainer}>
-                            <Text style={styles.numberText}>{
-                              getFormattedNumber( getIndex( index, seedIndex ) )
-                            }</Text>
-                          </View>
-                        </View>
+                        {/* <View style={styles.numberContainer}> */}
+                        {/* <View style={styles.numberInnerContainer}> */}
+                        <Text style={[ styles.numberText,
+                          {
+                            color : index == SelectedOption ? Colors.blue:Colors.skyBlue
+                          } ]}>{
+                            getFormattedNumber( getIndex( index, seedIndex ) )
+                          }</Text>
+                        {/* </View> */}
+                        {/* </View> */}
                         <TouchableOpacity style={styles.modalInputContainer}
                           onPress={() => {
                             setSelectedOption( index )
                             Keyboard.dismiss()
                           }}>
                           <Text style={[ styles.modalInputBox,
-                            partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name.length > 0 ? styles.selectedInput : null,
+                            index == SelectedOption ? styles.selectedInput : null,
                           // value?.name.length > 0 ? styles.selectedInput : null,
                           ]}>
                             {index == SelectedOption
@@ -376,7 +379,7 @@ const SeedPageComponent = ( props ) => {
               <Text
                 style={{
                   ...styles.proceedButtonText,
-                  color: props.disableChange ? Colors.lightBlue : Colors.blue,
+                  color: props.disableChange ? Colors.lightBlue : Colors.goldenYellow,
                 }}
               >
                 {( currentPosition * 12 ) != 0 ? props.previousButtonText : props.changeButtonText}
@@ -389,7 +392,8 @@ const SeedPageComponent = ( props ) => {
             {
               partialSeedData.map( ( item, index ) => {
                 return (
-                  <View key={( index )} style={currentPosition == index ? styles.selectedDot : styles.unSelectedDot} />
+                  <View key={( index )} style={currentPosition == index ?
+                    styles.selectedDot : styles.unSelectedDot} />
                 )
               } )
             }
@@ -447,7 +451,7 @@ const styles = StyleSheet.create( {
     // justifyContent: 'center',
     // paddingLeft: wp( '3%' ),
     // paddingRight: wp( '3%' ),
-    paddingHorizontal: wp( 2 ),
+    paddingHorizontal: wp( 5 ),
     paddingVertical: height > 760 ? hp( 1 ) : 0,
     alignSelf: 'center',
     flexDirection: 'row',
@@ -504,22 +508,24 @@ const styles = StyleSheet.create( {
     alignItems: 'center'
   },
   numberText: {
-    color: Colors.numberFont,
-    fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    color: Colors.skyBlue,
+    fontSize: RFValue( 25 ),
+    fontFamily: Fonts.RobotoSlabBold,
+    width: wp( 10 ),
+    // marginStart:  ( 10 )
     // marginEnd: 10
   },
   nameText: {
     color: Colors.greyTextColor,
-    fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
-    marginStart: 25
+    fontSize: RFValue( 18 ),
+    fontFamily: Fonts.RobotoSlabRegular,
+    marginStart: 14
   },
   modalInputContainer:{
-    width: '70%',
+    // width: '70%',
     height: 50,
     justifyContent:'center',
-    paddingLeft: 15,
+    paddingLeft: 10,
     // backgroundColor: 'red'
   },
   modalInputBox: {
@@ -527,9 +533,9 @@ const styles = StyleSheet.create( {
     // flex: 1,
     // width: '70%',
     // height: 50,
-    fontSize: RFValue( 13 ),
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 18 ),
+    color: Colors.gray16,
+    fontFamily: Fonts.RobotoSlabRegular,
     // borderRadius: 10,
     // borderColor: '#E3E3E3',
     // borderWidth: 1
@@ -539,25 +545,26 @@ const styles = StyleSheet.create( {
     // backgroundColor: Colors.white,
     // backgroundColor: 'red',
     // elevation: 5,
-    shadowColor: Colors.shadowBlack,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15,
-      height: 15,
-    },
+    // shadowColor: Colors.shadowBlack,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 15,
+    //   height: 15,
+    // },
+    color:Colors.gray17
   },
   selectedDot: {
     width: 25,
     height: 5,
     borderRadius: 5,
-    backgroundColor: Colors.blue,
+    backgroundColor: Colors.red,
     marginEnd: 5
   },
   unSelectedDot: {
     width: 6,
     height: 5,
     borderRadius: 5,
-    backgroundColor: Colors.primaryAccentLighter2,
+    backgroundColor: Colors.red1,
     marginEnd: 5
   }
 } )

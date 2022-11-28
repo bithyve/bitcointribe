@@ -8,6 +8,7 @@ import {
   Image,
   Platform,
   FlatList,
+  ImageSourcePropType,
 } from 'react-native'
 // import {
 //   widthPercentageToDP as wp,
@@ -66,6 +67,7 @@ import { makeContactRecipientDescription } from '../../utils/sending/RecipientFa
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientKind from '../../common/data/enums/RecipientKind'
+import BackupShield from '../../assets/images/icons/backupShield.svg'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -82,6 +84,16 @@ function setCurrencyCodeToImage( currencyName, currencyColor ) {
       />
     </View>
   )
+}
+
+interface MenuOption {
+  title: string;
+  subtitle: string;
+  screenName?: string;
+  name?: string;
+  onOptionPressed?: () => void;
+  // isSwitch: boolean;
+  imageSource: ImageSourcePropType;
 }
 
 const HomeHeader = ( {
@@ -164,6 +176,16 @@ const HomeHeader = ( {
     data?: any;
     channelKey?: string;
   }, any] = useState( defaultKeeperObj )
+  const walletBackup: MenuOption = {
+    imageSource: require( '../../assets/images/icons/icon_info.png' ),
+    subtitle: levelData[ 0 ].keeper1.status == 'notSetup'
+      ? 'Confirm backup phrase'
+      : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
+        ? 'Wallet backup confirmed'
+        :'Confirm backup phrase',
+    title: stringsBhr[ 'WalletBackup' ],
+    screenName: 'WalletBackup',
+  }
 
   // const accountShell = useSourceAccountShellForSending()
   // const balance = AccountShell.getTotalBalance( accountShell )
@@ -573,6 +595,40 @@ const HomeHeader = ( {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
 
+  const handleOptionSelection = ( menuOption: MenuOption ) => {
+    if ( menuOption.screenName == 'WalletBackup' ) {
+      if (
+        levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed' ||
+          levelData[ 0 ].keeper1ButtonText?.toLowerCase() ==
+            'write down seed-words'
+      ) {
+        if (
+          levelHealth.length == 0 ||
+            ( levelHealth.length &&
+              levelHealth[ 0 ].levelInfo.length &&
+              levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' )
+        ) {
+          // if( levelData[ 0 ].status == 'notSetup' )
+          // navigation.navigate( 'BackupSeedWordsContent' )
+          const navigationParams = {
+            selectedTitle: navigationObj?.selectedKeeper?.name,
+            SelectedRecoveryKeyNumber: 1,
+            selectedKeeper: navigationObj?.selectedKeeper,
+            selectedLevelId: levelData[ 0 ].id,
+            fromHome: true
+          }
+          navigation.navigate( 'SeedBackupHistory', navigationParams )
+        } else {
+          setSelectedKeeper( levelData[ 0 ].keeper1 )
+          dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
+          setOnKeeperButtonClick( true )
+        }
+      } else navigation.navigate( menuOption.screenName, {
+        fromHome: true
+      } )
+    }
+  }
+
   return (
     <View style={{
       ...styles.headerViewContainer
@@ -664,6 +720,42 @@ const HomeHeader = ( {
         </TouchableOpacity>
       </View>
       {/* {getMessage()} */}
+      <TouchableOpacity
+        style={{
+          backgroundColor: Colors.blueTextNew,
+          flexDirection: 'row',
+          // marginHorizontal: wp( 15 ),
+          // marginBottom: 40,
+          marginTop: hp( 10 ),
+        }}
+        onPress={()=>handleOptionSelection( walletBackup )}
+      >
+        <View style={styles.modalElementInfoView}>
+          <BackupShield />
+          <View
+            style={{
+              justifyContent: 'center',
+              marginLeft: wp( 20 ),
+            }}
+          >
+            <Text style={styles.addModalTitleTextHeader}>
+              {walletBackup.title}
+            </Text>
+            <Text style={styles.addModalInfoTextHeader}>
+              {walletBackup.subtitle}
+            </Text>
+          </View>
+        </View>
+        <Image
+          source={require( '../../assets/images/icons/icon_arrow.png' )}
+          style={{
+            width: wp( 12 ),
+            height: wp( 12 ),
+            alignSelf: 'center',
+            resizeMode: 'contain',
+          }}
+        />
+      </TouchableOpacity>
 
       <View style={{
         flex:1
@@ -676,8 +768,10 @@ const HomeHeader = ( {
         <ToggleContainer />
       </View>
 
-      <View style={{
+      <TouchableOpacity style={{
         flexDirection: 'row', alignItems: 'center', marginTop: hp( 10 )
+      }} activeOpacity={1} onPress={()=>{
+        navigation.navigate( 'MyWallets' )
       }}>
         <View style={{
           width: wp( 25 ), height: wp( 25 ), backgroundColor: Colors.white,
@@ -700,7 +794,7 @@ const HomeHeader = ( {
           {exchangeRates ?
             numberWithCommas( exchangeRates[ fiatCurrencyCode ]?.last.toFixed( 2 ) )
             : ''}</Text>
-      </View>
+      </TouchableOpacity>
       {/* {keepers.length > 0 &&
                   <>
                     {keepers.length && keepers.map( ( item, index ) => {
@@ -769,10 +863,9 @@ const styles = StyleSheet.create( {
   },
   headerTitleText: {
     color: Colors.white,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue( 25 ),
-    // marginBottom: wp(  ),
-    letterSpacing: RFValue( 0.01 )
+    fontFamily: Fonts.RobotoSlabMedium,
+    fontSize: RFValue( 12 ),
+    letterSpacing: RFValue( 0.6 )
   },
   // cardBitCoinImage: {
   //   width: wp( '3.5%' ),
@@ -843,5 +936,25 @@ const styles = StyleSheet.create( {
     marginTop: hp( 10 ),
     width: wp( 50 ),
     textAlign: 'center'
-  }
+  },
+  addModalInfoTextHeader: {
+    color: Colors.white,
+    fontSize: RFValue( 9 ),
+    marginTop: 5,
+    fontFamily: Fonts.RobotoSlabRegular,
+  },
+  modalElementInfoView: {
+    flex: 1,
+    marginVertical: 5,
+    // height: hp( 30 ),
+    flexDirection: 'row',
+    // justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addModalTitleTextHeader: {
+    color: Colors.white,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.RobotoSlabRegular,
+  },
+
 } )
