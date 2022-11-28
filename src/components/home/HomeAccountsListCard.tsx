@@ -22,13 +22,14 @@ import { Shadow } from 'react-native-shadow-2'
 export type Props = {
   accountShell: AccountShell;
   cardDisabled: boolean;
+  accountShellID: string;
 };
 
 type HeaderProps = Props;
 type BodyProps = Props;
 
 
-const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: HeaderProps ) => {
+const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled, accountShellID }: HeaderProps ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const secondarySubAccounts = useSecondarySubAccountsForShell( accountShell )
   const isVisited = useSelector( ( state ) => state.swanIntegration.isVisited )
@@ -157,15 +158,19 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
 }
 
 
-const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: Props ) => {
+const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled, accountShellID }: Props ) => {
   const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
   const opacityChange = cardDisabled || ( accountShell?.primarySubAccount?.visibility !== AccountVisibility.DEFAULT && showAllAccount === true )  ? true : false
   console.log( 'skk accountshell', JSON.stringify( accountShell ) )
   return (
     <Shadow  distance={10} startColor={Colors.shadowColor}  offset={[ 7, 7 ]}>
-      <View style={opacityChange ? {
-        ...styles.rootContainer, opacity:0.3
-      } : styles.rootContainer}>
+      <View style={[ opacityChange ? {
+        ...styles.rootContainer, opacity:0.3,
+      } : styles.rootContainer, {
+        // marginVertical: heightPercentageToDP( 2 )
+        height: accountShell.id != accountShellID ?
+          heightPercentageToDP( 18 ): heightPercentageToDP( 20 ),
+      } ]}>
         <HeaderSection accountShell={accountShell} cardDisabled={cardDisabled}/>
         <BodySection accountShell={accountShell} cardDisabled={cardDisabled}/>
       </View>

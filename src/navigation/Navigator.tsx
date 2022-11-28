@@ -78,6 +78,13 @@ import FriendsAndFamilyScreen from '../pages/FriendsAndFamily/FriendsAndFamilySc
 import WalletBackupStack from './stacks/more-options/WalletBackupStack'
 import MyWalletsContainer from '../pages/Home/MyWalletsContainer'
 import ScanNodeConfig from '../pages/lightningAccount/ScanNodeConfigScreen'
+import TransactionsListContainerScreen from '../pages/Accounts/Transactions/TransactionsListContainerScreen'
+import SendStack from './stacks/send/SendStack'
+import TransactionDetailsContainerScreen from '../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
+import DonationAccountWebViewSettingsScreen from '../pages/Accounts/AccountSettings/DonationAccountWebViewSettingsScreen'
+import SubAccountSettingsStack from './stacks/accounts/SubAccountSettingsStack'
+import SubAccountTFAHelpScreen from '../pages/Accounts/SubAccountTFAHelpScreen'
+import Receive from '../pages/Accounts/Receive'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -513,6 +520,48 @@ const NewHomeNavigator = createStackNavigator( {
     navigationOptions: {
       header: null
     }
+  },
+  TransactionsList: {
+    screen: TransactionsListContainerScreen,
+    navigationOptions: {
+      title: 'All Transactions',
+    },
+  },
+  Send: {
+    screen: SendStack,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  TransactionDetails: {
+    screen: TransactionDetailsContainerScreen,
+    navigationOptions: {
+      title: 'TransactionDetails',
+    },
+  },
+  DonationAccountWebViewSettings: {
+    screen: DonationAccountWebViewSettingsScreen,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  SubAccountSettings: {
+    screen: SubAccountSettingsStack,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  SubAccountTFAHelp: {
+    screen: SubAccountTFAHelpScreen,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  Receive: {
+    screen: Receive,
+    navigationOptions: {
+      header: null,
+    },
   },
 } )
 

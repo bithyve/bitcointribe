@@ -1,4 +1,4 @@
-import React, { createRef, PureComponent, useContext, useEffect } from 'react'
+import React, { createRef, PureComponent, useContext, useEffect, useMemo, useState } from 'react'
 import {
   Text,
   View,
@@ -40,6 +40,18 @@ import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/U
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import HomeAccountsListCard from '../../components/home/HomeAccountsListCard'
 import AddNewAccountCard from './AddNewAccountCard'
+import { sourceAccountSelectedForSending } from '../../store/actions/sending'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../components/MaterialCurrencyCodeIcon'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import { getCurrencyImageByRegion } from '../../common/CommonFunctions'
+import TransactionKind from '../../common/data/enums/TransactionKind'
+import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import useExchangeRates from '../../utils/hooks/state-selectors/UseExchangeRates'
 
 export enum BottomSheetKind {
   SWAN_STATUS_INFO,
@@ -71,6 +83,15 @@ export default function MyWalletsContainer( props ) {
   const accountShells = useActiveAccountShells()
   const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
   const dispatch = useDispatch()
+  const [ accountShellID, setAccountShellID ] = useState( '' )
+  const [ itemAccountShell, setItemAccountShell ]=useState( null )
+
+  const currencyKind: CurrencyKind = useCurrencyKind()
+  const fiatCurrencyCode = useCurrencyCode()
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
+  const exchangeRates = useExchangeRates()
 
   useEffect( () => {
     dispatch( setShowAllAccount( true ) )
@@ -198,18 +219,21 @@ export default function MyWalletsContainer( props ) {
     if ( selectedAccount.primarySubAccount.hasNewTxn ) {
       dispatch( markAccountChecked( selectedAccount.id ) )
     }
-    if ( selectedAccount.primarySubAccount.type === AccountType.LIGHTNING_ACCOUNT ) {
-      props.navigation.navigate( 'LNAccountDetails', {
-        accountShellID: selectedAccount.id,
-        swanDeepLinkContent: props.swanDeepLinkContent,
-        node: selectedAccount.primarySubAccount.node
-      } )
-    } else {
-      props.navigation.navigate( 'AccountDetails', {
-        accountShellID: selectedAccount.id,
-        swanDeepLinkContent: props.swanDeepLinkContent
-      } )
-    }
+    // if ( selectedAccount.primarySubAccount.type === AccountType.LIGHTNING_ACCOUNT ) {
+    //   props.navigation.navigate( 'LNAccountDetails', {
+    //     accountShellID: selectedAccount.id,
+    //     swanDeepLinkContent: props.swanDeepLinkContent,
+    //     node: selectedAccount.primarySubAccount.node
+    //   } )
+    // } else {
+    //   props.navigation.navigate( 'AccountDetails', {
+    //     accountShellID: selectedAccount.id,
+    //     swanDeepLinkContent: props.swanDeepLinkContent
+    //   } )
+    // }
+    console.log( 'skk selectedAccount', selectedAccount )
+    setAccountShellID( selectedAccount.id )
+    setItemAccountShell ( selectedAccount )
 
     // }
   }
@@ -225,6 +249,7 @@ export default function MyWalletsContainer( props ) {
   const handleGridCardLongPress = ( item ) => { }
 
   const onViewAllClick = () => {
+    console.log( 'skk accountShellID', accountShellID )
     props.navigation.navigate( 'TransactionsList', {
       accountShellID,
     } )
@@ -246,7 +271,8 @@ export default function MyWalletsContainer( props ) {
             :
             <TouchableOpacity style={{
               width: wp( 170 ),
-              marginEnd: wp( 10 )
+              marginEnd: wp( 10 ),
+              justifyContent:'center'
             }}
             key={innerItem?.id}
             onPress={() => handleAccountCardSelection( innerItem )}
@@ -256,11 +282,179 @@ export default function MyWalletsContainer( props ) {
               <HomeAccountsListCard
                 accountShell={innerItem}
                 cardDisabled={false}
+                accountShellID={accountShellID}
               />
             </TouchableOpacity>
         )
       } )
     )
+  }
+
+  const onSendClick = () => {
+    dispatch( sourceAccountSelectedForSending( itemAccountShell ) )
+    props.navigation.navigate( 'Send', {
+      subAccountKind: itemAccountShell.primarySubAccount.kind,
+    } )
+  }
+
+  const getTitle = ( transaction ) => {
+    if( transaction.transactionType === TransactionKind.RECEIVE ) {
+      return transaction.sender || 'External address'
+    } else {
+      let name = ''
+      if( transaction.receivers ) {
+        if( transaction.receivers.length > 1 ) {
+          name = `${transaction.receivers[ 0 ].name ? transaction.receivers[ 0 ].name : transaction.recipientAddresses[ 0 ]} and ${transaction.receivers.length - 1} other`
+        } else {
+          name = transaction.receivers[ 0 ] ? transaction.receivers[ 0 ].name ? transaction.receivers[ 0 ].name :
+            transaction.recipientAddresses ? 'External address' : transaction.accountType || transaction.accountName : '' ||  transaction.accountType || transaction.accountName
+        }
+      } else {
+        name =  transaction.accountName? transaction.accountName: transaction.accountType
+      }
+      return name
+    }
+  }
+
+  const formattedDateText = ( transaction ) => {
+    return new Date( transaction.date ).toLocaleDateString()
+  }
+
+  const amountToDisplay = ( balance ) => {
+    const divisor = [ BitcoinUnit.SATS, BitcoinUnit.TSATS ]
+      .includes( BitcoinUnit.SATS ) ? 1 : SATOSHIS_IN_BTC
+    return balance / divisor
+  }
+
+  // const formattedBalanceText = isTestAccount ?
+  //   UsNumberFormat( amountToDisplay )
+  //   : useFormattedAmountText( amountToDisplay )
+
+  const formattedBalanceText = ( item ) => {
+    let balance = amountToDisplay( item.amount )
+    if ( currencyKind === CurrencyKind.BITCOIN ) {
+      let decimalCount = 0, decimal = '.', thousands = ','
+      try {
+        decimalCount = Math.abs( decimalCount )
+        decimalCount = isNaN( decimalCount ) ? 2 : decimalCount
+        const negativeSign = balance < 0 ? '-' : ''
+        const i = parseInt( balance = Math.abs( Number( balance ) || 0 ).toFixed( decimalCount ) ).toString()
+        const j = ( i.length > 3 ) ? i.length % 3 : 0
+        return negativeSign + ( j ? i.substr( 0, j ) + thousands : '' ) + i.substr( j ).replace( /(\d{3})(?=\d)/g, '$1' + thousands ) + ( decimalCount ? decimal + Math.abs( balance - i ).toFixed( decimalCount ).slice( 2 ) : '' )
+      } catch ( e ) {
+      // console.log(e)
+      }
+      // return UsNumberFormat( balance )
+    } else if (
+      exchangeRates !== undefined &&
+    exchangeRates[ fiatCurrencyCode ] !== undefined &&
+    exchangeRates[ fiatCurrencyCode ].last !== undefined
+    ) {
+      return (
+        ( balance / SATOSHIS_IN_BTC ) * exchangeRates[ fiatCurrencyCode ].last
+      ).toFixed( 2 )
+    } else {
+      return `${balance}`
+    }
+    return useFormattedAmountText( amountToDisplay( item.amount ) )
+  }
+
+  const renderWalletItem = ( { item, index } )=>{
+    return(
+      <TouchableOpacity style={{
+        justifyContent:'center', alignItems:'center',
+        marginHorizontal: wp( 27 ), flexDirection: 'row',
+        marginBottom: wp( 27 )
+      }}>
+        {
+          item.transactionType === TransactionKind.SEND
+            ?
+            <Image source={require( '../../assets/images/accIcons/sent_out.png' )} style={{
+              width:wp( 30 ), height:wp( 30 )
+            }}/>
+            :
+            <Image source={require( '../../assets/images/accIcons/received.png' )} style={{
+              width:wp( 30 ), height:wp( 30 )
+            }}/>
+        }
+        <View style={{
+          marginHorizontal: wp( 15 ), flex:1
+        }}>
+          <Text style={{
+            letterSpacing:0.6, color: Colors.greyText,
+            fontSize: RFValue( 12 ), fontFamily: Fonts.RobotoSlabRegular
+          }}>{getTitle( item )}</Text>
+          <Text style={{
+            letterSpacing:0.5, color: Colors.greyText,
+            fontSize: RFValue( 10 ), marginTop: wp( 3 ),
+            fontFamily: Fonts.RobotoSlabLight
+          }}>{formattedDateText( item )}</Text>
+        </View>
+        <BalanceCurrencyIcon />
+        <Text style={{
+          letterSpacing:0.95, color: Colors.greyText,
+          fontSize: RFValue( 19 ), marginStart: wp( 7 ),
+          fontFamily: Fonts.RobotoSlabRegular
+        }}>{formattedBalanceText( item )}</Text>
+        <Image style={{
+          width:wp( 5 ), height:hp( 8 ), marginStart:wp( 13 ),
+          tintColor: Colors.gray18
+        }}
+        source={require( '../../assets/images/icons/icon_arrow.png' )}/>
+      </TouchableOpacity>
+    )
+  }
+
+  const bitcoinIconColor = 'gray'
+  const bitcoinIconSource = useMemo( () => {
+    switch ( bitcoinIconColor ) {
+        // case 'dark':
+        //   return require( '../../assets/images/currencySymbols/icon_bitcoin_dark.png' )
+        // case 'light':
+        //   return require( '../../assets/images/currencySymbols/icon_bitcoin_light.png' )
+        case 'gray':
+          return require( '../../assets/images/currencySymbols/icon_bitcoin_gray.png' )
+        default:
+          return require( '../../assets/images/currencySymbols/icon_bitcoin_gray.png' )
+    }
+  }, [ bitcoinIconColor ] )
+
+  const BalanceCurrencyIcon = () => {
+    const style = {
+      ...styles.currencyImage
+    }
+
+    if ( prefersBitcoin ) {
+      return <Image style={{
+        ...style, marginStart: wp( 3 ), marginEnd:wp( 5 )
+      }} source={bitcoinIconSource} />
+    }
+
+    if ( materialIconCurrencyCodes.includes( fiatCurrencyCode ) ) {
+      return (
+        <MaterialCurrencyCodeIcon
+          currencyCode={fiatCurrencyCode}
+          color={Colors.gray2}
+          size={RFValue( 20 )}
+          style={{
+          }}
+        />
+      )
+    }
+    else {
+      return (
+        <Image
+          style={style}
+          source={getCurrencyImageByRegion( fiatCurrencyCode, bitcoinIconColor )}
+        />
+      )
+    }
+  }
+
+  const onReceiveClick = () => {
+    props.navigation.navigate( 'Receive', {
+      accountShell:itemAccountShell,
+    } )
   }
 
   return (
@@ -325,13 +519,21 @@ export default function MyWalletsContainer( props ) {
             source={require( '../../assets/images/icons/icon_arrow.png' )}/>
           </TouchableOpacity>
         </View>
+        <FlatList
+          style={{
+            marginTop: wp( 45 )
+          }}
+          data={itemAccountShell ? AccountShell.getAllTransactions( itemAccountShell )?.slice( 0, 3 ) : [] }
+          keyExtractor={( item, index ) => item?.id}
+          renderItem={renderWalletItem}
+        />
       </View>
       <View style={{
         flexDirection:'row', marginBottom: hp( 30 ), justifyContent:'center'
       }}>
         <TouchableOpacity style={{
           alignItems:'center'
-        }}>
+        }} onPress={onSendClick}>
           <Image source={require( '../../assets/images/accIcons/send_blue.png' )} style={{
             width:wp( 38 ), height:wp( 38 )
           }}/>
@@ -344,7 +546,7 @@ export default function MyWalletsContainer( props ) {
 
         <TouchableOpacity style={{
           alignItems:'center'
-        }}>
+        }} onPress={onReceiveClick}>
           <Image source={require( '../../assets/images/accIcons/receive_red.png' )} style={{
             width:wp( 38 ), height:wp( 38 )
           }}/>
@@ -372,6 +574,16 @@ export default function MyWalletsContainer( props ) {
   )
 }
 
+
+const styles = StyleSheet.create( {
+  currencyImage: {
+    width: wp( 12 ),
+    height: wp( 18 ),
+    resizeMode: 'contain',
+    tintColor: Colors.gray2
+    // marginTop: wp( 0.3 )
+  },
+} )
 {/* const mapStateToProps = ( state ) => {
   return {
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),

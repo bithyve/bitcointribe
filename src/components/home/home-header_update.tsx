@@ -863,10 +863,9 @@ const styles = StyleSheet.create( {
   },
   headerTitleText: {
     color: Colors.white,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue( 25 ),
-    // marginBottom: wp(  ),
-    letterSpacing: RFValue( 0.01 )
+    fontFamily: Fonts.RobotoSlabMedium,
+    fontSize: RFValue( 12 ),
+    letterSpacing: RFValue( 0.6 )
   },
   // cardBitCoinImage: {
   //   width: wp( '3.5%' ),
