@@ -645,7 +645,7 @@ class FriendsAndFamilyScreen extends React.Component<
         >
         <StatusBar
           backgroundColor={Colors.blueTextNew}
-          barStyle="dark-content"
+          barStyle="light-content"
         />
         <View style={styles.accountCardsSectionContainer}>
           {showIndicator && (
@@ -684,7 +684,7 @@ class FriendsAndFamilyScreen extends React.Component<
               <TouchableOpacity
                 style={CommonStyles.headerLeftIconContainer}
                 onPress={() => {
-                  navigation.goBack();
+                  this.props.navigation.goBack();
                 }}
               >
                 <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -944,7 +944,7 @@ const styles = StyleSheet.create({
     marginHorizontal: wp(1),
   },
   accountCardsSectionContainer: {
-    height: hp("71.46%"),
+    height: hp("100%"),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor1,
     opacity: 1,
