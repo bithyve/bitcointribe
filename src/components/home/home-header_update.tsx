@@ -98,6 +98,7 @@ interface MenuOption {
 
 const HomeHeader = ( {
   onPressNotifications,
+  onPressFAndF,
   navigateToQRScreen,
   notificationData,
   walletName,
@@ -209,7 +210,9 @@ const HomeHeader = ( {
   useEffect( () => {
     // const keepers = []
     const otherContacts = []
-
+    otherContacts.push( {
+      id: null, channelKey: null, isActive: false, kind: RecipientKind.CONTACT, trustKind: null, displayedName: 'Notifications', walletName: null, avatarImageSource: null, lastSeenActive: null, walletId: null, streamId: null, messages: null, channelAddress: null
+    } )
     for ( const channelKey of Object.keys( trustedContacts ) ) {
       const contact = trustedContacts[ channelKey ]
 
@@ -244,19 +247,7 @@ const HomeHeader = ( {
       }
     }
     otherContacts.push( {
-      id: null,
-      channelKey: null,
-      isActive: false,
-      kind: RecipientKind.CONTACT,
-      trustKind: null,
-      displayedName: 'More',
-      walletName: null,
-      avatarImageSource: null,
-      lastSeenActive: null,
-      walletId: null,
-      streamId: null,
-      messages: null,
-      channelAddress: null
+      id: null, channelKey: null, isActive: false, kind: RecipientKind.CONTACT, trustKind: null, displayedName: 'More', walletName: null, avatarImageSource: null, lastSeenActive: null, walletId: null, streamId: null, messages: null, channelAddress: null
     } )
     console.log( 'skk otherContacts', JSON.stringify( otherContacts ) )
     setFamilyData( otherContacts )
@@ -542,50 +533,62 @@ const HomeHeader = ( {
       }}>
         {
           item?.displayedName == 'More' ?
-            <>
+            <TouchableOpacity style={{
+              alignItems:'center'
+            }} activeOpacity={1} onPress={onPressFAndF}>
               <Image source={require( '../../assets/images/HomePageIcons/more.png' )} style={{
-                width: wp( 40 ), height: wp( 40 ), borderRadius: wp( 20 ),
+                width: wp( 40 ), height: wp( 40 ), borderRadius: wp( 20 )
               }} />
               <Text numberOfLines={3} style={styles.familyText}>{item.displayedName}</Text>
-            </>
+            </TouchableOpacity>
             :
-            <>
-              <View style={{
-                width: wp( 40 ), height: wp( 40 ), borderRadius: wp( 20 ),
-                backgroundColor: Colors.white,
-                justifyContent: 'center', alignItems: 'center'
-              }}>
+            item?.displayedName == 'Notifications' ?
+              <TouchableOpacity style={{
+                alignItems:'center'
+              }} activeOpacity={1} onPress={onPressNotifications}>
+                <Image source={require( '../../assets/images/HomePageIcons/more.png' )} style={{
+                  width: wp( 40 ), height: wp( 40 ), borderRadius: wp( 20 ),
+                }} />
+                <Text numberOfLines={3} style={styles.familyText}>{item.displayedName}</Text>
+              </TouchableOpacity>
+              :
+              <>
                 <View style={{
-                  width: wp( 38 ), height: wp( 38 ),
-                  borderRadius: wp( 19 ), backgroundColor:Colors.blue1,
-                  justifyContent:'center', alignItems:'center'
+                  width: wp( 40 ), height: wp( 40 ), borderRadius: wp( 20 ),
+                  backgroundColor: Colors.white,
+                  justifyContent: 'center', alignItems: 'center'
                 }}>
-                  {
-                    item?.avatarImageSource ?
-                      <Image
-                        source={item.avatarImageSource ? item.avatarImageSource : item.image}
-                        style={{
-                          width: wp( 38 ), height: wp( 38 ),
-                        }}
-                        resizeMode="contain"
-                      />
-                      : <View style={{
-                        flexDirection:'row'
-                      }}>
-                        <Text style={{
-                          fontSize:RFValue( 13 ),
-                          fontFamily:Fonts.RobotoSlabRegular,
-                          color: Colors.backgroundColor1,
-                          letterSpacing: 2.6
+                  <View style={{
+                    width: wp( 38 ), height: wp( 38 ),
+                    borderRadius: wp( 19 ), backgroundColor:Colors.blue1,
+                    justifyContent:'center', alignItems:'center'
+                  }}>
+                    {
+                      item?.avatarImageSource ?
+                        <Image
+                          source={item.avatarImageSource ? item.avatarImageSource : item.image}
+                          style={{
+                            width: wp( 38 ), height: wp( 38 ),
+                          }}
+                          resizeMode="contain"
+                        />
+                        : <View style={{
+                          flexDirection:'row'
                         }}>
-                          {firstNamePieceText( item ) + secondNamePieceText( item )}
-                        </Text>
-                      </View>
-                  }
+                          <Text style={{
+                            fontSize:RFValue( 13 ),
+                            fontFamily:Fonts.RobotoSlabRegular,
+                            color: Colors.backgroundColor1,
+                            letterSpacing: 2.6
+                          }}>
+                            {firstNamePieceText( item ) + secondNamePieceText( item )}
+                          </Text>
+                        </View>
+                    }
+                  </View>
                 </View>
-              </View>
-              <Text numberOfLines={3} style={styles.familyText}>{item.displayedName}</Text>
-            </>
+                <Text numberOfLines={3} style={styles.familyText}>{item.displayedName}</Text>
+              </>
         }
       </View>
     )
@@ -653,12 +656,17 @@ const HomeHeader = ( {
 
           </View>
         </View>
-        <View style={{
+        <TouchableOpacity style={{
           flex: 1, justifyContent: 'center', alignItems: 'flex-start',
           marginStart: wp( 15 )
-        }}>
+        }}
+        activeOpacity={1}
+        onPress={()=>handleOptionSelection( walletBackup )}>
           <Text style={styles.headerTitleText}>{walletNameNew}</Text>
-        </View>
+          <Text style={styles.addModalInfoTextHeader}>
+            {walletBackup.subtitle}
+          </Text>
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={navigateToQRScreen}
           style={{
@@ -688,7 +696,7 @@ const HomeHeader = ( {
             ) : null} */}
           </ImageBackground>
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={onPressNotifications}
           style={{
             height: wp( 23 ),
@@ -705,22 +713,11 @@ const HomeHeader = ( {
             }}
             resizeMode={'contain'}
           >
-            {/* {notificationData.findIndex( ( value ) => value.status === 'unread' ) > -1 ? (
-              <View
-                style={{
-                  backgroundColor: Colors.red,
-                  height: wp( '2.5%' ),
-                  width: wp( '2.5%' ),
-                  borderRadius: wp( '2.5%' ) / 2,
-                  alignSelf: 'flex-end',
-                }}
-              />
-            ) : null} */}
           </ImageBackground>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       {/* {getMessage()} */}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={{
           backgroundColor: Colors.blueTextNew,
           flexDirection: 'row',
@@ -755,7 +752,7 @@ const HomeHeader = ( {
             resizeMode: 'contain',
           }}
         />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <View style={{
         flex:1

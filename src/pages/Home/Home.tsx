@@ -454,7 +454,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BottomSheetKind.TAB_BAR_BUY_MENU:
           return (
             <>
-              <BottomSheetHeader font={Fonts.RobotoSlabRegular} title="Buy Bitcoin" onPress={this.closeBottomSheet} />
+              <BottomSheetHeader font={Fonts.RobotoSlabMedium} title="Buy Bitcoin" onPress={this.closeBottomSheet} />
 
               <BuyBitcoinHomeBottomSheet
                 onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}

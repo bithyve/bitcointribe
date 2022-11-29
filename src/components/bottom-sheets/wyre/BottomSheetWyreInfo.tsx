@@ -143,11 +143,11 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
             style={[
               ListStyles.modalTitle,
               {
-                fontFamily: Fonts.RobotoSlabRegular,
+                fontFamily: Fonts.RobotoSlabMedium,
                 fontSize: RFValue( 18 ),
-                letterSpacing: RFValue( 0.27 ),
+                letterSpacing: RFValue( 0.54 ),
                 lineHeight: RFValue( 22 ),
-                marginBottom: hp( 25 ),
+                marginBottom: hp( 4 ),
                 marginLeft: wp( 30 ),
                 marginRight: wp( 48 ),
               },
@@ -211,7 +211,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
           </View>
           <ListItem.Content
             style={{
-              height: hp( 53 ),
+              height: 'auto',
               marginVertical: hp( 16 ),
             }}
           >
@@ -233,8 +233,8 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
                 ListStyles.infoHeaderSubtitleText,
                 {
                   alignSelf: 'baseline',
-                  color: '#269640',
-                  fontFamily: Fonts.RobotoSlabRegular,
+                  color: Colors.greyText,
+                  fontFamily: Fonts.RobotoSlabRegular
                 },
               ]}
               numberOfLines={1}
@@ -253,11 +253,16 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
                 resizeMode="contain"
               /> */}
               <Text style={{
-                color: '#4D4D4D',
+                color: Colors.backgroundColor,
                 fontSize: RFValue( 27 ),
                 textAlign: 'center',
                 fontFamily: Fonts.RobotoSlabMedium,
-                lineHeight: RFValue( 27 )
+                lineHeight: RFValue( 27 ),
+                backgroundColor: '#59A65C',
+                height: wp( 42 ),
+                width: wp( 42 ),
+                borderRadius: wp( 21 ),
+                textAlignVertical: 'center'
               }}>
                 @
               </Text>
@@ -288,7 +293,9 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
           style={{
             flexDirection: 'column',
             marginTop: 'auto',
-            alignItems: 'flex-start',
+            alignItems: 'flex-end',
+            marginBottom: hp( 20 ),
+            marginHorizontal: wp( 20 )
           }}
         >
           <AppBottomSheetTouchableWrapper
@@ -298,6 +305,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
             }
             style={{
               ...styles.successModalButtonView,
+              alignSelf: 'flex-end'
             }}
           >
             <Text style={styles.proceedButtonText}>
@@ -345,11 +353,11 @@ const styles = StyleSheet.create( {
   containerStyle: {
     flexDirection: 'row',
     marginHorizontal: wp( 30 ),
-    paddingHorizontal: wp( 20 ),
+    paddingRight: wp( 30 ),
     paddingVertical: hp( 19 ),
     width: wp( 295 ),
     height: hp( 100 ),
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.bgColor,
     alignItems: 'center',
     alignSelf: 'center',
     marginBottom: hp( 20 ),
@@ -390,7 +398,8 @@ const styles = StyleSheet.create( {
     borderRadius: wp( 44 ) / 2,
   },
   modalContentContainer: {
-    backgroundColor: Colors.backgroundColor1,
+    backgroundColor: Colors.bgColor,
+    height: 'auto',
   },
   avatarImage: {
     ...ImageStyles.circledAvatarContainer,
@@ -417,25 +426,25 @@ const styles = StyleSheet.create( {
   // },
   modalInfoText: {
     marginLeft: wp( 30 ),
-    marginRight: wp( 48 ),
+    marginRight: wp( 85 ),
     color: Colors.lightTextColor,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.RobotoSlabRegular,
+    fontFamily: Fonts.RobotoSlabLight,
     textAlign: 'justify',
-    letterSpacing: RFValue( 0.6 ),
+    letterSpacing: RFValue( 0.48 ),
     lineHeight: RFValue( 18 ),
-    marginBottom: hp( 20 )
+    marginBottom: RFValue( 12 ),
   },
   modalInfoText1: {
     marginLeft: wp( 30 ),
-    marginRight: wp( 48 ),
+    marginRight: wp( 85 ),
     color: '#6C6C6C',
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.RobotoSlabRegular,
+    fontFamily: Fonts.RobotoSlabLight,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 ),
-    marginBottom: hp( 30 )
+    marginBottom: hp( 77 )
   },
   successModalButtonView: {
     height: hp( 60 ),
@@ -464,8 +473,7 @@ const styles = StyleSheet.create( {
     color: Colors.white,
     fontSize: RFValue( 13 ),
     height: hp( 18 ),
-    width: wp( 70 ),
-    fontFamily: Fonts.RobotoSlabRegular
+    fontFamily: Fonts.RobotoSlabMedium
   },
 } )
 

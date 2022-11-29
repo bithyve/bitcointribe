@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../common/Colors'
@@ -9,6 +9,7 @@ import {
 import Fonts from '../../common/Fonts'
 import { translations } from '../../common/content/LocContext'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import KeyPad from '../KeyPad'
 const ReceiveAmountContent = ( {
   title,
   message,
@@ -16,8 +17,35 @@ const ReceiveAmountContent = ( {
   onPressConfirm,
   onPressBack
 } ) => {
-  const [ amount, setAmount ] = useState( selectedAmount )
+  const [ value, setValue ] = useState( Number( selectedAmount ) )
+  const [ amount, setAmount ] = useState( selectedAmount !== '' ? selectedAmount : 'Enter amount in sats' )
   const common  = translations[ 'common' ]
+
+  const onPressNumber = ( text ) => {
+    let tmpPasscode = value.toString()
+    if ( value === 0 ) {
+      tmpPasscode = ''
+    }
+
+    if ( text != 'x' ) {
+      if ( value !== 0 || text !== '0' ) {
+        tmpPasscode += text
+        setAmount( tmpPasscode )
+        setValue( Number ( tmpPasscode ) )
+      }
+    }
+
+    if ( value && text == 'x' ) {
+      if ( tmpPasscode.length > 1 ) {
+        const passcodeTemp = tmpPasscode.slice( 0, -1 )
+        setAmount( passcodeTemp )
+        setValue( Number ( passcodeTemp ) )
+      } else {
+        setAmount( 'Enter amount in sats' )
+        setValue( 0 )
+      }
+    }
+  }
 
   return (
     <View style={styles.modalContentContainer}>
@@ -55,21 +83,14 @@ const ReceiveAmountContent = ( {
               source={require( '../../assets/images/icons/icon_bitcoin_gray.png' )}
             />
           </View> */}
-          <TextInput
+          <Text
             style={{
-              ...styles.textBox
+              ...styles.textBox,
+              color: value === 0 ? '#CBCBCB' : Colors.textColorGrey,
             }}
-            placeholder={'Enter amount in sats'}
-            value={amount}
-            returnKeyLabel="Done"
-            returnKeyType="done"
-            keyboardType={'numeric'}
-            onChangeText={( value ) => setAmount( value )}
-            placeholderTextColor={Colors.borderColor}
-            autoCorrect={false}
-            autoFocus={false}
-            autoCompleteType="off"
-          />
+          >
+            {amount}
+          </Text>
         </View>
         <View style={{
           marginTop: 'auto',
@@ -89,11 +110,13 @@ const ReceiveAmountContent = ( {
               }}
               style={styles.successModalButtonView}
             >
-              <Text style={styles.proceedButtonText}>{common.receive}</Text>
+              <Text style={styles.proceedButtonText}>{common.confirm}</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
+
+      <KeyPad onPressNumber={onPressNumber}/>
     </View>
   )
 }
@@ -143,8 +166,10 @@ const styles = StyleSheet.create( {
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.RobotoSlabMedium,
+    lineHeight: RFValue( 16 ),
+    letterSpacing: RFValue( 0.24 )
   },
   backButton:{
     height: wp( '13%' ),
@@ -175,11 +200,14 @@ const styles = StyleSheet.create( {
   },
   textBox: {
     flex: 1,
+    height: hp1( 50 ),
     paddingLeft: 20,
-    color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansMedium,
     fontSize: RFValue( 13 ),
     backgroundColor: Colors.white,
     borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlignVertical: 'center'
   },
 } )

@@ -1,9 +1,8 @@
 import React, { useContext } from 'react'
-import { View, ImageSourcePropType, FlatList, Image, Platform, TouchableOpacity, Text, Linking, StyleSheet } from 'react-native'
+import { View, FlatList, Image, Platform, TouchableOpacity, Text, Linking, StyleSheet } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import * as RNLocalize from 'react-native-localize'
 import ListStyles from '../../common/Styles/ListStyles'
-import ImageStyles from '../../common/Styles/ImageStyles'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../common/Fonts'
@@ -11,8 +10,8 @@ import { LocalizationContext } from '../../common/content/LocContext'
 import BottomInfoBox from '../BottomInfoBox'
 import Ramp from '../../assets/images/svgs/ramp.svg'
 import Wyre from  '../../assets/images/svgs/wyre.svg'
-import { Shadow } from 'react-native-shadow-2'
 import { hp, wp } from '../../common/data/responsiveness/responsive'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export type Props = {
   onMenuItemSelected: ( menuItem: BuyBitcoinBottomSheetMenuItem ) => void;
@@ -112,16 +111,18 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
 
   const renderItem = ( { item: menuItem }: { item: BuyBitcoinBottomSheetMenuItem } ) => {
     return (
-      <Shadow viewStyle={styles.rootContainer}
-        startColor={Colors.shadowColor}
-        offset={[ 10, 10 ]}
-        distance={6}>
-        <View style={{
-          backgroundColor: Colors.white,
-          borderRadius: wp( 10 ),
-          height: hp( 110 ),
-          width: wp( 325 ),
-        }}>
+      <View style={{
+        ...styles.rootContainer,
+        backgroundColor: Colors.bgColor,
+        borderRadius: wp( 10 ),
+        width: wp( 325 ),
+      }}>
+        <TouchableOpacity
+          onPress={() => {
+            onMenuItemSelected( menuItem )
+          }}
+          disabled={menuItem.disabled}
+        >
           <ListItem
             containerStyle={
               menuItem.disabled
@@ -166,35 +167,27 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
                 {menuItem.subtitle}
               </ListItem.Subtitle>
             </ListItem.Content>
-
-            <TouchableOpacity
-              onPress={() => {
-                onMenuItemSelected( menuItem )
-              }}
-              disabled={menuItem.disabled}
-              style={styles.buyContainer}
-            >
-              <Text style={styles.buyButton}>{strings.buyBitCoin}</Text>
-            </TouchableOpacity>
+            <FontAwesome name="chevron-right" color={'#C4C4C4'} size={RFValue( 12 )} />
           </ListItem>
-          <TouchableOpacity
-            style={styles.linkContainer}
-            onPress={() => {
-              onPress()
-              Linking.openURL( menuItem.link )
-            }}
-          >
-            <Text style={[ ListStyles.listItemSubtitle, styles.linkText ]}>
-              {strings.fees}
-              <Text style={styles.learnMore}>{` ${strings.learnMore}   `}</Text>
-            </Text>
-            <Image
-              style={styles.imageStyle}
-              source={require( '../../assets/images/icons/openlink.png' )}
-            />
-          </TouchableOpacity>
-        </View>
-      </Shadow>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.linkContainer}
+          onPress={() => {
+            onPress()
+            Linking.openURL( menuItem.link )
+          }}
+        >
+          <Text style={[ ListStyles.listItemSubtitle, styles.linkText ]}>
+            {strings.fees}
+            <Text style={styles.learnMore}>{` ${strings.learnMore}   `}</Text>
+          </Text>
+          <Image
+            style={styles.imageStyle}
+            source={require( '../../assets/images/icons/openlink.png' )}
+          />
+        </TouchableOpacity>
+      </View>
+
     )
   }
 
@@ -268,11 +261,10 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
   },
   mainCardContainer: {
-    marginTop: hp( 19 ),
-    marginBottom: hp( 15 ),
     paddingHorizontal: 0,
     marginHorizontal: wp( 15 ),
-    height: hp( 46 )
+    height: 'auto',
+    backgroundColor: Colors.bgColor,
   },
   rootContainer: {
     // backgroundColor: Colors.white,
