@@ -23,6 +23,7 @@ import DropDown from '../../../utils/Dropdown'
 import { LocalizationContext } from '../../../common/content/LocContext'
 import CheckingAcc from '../../../assets/images/svgs/icon_checking.svg'
 import AccountShell from '../../../common/data/models/AccountShell'
+import RampLogo from '../../../assets/images/svgs/ramplogo.svg'
 import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import { hp, wp } from '../../../common/data/responsiveness/responsive'
 
@@ -116,11 +117,11 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
       <Text style={[
         ListStyles.modalTitle,
         {
-          fontFamily: Fonts.RobotoSlabRegular,
+          fontFamily: Fonts.RobotoSlabMedium,
           fontSize: RFValue( 18 ),
-          letterSpacing: RFValue( 0.27 ),
+          letterSpacing: RFValue( 0.54 ),
           lineHeight: RFValue( 22 ),
-          marginBottom: hp( 25 ),
+          marginBottom: hp( 4 ),
           marginLeft: wp( 30 ),
           marginRight: wp( 48 ),
         }
@@ -169,12 +170,14 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           <View style={styles.headerImageInitials}>
             <CheckingAcc
               style={styles.headerImage}
+              height={wp( 42 )}
+              width={wp( 42 )}
             />
           </View>
         </View>
 
         <ListItem.Content style={{
-          height: hp( 53 ),
+          height: 'auto',
         }}>
           <ListItem.Subtitle
             style={ListStyles.infoHeaderSubtitleText}
@@ -191,7 +194,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           </ListItem.Title>
           <ListItem.Subtitle
             style={[ ListStyles.infoHeaderSubtitleText, {
-              alignSelf: 'baseline', color: '#269640', fontFamily: Fonts.RobotoSlabRegular
+              alignSelf: 'baseline', color: Colors.greyText, fontFamily: Fonts.RobotoSlabRegular
             } ]}
             numberOfLines={1}
           >
@@ -209,11 +212,16 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
               resizeMode="contain"
             /> */}
             <Text style={{
-              color: '#4D4D4D',
+              color: Colors.backgroundColor,
               fontSize: RFValue( 27 ),
               textAlign: 'center',
               fontFamily: Fonts.RobotoSlabMedium,
-              lineHeight: RFValue( 27 )
+              lineHeight: RFValue( 27 ),
+              backgroundColor: '#59A65C',
+              height: wp( 42 ),
+              width: wp( 42 ),
+              borderRadius: wp( 21 ),
+              textAlignVertical: 'center'
             }}>
                 @
             </Text>
@@ -247,8 +255,28 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
       </View>
 
       <View style={{
-        flexDirection: 'column', alignItems: 'flex-start', marginTop: 'auto'
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-end',
+        marginTop: 'auto',
+        marginBottom: hp( 20 ),
+        marginHorizontal: wp( 20 )
       }} >
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
+          <Text style={{
+            fontFamily: Fonts.RobotoSlabRegular,
+            fontSize: RFValue( 10 ),
+            color: Colors.lightTextColor,
+            lineHeight: RFValue( 22 ),
+          }}>
+          Powered by&ensp;
+          </Text>
+          <RampLogo />
+        </View>
+
         <AppBottomSheetTouchableWrapper
           disabled={rampFromBuyMenu ? hasButtonBeenPressed : false}
           onPress={rampFromBuyMenu ? handleProceedButtonPress : onClickSetting}
@@ -257,7 +285,6 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           }}
         >
           <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? strings.buyBitCoin : common.ok}</Text>
-
         </AppBottomSheetTouchableWrapper>
       </View>
       {/* {rampFromBuyMenu
@@ -295,12 +322,11 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
 const styles = StyleSheet.create( {
   containerStyle: {
     flexDirection: 'row',
-    marginHorizontal: wp( 30 ),
-    paddingHorizontal: wp( 20 ),
+    paddingRight: wp( 30 ),
     paddingVertical: hp( 19 ),
     width: wp( 295 ),
     height: hp( 100 ),
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.bgColor,
     alignItems: 'center',
     alignSelf: 'center',
     marginBottom: hp( 20 ),
@@ -342,6 +368,8 @@ const styles = StyleSheet.create( {
   },
   modalContentContainer: {
     backgroundColor: Colors.bgColor,
+    height: 'auto',
+    // marginBottom: 20,
   },
   avatarImage: {
     ...ImageStyles.circledAvatarContainer,
@@ -365,25 +393,25 @@ const styles = StyleSheet.create( {
   // },
   modalInfoText: {
     marginLeft: wp( 30 ),
-    marginRight: wp( 48 ),
+    marginRight: wp( 85 ),
     color: Colors.lightTextColor,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.RobotoSlabRegular,
+    fontFamily: Fonts.RobotoSlabLight,
     textAlign: 'justify',
-    letterSpacing: RFValue( 0.6 ),
+    letterSpacing: RFValue( 0.48 ),
     lineHeight: RFValue( 18 ),
-    marginBottom: hp( 20 )
+    marginBottom: RFValue( 12 ),
   },
   modalInfoText1: {
     marginLeft: wp( 30 ),
-    marginRight: wp( 48 ),
+    marginRight: wp( 85 ),
     color: '#6C6C6C',
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.RobotoSlabRegular,
+    fontFamily: Fonts.RobotoSlabLight,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 ),
-    marginBottom: hp( 30 )
+    marginBottom: hp( 77 )
   },
   successModalButtonView: {
     height: hp( 60 ),
@@ -411,7 +439,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.RobotoSlabRegular
+    fontFamily: Fonts.RobotoSlabMedium
   },
 } )
 
