@@ -684,7 +684,7 @@ class FriendsAndFamilyScreen extends React.Component<
               <TouchableOpacity
                 style={CommonStyles.headerLeftIconContainer}
                 onPress={() => {
-                  navigation.goBack();
+                  navigation.pop();
                 }}
               >
                 <View style={CommonStyles.headerLeftIconInnerContainer}>
