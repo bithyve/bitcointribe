@@ -84,7 +84,7 @@ export default function MyWalletsContainer( props ) {
   const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
   const dispatch = useDispatch()
   const [ accountShellID, setAccountShellID ] = useState( '' )
-  const [ itemAccountShell, setItemAccountShell ]=useState( null )
+  const [ itemAccountShell, setItemAccountShell ] = useState( null )
 
   const currencyKind: CurrencyKind = useCurrencyKind()
   const fiatCurrencyCode = useCurrencyCode()
@@ -116,6 +116,8 @@ export default function MyWalletsContainer( props ) {
         AsyncStorage.setItem( 'randomSeedWord', JSON.stringify( asyncSeedData ) )
       }
     }, 2000 )
+
+    setColumnData( getcolumnData )
   }, [] )
 
   const navigateToAddNewAccountScreen = () => {
@@ -178,7 +180,8 @@ export default function MyWalletsContainer( props ) {
     let currentColumn = []
     sortedShells.forEach( ( accountShell, index ) => {
       // if( accountShell.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true ){
-      currentColumn.push( accountShell )
+      if( accountShell.primarySubAccount.kind != SubAccountKind.TEST_ACCOUNT )
+        currentColumn.push( accountShell )
 
       // Make a new column after adding two items -- or after adding the
       // very first item. This is because the first column
@@ -196,7 +199,7 @@ export default function MyWalletsContainer( props ) {
       }
       // }
     } )
-    if ( columns[ columns.length - 1 ].length === 1 && columns.length !== 1 ) {
+    if ( columns[ columns?.length - 1 ]?.length === 1 && columns?.length !== 1 ) {
       columns[ columns.length - 1 ].push( 'add new' )
     } else {
       columns.push( [ 'add new' ] )
@@ -205,15 +208,27 @@ export default function MyWalletsContainer( props ) {
     return columns
   }
 
-  const columnData = getcolumnData()
+  const [ columnData, setColumnData ] = useState( [] )
+
+  useEffect( () => {
+    columnData.map( ( item, index ) => {
+      item?.map( ( innerItem, innerIndex ) => {
+        if ( innerIndex == 0 ) {
+          if ( index == 0 && typeof ( innerItem ) !== 'string' )
+            handleAccountCardSelection( innerItem )
+        }
+        return
+      } )
+    } )
+  }, [ columnData ] )
 
   const handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
-    // if (
-    //   props.startRegistration &&
-    //   selectedAccount.primarySubAccount.kind === SubAccountKind.SERVICE &&
-    // ( selectedAccount.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
-    // ) {
-    //   props.openBottomSheet( 6, null, true )
+  // if (
+  //   props.startRegistration &&
+  //   selectedAccount.primarySubAccount.kind === SubAccountKind.SERVICE &&
+  // ( selectedAccount.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
+  // ) {
+  //   props.openBottomSheet( 6, null, true )
 
     // } else {
     if ( selectedAccount.primarySubAccount.hasNewTxn ) {
@@ -233,9 +248,9 @@ export default function MyWalletsContainer( props ) {
     // }
     console.log( 'skk selectedAccount', selectedAccount )
     setAccountShellID( selectedAccount.id )
-    setItemAccountShell ( selectedAccount )
+    setItemAccountShell( selectedAccount )
 
-    // }
+  // }
   }
 
   const numberWithCommas = ( x ) => {
@@ -257,7 +272,7 @@ export default function MyWalletsContainer( props ) {
 
   // { typeof innerItem === 'string' ?
   const renderItems = ( { item, index } ) => {
-    return(
+    return (
       item?.map( ( innerItem ) => {
         return (
           typeof innerItem === 'string' ?
@@ -272,7 +287,7 @@ export default function MyWalletsContainer( props ) {
             <TouchableOpacity style={{
               width: wp( 170 ),
               marginEnd: wp( 10 ),
-              justifyContent:'center'
+              justifyContent: 'center'
             }}
             key={innerItem?.id}
             onPress={() => handleAccountCardSelection( innerItem )}
@@ -298,19 +313,19 @@ export default function MyWalletsContainer( props ) {
   }
 
   const getTitle = ( transaction ) => {
-    if( transaction.transactionType === TransactionKind.RECEIVE ) {
+    if ( transaction.transactionType === TransactionKind.RECEIVE ) {
       return transaction.sender || 'External address'
     } else {
       let name = ''
-      if( transaction.receivers ) {
-        if( transaction.receivers.length > 1 ) {
+      if ( transaction.receivers ) {
+        if ( transaction.receivers.length > 1 ) {
           name = `${transaction.receivers[ 0 ].name ? transaction.receivers[ 0 ].name : transaction.recipientAddresses[ 0 ]} and ${transaction.receivers.length - 1} other`
         } else {
           name = transaction.receivers[ 0 ] ? transaction.receivers[ 0 ].name ? transaction.receivers[ 0 ].name :
-            transaction.recipientAddresses ? 'External address' : transaction.accountType || transaction.accountName : '' ||  transaction.accountType || transaction.accountName
+            transaction.recipientAddresses ? 'External address' : transaction.accountType || transaction.accountName : '' || transaction.accountType || transaction.accountName
         }
       } else {
-        name =  transaction.accountName? transaction.accountName: transaction.accountType
+        name = transaction.accountName ? transaction.accountName : transaction.accountType
       }
       return name
     }
@@ -344,7 +359,7 @@ export default function MyWalletsContainer( props ) {
       } catch ( e ) {
       // console.log(e)
       }
-      // return UsNumberFormat( balance )
+    // return UsNumberFormat( balance )
     } else if (
       exchangeRates !== undefined &&
     exchangeRates[ fiatCurrencyCode ] !== undefined &&
@@ -359,10 +374,10 @@ export default function MyWalletsContainer( props ) {
     return useFormattedAmountText( amountToDisplay( item.amount ) )
   }
 
-  const renderWalletItem = ( { item, index } )=>{
-    return(
+  const renderWalletItem = ( { item, index } ) => {
+    return (
       <TouchableOpacity style={{
-        justifyContent:'center', alignItems:'center',
+        justifyContent: 'center', alignItems: 'center',
         marginHorizontal: wp( 27 ), flexDirection: 'row',
         marginBottom: wp( 27 )
       }}>
@@ -370,37 +385,37 @@ export default function MyWalletsContainer( props ) {
           item.transactionType === TransactionKind.SEND
             ?
             <Image source={require( '../../assets/images/accIcons/sent_out.png' )} style={{
-              width:wp( 30 ), height:wp( 30 )
-            }}/>
+              width: wp( 30 ), height: wp( 30 )
+            }} />
             :
             <Image source={require( '../../assets/images/accIcons/received.png' )} style={{
-              width:wp( 30 ), height:wp( 30 )
-            }}/>
+              width: wp( 30 ), height: wp( 30 )
+            }} />
         }
         <View style={{
-          marginHorizontal: wp( 15 ), flex:1
+          marginHorizontal: wp( 15 ), flex: 1
         }}>
           <Text style={{
-            letterSpacing:0.6, color: Colors.greyText,
+            letterSpacing: 0.6, color: Colors.greyText,
             fontSize: RFValue( 12 ), fontFamily: Fonts.RobotoSlabRegular
           }}>{getTitle( item )}</Text>
           <Text style={{
-            letterSpacing:0.5, color: Colors.greyText,
+            letterSpacing: 0.5, color: Colors.greyText,
             fontSize: RFValue( 10 ), marginTop: wp( 3 ),
             fontFamily: Fonts.RobotoSlabLight
           }}>{formattedDateText( item )}</Text>
         </View>
         <BalanceCurrencyIcon />
         <Text style={{
-          letterSpacing:0.95, color: Colors.greyText,
+          letterSpacing: 0.95, color: Colors.greyText,
           fontSize: RFValue( 19 ), marginStart: wp( 7 ),
           fontFamily: Fonts.RobotoSlabRegular
         }}>{formattedBalanceText( item )}</Text>
         <Image style={{
-          width:wp( 5 ), height:hp( 8 ), marginStart:wp( 13 ),
+          width: wp( 5 ), height: hp( 8 ), marginStart: wp( 13 ),
           tintColor: Colors.gray18
         }}
-        source={require( '../../assets/images/icons/icon_arrow.png' )}/>
+        source={require( '../../assets/images/icons/icon_arrow.png' )} />
       </TouchableOpacity>
     )
   }
@@ -408,10 +423,10 @@ export default function MyWalletsContainer( props ) {
   const bitcoinIconColor = 'gray'
   const bitcoinIconSource = useMemo( () => {
     switch ( bitcoinIconColor ) {
-        // case 'dark':
-        //   return require( '../../assets/images/currencySymbols/icon_bitcoin_dark.png' )
-        // case 'light':
-        //   return require( '../../assets/images/currencySymbols/icon_bitcoin_light.png' )
+    // case 'dark':
+    //   return require( '../../assets/images/currencySymbols/icon_bitcoin_dark.png' )
+    // case 'light':
+    //   return require( '../../assets/images/currencySymbols/icon_bitcoin_light.png' )
         case 'gray':
           return require( '../../assets/images/currencySymbols/icon_bitcoin_gray.png' )
         default:
@@ -426,7 +441,7 @@ export default function MyWalletsContainer( props ) {
 
     if ( prefersBitcoin ) {
       return <Image style={{
-        ...style, marginStart: wp( 3 ), marginEnd:wp( 5 )
+        ...style, marginStart: wp( 3 ), marginEnd: wp( 5 )
       }} source={bitcoinIconSource} />
     }
 
@@ -453,7 +468,7 @@ export default function MyWalletsContainer( props ) {
 
   const onReceiveClick = () => {
     props.navigation.navigate( 'Receive', {
-      accountShell:itemAccountShell,
+      accountShell: itemAccountShell,
     } )
   }
 
@@ -492,84 +507,84 @@ export default function MyWalletsContainer( props ) {
           renderItem={renderItems} />
       </View>
       <View style={{
-        flex:1
+        flex: 1
       }}>
         <View style={{
-          flexDirection:'row', marginTop: hp( 33 ), marginStart: wp( 33 ), marginEnd:wp( 30 )
+          flexDirection: 'row', marginTop: hp( 33 ), marginStart: wp( 33 ), marginEnd: wp( 30 )
         }}>
           <Text style={{
-            color:Colors.greyText, fontFamily:Fonts.RobotoSlabRegular, fontSize: RFValue( 16 ),
-            letterSpacing:1.28
+            color: Colors.greyText, fontFamily: Fonts.RobotoSlabRegular, fontSize: RFValue( 16 ),
+            letterSpacing: 1.28
           }}>{'Transactions'}</Text>
           <View style={{
-            flex:1
-          }}/>
+            flex: 1
+          }} />
           <TouchableOpacity style={{
-            flexDirection:'row', alignItems:'center'
+            flexDirection: 'row', alignItems: 'center'
           }} onPress={onViewAllClick}>
             <Text style={{
-              color: Colors.appPrimary, fontFamily:Fonts.RobotoSlabBold, fontSize: RFValue( 11 ),
-              letterSpacing:1.28
+              color: Colors.appPrimary, fontFamily: Fonts.RobotoSlabBold, fontSize: RFValue( 11 ),
+              letterSpacing: 1.28
             }}>
-              View All
+            View All
             </Text>
             <Image style={{
-              width:wp( 5 ), height:hp( 8 ), marginStart:wp( 4 ), tintColor:Colors.black3
+              width: wp( 5 ), height: hp( 8 ), marginStart: wp( 4 ), tintColor: Colors.black3
             }}
-            source={require( '../../assets/images/icons/icon_arrow.png' )}/>
+            source={require( '../../assets/images/icons/icon_arrow.png' )} />
           </TouchableOpacity>
         </View>
         <FlatList
           style={{
             marginTop: wp( 45 )
           }}
-          data={itemAccountShell ? AccountShell.getAllTransactions( itemAccountShell )?.slice( 0, 3 ) : [] }
+          data={itemAccountShell ? AccountShell.getAllTransactions( itemAccountShell )?.slice( 0, 3 ) : []}
           keyExtractor={( item, index ) => item?.id}
           renderItem={renderWalletItem}
         />
       </View>
       <View style={{
-        flexDirection:'row', marginBottom: hp( 30 ), justifyContent:'center'
+        flexDirection: 'row', marginBottom: hp( 30 ), justifyContent: 'center'
       }}>
         <TouchableOpacity style={{
-          alignItems:'center'
+          alignItems: 'center'
         }} onPress={onSendClick}>
           <Image source={require( '../../assets/images/accIcons/send_blue.png' )} style={{
-            width:wp( 38 ), height:wp( 38 )
-          }}/>
+            width: wp( 38 ), height: wp( 38 )
+          }} />
           <Text style={{
-            fontSize:RFValue( 10 ), color:Colors.black1,
-            fontFamily:Fonts.RobotoSlabRegular, marginTop:hp( 9 ),
-            marginHorizontal:wp( 30 )
+            fontSize: RFValue( 10 ), color: Colors.black1,
+            fontFamily: Fonts.RobotoSlabRegular, marginTop: hp( 9 ),
+            marginHorizontal: wp( 30 )
           }}>Send</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={{
-          alignItems:'center'
+          alignItems: 'center'
         }} onPress={onReceiveClick}>
           <Image source={require( '../../assets/images/accIcons/receive_red.png' )} style={{
-            width:wp( 38 ), height:wp( 38 )
-          }}/>
+            width: wp( 38 ), height: wp( 38 )
+          }} />
           <Text style={{
-            fontSize:RFValue( 10 ), color:Colors.black1,
-            fontFamily:Fonts.RobotoSlabRegular, marginTop:hp( 9 ),
-            marginHorizontal:wp( 30 )
+            fontSize: RFValue( 10 ), color: Colors.black1,
+            fontFamily: Fonts.RobotoSlabRegular, marginTop: hp( 9 ),
+            marginHorizontal: wp( 30 )
           }}>Receive</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{
-          alignItems:'center'
+          alignItems: 'center'
         }}>
           <Image source={require( '../../assets/images/accIcons/settings.png' )} style={{
-            width:wp( 38 ), height:wp( 38 )
-          }}/>
+            width: wp( 38 ), height: wp( 38 )
+          }} />
           <Text style={{
-            fontSize:RFValue( 10 ), color:Colors.black1,
-            fontFamily:Fonts.RobotoSlabRegular, marginTop:hp( 9 ),
-            marginHorizontal:wp( 30 )
+            fontSize: RFValue( 10 ), color: Colors.black1,
+            fontFamily: Fonts.RobotoSlabRegular, marginTop: hp( 9 ),
+            marginHorizontal: wp( 30 )
           }}>Settings</Text>
         </TouchableOpacity>
       </View>
-      <SafeAreaView/>
+      <SafeAreaView />
     </View>
   )
 }

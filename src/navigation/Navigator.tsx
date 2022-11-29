@@ -85,6 +85,9 @@ import DonationAccountWebViewSettingsScreen from '../pages/Accounts/AccountSetti
 import SubAccountSettingsStack from './stacks/accounts/SubAccountSettingsStack'
 import SubAccountTFAHelpScreen from '../pages/Accounts/SubAccountTFAHelpScreen'
 import Receive from '../pages/Accounts/Receive'
+import ContactDetails from '../pages/Contacts/ContactDetails'
+import AccountDetailsStack from './stacks/accounts/AccountDetailsStack'
+import AccountDetailsContainerScreen from '../pages/Accounts/Details/AccountDetailsContainerScreen'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -561,6 +564,19 @@ const NewHomeNavigator = createStackNavigator( {
     screen: Receive,
     navigationOptions: {
       header: null,
+    },
+  },
+  ContactDetails: {
+    screen: ContactDetails,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  AccountDetails: {
+    screen: AccountDetailsContainerScreen,
+    navigationOptions: {
+      header: null,
+      // tabBarVisibl
     },
   },
 } )

@@ -832,7 +832,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
         //Friends and Family
         case 2:
-          this.props.navigation.navigate( 'FriendsAndFamily' )
+          this.navigateToFAndF()
           break
 
         //
@@ -849,6 +849,10 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
           break
     }
+  }
+
+  navigateToFAndF = () => {
+    this.props.navigation.navigate( 'FriendsAndFamily' )
   }
 
   getIconPath = ( item ) => {
@@ -886,7 +890,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }}>{'COMING SOON'}</Text>}
         <Image source={this.getIconPath( item )}
           style={{
-            width: wp( 31 ), height: wp( 31 ), marginTop: item.name == 'Shepa Settings' ? ( 14 ) : (36)
+            width: wp( 31 ), height: wp( 31 ), marginTop: item.name == 'Shepa Settings' ? ( 14 ) : ( 36 )
           }} />
         <Text style={{
           fontSize: RFValue( 12 ), fontFamily: Fonts.RobotoSlabMedium,
@@ -964,13 +968,14 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
             }}>
               <HomeHeader
                 onPressNotifications={this.onPressNotifications}
+                onPressFAndF={this.navigateToFAndF}
                 navigateToQRScreen={this.navigateToQRScreen}
                 notificationData={this.props.messages}
                 walletName={walletName}
                 getCurrencyImageByRegion={getCurrencyImageByRegion}
                 netBalance={netBalance}
                 exchangeRates={exchangeRates}
-                CurrencyCode={currencyCode}
+                // CurrencyCode={currencyCode}
                 navigation={navigation}
                 currentLevel={currentLevel}
                 //  onSwitchToggle={this.onSwitchToggle}
