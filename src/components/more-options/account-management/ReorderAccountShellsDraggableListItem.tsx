@@ -40,8 +40,10 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
         width: isActive ? '105%' : '100%',
       }}
     >
-      <View style={ImageStyles.thumbnailImageLarge} >
-        {getAvatarForSubAccount( primarySubAccount, false, true )}
+      <View style={{width: '10%', alignItems: 'center', justifyContent: 'center'}}>
+        <View>
+          {getAvatarForSubAccount( primarySubAccount, false, true )}
+        </View>
       </View>
       <ListItem.Content>
         <ListItem.Title
