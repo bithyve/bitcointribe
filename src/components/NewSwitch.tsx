@@ -56,8 +56,8 @@ const NewSwitch = () => {
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: prefersBitcoin ? '#fff' : 'transparent',
-          elevation: prefersBitcoin ? 5 : 0,
+          backgroundColor: !prefersBitcoin ? '#fff' : 'transparent',
+          elevation: !prefersBitcoin ? 5 : 0,
           width: hp( 26 ),
           height: hp( 26 ),
           borderRadius: wp( 13 ),
@@ -79,13 +79,13 @@ const NewSwitch = () => {
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: !prefersBitcoin ? '#fff' : 'transparent',
+          backgroundColor: prefersBitcoin ? '#fff' : 'transparent',
           width: hp( 26 ),
           height: hp( 26 ),
           borderRadius: wp( 13 ),
           marginVertical: hp( 2 ),
           marginEnd: wp( 2 ),
-          elevation: !prefersBitcoin ? 5 : 0,
+          elevation: prefersBitcoin ? 5 : 0,
         }}
         onPress={() => {
           ( exchangeRates && exchangeRates[ currencyCode ] )

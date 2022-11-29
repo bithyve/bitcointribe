@@ -62,6 +62,8 @@ const BackupSeedWordsContent = ( props ) => {
     }
     setSeedRandomNumber( ranNums )
   }, [] )
+  //
+  //[{"id": 1, "name": "kiwi"}, {"id": 2, "name": "decrease"}, {"id": 3, "name": "rough"}, {"id": 4, "name": "sauce"}, {"id": 5, "name": "walnut"}, {"id": 6, "name": "main"}, {"id": 7, "name": "crumble"}, {"id": 8, "name": "cover"}, {"id": 9, "name": "minute"}, {"id": 10, "name": "goat"}, {"id": 11, "name": "render"}, {"id": 12, "name": "mind"}]
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor

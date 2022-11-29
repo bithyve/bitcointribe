@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   View,
-  Image,
   TouchableOpacity,
   Text,
   StyleSheet,
-  TextInput,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -33,12 +31,10 @@ import {
   setReceiveHelper,
   setSavingWarning,
 } from '../../store/actions/preferences'
-import { getAccountIconByShell, getAccountTitleByShell } from './Send/utils'
-import KnowMoreButton from '../../components/KnowMoreButton'
+import { getAccountTitleByShell } from './Send/utils'
 import QRCode from '../../components/QRCode'
 import CopyThisText from '../../components/CopyThisText'
 import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
-import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
@@ -51,20 +47,13 @@ import { Account, AccountType, LevelData, LevelHealthInterface } from '../../bit
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import ModalContainer from '../../components/home/ModalContainer'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { getNextFreeAddress } from '../../store/sagas/accounts'
 import { translations } from '../../common/content/LocContext'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { onPressKeeper } from '../../store/actions/BHR'
 import NewSwitch from '../../components/NewSwitch'
-import CurrencyKind from '../../common/data/enums/CurrencyKind'
-import { UsNumberFormat } from '../../common/utilities'
-import { AccountsState } from '../../store/reducers/accounts'
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import IconBitcoin from  '../../assets/images/svgs/icon_bitcoin1.svg'
-import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
-import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import SelectAccount from '../../components/SelectAccount'
 
 export default function Receive( props ) {
   const dispatch = useDispatch()
@@ -243,151 +232,6 @@ export default function Receive( props ) {
     } else if ( paymentURI ) setPaymentURI( null )
   }, [ amount ] )
 
-  const accountsState: AccountsState = useSelector( ( state ) => state.accounts )
-
-  const currencyCode = useSelector( ( state ) => state.preferences.currencyCode )
-
-  const currencyKind: CurrencyKind = useSelector(
-    ( state ) => state.preferences.giftCurrencyKind || CurrencyKind.BITCOIN
-  )
-
-  const prefersBitcoin = useMemo( () => {
-    return currencyKind === CurrencyKind.BITCOIN
-  }, [ currencyKind ] )
-
-  const fiatCurrencyCode = useCurrencyCode()
-
-  const [ accountListModal, setAccountListModal ] = useState( false )
-
-  const activeAccounts = useActiveAccountShells().filter(
-    ( shell ) => shell?.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT
-  )
-
-  const renderAccountList = () => {
-    return (
-      <ScrollView
-        style={{
-          height: 'auto',
-        }}
-      >
-        {activeAccounts.map( ( item, index ) => {
-          if (
-            [ AccountType.TEST_ACCOUNT, AccountType.SWAN_ACCOUNT ].includes(
-              item.primarySubAccount.type
-            ) ||
-            !item.primarySubAccount.isUsable ||
-            item.primarySubAccount.isTFAEnabled
-          )
-            return
-          return (
-            <View
-              key={index}
-              style={{
-                backgroundColor: Colors.white,
-              }}
-            >
-              {accountElement( item, () => {
-                setAccountShell( item )
-                setAccountListModal( false )
-              } )}
-            </View>
-          )
-        } )}
-      </ScrollView>
-    )
-  }
-
-  const accountElement = (
-    item,
-    onPressCallBack,
-    activeOpacity = 0,
-    width = '90%',
-  ) => {
-    return (
-      <TouchableOpacity
-        style={{
-          ...styles.accountSelectionView,
-          width: width,
-        }}
-        onPress={() => onPressCallBack()}
-        activeOpacity={activeOpacity}
-      >
-        <View
-          style={{
-            borderRadius: wp( 2 ),
-          }}
-        >
-          <View
-            style={{
-              flexDirection: 'row',
-              width: '100%',
-              paddingVertical: hp1( 10 ),
-              paddingHorizontal: wp1( 2 ),
-              alignItems: 'center',
-              backgroundColor: Colors.white,
-            }}
-          >
-            <View
-              style={{
-                width: wp1( 38 ),
-                height: '100%',
-                marginTop: hp1( 30 ),
-                marginRight: wp1( 11 ),
-              }}
-            >
-              {getAvatarForSubAccount( item.primarySubAccount, false, true )}
-            </View>
-            <View
-              style={{
-                marginHorizontal: wp1( 3 ),
-                flex: 1,
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.black,
-                  fontSize: RFValue( 14 ),
-                  fontFamily: Fonts.RobotoSlabRegular,
-                }}
-              >
-                To {item.primarySubAccount.customDisplayName ??
-                  item.primarySubAccount.defaultTitle}
-              </Text>
-              <Text style={styles.availableToSpendText}>
-                {'Available '}
-                <Text style={styles.balanceText}>
-                  {prefersBitcoin
-                    ? UsNumberFormat(
-                      item.primarySubAccount?.balances?.confirmed
-                    )
-                    : accountsState.exchangeRates &&
-                      accountsState.exchangeRates[ currencyCode ]
-                      ? (
-                        ( item.primarySubAccount?.balances?.confirmed /
-                          SATOSHIS_IN_BTC ) *
-                        accountsState.exchangeRates[ currencyCode ].last
-                      ).toFixed( 2 )
-                      : 0}
-                </Text>
-                <Text>{prefersBitcoin ? ' sats' : ` ${fiatCurrencyCode}`}</Text>
-              </Text>
-            </View>
-            {activeOpacity === 0 && (
-              <MaterialCommunityIcons
-                name="dots-horizontal"
-                size={24}
-                color="gray"
-                style={{
-                  alignSelf: 'center',
-                }}
-              />
-            )}
-          </View>
-        </View>
-      </TouchableOpacity>
-    )
-  }
-
   return (
     <View style={{
       flex: 1
@@ -444,9 +288,7 @@ export default function Receive( props ) {
               </View>
             </View>
             <ScrollView>
-              {accountElement( accountShell, () =>
-                setAccountListModal( !accountListModal )
-              )}
+              <SelectAccount onSelect={( item ) => setAccountShell( item )}/>
 
               <View style={styles.QRView}>
                 <QRCode title={getAccountTitleByShell( accountShell ) === 'Test Account' ? 'Testnet address' : 'Bitcoin address'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp1( 230 )} />
@@ -503,14 +345,6 @@ export default function Receive( props ) {
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-
-      <ModalContainer
-        onBackground={() => setAccountListModal( false )}
-        visible={accountListModal}
-        closeBottomSheet={() => setAccountListModal( false )}
-      >
-        {renderAccountList()}
-      </ModalContainer>
 
       <ModalContainer onBackground={() => showReceiveHelper( false )} visible={receiveHelper} closeBottomSheet={() => { showReceiveHelper( false ) }} >
         <ReceiveHelpContents
