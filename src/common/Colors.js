@@ -54,6 +54,7 @@ const Colors = {
   darkGray: '#00000065',
   whiteGray:'#e5e5e5',
   checkBlue: '#056EB4',
+  errorPink : '#FFA59D',
 
   // Grayscale
   gray1: '#d0d0d0',

@@ -96,7 +96,7 @@ export default function PasscodeConfirm( props ) {
   return (
     <SafeAreaView style={ {
       flex: 1,
-      backgroundColor:'#F5F5F5'
+      backgroundColor: Colors.blue
     } }>
       <StatusBar />
       <View style={ {
@@ -495,12 +495,12 @@ export default function PasscodeConfirm( props ) {
               disabled={passcode == confirmPasscode ? false : true}
               onPress={() => dispatch( storeCreds( passcode ) ) }
               style={{
-                ...styles.proceedButtonView,
+                ...styles.loginButtonView,
                 backgroundColor:
-                  passcode == confirmPasscode ? Colors.blue : Colors.lightBlue,
+                  passcode == confirmPasscode ? Colors.white : Colors.white,
               }}
             >
-              <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+              <Text style={styles.proceedButtonText}>{common.login}</Text>
             </TouchableOpacity>
           ) : null}
 
@@ -638,7 +638,7 @@ export default function PasscodeConfirm( props ) {
                 style={ styles.keyPadElementText }
                 onPress={ () => onPressNumber( 'x' ) }
               >
-                <Ionicons name="ios-backspace" size={ 30 } color={ Colors.blue } />
+                <Ionicons name="ios-backspace" size={ 30 } color={ Colors.white } />
               </Text>
             </TouchableOpacity>
           </View>
@@ -699,30 +699,30 @@ const styles = StyleSheet.create( {
     alignItems: 'center'
   },
   keyPadElementText: {
-    color: Colors.blue,
+    color: Colors.white,
     fontSize: RFValue( 25 ),
     fontFamily: Fonts.FiraSansRegular,
     fontStyle: 'normal'
   },
-  proceedButtonView: {
-    marginLeft: 20,
-    marginTop: hp( '3%' ),
+  loginButtonView: {
+    marginLeft: wp(59),
+    marginTop: hp( '17%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    }
+    shadowColor: Colors.white,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 15, height: 15
+    // }
   },
   proceedButtonText: {
-    color: Colors.white,
+    color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.RobotoSlabRegular
   },
   boldItalicText: {
     fontFamily: Fonts.FiraSansMediumItalic,
@@ -731,17 +731,17 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
   },
   headerTitleText: {
-    color: Colors.blue,
+    color: Colors.white,
     fontSize: RFValue( 28 ),
     marginLeft: 20,
     marginTop: hp( '3%' ),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.RobotoSlabRegular
   },
   headerInfoText: {
-    color: Colors.textColorGrey,
+    color: Colors.white,
     fontSize: RFValue( 12 ),
     marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.RobotoSlabRegular
   },
   headerInfoBoldText: {
     color: Colors.textColorGrey,
