@@ -313,7 +313,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
         name: 'Buy Bitcoin',
         type: 5
       }, {
-        name: 'Shepa Settings',
+        name: 'Be a Sherpa',
         type: 6
       } ]
     }
@@ -884,13 +884,13 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
         backgroundColor: Colors.cream, paddingHorizontal: wp( 12 ),
         borderRadius: 10, marginBottom: 18
       }} activeOpacity={1} onPress={() => this.onItemClick( item )}>
-        { ( item.name == 'Shepa Settings' || item.name == '' ) && <Text style={{
+        { ( item.name == 'Be a Sherpa' || item.name == '' || item.name == 'Create group' ) && <Text style={{
           fontSize: RFValue( 8 ), fontFamily: Fonts.RobotoSlabMedium,
           letterSpacing: 0.8, lineHeight: ( 16 ), marginTop: 7, color: Colors.goldenText
         }}>{'COMING SOON'}</Text>}
         <Image source={this.getIconPath( item )}
           style={{
-            width: wp( 31 ), height: wp( 31 ), marginTop: item.name == 'Shepa Settings' ? ( 14 ) : ( 36 )
+            width: wp( 31 ), height: wp( 31 ), marginTop: ( item.name == 'Be a Sherpa' || item.name == 'Create group' )  ? ( 14 ) : ( 36 )
           }} />
         <Text style={{
           fontSize: RFValue( 12 ), fontFamily: Fonts.RobotoSlabMedium,
