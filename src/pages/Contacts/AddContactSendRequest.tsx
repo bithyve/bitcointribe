@@ -44,7 +44,7 @@ import * as ExpoContacts from 'expo-contacts'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { AccountsState } from '../../store/reducers/accounts'
 import ChangeSelection from '../FriendsAndFamily/ChangeSelection'
-import BackIcon from "../../assets/images/backWhite.svg";
+import BackIcon from '../../assets/images/backWhite.svg'
 
 export default function AddContactSendRequest( props ) {
   const { translations, formatString } = useContext( LocalizationContext )
@@ -139,11 +139,18 @@ export default function AddContactSendRequest( props ) {
   }
 
   const createTrustedContact = useCallback( async () => {
+    console.log( 'ss', 'createTrustedContact' )
     const contacts: Trusted_Contacts = trustedContacts
     for( const contact of Object.values( contacts ) ){
       if ( contact.contactDetails.id === Contact.id ) return
     }
-
+    console.log( 'dispatch( initializeTrustedContact', {
+      contact: Contact,
+      flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
+      giftId,
+      giftNote: note,
+    }
+    )
     dispatch( initializeTrustedContact( {
       contact: Contact,
       flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
@@ -424,49 +431,51 @@ export default function AddContactSendRequest( props ) {
   }, [ OTP, renderTimer ] )
 
   return (
-    <View style = {{ flex: 1, }}>
-    <SafeAreaView style={{
-     backgroundColor: Colors.blueTextNew
-    }}/>
+    <View style = {{
+      flex: 1,
+    }}>
+      <SafeAreaView style={{
+        backgroundColor: Colors.blueTextNew
+      }}/>
       <StatusBar backgroundColor={Colors.blueTextNew} barStyle="dark-content" />
       <ScrollView >
         <View
-        style={{
+          style={{
           // width,
-          borderBottomLeftRadius: 25,
-          backgroundColor: Colors.blueTextNew,
-          marginBottom: 20,
-          flexDirection: "column",
-        }}
-      >
-        <View
-          style={[
-            CommonStyles.headerContainer,
-            {
-              backgroundColor: Colors.blueTextNew,
-              flexDirection: "row",
-              marginRight: 10,
-              marginBottom: 20,
-            },
-          ]}
+            borderBottomLeftRadius: 25,
+            backgroundColor: Colors.blueTextNew,
+            marginBottom: 20,
+            flexDirection: 'column',
+          }}
         >
-          <TouchableOpacity
-            style={CommonStyles.headerLeftIconContainer}
-            onPress={() => {
-              props.navigation.popToTop()
-            }}
+          <View
+            style={[
+              CommonStyles.headerContainer,
+              {
+                backgroundColor: Colors.blueTextNew,
+                flexDirection: 'row',
+                marginRight: 10,
+                marginBottom: 20,
+              },
+            ]}
           >
-            <View style={CommonStyles.headerLeftIconInnerContainer}>
-              <BackIcon />
-            </View>
-          </TouchableOpacity>
-          <View style={CommonStyles.headerCenterIconContainer}>
-            <Text style={CommonStyles.headerCenterIconInnerContainer}>
+            <TouchableOpacity
+              style={CommonStyles.headerLeftIconContainer}
+              onPress={() => {
+                props.navigation.popToTop()
+              }}
+            >
+              <View style={CommonStyles.headerLeftIconInnerContainer}>
+                <BackIcon />
+              </View>
+            </TouchableOpacity>
+            <View style={CommonStyles.headerCenterIconContainer}>
+              <Text style={CommonStyles.headerCenterIconInnerContainer}>
               Add Contact
-            </Text>
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
         <RequestKeyFromContact
           isModal={false}
           headerText={giftId ? 'Send Gift' : null}

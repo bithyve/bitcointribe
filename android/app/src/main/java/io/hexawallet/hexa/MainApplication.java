@@ -11,7 +11,6 @@ import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.gantix.JailMonkey.JailMonkeyPackage;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
 import com.chirag.RNMail.*;
-import com.christopherdro.RNPrint.RNPrintPackage;
 import cl.json.RNSharePackage;
 import cl.json.ShareApplication;
 import org.reactnative.camera.RNCameraPackage;

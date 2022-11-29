@@ -132,7 +132,7 @@ import generatePDFKeeper from '../utils/generatePDFKeeper'
 import { generateRandomString } from '../../common/CommonFunctions'
 import Mailer from 'react-native-mail'
 import Share from 'react-native-share'
-import RNPrint from 'react-native-print'
+// import RNPrint from 'react-native-print'
 import idx from 'idx'
 import { restoreAccountShells, updateAccountShells, setGifts, twoFAValid } from '../actions/accounts'
 import { getVersions } from '../../common/utilities'
@@ -1184,7 +1184,7 @@ function* sharePDFWorker( { payload } ) {
           }
           if ( Platform.OS == 'android' ) {
             const PdfPassword = yield NativeModules.PdfPassword
-            yield call(
+            /*yield call(
               PdfPassword.print,
               JSON.stringify( pdfDecr ),
               ( err: any ) => {
@@ -1201,16 +1201,16 @@ function* sharePDFWorker( { payload } ) {
                   res
                 } )
               }
-            )
+            )*/
           } else {
-            try {
+            /*try {
               yield call( RNPrint.print, {
                 filePath: pdfInfo.filePath,
               } )
             } catch ( err ) {
               console.log( err )
               throw new Error( `Print failed: ${err}` )
-            }
+            }*/
           }
           break
 

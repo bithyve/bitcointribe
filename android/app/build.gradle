@@ -165,7 +165,6 @@ dependencies {
     implementation project(':react-native-config')
     implementation project(':jail-monkey')
     implementation project(':react-native-contacts')
-    implementation project(':react-native-print')
     implementation project(':react-native-share')
     implementation project(':react-native-camera')
 
