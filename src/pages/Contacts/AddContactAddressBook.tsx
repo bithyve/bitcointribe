@@ -399,7 +399,7 @@ export default function AddContactAddressBook(props) {
           backgroundColor: Colors.blueTextNew,
         }}
       />
-      <StatusBar backgroundColor={Colors.blueTextNew} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.blueTextNew} barStyle="light-content" />
       <View
         style={{
           // width,
@@ -438,7 +438,7 @@ export default function AddContactAddressBook(props) {
             </Text>
           </View>
         </View>
-        <View>
+        {/* <View>
           <Text
             style={[
               { marginHorizontal: wp("12%"), marginTop: 20 },
@@ -447,8 +447,8 @@ export default function AddContactAddressBook(props) {
           >
             Select contacts from your address book, or add a new contact
           </Text>
-        </View>
-        <TouchableOpacity
+        </View> */}
+        {/* <TouchableOpacity
           style={{
             flexDirection: "row",
             marginHorizontal: 20,
@@ -483,10 +483,10 @@ export default function AddContactAddressBook(props) {
               </Text>
             </View>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
-      {selectedContacts.length !== 0 && (
+      {/* {selectedContacts.length !== 0 && (
         <View style={styles.selectedContactContent}>
           <View style={styles.selectedContact}>
             <Text style={styles.selectedContactText}>
@@ -509,7 +509,7 @@ export default function AddContactAddressBook(props) {
             </TouchableOpacity>
           </View>
         </View>
-      )}
+      )} */}
 
       <View
         style={{
@@ -622,20 +622,23 @@ export default function AddContactAddressBook(props) {
                       key={index}
                       activeOpacity={0.1}
                     >
+                    <View style={{width: '5%'}}>
                       <RadioButton
                         size={15}
                         color={Colors.appPrimary}
-                        borderColor={Colors.white}
+                        borderColor={Colors.borderColor}
                         isChecked={item.checked}
                         onpress={() => onContactSelect(index)}
                       />
+                    </View>
+                    <View style={{width: '22%', alignItems: 'center'}}>
                       <View
                         style={{
                           backgroundColor: Colors.white,
                           borderRadius: 25,
                           height: 50,
                           width: 50,
-                          marginLeft: 12,
+                          // marginLeft: 12,
                         }}
                       >
                         <Text style = {{
@@ -646,7 +649,8 @@ export default function AddContactAddressBook(props) {
                           fontWeight: '900',
                         }}>{item.name.match(/\b(\w)/g).join('')}</Text>
                       </View>
-                      <View style={{ flexDirection: "column" }}>
+                      </View>
+                      <View style={{ flexDirection: "column", width: '50%' }}>
                         <View>
                           <Text style={styles.contactText}>
                             {item.name &&
@@ -720,7 +724,7 @@ export default function AddContactAddressBook(props) {
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
-              // backgroundColor: 'red'
+              backgroundColor: 'rgba(245,245,245, 0.6)',
             }}
           >
             {
@@ -932,11 +936,12 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   contactView: {
-    height: hp(7),
+    // height: hp(7),
     alignItems: "center",
     flexDirection: "row",
-    paddingLeft: wp(5),
-    marginVertical: hp(0.7),
+    paddingVertical: wp(2),
+    paddingHorizontal: wp(2.5),
+    marginVertical: hp(0.8),
     width: wp("90%"),
     borderRadius: 10,
     marginLeft: wp(5),
@@ -1013,4 +1018,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontFamily: Fonts.RobotoSlabRegular,
   },
+  overlay: {
+    opacity: 0.5,
+    backgroundColor: 'black',
+  } 
 });

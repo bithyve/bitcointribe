@@ -921,7 +921,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
         <SafeAreaView style={{
           backgroundColor: Colors.appPrimary
         }}/>
-        <StatusBar backgroundColor={Colors.appPrimary} barStyle="dark-content" />
+        <StatusBar backgroundColor={Colors.appPrimary} barStyle="light-content" />
         {/* <CustomToolbar toolbarTitle={'Title'} onBackPressed={()=>{}}/> */}
         {/* <ModalContainer
           onBackground={() => this.setState( {

@@ -441,7 +441,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       />
       <StatusBar
         backgroundColor={Colors.blueTextNew}
-        barStyle="dark-content"
+        barStyle="light-content"
       />
       <View
         style={{
@@ -479,17 +479,18 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             </Text>
           </View>
         </View>
-        <TouchableOpacity
-          style={{
+        <View style={{
             backgroundColor: Colors.blueTextNew,
             flexDirection: 'row',
             marginHorizontal: 20,
             marginBottom: 40,
             marginTop: heightPercentageToDP( '6%' ),
-          }}
+          }}>
+          <View style={styles.headerStyle} >
+          <TouchableOpacity
+          
           onPress={()=>handleOptionSelection( walletBackup )}
         >
-          <View style={styles.headerStyle} >
             <View style={styles.headerComps}>
               <BackupShield />
               <View
@@ -521,6 +522,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 />
               </View>
             </View>
+            </TouchableOpacity>
+            <TouchableOpacity>
             <View style={styles.headerComps}>
               <BackupShield />
               <View
@@ -548,14 +551,14 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 />
               </View>
             </View>
+            </TouchableOpacity>
           </View>
-          
-        </TouchableOpacity>
+          </View>
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingVertical: heightPercentageToDP( 3 ),
+          paddingVertical: heightPercentageToDP( 0.4 ),
         }}
       >
         {/* <View
@@ -688,14 +691,18 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         />
         <View
           style={{
+            width: '100%',
             flexDirection: 'row',
             marginHorizontal: 20,
           }}
         >
           <View style={styles.modalElementInfoView}>
+            <View style={{width: '8%'}}>
             <FAQs />
+            </View>
             <View
               style={{
+                width: '51%',
                 justifyContent: 'center',
                 marginLeft: 20,
               }}
@@ -725,14 +732,18 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         </View>
         <View
           style={{
+            width: '100%',
             flexDirection: 'row',
             marginHorizontal: 20,
           }}
         >
           <View style={styles.modalElementInfoView}>
+          <View style={{width: '8%'}}>
             <Telegram />
+            </View>
             <View
               style={{
+                width: '56%',
                 justifyContent: 'center',
                 marginLeft: 20,
               }}
