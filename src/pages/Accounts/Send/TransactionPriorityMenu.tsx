@@ -157,11 +157,13 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
                   size={wp( 12 )}
                   color={Colors.white}
                   borderColor={'#E3E3E3'}
-                  isChecked={transactionPriority == priority}
+                  selectedBorder={Colors.blue}
+                  isChecked={transactionPriority === priority}
                   onpress={() => {
                     setTransactionPriority( priority )
                     onTransactionPriorityChanged( priority )
                   }}
+                  ignoresTouch={false}
                 />
                 <Text style={{
                   ...styles.priorityTableText,
@@ -174,23 +176,23 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
               <Text style={{
                 ...styles.priorityTableText,
               }}>
-                ~
+            ~
                 {timeConvertNear30(
                   ( transactionFeeInfo[ priority.toUpperCase() ].estimatedBlocksBeforeConfirmation + 1 )
-                  * 10
+              * 10
                 )}
               </Text>
               <TextValue amt={transactionFeeInfo[ priority.toUpperCase() ].amount} unit={{
                 bitcoinUnit: bitcoinDisplayUnit,
               }}/>
               {/* <Text style={{
-                ...styles.priorityTableText,
-                flex: 1,
-              }}>
-                {useFormattedAmountText( transactionFeeInfo[ priority ].amount )} {useFormattedUnitText( {
-                  bitcoinUnit: BitcoinUnit.SATS,
-                } )}
-              </Text> */}
+            ...styles.priorityTableText,
+            flex: 1,
+          }}>
+            {useFormattedAmountText( transactionFeeInfo[ priority ].amount )} {useFormattedUnitText( {
+              bitcoinUnit: BitcoinUnit.SATS,
+            } )}
+          </Text> */}
             </TouchableOpacity>
           )
         } )}
@@ -210,7 +212,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
               size={wp( 12 )}
               color={Colors.white}
               borderColor={'#E3E3E3'}
-              isChecked={transactionPriority == TxPriority.CUSTOM}
+              isChecked={transactionPriority === TxPriority.CUSTOM}
               onpress={() => {
                 setTransactionPriority( TxPriority.CUSTOM )
                 onTransactionPriorityChanged( TxPriority.CUSTOM )

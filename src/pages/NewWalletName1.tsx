@@ -55,7 +55,7 @@ export enum BottomSheetState {
   Open,
 }
 
-const {height} = Dimensions.get('window');
+const { height } = Dimensions.get( 'window' )
 
 export default function NewWalletName( props ) {
   // const [ timerArray, setTimerArray ] = useState( [ 1, 1, 1 ] )
@@ -82,7 +82,7 @@ export default function NewWalletName( props ) {
   const [ message, setMessage ] = useState( strings.Creatingyourwallet )
   const [ signUpStarted, setSignUpStarted ] = useState( false )
   const mnemonic = props.navigation.getParam( 'mnemonic' ) || null
-  const [ new2Bit, setNew2Bit] = useState( false )
+  const [ new2Bit, setNew2Bit ] = useState( false )
 
   useEffect( () => {
     if ( walletSetupCompleted ) {
@@ -209,7 +209,7 @@ export default function NewWalletName( props ) {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.navigate("WalletInitialization");
+              props.navigation.navigate( 'WalletInitialization' )
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -221,7 +221,7 @@ export default function NewWalletName( props ) {
           style={{
             flex: 1,
           }}
-          behavior={Platform.OS == "ios" ? "padding" : ""}
+          behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
           <View
@@ -232,14 +232,14 @@ export default function NewWalletName( props ) {
             <HeaderTitle1
               firstLineTitle={`Step 1 of ${strings.Step1}`}
               secondLineBoldTitle={strings.NameyourWallet}
-              secondLineTitle={""}
-              infoTextNormal={""}
-              infoTextBold={""}
-              infoTextNormal1={""}
-              step={""}
+              secondLineTitle={''}
+              infoTextNormal={''}
+              infoTextBold={''}
+              infoTextNormal1={''}
+              step={''}
               firstStyle={{
                 fontFamily: Fonts.RobotoSlabRegular,
-                fontSize: RFValue(14),
+                fontSize: RFValue( 14 ),
               }}
               secondStyle={{
                 fontFamily: Fonts.RobotoSlabRegular,
@@ -252,34 +252,34 @@ export default function NewWalletName( props ) {
               placeholderTextColor={Colors.borderColor}
               value={walletName}
               keyboardType={
-                Platform.OS == "ios" ? "ascii-capable" : "visible-password"
+                Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
               }
               maxLength={10}
-              onChangeText={(text) => {
-                text = text.replace(/[^A-Za-z]/g, "");
-                setWalletName(text);
+              onChangeText={( text ) => {
+                text = text.replace( /[^A-Za-z]/g, '' )
+                setWalletName( text )
               }}
               onFocus={() => {
-                setInputStyle(styles.inputBoxFocused);
-                showNote(false);
+                setInputStyle( styles.inputBoxFocused )
+                showNote( false )
               }}
               onBlur={() => {
-                setInputStyle(styles.inputBox);
+                setInputStyle( styles.inputBox )
               }}
               autoCorrect={false}
               autoCompleteType="off"
             />
             <View
               style={{
-                marginRight: wp(6),
+                marginRight: wp( 6 ),
               }}
             >
               <Text
                 style={{
-                  fontSize: RFValue(10),
+                  fontSize: RFValue( 10 ),
                   fontFamily: Fonts.RobotoSlabRegular,
-                  color: "#EA4335",
-                  alignSelf: "flex-end",
+                  color: '#EA4335',
+                  alignSelf: 'flex-end',
                 }}
               >
                 Numbers and special characters not allowed
@@ -293,88 +293,104 @@ export default function NewWalletName( props ) {
             </View>
           </View>
           {/* </KeyboardAvoidingView> */}
-          {walletName.trim() != "" ? 
-          <View style={{
-              marginHorizontal: wp(6),
-              marginBottom: height < 720 ? hp(3) : hp(5),
+          {walletName.trim() != '' ?
+            <View style={{
+              marginHorizontal: wp( 6 ),
+              marginBottom: height < 720 ? hp( 3 ) : hp( 5 ),
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center'
             }}
-          >
-            <CheckBox
-              checked={new2Bit}
-              onPress={() => setNew2Bit(state => !state)}
-              containerStyle={{
-                margin: 0,
-                padding: 0,
-              }}
-            />
-            <View style={{flex: 1}}>
-              <Text style={{
-                fontFamily: Fonts.RobotoSlabRegular, 
-                color: '#6C6C6C', 
-                fontSize: RFValue(14)
+            >
+              <CheckBox
+                checked={new2Bit}
+                onPress={() => setNew2Bit( state => !state )}
+                containerStyle={{
+                  margin: 0,
+                  padding: 0,
                 }}
-              >
+              />
+              <View style={{
+                flex: 1
+              }}>
+                <Text style={{
+                  fontFamily: Fonts.RobotoSlabRegular,
+                  color: '#6C6C6C',
+                  fontSize: RFValue( 14 )
+                }}
+                >
                 I'm new to Bitcoin
-              </Text>
-              <Text style={{
-                fontFamily: Fonts.RobotoSlabRegular,
-                color: '#6C6C6C', 
-                fontSize: RFValue(11)
+                </Text>
+                <Text style={{
+                  fontFamily: Fonts.RobotoSlabRegular,
+                  color: '#6C6C6C',
+                  fontSize: RFValue( 11 )
                 }}
-              >
+                >
                 Lorem ipsum dolor sit amet, consectetur adipiscing
-              </Text>
-            </View>
-          </View> : null}
+                </Text>
+              </View>
+            </View> : null}
           <View
             style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
           >
             <View style={styles.bottomButtonView}>
+              <View style={styles.statusIndicatorView}>
+                {walletName.trim() === '' && <View style={[ styles.statusIndicatorInactiveView, {
+                  backgroundColor: '#FABC05',
+                } ]} />}
+                <View style={[ styles.statusIndicatorInactiveView, {
+                  backgroundColor: '#D85140',
+                } ]} />
+                <View style={[ styles.statusIndicatorActiveView, {
+                  width: 25
+                } ]} />
+              </View>
+
+              <View style={{
+                flex: 1
+              }} />
+
               <TouchableOpacity
-                disabled={walletName.trim() === ""}
+                disabled={walletName.trim() === ''}
                 onPress={() => {
-                  setLoaderModal(true);
-                  Keyboard.dismiss();
+                  setLoaderModal( true )
+                  Keyboard.dismiss()
                   // props.navigation.navigate( 'NewWalletQuestion', {
                   //   walletName,
                   // } )
-                  setTimeout(() => {
-                    setSignUpStarted(true);
-                    dispatch(updateCloudPermission(false));
-                    dispatch(setupWallet(walletName, null, mnemonic));
-                    dispatch(initNewBHRFlow(true));
-                    dispatch(setVersion("Current"));
-                    const current = Date.now();
+                  setTimeout( () => {
+                    setSignUpStarted( true )
+                    dispatch( updateCloudPermission( false ) )
+                    dispatch( setupWallet( walletName, null, mnemonic ) )
+                    dispatch( initNewBHRFlow( true ) )
+                    dispatch( setVersion( 'Current' ) )
+                    const current = Date.now()
                     AsyncStorage.setItem(
-                      "SecurityAnsTimestamp",
-                      JSON.stringify(current)
-                    );
+                      'SecurityAnsTimestamp',
+                      JSON.stringify( current )
+                    )
                     const securityQuestionHistory = {
                       created: current,
-                    };
+                    }
                     AsyncStorage.setItem(
-                      "securityQuestionHistory",
-                      JSON.stringify(securityQuestionHistory)
-                    );
-                  }, 1000);
+                      'securityQuestionHistory',
+                      JSON.stringify( securityQuestionHistory )
+                    )
+                  }, 1000 )
                 }}
-                style={[styles.buttonView, {opacity: walletName.trim() === "" ? 0.6 : 1}]}
+                style={[ styles.buttonView, {
+                  opacity: walletName.trim() === '' ? 0.6 : 1
+                } ]}
               >
                 <Text style={styles.buttonText}>Next</Text>
               </TouchableOpacity>
-              <View style={{ flex: 1 }} />
-              <View style={styles.statusIndicatorView}>
-                <View style={[styles.statusIndicatorActiveView, {width: walletName.trim() != "" ? 37 : 25}]} />
-                {walletName.trim() === "" && <View style={styles.statusIndicatorInactiveView} />}
-                <View style={styles.statusIndicatorInactiveView} />
-              </View>
+
+
             </View>
           </View>
         </KeyboardAvoidingView>
@@ -384,51 +400,51 @@ export default function NewWalletName( props ) {
         onPress={closeBottomSheet}
       /> */}
       <ModalContainer
-        onBackground={() => setCurrentBottomSheetKind(null)}
+        onBackground={() => setCurrentBottomSheetKind( null )}
         visible={currentBottomSheetKind != null}
         closeBottomSheet={() => {}}
       >
         {renderBottomSheetContent()}
       </ModalContainer>
     </SafeAreaView>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   pageTitle: {
     color: Colors.blue,
-    fontSize: RFValue(25),
+    fontSize: RFValue( 25 ),
     marginLeft: 20,
     marginBottom: 5,
     fontFamily: Fonts.FiraSansRegular,
   },
   labelStyle: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     marginLeft: 15,
     fontFamily: Fonts.FiraSansRegular,
   },
   inputBox: {
     borderRadius: 10,
-    marginTop: hp("1%"),
+    marginTop: hp( '1%' ),
     height: 50,
     marginLeft: 20,
     marginRight: 20,
     paddingLeft: 15,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    marginBottom: hp(1),
+    marginBottom: hp( 1 ),
     backgroundColor: Colors.backgroundColor1,
   },
   inputBoxFocused: {
     borderRadius: 10,
-    marginTop: hp("1%"),
+    marginTop: hp( '1%' ),
     height: 50,
     marginLeft: 20,
     marginRight: 20,
     paddingLeft: 15,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     elevation: 10,
     shadowColor: Colors.borderColor,
@@ -439,24 +455,24 @@ const styles = StyleSheet.create({
     },
     backgroundColor: Colors.backgroundColor1,
     fontFamily: Fonts.FiraSansRegular,
-    marginBottom: hp(1),
+    marginBottom: hp( 1 ),
   },
   bottomNoteText: {
     color: Colors.blue,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     marginBottom: 5,
     fontFamily: Fonts.FiraSansRegular,
   },
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   buttonView: {
-    height: wp("13%"),
-    width: wp("30%"),
-    justifyContent: "center",
-    alignItems: "center",
+    height: wp( '13%' ),
+    width: wp( '30%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 10,
     backgroundColor: Colors.blue,
     elevation: 10,
@@ -469,63 +485,62 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   bottomButtonView: {
-    flexDirection: "row",
-    paddingHorizontal: hp(6),
-    paddingBottom: DeviceInfo.hasNotch() ? hp(4) : hp(3),
+    flexDirection: 'row',
+    paddingHorizontal: hp( 6 ),
+    paddingBottom: DeviceInfo.hasNotch() ? hp( 4 ) : hp( 3 ),
     // paddin: hp( 9 ),
-    alignItems: "center",
+    alignItems: 'center',
   },
   statusIndicatorView: {
-    flexDirection: "row",
-    marginLeft: "auto",
+    flexDirection: 'row',
+    marginLeft: 'auto',
     // paddingHorizontal: hp( 3 )
   },
   statusIndicatorActiveView: {
     height: 5,
     width: 25,
-    backgroundColor: "#EA4335",
+    backgroundColor: Colors.blue,
     borderRadius: 10,
   },
   statusIndicatorInactiveView: {
     width: 7,
-    backgroundColor: "#F0ACA6",
     borderRadius: 10,
-    marginLeft: 5,
+    marginRight: 5,
   },
   checkbox: {
-    width: wp("7%"),
-    height: wp("7%"),
+    width: wp( '7%' ),
+    height: wp( '7%' ),
     borderRadius: 7,
     backgroundColor: Colors.white,
     borderColor: Colors.borderColor,
     borderWidth: 1,
-    marginLeft: "auto",
-    alignItems: "center",
-    justifyContent: "center",
+    marginLeft: 'auto',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   doCloudBackupField: {
     borderRadius: 10,
     backgroundColor: Colors.backgroundColor,
-    justifyContent: "center",
+    justifyContent: 'center',
     marginBottom: 36,
     marginHorizontal: 14,
     paddingHorizontal: 10,
     padding: 10,
-    marginTop: hp("5%"),
+    marginTop: hp( '5%' ),
   },
   doCloudBackupFieldContentContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   smallInfoLabelText: {
     backgroundColor: Colors.backgroundColor,
     color: Colors.textColorGrey,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
   },
-});
+} )

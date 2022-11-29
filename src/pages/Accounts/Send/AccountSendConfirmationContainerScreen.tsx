@@ -77,7 +77,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
   const [ note, setNote ] = useState( '' )
-  const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.LOW )
+  const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.HIGH )
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
   const fromWallet = navigation?.getParam( 'fromWallet' ) || false
 
@@ -228,6 +228,95 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     },
   } )
 
+  const RenderNoteModal = () => {
+    const [ state, setState ] = useState( '' )
+
+    return (
+      <View
+        style={{
+          width: '100%',
+          height: 'auto',
+          backgroundColor: '#EAEAEA',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingBottom: hp( 20 ),
+        }}
+      >
+        <TouchableOpacity style={{
+          width: wp( 28 ),
+          height: wp( 28 ),
+          alignSelf: 'flex-end',
+          marginRight: wp( 10 ),
+          marginTop: hp( 10 ),
+          borderRadius: wp( 14 ),
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#FABC05'
+        }}
+        onPress={() => setnoteModal( false )}>
+          <FontAwesome name="close" color={'white'} size={hp( 19 )}/>
+        </TouchableOpacity>
+
+        <Text style={{
+          alignSelf: 'flex-start',
+          marginHorizontal: wp( 30 ),
+          fontFamily: Fonts.RobotoSlabMedium,
+          color: Colors.blue,
+          fontSize: RFValue( 18 ),
+          lineHeight: RFValue( 24 ),
+          letterSpacing: RFValue( 0.54 )
+        }}>
+          Add a Note
+        </Text>
+        <Text style={{
+          alignSelf: 'flex-start',
+          marginHorizontal: wp( 30 ),
+          fontFamily: Fonts.RobotoSlabRegular,
+          color: Colors.greyText,
+          fontSize: RFValue( 12 ),
+          lineHeight: RFValue( 18 ),
+          letterSpacing: RFValue( 0.6 )
+        }}>
+          Leave a little note for your loved one
+        </Text>
+        <TextInput
+          style={styles.modalInputBox}
+          multiline={true}
+          numberOfLines={3}
+          textAlignVertical={'top'}
+          placeholder={'Add Note'}
+          placeholderTextColor={'#CBCBCB'}
+          value={state}
+          keyboardType={
+            Platform.OS == 'ios'
+              ? 'ascii-capable'
+              : 'visible-password'
+          }
+          returnKeyType="done"
+          returnKeyLabel="Done"
+          autoCompleteType="off"
+          autoCorrect={false}
+          autoCapitalize="none"
+          onChangeText={( text ) => {
+            setState( text )
+          }}
+        />
+        <TouchableOpacity style={[ ButtonStyles.primaryActionButton, {
+          alignSelf: 'flex-end', marginRight: wp( 30 )
+        } ]}
+        onPress={() => {
+          setNote( state )
+          setnoteModal( false )
+        }}
+        >
+          <Text style={ButtonStyles.actionButtonText}>
+              Enter
+          </Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
   const [ noteModal, setnoteModal ] = useState( false )
 
   return (
@@ -334,6 +423,9 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         />
       </TouchableOpacity>
       }
+      <View style={{
+        flex: 1
+      }}/>
       <View style={styles.footerSection}>
         <TouchableOpacity
           onPress={handleConfirmationButtonPress}
@@ -352,62 +444,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       <ModalContainer visible={noteModal} closeBottomSheet={() => {
         setnoteModal( false )
       }}>
-        <View
-          style={{
-            width: '100%',
-            height: 'auto',
-            backgroundColor: '#EAEAEA',
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingBottom: hp( 20 ),
-          }}
-        >
-          <TouchableOpacity style={{
-            width: wp( 28 ),
-            height: wp( 28 ),
-            alignSelf: 'flex-end',
-            marginRight: wp( 10 ),
-            marginTop: hp( 10 ),
-            borderRadius: wp( 14 ),
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: '#FABC05'
-          }}
-          onPress={() => setnoteModal( false )}>
-            <FontAwesome name="close" color={'white'}/>
-          </TouchableOpacity>
-          <TextInput
-            style={styles.modalInputBox}
-            multiline={true}
-            numberOfLines={3}
-            textAlignVertical={'bottom'}
-            placeholder={`${common.note} (${common.optional})`}
-            placeholderTextColor={Colors.gray1}
-            value={note}
-            keyboardType={
-              Platform.OS == 'ios'
-                ? 'ascii-capable'
-                : 'visible-password'
-            }
-            returnKeyType="done"
-            returnKeyLabel="Done"
-            autoCompleteType="off"
-            autoCorrect={false}
-            autoCapitalize="none"
-            onChangeText={( text ) => {
-              setNote( text )
-            }}
-          />
-          <TouchableOpacity style={[ ButtonStyles.primaryActionButton, {
-            alignSelf: 'flex-end', marginRight: wp( 30 )
-          } ]}
-          onPress={() => setnoteModal( false )}
-          >
-            <Text style={ButtonStyles.actionButtonText}>
-              Enter
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <RenderNoteModal />
       </ModalContainer>
     </KeyboardAwareScrollView>
   )
@@ -443,18 +480,17 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.backgroundColor1,
   },
   modalInputBox: {
-    marginTop: hp( 5 ),
+    marginTop: hp( 78 ),
     marginBottom: hp( 50 ),
     fontSize: RFValue( 13 ),
-    marginHorizontal: wp( 30 ),
+    marginHorizontal: wp( 20 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.RobotoSlabRegular,
+    fontFamily: Fonts.RobotoSlabMedium,
     paddingLeft: 15,
-    width: wp( 295 ),
-    height: hp( 50 ),
+    width: wp( 315 ),
+    minHeight: hp( 50 ),
     backgroundColor: '#FAFAFA',
     borderRadius: wp( 10 ),
-    justifyContent: 'center',
   },
   modalInfoText: {
     width: widthPercentageToDP( 90 ),

@@ -119,7 +119,7 @@ const SelectAccount: FC<{onSelect: ( item: any ) => void}> = ( { onSelect } ) =>
                 width: wp( 38 ),
                 height: '100%',
                 marginTop: hp( 30 ),
-                marginRight: wp( 11 ),
+                marginHorizontal: wp( 8 ),
               }}
             >
               {getAvatarForSubAccount( item.primarySubAccount, false, true )}
