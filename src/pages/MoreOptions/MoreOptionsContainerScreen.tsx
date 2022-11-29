@@ -441,7 +441,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       />
       <StatusBar
         backgroundColor={Colors.blueTextNew}
-        barStyle="dark-content"
+        barStyle="light-content"
       />
       <View
         style={{
@@ -479,17 +479,18 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             </Text>
           </View>
         </View>
-        <TouchableOpacity
-          style={{
+        <View style={{
             backgroundColor: Colors.blueTextNew,
             flexDirection: 'row',
             marginHorizontal: 20,
             marginBottom: 40,
             marginTop: heightPercentageToDP( '6%' ),
-          }}
+          }}>
+          <View style={styles.headerStyle} >
+          <TouchableOpacity
+          
           onPress={()=>handleOptionSelection( walletBackup )}
         >
-          <View style={styles.headerStyle} >
             <View style={styles.headerComps}>
               <BackupShield />
               <View
@@ -521,6 +522,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 />
               </View>
             </View>
+            </TouchableOpacity>
+            <TouchableOpacity>
             <View style={styles.headerComps}>
               <BackupShield />
               <View
@@ -548,9 +551,9 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 />
               </View>
             </View>
+            </TouchableOpacity>
           </View>
-          
-        </TouchableOpacity>
+          </View>
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
