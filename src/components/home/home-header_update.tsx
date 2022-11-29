@@ -537,7 +537,9 @@ const HomeHeader = ( {
               alignItems:'center'
             }} activeOpacity={1} onPress={onPressFAndF}>
               <Image source={require( '../../assets/images/HomePageIcons/more.png' )} style={{
-                width: wp( 40 ), height: wp( 40 ), borderRadius: wp( 20 )
+                width: wp( 40 ), height: wp( 40 ), borderRadius: wp( 20 ), transform: [ {
+                  rotate: '270deg'
+                } ]
               }} />
               <Text numberOfLines={3} style={styles.familyText}>{item.displayedName}</Text>
             </TouchableOpacity>
