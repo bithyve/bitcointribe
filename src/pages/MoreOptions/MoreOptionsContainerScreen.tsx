@@ -558,7 +558,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingVertical: heightPercentageToDP( 3 ),
+          paddingVertical: heightPercentageToDP( 0.4 ),
         }}
       >
         {/* <View
@@ -691,14 +691,18 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         />
         <View
           style={{
+            width: '100%',
             flexDirection: 'row',
             marginHorizontal: 20,
           }}
         >
           <View style={styles.modalElementInfoView}>
+            <View style={{width: '8%'}}>
             <FAQs />
+            </View>
             <View
               style={{
+                width: '51%',
                 justifyContent: 'center',
                 marginLeft: 20,
               }}
@@ -728,14 +732,18 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         </View>
         <View
           style={{
+            width: '100%',
             flexDirection: 'row',
             marginHorizontal: 20,
           }}
         >
           <View style={styles.modalElementInfoView}>
+          <View style={{width: '8%'}}>
             <Telegram />
+            </View>
             <View
               style={{
+                width: '56%',
                 justifyContent: 'center',
                 marginLeft: 20,
               }}
