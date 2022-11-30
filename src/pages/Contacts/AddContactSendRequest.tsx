@@ -81,7 +81,7 @@ export default function AddContactSendRequest( props ) {
   const SelectedContact = props.navigation.getParam( 'SelectedContact' )
     ? props.navigation.getParam( 'SelectedContact' )
     : []
-
+   
   const headerText = props.navigation.getParam( 'headerText' )
     ? props.navigation.getParam( 'headerText' )
     : ''
@@ -422,14 +422,15 @@ export default function AddContactSendRequest( props ) {
       />
     )
   }, [ OTP, renderTimer ] )
-
   return (
     <View style = {{ flex: 1, }}>
     <SafeAreaView style={{
      backgroundColor: Colors.blueTextNew
     }}/>
-      <StatusBar backgroundColor={Colors.blueTextNew} barStyle="dark-content" />
-      <ScrollView >
+      <StatusBar backgroundColor={Colors.blueTextNew} barStyle="light-content" />
+      <ScrollView style={{
+     backgroundColor: Colors.backgroundColor
+    }}>
         <View
         style={{
           // width,
@@ -506,7 +507,7 @@ export default function AddContactSendRequest( props ) {
         <TouchableOpacity
           onPress={() => setSecure2FAModal( true )}
           style={{
-            flex: 1
+            flex: 1,
           }}>
           <BottomInfoBox
             icon={true}

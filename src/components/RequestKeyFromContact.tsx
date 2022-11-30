@@ -56,7 +56,6 @@ function RequestKeyFromContact(props) {
   const walletName = useSelector((state) => state.storage.wallet.walletName);
 
   useEffect(() => {
-    console.log(Contact);
     setShareLink(props.link.replace(/\s+/g, ""));
   }, [props.link]);
 
@@ -120,7 +119,6 @@ function RequestKeyFromContact(props) {
       encryptLinkWith: props.encryptLinkWith,
     });
   };
-  console.log('Contact', Contact)
   const setPhoneNumber = () => {
     const phoneNumber = Contact && Contact.phoneNumbers[0].number;
     let number = phoneNumber.replace(/[^0-9]/g, ""); // removing non-numeric characters
@@ -133,7 +131,7 @@ function RequestKeyFromContact(props) {
       <View
         style={{ flexDirection: "row", marginTop: 20, marginLeft: wp("5%") }}
       >
-        <View
+        {Contact && Contact.name &&<View
           style={{
             backgroundColor: Colors.white,
             borderRadius: 30,
@@ -153,8 +151,8 @@ function RequestKeyFromContact(props) {
           >
             {Contact && Contact.name && Contact.name.match(/\b(\w)/g).join("")}
           </Text>
-        </View>
-        <View style={{ flexDirection: "column", marginLeft: wp('3%') }}>
+        </View>}
+        {Contact && Contact.name && <View style={{ flexDirection: "column", marginLeft: wp('3%') }}>
           <Text
             style={{
               fontFamily: Fonts.RobotoSlabRegular,
@@ -215,7 +213,7 @@ function RequestKeyFromContact(props) {
               </Text>
             )}
           </View>
-        </View>
+        </View>}
       </View>
       {props.isGift && (
         <>
