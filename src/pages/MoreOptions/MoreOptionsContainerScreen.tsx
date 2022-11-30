@@ -83,6 +83,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
   const [isEnabled, setIsEnabled] = useState(false);
   const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
   const currencyCode = useSelector((state) => state.preferences.currencyCode);
+  const walletName = useSelector((state) => state.storage.wallet.walletName);
   const strings = translations["settings"];
   const bhrStrings = translations["bhr"];
   const common = translations["common"];
@@ -779,12 +780,14 @@ const MoreOptionsContainerScreen: React.FC<Props> = ({ navigation }: Props) => {
           </View>
         </View>
       </ScrollView>
+      {/*  */}
       <ModalContainer
         onBackground={() => setEditProfileModal( false )}
         visible={editProfileModal}
         closeBottomSheet={() => setEditProfileModal( false )}
       >
         <EditProfileDetails
+          walletName={walletName && walletName}
           closeBottomSheet={() => setEditProfileModal( false )}
         />
       </ModalContainer>

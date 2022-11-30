@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import Icon from "react-native-vector-icons/Ionicons";
-import { launchImageLibrary } from "react-native-image-picker";
+import { launchImageLibrary, launchCamera } from "react-native-image-picker";
 import {
     heightPercentageToDP,
     widthPercentageToDP,
@@ -20,7 +20,7 @@ import Fonts from "../../common/Fonts";
 
 const EditProfileDetails = (props) => {
   const [pickerResponse, setPickerResponse] = useState(null);
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(props.walletName ? props.walletName : '');
   const onImageLibraryPress = async () => {
     const options = {
       selectionLimit: 1,
@@ -29,7 +29,6 @@ const EditProfileDetails = (props) => {
     };
     const result = await launchImageLibrary(options);
     const uri = result?.assets && result.assets[0].uri;
-    console.log("result", uri);
     setPickerResponse(uri);
   };
   return (
@@ -70,7 +69,7 @@ const EditProfileDetails = (props) => {
             style={styles.inputBox}
             autoCorrect={false}
             autoFocus={false}
-            placeholder={"Username"}
+            placeholder={ "Username"}
             placeholderTextColor={Colors.textColorGrey}
             onChangeText={(name) => {
               name = name.replace(/[^A-Za-z0-9 ]/g, "");
