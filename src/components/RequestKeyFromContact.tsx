@@ -56,7 +56,6 @@ function RequestKeyFromContact(props) {
   const walletName = useSelector((state) => state.storage.wallet.walletName);
 
   useEffect(() => {
-    console.log(Contact);
     setShareLink(props.link.replace(/\s+/g, ""));
   }, [props.link]);
 
@@ -121,7 +120,7 @@ function RequestKeyFromContact(props) {
     });
   };
   const setPhoneNumber = () => {
-    const phoneNumber = Contact.phoneNumbers[0].number;
+    const phoneNumber = Contact && Contact.phoneNumbers[0].number;
     let number = phoneNumber.replace(/[^0-9]/g, ""); // removing non-numeric characters
     number = number.slice(number.length - 10); // last 10 digits only
     return number;
@@ -132,7 +131,7 @@ function RequestKeyFromContact(props) {
       <View
         style={{ flexDirection: "row", marginTop: 20, marginLeft: wp("5%") }}
       >
-        <View
+        {Contact && Contact.name &&<View
           style={{
             backgroundColor: Colors.white,
             borderRadius: 30,
@@ -150,10 +149,10 @@ function RequestKeyFromContact(props) {
               fontWeight: "900",
             }}
           >
-            {Contact.name.match(/\b(\w)/g).join("")}
+            {Contact && Contact.name && Contact.name.match(/\b(\w)/g).join("")}
           </Text>
-        </View>
-        <View style={{ flexDirection: "column", marginLeft: wp('3%') }}>
+        </View>}
+        {Contact && Contact.name && <View style={{ flexDirection: "column", marginLeft: wp('3%') }}>
           <Text
             style={{
               fontFamily: Fonts.RobotoSlabRegular,
@@ -168,7 +167,7 @@ function RequestKeyFromContact(props) {
               fontSize: 22,}}>
               {Contact.name &&
                 Contact.name.split(" ").map((x, index) => {
-                  const i = Contact.name.split(" ").length;
+                  const i = Contact && Contact.name.split(" ").length;
                   return (
                     <Text
                       style={{
@@ -210,11 +209,11 @@ function RequestKeyFromContact(props) {
                   color: Colors.black,
                 }}
               >
-                {Contact.phoneNumbers[0].number}
+                {Contact && Contact.phoneNumbers && Contact.phoneNumbers[0].number}
               </Text>
             )}
           </View>
-        </View>
+        </View>}
       </View>
       {props.isGift && (
         <>
