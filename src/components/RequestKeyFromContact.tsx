@@ -120,8 +120,9 @@ function RequestKeyFromContact(props) {
       encryptLinkWith: props.encryptLinkWith,
     });
   };
+  console.log('Contact', Contact)
   const setPhoneNumber = () => {
-    const phoneNumber = Contact.phoneNumbers[0].number;
+    const phoneNumber = Contact && Contact.phoneNumbers[0].number;
     let number = phoneNumber.replace(/[^0-9]/g, ""); // removing non-numeric characters
     number = number.slice(number.length - 10); // last 10 digits only
     return number;
@@ -150,7 +151,7 @@ function RequestKeyFromContact(props) {
               fontWeight: "900",
             }}
           >
-            {Contact.name.match(/\b(\w)/g).join("")}
+            {Contact && Contact.name && Contact.name.match(/\b(\w)/g).join("")}
           </Text>
         </View>
         <View style={{ flexDirection: "column", marginLeft: wp('3%') }}>
@@ -168,7 +169,7 @@ function RequestKeyFromContact(props) {
               fontSize: 22,}}>
               {Contact.name &&
                 Contact.name.split(" ").map((x, index) => {
-                  const i = Contact.name.split(" ").length;
+                  const i = Contact && Contact.name.split(" ").length;
                   return (
                     <Text
                       style={{
@@ -210,7 +211,7 @@ function RequestKeyFromContact(props) {
                   color: Colors.black,
                 }}
               >
-                {Contact.phoneNumbers[0].number}
+                {Contact && Contact.phoneNumbers && Contact.phoneNumbers[0].number}
               </Text>
             )}
           </View>
