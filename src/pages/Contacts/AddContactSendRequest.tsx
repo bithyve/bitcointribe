@@ -508,6 +508,7 @@ export default function AddContactSendRequest( props ) {
           onPress={() => setSecure2FAModal( true )}
           style={{
             flex: 1,
+            margin: 3
           }}>
           <BottomInfoBox
             icon={true}
