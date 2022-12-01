@@ -293,7 +293,7 @@ export default function NewWalletName( props ) {
             </View>
           </View>
           {/* </KeyboardAvoidingView> */}
-          {walletName.trim() != '' ?
+          {/* {walletName.trim() != '' ?
             <View style={{
               marginHorizontal: wp( 6 ),
               marginBottom: height < 720 ? hp( 3 ) : hp( 5 ),
@@ -330,7 +330,7 @@ export default function NewWalletName( props ) {
                 Lorem ipsum dolor sit amet, consectetur adipiscing
                 </Text>
               </View>
-            </View> : null}
+            </View> : null} */}
           <View
             style={{
               flexDirection: 'row',

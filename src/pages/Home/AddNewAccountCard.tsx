@@ -38,16 +38,17 @@ const AddNewAccountCard: React.FC<Props> = ( {
             style={{
               width: 42, height: 42
             }}
-            source={require( '../../assets/images/icons/icon_add.png' )}
+            source={require( '../../assets/images/HomePageIcons/add.png' )}
           />
           <Text
             style={{
               color: Colors.textColorGrey,
               fontSize: RFValue( 12 ),
+              marginTop: RFValue( 10 ),
               fontWeight: '500',
             }}
           >
-            Add Lightning Wallet
+            Add Lightning account
           </Text>
         </View>
       </View>

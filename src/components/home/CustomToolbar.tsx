@@ -11,12 +11,14 @@ import Fonts from '../../common/Fonts'
 import { hp, wp } from '../../common/data/responsiveness/responsive'
 import { RFValue } from 'react-native-responsive-fontsize'
 import ToggleContainer from '../../pages/Home/ToggleContainer'
+import NewSwitch from '../NewSwitch'
 
 export type Props = {
   onBackPressed: () => void;
   toolbarTitle: string | null;
   toolbarIcon: string;
   containerStyle: any | null;
+  showSwitch: boolean;
   // cardData: AccountShell[];
   // prependsAddButton: boolean;
   // onAccountCardSelected: ( accountShell: AccountShell ) => void;
@@ -29,13 +31,8 @@ const CustomToolbar: React.FC<Props> = ( {
   onBackPressed,
   toolbarIcon,
   toolbarTitle,
-  containerStyle
-  // cardData,
-  // prependsAddButton,
-  // onAccountCardSelected,
-  // onAddNewAccountPressed,
-  // onCardLongPressed,
-  // currentLevel
+  containerStyle,
+  showSwitch = true
 }: Props ) => {
   return (
     <View style={[ styles.container, containerStyle ]}>
@@ -52,9 +49,13 @@ const CustomToolbar: React.FC<Props> = ( {
         </View>
       }
       <Text numberOfLines={1} style={styles.titleText}>{toolbarTitle}</Text>
+      {
+        showSwitch &&
       <View>
-        <ToggleContainer />
+        <NewSwitch />
+        {/* <ToggleContainer /> */}
       </View>
+      }
     </View>
   )
 }

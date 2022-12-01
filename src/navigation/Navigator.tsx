@@ -88,6 +88,9 @@ import Receive from '../pages/Accounts/Receive'
 import ContactDetails from '../pages/Contacts/ContactDetails'
 import AccountDetailsStack from './stacks/accounts/AccountDetailsStack'
 import AccountDetailsContainerScreen from '../pages/Accounts/Details/AccountDetailsContainerScreen'
+import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact'
+import VoucherScanner from '../pages/FastBitcoin/VoucherScanner'
+import VersionHistoryScreen from '../pages/VersionHistoryScreen'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -527,7 +530,7 @@ const NewHomeNavigator = createStackNavigator( {
   TransactionsList: {
     screen: TransactionsListContainerScreen,
     navigationOptions: {
-      title: 'All Transactions',
+      header: null
     },
   },
   Send: {
@@ -539,7 +542,7 @@ const NewHomeNavigator = createStackNavigator( {
   TransactionDetails: {
     screen: TransactionDetailsContainerScreen,
     navigationOptions: {
-      title: 'TransactionDetails',
+      header: null
     },
   },
   DonationAccountWebViewSettings: {
@@ -577,6 +580,14 @@ const NewHomeNavigator = createStackNavigator( {
     navigationOptions: {
       header: null,
       // tabBarVisibl
+    },
+  },
+  ContactsListForAssociateContact,
+  VoucherScanner,
+  VersionHistory: {
+    screen: VersionHistoryScreen,
+    navigationOptions: {
+      header: null,
     },
   },
 } )
