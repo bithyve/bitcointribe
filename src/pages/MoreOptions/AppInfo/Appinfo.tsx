@@ -205,7 +205,7 @@ const AppInfo = ( props ) => {
               index: 0,
               actions: [
                 NavigationActions.navigate( {
-                  routeName: 'Landing'
+                  routeName: 'NewHome'
                 } )
               ],
             } )

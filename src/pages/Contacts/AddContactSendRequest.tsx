@@ -139,18 +139,10 @@ export default function AddContactSendRequest( props ) {
   }
 
   const createTrustedContact = useCallback( async () => {
-    console.log( 'ss', 'createTrustedContact' )
     const contacts: Trusted_Contacts = trustedContacts
     for( const contact of Object.values( contacts ) ){
       if ( contact.contactDetails.id === Contact.id ) return
     }
-    console.log( 'dispatch( initializeTrustedContact', {
-      contact: Contact,
-      flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
-      giftId,
-      giftNote: note,
-    }
-    )
     dispatch( initializeTrustedContact( {
       contact: Contact,
       flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
@@ -429,7 +421,6 @@ export default function AddContactSendRequest( props ) {
       />
     )
   }, [ OTP, renderTimer ] )
-
   return (
     <View style = {{
       flex: 1,
@@ -437,8 +428,10 @@ export default function AddContactSendRequest( props ) {
       <SafeAreaView style={{
         backgroundColor: Colors.blueTextNew
       }}/>
-      <StatusBar backgroundColor={Colors.blueTextNew} barStyle="dark-content" />
-      <ScrollView >
+      <StatusBar backgroundColor={Colors.blueTextNew} barStyle="light-content" />
+      <ScrollView style={{
+        backgroundColor: Colors.backgroundColor
+      }}>
         <View
           style={{
           // width,
@@ -515,7 +508,8 @@ export default function AddContactSendRequest( props ) {
         <TouchableOpacity
           onPress={() => setSecure2FAModal( true )}
           style={{
-            flex: 1
+            flex: 1,
+            margin: 3
           }}>
           <BottomInfoBox
             icon={true}

@@ -347,7 +347,7 @@ const ManageGifts = ( props ) => {
         />
         <StatusBar
           backgroundColor={Colors.blueTextNew}
-          barStyle="dark-content"
+          barStyle="light-content"
         />
         <View
           style={{
@@ -487,8 +487,8 @@ const ManageGifts = ( props ) => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flex: 1,
-                  height: 40,
-                  borderRadius: active === item ? 8 : 0,
+                  height: 45,
+                  borderRadius: active === item ? 8 : 2,
                   backgroundColor:
                     active === item ? Colors.goldenYellow : Colors.white,
                 }}
@@ -498,8 +498,8 @@ const ManageGifts = ( props ) => {
                   style={{
                     color: active === item ? Colors.white : Colors.black,
                     fontSize: RFValue( 12 ),
-                    height: 40,
-                    marginTop: 10,
+                    height: 45,
+                    marginTop: 15,
                     fontFamily: Fonts.RobotoSlabRegular,
                   }}
                 >

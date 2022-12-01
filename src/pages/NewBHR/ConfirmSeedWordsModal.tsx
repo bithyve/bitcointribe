@@ -363,7 +363,7 @@ const styles = StyleSheet.create( {
   },
   successModalButtonView: {
     height: hp( 50 ),
-    width: wp( 120 ),
+    // width: wp( 120 ),
     paddingHorizontal: wp( 36 ),
     justifyContent: 'center',
     alignItems: 'center',
