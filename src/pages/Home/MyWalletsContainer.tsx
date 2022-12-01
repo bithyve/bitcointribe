@@ -374,13 +374,20 @@ export default function MyWalletsContainer( props ) {
     return useFormattedAmountText( amountToDisplay( item.amount ) )
   }
 
+  const handleTransactionSelection = ( transaction ) => {
+    props.navigation.navigate( 'TransactionDetails', {
+      transaction,
+      accountShellID,
+    } )
+  }
+
   const renderWalletItem = ( { item, index } ) => {
     return (
       <TouchableOpacity style={{
         justifyContent: 'center', alignItems: 'center',
         marginHorizontal: wp( 27 ), flexDirection: 'row',
         marginBottom: wp( 27 )
-      }}>
+      }} onPress={()=>handleTransactionSelection( item )}>
         {
           item.transactionType === TransactionKind.SEND
             ?

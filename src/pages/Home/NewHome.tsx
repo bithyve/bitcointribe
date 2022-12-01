@@ -8,7 +8,9 @@ import {
   FlatList,
   Image,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  Alert,
+  Linking,
 } from 'react-native'
 import {
   heightPercentageToDP,
@@ -26,8 +28,11 @@ import {
 } from '../../common/constants/wallet-service-types'
 import { connect } from 'react-redux'
 import {
+  InitTrustedContactFlowKind,
   rejectTrustedContact,
   syncPermanentChannels,
+  initializeTrustedContact,
+  PermanentChannelsSyncKind,
 } from '../../store/actions/trustedContacts'
 import {
   updateFCMTokens,
@@ -37,6 +42,7 @@ import {
   updateMessageStatusInApp,
   updateMessageStatus,
   getMessages,
+  notificationPressed,
 } from '../../store/actions/notifications'
 import {
   setCurrencyCode,
@@ -51,6 +57,7 @@ import {
   fetchFeeAndExchangeRates
 } from '../../store/actions/accounts'
 import {
+  AccountType,
   DeepLinkEncryptionType,
   LevelHealthInterface,
   notificationType,
@@ -96,11 +103,18 @@ import {
   rejectedExistingContactRequest
 } from '../../store/actions/BHR'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
-import { getCurrencyImageByRegion, processRequestQR } from '../../common/CommonFunctions'
+import { getCurrencyImageByRegion, processDeepLink, processRequestQR } from '../../common/CommonFunctions'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from './../../common/Fonts'
 import CustomToolbar from '../../components/home/CustomToolbar'
 import NotificationListContent from '../../components/NotificationListContent'
+import TrustedContactRequestContent from './TrustedContactRequestContent'
+import Toast from '../../components/Toast'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import Relay from '../../bitcoin/utilities/Relay'
+import { resetToHomeAction } from '../../navigation/actions/NavigationActions'
+import messaging from '@react-native-firebase/messaging'
+import PushNotification from 'react-native-push-notification'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -139,6 +153,7 @@ interface HomeStateTypes {
   notificationDataChange: boolean;
   appState: string;
   trustedContactRequest: any;
+  isCurrentLevel0: boolean;
   recoveryRequest: any;
   custodyRequest: any;
   isLoadContacts: boolean;
@@ -175,6 +190,7 @@ interface HomePropsTypes {
   wallet: Wallet;
   UNDER_CUSTODY: any;
   updateFCMTokens: any;
+  initializeTrustedContact: any;
   acceptExistingContactRequest: any;
   rejectTrustedContact: any;
   initializeHealthSetup: any;
@@ -237,6 +253,8 @@ interface HomePropsTypes {
   clipboardAccess: boolean;
   rejectedExistingContactRequest: any;
   walletName: string;
+  walletId: string;
+  notificationPressed: any;
 }
 
 class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -272,6 +290,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationDataChange: false,
       appState: '',
       trustedContactRequest: null,
+      isCurrentLevel0: false,
       recoveryRequest: null,
       custodyRequest: null,
       isLoadContacts: false,
@@ -330,9 +349,218 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
         this.props.setCloudData()
       }
     }
+    const {
+      navigation,
+      initializeHealthSetup,
+      newBHRFlowStarted,
+      credsAuthenticated,
+    } = this.props
     requestAnimationFrame( () => {
+      // Keeping autoSync disabled
+      credsAuthenticated( false )
+      //console.log( 'isAuthenticated*****', this.props.isAuthenticated )
+      this.syncChannel()
+      this.closeBottomSheet()
+      if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
+        this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
+      }
+
+      if( newBHRFlowStarted === true ){
+        if ( this.props.levelHealth.length == 0 && !this.props.initLoader ) {
+          initializeHealthSetup()
+        }
+      }
+
+      // this.bootStrapNotifications()
+      this.createNotificationListeners()
       this.setUpFocusListener()
+      //this.getNewTransactionNotifications()
+
+      Linking.addEventListener( 'url', this.handleDeepLinkEvent )
+      Linking.getInitialURL().then( this.handleDeepLinking )
+
+      // call this once deeplink is detected aswell
+      this.handleDeepLinkModal()
+
+      // set FCM token(if haven't already)
+      this.storeFCMToken()
+
+      const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
+
+      if ( unhandledDeepLinkURL ) {
+        navigation.setParams( {
+          unhandledDeepLinkURL: null,
+        } )
+        this.handleDeepLinking( unhandledDeepLinkURL )
+      }
+      this.props.setVersion()
+      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
     } )
+  }
+
+  componentWillUnmount() {
+    this.cleanupListeners()
+  }
+
+  handleDeepLinkModal = () => {
+    const recoveryRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.recoveryRequest : null //this.props.navigation.getParam( 'recoveryRequest' )
+    const trustedContactRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.trustedContactRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
+    const giftRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.giftRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
+    const userKey = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.userKey : null//this.props.navigation.getParam( 'userKey' )
+    const swanRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.swanRequest : null//this.props.navigation.getParam( 'swanRequest' )
+    if ( swanRequest ) {
+      this.setState( {
+        swanDeepLinkContent:swanRequest.url,
+      }, () => {
+        this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length
+          ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
+          : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
+        this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
+      } )
+    }
+
+    if ( trustedContactRequest || recoveryRequest ) {
+      this.setState(
+        {
+          recoveryRequest,
+          trustedContactRequest,
+        },
+        () => {
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+            1
+          )
+        }
+      )
+    } else if( giftRequest ){
+      this.setState(
+        {
+          giftRequest,
+        },
+        () => {
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.GIFT_REQUEST,
+            1
+          )
+        }
+      )
+    } else if ( userKey ) {
+      this.props.navigation.navigate( 'VoucherScanner', {
+        userKey,
+      } )
+    }
+  };
+
+  localNotification = async ( notificationDetails ) => {
+    const channelIdRandom = moment().valueOf()
+    PushNotification.createChannel(
+      {
+        channelId: `${channelIdRandom}`,
+        channelName: 'reminder',
+        channelDescription: 'A channel to categorise your notifications',
+        playSound: false,
+        soundName: 'default',
+        importance: 4, // (optional) default: 4. Int value of the Android notification importance
+        vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
+      },
+      ( created ) =>
+        console.log( `createChannel localNotification returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
+    )
+
+    PushNotification.localNotification( {
+      /* Android Only Properties */
+      channelId: `${channelIdRandom}`,
+      showWhen: true, // (optional) default: true
+      autoCancel: true, // (optional) default: true
+      vibrate: true, // (optional) default: true
+      vibration: 300, // vibration length in milliseconds, ignored if vibrate=false, default: 1000
+      priority: 'high', // (optional) set notification priority, default: high
+
+      /* iOS and Android properties */
+      id: notificationDetails.id,
+      title: notificationDetails.title,
+      message: notificationDetails.body,
+      soundName: 'default',
+    } )
+  };
+
+  createNotificationListeners = async () => {
+    this.props.setIsPermissionGiven( true )
+    PushNotification.configure( {
+      // largeIcon: 'ic_launcher',
+      // smallIcon:'ic_notification',
+      onNotification: ( notification ) => {
+        this.props.getMessages()
+        if( notification.data && notification.data.content ){
+          const { content } = notification.data
+          const notificationId = JSON.parse( content ).notificationId
+          this.currentNotificationId = notificationId
+        } else if( notification.data[ 'google.message_id' ] ){
+          const notificationId = notification.data[ 'google.message_id' ]
+          this.currentNotificationId = notificationId
+        }
+        this.notificationCheck()
+        // process the notification
+        if ( notification.data ) {
+          // this.onNotificationOpen( notification )
+          // (required) Called when a remote is received or opened, or local notification is opened
+          notification.finish( PushNotificationIOS.FetchResult.NoData )
+        }
+      },
+
+      // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
+      onAction: ( notification ) => {
+        console.log( 'ACTION onAction:', notification.action )
+        console.log( 'NOTIFICATION onAction:', notification )
+
+        // process the action
+      },
+
+      // (optional) Called when the user fails to register for remote notifications. Typically occurs when APNS is having issues, or the device is a simulator. (iOS)
+      onRegistrationError: ( err ) => {
+        console.error( err.message, err )
+      },
+
+      // IOS ONLY (optional): default: all - Permissions to register.
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true,
+      },
+
+      // Should the initial notification be popped automatically
+      // default: true
+      popInitialNotification: true,
+
+      /**
+       * (optional) default: true
+       * - Specified if permissions (ios) and token (android and ios) will requested or not,
+       * - if not, you must call PushNotificationsHandler.requestPermissions() later
+       * - if you are not using remote notification or do not have Firebase installed, use this:
+       *     requestPermissions: Platform.OS === 'ios'
+       */
+      requestPermissions: true,
+    } )
+
+    messaging().getInitialNotification().then( ( data ) => {
+      if ( data ) {
+        const content = JSON.parse( data.data.content )
+        this.props.notificationPressed( content.notificationId, this.handleNotificationBottomSheetSelection )
+      }
+    } )
+
+    messaging().onNotificationOpenedApp( ( data ) => {
+      const content = JSON.parse( data.data.content )
+      this.props.notificationPressed( content.notificationId, this.handleNotificationBottomSheetSelection )
+    } )
+  };
+
+  storeFCMToken = async () => {
+    const fcmToken = await messaging().getToken()
+    if ( !this.props.existingFCMToken || this.props.existingFCMToken != fcmToken ) {
+      this.props.setFCMToken( fcmToken )
+      this.props.updateFCMTokens( [ fcmToken ] )
+    }
   }
 
   handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
@@ -379,6 +607,108 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
           break
     }
   };
+
+  setUpFocusListener = () => {
+    const { navigation } = this.props
+
+    this.focusListener = navigation.addListener( 'didFocus', () => {
+      this.setCurrencyCodeFromAsync()
+      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
+      this.syncChannel()
+      // this.notificationCheck()
+      this.setState( {
+        lastActiveTime: moment().toISOString(),
+      } )
+    } )
+    this.notificationCheck()
+    this.setCurrencyCodeFromAsync()
+  };
+
+  syncChannel= () => {
+    if( this.syncPermanantChannelTime === null ) {
+      this.syncPermanantChannelTime = new Date()
+      this.props.syncPermanentChannels( {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+        metaSync: true,
+      } )
+    } else {
+      const now: any = new Date()
+      const diff = Math.abs( now - this.syncPermanantChannelTime )
+      if( diff > 300000 ) {
+        this.syncPermanantChannelTime = null
+        this.syncChannel()
+      }
+    }
+  }
+
+  handleDeepLinkEvent = async ( { url } ) => {
+    const { navigation, isFocused } = this.props
+    // If the user is on one of Home's nested routes, and a
+    // deep link is opened, we will navigate back to Home first.
+    if ( !isFocused )
+      navigation.dispatch(
+        resetToHomeAction( {
+          unhandledDeepLinkURL: url,
+        } )
+      )
+    else this.handleDeepLinking( url )
+  };
+
+  handleDeepLinking = async ( url ) => {
+    if ( url === null ) return
+    const { trustedContactRequest, swanRequest, giftRequest, campaignId } = await processDeepLink( url )
+    if( trustedContactRequest ){
+      this.setState( {
+        trustedContactRequest,
+      },
+      () => {
+        if ( trustedContactRequest.isContactGift ) {
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.GIFT_REQUEST,
+            1
+          )
+        } else{
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+            1
+          )
+        }
+
+      }
+      )
+    } else if ( giftRequest ) {
+      this.setState( {
+        giftRequest,
+      },
+      () => {
+        this.openBottomSheetOnLaunch(
+          BottomSheetKind.GIFT_REQUEST,
+          1
+        )
+      }
+      )
+    } else if ( swanRequest ) {
+      this.setState( {
+        swanDeepLinkContent:url,
+      }, () => {
+        this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
+        this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
+      } )
+    }
+    else if ( campaignId ) {
+      try {
+        const response = await Relay.getCampaignGift( campaignId, this.props.walletId )
+        if( response.error || response.err ){
+          Toast( response.error || response.err )
+        } else if( response.link ){
+          this.onCodeScanned( response.link )
+        }
+      } catch ( error ) {
+        Toast( error.message )
+        console.log( error )
+      }
+    }
+  }
 
   setCurrencyCodeFromAsync = async () => {
     const { currencyCode } = this.props
@@ -427,24 +757,6 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
   //   }
   // }
 
-  setUpFocusListener = () => {
-    const { navigation } = this.props
-
-    this.focusListener = navigation.addListener( 'didFocus', () => {
-
-      this.setCurrencyCodeFromAsync()
-      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
-      // this.syncChannel()
-      // this.notificationCheck()
-      this.setState( {
-        lastActiveTime: moment().toISOString(),
-      } )
-    } )
-    // this.notificationCheck()
-    this.setCurrencyCodeFromAsync()
-  };
-
-
   cleanupListeners() {
     if ( typeof this.focusListener === 'function' ) {
       this.props.navigation.removeListener( 'didFocus', this.focusListener )
@@ -491,6 +803,102 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onBackPress = () => {
     this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
+  };
+
+  onTrustedContactRequestAccepted = ( key ) => {
+    try {
+      this.closeBottomSheet()
+      const { navigation } = this.props
+      const { trustedContactRequest, isCurrentLevel0 } = this.state
+
+      let channelKeys: string[]
+      try{
+        switch( trustedContactRequest.encryptionType ){
+            case DeepLinkEncryptionType.DEFAULT:
+              channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
+              break
+
+            case DeepLinkEncryptionType.NUMBER:
+            case DeepLinkEncryptionType.EMAIL:
+            case DeepLinkEncryptionType.OTP:
+              const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
+              channelKeys = decryptedKeys.split( '-' )
+              break
+        }
+
+        trustedContactRequest.channelKey = channelKeys[ 0 ]
+        trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
+      } catch( err ){
+        Toast( 'Invalid key' )
+        return
+      }
+
+      if( trustedContactRequest.isExistingContact ){
+        this.props.acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey, isCurrentLevel0 )
+      } else {
+        navigation.navigate( 'ContactsListForAssociateContact', {
+          postAssociation: ( contact ) => {
+            this.props.initializeTrustedContact( {
+              contact,
+              flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
+              channelKey: trustedContactRequest.channelKey,
+              contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
+              isPrimaryKeeper: trustedContactRequest.isPrimaryKeeper,
+              isKeeper: trustedContactRequest.isKeeper,
+              isCurrentLevel0
+            } )
+            // TODO: navigate post approval (from within saga)
+            navigation.navigate( 'NewHome' )
+            if ( trustedContactRequest.isContactGift ) {
+              this.setState( {
+                trustedContactRequest: {
+                  ...trustedContactRequest, isAssociated: true
+                }
+              } )
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.GIFT_REQUEST,
+                1
+              )
+            }
+          }
+        } )
+      }
+    } catch ( error ) {
+      Alert.alert( 'Incompatible request, updating your app might help' )
+    }
+  };
+
+  onTrustedContactRejected = () => {
+    try {
+      this.closeBottomSheet()
+      const { trustedContactRequest } = this.state
+      let channelKeys: string[]
+      try{
+        switch( trustedContactRequest.encryptionType ){
+            case DeepLinkEncryptionType.DEFAULT:
+              channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
+              break
+
+            case DeepLinkEncryptionType.NUMBER:
+            case DeepLinkEncryptionType.EMAIL:
+            case DeepLinkEncryptionType.OTP:
+              const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
+              channelKeys = decryptedKeys.split( '-' )
+              break
+        }
+
+        trustedContactRequest.channelKey = channelKeys[ 0 ]
+        trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
+      } catch( err ){
+        Toast( 'Invalid key' )
+        return
+      }
+      this.props.rejectTrustedContact( {
+        channelKey: trustedContactRequest.channelKey, isExistingContact: trustedContactRequest.isExistingContact
+      } )
+    } catch ( error ) {
+      Alert.alert( 'Incompatible request, updating your app might help' )
+    }
   };
 
 
@@ -567,10 +975,25 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           )
 
+        case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
+          const { trustedContactRequest } = this.state
+
+          return (
+            <TrustedContactRequestContent
+              trustedContactRequest={trustedContactRequest}
+              onPressAccept={this.onTrustedContactRequestAccepted}
+              onPressReject={this.onTrustedContactRejected}
+              onPhoneNumberChange={this.onPhoneNumberChange}
+              bottomSheetRef={this.bottomSheetRef}
+            />
+          )
+
         default:
           break
     }
   }
+
+  onPhoneNumberChange = () => {};
 
   onNotificationClicked = async ( value ) => {
     console.log( 'value', value )
@@ -1072,6 +1495,7 @@ const mapStateToProps = ( state ) => {
     initLoader: idx( state, ( _ ) => _.bhr.loading.initLoader ),
     updateWIStatus: idx( state, ( _ ) => _.bhr.loading.updateWIStatus ),
     clipboardAccess: idx( state, ( _ ) => _.misc.clipboardAccess ),
+    walletId: idx( state, ( _ ) => _.storage.wallet.walletId ),
     walletName:
       idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
   }
@@ -1080,6 +1504,7 @@ const mapStateToProps = ( state ) => {
 export default withNavigationFocus(
   connect( mapStateToProps, {
     updateFCMTokens,
+    initializeTrustedContact,
     acceptExistingContactRequest,
     rejectTrustedContact,
     initializeHealthSetup,
@@ -1109,6 +1534,7 @@ export default withNavigationFocus(
     getMessages,
     syncPermanentChannels,
     rejectedExistingContactRequest,
+    notificationPressed,
   } )( NewHome )
 )
 

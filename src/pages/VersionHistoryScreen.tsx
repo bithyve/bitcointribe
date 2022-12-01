@@ -17,6 +17,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { useSelector } from 'react-redux'
 import idx from 'idx'
 import { getVersions } from '../common/utilities'
+import CustomToolbar from '../components/home/CustomToolbar'
 
 
 export default function VersionHistoryScreen( props ) {
@@ -48,8 +49,19 @@ export default function VersionHistoryScreen( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1
+      flex:1,
+      backgroundColor: Colors.appPrimary
     }}>
+      <CustomToolbar
+        onBackPressed={() => props.navigation.goBack()}
+        toolbarTitle={'Version History'}
+        showSwitch={false}
+        containerStyle={{
+          flex:0.1,
+          // borderBottomStartRadius: 0,
+          // marginTop: hp( 40 )
+          height: hp( 100 )
+        }} />
       <View style={styles.rootContainer}>
         {data && data.length ? (
           <View style={{
