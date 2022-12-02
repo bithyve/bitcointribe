@@ -974,7 +974,6 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
               bottomSheetRef={this.bottomSheetRef}
             />
           )
-
         case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
           const { trustedContactRequest } = this.state
 
@@ -1278,6 +1277,10 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.props.navigation.navigate( 'FriendsAndFamily' )
   }
 
+  navigateToNotification = () => {
+    this.props.navigation.navigate( 'NotificationListContent' )
+  }
+
   getIconPath = ( item ) => {
     switch ( item.type ) {
         case 1:
@@ -1390,7 +1393,8 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
               flex:1
             }}>
               <HomeHeader
-                onPressNotifications={this.onPressNotifications}
+                // onPressNotifications={this.onPressNotifications}
+                onPressNotifications={this.navigateToNotification}
                 onPressFAndF={this.navigateToFAndF}
                 navigateToQRScreen={this.navigateToQRScreen}
                 notificationData={this.props.messages}

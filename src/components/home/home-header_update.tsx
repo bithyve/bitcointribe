@@ -547,7 +547,9 @@ const HomeHeader = ( {
             item?.displayedName == 'Notifications' ?
               <TouchableOpacity style={{
                 alignItems:'center'
-              }} activeOpacity={1} onPress={onPressNotifications}>
+              }} activeOpacity={1} 
+              // onPress={()=> {console.log('onclick'); onPressNotifications}}
+              onPress={onPressNotifications}>
                 <Image source={require( '../../assets/images/HomePageIcons/more.png' )} style={{
                   width: wp( 40 ), height: wp( 40 ), borderRadius: wp( 20 ),
                 }} />

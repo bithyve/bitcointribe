@@ -455,7 +455,7 @@ export default function Login( props ) {
       flex: 1,
       backgroundColor: Colors.blue
     } }>
-      <StatusBar />
+      <StatusBar barStyle="light-content"/>
       <View style={{
         flex: 1
       }}>
