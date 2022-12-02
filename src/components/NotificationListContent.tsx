@@ -1,9 +1,11 @@
 import React, { useContext } from 'react'
-import { View, Image, Text, StyleSheet, Platform, Dimensions } from 'react-native'
+import { View, Image, Text, StyleSheet, Platform, Dimensions, StatusBar, SafeAreaView, TouchableOpacity } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import { useSelector } from 'react-redux'
+
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -15,34 +17,34 @@ import Loader from './loader'
 import { getEnvReleaseTopic } from '../utils/geEnvSpecificParams'
 import { getTime } from '../common/CommonFunctions/timeFormatter'
 import { LocalizationContext } from '../common/content/LocContext'
+import commonStyle from "../common/Styles/Styles";
 
 const releaseNotificationTopic = getEnvReleaseTopic()
 const { height } = Dimensions.get( 'window' )
 export default function NotificationListContent( props ) {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'home' ]
+  const messageData = useSelector((state)=> state.notifications.messages)
 
   return (
-    <View style={styles.modalContainer}>
-      <AppBottomSheetTouchableWrapper
-        onPress={() => props.onPressBack()}
-        style={{
-          width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
-          alignSelf: 'flex-end',
-          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
-          marginTop: wp( 3 ), marginRight: wp( 3 )
-        }}
-      >
-        <FontAwesome name="close" color={Colors.white} size={19} style={{
-        // marginTop: hp( 0.5 )
-        }} />
-      </AppBottomSheetTouchableWrapper>
+    <SafeAreaView style={styles.modalContainer}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <TouchableOpacity
+          style={commonStyle.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack();
+          }}
+        >
+          <View style={commonStyle.headerLeftIconInnerContainer}>
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </View>
+        </TouchableOpacity>
       <View style={styles.modalHeaderTitleView}>
-
         <View style={{
           justifyContent: 'center'
         }}>
           <Text style={styles.modalHeaderTitleText}>{strings.Notifications}</Text>
+          <Text style={styles.subTitleText}>Lorem Ipsum dolor amet cons</Text>
         </View>
       </View>
       <ScrollView style={{
@@ -51,10 +53,10 @@ export default function NotificationListContent( props ) {
       }}>
         {props.notificationLoading
           ? null
-          : props.NotificationData.map( ( value, index ) => {
+          : messageData.map( ( value, index ) => {
             return (
               <AppBottomSheetTouchableWrapper
-                key={index}
+                // key={index}
                 onPress={() => props.onNotificationClicked( value )}
                 style={{
                   ...styles.notificationElement,
@@ -108,7 +110,7 @@ export default function NotificationListContent( props ) {
       {
         props.notificationLoading ? <Loader isLoading={true}/> : null
       }
-      {!props.NotificationData.length ? (
+      {!messageData.length ? (
         <View style={{
           backgroundColor: Colors.white, marginTop: 'auto'
         }}>
@@ -122,31 +124,36 @@ export default function NotificationListContent( props ) {
           </View>
         </View>
       ) : null}
-    </View>
+    </SafeAreaView>
   )
 }
 const styles = StyleSheet.create( {
   modalContainer: {
     backgroundColor: Colors.white,
+    padding: 5,
     // maxHeight: height - 120,
-    height:hp( 63 )
+    // height:hp( 63 )
   },
   modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
     alignItems: 'center',
     flexDirection: 'row',
     paddingRight: 10,
     paddingBottom: hp( '2%' ),
-    // paddingTop: hp( '2%' ),
+    paddingTop: hp( '2%' ),
     // marginLeft: wp( '4%' ),
     // marginRight: wp( '4%' ),
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
-    marginHorizontal: wp( 4 )
+    fontSize: RFValue( 22 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginHorizontal: wp( 6 )
+  },
+  subTitleText: {
+    color: Colors.gray4,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginHorizontal: wp( 6 )
   },
   notificationElement: {
     paddingHorizontal: wp( '4%' ),
