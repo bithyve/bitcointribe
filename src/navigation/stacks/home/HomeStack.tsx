@@ -74,7 +74,7 @@ const MODAL_ROUTES = [
   'FriendsAndFamily',
   'MoreOptions',
   'PlaceWyreOrder',
-  'PlaceRampOrder'
+  'PlaceRampOrder',
 ]
 
 
@@ -173,6 +173,7 @@ const HomeStack = createStackNavigator(
         header: null,
       },
     },
+    
     // MoreOptions: {
     //   screen: MoreOptionsStack,
     //   navigationOptions: {
