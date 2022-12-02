@@ -91,6 +91,7 @@ import AccountDetailsContainerScreen from '../pages/Accounts/Details/AccountDeta
 import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact'
 import VoucherScanner from '../pages/FastBitcoin/VoucherScanner'
 import VersionHistoryScreen from '../pages/VersionHistoryScreen'
+import NotificationListContent from '../components/NotificationListContent'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -586,6 +587,12 @@ const NewHomeNavigator = createStackNavigator( {
   VoucherScanner,
   VersionHistory: {
     screen: VersionHistoryScreen,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  NotificationListContent: {
+    screen: NotificationListContent,
     navigationOptions: {
       header: null,
     },
