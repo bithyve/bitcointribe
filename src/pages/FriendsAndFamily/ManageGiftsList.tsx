@@ -117,28 +117,6 @@ const ManageGiftsList = (props) => {
           />
         </View>
       </View>
-
-      {/* <View style={{
-         justifyContent: 'space-between', paddingTop: RFValue( 4 ),
-          // backgroundColor:'red'
-        }}> */}
-      {/* <View> */}
-
-      {/* <Text style={{
-              color: Colors.lightTextColor,
-              fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
-
-            }}>
-              {props.subText}
-            </Text> */}
-      {/* </View> */}
-      {/* <View style={{
-            flexDirection: 'row', alignItems: 'flex-end',
-          }}>
-            
-          </View> */}
-      {/* </View> */}
     </TouchableOpacity>
   );
 };
