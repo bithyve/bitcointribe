@@ -42,7 +42,7 @@ const ManageGiftsList = (props) => {
         style={{
           // backgroundColor: Colors.gray7,
           borderRadius: wp(2),
-          paddingVertical: hp(2),
+          paddingVertical: hp(1.5),
           paddingHorizontal: wp(2),
           flexDirection: "row",
           alignItems: 'center',
