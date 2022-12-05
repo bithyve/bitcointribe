@@ -42,7 +42,7 @@ const ManageGiftsList = (props) => {
         style={{
           // backgroundColor: Colors.gray7,
           borderRadius: wp(2),
-          paddingVertical: hp(1),
+          paddingVertical: hp(2),
           paddingHorizontal: wp(2),
           flexDirection: "row",
           alignItems: 'center',
@@ -53,7 +53,9 @@ const ManageGiftsList = (props) => {
           width: '100%'
         }}
       >
-        <View style={{width: '15%', alignItems: 'center', justifyContent: 'center'}}>{props.image}</View>
+        <View style={{width: '15%', alignItems: 'center', justifyContent: 'center'}}>
+          {props.image}
+        </View>
         <View style={{width: '53%'}}>
           <Text
             style={{
