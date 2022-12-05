@@ -407,7 +407,7 @@ export default class AccountUtilities {
     {
       balance: string
     }> => {
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
       const accountToAddressMapping = {
       }
@@ -546,7 +546,7 @@ export default class AccountUtilities {
     }
    }
   }> => {
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
       const accountToAddressMapping = {
       }
@@ -901,7 +901,7 @@ export default class AccountUtilities {
     const txCounts = {
     }
     try {
-      let res: AxiosResponse;
+      let res: AxiosResponse
       try {
         if ( network === bitcoinJS.networks.testnet ) {
           res = await BH_AXIOS.post(
@@ -972,11 +972,11 @@ export default class AccountUtilities {
   ): Promise<{
     txid: string;
   }> => {
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
       if ( network === bitcoinJS.networks.testnet ) {
         res = await BH_AXIOS.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
+          'https://blockstream.info/testnet/api/tx',
           txHex,
           {
             headers: {
@@ -1207,7 +1207,7 @@ export default class AccountUtilities {
       xpubs.push( ( account as MultiSigAccount ).xpubs.bithyve )
     }
 
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
       res = await BH_AXIOS.post( 'setupDonationAccount', {
         HEXA_ID: config.HEXA_ID,
@@ -1250,7 +1250,7 @@ export default class AccountUtilities {
     },
   ): Promise<{ updated: boolean, updatedAccount: DonationAccount }> => {
 
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
       res = await BH_AXIOS.post( 'updatePreferences', {
         HEXA_ID: config.HEXA_ID,
@@ -1303,7 +1303,7 @@ export default class AccountUtilities {
   }> => {
     // syncs account via xpub-agent(relay)
 
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
       res = await BH_AXIOS.post( 'fetchXpubInfo', {
         HEXA_ID: config.HEXA_ID,

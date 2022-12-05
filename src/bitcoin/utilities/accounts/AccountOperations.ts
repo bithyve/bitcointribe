@@ -1001,6 +1001,7 @@ export default class AccountOperations {
     }
 
     const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
+    if ( !txid ) throw new Error( 'Failed to broadcast transaction, txid missing' )
     if( txid.includes( 'sendrawtransaction RPC error' ) ){
       let err
       try{
