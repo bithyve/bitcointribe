@@ -9,11 +9,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { setShowAllAccount } from '../../../../store/actions/accounts'
 import { translations } from '../../../../common/content/LocContext'
+import CustomToolbar from '../../../../components/home/CustomToolbar'
 
 export default function SecurityQuestionScreen( props ) {
   const { security } = useSelector( ( state ) => state.storage.wallet )
   const common  = translations[ 'common' ]
   const strings  = translations[ 'login' ]
+  const stackTitleString = translations[ 'stackTitle' ]
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
   const securityQuestion = security.question
   const securityAnswer = security.answer
@@ -57,19 +59,28 @@ export default function SecurityQuestionScreen( props ) {
   }, [ answer, errorText ] )
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-      }}
-    >
+    <View style={{
+      flex: 1,
+    }}>
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }}/>
+      <StatusBar backgroundColor={Colors.appPrimary} barStyle="dark-content" />
+
+      <CustomToolbar
+        onBackPressed={() => props.navigation.goBack()}
+        toolbarTitle={stackTitleString[ 'ShowAllAccounts' ]}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 12 )
+        }} />
       <KeyboardAvoidingView
         style={{
-          flex: 1,
+          flex: 1, marginTop: 10
         }}
         behavior={Platform.OS == 'ios' ? 'padding' : ''}
         enabled
       >
-        <StatusBar />
         <View
           style={{
             flex: 1,
@@ -188,7 +199,7 @@ export default function SecurityQuestionScreen( props ) {
           </View>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   )
 }
 

@@ -355,47 +355,47 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
       newBHRFlowStarted,
       credsAuthenticated,
     } = this.props
-    requestAnimationFrame( () => {
-      // Keeping autoSync disabled
-      credsAuthenticated( false )
-      //console.log( 'isAuthenticated*****', this.props.isAuthenticated )
-      this.syncChannel()
-      this.closeBottomSheet()
-      if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
-        this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
-      }
+    // requestAnimationFrame( () => {
+    //   // Keeping autoSync disabled
+    //   credsAuthenticated( false )
+    //   //console.log( 'isAuthenticated*****', this.props.isAuthenticated )
+    //   this.syncChannel()
+    //   this.closeBottomSheet()
+    //   if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
+    //     this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
+    //   }
 
-      if( newBHRFlowStarted === true ){
-        if ( this.props.levelHealth.length == 0 && !this.props.initLoader ) {
-          initializeHealthSetup()
-        }
-      }
+    //   if( newBHRFlowStarted === true ){
+    //     if ( this.props.levelHealth.length == 0 && !this.props.initLoader ) {
+    //       initializeHealthSetup()
+    //     }
+    //   }
 
-      // this.bootStrapNotifications()
-      this.createNotificationListeners()
-      this.setUpFocusListener()
-      //this.getNewTransactionNotifications()
+    //   // this.bootStrapNotifications()
+    //   this.createNotificationListeners()
+    //   this.setUpFocusListener()
+    //   //this.getNewTransactionNotifications()
 
-      Linking.addEventListener( 'url', this.handleDeepLinkEvent )
-      Linking.getInitialURL().then( this.handleDeepLinking )
+    //   Linking.addEventListener( 'url', this.handleDeepLinkEvent )
+    //   Linking.getInitialURL().then( this.handleDeepLinking )
 
-      // call this once deeplink is detected aswell
-      this.handleDeepLinkModal()
+    //   // call this once deeplink is detected aswell
+    //   this.handleDeepLinkModal()
 
-      // set FCM token(if haven't already)
-      this.storeFCMToken()
+    //   // set FCM token(if haven't already)
+    //   this.storeFCMToken()
 
-      const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
+    //   const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
 
-      if ( unhandledDeepLinkURL ) {
-        navigation.setParams( {
-          unhandledDeepLinkURL: null,
-        } )
-        this.handleDeepLinking( unhandledDeepLinkURL )
-      }
-      this.props.setVersion()
-      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
-    } )
+    //   if ( unhandledDeepLinkURL ) {
+    //     navigation.setParams( {
+    //       unhandledDeepLinkURL: null,
+    //     } )
+    //     this.handleDeepLinking( unhandledDeepLinkURL )
+    //   }
+    //   this.props.setVersion()
+    //   this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
+    // } )
   }
 
   componentWillUnmount() {
