@@ -55,6 +55,7 @@ import idx from 'idx'
 import { getNextFreeAddress } from '../../store/sagas/accounts'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import { NavigationActions, StackActions } from 'react-navigation'
+import CustomToolbar from '../../components/home/CustomToolbar'
 
 
 const WalletBackup = ( props, navigation ) => {
@@ -799,11 +800,21 @@ const WalletBackup = ( props, navigation ) => {
   }
 
   return (
-    <SafeAreaView style={{
+    <View  style={{
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
-      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      <View style={[ CommonStyles.headerContainer, {
+      <StatusBar backgroundColor={Colors.appPrimary} barStyle="light-content" />
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }}/>
+      <CustomToolbar
+        onBackPressed={() => navigation.goBack()}
+        toolbarTitle={strings[ 'WalletBackup' ]}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 12 )
+        }} />
+      {/* <View style={[ CommonStyles.headerContainer, {
         backgroundColor: Colors.backgroundColor
       } ]}>
         <TouchableOpacity
@@ -832,7 +843,7 @@ const WalletBackup = ( props, navigation ) => {
         infoTextBold={''}
         infoTextNormal1={''}
         step={''}
-      />
+      /> */}
       {/* <Text style={{
         fontSize: 16, color: Colors.blue, fontFamily: Fonts.FiraSansRegular, marginTop: 10, marginStart: 20
       }}>{( levelData && levelData[ 0 ]?.status == 'notSetup' ) ? 'No backup created' : 'Backup created'}</Text> */}
@@ -1174,7 +1185,7 @@ const WalletBackup = ( props, navigation ) => {
           account={primarySubAccount}
         />
       </ModalContainer>
-    </SafeAreaView>
+    </View>
   )
 }
 

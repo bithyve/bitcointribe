@@ -32,6 +32,7 @@ import { recreateAccounts, syncMissingAccounts, updateSynchedMissingAccount } fr
 import { sweepMissingAccounts } from '../../../store/actions/upgrades'
 import { TextInput } from 'react-native-paper'
 import CustomToolbar from '../../../components/home/CustomToolbar'
+import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 
 export type Props = {
   navigation: any;
@@ -67,7 +68,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     const newDraggableOrderedAccountShell = []
     if( accountShells ){
       accountShells.map( ( value ) =>{
-        if( value.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
+        if( value.primarySubAccount.kind != SubAccountKind.TEST_ACCOUNT
+          && value.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
           newDraggableOrderedAccountShell.push( value )
         }
       } )
@@ -80,7 +82,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     if( showAllAccount === true ){
       const newOrderedAccountShell = []
       accountShells.map( ( value ) =>{
-        if( value.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
+        if( value.primarySubAccount.kind != SubAccountKind.TEST_ACCOUNT
+        && value.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
           newOrderedAccountShell.push( value )
         }
       } )
@@ -500,7 +503,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       <SafeAreaView style={{
         backgroundColor: Colors.appPrimary
       }}/>
-      <StatusBar backgroundColor={Colors.appPrimary} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.appPrimary} barStyle="light-content" />
       <ModalContainer onBackground={()=>showUnHideArchiveModal( false )} visible={unHideArchiveModal} closeBottomSheet={() => { showUnHideArchiveModal( false ) }} >
         {showUnHideArchiveAccountBottomSheet()}
       </ModalContainer>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
 import ListStyles from '../../common/Styles/ListStyles'
@@ -36,6 +36,8 @@ import AcceptGift from '../FriendsAndFamily/AcceptGift'
 import { launchImageLibrary } from 'react-native-image-picker'
 import LocalQRCode from '@remobile/react-native-qrcode-local-image'
 import Toast from '../../components/Toast'
+import CustomToolbar from '../../components/home/CustomToolbar'
+import { hp } from '../../common/data/responsiveness/responsive'
 
 export type Props = {
   navigation: any;
@@ -133,6 +135,16 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
   return (
     <View style={styles.rootContainer}>
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }}/>
+      <CustomToolbar
+        onBackPressed={() => navigation.pop()}
+        toolbarTitle={'QR'}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 100 )
+        }} />
       <ScrollView>
         <KeyboardAwareScrollView
           resetScrollToCoords={{

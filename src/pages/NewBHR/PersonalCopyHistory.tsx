@@ -642,7 +642,7 @@ const PersonalCopyHistory = ( props ) => {
           flex: 0, backgroundColor: Colors.backgroundColor
         }}
       />
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.white} barStyle="light-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
@@ -704,10 +704,10 @@ const PersonalCopyHistory = ( props ) => {
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
-             // note remove PDF flow for level 2 & 3
+            // note remove PDF flow for level 2 & 3
             // if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
             // else
-             onPressChangeKeeperType( type, name )
+            onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           keeper={selectedKeeper}

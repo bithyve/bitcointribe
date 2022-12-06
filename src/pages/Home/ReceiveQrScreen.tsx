@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react'
-import { StyleSheet, Modal, View, Image, Text, Platform, TextInput, TouchableOpacity } from 'react-native'
+import { StyleSheet, Modal, View, Image, Text, Platform, TextInput, TouchableOpacity, SafeAreaView } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   widthPercentageToDP as wp,
@@ -24,6 +24,8 @@ import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 import ModalContainer from '../../components/home/ModalContainer'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import { translations } from '../../common/content/LocContext'
+import CustomToolbar from '../../components/home/CustomToolbar'
+import SubAccountKind from '../../common/data/enums/SubAccountKind'
 
 export type Props = {
   navigation: any;
@@ -59,8 +61,11 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   useEffect( () => {
     if ( allAccounts ) {
       const acc = []
+      console.log( 'skk allaccounts', JSON.stringify( allAccounts ) )
       for ( const [ key, value ] of Object.entries( allAccounts ) ) {
-        if( value.isUsable ) acc.push( value )
+        if( value?.type != SubAccountKind.TEST_ACCOUNT
+          && value.isUsable )
+          acc.push( value )
       }
       setAccounts( acc )
       setSelectedAccount( acc[ 0 ] )
@@ -104,6 +109,16 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
   return (
     <View style={styles.rootContainer}>
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }}/>
+      <CustomToolbar
+        onBackPressed={() => navigation.goBack()}
+        toolbarTitle={'Receive'}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 12 )
+        }} />
       <ScrollView>
         <View style={styles.QRView}>
           <QRCode title="Bitcoin address" value={receivingAddress ? receivingAddress : 'eert'} size={hp( '27%' )} />

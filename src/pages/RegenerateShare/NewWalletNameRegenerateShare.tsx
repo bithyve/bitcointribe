@@ -31,11 +31,11 @@ export default function NewWalletNameRegenerateShare( props ) {
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.white} barStyle="light-content" />
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
@@ -55,7 +55,7 @@ export default function NewWalletNameRegenerateShare( props ) {
         </View>
         <KeyboardAvoidingView
           style={{
-            flex: 1 
+            flex: 1
           }}
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
@@ -161,7 +161,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 2, height: 2 
+      width: 2, height: 2
     },
     backgroundColor: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
@@ -202,7 +202,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
   },
   statusIndicatorView: {

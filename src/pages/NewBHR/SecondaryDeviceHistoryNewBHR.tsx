@@ -641,7 +641,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       <SafeAreaView style={{
         flex: 0, backgroundColor: Colors.backgroundColor
       }}/>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.white} barStyle="light-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={props.navigation.state.params.selectedTitle}
@@ -759,7 +759,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             setSelectedKeeperName( name )
             // note remove PDF flow for level 2 & 3
             // if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
-            // else 
+            // else
             onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
