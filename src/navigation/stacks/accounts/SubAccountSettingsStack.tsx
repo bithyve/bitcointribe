@@ -22,20 +22,26 @@ const SubAccountSettingsStack = createStackNavigator(
   {
     AccountSettingsMain: {
       screen: AccountSettingsMainScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          title: strings[ 'AccountSettings' ],
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-          },
-        }
+      navigationOptions: {
+        header: null,
       },
+      // navigationOptions: ( { navigation } ) => {
+      //   return {
+      //     title: strings[ 'AccountSettings' ],
+      //     headerLeft: () => {
+      //       return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+      //     },
+      //   }
+      // },
     },
     EditDisplayProperties: {
       screen: AccountSettingsEditDisplayPropertiesScreen,
       navigationOptions: {
-        title: strings[ 'NameDescription' ],
+        header: null,
       },
+      // navigationOptions: {
+      //   title: strings[ 'NameDescription' ],
+      // },
     },
     ReassignTransactionsMainOptions: {
       screen: ReassignTransactionsMainOptionsScreen,
@@ -69,19 +75,25 @@ const SubAccountSettingsStack = createStackNavigator(
     EditVisibility: {
       screen: AccountSettingsEditVisibilityScreen,
       navigationOptions: {
-        title: 'Account Visibility',
-      },
+        header: null
+      }
+      // navigationOptions: {
+      //   title: 'Account Visibility',
+      // },
     },
     ShowXPub: {
       screen: XPubDetailsScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          ...defaultStackScreenNavigationOptions,
-          headerLeft: () => {
-            return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-          },
-        }
-      },
+      navigationOptions: {
+        header: null
+      }
+      // navigationOptions: ( { navigation } ) => {
+      //   return {
+      //     ...defaultStackScreenNavigationOptions,
+      //     headerLeft: () => {
+      //       return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+      //     },
+      //   }
+      // },
     },
     MergeAccounts: {
       screen: AccountSettingsMergeAccountShellsScreen,

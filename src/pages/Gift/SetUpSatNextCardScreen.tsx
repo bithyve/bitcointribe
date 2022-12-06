@@ -36,6 +36,8 @@ import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePri
 import useSendingState from '../../utils/hooks/state-selectors/sending/UseSendingState'
 import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 import { weekdaysShort } from 'moment'
+import CustomToolbar from '../../components/home/CustomToolbar'
+import { hp } from '../../common/data/responsiveness/responsive'
 
 const { height, width } = Dimensions.get( 'window' )
 const dummySatcardAddress = '3Ax781srE163xdH9DR9JKPRWooQ3xkbM4m'
@@ -288,9 +290,19 @@ export default function SetUpSatNextCardScreen( props ) {
   } )
 
   return (
-    <SafeAreaView style={styles.safeAreaContainer}>
+    <View style={styles.safeAreaContainer}>
       <StatusBar />
-      <View style={[ CommonStyles.headerContainer, {
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }} />
+      <CustomToolbar
+        onBackPressed={() => props.navigation.goBack()}
+        toolbarTitle={'Associating SATSCARDTM'}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 100 )
+        }} />
+      {/* <View style={[ CommonStyles.headerContainer, {
         backgroundColor: Colors.white,
       } ]}>
         <TouchableOpacity
@@ -308,7 +320,7 @@ export default function SetUpSatNextCardScreen( props ) {
             />
           </View>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <GiftStepperComponent
         extraContainer={{
@@ -364,7 +376,7 @@ export default function SetUpSatNextCardScreen( props ) {
         />
       </ModalContainer>
       <NfcPrompt visible={showNFCModal} />
-    </SafeAreaView>
+    </View>
   )
 }
 

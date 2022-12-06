@@ -1402,7 +1402,7 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 getCurrencyImageByRegion={getCurrencyImageByRegion}
                 netBalance={netBalance}
                 exchangeRates={exchangeRates}
-                // CurrencyCode={currencyCode}
+                CurrencyCode={currencyCode}
                 navigation={navigation}
                 currentLevel={currentLevel}
                 //  onSwitchToggle={this.onSwitchToggle}

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native'
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import { useDispatch } from 'react-redux'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
@@ -13,6 +13,8 @@ import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import Colors from '../../../common/Colors'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import { translations } from '../../../common/content/LocContext'
+import CustomToolbar from '../../../components/home/CustomToolbar'
+import { hp } from '../../../common/data/responsiveness/responsive'
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.DEFAULT,
@@ -59,6 +61,16 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
 
   return (
     <View style={styles.rootContainer}>
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }} />
+      <CustomToolbar
+        onBackPressed={() => navigation.pop()}
+        toolbarTitle={'Account Visibility'}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 100 )
+        }} />
       <HeaderSection title={strings.Choosewhen}/>
 
       <View style={{
