@@ -515,13 +515,13 @@ const ManageGifts = ( props ) => {
           <View
             style={{
               flexDirection: 'column',
-              marginHorizontal: wp( 9 ),
+              marginHorizontal: wp( 5 ),
               marginVertical: hp( 1 ),
             }}
           >
             <Text style={styles.GiftText}>Available Gifts</Text>
             <Text style={styles.GiftSubText}>
-              Lorem dolor sit amet, consectetur dolor sit
+            Send them to contacts or add back to account
             </Text>
           </View>
         )}
@@ -530,13 +530,13 @@ const ManageGifts = ( props ) => {
           <View
             style={{
               flexDirection: 'column',
-              marginHorizontal: wp( 9 ),
+              marginHorizontal: wp( 5 ),
               marginVertical: hp( 1 ),
             }}
           >
             <Text style={styles.GiftText}>Sent Gifts</Text>
             <Text style={styles.GiftSubText}>
-              Lorem dolor sit amet, consectetur dolor sit
+            List of all gifts you've sent
             </Text>
           </View>
         )}
@@ -663,8 +663,8 @@ const ManageGifts = ( props ) => {
                         backgroundColor: Colors.backgroundColor1,
                         borderRadius: wp( 2 ),
                         padding: wp( 3 ),
-                        borderColor: Colors.blue,
-                        borderWidth: 1,
+                        // borderColor: Colors.blue,
+                        // borderWidth: 1,
                       }}
                     >
                       <View
@@ -705,7 +705,7 @@ const ManageGifts = ( props ) => {
                               fontSize: RFValue( 12 ),
                               // textAlign: 'center',
                               color: Colors.gray13,
-                              marginTop: 6,
+                              // marginTop: 6,
                               letterSpacing: 0.6,
                             }}
                           >
@@ -893,6 +893,8 @@ const styles = StyleSheet.create( {
     borderRadius: wp( 10 ) / 2,
     borderWidth: 0.6,
     borderColor: Colors.gray2,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   listItem: {
     marginVertical: hp( 0.5 ),
