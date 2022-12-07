@@ -17,10 +17,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { credsAuth, credsAuthenticated, switchReLogin } from '../../../../store/actions/setupAndAuth'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { translations } from '../../../../common/content/LocContext'
+import CustomToolbar from '../../../../components/home/CustomToolbar'
+import { hp } from '../../../../common/data/responsiveness/responsive'
 
 export default function EnterPasscodeScreen( props ) {
   const common  = translations[ 'common' ]
   const strings  = translations[ 'login' ]
+  const stackTitleStrings  = translations[ 'stackTitle' ]
   const [ pin, setPin ] = useState( '' )
   const [ pinFlag ] = useState( true )
   function onPressNumber( text ) {
@@ -72,9 +75,19 @@ export default function EnterPasscodeScreen( props ) {
   const [] = useState( false )
 
   return (
-    <SafeAreaView style={{
+    <View style={{
       flex: 1
     }}>
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }}/>
+      <CustomToolbar
+        onBackPressed={() => props.navigation.goBack()}
+        toolbarTitle={stackTitleStrings[ 'ShowAllAccounts' ]}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 100 )
+        }} />
       <View style={{
         alignSelf: 'baseline'
       }}>
@@ -386,7 +399,7 @@ export default function EnterPasscodeScreen( props ) {
           </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 

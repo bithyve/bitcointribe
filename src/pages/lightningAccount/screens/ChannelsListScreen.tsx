@@ -185,7 +185,7 @@ export default class ChannelScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <StatusBar barStyle="dark-content"/>
+        <StatusBar barStyle="light-content"/>
 
         <HeaderTitle
           firstLineTitle={'Channels'}
@@ -501,7 +501,7 @@ const styles = StyleSheet.create( {
     color: Colors.backgroundColor1,
     fontSize: RFValue( 12 ),
     marginLeft: 7,
-    minWidth: wp('5%')
+    minWidth: wp( '5%' )
   },
   channelSats: {
     color: Colors.backgroundColor1,

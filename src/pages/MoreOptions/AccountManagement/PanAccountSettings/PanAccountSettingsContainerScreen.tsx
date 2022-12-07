@@ -1,9 +1,12 @@
 import React from 'react'
-import { StyleSheet, Image, FlatList, ImageSourcePropType } from 'react-native'
+import { StyleSheet, Image, FlatList, ImageSourcePropType, View, SafeAreaView, StatusBar } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import ListStyles from '../../../../common/Styles/ListStyles'
 import ImageStyles from '../../../../common/Styles/ImageStyles'
 import { translations } from '../../../../common/content/LocContext'
+import CustomToolbar from '../../../../components/home/CustomToolbar'
+import { hp } from '../../../../common/data/responsiveness/responsive'
+import Colors from '../../../../common/Colors'
 
 export type Props = {
   navigation: any;
@@ -65,12 +68,26 @@ const PanAccountSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
   }
 
   return (
-    <FlatList
-      style={styles.rootContainer}
-      data={menuOptions}
-      keyExtractor={listItemKeyExtractor}
-      renderItem={renderItem}
-    />
+    <View>
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }}/>
+      <StatusBar backgroundColor={Colors.appPrimary} barStyle="dark-content" />
+
+      <CustomToolbar
+        onBackPressed={() => navigation.pop()}
+        toolbarTitle={strings[ 'AccountSettings' ]}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 100 )
+        }} />
+      <FlatList
+        style={styles.rootContainer}
+        data={menuOptions}
+        keyExtractor={listItemKeyExtractor}
+        renderItem={renderItem}
+      />
+    </View>
   )
 }
 

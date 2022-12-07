@@ -110,6 +110,7 @@ const HomeHeader = ( {
   isTestAccount = false,
   bitcoinUnit = BitcoinUnit.SATS,
   textColor = Colors.white,
+  CurrencyCode
 } ) => {
   const { translations, } = useContext( LocalizationContext )
   const strings = translations[ 'header' ]
@@ -547,7 +548,7 @@ const HomeHeader = ( {
             item?.displayedName == 'Notifications' ?
               <TouchableOpacity style={{
                 alignItems:'center'
-              }} activeOpacity={1} 
+              }} activeOpacity={1}
               // onPress={()=> {console.log('onclick'); onPressNotifications}}
               onPress={onPressNotifications}>
                 <Image source={require( '../../assets/images/HomePageIcons/more.png' )} style={{
@@ -792,9 +793,18 @@ const HomeHeader = ( {
           <BalanceCurrencyIcon />
         </View>
         <Text style={styles.amountText}>
-          {exchangeRates ?
+          {!prefersBitcoin
+            ? UsNumberFormat( netBalance )
+            : exchangeRates && exchangeRates[ CurrencyCode ]
+              ? (
+                ( netBalance / SATOSHIS_IN_BTC ) *
+                      exchangeRates[ CurrencyCode ].last
+              ).toFixed( 2 )
+              : 0}
+          {/* {exchangeRates ?
             numberWithCommas( exchangeRates[ fiatCurrencyCode ]?.last.toFixed( 2 ) )
-            : ''}</Text>
+            : ''} */}
+        </Text>
       </TouchableOpacity>
       {/* {keepers.length > 0 &&
                   <>

@@ -580,6 +580,10 @@ export default function MyWalletsContainer( props ) {
         </TouchableOpacity>
         <TouchableOpacity style={{
           alignItems: 'center'
+        }} onPress={()=>{
+          props.navigation.navigate( 'SubAccountSettings', {
+            accountShellID,
+          } )
         }}>
           <Image source={require( '../../assets/images/accIcons/settings.png' )} style={{
             width: wp( 38 ), height: wp( 38 )

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
 import QRCode from '../../../components/QRCode'
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import BottomInfoBox from '../../../components/BottomInfoBox'
@@ -17,6 +17,8 @@ import AccountOperations from '../../../bitcoin/utilities/accounts/AccountOperat
 import _ from 'lodash'
 import { RootStateOrAny, useSelector } from 'react-redux'
 import { ActivityIndicator } from 'react-native-paper'
+import CustomToolbar from '../../../components/home/CustomToolbar'
+import { translations } from '../../../common/content/LocContext'
 
 enum XpubTypes {
   PRIMARY = 'PRIMARY',
@@ -32,6 +34,7 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const accountShell = useAccountShellFromNavigation( navigation )
   const account: Account | MultiSigAccount = useAccountByAccountShell( accountShell )
   const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
+  const strings  = translations[ 'accounts' ]
   const [ xpubs, setXpubs ] = useState( [] )
   const [ debugAccount, setDebugAccount ] = useState( null )
   const [ debugAccountBalance, setDebugAccountBalance ] = useState( 0 )
@@ -184,6 +187,16 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
 
   return (
     <>
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }} />
+      <CustomToolbar
+        onBackPressed={() => navigation.pop()}
+        toolbarTitle={strings[ 'ShowxPub' ]}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 12 )
+        }} />
       <View style={styles.rootContainer} >
         <View style={styles.headerSectionContainer}>
           <Text style={HeadingStyles.sectionSubHeadingText}>

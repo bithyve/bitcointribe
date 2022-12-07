@@ -40,6 +40,7 @@ import { NavigationActions, StackActions } from 'react-navigation'
 // import { goHomeAction } from '../../../navigation/actions/NavigationActions'
 import { translations } from '../../../common/content/LocContext'
 import Options from '../../../assets/images/svgs/options.svg'
+import CustomToolbar from '../../../components/home/CustomToolbar'
 
 interface MenuOption {
     title: string;
@@ -165,10 +166,13 @@ const AppInfo = ( props ) => {
   }
 
   return (
-    <SafeAreaView style={{
+    <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
-      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }}/>
+      <StatusBar backgroundColor={Colors.appPrimary} barStyle="dark-content" />
       <ModalContainer onBackground={()=>showSecurityQuestion( false )} visible={securityQue} closeBottomSheet={() => {}}>
         {requestSecurityQuestionModal()}
       </ModalContainer>
@@ -215,7 +219,14 @@ const AppInfo = ( props ) => {
         />
       </ModalContainer>
 
-      <View style={[ CommonStyles.headerContainer, {
+      <CustomToolbar
+        onBackPressed={() => props.navigation.goBack()}
+        toolbarTitle={strings.AppInfo}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 12 )
+        }} />
+      {/* <View style={[ CommonStyles.headerContainer, {
         backgroundColor: Colors.backgroundColor
       } ]}>
         <TouchableOpacity
@@ -232,14 +243,14 @@ const AppInfo = ( props ) => {
             />
           </View>
         </TouchableOpacity>
-      </View>
+      </View> */}
       <HeaderTitle
-        firstLineTitle={strings.AppInfo}
+        // firstLineTitle={strings.AppInfo}
         secondLineTitle={strings.AppInfoSub}
-        infoTextNormal={''}
-        infoTextBold={''}
-        infoTextNormal1={''}
-        step={''}
+        // infoTextNormal={''}
+        // infoTextBold={''}
+        // infoTextNormal1={''}
+        // step={''}
       />
       <FlatList
         data={menuOptions}
@@ -289,7 +300,7 @@ const AppInfo = ( props ) => {
           </AppBottomSheetTouchableWrapper>
         }}
       />
-    </SafeAreaView>
+    </View>
   )
 }
 

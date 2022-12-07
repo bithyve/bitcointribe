@@ -350,7 +350,7 @@ const SecurityQuestionHistory = ( props ) => {
               alignSelf: 'flex-end'
             }}
             activeOpacity={10}
-            onPress={() => showEncryptionPswd(false)}
+            onPress={() => showEncryptionPswd( false )}
           >
             <FontAwesome name="close" color={Colors.white} size={19} />
           </TouchableOpacity>
@@ -846,7 +846,7 @@ const SecurityQuestionHistory = ( props ) => {
           flex: 0, backgroundColor: Colors.backgroundColor
         }}
       />
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.white} barStyle="light-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={strings.EncryptionPassword}

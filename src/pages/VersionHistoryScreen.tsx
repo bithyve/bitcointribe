@@ -52,17 +52,14 @@ export default function VersionHistoryScreen( props ) {
       flex:1,
       backgroundColor: Colors.appPrimary
     }}>
-      <CustomToolbar
-        onBackPressed={() => props.navigation.goBack()}
-        toolbarTitle={'Version History'}
-        showSwitch={false}
-        containerStyle={{
-          flex:0.1,
-          // borderBottomStartRadius: 0,
-          // marginTop: hp( 40 )
-          height: hp( 100 )
-        }} />
       <View style={styles.rootContainer}>
+        <CustomToolbar
+          onBackPressed={() => props.navigation.goBack()}
+          toolbarTitle={'Version History'}
+          showSwitch={false}
+          containerStyle={{
+            height: hp( 12 )
+          }} />
         {data && data.length ? (
           <View style={{
             flex: 1

@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native'
 import { Input } from 'react-native-elements'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -12,6 +12,8 @@ import { useDispatch } from 'react-redux'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import ButtonBlue from '../../../components/ButtonBlue'
 import { translations } from '../../../common/content/LocContext'
+import CustomToolbar from '../../../components/home/CustomToolbar'
+import { hp } from '../../../common/data/responsiveness/responsive'
 
 export type Props = {
   navigation: any;
@@ -24,6 +26,7 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
   const nameInputRef = useRef<Input>( null )
   const strings  = translations[ 'accounts' ]
   const common  = translations[ 'common' ]
+  const stackTitleStrings  = translations[ 'stackTitle' ]
 
   const [ accountName, setAccountName ] = useState(
     primarySubAccount?.customDisplayName ||
@@ -66,52 +69,64 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
   }
 
   return (
-    <View style={styles.rootContainer}>
-      <View style={styles.headerSection}>
-        <View style={{
-          flexDirection: 'row'
-        }}>
-          <Text style={styles.headerText}>{strings.Youcanset}</Text>
-          {/* <Text style={{
+    <View>
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }} />
+      <CustomToolbar
+        onBackPressed={() => navigation.goBack()}
+        toolbarTitle={stackTitleStrings[ 'NameDescription' ]}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 100 )
+        }} />
+      <View style={styles.rootContainer}>
+        <View style={styles.headerSection}>
+          <View style={{
+            flexDirection: 'row'
+          }}>
+            <Text style={styles.headerText}>{strings.Youcanset}</Text>
+            {/* <Text style={{
             ...styles.headerText, fontStyle: 'italic'
           }}>Name and Description</Text> */}
+          </View>
         </View>
-      </View>
 
-      <View style={styles.formContainer}>
-        <Input
-          inputContainerStyle={[ FormStyles.textInputContainer, styles.textInputContainer ]}
-          inputStyle={FormStyles.inputText}
-          placeholder={strings.Enteraccountname}
-          placeholderTextColor={FormStyles.placeholderText.color}
-          // underlineColorAndroid={FormStyles.placeholderText.color}
-          value={accountName}
-          maxLength={24}
-          numberOfLines={1}
-          textContentType="name"
-          onChangeText={setAccountName}
-          ref={nameInputRef}
-        />
+        <View style={styles.formContainer}>
+          <Input
+            inputContainerStyle={[ FormStyles.textInputContainer, styles.textInputContainer ]}
+            inputStyle={FormStyles.inputText}
+            placeholder={strings.Enteraccountname}
+            placeholderTextColor={FormStyles.placeholderText.color}
+            // underlineColorAndroid={FormStyles.placeholderText.color}
+            value={accountName}
+            maxLength={24}
+            numberOfLines={1}
+            textContentType="name"
+            onChangeText={setAccountName}
+            ref={nameInputRef}
+          />
 
-        <Input
-          inputContainerStyle={[ FormStyles.textInputContainer, styles.textInputContainer ]}
-          inputStyle={FormStyles.inputText}
-          placeholder={strings.Enterdescription}
-          placeholderTextColor={FormStyles.placeholderText.color}
-          // underlineColorAndroid={FormStyles.placeholderText.color}
-          value={accountDescription}
-          numberOfLines={2}
-          onChangeText={setAccountDescription}
-          maxLength={40}
-        />
-      </View>
+          <Input
+            inputContainerStyle={[ FormStyles.textInputContainer, styles.textInputContainer ]}
+            inputStyle={FormStyles.inputText}
+            placeholder={strings.Enterdescription}
+            placeholderTextColor={FormStyles.placeholderText.color}
+            // underlineColorAndroid={FormStyles.placeholderText.color}
+            value={accountDescription}
+            numberOfLines={2}
+            onChangeText={setAccountDescription}
+            maxLength={40}
+          />
+        </View>
 
-      <View style={styles.listFooterSection}>
-        <ButtonBlue
-          buttonText={common.confirmProceed}
-          handleButtonPress={handleSaveButtonPress}
-          buttonDisable={canSaveChanges === false}
-        />
+        <View style={styles.listFooterSection}>
+          <ButtonBlue
+            buttonText={common.confirmProceed}
+            handleButtonPress={handleSaveButtonPress}
+            buttonDisable={canSaveChanges === false}
+          />
+        </View>
       </View>
     </View>
   )

@@ -16,36 +16,45 @@ const PanAccountSettingsStack = createStackNavigator(
   {
     PanAccountSettingsRoot: {
       screen: PanAccountSettingsContainerScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          title: strings[ 'AccountSettings' ],
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-          },
-        }
+      navigationOptions: {
+        header: null,
       },
+      // navigationOptions: ( { navigation } ) => {
+      //   return {
+      //     title: '123',
+      //     headerLeft: () => {
+      //       return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+      //     },
+      //   }
+      // },
     },
     EnterPasscode: {
       screen: EnterPasscodeScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          title: strings[ 'ShowAllAccounts' ],
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-          },
-        }
+      navigationOptions: {
+        header: null,
       },
+      // navigationOptions: ( { navigation } ) => {
+      //   return {
+      //     title: strings[ 'ShowAllAccounts' ],
+      //     headerLeft: () => {
+      //       return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+      //     },
+      //   }
+      // },
     },
     SecurityQuestion: {
       screen: SecurityQuestionScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          title: strings[ 'ShowAllAccounts' ],
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-          },
-        }
+      navigationOptions: {
+        header: null,
       },
+      // navigationOptions: ( { navigation } ) => {
+      //   return {
+      //     title: strings[ 'ShowAllAccounts' ],
+      //     headerLeft: () => {
+      //       return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+      //     },
+      //   }
+      // },
     },
   },
   {

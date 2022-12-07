@@ -92,6 +92,7 @@ import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsL
 import VoucherScanner from '../pages/FastBitcoin/VoucherScanner'
 import VersionHistoryScreen from '../pages/VersionHistoryScreen'
 import NotificationListContent from '../components/NotificationListContent'
+import SetUpSatNextCardScreen from '../pages/Gift/SetUpSatNextCardScreen'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -597,6 +598,18 @@ const NewHomeNavigator = createStackNavigator( {
       header: null,
     },
   },
+  SetUpSatNextCard:{
+    screen:SetUpSatNextCardScreen,
+    navigationOptions: {
+      header:null
+    }
+  },
+  ClaimSats :{
+    screen: ClaimSatsScreen,
+    navigationOptions: {
+      header:null
+    }
+  }
 } )
 
 const Navigator = createSwitchNavigator( {

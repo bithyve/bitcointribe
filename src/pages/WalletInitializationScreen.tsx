@@ -34,44 +34,48 @@ const WalletInitializationScreen = props => {
         backgroundColor: Colors.backgroundColor,
       }}
     >
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.white} barStyle="light-content" />
       <View
         style={{
-          marginBottom: wp("5%"),
+          marginBottom: wp( '5%' ),
         }}
       >
         <View style={styles.titleView}>
           <Text
             style={[
               styles.headerTitleText,
-              { fontFamily: Fonts.RobotoSlabRegular, color: Colors.blue },
+              {
+                fontFamily: Fonts.RobotoSlabRegular, color: Colors.blue
+              },
             ]}
           >{`${strings.new} Wallet`}</Text>
           <Text
             style={[
               styles.headerInfoText,
-              { fontFamily: Fonts.RobotoSlabRegular, color: "#6C6C6C" },
+              {
+                fontFamily: Fonts.RobotoSlabRegular, color: '#6C6C6C'
+              },
             ]}
           >
             {strings.appcreates}
           </Text>
         </View>
         <TouchableOpacity
-          onPress={() => props.navigation.navigate("NewWalletName")}
+          onPress={() => props.navigation.navigate( 'NewWalletName' )}
           style={styles.NewWalletTouchableView}
         >
           <Image
             style={{
               ...styles.iconImage,
-              width: wp(7),
-              height: wp(7),
-              marginBottom: wp(2),
+              width: wp( 7 ),
+              height: wp( 7 ),
+              marginBottom: wp( 2 ),
             }}
-            source={require("../assets/images/icons/icon_newwallet.png")}
+            source={require( '../assets/images/icons/icon_newwallet.png' )}
           />
           <View style={styles.textView}>
             <Text style={styles.touchableText}>
-              {`Start with a new Hexa Wallet`}
+              {'Start with a new Hexa Wallet'}
             </Text>
           </View>
           <View style={styles.arrowIconView}>
@@ -80,7 +84,7 @@ const WalletInitializationScreen = props => {
               color={Colors.borderColor}
               size={15}
               style={{
-                alignSelf: "center",
+                alignSelf: 'center',
               }}
             />
           </View>
@@ -94,34 +98,38 @@ const WalletInitializationScreen = props => {
         <View
           style={{
             ...styles.titleView,
-            marginTop: wp("2%"),
+            marginTop: wp( '2%' ),
           }}
         >
           <Text
-            style={[styles.headerTitleText, {fontFamily: Fonts.RobotoSlabRegular, color: Colors.blue}]}
+            style={[ styles.headerTitleText, {
+              fontFamily: Fonts.RobotoSlabRegular, color: Colors.blue
+            } ]}
           >{`${strings.Existing} Wallet`}</Text>
-          <Text style={[styles.headerInfoText, {fontFamily: Fonts.RobotoSlabRegular,}]}>
+          <Text style={[ styles.headerInfoText, {
+            fontFamily: Fonts.RobotoSlabRegular,
+          } ]}>
             {/* {strings.previously} */}
             {
-              "If you previously had a Hexa wallet you can recover it using the Recovery Keys with these options"
+              'If you previously had a Hexa wallet you can recover it using the Recovery Keys with these options'
             }
           </Text>
         </View>
         <TouchableOpacity
           onPress={async () => {
-            dispatch(setDownloadedBackupData([]));
-            dispatch(setCloudDataRecovery(null));
-            dispatch(setIsFileReading(false));
-            props.navigation.navigate("RestoreWithICloud");
+            dispatch( setDownloadedBackupData( [] ) )
+            dispatch( setCloudDataRecovery( null ) )
+            dispatch( setIsFileReading( false ) )
+            props.navigation.navigate( 'RestoreWithICloud' )
           }}
           style={{
             ...styles.NewWalletTouchableView,
-            marginBottom: wp("7%"),
+            marginBottom: wp( '7%' ),
           }}
         >
           <Image
             style={styles.iconImage}
-            source={require("../assets/images/icons/icon_secrets.png")}
+            source={require( '../assets/images/icons/icon_secrets.png' )}
           />
           <View style={styles.textView}>
             <Text style={styles.touchableText}>Using Recovery Keys</Text>
@@ -132,23 +140,23 @@ const WalletInitializationScreen = props => {
               color={Colors.borderColor}
               size={15}
               style={{
-                alignSelf: "center",
+                alignSelf: 'center',
               }}
             />
           </View>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={async () => {
-            props.navigation.navigate("RestoreSeedWordsContent");
+            props.navigation.navigate( 'RestoreSeedWordsContent' )
           }}
           style={{
             ...styles.NewWalletTouchableView,
-            marginBottom: wp("7%"),
+            marginBottom: wp( '7%' ),
           }}
         >
           <Image
             style={styles.iconImage}
-            source={require("../assets/images/icons/seedwords.png")}
+            source={require( '../assets/images/icons/seedwords.png' )}
           />
           <View style={styles.textView}>
             <Text style={styles.touchableText}>Using Backup phrase</Text>
@@ -159,7 +167,7 @@ const WalletInitializationScreen = props => {
               color={Colors.borderColor}
               size={15}
               style={{
-                alignSelf: "center",
+                alignSelf: 'center',
               }}
             />
           </View>
@@ -215,7 +223,7 @@ const WalletInitializationScreen = props => {
         >
           <View
             style={{
-              marginTop: "auto",
+              marginTop: 'auto',
             }}
           >
             <BottomInfoBox
@@ -225,14 +233,14 @@ const WalletInitializationScreen = props => {
               linkText={strings.TermsService}
               titleColor={Colors.blue}
               onPress={() =>
-                openLink("https://hexawallet.io/terms-of-service/")
+                openLink( 'https://hexawallet.io/terms-of-service/' )
               }
             />
           </View>
         </View>
       </View>
     </SafeAreaView>
-  );
+  )
 }
 
 export default WalletInitializationScreen

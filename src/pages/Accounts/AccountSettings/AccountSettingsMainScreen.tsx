@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { StyleSheet, FlatList, ImageSourcePropType, Image, Alert, View } from 'react-native'
+import { StyleSheet, FlatList, ImageSourcePropType, Image, Alert, View, SafeAreaView } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import ListStyles from '../../../common/Styles/ListStyles'
 import AccountShellRescanningBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningBottomSheet'
@@ -18,6 +18,9 @@ import NameNDesc from '../../../assets/images/svgs/name_desc.svg'
 import Archive from '../../../assets/images/svgs/icon_archive.svg'
 import Xpub from '../../../assets/images/svgs/xpub.svg'
 import Visibilty from '../../../assets/images/svgs/icon_visibility.svg'
+import CustomToolbar from '../../../components/home/CustomToolbar'
+import Colors from '../../../common/Colors'
+import { hp } from '../../../common/data/responsiveness/responsive'
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.ARCHIVED,
@@ -46,6 +49,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }, [ navigation ] )
   const dispatch = useDispatch()
   const strings  = translations[ 'accounts' ]
+  const stackTitleStrings  = translations[ 'stackTitle' ]
   const [ showRescanning, setShowRescanning ] = useState( false )
   const [ showRescanningPrompt, setShowRescanningPrompt ] = useState( false )
   const [ showAccountArchiveModal, setShowAccountArchiveModal ] = useState( false )
@@ -271,7 +275,17 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
 
 
   return (
-    <>
+    <View>
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }} />
+      <CustomToolbar
+        onBackPressed={() => navigation.pop()}
+        toolbarTitle={stackTitleStrings[ 'AccountSettings' ]}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 100 )
+        }} />
       <FlatList
         style={styles.rootContainer}
         contentContainerStyle={{
@@ -297,7 +311,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       <ModalContainer onBackground={()=>setShowRescanning( false )} visible={showRescanning} closeBottomSheet={() => {}}>
         {showRescanningBottomSheet()}
       </ModalContainer> */}
-    </>
+    </View>
   )
 }
 
