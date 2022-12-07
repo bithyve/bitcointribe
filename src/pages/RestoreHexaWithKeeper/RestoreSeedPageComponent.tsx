@@ -448,7 +448,7 @@ const RestoreSeedPageComponent = ( props ) => {
               <Text
                 style={{
                   ...styles.proceedButtonText,
-                  color: props.disableChange ? Colors.lightBlue : Colors.blue,
+                  color: props.disableChange ? Colors.goldenYellow : Colors.goldenYellow,
                 }}
               >
                 {(  currentPosition  * 6 )!=0 ? props.previousButtonText : props.changeButtonText}

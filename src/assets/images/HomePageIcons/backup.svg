@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="31" height="31" viewBox="0 0 31 31">
+  <g id="backup" transform="translate(-30 -168)">
+    <circle id="Ellipse_1952" data-name="Ellipse 1952" cx="15.5" cy="15.5" r="15.5" transform="translate(30 168)" fill="#fafafa"/>
+    <g id="shield" transform="translate(37.745 174.967)">
+      <path id="Path" d="M13.933,2.342,7.793.076a1.227,1.227,0,0,0-.851,0L.8,2.342A1.23,1.23,0,0,0,0,3.495v3.4a8.991,8.991,0,0,0,7.175,9.054,1.184,1.184,0,0,0,.388,0A8.991,8.991,0,0,0,14.74,6.895v-3.4a1.23,1.23,0,0,0-.807-1.153Z" transform="translate(0.383 0.55)" fill="#5384ed"/>
+    </g>
+  </g>
+</svg>

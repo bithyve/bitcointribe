@@ -237,7 +237,7 @@ const SeedPageComponent = ( props ) => {
           >
             {partialSeedData.map( ( seedItem, seedIndex ) => (
               <View key={seedIndex} style={{
-                marginTop: 10
+                marginTop: 0
               }} >
                 <FlatList
                   keyExtractor={( item, index ) => index.toString()}
@@ -510,7 +510,7 @@ const styles = StyleSheet.create( {
   numberText: {
     color: Colors.skyBlue,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.RobotoSlabBold,
+    fontFamily: Fonts.FiraSansSemiBold,
     width: wp( 10 ),
     // marginStart:  ( 10 )
     // marginEnd: 10
@@ -518,7 +518,7 @@ const styles = StyleSheet.create( {
   nameText: {
     color: Colors.greyTextColor,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.RobotoSlabRegular,
+    fontFamily: Fonts.FiraSansRegular,
     marginStart: 14
   },
   modalInputContainer:{

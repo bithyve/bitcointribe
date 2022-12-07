@@ -29,6 +29,7 @@ import { translations } from '../../common/content/LocContext'
 import AlertModalContents from '../../components/AlertModalContents'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { NavigationContext } from 'react-navigation'
+import CustomToolbar from '../../components/home/CustomToolbar'
 
 const RestoreSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
@@ -139,17 +140,25 @@ const RestoreSeedWordsContent = ( props ) => {
       }
       <SafeAreaView
         style={{
-          flex: 0, backgroundColor: Colors.backgroundColor
+          flex: 0, backgroundColor: Colors.appPrimary
         }}
       />
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      <RestoreSeedHeaderComponent
+      {/* <RestoreSeedHeaderComponent
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={'Enter backup phrase'}
         moreInfo={''}
-      />
+      /> */}
+      <CustomToolbar
+        onBackPressed={() => props.navigation.goBack()}
+        toolbarTitle={'Enter backup phrase'}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 12 )
+        }} />
       <View style={{
         flex: 1,
+        marginTop: hp( 2 )
       }}>
         <RestoreSeedPageComponent
           // infoBoxTitle={'Note'}

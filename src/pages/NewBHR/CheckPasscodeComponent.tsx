@@ -32,6 +32,7 @@ import AlertModalContents from '../../components/AlertModalContents'
 import { setCloudBackupStatus } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { setOpenToApproval } from '../../store/actions/BHR'
+import CustomToolbar from '../../components/home/CustomToolbar'
 
 export default function CheckPasscodeComponent( props ) {
   const dispatch = useDispatch()
@@ -153,7 +154,7 @@ export default function CheckPasscodeComponent( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1
+      flex: 1, backgroundColor: Colors.appPrimary
     }}>
       <StatusBar />
       <View style={{
@@ -161,7 +162,7 @@ export default function CheckPasscodeComponent( props ) {
       }}>
         <View style={{
         }}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => props.navigation.goBack()}
             style={{
               height: wp( '10%' ), width: wp( '10%' ), alignItems: 'center',
@@ -174,8 +175,15 @@ export default function CheckPasscodeComponent( props ) {
                 width: wp( '5%' ), height: wp( '2%' )
               }}
             />
-          </TouchableOpacity>
-          <Text style={styles.headerTitleText}>{'Confirm Passcode'}</Text>
+          </TouchableOpacity> */}
+          {/* <Text style={styles.headerTitleText}>{'Confirm Passcode'}</Text> */}
+          <CustomToolbar
+            onBackPressed={() => props.navigation.pop()}
+            toolbarTitle={'Confirm Passcode'}
+            showSwitch={false}
+            containerStyle={{
+              height: hp( 12 )
+            }} />
           <View>
             <Text style={styles.headerInfoText}>
               {'Please enter your passcode to view your backup'}
@@ -341,8 +349,8 @@ export default function CheckPasscodeComponent( props ) {
                 ...styles.proceedButtonView,
                 elevation: Elevation,
                 backgroundColor: isDisabledProceed
-                  ? Colors.lightBlue
-                  : Colors.blue,
+                  ? Colors.white
+                  : Colors.white,
               }}
             >
               <Text style={styles.proceedButtonText}>{common.proceed}</Text>
@@ -502,7 +510,7 @@ export default function CheckPasscodeComponent( props ) {
                 style={styles.keyPadElementText}
                 onPress={() => onPressNumber( 'x' )}
               >
-                <Ionicons name="ios-backspace" size={30} color={Colors.blue} />
+                <Ionicons name="ios-backspace" size={30} color={Colors.white} />
               </Text>
             </TouchableOpacity>
           </View>
@@ -530,11 +538,11 @@ const styles = StyleSheet.create( {
     borderRadius: 7,
     marginLeft: 20,
     elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 0, height: 3
-    },
+    // shadowColor: Colors.borderColor,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 0, height: 3
+    // },
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.white,
@@ -563,7 +571,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
   },
   keyPadElementText: {
-    color: Colors.blue,
+    color: Colors.white,
     fontSize: RFValue( 25 ),
     fontFamily: Fonts.FiraSansRegular,
     fontStyle: 'normal',
@@ -576,14 +584,14 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
+    // shadowColor: Colors.white,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 15, height: 15
+    // },
   },
   proceedButtonText: {
-    color: Colors.white,
+    color: Colors.appPrimary,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
@@ -594,26 +602,26 @@ const styles = StyleSheet.create( {
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
-    color: Colors.tomatoRed,
+    color: Colors.errorPink,
     fontSize: RFValue( 10 ),
     fontStyle: 'italic',
     letterSpacing: 0.5
   },
   headerTitleText: {
-    color: Colors.blue,
+    color: Colors.white,
     fontSize: RFValue( 25 ),
     marginLeft: 20,
     // marginTop: hp( '10%' ),
     fontFamily: Fonts.FiraSansRegular,
   },
   headerInfoText: {
-    color: Colors.textColorGrey,
+    color: Colors.white,
     fontSize: RFValue( 12 ),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular,
   },
   passcodeTextInputText: {
-    color: Colors.blue,
+    color: Colors.white,
     fontWeight: 'bold',
     fontSize: RFValue( 13 ),
   },
