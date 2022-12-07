@@ -14,7 +14,7 @@ const RestoreSeedHeaderComponent = ( props ) => {
 
   return (
     <View style={styles.modalHeaderTitleView}>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => props.onPressBack()}
         style={{
           height: wp( '10%' ), width: wp( '10%' ), alignItems: 'center'
@@ -27,7 +27,7 @@ const RestoreSeedHeaderComponent = ( props ) => {
           }}
         />
       </TouchableOpacity>
-      <Text style={styles.titleText}>{props.selectedTitle}</Text>
+      <Text style={styles.titleText}>{props.selectedTitle}</Text> */}
       <Text style={styles.infoText}>{props.info}</Text>
     </View>
   )
@@ -48,11 +48,11 @@ const styles = StyleSheet.create( {
     marginRight: wp( '4%' ),
   },
   infoText: {
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.lightTextColor,
-    fontSize: RFValue( 11 ),
+    color: Colors.greyText,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 14 ),
     marginLeft: wp( '4%' ),
-    marginTop: wp( '1.5%' ),
+    marginTop: wp( '1%' ),
   },
   titleText: {
     marginLeft: wp( '4%' ),

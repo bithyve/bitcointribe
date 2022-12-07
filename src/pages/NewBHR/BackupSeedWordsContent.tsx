@@ -27,6 +27,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import CustomToolbar from '../../components/home/CustomToolbar'
 
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
@@ -70,17 +71,25 @@ const BackupSeedWordsContent = ( props ) => {
     }}>
       <SafeAreaView
         style={{
-          flex: 0, backgroundColor: Colors.backgroundColor
+          flex: 0, backgroundColor: Colors.appPrimary
         }}
       />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <CustomToolbar
+        onBackPressed={() => props.navigation.pop()}
+        toolbarTitle={'Seed words'}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 12 )
+        }} />
+
       <SeedHeaderComponent
         onPressBack={() => {
           // RNPreventScreenshot.enabled( false )
           props.navigation.goBack()
           // props.navigation.navigate( 'Home' )
         }}
-        info={'Make sure you keep them safe'}
+        info={'Make sure you write them down in order for safe-keeping'}
         selectedTitle={headerTitle}
       />
       <KeyboardAwareScrollView

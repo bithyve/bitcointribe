@@ -551,7 +551,7 @@ const HomeHeader = ( {
               }} activeOpacity={1}
               // onPress={()=> {console.log('onclick'); onPressNotifications}}
               onPress={onPressNotifications}>
-                <Image source={require( '../../assets/images/HomePageIcons/more.png' )} style={{
+                <Image source={require( '../../assets/images/HomePageIcons/notification.png' )} style={{
                   width: wp( 40 ), height: wp( 40 ), borderRadius: wp( 20 ),
                 }} />
                 <Text numberOfLines={3} style={styles.familyText}>{item.displayedName}</Text>
