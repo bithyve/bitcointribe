@@ -20,12 +20,23 @@ const name = {
 
 const SendStack = createStackNavigator(
   {
-    SendRoot: AccountSendContainerScreen,
+    SendRoot:{
+      screen: AccountSendContainerScreen,
+      navigationOptions: {
+        header: null,
+      },
+    },
     SentAmountForContactForm: {
       screen: SentAmountForContactFormScreen,
+      navigationOptions: {
+        header: null,
+      },
     },
     SendConfirmation: {
       screen: AccountSendConfirmationContainerScreen,
+      navigationOptions: {
+        header: null,
+      },
     },
     OTPAuthentication: {
       screen: OTPAuthenticationScreen,

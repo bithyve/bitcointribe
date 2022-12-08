@@ -58,7 +58,7 @@ import { NavigationActions, StackActions } from 'react-navigation'
 import CustomToolbar from '../../components/home/CustomToolbar'
 
 
-const WalletBackup = ( props, navigation ) => {
+const WalletBackup = ( props ) => {
   const dispatch = useDispatch()
   const strings = translations[ 'bhr' ]
   const headerStrings = translations[ 'header' ]
@@ -808,7 +808,7 @@ const WalletBackup = ( props, navigation ) => {
         backgroundColor: Colors.appPrimary
       }}/>
       <CustomToolbar
-        onBackPressed={() => navigation.goBack()}
+        onBackPressed={() => props.navigation.goBack()}
         toolbarTitle={strings[ 'WalletBackup' ]}
         showSwitch={false}
         containerStyle={{

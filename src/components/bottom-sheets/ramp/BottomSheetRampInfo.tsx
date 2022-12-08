@@ -205,22 +205,29 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
 
       <View style={styles.containerStyle}>
         <View style={styles.headerImageView}>
-          <View style={styles.headerImageInitials}>
+          <View style={[ styles.headerImageInitials, {
+            height: wp( 42 ),
+            width: wp( 42 ),
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: wp( 21 ),
+            backgroundColor: '#59A65C'
+          } ]}>
             {/* <Image
-              source={require( '../../../assets/images/icons/icon_address_type.png' )}
-              style={styles.headerImage}
-              resizeMode="contain"
-            /> */}
+                source={require( '../../../assets/images/icons/icon_address_type.png' )}
+                style={styles.headerImage}
+                resizeMode="contain"
+              /> */}
             <Text style={{
               color: Colors.backgroundColor,
-              fontSize: RFValue( 27 ),
+              fontSize: RFValue( 22 ),
               textAlign: 'center',
               fontFamily: Fonts.RobotoSlabMedium,
-              lineHeight: RFValue( 27 ),
-              backgroundColor: '#59A65C',
-              height: wp( 42 ),
-              width: wp( 42 ),
-              borderRadius: wp( 21 ),
+              lineHeight: RFValue( 22 ),
+              // backgroundColor: '#59A65C',
+              // height: wp( 42 ),
+              // width: wp( 42 ),
+              // borderRadius: wp( 21 ),
               textAlignVertical: 'center'
             }}>
                 @
