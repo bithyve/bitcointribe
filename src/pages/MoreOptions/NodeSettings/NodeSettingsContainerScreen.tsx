@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
+import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, StatusBar, SafeAreaView } from 'react-native'
 import { useDispatch } from 'react-redux'
 import PersonalNodeConnectionForm, { PersonalNodeFormData } from './PersonalNodeConnectionForm'
 import PersonalNodeDetailsSection from './PersonalNodeDetailsSection'
@@ -16,6 +16,9 @@ import {  bitHyveNodeConnectionCompleted, connectToBitHyveNode, personalNodeConn
 import { Keyboard } from 'react-native'
 import BitHyveNodeConnectionSuccessBottomSheet from '../../../components/bottom-sheets/settings/BitHyveNodeConnectionSuccessBottomSheet'
 import { translations } from '../../../common/content/LocContext'
+import CustomToolbar from '../../../components/home/CustomToolbar'
+import { hp } from '../../../common/data/responsiveness/responsive'
+import Colors from '../../../common/Colors'
 
 export type Props = {
   navigation: any;
@@ -181,6 +184,17 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) 
 
   return (
     <View style={styles.rootContainer}>
+         <StatusBar backgroundColor={Colors.appPrimary} barStyle="light-content" />
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }}/>
+      <CustomToolbar
+        onBackPressed={() => navigation.goBack()}
+        toolbarTitle={'Node Settings'}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 100 )
+        }} />
       <KeyboardAvoidingView
         style={styles.rootContainer}
         behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
