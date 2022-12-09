@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { View, Text, StyleSheet, Keyboard, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, Keyboard, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native'
 import { Input } from 'react-native-elements'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -45,6 +45,7 @@ import useCurrencyKind from '../../../utils/hooks/state-selectors/UseCurrencyKin
 import useExchangeRates from '../../../utils/hooks/state-selectors/UseExchangeRates'
 import useCurrencyCode from '../../../utils/hooks/state-selectors/UseCurrencyCode'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
+import CustomToolbar from '../../../components/home/CustomToolbar'
 
 export type NavigationParams = {
 };
@@ -202,6 +203,15 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
   return (
     <View style={styles.rootContainer}>
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }} />
+      <CustomToolbar
+        onBackPressed={() => navigation.goBack()}
+        toolbarTitle={'Send'}
+        containerStyle={{
+          height: hp( 100 )
+        }} />
       <ModalContainer onBackground={()=>setFailure( false )} visible={sendFailureModal} closeBottomSheet={() => {}} >
         {showSendFailureBottomSheet()}
       </ModalContainer>

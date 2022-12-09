@@ -68,6 +68,7 @@ import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientKind from '../../common/data/enums/RecipientKind'
 import BackupShield from '../../assets/images/icons/backupShield.svg'
+import NewSwitch from '../NewSwitch'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -767,7 +768,8 @@ const HomeHeader = ( {
         marginTop: hp( 20 ), alignItems: 'center'
       }}>
         <Text style={styles.walletBalanceText}>Wallet Balance</Text>
-        <ToggleContainer />
+        {/* <ToggleContainer /> */}
+        <NewSwitch />
       </View>
 
       <TouchableOpacity style={{

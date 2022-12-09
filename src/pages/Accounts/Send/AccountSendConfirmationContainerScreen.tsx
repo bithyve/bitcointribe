@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Dimensions } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Dimensions, SafeAreaView } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -40,6 +40,7 @@ import ImageStyles from '../../../common/Styles/ImageStyles'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CheckingAcc from '../../../assets/images/svgs/note.svg'
+import CustomToolbar from '../../../components/home/CustomToolbar'
 
 export type NavigationParams = {
 };
@@ -116,11 +117,12 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
               syncDonationAccount: account.type === AccountType.DONATION_ACCOUNT
             } ) )
           } )
-          navigation.dispatch(
-            resetStackToAccountDetails( {
-              accountShellID: sourceAccountShell.id,
-            } )
-          )
+          navigation.navigate( 'MyWallets' )
+          // navigation.dispatch(
+          // resetStackToAccountDetails( {
+          //   accountShellID: sourceAccountShell.id,
+          // } )
+          // )
         }}
         onPressCancel={() => setSuccess( false )}
         isSuccess={true}
@@ -151,11 +153,12 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
           // dismissBottomSheet()
           setFailure( false )
-          navigation.dispatch(
-            resetStackToAccountDetails( {
-              accountShellID: sourceAccountShell.id,
-            } )
-          )
+          navigation.navigate( 'MyWallets' )
+          // navigation.dispatch(
+          // resetStackToAccountDetails( {
+          //   accountShellID: sourceAccountShell.id,
+          // } )
+          // )
         }}
         isUnSuccess={true}
         accountKind={sourcePrimarySubAccount.kind}
@@ -320,97 +323,109 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const [ noteModal, setnoteModal ] = useState( false )
 
   return (
-    <KeyboardAwareScrollView
-      resetScrollToCoords={{
-        x: 0, y: 0
-      }}
-      style={styles.rootContainer}
-    >
-      <ModalContainer onBackground={()=>setSuccess( false )} visible={sendSuccessModal} closeBottomSheet={() => {}} >
-        {showSendSuccessBottomSheet()}
-      </ModalContainer>
-      <ModalContainer onBackground={()=>setFailure( false )} visible={sendFailureModal} closeBottomSheet={() => {}} >
-        {showSendFailureBottomSheet()}
-      </ModalContainer>
-      <SelectAccount onSelect={( item ) => {
-        setSourceShell( item )
+    <View style={{
+      flex:1
+    }}>
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
       }} />
-      {/* <View style={styles.headerSection}>
+      <CustomToolbar
+        onBackPressed={() => navigation.goBack()}
+        toolbarTitle={'Send'}
+        containerStyle={{
+          height: hp( 100 )
+        }} />
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{
+          x: 0, y: 0
+        }}
+        style={styles.rootContainer}
+      >
+        <ModalContainer onBackground={()=>setSuccess( false )} visible={sendSuccessModal} closeBottomSheet={() => {}} >
+          {showSendSuccessBottomSheet()}
+        </ModalContainer>
+        <ModalContainer onBackground={()=>setFailure( false )} visible={sendFailureModal} closeBottomSheet={() => {}} >
+          {showSendFailureBottomSheet()}
+        </ModalContainer>
+        <SelectAccount onSelect={( item ) => {
+          setSourceShell( item )
+        }} />
+        {/* <View style={styles.headerSection}>
         <SelectedRecipientsCarousel
           recipients={selectedRecipients}
           subAccountKind={sourcePrimarySubAccount.kind}
         />
       </View> */}
 
-      <View
-        style={{
-          borderRadius: wp( 2 ),
-          width: '90%',
-          alignSelf: 'center',
-          marginTop: hp( 2 ),
-          marginBottom: hp( 2 ),
-        }}
-      >
         <View
           style={{
-            flexDirection: 'row',
-            width: '100%',
-            paddingVertical: hp( 10 ),
-            paddingHorizontal: wp( 2 ),
-            alignItems: 'center',
+            borderRadius: wp( 2 ),
+            width: '90%',
+            alignSelf: 'center',
+            marginTop: hp( 2 ),
+            marginBottom: hp( 2 ),
           }}
         >
           <View
             style={{
-              width: wp( 38 ),
-              height: '100%',
-              marginTop: hp( 10 ),
-              marginRight: wp( 11 ),
+              flexDirection: 'row',
+              width: '100%',
+              paddingVertical: hp( 10 ),
+              paddingHorizontal: wp( 2 ),
+              alignItems: 'center',
             }}
           >
-            <RecipientAvatar
-              recipient={selectedRecipients[ 0 ]}
-              contentContainerStyle={styles.avatarImage}
-            />
-          </View>
-
-          <View
-            style={{
-              marginHorizontal: wp( 3 ),
-              flex: 1,
-            }}
-          >
-            <Text
+            <View
               style={{
-                color: Colors.black,
-                fontSize: RFValue( 14 ),
-                fontFamily: Fonts.RobotoSlabRegular,
+                width: wp( 38 ),
+                height: '100%',
+                marginTop: hp( 10 ),
+                marginRight: wp( 11 ),
               }}
             >
+              <RecipientAvatar
+                recipient={selectedRecipients[ 0 ]}
+                contentContainerStyle={styles.avatarImage}
+              />
+            </View>
+
+            <View
+              style={{
+                marginHorizontal: wp( 3 ),
+                flex: 1,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.black,
+                  fontSize: RFValue( 14 ),
+                  fontFamily: Fonts.RobotoSlabRegular,
+                }}
+              >
                 To {selectedRecipients[ 0 ].displayedName}
-            </Text>
+              </Text>
+            </View>
+            <MaterialCommunityIcons
+              name="dots-horizontal"
+              size={24}
+              color="gray"
+              style={{
+                alignSelf: 'center',
+              }}
+            />
           </View>
-          <MaterialCommunityIcons
-            name="dots-horizontal"
-            size={24}
-            color="gray"
-            style={{
-              alignSelf: 'center',
-            }}
-          />
         </View>
-      </View>
 
-      <SendConfirmationCurrentTotalHeader
-        Unit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
-      />
+        <SendConfirmationCurrentTotalHeader
+          Unit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
+        />
 
-      <TransactionPriorityMenu
-        accountShell={sourceAccountShell}
-        bitcoinDisplayUnit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
-        onTransactionPriorityChanged={setTransactionPriority}
-      />
-      {selectedRecipients.length === 1 &&
+        <TransactionPriorityMenu
+          accountShell={sourceAccountShell}
+          bitcoinDisplayUnit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
+          onTransactionPriorityChanged={setTransactionPriority}
+        />
+        {selectedRecipients.length === 1 &&
       <TouchableOpacity style={{
         marginHorizontal: wp( 26 ),
         flexDirection: 'row',
@@ -422,31 +437,32 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           subHeading={common.subNote}
         />
       </TouchableOpacity>
-      }
-      <View style={{
-        flex: 1
-      }}/>
-      <View style={styles.footerSection}>
-        <TouchableOpacity
-          onPress={handleConfirmationButtonPress}
-          style={[ handleButton ? ButtonStyles.primaryActionButton : ButtonStyles.disabledNewPrimaryActionButton, {
-            alignSelf: 'flex-end'
-          } ]}
-        >
-          <Text style={ButtonStyles.actionButtonText}>Send</Text>
-        </TouchableOpacity>
-      </View>
-      <ModalContainer visible={!handleButton} closeBottomSheet = {()=>{}} onBackground = {()=>{}}>
-        <LoaderModal
-          headerText={'Sending...'}
-        />
-      </ModalContainer>
-      <ModalContainer visible={noteModal} closeBottomSheet={() => {
-        setnoteModal( false )
-      }}>
-        <RenderNoteModal />
-      </ModalContainer>
-    </KeyboardAwareScrollView>
+        }
+        <View style={{
+          flex: 1
+        }}/>
+        <View style={styles.footerSection}>
+          <TouchableOpacity
+            onPress={handleConfirmationButtonPress}
+            style={[ handleButton ? ButtonStyles.primaryActionButton : ButtonStyles.disabledNewPrimaryActionButton, {
+              alignSelf: 'flex-end'
+            } ]}
+          >
+            <Text style={ButtonStyles.actionButtonText}>Send</Text>
+          </TouchableOpacity>
+        </View>
+        <ModalContainer visible={!handleButton} closeBottomSheet = {()=>{}} onBackground = {()=>{}}>
+          <LoaderModal
+            headerText={'Sending...'}
+          />
+        </ModalContainer>
+        <ModalContainer visible={noteModal} closeBottomSheet={() => {
+          setnoteModal( false )
+        }}>
+          <RenderNoteModal />
+        </ModalContainer>
+      </KeyboardAwareScrollView>
+    </View>
   )
 }
 

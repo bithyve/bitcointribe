@@ -1,6 +1,6 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import React, { useCallback, useEffect, useState } from 'react'
-import { Alert } from 'react-native'
+import { Alert, SafeAreaView, View } from 'react-native'
 import { useDispatch } from 'react-redux'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import SendHelpContents from '../../../components/Helper/SendHelpContents'
@@ -36,6 +36,8 @@ import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accou
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import useWalletState from '../../../utils/hooks/state-selectors/storage/useWalletState'
 import AccountShell from '../../../common/data/models/AccountShell'
+import CustomToolbar from '../../../components/home/CustomToolbar'
+import { hp } from '../../../common/data/responsiveness/responsive'
 
 export type Props = {
   navigation: any;
@@ -236,17 +238,30 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
 
   return (
-    <AccountSendScreen
-      address={address}
-      accountShell={accountShell}
-      setAccountShell={setAccountShell}
-      sendableContacts={sendableContacts}
-      sendableAccountShells={sendableAccountShells}
-      onQRScanned={handleQRScan}
-      onAddressSubmitted={handleManualAddressSubmit}
-      onPaymentURIEntered={handlePaymentURIEntry}
-      onRecipientSelected={handleRecipientSelection}
-    />
+    <View style={{
+      flex:1
+    }}>
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }} />
+      <CustomToolbar
+        onBackPressed={() => navigation.pop()}
+        toolbarTitle={'Send'}
+        containerStyle={{
+          height: hp( 100 )
+        }} />
+      <AccountSendScreen
+        address={address}
+        accountShell={accountShell}
+        setAccountShell={setAccountShell}
+        sendableContacts={sendableContacts}
+        sendableAccountShells={sendableAccountShells}
+        onQRScanned={handleQRScan}
+        onAddressSubmitted={handleManualAddressSubmit}
+        onPaymentURIEntered={handlePaymentURIEntry}
+        onRecipientSelected={handleRecipientSelection}
+      />
+    </View>
   )
 }
 

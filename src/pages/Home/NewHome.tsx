@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   Alert,
   Linking,
+  AppState,
 } from 'react-native'
 import {
   heightPercentageToDP,
@@ -45,6 +46,9 @@ import {
   notificationPressed,
 } from '../../store/actions/notifications'
 import {
+  updateLastSeen
+} from '../../store/actions/preferences'
+import {
   setCurrencyCode,
   setCardData,
   setIsPermissionGiven,
@@ -65,7 +69,7 @@ import {
   Wallet,
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
-import { withNavigationFocus } from 'react-navigation'
+import { NavigationActions, withNavigationFocus } from 'react-navigation'
 import {
   updatePreference,
   setFCMToken,
@@ -255,6 +259,9 @@ interface HomePropsTypes {
   walletName: string;
   walletId: string;
   notificationPressed: any;
+  updateLastSeen: any;
+  openApproval: boolean;
+  IsCurrentLevel0: boolean;
 }
 
 class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -272,13 +279,12 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
     super( props )
     this.props.setShowAllAccount( false )
     this.focusListener = null
-    this.appStateListener = null
     this.openBottomSheetOnLaunchTimeout = null
     this.syncPermanantChannelTime = null
     this.state = {
       notificationData: [],
       CurrencyCode: 'USD',
-      netBalance: 0,
+      netBalance: this.props.accountsState.netBalance,
       bottomSheetState: BottomSheetState.Closed,
       currentBottomSheetKind: null,
       secondaryDeviceOtp: {
@@ -355,48 +361,145 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
       newBHRFlowStarted,
       credsAuthenticated,
     } = this.props
-    // requestAnimationFrame( () => {
-    //   // Keeping autoSync disabled
-    //   credsAuthenticated( false )
-    //   //console.log( 'isAuthenticated*****', this.props.isAuthenticated )
-    //   this.syncChannel()
-    //   this.closeBottomSheet()
-    //   if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
-    //     this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
-    //   }
+    this.appStateListener = AppState.addEventListener(
+      'change',
+      this.onAppStateChange
+    )
+    requestAnimationFrame( () => {
+      // Keeping autoSync disabled
+      credsAuthenticated( false )
+      //console.log( 'isAuthenticated*****', this.props.isAuthenticated )
+      this.syncChannel()
+      this.closeBottomSheet()
+      if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
+        this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
+      }
 
-    //   if( newBHRFlowStarted === true ){
-    //     if ( this.props.levelHealth.length == 0 && !this.props.initLoader ) {
-    //       initializeHealthSetup()
-    //     }
-    //   }
+      if( newBHRFlowStarted === true ){
+        if ( this.props.levelHealth.length == 0 && !this.props.initLoader ) {
+          initializeHealthSetup()
+        }
+      }
 
-    //   // this.bootStrapNotifications()
-    //   this.createNotificationListeners()
-    //   this.setUpFocusListener()
-    //   //this.getNewTransactionNotifications()
+      // this.bootStrapNotifications()
+      this.createNotificationListeners()
+      this.setUpFocusListener()
+      //this.getNewTransactionNotifications()
 
-    //   Linking.addEventListener( 'url', this.handleDeepLinkEvent )
-    //   Linking.getInitialURL().then( this.handleDeepLinking )
+      Linking.addEventListener( 'url', this.handleDeepLinkEvent )
+      Linking.getInitialURL().then( this.handleDeepLinking )
 
-    //   // call this once deeplink is detected aswell
-    //   this.handleDeepLinkModal()
+      // call this once deeplink is detected aswell
+      this.handleDeepLinkModal()
 
-    //   // set FCM token(if haven't already)
-    //   this.storeFCMToken()
+      // set FCM token(if haven't already)
+      this.storeFCMToken()
 
-    //   const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
+      const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
 
-    //   if ( unhandledDeepLinkURL ) {
-    //     navigation.setParams( {
-    //       unhandledDeepLinkURL: null,
-    //     } )
-    //     this.handleDeepLinking( unhandledDeepLinkURL )
-    //   }
-    //   this.props.setVersion()
-    //   this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
-    // } )
+      if ( unhandledDeepLinkURL ) {
+        navigation.setParams( {
+          unhandledDeepLinkURL: null,
+        } )
+        this.handleDeepLinking( unhandledDeepLinkURL )
+      }
+      this.props.setVersion()
+      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
+    } )
   }
+
+  onAppStateChange = async ( nextAppState ) => {
+    const { appState } = this.state
+    const { isPermissionSet, setIsPermissionGiven } = this.props
+    try {
+      // TODO: Will this function ever be called if the state wasn't different? If not,
+      // I don't think we need to be holding on to `appState` in this component's state.
+      if ( appState === nextAppState ) return
+      if ( isPermissionSet ) {
+        setIsPermissionGiven( false )
+        return
+      }
+      this.setState(
+        {
+          appState: nextAppState,
+        },
+        async () => {
+          if ( nextAppState === 'active' ) {
+          //this.scheduleNotification()
+          }
+          if ( nextAppState === 'inactive' || nextAppState == 'background' ) {
+            if( nextAppState === 'background' ) {
+              // this.closeBottomSheet()
+            }
+            // console.log( 'inside if nextAppState', nextAppState )
+            this.props.updatePreference( {
+              key: 'hasShownNoInternetWarning',
+              value: false,
+            } )
+            // sss files removed
+            this.props.updateLastSeen( new Date() )
+            // this.props.navigation.dispatch( [ NavigationActions.navigate( {
+            //   routeName: 'Bottomtab',
+            // } ),
+            NavigationActions.navigate( {
+              routeName: 'Intermediate',
+            } )
+          // ]
+            // )
+          }
+        }
+      )
+    } catch ( error ) {
+      // do nothing
+    }
+  };
+
+  componentDidUpdate = ( prevProps, prevState ) => {
+    if (
+      prevProps.accountsState.netBalance !==
+      this.props.accountsState.netBalance
+    )  this.setState( {
+      netBalance: this.props.accountsState.netBalance,
+    } )
+
+    if (
+      prevProps.secondaryDeviceAddressValue !==
+      this.props.secondaryDeviceAddressValue
+    ) {
+      this.setSecondaryDeviceAddresses()
+    }
+    if (
+      prevProps.messages !==
+      this.props.messages
+    ) {
+      this.updateBadgeCounter()
+    }
+    if( prevProps.openApproval != this.props.openApproval && !this.props.IsCurrentLevel0 ){
+      if( this.props.openApproval ){
+        this.openBottomSheetOnLaunch(
+          BottomSheetKind.APPROVAL_MODAL,
+          1
+        )
+      }
+    }
+
+  };
+
+  setSecondaryDeviceAddresses = async () => {
+    let secondaryDeviceOtpTemp = this.props.secondaryDeviceAddressValue
+
+    if ( !secondaryDeviceOtpTemp ) {
+      secondaryDeviceOtpTemp = []
+    }
+    if (
+      secondaryDeviceOtpTemp.findIndex(
+        ( value ) => value.otp == ( this.state.secondaryDeviceOtp as any ).otp
+      ) == -1
+    ) {
+      secondaryDeviceOtpTemp.push( this.state.secondaryDeviceOtp )
+      this.props.setSecondaryDeviceAddress( secondaryDeviceOtpTemp )
+    }
+  };
 
   componentWillUnmount() {
     this.cleanupListeners()
@@ -760,6 +863,16 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
   cleanupListeners() {
     if ( typeof this.focusListener === 'function' ) {
       this.props.navigation.removeListener( 'didFocus', this.focusListener )
+    }
+
+    if ( typeof this.appStateListener === 'function' ) {
+      AppState.removeEventListener( 'change', this.appStateListener )
+    }
+
+    Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
+    clearTimeout( this.openBottomSheetOnLaunchTimeout )
+    if ( this.firebaseNotificationListener ) {
+      this.firebaseNotificationListener()
     }
   }
 
@@ -1502,6 +1615,8 @@ const mapStateToProps = ( state ) => {
     walletId: idx( state, ( _ ) => _.storage.wallet.walletId ),
     walletName:
       idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
+    openApproval: idx( state, ( _ ) => _.bhr.openApproval ),
+    IsCurrentLevel0: idx( state, ( _ ) => _.bhr.IsCurrentLevel0 ),
   }
 }
 
@@ -1539,6 +1654,7 @@ export default withNavigationFocus(
     syncPermanentChannels,
     rejectedExistingContactRequest,
     notificationPressed,
+    updateLastSeen,
   } )( NewHome )
 )
 

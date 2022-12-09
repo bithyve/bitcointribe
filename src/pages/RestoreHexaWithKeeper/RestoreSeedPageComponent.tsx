@@ -305,7 +305,7 @@ const RestoreSeedPageComponent = ( props ) => {
                             partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name.length > 0 ? styles.selectedInput : null,
                             // value?.name.length > 0 ? styles.selectedInput : null,
                           ]}
-                          placeholder={`Enter ${getPlaceholder( getIndex( index, seedIndex ) )} word`}
+                          placeholder={`Enter ${getPlaceholder( getIndex( index, seedIndex ) )} phrase`}
                           placeholderTextColor={Colors.borderColor}
                           value={partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name}
                           // value={value}

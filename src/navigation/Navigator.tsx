@@ -581,7 +581,6 @@ const NewHomeNavigator = createStackNavigator( {
     screen: AccountDetailsContainerScreen,
     navigationOptions: {
       header: null,
-      // tabBarVisibl
     },
   },
   ContactsListForAssociateContact,

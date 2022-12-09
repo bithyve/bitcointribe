@@ -63,6 +63,7 @@ import NfcPrompt from '../Gift/NfcPromptAndroid'
 import { CKTapCard } from 'cktap-protocol-react-native'
 import axios from 'axios'
 import AlertModalContents from '../../components/AlertModalContents'
+import NewSwitch from '../../components/NewSwitch'
 const { width, height: screenHeight } = Dimensions.get( 'window' )
 
 const listItemKeyExtractor = ( item ) => item.id
@@ -389,8 +390,9 @@ const ManageGifts = ( props ) => {
                 { marginLeft: 150 },
               ]}
             > */}
-            <ToggleContainer />
+            {/* <ToggleContainer /> */}
             {/* </View> */}
+            <NewSwitch />
           </View>
 
           <TouchableOpacity
