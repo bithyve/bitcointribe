@@ -101,5 +101,6 @@ const Colors = {
   black3: '#092C27',
   goldenText:'#A27F29',
   gray18: '#808685',
+  gray19: 'rgba(80, 80, 80, 0.5)'
 }
 export default Colors

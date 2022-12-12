@@ -22,7 +22,7 @@ import SwanAccountCreationStatus from '../../../common/data/enums/SwanAccountCre
 import { ListItem } from 'react-native-elements'
 import BottomInfoBox from '../../BottomInfoBox'
 import { translations } from '../../../common/content/LocContext'
-import Close from '../../../assets/images/svgs/close.svg';
+import Close from '../../../assets/images/svgs/close.svg'
 
 const swanAccountCount = 0
 
@@ -148,10 +148,38 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           }} />
         </TouchableOpacity> */}
         <View style={styles.successModalHeaderView}>
-            <TouchableOpacity style={{marginLeft: wp('86%')}} >
-              <Close  />
-            </TouchableOpacity>
-            <Text style={styles.modalTitleText}>{swanTitle}</Text>
+          {/* <TouchableOpacity style={{
+            marginLeft: wp( '86%' )
+          }}  onPress={() => {onPress()}}>
+            <Close  />
+          </TouchableOpacity> */}
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={onPress}
+            style={{
+              width: wp( 6 ),
+              height: wp( 6 ),
+              borderRadius: wp( 14 ),
+              // alignSelf: 'flex-end',
+              backgroundColor: Colors.golden,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginLeft: wp( '86%' )
+              // marginTop: hp( 1 ),
+              // marginRight: wp( 1 ),
+            }}>
+            <FontAwesome
+              name="close"
+              color={Colors.white}
+              size={19}
+              style={
+                {
+                // marginTop: hp( 0.5 )
+                }
+              }
+            />
+          </TouchableOpacity>
+          <Text style={styles.modalTitleText}>{swanTitle}</Text>
 
           <Text style={{
             ...styles.modalInfoText,
@@ -217,7 +245,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
     return ( <View style={{
       flexDirection: 'row', marginTop: 'auto', alignItems: 'flex-start'
     }} >
-     
+
       <AppBottomSheetTouchableWrapper
         disabled={hasButtonBeenPressed? true : false}
         onPress={()=> {
@@ -246,7 +274,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
         <Text
           style={{
             fontFamily: Fonts.FiraSansMedium,
-            color: Colors.blue
+            color: Colors.goldenYellow
           }}
         >
           {strings.NotNow}
@@ -338,13 +366,13 @@ const styles = StyleSheet.create( {
   statusIndicatorActiveView: {
     height: 5,
     width: 25,
-    backgroundColor: Colors.blue,
+    backgroundColor: Colors.red,
     borderRadius: 10,
     marginLeft: 5,
   },
   statusIndicatorInactiveView: {
     width: 5,
-    backgroundColor: Colors.lightBlue,
+    backgroundColor: Colors.tomatoRed,
     borderRadius: 10,
     marginLeft: 5,
   },

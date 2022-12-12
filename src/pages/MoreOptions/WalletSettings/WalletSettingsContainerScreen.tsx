@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { View, Text, StyleSheet, ScrollView, Image, ImageSourcePropType, Alert } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, Image, ImageSourcePropType, Alert, SafeAreaView } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -12,6 +12,8 @@ import WalletRescanningBottomSheet from '../../../components/bottom-sheets/walle
 import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningPromptBottomSheet'
 import ModalContainer from '../../../components/home/ModalContainer'
 import { translations } from '../../../common/content/LocContext'
+import CustomToolbar from '../../../components/home/CustomToolbar'
+import { hp } from '../../../common/data/responsiveness/responsive'
 
 export type Props = {
   navigation: any;
@@ -117,6 +119,16 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
 
   return (
     <View style={styles.modalContainer}>
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }} />
+      <CustomToolbar
+        onBackPressed={() => navigation.pop()}
+        toolbarTitle={'Wallet Settings'}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 100 )
+        }} />
       <ScrollView style={{
         flex: 1
       }}>

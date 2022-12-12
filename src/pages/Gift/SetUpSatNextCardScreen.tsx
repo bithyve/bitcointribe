@@ -322,15 +322,19 @@ export default function SetUpSatNextCardScreen( props ) {
         </TouchableOpacity>
       </View> */}
 
-      <GiftStepperComponent
-        extraContainer={{
-          marginTop: 10
-        }}
-        showLoader={stepsVerified <= 0}
-        verifiedText={stepsVerified >= 1 ? 'SATSCARD™ detected' : 'Detecting SATSCARD™'}
-      />
-      {
-        stepsVerified >= 1 &&
+      <View style={{
+        flex:1, justifyContent:'center'
+      }}>
+        <GiftStepperComponent
+          extraContainer={{
+            marginTop: 10
+          }}
+          showLoader={stepsVerified <= 0}
+          stepImage={require( '../../assets/images/HomePageIcons/step_one.png' )}
+          verifiedText={stepsVerified >= 1 ? 'SATSCARD™ detected' : 'Detecting SATSCARD™'}
+        />
+        {
+          stepsVerified >= 1 &&
         <>
           <View style={styles.dashContainer}>
             <View style={styles.dashInnerContainer} />
@@ -338,32 +342,32 @@ export default function SetUpSatNextCardScreen( props ) {
 
           <GiftStepperComponent
             // extraContainer={{        }}
+            stepImage={require( '../../assets/images/HomePageIcons/step_two.png' )}
             showLoader={stepsVerified <= 1}
             verifiedText={stepsVerified >= 2 ? 'Card found' : 'Detecting card'}
           />
         </>
-      }
-      {
-        stepsVerified >= 2 &&
+        }
+        {
+          stepsVerified >= 2 &&
         <>
           <View style={styles.dashContainer}>
             <View style={styles.dashInnerContainer} />
           </View>
           <GiftStepperComponent
             // extraContainer={{        }}
+            stepImage={require( '../../assets/images/HomePageIcons/step_three.png' )}
             showLoader={stepsVerified <= 2}
             verifiedText={stepsVerified >= 3 ? 'SATSCARD™ ready to use' : 'Transferring sats into SATSCARD™'}
           />
         </>
-      }
-      <View style={{
-        flex: 1
-      }} />
+        }
+      </View>
       <View style={styles.pagerContainer}>
         <View style={styles.pagerDeSelected} />
         <View style={styles.pagerSelected} />
       </View>
-      <ModalContainer onBackground={() => { setShowAlertModal( false ) }} visible={showAlertModal} closeBottomSheet={() => { }}>
+      {/* <ModalContainer onBackground={() => { setShowAlertModal( false ) }} visible={showAlertModal} closeBottomSheet={() => { }}>
         <AlertModalContents
           info={errorMessage != '' ? errorMessage : 'SatCards not detected'}
           proceedButtonText={'Please try again'}
@@ -374,7 +378,7 @@ export default function SetUpSatNextCardScreen( props ) {
           isBottomImage={true}
           bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
-      </ModalContainer>
+      </ModalContainer> */}
       <NfcPrompt visible={showNFCModal} />
     </View>
   )
