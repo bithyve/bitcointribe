@@ -70,12 +70,17 @@ export default class Relay {
           walletID,
           FCMs,
         } )
+        console.log( 'res===>' + JSON.stringify( res ) )
+
       } catch ( err ) {
+        console.log( 'Error 1===>' + JSON.stringify( err ) )
+
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }
       return res.data
     } catch ( err ) {
+      console.log( 'Error===>' + JSON.stringify( err ) )
       throw new Error( 'Failed to fetch GetBittr Details' )
     }
   };

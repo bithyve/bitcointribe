@@ -65,6 +65,8 @@ const RestoreSeedWordsContent = ( props ) => {
 
   useEffect( () => {
     setLoaderModal( false )
+    console.log( 'wallet on restore' + wallet )
+
     if ( wallet ) {
       dispatch( completedWalletSetup() )
       AsyncStorage.setItem( 'walletRecovered', 'true' )
@@ -74,6 +76,7 @@ const RestoreSeedWordsContent = ( props ) => {
   }, [ wallet ] )
 
   useEffect( () => {
+    console.log( 'restoreSeedData on restore' + restoreSeedData )
     if( restoreSeedData == 'restoreSeedDataFailed' ){
       setLoaderModal( false )
       props.navigation.navigate( 'NewWalletName', {

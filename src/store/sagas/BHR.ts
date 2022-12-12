@@ -552,6 +552,7 @@ function* recoverWalletWithMnemonicWorker( { payload } ) {
   try {
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
     const { primaryMnemonic }: { primaryMnemonic: string } = payload
+    console.log( 'payload on recover wallet' + JSON.stringify( payload ) )
 
     yield call( recoverWalletWorker, {
       payload: {
@@ -561,6 +562,7 @@ function* recoverWalletWithMnemonicWorker( { payload } ) {
     yield put( updateSeedHealth() )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
   } catch ( err ) {
+    console.log( 'err on recover wallet' + JSON.stringify( err ) )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
     yield put( walletRecoveryFailed( true ) )
   }
@@ -614,10 +616,18 @@ function* recoverWalletWorker( { payload } ) {
         secondaryMnemonics = smShares.length ? BHROperations.getMnemonics( smShares, answer ).mnemonic : ''
         primaryMnemonic = BHROperations.getMnemonics( pmShares, answer, true ).mnemonic
       }
-
-      const getWI = yield call( BHROperations.fetchWalletImage, image.walletId )
+      let walletId = image ? image.walletId : null
+      if( !walletId ){
+        const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
+        walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
+      }
+      console.log( 'wallet id===>' + walletId )
+      const getWI = yield call( BHROperations.fetchWalletImage, walletId )
+      console.log( 'getWI ===>' +  JSON.stringify( getWI ) )
       if ( getWI.status == 200 ) image = idx( getWI, _ => _.data.walletImage )
     }
+    console.log( 'image====>' + JSON.stringify( image ) )
+
     const accounts = image.accounts
     const acc: Account[] = []
     const accountData = {
@@ -986,6 +996,7 @@ function* updateWalletImageWorker( { payload } ) {
   const res = yield call( Relay.updateWalletImage, walletImage )
   if ( res.status === 200 ) {
     if ( res.data ) console.log( 'Wallet Image updated', payload )
+    console.log( 'Wallet update WalletImage res.data', JSON.stringify(res) )
     yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
     //yield call( AsyncStorage.setItem, 'WI_HASHES', JSON.stringify( hashesWI ) )
   } else {
