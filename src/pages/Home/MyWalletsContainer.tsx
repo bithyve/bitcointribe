@@ -10,7 +10,8 @@ import {
   SafeAreaView,
   StatusBar,
   FlatList,
-  TouchableOpacity
+  TouchableOpacity,
+  RefreshControl
 } from 'react-native'
 import Colors from '../../common/Colors'
 import { connect, useDispatch, useSelector } from 'react-redux'
@@ -19,7 +20,7 @@ import idx from 'idx'
 import { withNavigationFocus } from 'react-navigation'
 import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
-import { setShowAllAccount, markAccountChecked } from '../../store/actions/accounts'
+import { setShowAllAccount, markAccountChecked, refreshAccountShells } from '../../store/actions/accounts'
 import { SwanIntegrationState } from '../../store/reducers/SwanIntegration'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -52,6 +53,11 @@ import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmo
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import useExchangeRates from '../../utils/hooks/state-selectors/UseExchangeRates'
+import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
+import { clearSwanCache, isSwanVisited, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import ModalContainer from '../../components/home/ModalContainer'
+import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
+import SyncStatus from '../../common/data/enums/SyncStatus'
 
 export enum BottomSheetKind {
   SWAN_STATUS_INFO,
@@ -92,6 +98,11 @@ export default function MyWalletsContainer( props ) {
     return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
   const exchangeRates = useExchangeRates()
+  const [ swanModal, showSwanModal ] = useState( false )
+  const isVisited = useSelector( ( state ) => state.swanIntegration.isVisited )
+  const isRefreshing = useMemo( () => {
+    return ( itemAccountShell?.syncStatus===SyncStatus.IN_PROGRESS )
+  }, [ itemAccountShell?.syncStatus ] )
 
   useEffect( () => {
     dispatch( setShowAllAccount( true ) )
@@ -250,6 +261,21 @@ export default function MyWalletsContainer( props ) {
     setAccountShellID( selectedAccount.id )
     setItemAccountShell( selectedAccount )
 
+    if (
+      !selectedAccount.primarySubAccount.isUsable &&
+        selectedAccount.primarySubAccount.kind === SubAccountKind.SERVICE &&
+      ( selectedAccount.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
+    ) {
+      dispatch( clearSwanCache() )
+      dispatch( updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED ) )
+      // else {
+      //   dispatch( updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED ) )
+      // }
+      setTimeout( () => {
+        showSwanModal( true )
+      }, 600 )
+
+    }
   // }
   }
 
@@ -479,6 +505,13 @@ export default function MyWalletsContainer( props ) {
     } )
   }
 
+  function performRefreshOnPullDown() {
+    dispatch( refreshAccountShells( [ itemAccountShell ], {
+      hardRefresh: true,
+      syncDonationAccount: itemAccountShell.primarySubAccount.type === AccountType.DONATION_ACCOUNT
+    } ) )
+  }
+
   return (
     <View style={{
       backgroundColor: Colors.white, flex: 1
@@ -498,6 +531,27 @@ export default function MyWalletsContainer( props ) {
             marginTop: hp( 40 )
           }} />
       </View>
+      {swanModal &&
+      <ModalContainer onBackground={()=>{showSwanModal( false )
+        setTimeout( () => {
+          showSwanModal( true )
+        }, 200 )}} visible={swanModal} closeBottomSheet={() => {}} >
+        <BottomSheetSwanInfo
+          // swanDeepLinkContent={swanDeepLinkContent}
+          swanDeepLinkContent={null}
+          onClickSetting={() => {
+            showSwanModal( false )
+          }}
+          onPress={() => {
+            if ( !isVisited ) {
+              dispatch( isSwanVisited() )
+            }
+            showSwanModal( false )
+            props.navigation.pop()
+          }}
+        />
+      </ModalContainer>
+      }
       <View style={{
         height: hp( 210 ), backgroundColor: Colors.appPrimary,
         borderBottomStartRadius: 25, alignItems: 'center'
@@ -548,6 +602,12 @@ export default function MyWalletsContainer( props ) {
           data={itemAccountShell ? AccountShell.getAllTransactions( itemAccountShell )?.slice( 0, 3 ) : []}
           keyExtractor={( item, index ) => item?.id}
           renderItem={renderWalletItem}
+          refreshControl={
+            <RefreshControl
+              onRefresh={performRefreshOnPullDown}
+              refreshing={isRefreshing}
+            />
+          }
         />
       </View>
       <View style={{

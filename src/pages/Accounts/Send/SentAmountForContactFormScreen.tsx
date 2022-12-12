@@ -46,6 +46,7 @@ import useExchangeRates from '../../../utils/hooks/state-selectors/UseExchangeRa
 import useCurrencyCode from '../../../utils/hooks/state-selectors/UseCurrencyCode'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import CustomToolbar from '../../../components/home/CustomToolbar'
+import BalanceStore from '../../../mobxstore/BalanceStore'
 
 export type NavigationParams = {
 };
@@ -325,6 +326,19 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
             />
           </TouchableOpacity>
 
+        </View>
+
+        <View style={styles.formBodySection}>
+          <BalanceEntryFormGroup
+            currentRecipient={currentRecipient}
+            subAccountKind={SubAccountKind.LIGHTNING_ACCOUNT}
+            spendableBalance={availableBalance}
+            onAmountChanged={( amount: Satoshis ) => {
+              setSelectedAmount( amount )
+            }}
+            onSendMaxPressed={()=> {}}
+            showSendMax={true}
+          />
         </View>
 
         <View style={styles.footerSection}>

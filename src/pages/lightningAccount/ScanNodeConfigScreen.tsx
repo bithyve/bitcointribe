@@ -23,6 +23,7 @@ import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCod
 import BottomInfoBox from '../../components/BottomInfoBox'
 import LndConnectUtils from '../../utils/ln/LndConnectUtils'
 import Toast from '../../components/Toast'
+import CustomToolbar from '../../components/home/CustomToolbar'
 
 const styles = StyleSheet.create( {
   viewContainer: {
@@ -105,9 +106,9 @@ export default function ScanNodeConfig( { navigation } ) {
 
   return (
 
-    <SafeAreaView style={styles.viewContainer}>
+    <View style={styles.viewContainer}>
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      <View style={[ CommonStyles.headerContainer, {
+      {/* <View style={[ CommonStyles.headerContainer, {
         backgroundColor: Colors.backgroundColor,
         marginRight: wp( 4 )
       } ]}>
@@ -126,7 +127,17 @@ export default function ScanNodeConfig( { navigation } ) {
           </View>
         </TouchableOpacity>
 
-      </View>
+      </View> */}
+      <SafeAreaView style={{
+        backgroundColor: Colors.appPrimary
+      }} />
+      <CustomToolbar
+        onBackPressed={() => navigation.goBack()}
+        toolbarTitle={strings.Connectyournode}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 12 )
+        }} />
       <ScrollView
         overScrollMode="never"
         bounces={false}
@@ -136,7 +147,7 @@ export default function ScanNodeConfig( { navigation } ) {
         }}
         keyboardShouldPersistTaps='handled'>
         <HeaderTitle
-          firstLineTitle={strings.Connectyournode}
+          // firstLineTitle={strings.Connectyournode}
           secondLineTitle={strings.SetupLightningAccount}
           infoTextNormal={''}
           infoTextBold={''}
@@ -172,6 +183,6 @@ export default function ScanNodeConfig( { navigation } ) {
       </ScrollView>
 
 
-    </SafeAreaView>
+    </View>
   )
 }

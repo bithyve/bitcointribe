@@ -482,20 +482,23 @@ const NewHomeNavigator = createStackNavigator( {
   },
   NodeSettings: {
     screen: NodeSettingsContainerScreen,
-    navigationOptions: ( { navigation } ) => {
-      return {
-        title: 'Node Settings',
-        headerTitleStyle:{
-          color: Colors.blue,
-          fontSize: RFValue( 18 ),
-          fontFamily: Fonts.FiraSansMedium,
-          textAlign: 'left',
-          marginHorizontal: 0,
-        },
-        headerLeft: () => {
-          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-        },
-      }
+    // navigationOptions: ( { navigation } ) => {
+    //   return {
+    //     title: 'Node Settings',
+    //     headerTitleStyle:{
+    //       color: Colors.blue,
+    //       fontSize: RFValue( 18 ),
+    //       fontFamily: Fonts.FiraSansMedium,
+    //       textAlign: 'left',
+    //       marginHorizontal: 0,
+    //     },
+    //     headerLeft: () => {
+    //       return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+    //     },
+    //   }
+    // },
+    navigationOptions: {
+      header: null,
     },
   },
   AppInfo: {

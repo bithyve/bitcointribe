@@ -379,7 +379,9 @@ const ManageGifts = ( props ) => {
                 <BackIcon />
               </View>
             </TouchableOpacity>
-            <View style={CommonStyles.headerCenterIconContainer}>
+            <View style={[ CommonStyles.headerCenterIconContainer, {
+              flex:1
+            } ]}>
               <Text style={CommonStyles.headerCenterIconInnerContainer}>
                 Gifts & Tips
               </Text>
