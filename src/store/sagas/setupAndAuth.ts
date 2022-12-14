@@ -86,7 +86,10 @@ function* setupWalletWorker( { payload } ) {
   // prepare default accounts for the wallet
 
   const accountsInfo: newAccountsInfo[] = []
-  const accountArray = [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT, AccountType.SWAN_ACCOUNT, AccountType.SAVINGS_ACCOUNT ]
+  const accountArray = [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT, AccountType.SWAN_ACCOUNT,
+    // Note New saving account create is off
+    // AccountType.SAVINGS_ACCOUNT
+  ]
   // !newBie && accountArray.splice( 0, 1 )
   accountArray.forEach( ( accountType ) => {
 
