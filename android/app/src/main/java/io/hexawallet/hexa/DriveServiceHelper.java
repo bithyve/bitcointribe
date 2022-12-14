@@ -311,7 +311,7 @@ public class DriveServiceHelper {
         JSONObject jsonObj = null;
         try {
             jsonObj = new JSONObject(metadata);
-            JSONObject finalJsonObj = jsonObj;
+            final JSONObject finalJsonObj = jsonObj;
             return Tasks.call(mExecutor, new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
