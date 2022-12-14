@@ -59,7 +59,7 @@ android {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 527
+        versionCode 528
         versionName "2.1.0"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
@@ -211,6 +211,8 @@ dependencies {
     implementation('com.google.apis:google-api-services-drive:v3-rev136-1.25.0') {
         exclude group: 'org.apache.httpcomponents'
     }
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.1.0"
+
 }
 
 // Run this once to be able to run the application with BUCK

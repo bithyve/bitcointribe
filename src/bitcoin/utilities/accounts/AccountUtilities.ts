@@ -976,7 +976,8 @@ export default class AccountUtilities {
     try {
       if ( network === bitcoinJS.networks.testnet ) {
         res = await BH_AXIOS.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
+          'https://blockstream.info/testnet/api/tx',
+          // config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
           txHex,
           {
             headers: {
