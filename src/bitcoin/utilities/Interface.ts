@@ -607,6 +607,11 @@ export enum TrustedContactRelationTypes {
   EXISTING_CONTACT = 'EXISTING_CONTACT'
 }
 
+export enum ChannelMessageTypes {
+  TEXT = 'TEXT',
+  CONTACT_REQUEST = 'CONTACT_REQUEST'
+}
+
 export interface TrustedContact {
   contactDetails: ContactDetails,
   relationType: TrustedContactRelationTypes,

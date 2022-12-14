@@ -608,7 +608,9 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
       updatedContacts: Trusted_Contacts
     } = yield call(
       TrustedContactsOperations.syncPermanentChannels,
-      channelSyncUpdates
+      channelSyncUpdates,
+      wallet.walletName,
+      wallet.walletId
     )
 
     if ( updated ) {
@@ -1234,9 +1236,9 @@ function* sendChannelMessageWorker( { payload } ) {
     const wallet: Wallet = yield select(
       ( state ) => state.storage.wallet,
     )
-    const { walletId } = wallet
+    const { walletId, walletName } = wallet
     const response = yield call( TrustedContactsOperations.sendMessage, {
-      walletId, channelAddress, message
+      walletId, walletName, channelAddress, message
     } )
     console.log( 'response', response )
   } catch ( error ) {

@@ -228,12 +228,12 @@ export default class TrustedContactsOperations {
     channelKey: string,
     instreamUpdates: StreamData,
     outStreamId: string,
-    messages: []
+    // messages: []
   ) => {
     let encryptedInstream =
       contact.permanentChannel[ instreamUpdates.streamId ] || {
       }
-    contact.messages = messages
+    // contact.messages = messages
     let unencryptedInstream =
       contact.unencryptedPermanentChannel[ instreamUpdates.streamId ] || {
       }
@@ -315,7 +315,9 @@ export default class TrustedContactsOperations {
       unEncryptedOutstreamUpdates?: UnecryptedStreamData;
       contactsSecondaryChannelKey?: string;
       metaSync?: boolean;
-    }[]
+    }[],
+    walletName: string,
+    walletId?:string,
   ): Promise<{
     updated: boolean;
     updatedContacts: Trusted_Contacts;
@@ -386,11 +388,12 @@ export default class TrustedContactsOperations {
           {
             HEXA_ID,
             channelOutstreams,
+            walletName,
+            walletId
           }
         )
 
         const { channelInstreams } = res.data
-        console.log( 'channelInstreams', channelInstreams )
         for ( const permanentChannelAddress of Object.keys( channelInstreams ) ) {
           const { updated, isActive, instream, messages } =
             channelInstreams[ permanentChannelAddress ]
@@ -404,7 +407,8 @@ export default class TrustedContactsOperations {
             )
           if ( typeof isActive === 'boolean' )
             ( contact as TrustedContact ).isActive = isActive
-          if ( instream ) TrustedContactsOperations.cacheInstream( contact, channelKey, instream, outStreamId, messages )
+          contact.messages = messages
+          if ( instream ) TrustedContactsOperations.cacheInstream( contact, channelKey, instream, outStreamId )
         }
 
         // consolidate contact updates/creation
@@ -415,7 +419,6 @@ export default class TrustedContactsOperations {
             channelMapping[ permanentChannelAddress ]
           updatedContacts[ channelKey ] = contact
         } )
-        console.log( 'updatedContacts', updatedContacts )
         return {
           updated: true, updatedContacts
         }
@@ -588,10 +591,12 @@ export default class TrustedContactsOperations {
 
    static sendMessage = async ( {
      walletId,
+     walletName,
      channelAddress,
      message
    }: {
    walletId: string;
+   walletName: string;
    channelAddress: string;
    message: object
    } ) =>{
@@ -600,6 +605,7 @@ export default class TrustedContactsOperations {
          HEXA_ID,
          channelAddress,
          sender: walletId,
+         walletName,
          message,
        } )
        return res.data

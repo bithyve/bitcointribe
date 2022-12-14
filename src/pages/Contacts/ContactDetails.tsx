@@ -49,6 +49,7 @@ import SendViaQR from '../../components/SendViaQR'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import {
   AccountType,
+  ChannelMessageTypes,
   KeeperInfoInterface,
   QRCodeTypes,
   StreamData,
@@ -87,6 +88,9 @@ import QRModal from '../Accounts/QRModal'
 import Loader from '../../components/loader'
 import AlertModalContents from '../../components/AlertModalContents'
 import MessageItem from './MessageItem'
+import CommonStyles from '../../common/Styles/Styles'
+import BackIcon from '../../assets/images/backWhite.svg'
+import MessageList from './MessageList'
 
 const getImageIcon = ( item: ContactRecipientDescribing ) => {
   if ( Object.keys( item ).length ) {
@@ -171,6 +175,7 @@ interface ContactDetailsStateTypes {
   showLoader: boolean;
   showAlertModal: boolean;
   message: string;
+  isInputfocused: boolean;
 }
 
 class ContactDetails extends PureComponent<
@@ -212,6 +217,7 @@ class ContactDetails extends PureComponent<
       encryptedExitKey: '',
       showQRCode: false,
       message: '',
+      isInputfocused: false,
       trustedContactHistory: [
         {
           id: 1,
@@ -482,8 +488,6 @@ class ContactDetails extends PureComponent<
     isKeeper?: boolean;
     isPrimary?: boolean;
   } ) => {
-    console.log( this.contact )
-    return
     if ( this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER ) {
       this.createDeepLink( this.contact )
       setTimeout( () => {
@@ -980,16 +984,6 @@ class ContactDetails extends PureComponent<
         </AppBottomSheetTouchableWrapper>
         <View style={styles.headerRowContainer}>
           {getImageIcon( this.contact )}
-          <Text
-            style={styles.contactText}
-            ellipsizeMode="clip"
-            numberOfLines={1}
-          >
-            {this.firstNamePieceText()}
-            <Text style={styles.contactTextBold}>
-              {this.secondNamePieceText()}
-            </Text>
-          </Text>
         </View>
         <View style={styles.detailsView}>
           <Text style={styles.titleText}>{this.common[ 'relationship' ]}</Text>
@@ -1147,15 +1141,13 @@ class ContactDetails extends PureComponent<
     this.props.sendChannelMessage( {
       channelAddress: this.contact.channelAddress,
       message: {
-        type: 'TEXT',
-        text: this.state.message
+        type: ChannelMessageTypes.TEXT,
+        text: this.state.message,
+        walletName: this.props.wallet.walletName
       }
     } )
   }
 
-  renderMessageList = ( message, index ) => {
-    return <MessageItem item={message} index={index}/>
-  };
 
   render() {
     const {
@@ -1171,7 +1163,7 @@ class ContactDetails extends PureComponent<
       showContactDetails,
     } = this.state
     return (
-      <SafeAreaView
+      <View
         style={{
           flex: 1,
           backgroundColor: Colors.backgroundColor,
@@ -1179,56 +1171,64 @@ class ContactDetails extends PureComponent<
       >
         <SafeAreaView
           style={{
-            backgroundColor: Colors.backgroundColor,
+            backgroundColor: Colors.blueTextNew,
           }}
         />
-        <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+        <StatusBar backgroundColor={Colors.blueTextNew} barStyle="light-content" />
+
         <View
           style={{
-            flexDirection: 'row',
+          // width,
+            borderBottomLeftRadius: 25,
+            backgroundColor: Colors.blueTextNew,
+            marginBottom: 20,
+            flexDirection: 'column',
           }}
         >
-          <BackIconTitle />
-          <TouchableOpacity
-            disabled={isSendDisabled}
-            onPress={() => {
-              this.setState( {
-                isSendDisabled: true,
-              } )
-              this.contact.lastSeenActive
-                ? this.onPressSend()
-                : ![
-                  'Personal Device',
-                  'Personal Device 1',
-                  'Personal Device 2',
-                  'Personal Device 3',
-                ].includes( this.contact.displayedName )
-                  ? this.onPressResendRequest()
-                  : this.onPressResendRequest( {
-                    isKeeper: true,
-                    isPrimary:
-                      this.contact.displayedName == 'Personal Device 1'
-                        ? true
-                        : false,
-                  } )
-            }}
-            style={styles.resendContainer}
+          <View
+            style={[
+              CommonStyles.headerContainer,
+              {
+                backgroundColor: Colors.blueTextNew,
+                flexDirection: 'row',
+                marginRight: 10,
+                marginBottom: 20,
+              },
+            ]}
           >
-            {this.contact.lastSeenActive ? (
-              <Image
-                source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
-                style={styles.bitcoinIconStyle}
-              />
-            ) : null}
-            <Text style={styles.sendTextStyle}>
-              {this.contact.lastSeenActive
-                ? this.common[ 'send' ]
-                : this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER
-                  ? 'Reshare'
-                  : this.strings[ 'ResendRequest' ]}
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={CommonStyles.headerLeftIconContainer}
+              onPress={() => {
+                this.props.navigation.goBack()
+              }}
+            >
+              <View style={CommonStyles.headerLeftIconInnerContainer}>
+                <BackIcon />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.headerRowContainer}
+              activeOpacity={0.6}
+              onPress={this.showDetails}
+            >
+              {getImageIcon( this.contact )}
+
+              <Text
+                style={styles.textTitle}
+                ellipsizeMode="clip"
+                numberOfLines={1}
+              >
+                {this.firstNamePieceText()}
+                <Text style={styles.textTitle}>
+                  {this.secondNamePieceText()}
+                </Text>
+              </Text>
+            </TouchableOpacity>
+
+          </View>
         </View>
+
 
         {showContactDetails && (
           <ModalContainer
@@ -1247,8 +1247,7 @@ class ContactDetails extends PureComponent<
             {this.renderContactDetailsModal()}
           </ModalContainer>
         )}
-        {/* <View style={styles.modalContainer}> */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={this.showDetails}
           style={styles.modalHeaderTitleView}
         >
@@ -1297,66 +1296,27 @@ class ContactDetails extends PureComponent<
                   </Text>
                 )}
               </View>
-              <Text
-                style={styles.contactText}
-                ellipsizeMode="clip"
-                numberOfLines={1}
-              >
-                {this.firstNamePieceText()}
-                <Text style={styles.contactTextBold}>
-                  {this.secondNamePieceText()}
-                </Text>
-              </Text>
               <Text style={styles.contactTypeText}>{this.contactsType}</Text>
 
-              {/* {this.contact.connectedVia ? (
-                  <Text style={styles.phoneText}>
-                    {this.contact.usesOTP
-                      ? !contact.hasTrustedChannel
-                        ? 'OTP: ' + contact.connectedVia
-                        : ''
-                      : this.contact.connectedVia}
-                  </Text>
-                ) : null} */}
+              {this.contact.connectedVia ? (
+                <Text style={styles.phoneText}>
+                  {this.contact.usesOTP
+                    ? !contact.hasTrustedChannel
+                      ? 'OTP: ' + contact.connectedVia
+                      : ''
+                    : this.contact.connectedVia}
+                </Text>
+              ) : null}
             </View>
             <More width={14} height={4} />
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         {Loading ? (
           <View
             style={{
               flex: 1,
             }}
           >
-            {/* <ScrollView style={{
-              flex: 1
-            }}>
-              {[ 1, 2, 3, 4, 5 ].map( ( value, index ) => {
-                return (
-                  <View key={index} style={styles.scrollViewContainer}>
-                    <View>
-                      <View
-                        style={{
-                          backgroundColor: Colors.backgroundColor,
-                          height: wp( '4%' ),
-                          width: wp( '40%' ),
-                          borderRadius: 10,
-                        }}
-                      />
-                      <View
-                        style={{
-                          backgroundColor: Colors.backgroundColor,
-                          height: wp( '4%' ),
-                          width: wp( '30%' ),
-                          marginTop: 5,
-                          borderRadius: 10,
-                        }}
-                      />
-                    </View>
-                  </View>
-                )
-              } )}
-            </ScrollView> */}
             <BottomInfoBox
               backgroundColor={Colors.white}
               title={this.common[ 'note' ]}
@@ -1371,60 +1331,63 @@ class ContactDetails extends PureComponent<
             keyboardVerticalOffset={30}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           >
-            <FlatList
-              inverted
-              style={{
-                flexGrow: 1,
-              }}
-              // ref={flatListRef}
-              keyboardShouldPersistTaps="handled"
-              maxToRenderPerBatch={10}
-              removeClippedSubviews
-              initialNumToRender={10}
-              updateCellsBatchingPeriod={100}
-              windowSize={4}
-              contentContainerStyle={styles.list}
-              data={this.contact.messages}
-              extraData={[ this.contact.messages ]}
-              onScroll={( e ) => {
-                Keyboard.dismiss()
-              }}
-              onScrollToIndexFailed={( e ) => console.log( e )}
-              renderItem={( { item, index } ) =>
-                this.renderMessageList( item, index )
-              }
+            <MessageList
+              data={this.contact.messages.reverse()}
+              resendRequest={this.onPressResendRequest}
             />
 
             <View style={styles.containerBottom}>
-              <TextInput
-                value={this.state.message}
-                onChangeText={( text ) => {
-                  this.setState( {
-                    message: text
-                  } )
-                }}
-                style={styles.textInputMsg}
-                placeholderTextColor="a0a0a0"
-                //numberOfLines={3}
-                multiline
-                placeholder="Type your message here"
-              />
 
-              <TouchableOpacity
-                style={styles.fab2}
-                onPress={() => this.sendMessage()}
-                disabled={!this.state.message.trim()}
-                activeOpacity={0.55}
-                delayLongPress={500}>
-                <Icon
-                  style={{
-                    alignSelf: 'center', marginLeft: 2, marginTop: 2
+              {
+                ( !this.state.isInputfocused && this.contact.lastSeenActive ) && (
+                  <>
+                    <TouchableOpacity onPress={()=>this.onPressSend()} style={styles.btnPay}>
+                      <Text style={styles.textBtn}>Pay</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.btnRequest}>
+                      <Text style={styles.textBtn}>Request</Text>
+                    </TouchableOpacity>
+                  </>
+                )
+              }
+
+              <View style={styles.containerInput}>
+                <TextInput
+                  value={this.state.message}
+                  onChangeText={( text ) => {
+                    this.setState( {
+                      message: text
+                    } )
                   }}
-                  name={'md-send'}
-                  size={24}
-                  color={Colors.white}
+                  style={styles.textInputMsg}
+                  placeholderTextColor="a0a0a0"
+                  numberOfLines={3}
+                  multiline
+                  onFocus={()=> this.setState( {
+                    isInputfocused: true
+                  } )}
+                  onBlur={()=> this.setState( {
+                    isInputfocused: false
+                  } )}
+                  placeholder="Message"
                 />
-              </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.fab2}
+                  onPress={() => this.sendMessage()}
+                  disabled={!this.state.message.trim()}
+                  activeOpacity={0.55}
+                  delayLongPress={500}>
+                  <View style={styles.icFab}>
+                    <Icon
+                      name={( !this.state.isInputfocused&& this.contact.lastSeenActive ) ? 'gift' : 'md-send'}
+                      size={20}
+                      color={Colors.white}
+                    />
+                  </View>
+                </TouchableOpacity>
+              </View>
             </View>
           </KeyboardAvoidingView>
         )}
@@ -1711,7 +1674,7 @@ class ContactDetails extends PureComponent<
           renderHeader={this.SendModalFunction}
         /> */}
         {this.state.showLoader ? <Loader /> : null}
-      </SafeAreaView>
+      </View>
     )
   }
 }
@@ -1864,31 +1827,24 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
   },
   headerImageView: {
-    width: wp( '17%' ),
-    height: wp( '17%' ),
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 10,
-    shadowOffset: {
-      width: 2,
-      height: 2,
-    },
+    width: wp( '8%' ),
+    height: wp( '8%' ),
     backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: wp( '17%' ) / 2,
+    borderRadius: wp( '8%' ) / 2,
   },
   headerImage: {
-    width: wp( '16%' ),
-    height: wp( '16%' ),
+    width: wp( '10%' ),
+    height: wp( '10%' ),
     borderRadius: wp( '16%' ) / 2,
   },
   headerImageInitials: {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.shadowBlue,
-    width: wp( '16%' ),
-    height: wp( '16%' ),
+    width: wp( '12%' ),
+    height: wp( '12%' ),
     borderRadius: wp( '16%' ) / 2,
   },
   headerImageInitialsText: {
@@ -1954,7 +1910,8 @@ const styles = StyleSheet.create( {
   headerRowContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: wp( 3 ),
+    paddingHorizontal: wp( 1 ),
+    flex: 1
   },
   contactTypeText: {
     color: Colors.textColorGrey,
@@ -2052,35 +2009,76 @@ const styles = StyleSheet.create( {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     elevation: 4,
+    marginBottom: 4,
+  },
+  containerInput: {
+    flex: 1,
+    flexDirection: 'row',
+    margin: 5,
+    borderRadius: 20,
+    borderColor: '#FFE09D',
+    borderWidth: 1,
+    maxHeight: 80,
+    minHeight: 40,
+    alignItems: 'center'
   },
   textInputMsg: {
-    margin: 5,
-    borderRadius: 5,
-    borderColor: Colors.lightBlue,
-    borderWidth: 0.5,
-    padding: 7,
-    maxHeight: 80,
-    paddingLeft: 10,
-    paddingRight: 10,
-    minHeight: 40,
     flex: 1,
-    backgroundColor: 'white',
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 12 ),
+    borderRadius: 20,
+    maxHeight: 80,
+    minHeight: 40,
+    padding: 5,
+  },
+  btnPay: {
+    backgroundColor: Colors.blue,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    marginRight: 5
+  },
+  btnRequest: {
+    backgroundColor: '#FABC05',
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    marginLeft: 5
+  },
+  textBtn: {
+    color: 'white'
   },
   fab2: {
-    marginHorizontal: 5,
-    height: 40,
-    width: 40,
+    height: 35,
+    width: 35,
     borderRadius: 22,
-    backgroundColor: Colors.lightBlue,
-    borderColor: 'white',
     elevation: 2,
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: 5,
+    borderWidth: 1,
+    borderColor: '#FABC05',
   },
-  list: {
-    //paddingTop: 5,
-    flexGrow: 1,
-    justifyContent: 'flex-end',
-    paddingHorizontal: 15
+  icFab: {
+    alignSelf: 'center',
+    margin: 2,
+    borderRadius: 20,
+    backgroundColor: '#FABC05',
+    height: 30,
+    width: 30,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
+  textTitle: {
+    alignItems: 'center',
+    fontSize: RFValue( 14 ),
+    fontWeight: '600',
+    color: 'white',
+    fontFamily: Fonts.RobotoSlabBold,
+    marginLeft: 20,
+  }
 } )
