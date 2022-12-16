@@ -117,7 +117,7 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
         }}
         onPress={onSendPressed}
         title={common.send}
-        subtitle={`Tran Fee: ~${
+        subtitle={averageTxFees!== '' ?`Tran Fee: ~${
           averageTxFees ?
             prefersBitcoin?
               averageTxFees[ network ].low.averageTxFee :
@@ -128,7 +128,7 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
                 ).toFixed( 2 )
                 : ''
             : 0
-        } (${isTestAccount ? 't-sats' : transactionFeeUnitText})`}
+        } (${isTestAccount ? 't-sats' : transactionFeeUnitText})` : null}
         imageSource={require( '../../../assets/images/icons/icon_send_blue.png' )}
       />
       <FooterButton
