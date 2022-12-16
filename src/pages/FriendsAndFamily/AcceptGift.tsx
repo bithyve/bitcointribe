@@ -162,6 +162,11 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     if ( passcodeArray.join( '' ).length == 6 ) {
       setPasscode( tempPasscode.join( '' ) )
     }
+    if ( i == 5 && tempPasscode[ i ] != '' ) {
+      setIsDisabled( false )
+    } else {
+      setIsDisabled( true )
+    }
   }
 
   const getInputBox = () => {
@@ -570,8 +575,10 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             setAcceptGiftModal( false ); 
             closeModal(); 
             dispatch( giftAccepted( '' ) );
-            navigation.navigate( 'ManageGifts', {giftType : '0'} );
-          } 
+            navigation.navigate( 'ManageGifts', {
+              giftType : '0'
+            } )
+          }
 
           }
           style={{
