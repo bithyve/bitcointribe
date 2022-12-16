@@ -182,9 +182,9 @@ export default function GiftCreatedScreen( props ) {
             backgroundColor={Colors.background}
             title={props.infoBoxTitle}
             infoText={slotFromIndex == 1 ? 'Your SATSCARD™ is now ready to be gifted to your loved ones\nThe person you gift it to will have to enter the spend code at the back of the card to claim the sats.\nA transaction fee will be deducted from the sats in the SATSCARD™ when its claimed.\n'
-              : slotFromIndex == 2 ? 'There are sats in your SATSCARD™\nYou could gift it as is. But if you’d like to gift a higher/lower amount, withdraw sats to unlock a new slot. This is a security feature.\nYou will be charged <enter amount> sats as transaction fee for withdrawal. The sats would be deducted from the SATSCARD™\n'
+              : slotFromIndex == 2 ? 'There are sats in your SATSCARD™\nYou could gift it as is. But if you’d like to gift a higher/lower amount, withdraw sats to unlock a new slot. This is a security feature.\nYou will be charged 226 sats as transaction fee for withdrawal. The sats would be deducted from the SATSCARD™\n'
                 : slotFromIndex == 3 ? 'Oops! No sats were found on the SATSCARD™. Either the sats are unconfirmed, or the gift creation failed!\n\n'
-                  : slotFromIndex == 4 ? 'You could claim sats into your wallet or gift the SATSCARD™ forward as is.\nTo claim sats, enter the spend code at the back of your SATSCARD™ on the next screen.\nYou will be charged <enter amount> sats as transaction fee to claim sats. The sats would be deducted from the SATSCARD™\n'
+                  : slotFromIndex == 4 ? 'You could claim sats into your wallet or gift the SATSCARD™ forward as is.\nTo claim sats, enter the spend code at the back of your SATSCARD™ on the next screen.\nYou will be charged 226 sats as transaction fee to claim sats. The sats would be deducted from the SATSCARD™\n'
                     : ''
             }
           />
