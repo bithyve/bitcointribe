@@ -616,6 +616,7 @@ function* recoverWalletWorker( { payload } ) {
       }
 
       const getWI = yield call( BHROperations.fetchWalletImage, image.walletId )
+      console.log( 'getWI', getWI )
       if ( getWI.status == 200 ) image = idx( getWI, _ => _.data.walletImage )
     }
     const accounts = image.accounts

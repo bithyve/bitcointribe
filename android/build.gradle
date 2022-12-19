@@ -33,6 +33,7 @@ buildscript {
         // in the individual module build.gradle files
     }
 }
+def REACT_NATIVE_VERSION = new File(['node', '--print',"JSON.parse(require('fs').readFileSync(require.resolve('react-native/package.json'), 'utf-8')).version"].execute(null, rootDir).text.trim())
 
 allprojects {
     subprojects { subproject ->
@@ -60,5 +61,15 @@ allprojects {
         }
         google()
         maven { url 'https://www.jitpack.io' }
+        exclusiveContent {
+           filter {
+               includeGroup "com.facebook.react"
+           }
+           forRepository {
+               maven {
+                   url "$rootDir/../node_modules/react-native/android"
+               }
+           }
+       }
     }
 }
