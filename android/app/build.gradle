@@ -52,7 +52,7 @@ def enableHermes = project.ext.react.get("enableHermes", false);
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    // buildToolsVersion rootProject.ext.buildToolsVersion
     flavorDimensions "default"
 
     defaultConfig {
