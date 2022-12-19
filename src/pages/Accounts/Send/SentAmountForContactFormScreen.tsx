@@ -276,7 +276,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
           </View>
         </View>
 
-        <View style={styles.formBodySection}>
+        {/* <View style={styles.formBodySection}>
           <TouchableOpacity
             style={{
               ...styles.textInputFieldWrapper,
@@ -326,7 +326,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
             />
           </TouchableOpacity>
 
-        </View>
+        </View> */}
 
         <View style={styles.formBodySection}>
           <BalanceEntryFormGroup
@@ -371,6 +371,7 @@ const styles = StyleSheet.create( {
   formBodySection: {
     // flex: 1,
     marginBottom: 24,
+    marginTop: hp( 80 )
   },
 
   footerSection: {

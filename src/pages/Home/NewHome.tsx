@@ -1421,15 +1421,19 @@ class NewHome extends PureComponent<HomePropsTypes, HomeStateTypes> {
       <TouchableOpacity style={{
         width: wp( 95 ), height: wp( 120 ), marginEnd: wp( 18 ),
         backgroundColor: Colors.cream, paddingHorizontal: wp( 12 ),
-        borderRadius: 10, marginBottom: 18
+        borderRadius: 10, marginBottom: 18, overflow:'hidden'
       }} activeOpacity={1} onPress={() => this.onItemClick( item )}>
-        { ( item.name == 'Be a Sherpa' || item.name == '' || item.name == 'Create group' ) && <Text style={{
+        { ( item.name == 'Be a Sherpa' || item.name == '' || item.name == 'Create group' ) &&
+        <Text style={{
           fontSize: RFValue( 8 ), fontFamily: Fonts.RobotoSlabMedium,
-          letterSpacing: 0.8, lineHeight: ( 16 ), marginTop: 7, color: Colors.goldenText
+          letterSpacing: 0.8, lineHeight: ( 16 ), marginTop: 7,
+          color: Colors.goldenText
         }}>{'COMING SOON'}</Text>}
         <Image source={this.getIconPath( item )}
           style={{
-            width: wp( 31 ), height: wp( 31 ), marginTop: ( item.name == 'Be a Sherpa' || item.name == 'Create group' )  ? ( 14 ) : ( 36 )
+            width: wp( 31 ), height: wp( 31 ),
+            marginTop: ( item.name == 'Be a Sherpa' || item.name == 'Create group' )
+              ? hp( 8 ) : hp( 36 )
           }} />
         <Text style={{
           fontSize: RFValue( 12 ), fontFamily: Fonts.RobotoSlabMedium,

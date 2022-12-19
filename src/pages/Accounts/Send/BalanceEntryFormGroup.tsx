@@ -50,6 +50,9 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   const exchangeRates = useExchangeRates()
   const currencyCode = useCurrencyCode()
   const currencyKind = useCurrencyKind()
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
   const sendingState = useSendingState()
   const totalSpendingAmount = useTotalSpendingAmount( currentRecipient )
   const dispatch = useDispatch()
@@ -76,7 +79,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
     return currentSatsAmountFormValue > spendableBalance
   }, [ currentSatsAmountFormValue, spendableBalance ] )
 
-  const [ currencyKindForEntry, setCurrencyKindForEntry ] = useState( currencyKind )
+  // const [ currencyKindForEntry, setCurrencyKindForEntry ] = useState( currencyKind )
 
   const FiatAmountInputLeftIcon: React.FC = () => {
     return (
@@ -154,7 +157,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
         <TouchableOpacity
           style={{
             ...styles.textInputFieldWrapper,
-            backgroundColor: currencyKindForEntry == CurrencyKind.FIAT
+            backgroundColor: !prefersBitcoin
               ? Colors.white
               : Colors.backgroundColor,
           }}
@@ -171,8 +174,8 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
               borderBottomColor: 'transparent',
             }}
             inputStyle={styles.textInputContent}
-            editable={currencyKindForEntry == CurrencyKind.FIAT}
-            placeholder={currencyKindForEntry == CurrencyKind.BITCOIN
+            editable={!prefersBitcoin}
+            placeholder={prefersBitcoin
               ? `${strings.ConvertedIn} ` + currencyCode
               : `${strings.Enteramountin} ` + currencyCode
             }
@@ -205,7 +208,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
 
           {
             showSendMax &&
-            ( currencyKindForEntry == CurrencyKind.FIAT ) &&
+            ( !prefersBitcoin ) &&
             ( isSendingMax == false ) &&
             (
               <AppBottomSheetTouchableWrapper
@@ -234,7 +237,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
         <TouchableOpacity
           style={{
             ...styles.textInputFieldWrapper,
-            backgroundColor: currencyKindForEntry == CurrencyKind.BITCOIN
+            backgroundColor: prefersBitcoin
               ? Colors.white
               : Colors.backgroundColor,
           }}
@@ -256,9 +259,9 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
               borderBottomColor: 'transparent',
             }}
             inputStyle={styles.textInputContent}
-            editable={!fromWallet && currencyKindForEntry == CurrencyKind.BITCOIN}
+            editable={!fromWallet && prefersBitcoin}
             placeholder={
-              currencyKindForEntry == CurrencyKind.BITCOIN
+              prefersBitcoin
                 ? subAccountKind == SubAccountKind.TEST_ACCOUNT
                   ? `${strings.Enteramountin} t-sats`
                   : `${strings.Enteramountin} sats`
@@ -295,7 +298,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
           />
 
           {showSendMax &&
-            ( currencyKindForEntry == CurrencyKind.BITCOIN ) &&
+            ( prefersBitcoin ) &&
             ( isSendingMax == false ) &&
             (
               <TouchableOpacity
@@ -337,19 +340,19 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
         ) : null} */}
       </View>
 
-      <View style={styles.toggleSwitchView}>
+      {/* <View style={styles.toggleSwitchView}>
         <CurrencyKindToggleSwitch
           fiatCurrencyCode={currencyCode}
           onpress={() => setCurrencyKindForEntry(
-            currencyKindForEntry == CurrencyKind.BITCOIN ?
+            prefersBitcoin ?
               CurrencyKind.FIAT
               : CurrencyKind.BITCOIN
           )}
-          isOn={currencyKindForEntry == CurrencyKind.BITCOIN}
+          isOn={prefersBitcoin}
           isVertical={true}
           disabled={exchangeRates && exchangeRates[ currencyCode ] ? false : true}
         />
-      </View>
+      </View> */}
     </View >
   )
 }

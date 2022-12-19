@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Linking,
-  StyleSheet
+  StyleSheet,
+  StatusBar
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -24,6 +25,7 @@ import { translations, LocalizationContext } from '../common/content/LocContext'
 import ChangeCurrency from '../assets/images/icon_currency.svg'
 import IconLanguage from '../assets/images/icon_language.svg'
 import Languages from '../common/content/availableLanguages'
+import CustomToolbar from '../components/home/CustomToolbar'
 
 const styles = StyleSheet.create( {
   container: {
@@ -201,10 +203,18 @@ export default function ChangeCurrencyScreen( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1
+      flex: 1,
     }}>
+      <CustomToolbar
+        onBackPressed={() => props.navigation.goBack()}
+        toolbarTitle={strings.ChangeCurrency}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 12 )
+        }} />
+      <StatusBar backgroundColor={Colors.appPrimary} barStyle="dark-content" />
       <ScrollView contentContainerStyle={styles.container} overScrollMode="never" showsVerticalScrollIndicator={false}>
-        <Text style={styles.textHeading}>{strings.ChangeCurrency}</Text>
+        {/* <Text style={styles.textHeading}>{strings.ChangeCurrency}</Text> */}
         <MenuHeading
           title={strings.AlternateCurrency}
           subtitle={strings.Selectyourlocalcurrency}

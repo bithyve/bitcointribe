@@ -183,6 +183,10 @@ const styles = StyleSheet.create( {
     marginHorizontal: wp1( 20 ),
     marginBottom: hp1( 41 ),
     marginTop: hp1( 96 ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.white,
+    borderRadius: 10,
   },
   textBoxImage: {
     width: wp( '6%' ),
@@ -200,14 +204,14 @@ const styles = StyleSheet.create( {
   },
   textBox: {
     flex: 1,
-    height: hp1( 50 ),
-    paddingLeft: 20,
+    // height: hp1( 50 ),
+    paddingHorizontal: 20,
     fontFamily: Fonts.FiraSansMedium,
     fontSize: RFValue( 13 ),
-    backgroundColor: Colors.white,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    textAlignVertical: 'center'
+    // backgroundColor: Colors.white,
+    // borderRadius: 10,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    // textAlignVertical: 'center'
   },
 } )

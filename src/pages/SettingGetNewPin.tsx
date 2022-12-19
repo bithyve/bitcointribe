@@ -29,6 +29,7 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../components/ErrorModalContents'
 import ModalHeader from '../components/ModalHeader'
+import CustomToolbar from '../components/home/CustomToolbar'
 
 export default function SettingGetNewPin( props ) {
   const [ passcode, setPasscode ] = useState( '' )
@@ -177,8 +178,16 @@ export default function SettingGetNewPin( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1
+      flex: 1,
+      backgroundColor: Colors.appPrimary
     }}>
+      <CustomToolbar
+        onBackPressed={() => props.navigation.goBack()}
+        toolbarTitle={'Manage Passcode'}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 12 )
+        }} />
       <StatusBar />
       <View style={{
         flex: 1
@@ -564,7 +573,7 @@ export default function SettingGetNewPin( props ) {
                 }}
                 style={{
                   ...styles.proceedButtonView,
-                  backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
+                  backgroundColor: isDisabled ? Colors.white : Colors.white,
                 }}
               >
                 <Text style={styles.proceedButtonText}>Proceed</Text>
@@ -705,7 +714,7 @@ export default function SettingGetNewPin( props ) {
                 style={styles.keyPadElementText}
                 onPress={() => onPressNumber( 'x' )}
               >
-                <Ionicons name="ios-backspace" size={30} color={Colors.blue} />
+                <Ionicons name="ios-backspace" size={30} color={Colors.white} />
               </Text>
             </TouchableOpacity>
           </View>
@@ -780,7 +789,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
   },
   keyPadElementText: {
-    color: Colors.blue,
+    color: Colors.white,
     fontSize: RFValue( 25 ),
     fontFamily: Fonts.FiraSansRegular,
     fontStyle: 'normal',
@@ -793,15 +802,15 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
+    // elevation: 10,
+    // shadowColor: Colors.shadowBlue,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 15, height: 15
+    // },
   },
   proceedButtonText: {
-    color: Colors.white,
+    color: Colors.blue,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
@@ -818,14 +827,14 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
   },
   headerInfoText: {
-    color: Colors.textColorGrey,
+    color: Colors.white,
     fontSize: RFValue( 12 ),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular,
     marginTop: hp( 1 )
   },
   passcodeTextInputText: {
-    color: Colors.blue,
+    color: Colors.white,
     fontWeight: 'bold',
     fontSize: RFValue( 13, 812 ),
   },

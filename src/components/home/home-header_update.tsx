@@ -69,6 +69,7 @@ import { ContactRecipientDescribing } from '../../common/data/models/interfaces/
 import RecipientKind from '../../common/data/enums/RecipientKind'
 import BackupShield from '../../assets/images/icons/backupShield.svg'
 import NewSwitch from '../NewSwitch'
+import Details from '../../assets/images/HomePageIcons/details.svg'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -606,7 +607,9 @@ const HomeHeader = ( {
 
   const handleOptionSelection = ( menuOption: MenuOption ) => {
     if ( menuOption.screenName == 'WalletBackup' ) {
+      console.log( 'skk leveldataqwe', JSON.stringify( levelData ) )
       if (
+        levelData[ 0 ].status == 'notSetup' ||
         levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed' ||
           levelData[ 0 ].keeper1ButtonText?.toLowerCase() ==
             'write down seed-words'
@@ -632,7 +635,7 @@ const HomeHeader = ( {
           dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
           setOnKeeperButtonClick( true )
         }
-      } else navigation.navigate( menuOption.screenName, {
+      } else navigation.navigate( 'WalletBackup', {
         fromHome: true
       } )
     }
@@ -643,7 +646,8 @@ const HomeHeader = ( {
       ...styles.headerViewContainer
     }}>
       <View style={{
-        flexDirection: 'row', alignItems: 'center'
+        flexDirection: 'row', alignItems
+        : 'center'
       }}>
         <View style={{
           height: wp( 40 ),
@@ -657,9 +661,11 @@ const HomeHeader = ( {
             height: wp( 38 ),
             width: wp( 38 ),
             backgroundColor: Colors.appPrimary,
-            borderRadius: wp( 20 )
+            borderRadius: wp( 20 ),
+            justifyContent: 'center',
+            alignItems: 'center'
           }}>
-
+            <Details />
           </View>
         </View>
         <TouchableOpacity style={{

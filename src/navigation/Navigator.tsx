@@ -100,17 +100,20 @@ const SetupNavigator = createStackNavigator(
     Login,
     SettingGetNewPin: {
       screen: SettingGetNewPin,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          ...defaultStackScreenNavigationOptions,
-          headerLeft: () => {
-            return <SmallNavHeaderBackButton onPress={() => {
-              navigation.popToTop() }} />
-          },
-          title: 'Manage Passcode',
-          headerShown: true
-        }
+      navigationOptions: {
+        header:null
       },
+      // navigationOptions: ( { navigation } ) => {
+      //   return {
+      //     ...defaultStackScreenNavigationOptions,
+      //     headerLeft: () => {
+      //       return <SmallNavHeaderBackButton onPress={() => {
+      //         navigation.popToTop() }} />
+      //     },
+      //     title: 'Manage Passcode123',
+      //     headerShown: true
+      //   }
+      // },
     },
     PasscodeConfirm,
     NewWalletName,

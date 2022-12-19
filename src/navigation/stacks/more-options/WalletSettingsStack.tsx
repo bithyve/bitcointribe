@@ -24,13 +24,15 @@ const WalletSettingsStack = createStackNavigator(
     ManagePasscode: {
       screen: ManagePasscodeScreen,
       navigationOptions: {
-        title: 'Manage Passcode',
+        header:null
+        // title: 'Manage Passcode',
       },
     },
     ChangeCurrency: {
       screen: ChangeCurrencyScreen,
       navigationOptions: {
-        title: '',
+        header:null
+        // title: '',
       },
     },
     ReLogin: {
@@ -54,7 +56,7 @@ const WalletSettingsStack = createStackNavigator(
     SettingGetNewPin: {
       screen: SettingGetNewPin,
       navigationOptions: {
-        title: 'Manage Passcode',
+        header:null
       },
     },
   },

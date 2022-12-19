@@ -16,6 +16,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { translations } from '../common/content/LocContext'
+import CustomToolbar from '../components/home/CustomToolbar'
+import { hp } from '../common/data/responsiveness/responsive'
 
 export default function ManagePasscodeScreen( props ) {
   const strings  = translations[ 'login' ]
@@ -66,8 +68,16 @@ export default function ManagePasscodeScreen( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1
+      flex: 1,
+      backgroundColor: Colors.appPrimary
     }}>
+      <CustomToolbar
+        onBackPressed={() => props.navigation.goBack()}
+        toolbarTitle={'Manage Passcode'}
+        showSwitch={false}
+        containerStyle={{
+          height: hp( 100 )
+        }} />
       <View style={{
         alignSelf: 'baseline'
       }}>
@@ -226,7 +236,7 @@ export default function ManagePasscodeScreen( props ) {
             style={{
               ...styles.proceedButtonView,
               backgroundColor:
-                pin.length == 4 ? Colors.blue : Colors.lightBlue,
+                pin.length == 4 ? Colors.white : Colors.white,
             }}
           >
             <Text style={styles.proceedButtonText}>{common.proceed}</Text>
@@ -373,7 +383,7 @@ export default function ManagePasscodeScreen( props ) {
               <Ionicons
                 name="ios-backspace"
                 size={30}
-                color={Colors.blue}
+                color={Colors.white}
               />
             </Text>
           </TouchableOpacity>
@@ -390,7 +400,7 @@ const styles = StyleSheet.create( {
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
-    color: Colors.red,
+    color: Colors.errorPink,
     fontSize: RFValue( 11, 812 ),
     fontStyle: 'italic',
   },
@@ -402,7 +412,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
   },
   keyPadElementText: {
-    color: Colors.blue,
+    color: Colors.white,
     fontSize: RFValue( 25 ),
     fontFamily: Fonts.FiraSansRegular,
     fontStyle: 'normal',
@@ -415,21 +425,21 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
+    // elevation: 10,
+    // shadowColor: Colors.white,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 15, height: 15
+    // },
     marginBottom: heightPercentageToDP( '5%' ),
   },
   proceedButtonText: {
-    color: Colors.white,
+    color: Colors.blue,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   passcodeTextInputText: {
-    color: Colors.blue,
+    color: Colors.white,
     fontWeight: 'bold',
     fontSize: RFValue( 13 ),
   },
@@ -491,8 +501,8 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
   },
   headerInfoText: {
+    color: Colors.white,
     marginTop: heightPercentageToDP( '2%' ),
-    color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular,

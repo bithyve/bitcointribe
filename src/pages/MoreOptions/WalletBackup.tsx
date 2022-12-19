@@ -808,7 +808,7 @@ const WalletBackup = ( props ) => {
         backgroundColor: Colors.appPrimary
       }}/>
       <CustomToolbar
-        onBackPressed={() => props.navigation.goBack()}
+        onBackPressed={() => handleBackButtonClick()}
         toolbarTitle={strings[ 'WalletBackup' ]}
         showSwitch={false}
         containerStyle={{

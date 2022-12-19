@@ -269,6 +269,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     } else if ( menuOption.screenName !== undefined ) {
       if ( menuOption.screenName == 'WalletBackup' ) {
         if (
+          levelData[ 0 ].status == 'notSetup' ||
           levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed' ||
           levelData[ 0 ].keeper1ButtonText?.toLowerCase() ==
             'write down seed-words'
