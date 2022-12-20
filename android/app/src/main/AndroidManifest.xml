@@ -40,6 +40,7 @@
       android:label="@string/app_name"
       android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
       android:screenOrientation="portrait"
+        android:exported="true"
       android:windowSoftInputMode="adjustResize"
     >
       <intent-filter>
@@ -125,7 +126,7 @@
         <data android:scheme="hexa" />
       </intent-filter>
     </activity>
-    <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+    <activity android:exported="true" android:name="com.facebook.react.devsupport.DevSettingsActivity" />
     <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.provider" android:grantUriPermissions="true" android:exported="false">
       <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/filepaths" />
     </provider>  
