@@ -36,6 +36,7 @@ import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/tru
 import semverLte from 'semver/functions/lte'
 import { applyUpgradeSequence } from './upgrades'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
+import ElectrumClient from '../../bitcoin/electrum/client'
 
 
 function* setupWalletWorker( { payload } ) {
@@ -129,6 +130,9 @@ function* credentialsStorageWorker( { payload } ) {
   yield put( keyFetched( AES_KEY ) )
   yield call( AsyncStorage.setItem, 'hasCreds', 'true' )
   yield put( credsStored() )
+
+  // connect electrum-client
+  yield call( ElectrumClient.connect )
 }
 
 export const credentialStorageWatcher = createWatcher(
@@ -202,6 +206,8 @@ function* credentialsAuthWorker( { payload } ) {
     yield put( credsAuthenticated( true ) )
     // t.stop()
     yield put( keyFetched( key ) )
+
+    yield call( ElectrumClient.connect )
 
     // check if the app has been upgraded
     const wallet: Wallet = yield select( state => state.storage.wallet )
