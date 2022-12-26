@@ -21,7 +21,6 @@ import {
   AUTO_SYNC_SHELLS,
   accountShellRefreshCompleted,
   accountShellRefreshStarted,
-  FETCH_FEE_AND_EXCHANGE_RATES,
   exchangeRatesCalculated,
   setAverageTxFee,
   VALIDATE_TWO_FA,
@@ -49,6 +48,8 @@ import {
   GENERATE_GIFTS,
   giftCreationSuccess,
   updateAccountSettings,
+  FETCH_FEE_RATES,
+  FETCH_EXCHANGE_RATES,
 } from '../actions/accounts'
 import {
   setAllowSecureAccount,
@@ -461,43 +462,38 @@ function* testcoinsWorker( { payload: testAccount }: { payload: Account } ) {
 
 export const testcoinsWatcher = createWatcher( testcoinsWorker, GET_TESTCOINS )
 
-function* feeAndExchangeRatesWorker() {
-  const storedExchangeRates = yield select(
-    ( state ) => state.accounts.exchangeRates
-  )
-  const storedAverageTxFees = yield select(
-    ( state ) => state.accounts.averageTxFees
-  )
-  const currencyCode = yield select(
-    ( state ) => state.preferences.currencyCode
-  )
+function* fetchFeeRatesWorker() {
   try {
-    const { exchangeRates, averageTxFees } = yield call( Relay.fetchFeeAndExchangeRates, currencyCode )
-    if ( !exchangeRates ) console.log( 'Failed to fetch exchange rates' )
-    else {
-      if (
-        JSON.stringify( exchangeRates ) !== JSON.stringify( storedExchangeRates )
-      )
-        yield put( exchangeRatesCalculated( exchangeRates ) )
-    }
-
-    if ( !averageTxFees ) console.log( 'Failed to fetch fee rates' )
-    else {
-      if (
-        JSON.stringify( averageTxFees ) !== JSON.stringify( storedAverageTxFees )
-      )
-        yield put( setAverageTxFee( averageTxFees ) )
-    }
+    const averageTxFeeByNetwork = yield call( AccountOperations.calculateAverageTxFee )
+    if ( !averageTxFeeByNetwork ) console.log( 'Failed to calculate fee rates' )
+    else yield put( setAverageTxFee( averageTxFeeByNetwork ) )
   } catch ( err ) {
-    console.log( {
+    console.log( 'Failed to calculate fee rates', {
       err
     } )
   }
 }
 
-export const feeAndExchangeRatesWatcher = createWatcher(
-  feeAndExchangeRatesWorker,
-  FETCH_FEE_AND_EXCHANGE_RATES
+export const fetchFeeRatesWatcher = createWatcher( fetchFeeRatesWorker, FETCH_FEE_RATES )
+
+function* fetchExchangeRatesWorker() {
+  try {
+    const currencyCode = yield select(
+      ( state ) => state.preferences.currencyCode
+    )
+    const { exchangeRates } = yield call( Relay.fetchFeeAndExchangeRates, currencyCode )
+    if ( !exchangeRates ) console.log( 'Failed to fetch exchange rates' )
+    else yield put( exchangeRatesCalculated( exchangeRates ) )
+  } catch ( err ) {
+    console.log( 'Failed to fetch fee and exchange rates', {
+      err
+    } )
+  }
+}
+
+export const fetchExchangeRatesWatcher = createWatcher(
+  fetchExchangeRatesWorker,
+  FETCH_EXCHANGE_RATES
 )
 
 function* resetTwoFAWorker( { payload }: { payload: { secondaryMnemonic: string }} ) {

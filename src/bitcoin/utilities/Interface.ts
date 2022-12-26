@@ -780,6 +780,8 @@ export interface AverageTxFees {
   },
 }
 
+export type AverageTxFeesByNetwork = Record<NetworkType, AverageTxFees>;
+
 export interface LevelDataObj {
   shareType: string
   updatedAt: number

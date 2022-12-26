@@ -27,7 +27,7 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { fetchFeeAndExchangeRates, refreshAccountShells } from '../../../store/actions/accounts'
+import { fetchExchangeRates, fetchFeeRates, refreshAccountShells } from '../../../store/actions/accounts'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import config from '../../../bitcoin/HexaConfig'
@@ -280,8 +280,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       !Object.keys( averageTxFees ).length ||
       !exchangeRates ||
       !Object.keys( exchangeRates ).length
-    )
-      dispatch( fetchFeeAndExchangeRates() )
+    ){
+      dispatch( fetchFeeRates() )
+      dispatch( fetchExchangeRates() )
+    }
   }, [] )
 
   const onSendBittonPress = () => {

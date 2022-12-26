@@ -22,6 +22,8 @@ import {
   TransactionPrerequisiteElements,
   TxPriority,
   TransactionType,
+  NetworkType,
+  AverageTxFeesByNetwork,
 } from '../Interface'
 
 import AccountUtilities from './AccountUtilities'
@@ -724,6 +726,63 @@ export default class AccountOperations {
     return {
       fee
     }
+  };
+
+  static fetchFeeRatesByPriority = async () => {
+    // high fee: 30 minutes
+    const highFeeBlockEstimate = 3
+    const high = {
+      feePerByte: Math.round( await ElectrumClient.estimateFee( highFeeBlockEstimate ) ),
+      estimatedBlocks: highFeeBlockEstimate,
+    } // high: within 3 blocks
+
+    // medium fee: 2 hours
+    const mediumFeeBlockEstimate = 12
+    const medium = {
+      feePerByte: Math.round( await ElectrumClient.estimateFee( mediumFeeBlockEstimate ) ),
+      estimatedBlocks: mediumFeeBlockEstimate,
+    } // medium: within 12 blocks
+
+    // low fee: 6 hours
+    const lowFeeBlockEstimate = 36
+    const low = {
+      feePerByte: Math.round( await ElectrumClient.estimateFee( lowFeeBlockEstimate ) ),
+      estimatedBlocks: lowFeeBlockEstimate,
+    } // low: within 36 blocks
+
+    const feeRatesByPriority = {
+      high, medium, low
+    }
+    return feeRatesByPriority
+  };
+
+  static calculateAverageTxFee = async () => {
+    const feeRatesByPriority = await AccountOperations.fetchFeeRatesByPriority()
+    const averageTxSize = 226 // the average Bitcoin transaction is about 226 bytes in size (1 Inp (148); 2 Out)
+    const averageTxFees: AverageTxFees = {
+      high: {
+        averageTxFee: Math.round( averageTxSize * feeRatesByPriority.high.feePerByte ),
+        feePerByte: feeRatesByPriority.high.feePerByte,
+        estimatedBlocks: feeRatesByPriority.high.estimatedBlocks,
+      },
+      medium: {
+        averageTxFee: Math.round( averageTxSize * feeRatesByPriority.medium.feePerByte ),
+        feePerByte: feeRatesByPriority.medium.feePerByte,
+        estimatedBlocks: feeRatesByPriority.medium.estimatedBlocks,
+      },
+      low: {
+        averageTxFee: Math.round( averageTxSize * feeRatesByPriority.low.feePerByte ),
+        feePerByte: feeRatesByPriority.low.feePerByte,
+        estimatedBlocks: feeRatesByPriority.low.estimatedBlocks,
+      },
+    }
+
+    // TODO: configure to procure fee by network type
+    const averageTxFeeByNetwork: AverageTxFeesByNetwork = {
+      [ NetworkType.TESTNET ]: averageTxFees,
+      [ NetworkType.MAINNET ]: averageTxFees,
+    }
+    return averageTxFeeByNetwork
   };
 
   static prepareTransactionPrerequisites = (
