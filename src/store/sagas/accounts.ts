@@ -287,38 +287,20 @@ export function* syncAccountsWorker( { payload }: {payload: {
   accounts: Accounts,
   options: {
     hardRefresh?: boolean;
-    syncDonationAccount?: boolean,
   }}} ) {
   const { accounts, options } = payload
   const network = AccountUtilities.getNetworkByType( Object.values( accounts )[ 0 ].networkType )
 
-  if( options.syncDonationAccount ){
-    // can only sync one donation instance at a time
-    const donationAccount = ( Object.values( accounts )[ 0 ] as DonationAccount )
+  const { synchedAccounts } = yield call(
+    AccountOperations.syncAccountsViaElectrumClient,
+    accounts,
+    network,
+  )
 
-    const { synchedAccount, txsFound } = yield call(
-      AccountOperations.syncDonationAccount,
-      donationAccount,
-      network )
-
-    const synchedAccounts = {
-      [ synchedAccount.id ]: synchedAccount
-    }
-    return {
-      synchedAccounts, txsFound, activeAddressesWithNewTxsMap: {
-      }
-    }
-  } else {
-    const { synchedAccounts } = yield call(
-      AccountOperations.syncAccountsViaElectrumClient,
-      accounts,
-      network,
-    )
-
-    return {
-      synchedAccounts,
-    }
+  return {
+    synchedAccounts,
   }
+
 }
 
 function* accountCheckWoker( { payload } ) {
@@ -605,10 +587,10 @@ export const updateDonationPreferencesWatcher = createWatcher(
 
 function* refreshAccountShellsWorker( { payload }: { payload: {
   shells: AccountShell[],
-  options: { hardRefresh?: boolean, syncDonationAccount?: boolean }
+  options: { hardRefresh?: boolean }
 }} ) {
   const accountShells: AccountShell[] = payload.shells
-  const options: { hardRefresh?: boolean, syncDonationAccount?: boolean } = payload.options
+  const options: { hardRefresh?: boolean } = payload.options
   yield put( accountShellRefreshStarted( accountShells ) )
   const accountState: AccountsState = yield select(
     ( state ) => state.accounts
@@ -757,24 +739,6 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
       shells: lnShellsToSync,
     }
   } )
-
-  // TODO: enable multi-donation sync
-  if( donationShellsToSync.length )
-    try {
-      for( const donationAcc of donationShellsToSync ) {
-        yield call( refreshAccountShellsWorker, {
-          payload: {
-            shells: [ donationAcc ],
-            options: {
-              syncDonationAccount: true
-            }
-          }
-        } )
-      }
-    }
-    catch( err ){
-      console.log( `Sync via xpub agent failed w/ the following err: ${err}` )
-    }
 }
 
 export const autoSyncShellsWatcher = createWatcher(
@@ -1069,7 +1033,7 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
   let testcoinsToAccount
 
   for ( const { accountType, accountDetails, recreationInstanceNumber } of newAccountsInfo ){
-    const account: Account | MultiSigAccount | DonationAccount = yield call(
+    const account: Account | MultiSigAccount = yield call(
       addNewAccount,
       accountType,
       accountDetails || {
