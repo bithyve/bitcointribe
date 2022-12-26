@@ -1156,23 +1156,18 @@ export default class AccountOperations {
       txHex = signedTxb.build().toHex()
     }
 
-    const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
-    if( txid.includes( 'sendrawtransaction RPC error' ) ){
+    const txid = await ElectrumClient.broadcast( txHex )
+    if ( !txid ) throw new Error( 'Failed to broadcast transaction, txid missing' )
+
+    if ( txid.includes( 'sendrawtransaction RPC error' ) ) {
       let err
-      try{
-        err = ( txid.split( ':' )[ 3 ] ).split( '"' )[ 1 ]
-      } catch( err ){
-        console.log( {
-          err
-        } )
-      }
-      throw new Error( err )
+      try {
+        err = txid.split( ':' )[ 3 ].split( '"' )[ 1 ]
+      } catch ( err ) {}
+      throw new Error( err || txid )
     }
 
-    if( txid ){
-      AccountOperations.removeConsumedUTXOs( account, inputs, txid, recipients )  // chip consumed utxos
-    }
-    else throw new Error( 'Failed to broadcast transaction, txid missing' )
+    AccountOperations.removeConsumedUTXOs( account, inputs, txid, recipients )  // chip consumed utxos
     return {
       txid
     }
