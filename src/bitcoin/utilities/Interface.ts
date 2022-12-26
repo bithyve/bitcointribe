@@ -43,7 +43,7 @@ export interface Transaction {
   /**
    * Sats per byte
    */
-  fee?: string;
+  fee?: number;
 
   /**
    * UTC string

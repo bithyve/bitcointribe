@@ -21,6 +21,7 @@ import {
   TransactionPrerequisite,
   TransactionPrerequisiteElements,
   TxPriority,
+  TransactionType,
 } from '../Interface'
 
 import AccountUtilities from './AccountUtilities'
@@ -30,6 +31,7 @@ import config from '../../HexaConfig'
 import crypto from 'crypto'
 import idx from 'idx'
 import wif from 'wif'
+import ElectrumClient from '../../electrum/client'
 
 export default class AccountOperations {
 
@@ -114,6 +116,116 @@ export default class AccountOperations {
       assignee: requester
     }
   }
+
+  static fetchTransactions = async (
+    account: Account,
+    addresses: string[],
+    externalAddresses: { [address: string]: number },
+    internalAddresses: { [address: string]: number },
+    network: bitcoinJS.Network
+  ) => {
+    const { historyByAddress, txids, txidToAddress } = await ElectrumClient.syncHistoryByAddress(
+      addresses,
+      network
+    )
+
+    const transactions: Transaction[] = []
+    const txs = await ElectrumClient.getTransactionsById( txids )
+
+    // saturate transaction:  inputs-params, type, amount
+    const inputTxIds = []
+    for ( const txid in txs ) {
+      for ( const vin of txs[ txid ].vin ) inputTxIds.push( vin.txid )
+    }
+    const inputTxs = await ElectrumClient.getTransactionsById( inputTxIds )
+
+    let lastUsedAddressIndex = account.nextFreeAddressIndex - 1
+    let lastUsedChangeAddressIndex = account.nextFreeChangeAddressIndex - 1
+
+    for ( const txid in txs ) {
+      const tx = txs[ txid ]
+      // popluate tx-inputs with addresses and values
+      const inputs = tx.vin
+      for ( let index = 0; index < tx.vin.length; index++ ) {
+        const input = inputs[ index ]
+
+        const inputTx = inputTxs[ input.txid ]
+        if ( inputTx && inputTx.vout[ input.vout ] ) {
+          const vout = inputTx.vout[ input.vout ]
+          input.addresses = vout.scriptPubKey.addresses
+          input.value = vout.value
+        }
+      }
+
+      // calculate cumulative amount and transaction type
+      const outputs = tx.vout
+      let fee = 0 // delta b/w inputs and outputs
+      let amount = 0
+      const senderAddresses = []
+      const recipientAddresses = []
+
+      for ( const input of inputs ) {
+        const inputAddress = input.addresses[ 0 ]
+        if (
+          externalAddresses[ inputAddress ] !== undefined ||
+          internalAddresses[ inputAddress ] !== undefined
+        )
+          amount -= input.value
+
+        senderAddresses.push( inputAddress )
+        fee += input.value
+      }
+
+      for ( const output of outputs ) {
+        const outputAddress = output.scriptPubKey.addresses[ 0 ]
+        if (
+          externalAddresses[ outputAddress ] !== undefined ||
+          internalAddresses[ outputAddress ] !== undefined
+        )
+          amount += output.value
+
+        recipientAddresses.push( outputAddress )
+        fee -= output.value
+      }
+
+      const address = txidToAddress[ txid ]
+
+      const transaction: Transaction = {
+        txid,
+        confirmations: tx.confirmations ? tx.confirmations : 0,
+        status: tx.confirmations ? 'Confirmed' : 'Unconfirmed',
+        fee: Math.floor( fee * 1e8 ),
+        date: tx.time ? new Date( tx.time * 1000 ).toUTCString() : new Date( Date.now() ).toUTCString(),
+        transactionType: amount > 0 ? TransactionType.RECEIVED : TransactionType.SENT,
+        amount: Math.floor( Math.abs( amount ) * 1e8 ),
+        accountType: account.type,
+        accountName: account.accountName,
+        recipientAddresses,
+        senderAddresses,
+        address,
+        blockTime: tx.blocktime,
+      }
+      transactions.push( transaction )
+
+      // update the last used address/change-address index
+      if ( externalAddresses[ address ] !== undefined ) {
+        lastUsedAddressIndex = Math.max( externalAddresses[ address ], lastUsedAddressIndex )
+      } else if ( internalAddresses[ address ] !== undefined ) {
+        lastUsedChangeAddressIndex = Math.max(
+          internalAddresses[ address ],
+          lastUsedChangeAddressIndex
+        )
+      }
+    }
+
+    // sort transactions chronologically
+    transactions.sort( ( tx1, tx2 ) => ( tx1.confirmations > tx2.confirmations ? 1 : -1 ) )
+    return {
+      transactions,
+      lastUsedAddressIndex,
+      lastUsedChangeAddressIndex,
+    }
+  };
 
   static syncAccounts = async ( accounts: Accounts, network: bitcoinJS.networks.Network, hardRefresh?: boolean ): Promise<{
     synchedAccounts: Accounts,
@@ -318,6 +430,109 @@ export default class AccountOperations {
       synchedAccounts: accounts,
       txsFound,
       activeAddressesWithNewTxsMap
+    }
+  };
+
+
+  static syncAccountsViaElectrumClient = async (
+    accounts: Accounts,
+    network: bitcoinJS.networks.Network
+  ): Promise<{
+    synchedAccounts: Accounts,
+  }> => {
+    for ( const account of Object.values( accounts ) ) {
+
+      const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
+      const hardGapLimit = 10 // hard refresh gap limit
+      const addresses = []
+
+      // collect external(receive) chain addresses
+      const externalAddresses: { [address: string]: number } = {
+      } // all external addresses(till closingExtIndex)
+      for ( let itr = 0; itr < account.nextFreeAddressIndex + hardGapLimit; itr++ ) {
+        let address: string
+        if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig( {
+          primary: account.xpub,
+          secondary: ( account as MultiSigAccount ).xpubs.secondary,
+          bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+        }, 2, network, itr, false ).address
+        else address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network, purpose )
+
+        externalAddresses[ address ] = itr
+        addresses.push( address )
+      }
+
+      // include imported external addresses
+      if( !account.importedAddresses ) account.importedAddresses = {
+      }
+      Object.keys( account.importedAddresses ).forEach( address => {
+        externalAddresses[ address ] = -1
+        addresses.push( address )
+      } )
+
+      // collect internal(change) chain addresses
+      const internalAddresses: { [address: string]: number } = {
+      } // all internal addresses(till closingIntIndex)
+      for ( let itr = 0; itr < account.nextFreeChangeAddressIndex + hardGapLimit; itr++ ) {
+        let address: string
+        if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig(  {
+          primary: account.xpub,
+          secondary: ( account as MultiSigAccount ).xpubs.secondary,
+          bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+        }, 2, network, itr, true ).address
+        else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network, purpose )
+
+        internalAddresses[ address ] = itr
+        addresses.push( address )
+      }
+
+      // sync utxos & balances
+      const utxosByAddress = await ElectrumClient.syncUTXOByAddress( addresses, network )
+
+      const balances: Balances = {
+        confirmed: 0,
+        unconfirmed: 0,
+      }
+      const confirmedUTXOs: InputUTXOs[] = []
+      const unconfirmedUTXOs: InputUTXOs[] = []
+      for ( const address in utxosByAddress ) {
+        const utxos = utxosByAddress[ address ]
+        for ( const utxo of utxos ) {
+          if ( utxo.height > 0 ) {
+            confirmedUTXOs.push( utxo )
+            balances.confirmed += utxo.value
+          } else if ( internalAddresses[ utxo.address ] !== undefined ) {
+            // defaulting utxo's on the change branch to confirmed
+            confirmedUTXOs.push( utxo )
+            balances.confirmed += utxo.value
+          } else {
+            unconfirmedUTXOs.push( utxo )
+            balances.unconfirmed += utxo.value
+          }
+        }
+      }
+
+      // sync & populate transactions
+      const { transactions, lastUsedAddressIndex, lastUsedChangeAddressIndex } =
+        await AccountOperations.fetchTransactions(
+          account,
+          addresses,
+          externalAddresses,
+          internalAddresses,
+          network
+        )
+
+      // update wallet w/ latest utxos, balances and transactions
+      account.unconfirmedUTXOs = unconfirmedUTXOs
+      account.confirmedUTXOs = confirmedUTXOs
+      account.balances = balances
+      account.transactions = transactions
+      account.nextFreeAddressIndex = lastUsedAddressIndex + 1
+      account.nextFreeChangeAddressIndex = lastUsedChangeAddressIndex + 1
+    }
+
+    return {
+      synchedAccounts: accounts,
     }
   };
 
