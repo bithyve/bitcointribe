@@ -309,14 +309,14 @@ export function* syncAccountsWorker( { payload }: {payload: {
       }
     }
   } else {
-    const { synchedAccounts, txsFound, activeAddressesWithNewTxsMap } = yield call(
-      AccountOperations.syncAccounts,
+    const { synchedAccounts } = yield call(
+      AccountOperations.syncAccountsViaElectrumClient,
       accounts,
       network,
-      options.hardRefresh )
+    )
 
     return {
-      synchedAccounts, txsFound, activeAddressesWithNewTxsMap
+      synchedAccounts,
     }
   }
 }
@@ -651,7 +651,7 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
   if( computeNetBalance ) yield put( recomputeNetBalance() )
 
   // update F&F channels if any new txs found on an assigned address
-  if( Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
+  if( activeAddressesWithNewTxsMap && Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
 }
 
 function* refreshLNShellsWorker( { payload }: { payload: {
