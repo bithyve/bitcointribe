@@ -1296,7 +1296,10 @@ const CreateGift = ( { navigation }: Props ) => {
                   color: amount !== '' ? Colors.textColorGrey : Colors.gray1,
                 },
               ]}
-              onPress={() => setKeyboard( true )}
+              onPress={() => {
+                if( showKeyboard ) return
+                setKeyboard( true )
+              }}
             >
               {currencyKind == CurrencyKind.FIAT
                 ? amount
@@ -1616,7 +1619,7 @@ const CreateGift = ( { navigation }: Props ) => {
             alignItems: 'center',
             marginHorizontal: wp( 6 ),
             justifyContent: 'space-between',
-            marginVertical: height < 720 ? hp( 1 ) : hp( 3 ),
+            marginVertical: height < 720 ? hp( 1 ) : hp( 1.5 ),
           }}
         >
           <Text
@@ -1875,7 +1878,7 @@ const CreateGift = ( { navigation }: Props ) => {
 const styles = StyleSheet.create( {
   keyPadRow: {
     flexDirection: 'row',
-    height: hp( '8%' ),
+    height: hp( '7%' ),
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
