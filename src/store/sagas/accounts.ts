@@ -21,7 +21,6 @@ import {
   AUTO_SYNC_SHELLS,
   accountShellRefreshCompleted,
   accountShellRefreshStarted,
-  FETCH_FEE_AND_EXCHANGE_RATES,
   exchangeRatesCalculated,
   setAverageTxFee,
   VALIDATE_TWO_FA,
@@ -49,6 +48,8 @@ import {
   GENERATE_GIFTS,
   giftCreationSuccess,
   updateAccountSettings,
+  FETCH_FEE_RATES,
+  FETCH_EXCHANGE_RATES,
 } from '../actions/accounts'
 import {
   setAllowSecureAccount,
@@ -287,38 +288,20 @@ export function* syncAccountsWorker( { payload }: {payload: {
   accounts: Accounts,
   options: {
     hardRefresh?: boolean;
-    syncDonationAccount?: boolean,
   }}} ) {
   const { accounts, options } = payload
   const network = AccountUtilities.getNetworkByType( Object.values( accounts )[ 0 ].networkType )
 
-  if( options.syncDonationAccount ){
-    // can only sync one donation instance at a time
-    const donationAccount = ( Object.values( accounts )[ 0 ] as DonationAccount )
+  const { synchedAccounts } = yield call(
+    AccountOperations.syncAccountsViaElectrumClient,
+    accounts,
+    network,
+  )
 
-    const { synchedAccount, txsFound } = yield call(
-      AccountOperations.syncDonationAccount,
-      donationAccount,
-      network )
-
-    const synchedAccounts = {
-      [ synchedAccount.id ]: synchedAccount
-    }
-    return {
-      synchedAccounts, txsFound, activeAddressesWithNewTxsMap: {
-      }
-    }
-  } else {
-    const { synchedAccounts, txsFound, activeAddressesWithNewTxsMap } = yield call(
-      AccountOperations.syncAccounts,
-      accounts,
-      network,
-      options.hardRefresh )
-
-    return {
-      synchedAccounts, txsFound, activeAddressesWithNewTxsMap
-    }
+  return {
+    synchedAccounts,
   }
+
 }
 
 function* accountCheckWoker( { payload } ) {
@@ -479,43 +462,38 @@ function* testcoinsWorker( { payload: testAccount }: { payload: Account } ) {
 
 export const testcoinsWatcher = createWatcher( testcoinsWorker, GET_TESTCOINS )
 
-function* feeAndExchangeRatesWorker() {
-  const storedExchangeRates = yield select(
-    ( state ) => state.accounts.exchangeRates
-  )
-  const storedAverageTxFees = yield select(
-    ( state ) => state.accounts.averageTxFees
-  )
-  const currencyCode = yield select(
-    ( state ) => state.preferences.currencyCode
-  )
+function* fetchFeeRatesWorker() {
   try {
-    const { exchangeRates, averageTxFees } = yield call( Relay.fetchFeeAndExchangeRates, currencyCode )
-    if ( !exchangeRates ) console.log( 'Failed to fetch exchange rates' )
-    else {
-      if (
-        JSON.stringify( exchangeRates ) !== JSON.stringify( storedExchangeRates )
-      )
-        yield put( exchangeRatesCalculated( exchangeRates ) )
-    }
-
-    if ( !averageTxFees ) console.log( 'Failed to fetch fee rates' )
-    else {
-      if (
-        JSON.stringify( averageTxFees ) !== JSON.stringify( storedAverageTxFees )
-      )
-        yield put( setAverageTxFee( averageTxFees ) )
-    }
+    const averageTxFeeByNetwork = yield call( AccountOperations.calculateAverageTxFee )
+    if ( !averageTxFeeByNetwork ) console.log( 'Failed to calculate fee rates' )
+    else yield put( setAverageTxFee( averageTxFeeByNetwork ) )
   } catch ( err ) {
-    console.log( {
+    console.log( 'Failed to calculate fee rates', {
       err
     } )
   }
 }
 
-export const feeAndExchangeRatesWatcher = createWatcher(
-  feeAndExchangeRatesWorker,
-  FETCH_FEE_AND_EXCHANGE_RATES
+export const fetchFeeRatesWatcher = createWatcher( fetchFeeRatesWorker, FETCH_FEE_RATES )
+
+function* fetchExchangeRatesWorker() {
+  try {
+    const currencyCode = yield select(
+      ( state ) => state.preferences.currencyCode
+    )
+    const { exchangeRates } = yield call( Relay.fetchFeeAndExchangeRates, currencyCode )
+    if ( !exchangeRates ) console.log( 'Failed to fetch exchange rates' )
+    else yield put( exchangeRatesCalculated( exchangeRates ) )
+  } catch ( err ) {
+    console.log( 'Failed to fetch fee and exchange rates', {
+      err
+    } )
+  }
+}
+
+export const fetchExchangeRatesWatcher = createWatcher(
+  fetchExchangeRatesWorker,
+  FETCH_EXCHANGE_RATES
 )
 
 function* resetTwoFAWorker( { payload }: { payload: { secondaryMnemonic: string }} ) {
@@ -605,10 +583,10 @@ export const updateDonationPreferencesWatcher = createWatcher(
 
 function* refreshAccountShellsWorker( { payload }: { payload: {
   shells: AccountShell[],
-  options: { hardRefresh?: boolean, syncDonationAccount?: boolean }
+  options: { hardRefresh?: boolean }
 }} ) {
   const accountShells: AccountShell[] = payload.shells
-  const options: { hardRefresh?: boolean, syncDonationAccount?: boolean } = payload.options
+  const options: { hardRefresh?: boolean } = payload.options
   yield put( accountShellRefreshStarted( accountShells ) )
   const accountState: AccountsState = yield select(
     ( state ) => state.accounts
@@ -651,7 +629,7 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
   if( computeNetBalance ) yield put( recomputeNetBalance() )
 
   // update F&F channels if any new txs found on an assigned address
-  if( Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
+  if( activeAddressesWithNewTxsMap && Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
 }
 
 function* refreshLNShellsWorker( { payload }: { payload: {
@@ -757,24 +735,6 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
       shells: lnShellsToSync,
     }
   } )
-
-  // TODO: enable multi-donation sync
-  if( donationShellsToSync.length )
-    try {
-      for( const donationAcc of donationShellsToSync ) {
-        yield call( refreshAccountShellsWorker, {
-          payload: {
-            shells: [ donationAcc ],
-            options: {
-              syncDonationAccount: true
-            }
-          }
-        } )
-      }
-    }
-    catch( err ){
-      console.log( `Sync via xpub agent failed w/ the following err: ${err}` )
-    }
 }
 
 export const autoSyncShellsWatcher = createWatcher(
@@ -1069,7 +1029,7 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
   let testcoinsToAccount
 
   for ( const { accountType, accountDetails, recreationInstanceNumber } of newAccountsInfo ){
-    const account: Account | MultiSigAccount | DonationAccount = yield call(
+    const account: Account | MultiSigAccount = yield call(
       addNewAccount,
       accountType,
       accountDetails || {

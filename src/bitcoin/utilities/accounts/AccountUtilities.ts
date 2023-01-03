@@ -407,7 +407,7 @@ export default class AccountUtilities {
     {
       balance: string
     }> => {
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
       const accountToAddressMapping = {
       }
@@ -546,7 +546,7 @@ export default class AccountUtilities {
     }
    }
   }> => {
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
       const accountToAddressMapping = {
       }
@@ -901,7 +901,7 @@ export default class AccountUtilities {
     const txCounts = {
     }
     try {
-      let res: AxiosResponse;
+      let res: AxiosResponse
       try {
         if ( network === bitcoinJS.networks.testnet ) {
           res = await BH_AXIOS.post(
@@ -972,7 +972,7 @@ export default class AccountUtilities {
   ): Promise<{
     txid: string;
   }> => {
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
       if ( network === bitcoinJS.networks.testnet ) {
         res = await BH_AXIOS.post(
@@ -1208,7 +1208,7 @@ export default class AccountUtilities {
       xpubs.push( ( account as MultiSigAccount ).xpubs.bithyve )
     }
 
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
       res = await BH_AXIOS.post( 'setupDonationAccount', {
         HEXA_ID: config.HEXA_ID,
@@ -1251,7 +1251,7 @@ export default class AccountUtilities {
     },
   ): Promise<{ updated: boolean, updatedAccount: DonationAccount }> => {
 
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
       res = await BH_AXIOS.post( 'updatePreferences', {
         HEXA_ID: config.HEXA_ID,
@@ -1282,61 +1282,6 @@ export default class AccountUtilities {
 
     return {
       updated, updatedAccount: account
-    }
-  };
-
-  static syncViaXpubAgent = async (
-    xpubId: string,
-    donationId: string
-  ): Promise<{
-    usedAddresses: string[],
-    nextFreeAddressIndex: number,
-    nextFreeChangeAddressIndex: number,
-    utxos: Array<{
-      txId: string;
-      vout: number;
-      value: number;
-      address: string;
-      status?: any;
-    }>,
-    balances: { confirmed: number; unconfirmed: number },
-    transactions: Transaction[],
-  }> => {
-    // syncs account via xpub-agent(relay)
-
-    let res: AxiosResponse;
-    try {
-      res = await BH_AXIOS.post( 'fetchXpubInfo', {
-        HEXA_ID: config.HEXA_ID,
-        xpubId,
-        accountType: DONATION_ACCOUNT,
-        accountDetails: {
-          donationId
-        },
-      } )
-    } catch ( err ) {
-      if ( err.response ) throw new Error( err.response.data.err )
-      if ( err.code ) throw new Error( err.code )
-    }
-
-    const {
-      usedAddresses,
-      nextFreeAddressIndex,
-      nextFreeChangeAddressIndex,
-      utxos,
-      balances,
-      transactions,
-    } = res.data || res.json
-
-    return {
-      usedAddresses,
-      nextFreeAddressIndex,
-      nextFreeChangeAddressIndex,
-      utxos,
-      balances: {
-        confirmed: balances.balance, unconfirmed: balances.unconfirmedBalance
-      },
-      transactions: transactions.transactionDetails,
     }
   };
 }
