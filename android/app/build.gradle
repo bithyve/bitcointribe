@@ -173,7 +173,7 @@ dependencies {
 
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-udp')
-    implementation project(':react-native-tcp')
+//    implementation project(':react-native-tcp')
     implementation project(':react-native-os')
     implementation project(':react-native-svg')
     implementation project(':react-native-video')
