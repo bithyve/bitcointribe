@@ -1052,7 +1052,7 @@ export default class AccountUtilities {
     }
     const amount = 10000 / SATOSHIS_IN_BTC
     try {
-      const res = await BH_AXIOS.post( `${config.RELAY}/testnetFaucet`, {
+      const res = await BH_AXIOS.post( `${config.RELAY}testnetFaucet`, {
         HEXA_ID: config.HEXA_ID,
         recipientAddress,
         amount,
