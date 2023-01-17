@@ -8,7 +8,7 @@ import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   isConnectionEnabled: boolean;
-  onToggle: () => void;
+  onToggle: (value: boolean) => void;
   containerStyle?: Record<string, unknown>;
 };
 

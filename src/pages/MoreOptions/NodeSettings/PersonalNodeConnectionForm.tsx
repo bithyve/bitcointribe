@@ -1,8 +1,8 @@
 import React, { useMemo, useState, useRef, useEffect } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Switch } from 'react-native'
 import ListStyles from '../../../common/Styles/ListStyles'
 import FormStyles from '../../../common/Styles/FormStyles'
-import { Input } from 'react-native-elements'
+import { Button, Input } from 'react-native-elements'
 import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSettings/UseActivePersonalNode'
 import ButtonBlue from '../../../components/ButtonBlue'
 import { TouchableOpacity } from 'react-native-gesture-handler'
@@ -14,58 +14,94 @@ import {
 } from 'react-native-responsive-screen'
 import Fonts from '../../../common/Fonts'
 import { translations } from '../../../common/content/LocContext'
+import ButtonStyles from '../../../common/Styles/ButtonStyles'
+import PersonalNode from '../../../common/data/models/PersonalNode'
 
 export type PersonalNodeFormData = {
   ipAddress: string;
   portNumber: number;
-  useFallback: boolean;
+  useKeeperNode: boolean;
 }
 
 export type Props = {
-  onSubmit: ( formData: PersonalNodeFormData ) => void;
+  params: PersonalNode;
+  onSubmit: ( formData: PersonalNode ) => void;
+  onCloseClick: () => void;
 };
 
 
-const PersonalNodeConnectionForm: React.FC<Props> = ( { onSubmit, }: Props ) => {
+const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onCloseClick }: Props ) => {
   const activePersonalNode = useActivePersonalNode()
   const strings  = translations[ 'settings' ]
   const common  = translations[ 'common' ]
-  const [ currentIPAddressValue, setCurrentIPAddressValue ] = useState(
-    activePersonalNode?.ipAddress || ''
-  )
-
-  const [ currentPortNumberValue, setCurrentPortNumberValue ] = useState(
-    String( activePersonalNode?.portNumber || '' )
-  )
-
-  const [ useFallback, setUseFallbacck ] = useState( activePersonalNode?.useFallback || false )
+  
+  const [useKeeperNode, setuseKeeperNode] = useState(params?.useKeeperNode);
+  const [useSSL, setUseSSL] = useState(params?.useSSL);
+  const [host, setHost] = useState(params?.host || '');
+  const [port, setPort] = useState(params?.port || '');
+  const [isHostValid, setIsHostValid] = useState(true);
+  const [isPortValid, setIsPortValid] = useState(true);
 
   const ipAddressInputRef = useRef<Input>( null )
 
   const canProceed = useMemo( () => {
     return (
-      currentIPAddressValue.length != 0 &&
-      Boolean( Number( currentPortNumberValue ) )
+      host.length != 0 &&
+      Boolean( Number( port ) )
     )
-  }, [ currentIPAddressValue, currentPortNumberValue ] )
+  }, [ host, port ] )
 
   function handleProceedButtonPress() {
-    onSubmit( {
-      ipAddress: currentIPAddressValue,
-      portNumber: Number( currentPortNumberValue ),
-      useFallback
-    } )
+    if (host === null || host.length === 0) {
+      setIsHostValid(false);
+    }
+
+    if (port === null || port.length === 0) {
+      setIsPortValid(false);
+    }
+    if (host !== null && host.length !== 0 && port !== null && port.length !== 0) {
+      const nodeDetails: PersonalNode = {
+        id: params.id,
+        host,
+        port,
+        useKeeperNode,
+        isConnected: params.isConnected,
+        useSSL,
+      };
+      onSubmit(nodeDetails);
+    }
   }
 
   useEffect( () => {
     ipAddressInputRef.current?.focus()
   }, [] )
 
+  function onToggle() {
+    setUseSSL(!useSSL)
+  }
+
   return (
     <View style={styles.rootContainer}>
 
       <View style={ListStyles.infoHeaderSection}>
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
         <Text style={ListStyles.infoHeaderTitleText}>{strings.SetupPersonal}</Text>
+
+<TouchableOpacity onPress={onCloseClick} style={ButtonStyles.miniNavButton}>
+  <Text style={ButtonStyles.miniNavButtonText}>{'Close'}</Text>
+</TouchableOpacity>
+        {/* <Button
+            raised
+            buttonStyle={ButtonStyles.miniNavButton}
+            title="Close"
+            titleStyle={ButtonStyles.miniNavButtonText}
+            onPress={onCloseClick}
+          /> */}
+          </View>
       </View>
 
       <View style={styles.bodySection}>
@@ -78,8 +114,11 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { onSubmit, }: Props ) => 
           placeholder={'Your Node Address ex: http://11.22.33.44'}
           placeholderTextColor={FormStyles.placeholderText.color}
           underlineColorAndroid={'transparent'}
-          value={currentIPAddressValue}
-          onChangeText={setCurrentIPAddressValue}
+          value={host}
+          onChangeText={(text) => {
+            setIsHostValid(!(text === null || text.length === 0));
+            setHost(text);
+          }}
           keyboardType="numbers-and-punctuation"
           numberOfLines={1}
           ref={ipAddressInputRef}
@@ -94,23 +133,43 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { onSubmit, }: Props ) => 
           placeholder={'Port Number ex: 8003'}
           placeholderTextColor={FormStyles.placeholderText.color}
           underlineColorAndroid={'transparent'}
-          value={currentPortNumberValue}
-          onChangeText={setCurrentPortNumberValue}
+          value={port}
+          onChangeText={(text) => {
+            setIsPortValid(!(text === null || text.length === 0));
+            setPort(text);
+          }}
           keyboardType="number-pad"
           numberOfLines={1}
         />
       </View>
 
+      <View
+        style={[styles.useFallbackTouchable, {justifyContent:'space-between'}]}
+      >
+        <Text style={styles.useFallbackText}>
+          {'Use SSL for this node '}
+        </Text>
+        <Switch
+          value={useSSL}
+          onValueChange={onToggle}
+          thumbColor={useSSL ? Colors.blue : Colors.white}
+          trackColor={{
+            false: Colors.borderColor, true: Colors.lightBlue
+          }}
+          onTintColor={Colors.blue}
+        />
+      </View>
+
       <TouchableOpacity
         activeOpacity={10}
-        onPress={() => setUseFallbacck( !useFallback )}
+        onPress={() => setuseKeeperNode( !useKeeperNode )}
         style={styles.useFallbackTouchable}
       >
         <Text style={styles.useFallbackText}>
           {strings.fallback}
         </Text>
         <View style={styles.useFallbackCheckView}>
-          {useFallback && (
+          {useKeeperNode && (
             <Entypo
               name="check"
               size={RFValue( 17 )}

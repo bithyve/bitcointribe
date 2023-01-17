@@ -7,6 +7,8 @@ export const SAVE_PERSONAL_NODE_CONFIGURATION = 'SAVE_PERSONAL_NODE_CONFIGURATIO
 export const PERSONAL_NODE_CONFIGURATION_SET = 'PERSONAL_NODE_CONFIGURATION_SET'
 export const RESTORE_PERSONAL_NODE_CONFIGURATION = 'RESTORE_PERSONAL_NODE_CONFIGURATION'
 
+export const SET_ALL_NODES = 'SET_ALL_NODES'
+export const IS_CONNECTION_ACTIVE = 'IS_CONNECTION_ACTIVE'
 export const CONNECT_TO_PERSONAL_NODE = 'CONNECT_TO_PERSONAL_NODE'
 export const PERSONAL_NODE_CONNECTING_FAILED = 'PERSONAL_NODE_CONNECTING_FAILED'
 export const PERSONAL_NODE_CONNECTING_SUCCEEDED = 'PERSONAL_NODE_CONNECTING_SUCCEEDED'
@@ -76,6 +78,34 @@ export const connectToPersonalNode = (
   return {
     type: CONNECT_TO_PERSONAL_NODE,
     payload,
+  }
+}
+
+export interface SetConnectionActive extends Action {
+  type: typeof IS_CONNECTION_ACTIVE;
+  payload: boolean;
+}
+
+export const setIsConnectionActive = (
+  payload: boolean
+): SetConnectionActive => {
+  return {
+    type: IS_CONNECTION_ACTIVE,
+    payload,
+  }
+}
+
+export interface SetAllNodesAction extends Action {
+  type: typeof SET_ALL_NODES;
+  payload: PersonalNode[];
+}
+
+export const setAllNodes = (
+  payload: PersonalNode[]
+): SetAllNodesAction => {
+  return {
+    type: SET_ALL_NODES,
+    payload
   }
 }
 

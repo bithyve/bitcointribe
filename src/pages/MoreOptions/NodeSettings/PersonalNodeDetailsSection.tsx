@@ -1,5 +1,5 @@
-import React  from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import React, { useState }  from 'react'
+import { View, Text, StyleSheet, FlatList } from 'react-native'
 import PersonalNode from '../../../common/data/models/PersonalNode'
 import ListStyles from '../../../common/Styles/ListStyles'
 import FormStyles from '../../../common/Styles/FormStyles'
@@ -15,22 +15,42 @@ import {
 } from 'react-native-responsive-screen'
 import Fonts from '../../../common/Fonts'
 import { translations } from '../../../common/content/LocContext'
+import Node from './node'
+import EditIcon from '../../../assets/images/icons/edit_yellow.svg';
+import ConnectIcon from '../../../assets/images/icons/connect.svg';
+import DisconnectIcon from '../../../assets/images/icons/disconnect.svg';
+import DeleteIcon from '../../../assets/images/icons/delete_orange.svg'
 
 export type Props = {
-  personalNode: PersonalNode | null;
-  onEditButtonPressed: () => void;
+  // personalNode: PersonalNode | null;
+  onAddButtonPressed: () => void;
+  nodeList: PersonalNode[];
+  ConnectToNode: Boolean;
+  onEdit: (selectedItem: PersonalNode) => void;
+  onDelete: (selectedItem: PersonalNode) => void;
+  onConnectNode: (selectedItem: PersonalNode) => void;
+  onSelectedNodeitem: (selectedItem: PersonalNode) => void;
+  selectedNodeItem: PersonalNode | null
 };
 
 const PersonalNodeDetailsSection: React.FC<Props> = ( {
-  personalNode,
-  onEditButtonPressed,
+  // personalNode,
+  onAddButtonPressed,
+  nodeList,
+  ConnectToNode,
+  onEdit,
+  onDelete,
+  onConnectNode,
+  onSelectedNodeitem,
+  selectedNodeItem
 }: Props ) => {
   const strings  = translations[ 'settings' ]
   const common  = translations[ 'common' ]
+
   return (
     <View style={styles.rootContainer}>
 
-      <View style={ListStyles.infoHeaderSection}>
+      <View style={[ListStyles.infoHeaderSection, {paddingVertical: 24}]}>
         <View style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
@@ -45,60 +65,87 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
           <Button
             raised
             buttonStyle={ButtonStyles.miniNavButton}
-            title="Edit"
+            title="Add"
             titleStyle={ButtonStyles.miniNavButtonText}
-            onPress={onEditButtonPressed}
+            onPress={onAddButtonPressed}
           />
         </View>
+
+<View style={{backgroundColor:Colors.gray9,height:1,marginVertical:20}}/>
+<View>
+<Text style={{
+      ...ListStyles.infoHeaderTitleText
+    }}>
+      {'Node connected previously'}
+    </Text>
+</View>
       </View>
 
+{
+  (nodeList.length > 0 )&&
       <View style={styles.bodySection}>
-        <View style={{
-          marginBottom: 16
-        }}>
-          <Text style={{
-            ...HeadingStyles.labelText, marginBottom: 4
-          }}>
-            {strings.NodeAddress}
-          </Text>
+      <FlatList
+            data={nodeList}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => onSelectedNodeitem(item)}
+                style={[
+                  styles.nodeContainer,
+                  item.id === selectedNodeItem?.id
+                    ? [styles.selectedItem, { borderColor: Colors.blue }]
+                    : null,
+                { backgroundColor: ConnectToNode ? Colors.gray9 : Colors.gray9 },
+              ]}
+              activeOpacity={ConnectToNode ? 1 : 0.50}
+              >
+                <View style={styles.nodeDetail}>
+                  <Text
+                      style={[styles.nodeTextHeader]}>
+                      {'Host'}
+                    </Text>
+                    <Text style={styles.nodeTextValue}>{item.host}</Text>
+                    <Text style={[styles.nodeTextHeader,{marginTop:4}]}>
+                      {'Port Number'}
+                    </Text>
+                    <Text style={styles.nodeTextValue}>{item.port}</Text>
+                </View>
+               
+                <View style={styles.verticleSplitter} />
 
-          <Text numberOfLines={1}>{personalNode?.ipAddress || strings.NoAddressSet}</Text>
-        </View>
+                <TouchableOpacity onPress={() => onEdit(item)}>
+                    <View style={[styles.actionArea, { paddingLeft: 15, paddingRight: 15 }]}>
+                      <EditIcon />
+                      <Text
+                        style={[styles.actionText]}>{'Edit'}</Text>
+                    </View>
+                </TouchableOpacity>
+                  
+                <View style={styles.verticleSplitter} />
 
-        <View style={{
-          marginBottom: 8,
-        }}>
-          <Text style={{
-            ...HeadingStyles.labelText,
-            marginBottom: 4
-          }}>
-            {strings.PortNumber}
-          </Text>
+                <TouchableOpacity onPress={() => onConnectNode(item)}>
+                    <View style={[styles.actionArea, { paddingLeft: 15, paddingRight: 15 }]}>
+                    {Node.nodeConnectionStatus(item) ? <DisconnectIcon /> : <ConnectIcon />}
+                      <Text style={[styles.actionText]}>
+                        {Node.nodeConnectionStatus(item) ? 'Disconnect' : 'Connect'}
+                      </Text>
+                    </View>
+                </TouchableOpacity>
+                  
+                <View style={styles.verticleSplitter} />
 
-          <Text numberOfLines={1}>{String( personalNode?.portNumber || strings.NoPort )}</Text>
-        </View>
-
-        <TouchableOpacity
-          activeOpacity={10}
-          onPress={() => {}}
-          style={styles.useFallbackTouchable}
-        >
-          <Text style={styles.useFallbackText}>
-            {strings.fallback}
-          </Text>
-          <View style={styles.useFallbackCheckView}>
-            {personalNode?.useFallback && (
-              <Entypo
-                name="check"
-                size={RFValue( 17 )}
-                color={Colors.green}
-              />
+                <TouchableOpacity onPress={() => onDelete(item)}>
+                    <View style={[styles.actionArea, { paddingLeft: 15, paddingRight: 15 }]}>
+                      <DeleteIcon />
+                      <Text
+                        style={[styles.actionText]}>{'Delete'}</Text>
+                    </View>
+                </TouchableOpacity>
+              </TouchableOpacity>
             )}
-          </View>
-        </TouchableOpacity>
-
+          />
       </View>
-
+}
     </View>
   )
 }
@@ -145,6 +192,49 @@ const styles = StyleSheet.create( {
     borderColor: Colors.borderColor,
     borderWidth: 1,
     marginLeft: 'auto',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectedItem: {
+    borderWidth: 1,
+  },
+  nodeContainer:{
+    borderRadius: 5,
+    flexDirection: 'row',
+    // width: '99%',
+    marginBottom: 4,
+    alignItems: 'center',
+  },
+  nodeDetail: {
+    flex: 1,
+    padding: 5,
+  },
+  nodeTextHeader: {
+    marginHorizontal: 5,
+    fontSize: 11,
+    letterSpacing: 0.6,
+    color:'rgba(95,105,101,1)'
+  },
+  nodeTextValue: {
+    fontSize: 12,
+    letterSpacing: 1.56,
+    marginHorizontal: 5,
+    paddingBottom: 2,
+    color:'rgba(95,105,101,1)'
+  },
+  verticleSplitter: {
+    opacity: 0.40,
+    borderWidth: 0.4,
+    height: 45,
+    borderColor:'rgba(79,89,85,1)'
+  },
+  actionText: {
+    fontSize: 11,
+    letterSpacing: 0.36,
+    fontWeight: '600',
+    paddingTop: 4
+  },
+  actionArea: {
     alignItems: 'center',
     justifyContent: 'center',
   },

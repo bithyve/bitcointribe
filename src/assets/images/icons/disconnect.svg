@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="18.214" height="17.002" viewBox="0 0 18.214 17.002">
+  <g id="disconnect" transform="translate(-2.146 -4.978)">
+    <path id="Path_118095" data-name="Path 118095" d="M25.468,11.106l-1.338,0V9.994A4.765,4.765,0,0,1,28.9,5.228h0A4.765,4.765,0,0,1,33.664,10v1.051l-1.338,0V10A3.428,3.428,0,0,0,28.9,6.566h0a3.426,3.426,0,0,0-3.426,3.427Z" transform="translate(-17.644 0)" fill="#6c6c6c" stroke="#6c6c6c" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5"/>
+    <path id="Path_118096" data-name="Path 118096" d="M28.9,68.758h-.007a4.764,4.764,0,0,1-4.762-4.767v-1.05l1.338,0v1.052a3.427,3.427,0,0,0,3.425,3.43H28.9a3.426,3.426,0,0,0,3.428-3.429V62.883l1.338,0V63.99A4.764,4.764,0,0,1,28.9,68.758Z" transform="translate(-17.644 -47.028)" fill="#6c6c6c" stroke="#6c6c6c" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5"/>
+    <rect id="Rectangle_8308" data-name="Rectangle 8308" width="1.338" height="2.592" transform="translate(2.5 9.746) rotate(-45)" fill="#6c6c6c" stroke="#6c6c6c" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5"/>
+    <rect id="Rectangle_8309" data-name="Rectangle 8309" width="2.592" height="1.338" transform="translate(2.5 17.212) rotate(-45.003)" fill="#6c6c6c" stroke="#6c6c6c" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5"/>
+    <rect id="Rectangle_8310" data-name="Rectangle 8310" width="2.592" height="1.338" transform="translate(17.228 10.632) rotate(-45)" fill="#6c6c6c" stroke="#6c6c6c" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5"/>
+    <rect id="Rectangle_8311" data-name="Rectangle 8311" width="1.338" height="2.592" transform="translate(17.228 16.326) rotate(-45)" fill="#6c6c6c" stroke="#6c6c6c" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5"/>
+  </g>
+</svg>
