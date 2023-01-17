@@ -1,5 +1,5 @@
 import PersonalNode from '../../common/data/models/PersonalNode'
-import { CONNECT_TO_PERSONAL_NODE, PERSONAL_NODE_CONNECTING_FAILED, PERSONAL_NODE_CONNECTING_SUCCEEDED, PERSONAL_NODE_PREFERENCE_TOGGLED, PERSONAL_NODE_CONFIGURATION_SET, PERSONAL_NODE_CONNECTING_COMPLETED, BIT_HYVE_NODE_CONNECTING_SUCCEEDED, BIT_HYVE_NODE_CONNECTING_COMPLETED } from '../actions/nodeSettings'
+import { CONNECT_TO_PERSONAL_NODE, PERSONAL_NODE_CONNECTING_FAILED, PERSONAL_NODE_CONNECTING_SUCCEEDED, PERSONAL_NODE_PREFERENCE_TOGGLED, PERSONAL_NODE_CONFIGURATION_SET, PERSONAL_NODE_CONNECTING_COMPLETED, BIT_HYVE_NODE_CONNECTING_SUCCEEDED, BIT_HYVE_NODE_CONNECTING_COMPLETED, SET_ALL_NODES, IS_CONNECTION_ACTIVE } from '../actions/nodeSettings'
 
 export type NodeSettingsState = {
   isConnectionActive: boolean;
@@ -52,6 +52,20 @@ const nodeSettingsReducer = ( state: NodeSettingsState = INITIAL_STATE, action )
           activePersonalNode: action.payload,
         }
 
+      case SET_ALL_NODES:
+        return {
+          ...state,
+          personalNodes: action.payload
+        }
+
+      case IS_CONNECTION_ACTIVE:
+        return {
+          ...state,
+          isConnectionActive: action.payload,
+          // hasPersonalNodeConnectionSucceeded: false,
+          // hasPersonalNodeConnectionFailed: false,
+        }
+
       case CONNECT_TO_PERSONAL_NODE:
         return {
           ...state,
@@ -87,7 +101,6 @@ const nodeSettingsReducer = ( state: NodeSettingsState = INITIAL_STATE, action )
           hasPersonalNodeConnectionFailed: false,
           personalNodeConnectionErrorMessage: null,
         }
-
 
       case BIT_HYVE_NODE_CONNECTING_SUCCEEDED:
         return {
