@@ -34,6 +34,7 @@ import DashedContainerSmall from './DashedContainerSmall'
 import { resetStackToAccountDetails,  } from '../../navigation/actions/NavigationActions'
 import AccountSelected from './AccountSelected'
 import AddGiftToAccount from './AddGiftToAccount'
+import semver from 'semver'
 
 
 export type Props = {
@@ -603,6 +604,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               }}>{`The gift is encrypted with ${inputType == DeepLinkEncryptionType.EMAIL ? 'an email' : inputType == DeepLinkEncryptionType.NUMBER ? 'number' : 'an OTP'}`}</Text>
               : null}
           </View>
+          {console.log('skk version', version +' '+JSON.stringify(semver.gte( version, '2.0.71' )))}
           <DashedLargeContainer
             titleText={'Gift Card'}
             titleTextColor={Colors.black}
@@ -778,12 +780,72 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           {getInputBox()}
         </View>
         {/* )} */}
+        </>
+        
+      }
+{semver.gte( version, '2.0.71' ) ? null :
+<View style={{justifyContent: 'center', alignItems: 'center'}}>
+<Text style={{
+  color: Colors.gray4,
+  fontSize: RFValue( 13 ),
+  letterSpacing: 0.6,
+  fontFamily: Fonts.FiraSansRegular,
+  marginHorizontal: wp( 5 ),
+  marginVertical: wp( 2 ),
+}}>
+  OR
+</Text>
+<Text style={{
+  color: Colors.gray4,
+  fontSize: RFValue( 13 ),
+  letterSpacing: 0.6,
+  fontFamily: Fonts.FiraSansRegular,
+  marginHorizontal: wp( 5 ),
+  marginVertical: wp( 2 ),
+}}
+onPress={() => { 
+  setIsDisabled( true )
+  if ( isGiftWithFnF ) {
+    let key
+    switch ( inputType ) {
+        case DeepLinkEncryptionType.NUMBER:
+          key = PhoneNumber
+          break
 
+        case DeepLinkEncryptionType.EMAIL:
+          key = EmailId
+          break
+
+        case DeepLinkEncryptionType.OTP:
+        case DeepLinkEncryptionType.LONG_OTP:
+        case DeepLinkEncryptionType.SECRET_PHRASE:
+          key = passcode
+          break
+
+        default:
+          break
+    }
+
+    setTimeout( () => {
+      setPhoneNumber( '' )
+    }, 2 )
+    onPressAccept( key )
+  } else {
+    onGiftRequestAccepted( passcode )
+  }}
+  // setAcceptGiftModal( false )
+  // setGiftAcceptedModel( true )
+}>
+  Skip
+</Text>
+</View>
+
+ }
         <View style={{
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ),
           marginTop: hp( 5 )
         }}>
-          {renderButton( 'Accept', true )}
+          {renderButton( 'Accept', semver.gte( version, '2.0.71' ) ?true:false )}
           <TouchableOpacity
             onPress={() => {
               if ( isGiftWithFnF ) {
