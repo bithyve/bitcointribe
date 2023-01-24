@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Keyboard, Alert } from 'react-native'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import {  useDispatch, useSelector } from 'react-redux'
@@ -157,6 +157,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   function onPressNumber( text, i ) {
     const tempPasscode = passcodeArray
     tempPasscode[ i ] = text
+    console.log('skk temppasscode', tempPasscode)
+    console.log('skk text', text)
+    console.log('skk i2', i)
     setTimeout( () => {
       setPasscodeArray( tempPasscode )
     }, 2 )
@@ -169,7 +172,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       setIsDisabled( true )
     }
   }
-
+  const otpRef = useRef();
   const getInputBox = () => {
     if ( inputType == DeepLinkEncryptionType.EMAIL ) {
       return (
@@ -244,13 +247,13 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     } else if ( inputType === DeepLinkEncryptionType.OTP ){
       return (
         <View style={{
-          flexDirection: 'row', marginBottom: wp( '5%' ), justifyContent: 'space-evenly'
+          flexDirection: 'row', marginBottom: wp( '5%' ), justifyContent: 'space-evenly', backgroundColor:'red'
         }}>
           {[ 0, 1, 2, 3, 4, 5 ].map( ( i ) => {
             return (
               <TextInput
                 key={i}
-                maxLength={1}
+                // maxLength={1}
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType={
@@ -267,30 +270,64 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 }}
                 style={getStyle( i )}
                 onChangeText={( value ) => {
-                  if ( value && i == 0 ) {
-                    onPressNumber( value, 0 )
-                    this.textInput2.focus()
-                  }
-                  if ( value && i == 1 ) {
-                    onPressNumber( value, 1 )
-                    this.textInput3.focus()
-                  }
-                  if ( value && i == 2 ) {
-                    onPressNumber( value, 2 )
-                    this.textInput4.focus()
-                  }
-                  if ( value && i == 3 ) {
-                    onPressNumber( value, 3 )
-                    this.textInput5.focus()
-                  }
-                  if ( value && i == 4 ) {
-                    onPressNumber( value, 4 )
-                    this.textInput6.focus()
-                  }
-                  if ( value && i == 5 ) {
-                    onPressNumber( value, 5 )
-                    this.textInput6.focus()
-
+                  console.log('skk value', value)
+                  // if(value.length > 0)
+                  console.log('skk value', value.length + ' ' )
+                  if(value.length > 1) {
+                    const maxLength = 6 > value.length ? value.length : 6
+                  console.log('skk maxLength', maxLength )
+                  console.log('skk i', i )
+                  for(let j=i; j < maxLength; j++) {
+                    // setTimeout(() => {
+                      console.log('skk onPressNumber', value.slice(j,j+1) )
+                      console.log('skk j', j )
+                      onPressNumber(value.slice(j,j+1), j)
+                      if ( value && j == 0 ) {
+                        this.textInput2.focus()
+                      }
+                      if ( value && j == 1 ) {
+                        this.textInput3.focus()
+                      }
+                      if ( value && j == 2 ) {
+                        this.textInput4.focus()
+                      }
+                      if ( value && j == 3 ) {
+                        this.textInput5.focus()
+                      }
+                      if ( value && j == 4 ) {
+                        this.textInput6.focus()
+                      }
+                      if ( value && j == 5 ) {
+                        this.textInput6.focus()
+                      }
+                      i = j+1
+                    // }, 2000);
+                   }
+                  } else {
+                    if ( value && i == 0 ) {
+                      onPressNumber( value, 0 )
+                      this.textInput1.focus()
+                    }
+                    if ( value && i == 1 ) {
+                      onPressNumber( value, 1 )
+                      this.textInput2.focus()
+                    }
+                    if ( value && i == 2 ) {
+                      onPressNumber( value, 2 )
+                      this.textInput3.focus()
+                    }
+                    if ( value && i == 3 ) {
+                      onPressNumber( value, 3 )
+                      this.textInput4.focus()
+                    }
+                    if ( value && i == 4 ) {
+                      onPressNumber( value, 4 )
+                      this.textInput5.focus()
+                    }
+                    if ( value && i == 5 ) {
+                      onPressNumber( value, 5 )
+                      this.textInput6.focus()
+                    }
                   }
                 }}
                 onKeyPress={( e ) => {
@@ -299,7 +336,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                     onPressNumber( '', 0 )
                   }
                   if ( e.nativeEvent.key === 'Backspace' && i == 1 ) {
-                    this.textInput.focus()
+                    this.textInput1.focus()
                     onPressNumber( '', 1 )
                   }
                   if ( e.nativeEvent.key === 'Backspace' && i == 2 ) {
@@ -340,7 +377,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 //value={passcodeArray[i] && passcodeArray[i].length ? passcodeArray[i] : ""}
               />
             )
-          } )}
+          } )} 
         </View>
       )
     } else if ( inputType == DeepLinkEncryptionType.LONG_OTP || inputType == DeepLinkEncryptionType.SECRET_PHRASE ) {
@@ -750,6 +787,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             {`Hint: ${Buffer.from( hint, 'hex' ).toString( 'utf-8' )}`}
           </Text>
         }
+        {
+          
+          <>
         {( inputType === DeepLinkEncryptionType.LONG_OTP
         || inputType === DeepLinkEncryptionType.OTP
         ) &&

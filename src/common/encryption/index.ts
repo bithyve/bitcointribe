@@ -8,10 +8,14 @@ export const encrypt = ( data, key ) => {
 
 export const decrypt = ( ciphertext, key ) => {
   try{
+    console.log('skk decrypt inside')
     const bytes = cryptoJS.AES.decrypt( ciphertext.toString(), key )
+    console.log('skk bytes', JSON.stringify(bytes))
     const decryptedData = JSON.parse( bytes.toString( cryptoJS.enc.Utf8 ) )
+    console.log('skk decryptedData', JSON.stringify(decryptedData))
     return decryptedData
   } catch( e ){
+    console.log('skk e', JSON.stringify(e))
     return null
   }
 

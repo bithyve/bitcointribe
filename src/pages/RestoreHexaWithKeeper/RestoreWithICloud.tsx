@@ -551,7 +551,10 @@ class RestoreWithICloud extends Component<
     const { answer, selectedBackup }: { answer: string, selectedBackup: any } = this.state
     try {
       const key = BHROperations.strechKey( answer )
+      console.log('skk key', JSON.stringify(key))
       const decryptedCloudDataJson = decrypt( selectedBackup.data, key )
+      console.log('skk decryptedCloudDataJson', JSON.stringify(decryptedCloudDataJson))
+      console.log('skk selectedBackup', JSON.stringify(selectedBackup))
       // if ( decryptedCloudDataJson ) this.setSecurityQuestionAndName()
       const KeeperData: KeeperInfoInterface[] = JSON.parse( selectedBackup.keeperData )
       this.setKeeperInfoList( selectedBackup.levelStatus, KeeperData, selectedBackup.dateTime )

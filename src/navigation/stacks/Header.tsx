@@ -1128,14 +1128,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             case DeepLinkEncryptionType.NUMBER:
             case DeepLinkEncryptionType.EMAIL:
             case DeepLinkEncryptionType.OTP:
+              if(key.length >= 6) {
               const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
               channelKeys = decryptedKeys.split( '-' )
+              }
               break
         }
 
-        trustedContactRequest.channelKey = channelKeys[ 0 ]
+        if(key.length >= 6) {
+          trustedContactRequest.channelKey = channelKeys[ 0 ]
         trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
+        }
       } catch( err ){
+        console.log('skk key', key)
+        console.log('skk err', err)
         Toast( 'Invalid key' )
         return
       }
@@ -1197,6 +1203,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         trustedContactRequest.channelKey = channelKeys[ 0 ]
         trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
       } catch( err ){
+        console.log('skk key2')
+        console.log('skk err2', err)
         Toast( 'Invalid key' )
         return
       }
@@ -1222,10 +1230,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             case DeepLinkEncryptionType.OTP:
             case DeepLinkEncryptionType.LONG_OTP:
             case DeepLinkEncryptionType.SECRET_PHRASE:
-              decryptionKey = TrustedContactsOperations.decryptViaPsuedoKey( giftRequest.encryptedChannelKeys, key )
+        if(key.length >= 6) 
+          decryptionKey = TrustedContactsOperations.decryptViaPsuedoKey( giftRequest.encryptedChannelKeys, key )
               break
         }
       } catch( err ){
+        console.log('skk key3', key)
+        console.log('skk err3', err)
         Toast( 'Invalid key' )
         return
       }

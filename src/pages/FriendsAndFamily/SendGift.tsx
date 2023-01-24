@@ -93,7 +93,8 @@ export default function SendGift( props ) {
     }
     giftToSend.sender.contactId = null
 
-    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink, encryptionKey } = await generateGiftLink( giftToSend, senderName, fcmToken, giftThemeId, note, giftLinkEncryptionType, generateShortLink, secretPhrase, secretPhraseHint )
+    const { updatedGift, deepLink, encryptedChannelKeys, encryptionType, encryptionHint, deepLinkEncryptionOTP, channelAddress, shortLink, encryptionKey } = 
+    await generateGiftLink( giftToSend, senderName, fcmToken, giftThemeId, note, giftLinkEncryptionType, generateShortLink, secretPhrase, secretPhraseHint )
     setEncryptionKey( encryptionKey )
     dispatch( updateGift( updatedGift ) )
     dbManager.createGift( updatedGift  )
