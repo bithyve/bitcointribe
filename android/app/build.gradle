@@ -59,8 +59,8 @@ android {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 538
-        versionName "2.1.1"
+        versionCode 542
+        versionName "2.1.3"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
         resValue "string", "build_config_package", "io.hexawallet.hexa"
@@ -173,7 +173,7 @@ dependencies {
 
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-udp')
-    implementation project(':react-native-tcp')
+//    implementation project(':react-native-tcp')
     implementation project(':react-native-os')
     implementation project(':react-native-svg')
     implementation project(':react-native-video')

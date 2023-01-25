@@ -166,9 +166,9 @@ function RequestKeyFromContact( props ) {
                       alignItems: 'center',
                       justifyContent: 'center',
                       backgroundColor: Colors.backgroundColor,
-                      width: 80,
-                      height: 80,
-                      borderRadius: 80 / 2,
+                      width: wp(15),
+                      height: wp(15),
+                      borderRadius: wp(7.5),
                       // shadowColor: Colors.shadowBlue,
                       // shadowOpacity: 1,
                       // shadowOffset: {
@@ -328,7 +328,7 @@ function RequestKeyFromContact( props ) {
           marginRight: wp( 10 ),
           lineHeight: 18,
           marginVertical: hp( 2 ),
-          marginBottom: hp( 6 )
+          // marginBottom: hp( 6 )
         }}>
           {'Your friend will be prompted to enter '}
           <Text style={{
@@ -407,7 +407,7 @@ function RequestKeyFromContact( props ) {
       {
         props.isGift &&
         <View style={{
-          flexDirection: 'row', alignItems: 'center', margin: wp( 6 )
+          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ), marginVertical: wp( 5 )
         }}>
           <Text style={styles.subHeaderText}>If the recipient does not accept in 7 days, the link/QR will expire and the gift will revert back to you</Text>
         </View>
@@ -436,16 +436,16 @@ function RequestKeyFromContact( props ) {
 }
 const styles = StyleSheet.create( {
   contactProfileImage: {
-    width: 81,
-    height: 81,
+    width: wp(12),
+    height: wp(12),
     resizeMode: 'cover',
-    borderRadius: 81 / 2,
+    borderRadius: wp(6),
   },
   contactProfileImageContainer: {
-    width: 90,
-    height: 90,
+    width: wp(15),
+    height: wp(15),
     resizeMode: 'cover',
-    borderRadius: 90 / 2,
+    borderRadius: wp(7.5),
     backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',

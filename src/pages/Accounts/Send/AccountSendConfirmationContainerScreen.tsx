@@ -46,7 +46,7 @@ export type Props = {
   navigation: NavigationProp;
 };
 
-const {height} = Dimensions.get('window')
+const { height } = Dimensions.get( 'window' )
 
 const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const dispatch = useDispatch()
@@ -107,7 +107,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           requestAnimationFrame( () => {
             dispatch( refreshAccountShells( [ sourceAccountShell ], {
               hardRefresh: true,
-              syncDonationAccount: account.type === AccountType.DONATION_ACCOUNT
             } ) )
           } )
           navigation.dispatch(

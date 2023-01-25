@@ -5,7 +5,7 @@ cp mods/bunyan/bunyan.js node_modules/bunyan/lib/bunyan.js
 cp mods/react-native-safe-area-view/index.js node_modules/react-native-safe-area-view/index.js
 
 # enabling node core modules
-rn-nodeify --install --hack --yarn
+rn-nodeify --install buffer,events,process,stream,util,inherits,fs,path,assert,crypto --hack --yarn
 
 echo "patch cocoapods"
 cp ./rnPatchFiles/RNLocalize.podspec ./node_modules/react-native-localize/RNLocalize.podspec
