@@ -321,8 +321,8 @@ export default function SendViaLinkAndQR( props ) {
             <View
               style={[ styles.mainContainer,
                 {
-                  marginTop: hp( '2%' ),
-                  marginBottom: hp( '1%' ),
+                  // marginTop: hp( '1%' ),
+                  // marginBottom: hp( '1%' ),
                 } ]}
             >
               <View style={[ styles.qrContainer, {
@@ -333,7 +333,7 @@ export default function SendViaLinkAndQR( props ) {
                   <QRCode
                     title={'Gift card'}
                     value={link}
-                    size={hp( '24%' )} />
+                    size={hp( '20%' )} />
                 )}
               </View>
             </View>
@@ -462,15 +462,16 @@ const styles = StyleSheet.create( {
     marginTop: hp( '1.7%' ),
   },
   qrContainer: {
-    height: hp( '27%' ),
+    height: hp( '24%' ),
     justifyContent: 'center',
     marginLeft: 20,
     marginRight: 20,
     alignItems: 'center',
   },
   mainContainer: {
-    marginLeft: 20,
+    marginTop: 15,
     marginRight: 20,
+    marginLeft:20,
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -21,6 +21,9 @@ import {
   TransactionPrerequisite,
   TransactionPrerequisiteElements,
   TxPriority,
+  TransactionType,
+  NetworkType,
+  AverageTxFeesByNetwork,
 } from '../Interface'
 
 import AccountUtilities from './AccountUtilities'
@@ -30,6 +33,7 @@ import config from '../../HexaConfig'
 import crypto from 'crypto'
 import idx from 'idx'
 import wif from 'wif'
+import ElectrumClient from '../../electrum/client'
 
 export default class AccountOperations {
 
@@ -114,6 +118,116 @@ export default class AccountOperations {
       assignee: requester
     }
   }
+
+  static fetchTransactions = async (
+    account: Account,
+    addresses: string[],
+    externalAddresses: { [address: string]: number },
+    internalAddresses: { [address: string]: number },
+    network: bitcoinJS.Network
+  ) => {
+    const { historyByAddress, txids, txidToAddress } = await ElectrumClient.syncHistoryByAddress(
+      addresses,
+      network
+    )
+
+    const transactions: Transaction[] = []
+    const txs = await ElectrumClient.getTransactionsById( txids )
+
+    // saturate transaction:  inputs-params, type, amount
+    const inputTxIds = []
+    for ( const txid in txs ) {
+      for ( const vin of txs[ txid ].vin ) inputTxIds.push( vin.txid )
+    }
+    const inputTxs = await ElectrumClient.getTransactionsById( inputTxIds )
+
+    let lastUsedAddressIndex = account.nextFreeAddressIndex - 1
+    let lastUsedChangeAddressIndex = account.nextFreeChangeAddressIndex - 1
+
+    for ( const txid in txs ) {
+      const tx = txs[ txid ]
+      // popluate tx-inputs with addresses and values
+      const inputs = tx.vin
+      for ( let index = 0; index < tx.vin.length; index++ ) {
+        const input = inputs[ index ]
+
+        const inputTx = inputTxs[ input.txid ]
+        if ( inputTx && inputTx.vout[ input.vout ] ) {
+          const vout = inputTx.vout[ input.vout ]
+          input.addresses = vout.scriptPubKey.addresses
+          input.value = vout.value
+        }
+      }
+
+      // calculate cumulative amount and transaction type
+      const outputs = tx.vout
+      let fee = 0 // delta b/w inputs and outputs
+      let amount = 0
+      const senderAddresses = []
+      const recipientAddresses = []
+
+      for ( const input of inputs ) {
+        const inputAddress = input.addresses[ 0 ]
+        if (
+          externalAddresses[ inputAddress ] !== undefined ||
+          internalAddresses[ inputAddress ] !== undefined
+        )
+          amount -= input.value
+
+        senderAddresses.push( inputAddress )
+        fee += input.value
+      }
+
+      for ( const output of outputs ) {
+        const outputAddress = output.scriptPubKey.addresses[ 0 ]
+        if (
+          externalAddresses[ outputAddress ] !== undefined ||
+          internalAddresses[ outputAddress ] !== undefined
+        )
+          amount += output.value
+
+        recipientAddresses.push( outputAddress )
+        fee -= output.value
+      }
+
+      const address = txidToAddress[ txid ]
+
+      const transaction: Transaction = {
+        txid,
+        confirmations: tx.confirmations ? tx.confirmations : 0,
+        status: tx.confirmations ? 'Confirmed' : 'Unconfirmed',
+        fee: Math.floor( fee * 1e8 ),
+        date: tx.time ? new Date( tx.time * 1000 ).toUTCString() : new Date( Date.now() ).toUTCString(),
+        transactionType: amount > 0 ? TransactionType.RECEIVED : TransactionType.SENT,
+        amount: Math.floor( Math.abs( amount ) * 1e8 ),
+        accountType: account.type,
+        accountName: account.accountName,
+        recipientAddresses,
+        senderAddresses,
+        address,
+        blockTime: tx.blocktime,
+      }
+      transactions.push( transaction )
+
+      // update the last used address/change-address index
+      if ( externalAddresses[ address ] !== undefined ) {
+        lastUsedAddressIndex = Math.max( externalAddresses[ address ], lastUsedAddressIndex )
+      } else if ( internalAddresses[ address ] !== undefined ) {
+        lastUsedChangeAddressIndex = Math.max(
+          internalAddresses[ address ],
+          lastUsedChangeAddressIndex
+        )
+      }
+    }
+
+    // sort transactions chronologically
+    transactions.sort( ( tx1, tx2 ) => ( tx1.confirmations > tx2.confirmations ? 1 : -1 ) )
+    return {
+      transactions,
+      lastUsedAddressIndex,
+      lastUsedChangeAddressIndex,
+    }
+  };
 
   static syncAccounts = async ( accounts: Accounts, network: bitcoinJS.networks.Network, hardRefresh?: boolean ): Promise<{
     synchedAccounts: Accounts,
@@ -321,64 +435,108 @@ export default class AccountOperations {
     }
   };
 
-  static syncDonationAccount = async ( account: DonationAccount, network: bitcoinJS.networks.Network ): Promise<{
-    synchedAccount: Account,
+
+  static syncAccountsViaElectrumClient = async (
+    accounts: Accounts,
+    network: bitcoinJS.networks.Network
+  ): Promise<{
+    synchedAccounts: Accounts,
   }> => {
+    for ( const account of Object.values( accounts ) ) {
 
-    const xpubId = account.id
-    const donationId = account.id.slice( 0, 15 )
-    const { nextFreeAddressIndex, nextFreeChangeAddressIndex, utxos, balances, transactions } = await AccountUtilities.syncViaXpubAgent( xpubId, donationId )
-    const internalAddresses = []
-    for ( let itr = 0; itr < nextFreeChangeAddressIndex + config.DONATION_GAP_LIMIT_INTERNAL; itr++ )
-    {
-      let address
-      if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig(  {
-        primary: account.xpub,
-        secondary: ( account as MultiSigAccount ).xpubs.secondary,
-        bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
-      }, 2, network, itr, true ).address
-      else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network )
-      internalAddresses.push( address )
-    }
+      const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
+      const hardGapLimit = 10 // hard refresh gap limit
+      const addresses = []
 
-    const confirmedUTXOs = []
-    const unconfirmedUTXOs = []
-    for ( const utxo of utxos ) {
-      if ( utxo.status ) {
-        if ( utxo.status.confirmed ) confirmedUTXOs.push( utxo )
-        else {
-          if ( internalAddresses.includes( utxo.address ) ) {
+      // collect external(receive) chain addresses
+      const externalAddresses: { [address: string]: number } = {
+      } // all external addresses(till closingExtIndex)
+      for ( let itr = 0; itr < account.nextFreeAddressIndex + hardGapLimit; itr++ ) {
+        let address: string
+        if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig( {
+          primary: account.xpub,
+          secondary: ( account as MultiSigAccount ).xpubs.secondary,
+          bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+        }, 2, network, itr, false ).address
+        else address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network, purpose )
+
+        externalAddresses[ address ] = itr
+        addresses.push( address )
+      }
+
+      // include imported external addresses
+      if( !account.importedAddresses ) account.importedAddresses = {
+      }
+      Object.keys( account.importedAddresses ).forEach( address => {
+        externalAddresses[ address ] = -1
+        addresses.push( address )
+      } )
+
+      // collect internal(change) chain addresses
+      const internalAddresses: { [address: string]: number } = {
+      } // all internal addresses(till closingIntIndex)
+      for ( let itr = 0; itr < account.nextFreeChangeAddressIndex + hardGapLimit; itr++ ) {
+        let address: string
+        if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig(  {
+          primary: account.xpub,
+          secondary: ( account as MultiSigAccount ).xpubs.secondary,
+          bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
+        }, 2, network, itr, true ).address
+        else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network, purpose )
+
+        internalAddresses[ address ] = itr
+        addresses.push( address )
+      }
+
+      // sync utxos & balances
+      const utxosByAddress = await ElectrumClient.syncUTXOByAddress( addresses, network )
+
+      const balances: Balances = {
+        confirmed: 0,
+        unconfirmed: 0,
+      }
+      const confirmedUTXOs: InputUTXOs[] = []
+      const unconfirmedUTXOs: InputUTXOs[] = []
+      for ( const address in utxosByAddress ) {
+        const utxos = utxosByAddress[ address ]
+        for ( const utxo of utxos ) {
+          if ( utxo.height > 0 ) {
+            confirmedUTXOs.push( utxo )
+            balances.confirmed += utxo.value
+          } else if ( internalAddresses[ utxo.address ] !== undefined ) {
             // defaulting utxo's on the change branch to confirmed
             confirmedUTXOs.push( utxo )
+            balances.confirmed += utxo.value
+          } else {
+            unconfirmedUTXOs.push( utxo )
+            balances.unconfirmed += utxo.value
           }
-          else unconfirmedUTXOs.push( utxo )
         }
-      } else {
-        // utxo's from fallback won't contain status var (defaulting them as confirmed)
-        confirmedUTXOs.push( utxo )
       }
-    }
 
-    const { newTransactions, lastSynched } = AccountUtilities.setNewTransactions( transactions, account.lastSynched )
-    account.unconfirmedUTXOs = unconfirmedUTXOs
-    account.confirmedUTXOs = confirmedUTXOs
-    account.balances = balances
-    account.nextFreeAddressIndex = nextFreeAddressIndex
-    account.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex
-    account.transactions = transactions
-    account.newTransactions = newTransactions
-    account.lastSynched = lastSynched
-    if( ( account as MultiSigAccount ).is2FA ) account.receivingAddress = AccountUtilities.createMultiSig(  {
-      primary: account.xpub,
-      secondary: ( account as MultiSigAccount ).xpubs.secondary,
-      bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
-    }, 2, network, account.nextFreeAddressIndex, false ).address
-    else account.receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network )
+      // sync & populate transactions
+      const { transactions, lastUsedAddressIndex, lastUsedChangeAddressIndex } =
+        await AccountOperations.fetchTransactions(
+          account,
+          addresses,
+          externalAddresses,
+          internalAddresses,
+          network
+        )
+
+      // update wallet w/ latest utxos, balances and transactions
+      account.unconfirmedUTXOs = unconfirmedUTXOs
+      account.confirmedUTXOs = confirmedUTXOs
+      account.balances = balances
+      account.transactions = transactions
+      account.nextFreeAddressIndex = lastUsedAddressIndex + 1
+      account.nextFreeChangeAddressIndex = lastUsedChangeAddressIndex + 1
+    }
 
     return {
-      synchedAccount: account
+      synchedAccounts: accounts,
     }
-  }
+  };
 
   static updateActiveAddresses = (
     account: Account,
@@ -568,6 +726,63 @@ export default class AccountOperations {
     return {
       fee
     }
+  };
+
+  static fetchFeeRatesByPriority = async () => {
+    // high fee: 30 minutes
+    const highFeeBlockEstimate = 3
+    const high = {
+      feePerByte: Math.round( await ElectrumClient.estimateFee( highFeeBlockEstimate ) ),
+      estimatedBlocks: highFeeBlockEstimate,
+    } // high: within 3 blocks
+
+    // medium fee: 2 hours
+    const mediumFeeBlockEstimate = 12
+    const medium = {
+      feePerByte: Math.round( await ElectrumClient.estimateFee( mediumFeeBlockEstimate ) ),
+      estimatedBlocks: mediumFeeBlockEstimate,
+    } // medium: within 12 blocks
+
+    // low fee: 6 hours
+    const lowFeeBlockEstimate = 36
+    const low = {
+      feePerByte: Math.round( await ElectrumClient.estimateFee( lowFeeBlockEstimate ) ),
+      estimatedBlocks: lowFeeBlockEstimate,
+    } // low: within 36 blocks
+
+    const feeRatesByPriority = {
+      high, medium, low
+    }
+    return feeRatesByPriority
+  };
+
+  static calculateAverageTxFee = async () => {
+    const feeRatesByPriority = await AccountOperations.fetchFeeRatesByPriority()
+    const averageTxSize = 226 // the average Bitcoin transaction is about 226 bytes in size (1 Inp (148); 2 Out)
+    const averageTxFees: AverageTxFees = {
+      high: {
+        averageTxFee: Math.round( averageTxSize * feeRatesByPriority.high.feePerByte ),
+        feePerByte: feeRatesByPriority.high.feePerByte,
+        estimatedBlocks: feeRatesByPriority.high.estimatedBlocks,
+      },
+      medium: {
+        averageTxFee: Math.round( averageTxSize * feeRatesByPriority.medium.feePerByte ),
+        feePerByte: feeRatesByPriority.medium.feePerByte,
+        estimatedBlocks: feeRatesByPriority.medium.estimatedBlocks,
+      },
+      low: {
+        averageTxFee: Math.round( averageTxSize * feeRatesByPriority.low.feePerByte ),
+        feePerByte: feeRatesByPriority.low.feePerByte,
+        estimatedBlocks: feeRatesByPriority.low.estimatedBlocks,
+      },
+    }
+
+    // TODO: configure to procure fee by network type
+    const averageTxFeeByNetwork: AverageTxFeesByNetwork = {
+      [ NetworkType.TESTNET ]: averageTxFees,
+      [ NetworkType.MAINNET ]: averageTxFees,
+    }
+    return averageTxFeeByNetwork
   };
 
   static prepareTransactionPrerequisites = (
@@ -1000,23 +1215,18 @@ export default class AccountOperations {
       txHex = signedTxb.build().toHex()
     }
 
-    const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
-    if( txid.includes( 'sendrawtransaction RPC error' ) ){
+    const txid = await ElectrumClient.broadcast( txHex )
+    if ( !txid ) throw new Error( 'Failed to broadcast transaction, txid missing' )
+
+    if ( txid.includes( 'sendrawtransaction RPC error' ) ) {
       let err
-      try{
-        err = ( txid.split( ':' )[ 3 ] ).split( '"' )[ 1 ]
-      } catch( err ){
-        console.log( {
-          err
-        } )
-      }
-      throw new Error( err )
+      try {
+        err = txid.split( ':' )[ 3 ].split( '"' )[ 1 ]
+      } catch ( err ) {}
+      throw new Error( err || txid )
     }
 
-    if( txid ){
-      AccountOperations.removeConsumedUTXOs( account, inputs, txid, recipients )  // chip consumed utxos
-    }
-    else throw new Error( 'Failed to broadcast transaction, txid missing' )
+    AccountOperations.removeConsumedUTXOs( account, inputs, txid, recipients )  // chip consumed utxos
     return {
       txid
     }
