@@ -126,7 +126,7 @@
         <data android:scheme="hexa" />
       </intent-filter>
     </activity>
-    <activity android:exported="true" android:name="com.facebook.react.devsupport.DevSettingsActivity" /> 
+    <activity android:exported="true" android:name="com.facebook.react.devsupport.DevSettingsActivity" />
      <!-- <meta-data
       android:name="com.google.firebase.messaging.default_notification_channel_id"
       android:value="@string/default_notification_channel_id" /> -->

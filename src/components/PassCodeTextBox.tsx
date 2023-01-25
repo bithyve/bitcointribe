@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Platform,
 } from "react-native";
 import Clipboard from '@react-native-clipboard/clipboard';
 import {
@@ -26,6 +27,13 @@ const PassCodeTextBox: React.FC<IPassCodeTextBoxProps> = ({passcode, setPasscode
 
   const [active, setActive] = useState<boolean>(false);
 
+  useEffect(()=>{
+if(active)
+console.log('skk 123')
+ref.current.focus()
+// setTimeout(() => ref.current.focus(), 100);
+  },[active])
+
   useEffect(() => {
     if (passcode.length === 6) {
       setErrmsg('');
@@ -39,18 +47,45 @@ const PassCodeTextBox: React.FC<IPassCodeTextBoxProps> = ({passcode, setPasscode
     }}>
       <TextInput
         ref={ref}
-        style={{ display: "none" }}
+        style={styles.textBoxStyles}
+        // style={{ display: "none" }}
         value={passcode}
         onChangeText={(text) => {
           if (text.length <= 6) {
             setPasscode(text);
           }
         }}
+        // returnKeyType="done"
+        // returnKeyLabel="Done"
+        // keyboardType={
+        //   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+        // }
+        // onFocus={() => {
+        //   // if ( Platform.OS == 'ios' ) {
+        //   // props.bottomSheetRef.current?.expand()
+        //   setDisabled( true )
+        //   // }
+        // }}
+        // onBlur={() => {
+        //   // if ( Platform.OS == 'ios' ) {
+        //   if (
+        //     ( passcode.length == 0 ||
+        //       passcode.length == 6 ) 
+        //   ) {
+        //     // props.bottomSheetRef.current?.snapTo( 1 )
+        //     setDisabled( false )
+        //   }
+        //   // }
+        // }}
+        // autoCorrect={false}
+        // onLayout={()=> ref.current.focus()}
+        // autoCompleteType="off"
       />
       <Text style={{color: 'red'}}>{errMsg}</Text>
       <TouchableOpacity
         onPress={() => {
-          setTimeout(() => ref.current.focus(), 0);
+          // console.log('skk 123')
+          // setTimeout(() => ref.current.focus(), 1000);
           setActive(true);
         }}
         onLongPress={async () => {
@@ -62,7 +97,7 @@ const PassCodeTextBox: React.FC<IPassCodeTextBoxProps> = ({passcode, setPasscode
           }
         }}
       >
-        <View
+        {/* <View
           style={{
             flexDirection: "row",
             marginBottom: wp("5%"),
@@ -106,7 +141,7 @@ const PassCodeTextBox: React.FC<IPassCodeTextBoxProps> = ({passcode, setPasscode
               ? "|"
               : ""}
           </Text>
-        </View>
+        </View> */}
       </TouchableOpacity>
     </View>
   );
@@ -118,7 +153,7 @@ const styles = StyleSheet.create({
   textBoxStyles: {
     borderWidth: 0.5,
     height: wp("12%"),
-    width: wp("12%"),
+    width: wp("80%"),
     borderRadius: 7,
     borderColor: Colors.borderColor,
     alignItems: "center",
@@ -127,7 +162,8 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     color: Colors.black,
     fontSize: RFValue(20),
-    textAlign: "center",
+    // textAlign: "center",
+    paddingHorizontal: 20,
     textAlignVertical: 'center'
   },
   textBoxActive: {

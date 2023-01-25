@@ -33,6 +33,7 @@ import { clearSwanCache, isSwanVisited, updateSwanStatus } from '../../store/act
 import { withNavigation } from 'react-navigation'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { translations } from '../../common/content/LocContext'
+import { hp } from '../../common/data/responsiveness/responsive'
 
 export type Props = {
   accountShell: AccountShell;
@@ -292,9 +293,9 @@ const cardBorderRadius = 15
 const styles = StyleSheet.create( {
   rootContainer: {
     width: '100%',
-    maxWidth: 440,
-    maxHeight: 440 * 0.7,
-    minHeight: 210,
+    // maxWidth: 440,
+    // maxHeight: hp(250),
+    height: hp(210),
     borderRadius: cardBorderRadius,
     elevation: 5,
     shadowOpacity: 0.62,

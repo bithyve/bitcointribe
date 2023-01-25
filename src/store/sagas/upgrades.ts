@@ -224,7 +224,7 @@ function* syncMissingAccounts( ) {
         }
       }
 
-      const options: { hardRefresh?: boolean, syncDonationAccount?: boolean } = {
+      const options: { hardRefresh?: boolean } = {
         hardRefresh: true
       }
       const { synchedAccounts }: { synchedAccounts: Accounts } = yield call( syncAccountsWorker, {
