@@ -27,7 +27,7 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import ModalContainer from '../../components/home/ModalContainer'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { translations } from '../../common/content/LocContext'
-import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { KeeperType, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import { getIndex } from '../../common/utilities'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
@@ -121,7 +121,9 @@ const SeedBackupHistory = ( props ) => {
 
     if ( ( levelHealth.length == 0 ) ||
     ( levelHealth.length && levelHealth[ 0 ].levelInfo.length &&
-      levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+      levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' )  || 
+      ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && 
+        levelHealth[ 0 ].levelInfo[ 0 ].shareType == KeeperType.SECURITY_QUESTION ) ) {
       setSeedBackupModal( true )
     }
   }, [] )

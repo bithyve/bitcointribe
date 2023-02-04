@@ -659,7 +659,7 @@ function* recoverWalletWorker( { payload } ) {
 
     const appVersion = DeviceInfo.getVersion()
     // RESTORE: Wallet
-    const wallet: Wallet = {
+    const walletDB: Wallet = {
       walletId: image.walletId,
       walletName: image.name,
       security: {
@@ -676,6 +676,20 @@ function* recoverWalletWorker( { payload } ) {
       details2FA,
       smShare
     }
+    const wallet: Wallet = {
+      walletId: image.walletId,
+      walletName: image.name,
+      userName: image.userName ? image.userName: '',
+      security: {
+        question: selectedBackup?.question,
+        questionId: selectedBackup?.questionId,
+        answer: answer
+      },
+      // primaryMnemonic: '',
+      // primarySeed: '',
+      accounts: accountData,
+      version: appVersion
+    }
 
     // RESTORE: Contacts
     if( image.contacts ) {
@@ -691,7 +705,7 @@ function* recoverWalletWorker( { payload } ) {
     }
     yield put( updateWallet( wallet ) )
     yield put( setWalletId( wallet.walletId ) )
-    yield call( dbManager.createWallet, wallet )
+    yield call( dbManager.createWallet, walletDB )
 
     // RESTORE: Version history
     let versionHistory = []

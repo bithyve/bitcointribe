@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Keyboard, Alert } from 'react-native'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import {  useDispatch, useSelector } from 'react-redux'
@@ -55,6 +55,7 @@ export type Props = {
   version?: string
 };
 
+const NUMBER_OF_INPUTS = 6;
 
 export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject, version }: Props ) {
   const dispatch = useDispatch()
@@ -64,7 +65,14 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const [ EmailId, setEmailId ] = useState( '' )
   const [ onBlurFocus, setOnBlurFocus ] = useState( false )
   const [ passcode, setPasscode ] = useState( '' )
-  const [ passcodeArray, setPasscodeArray ] = useState( [] )
+  const [ passcodeArray, setPasscodeArray ] = useState( [
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+  ] )
   const [ acceptGift, setAcceptGiftModal ] = useState( !isContactAssociated )
   const [ downloadedGiftid, seDownloadedGiftId ] = useState( '' )
   const [ confirmAccount, setConfirmAccount ] = useState( false )
@@ -168,6 +176,26 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       setIsDisabled( true )
     }
   }
+  const itemsRef = useRef<Array<TextInput | null>>([]);
+
+  const applyOTPCodeToInputs = (code: string) => {
+    // split up code and apply it to all inputs
+    const codeArray = code.split('');
+    codeArray.forEach((char, index) => {
+    const input = itemsRef.current[index];
+      if (input) {
+        input.setNativeProps({
+          text: char,
+        });
+      }
+    });
+    // focus on last input as a cherry on top
+    const lastInput = itemsRef.current[itemsRef.current.length - 1];
+    if (lastInput) {
+      lastInput.focus();
+      // otpCodeChanged(code);
+    }
+  };
 
   const getInputBox = () => {
     if ( inputType == DeepLinkEncryptionType.EMAIL ) {
@@ -245,7 +273,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
         <View style={{
           flexDirection: 'row', marginBottom: wp( '5%' ), justifyContent: 'space-evenly'
         }}>
-          {[ 0, 1, 2, 3, 4, 5 ].map( ( i ) => {
+          {/* {[ 0, 1, 2, 3, 4, 5 ].map( ( i ) => {
             return (
               <TextInput
                 key={i}
@@ -339,7 +367,80 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 //value={passcodeArray[i] && passcodeArray[i].length ? passcodeArray[i] : ""}
               />
             )
-          } )}
+          } )} */}
+          {Array.from({ length: NUMBER_OF_INPUTS }, (_, i) => (
+        <TextInput
+          // style={{
+          //   paddingLeft: Platform.OS === 'ios' ? 0 : 0,
+          //   paddingRight: Platform.OS === 'ios' ? 10 : 0,
+          //   color: 'red'
+          // }}
+          style={getStyle( i )}
+          ref={(el) => (itemsRef.current[i] = el)}
+          key={i}
+          returnKeyType="done"
+          returnKeyLabel="Done"
+          keyboardType={
+            Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+          }
+          placeholder={'-'}
+          value={passcodeArray[i]}
+          defaultValue=""
+          // first input can have a length of 6 because they paste their code into it
+          maxLength={i === 0 ? NUMBER_OF_INPUTS : 1}
+          onChange={(event) => {
+            const { text } = event.nativeEvent;
+            // console.log('skk text', text)
+            // console.log('skk event.nativeEvent', event.nativeEvent)
+
+            // only continue one if we see a text of length 1 or 6
+            // if (text.length === 0 || text.length === 1 || text.length === 6) {
+            if (text.length > 1) {
+              applyOTPCodeToInputs(text);
+              // determine new value
+              const newValues = [...passcodeArray];
+              newValues[i] = text.charAt(0);
+  
+              // update state
+              setPasscodeArray(newValues);
+              return;
+            }
+            // going forward, only if text is not empty
+            if (text.length === 1 && i !== NUMBER_OF_INPUTS - 1) {
+              const nextInput = itemsRef.current[i + 1];
+              if (nextInput) {
+                nextInput.focus();
+              }
+            }
+            // }
+            // determine new value
+            const newValues = [...passcodeArray];
+            newValues[i] = text;
+
+            // update state
+            setPasscodeArray(newValues);
+            // also call callback as a flat string
+            // otpCodeChanged(newValues?.join('')); 
+          }}
+          onKeyPress={(event) => {
+            if (event.nativeEvent.key === 'Backspace') {
+              // going backward:
+              if (i !== 0) {
+                console.log('skk on key press i', i)
+                const previousInput = itemsRef.current[i - 1];
+                console.log('skk on key press previous input', previousInput)
+                if (previousInput) {
+                  previousInput.focus();
+                  return;
+                }
+              }
+            }
+          }}
+          // textContentType="oneTimeCode"
+          autoCorrect={false}
+          autoCompleteType="off"
+        />
+      ))}
         </View>
       )
     } else if ( inputType == DeepLinkEncryptionType.LONG_OTP || inputType == DeepLinkEncryptionType.SECRET_PHRASE ) {

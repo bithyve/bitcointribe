@@ -94,6 +94,7 @@ import {
   addTransferDetails,
   fetchFeeRates,
   fetchExchangeRates,
+  recomputeNetBalance
 } from '../../store/actions/accounts'
 import {
   AccountType,
@@ -276,6 +277,7 @@ interface HomePropsTypes {
   walletId: string;
   notificationPressed: any;
   clipboardAccess: boolean;
+  recomputeNetBalance: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -847,6 +849,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.setVersion()
       this.props.fetchExchangeRates( this.props.currencyCode )
       this.props.fetchFeeRates()
+      this.props.recomputeNetBalance()
     } )
 
   };
@@ -909,11 +912,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   componentDidUpdate = ( prevProps, prevState ) => {
     if (
-      prevProps.accountsState.netBalance !==
+      this.state.netBalance !==
       this.props.accountsState.netBalance
-    )  this.setState( {
+    ) {
+    console.log('skk netBalance new', JSON.stringify(this.state.netBalance))
+    this.setState( {
       netBalance: this.props.accountsState.netBalance,
     } )
+  }
+    console.log('skk accountstate new', JSON.stringify(this.props.accountsState))
 
     if (
       prevProps.secondaryDeviceAddressValue !==
@@ -1020,6 +1027,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { navigation } = this.props
 
     this.focusListener = navigation.addListener( 'didFocus', () => {
+      this.props.recomputeNetBalance()
       this.setCurrencyCodeFromAsync()
       this.props.fetchExchangeRates( this.props.currencyCode )
       this.props.fetchFeeRates()
@@ -1866,7 +1874,7 @@ const mapStateToProps = ( state ) => {
   return {
     levelHealth: idx( state, ( _ ) => _.bhr.levelHealth ),
     notificationList: state.notifications.notifications,
-    accountsState: state.accounts,
+    accountsState: idx( state, ( _ ) => _.accounts ),
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
     walletName:
       idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
@@ -1924,6 +1932,7 @@ export default withNavigationFocus(
     updateSecondaryShard,
     rejectedExistingContactRequest,
     notificationPressed,
+    recomputeNetBalance
   } )( Home )
 )
 

@@ -15,7 +15,7 @@ import DocumentPad from '../../assets/images/svgs/icons_document_copy.svg'
 import QueActive from '../../assets/images/svgs/question_inactive.svg'
 import Telegram from '../../assets/images/svgs/icon_telegram.svg'
 import { LocalizationContext } from '../../common/content/LocContext'
-import { LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { LevelData, LevelHealthInterface, KeeperType } from '../../bitcoin/utilities/Interface'
 import ModalContainer from '../../components/home/ModalContainer'
 import CrossButton from '../../assets/images/svgs/icons_close.svg'
 import { toggleClipboardAccess } from '../../store/actions/misc'
@@ -204,7 +204,11 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       if( menuOption.screenName == 'WalletBackup' ) {
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
         levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){
-          if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+          if ( ( levelHealth.length == 0 ) || 
+          ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && 
+            levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) || 
+            ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && 
+              levelHealth[ 0 ].levelInfo[ 0 ].shareType == KeeperType.SECURITY_QUESTION ) ) {
             // if( levelData[ 0 ].status == 'notSetup' )
             // navigation.navigate( 'BackupSeedWordsContent' )
             const navigationParams = {
