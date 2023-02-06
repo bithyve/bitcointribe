@@ -59,7 +59,7 @@ const TransactionsPreviewSection: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   headerContainer: {
-    paddingVertical: 20,
+    paddingTop: 20,
     paddingHorizontal: 20,
   },
 } )

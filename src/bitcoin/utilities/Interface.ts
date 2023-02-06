@@ -43,7 +43,7 @@ export interface Transaction {
   /**
    * Sats per byte
    */
-  fee?: string;
+  fee?: number;
 
   /**
    * UTC string
@@ -780,6 +780,8 @@ export interface AverageTxFees {
     estimatedBlocks: number,
   },
 }
+
+export type AverageTxFeesByNetwork = Record<NetworkType, AverageTxFees>;
 
 export interface LevelDataObj {
   shareType: string

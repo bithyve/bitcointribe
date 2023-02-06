@@ -56,18 +56,15 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
       hasButton: true,
       link: 'https://support.ramp.network/en/',
     },
-    {
-      title: strings.wyre,
-      subtitle: strings.wyreSub,
-      kind: BuyMenuItemKind.WYRE,
-      getImage: () => <Wyre style={{
-        height: hp( 46 ),
-        width: wp( 44 )
-      }}/>,
-      disabled: false,
-      hasButton: false,
-      link: 'https://support.sendwyre.com/hc/en-us',
-    },
+    // {
+    //   title: strings.wyre,
+    //   subtitle: strings.wyreSub,
+    //   kind: BuyMenuItemKind.WYRE,
+    //   getImage: () => <Wyre />,
+    //   disabled: false,
+    //   hasButton: false,
+    //   link: 'https://support.sendwyre.com/hc/en-us',
+    // },
     // {
     //   title: Platform.OS == 'ios' ? 'Buy with FastBitcoins' : 'Buy with FastBitcoins',
     //   subtitle: 'Scan FastBitcoin vouchers',

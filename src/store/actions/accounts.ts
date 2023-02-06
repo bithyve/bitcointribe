@@ -13,10 +13,10 @@ export const ADD_TRANSFER_DETAILS = 'ADD_TRANSFER_DETAILS'
 export const REMOVE_TRANSFER_DETAILS = 'REMOVE_TRANSFER_DETAILS'
 export const CLEAR_TRANSFER = 'CLEAR_TRANSFER'
 export const ACCUMULATIVE_BAL_AND_TX = 'ACCUMULATIVE_BAL_AND_TX'
-export const FETCH_FEE_AND_EXCHANGE_RATES = 'FETCH_FEE_AND_EXCHANGE_RATES'
+export const FETCH_EXCHANGE_RATES = 'FETCH_EXCHANGE_RATES'
+export const FETCH_FEE_RATES = 'FETCH_FEE_RATES'
 export const CLEAR_ACCOUNT_SYNC_CACHE = 'CLEAR_ACCOUNT_SYNC_CACHE'
 export const AUTO_SYNC_SHELLS = 'AUTO_SYNC_SHELLS'
-export const SYNC_VIA_XPUB_AGENT = 'SYNC_VIA_XPUB_AGENT'
 export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV'
 export const RESET_TWO_FA = 'RESET_TWO_FA'
 export const RUN_TEST = 'RUN_TEST'
@@ -211,19 +211,6 @@ export const autoSyncShells = ( syncAll?: boolean, hardRefresh?: boolean, ) => {
   }
 }
 
-export const syncViaXpubAgent = (
-  serviceType,
-  derivativeAccountType,
-  accountNumber
-) => {
-  return {
-    type: SYNC_VIA_XPUB_AGENT,
-    payload: {
-      serviceType, derivativeAccountType, accountNumber
-    },
-  }
-}
-
 export const validateTwoFA = ( token: number ) => {
   return {
     type: VALIDATE_TWO_FA,
@@ -233,11 +220,13 @@ export const validateTwoFA = ( token: number ) => {
   }
 }
 
-export const fetchFeeAndExchangeRates = () => {
-  return {
-    type: FETCH_FEE_AND_EXCHANGE_RATES
-  }
-}
+export const fetchExchangeRates = () => ( {
+  type: FETCH_EXCHANGE_RATES,
+} )
+
+export const fetchFeeRates = () => ( {
+  type: FETCH_FEE_RATES,
+} )
 
 export const generateSecondaryXpriv = ( accountShell, secondaryMnemonic ) => {
   return {
@@ -351,7 +340,7 @@ export const recomputeNetBalance = () => {
 
 export const refreshAccountShells = (
   shells: AccountShell[],
-  options: { hardRefresh?: boolean, syncDonationAccount?: boolean }
+  options: { hardRefresh?: boolean }
 ) => {
   return {
     type: REFRESH_ACCOUNT_SHELLS, payload: {

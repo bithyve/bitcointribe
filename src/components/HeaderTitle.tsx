@@ -22,6 +22,8 @@ export default function HeaderTitle( props ) {
         {props.firstLineTitle}
       </Text>
     </View>
+    {
+      (props.secondLineBoldTitle || props.secondLineTitle) ?
     <View style={{
       flexDirection: 'row', alignItems: 'center',
     }}>
@@ -35,18 +37,21 @@ export default function HeaderTitle( props ) {
           {props.secondLineTitle}
         </Text>
       </Text>
-
     </View>
+    : null
+    }
+
     {props.isKnowMoreButton &&
                 <KnowMoreButton onpress={() => props.onPressKnowMore} containerStyle={{
                   marginLeft: 'auto', marginRight: 20
                 }} />
     }
-
+{props.infoTextNormal ?
     <Text style={CommonStyles.headerTitlesInfoText} >
       {props.infoTextNormal}
     </Text>
+    :null
+}
   </View>
-
   )
 }

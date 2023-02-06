@@ -44,7 +44,7 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
     <View style={styles.rootContainer}>
 
       <Text style={{
-        ...ListStyles.listItemTitle, marginBottom: 12,  color: shadowColorForAccountKind( {
+        ...ListStyles.listItemTitle, marginBottom: 4,  color: shadowColorForAccountKind( {
           kind
         } )
       }}>
@@ -71,7 +71,7 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    marginBottom: 5,
+    // marginBottom: 5,
   },
 
   viewMoreLinkRow: {

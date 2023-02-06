@@ -50,7 +50,8 @@ import {
 import * as RNLocalize from 'react-native-localize'
 import {
   addTransferDetails,
-  fetchFeeAndExchangeRates
+  fetchExchangeRates,
+  fetchFeeRates,
 } from '../../store/actions/accounts'
 import {
   LevelHealthInterface,
@@ -164,7 +165,8 @@ interface HomePropsTypes {
   clearRampCache: any;
   clearSwanCache: any;
   updateSwanStatus: any;
-  fetchFeeAndExchangeRates: any;
+  fetchFeeRates: any;
+  fetchExchangeRates: any;
   createTempSwanAccountInfo: any;
   addTransferDetails: any;
   isFocused: boolean;
@@ -387,7 +389,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.focusListener = navigation.addListener( 'didFocus', () => {
 
       this.setCurrencyCodeFromAsync()
-      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
+      this.props.fetchExchangeRates( this.props.currencyCode )
+      this.props.fetchFeeRates()
       // this.syncChannel()
       // this.notificationCheck()
       this.setState( {
@@ -614,7 +617,8 @@ export default withNavigationFocus(
     clearRampCache,
     clearSwanCache,
     updateSwanStatus,
-    fetchFeeAndExchangeRates,
+    fetchFeeRates,
+    fetchExchangeRates,
     createTempSwanAccountInfo,
     addTransferDetails,
     notificationsUpdated,

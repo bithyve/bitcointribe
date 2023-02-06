@@ -92,7 +92,8 @@ import {
 } from '../../common/CommonFunctions/index'
 import {
   addTransferDetails,
-  fetchFeeAndExchangeRates
+  fetchFeeRates,
+  fetchExchangeRates,
 } from '../../store/actions/accounts'
 import {
   AccountType,
@@ -225,7 +226,8 @@ interface HomePropsTypes {
   clearRampCache: any;
   clearSwanCache: any;
   updateSwanStatus: any;
-  fetchFeeAndExchangeRates: any;
+  fetchFeeRates: any;
+  fetchExchangeRates: any;
   createTempSwanAccountInfo: any;
   addTransferDetails: any;
   notificationListNew: any;
@@ -394,7 +396,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   notificationCheck = () =>{
     const { messages } = this.props
-    console.log("notificationCheck "+JSON.stringify(messages));
+    console.log( 'notificationCheck '+JSON.stringify( messages ) )
     if( messages && messages.length ){
       this.updateBadgeCounter()
       messages.sort( function ( left, right ) {
@@ -477,12 +479,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           break
         case NotificationType.FNF_REQUEST_REJECTED:
         case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
-          this.moveToContactDetails( message.additionalInfo.channelKey,'I am the Keeper of' )
+          this.moveToContactDetails( message.additionalInfo.channelKey, 'I am the Keeper of' )
           break
         case NotificationType.FNF_KEEPER_REQUEST_REJECTED:
         case 'contact':
-          if (message.additionalInfo.txid !== undefined) {
-            this.moveToAccount(message.additionalInfo.type)
+          if ( message.additionalInfo.txid !== undefined ) {
+            this.moveToAccount( message.additionalInfo.type )
           }
           break
         case NotificationType.SECURE_XPUB:
@@ -493,8 +495,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case NotificationType.SM_UPLOADED_FOR_PK:
         case NotificationType.NEW_KEEPER_INFO:
         case NotificationType.GIFT_ACCEPTED:
-          this.closeBottomSheet();
-          this.props.navigation.navigate( 'ManageGifts', {giftType : '1'});
+          this.closeBottomSheet()
+          this.props.navigation.navigate( 'ManageGifts', {
+            giftType : '1'
+          } )
           break
         case NotificationType.GIFT_REJECTED:
           // console.log( 'message.AdditionalInfo', message.additionalInfo )
@@ -508,8 +512,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             isIgnoreButton: false,
             notificationType: message.type
           }, () => {
-            this.closeBottomSheet();
-            this.props.navigation.navigate( 'ManageGifts', {giftType : '1'});
+            this.closeBottomSheet()
+            this.props.navigation.navigate( 'ManageGifts', {
+              giftType : '1'
+            } )
           } )
           break
         case NotificationType.FNF_TRANSACTION:
@@ -685,17 +691,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       requestPermissions: true,
     } )
 
-    messaging().getInitialNotification().then((data) => {
-      if (data) {
-        const content = JSON.parse(data.data.content)
-        this.props.notificationPressed(content.notificationId, this.handleNotificationBottomSheetSelection)
+    messaging().getInitialNotification().then( ( data ) => {
+      if ( data ) {
+        const content = JSON.parse( data.data.content )
+        this.props.notificationPressed( content.notificationId, this.handleNotificationBottomSheetSelection )
       }
-    })
+    } )
 
-    messaging().onNotificationOpenedApp((data) => {
-      const content = JSON.parse(data.data.content)
-      this.props.notificationPressed(content.notificationId, this.handleNotificationBottomSheetSelection)
-    })
+    messaging().onNotificationOpenedApp( ( data ) => {
+      const content = JSON.parse( data.data.content )
+      this.props.notificationPressed( content.notificationId, this.handleNotificationBottomSheetSelection )
+    } )
   };
 
   syncChannel= () => {
@@ -839,7 +845,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         this.handleDeepLinking( unhandledDeepLinkURL )
       }
       this.props.setVersion()
-      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
+      this.props.fetchExchangeRates( this.props.currencyCode )
+      this.props.fetchFeeRates()
     } )
 
   };
@@ -1014,7 +1021,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.focusListener = navigation.addListener( 'didFocus', () => {
       this.setCurrencyCodeFromAsync()
-      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
+      this.props.fetchExchangeRates( this.props.currencyCode )
+      this.props.fetchFeeRates()
       this.syncChannel()
       // this.notificationCheck()
       this.setState( {
@@ -1361,7 +1369,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   moveToContactDetails = ( channelKey, type ) => {
-    this.closeBottomSheet();
+    this.closeBottomSheet()
     const contactData = makeContactRecipientDescription(
       channelKey,
       this.props.trustedContacts[ channelKey ],
@@ -1375,10 +1383,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   moveToAccount = ( txid ) => {
-    if (txid !== undefined && txid !== null) {
-      this.closeBottomSheet();
+    if ( txid !== undefined && txid !== null ) {
+      this.closeBottomSheet()
       this.props.navigation.navigate( 'AccountDetails', {
-        accountShellID: this.props.accountShells[txid].id,
+        accountShellID: this.props.accountShells[ txid ].id,
         swanDeepLinkContent: this.props.swanDeepLinkContent
       } )
     }
@@ -1389,10 +1397,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // const primarySubAccount = usePrimarySubAccountForShell( accountShellInfo )
 
     // alert(JSON.stringify(primarySubAccount));
-    const accountShell = this.props.accountShells[1];
-    let transaction = accountShell.primarySubAccount.transactions.find(tx => tx.txid === notificationAdditionalInfo.txid);
-    console.log("primarySubAccountShell "+ JSON.stringify(transaction));
-    this.closeBottomSheet();
+    const accountShell = this.props.accountShells[ 1 ]
+    const transaction = accountShell.primarySubAccount.transactions.find( tx => tx.txid === notificationAdditionalInfo.txid )
+    console.log( 'primarySubAccountShell '+ JSON.stringify( transaction ) )
+    this.closeBottomSheet()
     // alert(JSON.stringify(accountShell.primarySubAccount));
 
     // console.log("bhumika " +JSON.stringify(this.props.accountShells))
@@ -1598,8 +1606,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 }
                 switch ( this.state.notificationType ) {
                     case 'contact':
-                      if (notificationAdditionalInfo.txid !== undefined) {
-                        this.moveToAccount(notificationAdditionalInfo.type)
+                      if ( notificationAdditionalInfo.txid !== undefined ) {
+                        this.moveToAccount( notificationAdditionalInfo.type )
                       }
                       // this.moveToAccount( notificationAdditionalInfo )
                       break
@@ -1611,14 +1619,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       this.moveToContactDetails( notificationAdditionalInfo.channelKey, 'Contact' )
                       break
 
-                      case NotificationType.GIFT_ACCEPTED:
-                        this.closeBottomSheet();
-                        this.props.navigation.navigate( 'ManageGifts', {giftType : '1'});
+                    case NotificationType.GIFT_ACCEPTED:
+                      this.closeBottomSheet()
+                      this.props.navigation.navigate( 'ManageGifts', {
+                        giftType : '1'
+                      } )
                       break
 
-                      case NotificationType.GIFT_REJECTED:
-                        this.closeBottomSheet();
-                        this.props.navigation.navigate( 'ManageGifts', {giftType : '1'});
+                    case NotificationType.GIFT_REJECTED:
+                      this.closeBottomSheet()
+                      this.props.navigation.navigate( 'ManageGifts', {
+                        giftType : '1'
+                      } )
                       break
 
                     case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
@@ -1765,10 +1777,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           />
           <ModalContainer
             onBackground={() => {
-              if (this.state.currentBottomSheetKind === BottomSheetKind.GIFT_REQUEST) {
-                console.log('bgState');
-              } else if (this.state.currentBottomSheetKind === BottomSheetKind.TRUSTED_CONTACT_REQUEST) {
-                console.log('bgState');
+              if ( this.state.currentBottomSheetKind === BottomSheetKind.GIFT_REQUEST ) {
+                console.log( 'bgState' )
+              } else if ( this.state.currentBottomSheetKind === BottomSheetKind.TRUSTED_CONTACT_REQUEST ) {
+                console.log( 'bgState' )
               } else {
                 const perviousState = this.state.currentBottomSheetKind
                 this.setState( {
@@ -1869,7 +1881,7 @@ const mapStateToProps = ( state ) => {
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
     IsCurrentLevel0: idx( state, ( _ ) => _.bhr.IsCurrentLevel0 ),
     walletId: idx( state, ( _ ) => _.storage.wallet.walletId ),
-    clipboardAccess: idx(state, ( _ ) => _.misc.clipboardAccess ),
+    clipboardAccess: idx( state, ( _ ) => _.misc.clipboardAccess ),
   }
 }
 
@@ -1886,7 +1898,8 @@ export default withNavigationFocus(
     clearRampCache,
     clearSwanCache,
     updateSwanStatus,
-    fetchFeeAndExchangeRates,
+    fetchFeeRates,
+    fetchExchangeRates,
     createTempSwanAccountInfo,
     addTransferDetails,
     notificationsUpdated,

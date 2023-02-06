@@ -5,7 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  TextInput, FlatList, Animated, Dimensions, Alert
+  TextInput, FlatList, Animated, Dimensions, Alert, Platform, KeyboardAvoidingView
 } from 'react-native'
 import Fonts from '../../common/Fonts'
 import {
@@ -20,6 +20,7 @@ import { PagerView, PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEvent
 import ModalContainer from '../../components/home/ModalContainer'
 import AlertModalContents from '../../components/AlertModalContents'
 import Icon from 'react-native-vector-icons/dist/MaterialCommunityIcons'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 const AnimatedPagerView = Animated.createAnimatedComponent( PagerView )
 
@@ -66,8 +67,8 @@ const RestoreSeedPageComponent = ( props ) => {
   const [ partialSeedData, setPartialSeedData ] = useState( [] )
   const [ currentPosition, setCurrentPosition ] = useState( 0 )
   const [ showAlertModal, setShowAlertModal ] = useState( false )
-  const [ extraSeeds, setExtraSeeds ]=useState( false )
-  const [ suggestedWords, setSuggestedWords ] = useState( [ ] )
+  const [ extraSeeds, setExtraSeeds ] = useState( false )
+  const [ suggestedWords, setSuggestedWords ] = useState( [] )
   const [ onChangeIndex, setOnChangeIndex ] = useState( -1 )
 
   const width = Dimensions.get( 'window' ).width
@@ -88,22 +89,22 @@ const RestoreSeedPageComponent = ( props ) => {
     setPartialSeedDataFun( seedData )
   }, [] )
 
-  const setPartialSeedDataFun = ( testingData ) =>{
+  const setPartialSeedDataFun = ( testingData ) => {
     const tempData = []
     let innerTempData = []
     let initPosition = 0
     let lastPosition = 6
     const totalLength = testingData.length
-    testingData.map( ( item, index )=>{
-      if( index != 0 && index % 6 == 0 ){
+    testingData.map( ( item, index ) => {
+      if ( index != 0 && index % 6 == 0 ) {
         initPosition = initPosition + 6
-        lastPosition = ( lastPosition + 6 > totalLength )?totalLength:lastPosition
+        lastPosition = ( lastPosition + 6 > totalLength ) ? totalLength : lastPosition
         tempData.push( innerTempData )
         innerTempData = []
       }
       innerTempData.push( item )
     } )
-    if( innerTempData.length > 0 ){
+    if ( innerTempData.length > 0 ) {
       tempData.push( innerTempData )
     }
     setPartialSeedData( tempData )
@@ -111,7 +112,7 @@ const RestoreSeedPageComponent = ( props ) => {
   }
 
   const onNextClick = () => {
-    const nextPosition = currentPosition+1
+    const nextPosition = currentPosition + 1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
   }
@@ -123,10 +124,10 @@ const RestoreSeedPageComponent = ( props ) => {
 
   const onCheckPressed = () => {
     const tempData = [ ...seedData ]
-    if( !extraSeeds ){
-      for( let i = 13; i<25;i++ ){
+    if ( !extraSeeds ) {
+      for ( let i = 13; i < 25; i++ ) {
         tempData.push( {
-          id:i, name:''
+          id: i, name: ''
         } )
       }
     } else {
@@ -137,18 +138,18 @@ const RestoreSeedPageComponent = ( props ) => {
     setPartialSeedDataFun( tempData )
   }
 
-  const onProceedClick = () =>{
+  const onProceedClick = () => {
     let seed = ''
     let showValidation = false
     seedData.forEach( ( { name } ) => {
-      if( name == null || name == '' ) {
+      if ( name == null || name == '' ) {
         showValidation = true
         return
       }
-      if( !seed ) seed = name
+      if ( !seed ) seed = name
       else seed = seed + ' ' + name
     } )
-    if( showValidation ){
+    if ( showValidation ) {
       // Alert.alert( 'Please fill all seed words' )
       setShowAlertModal( true )
     } else {
@@ -157,7 +158,7 @@ const RestoreSeedPageComponent = ( props ) => {
   }
 
   const onPreviousClick = () => {
-    const nextPosition = currentPosition-1
+    const nextPosition = currentPosition - 1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
   }
@@ -174,34 +175,34 @@ const RestoreSeedPageComponent = ( props ) => {
     else return index + 'th'
   }
 
-  const getIndex = ( index, seedIndex )=>{
+  const getIndex = ( index, seedIndex ) => {
     let newIndex = index + 1 + ( seedIndex * 6 )
     let isAdd = false
-    if( index % 2 == 0 ) isAdd = true
+    if ( index % 2 == 0 ) isAdd = true
 
     let tempNumber = 0
-    if( index == 0 || index == 5 ) tempNumber = 0
-    else if( index == 1 || index == 4 ) tempNumber = 2
+    if ( index == 0 || index == 5 ) tempNumber = 0
+    else if ( index == 1 || index == 4 ) tempNumber = 2
     else tempNumber = 1
 
-    if( isAdd )
+    if ( isAdd )
       newIndex -= tempNumber
     else newIndex += tempNumber
 
     return newIndex
   }
 
-  const getTextIndex = ( index )=>{
+  const getTextIndex = ( index ) => {
     let newIndex = index
     let isAdd = false
-    if( index % 2 == 0 ) isAdd = true
+    if ( index % 2 == 0 ) isAdd = true
 
     let tempNumber = 0
-    if( index == 0 || index == 5 ) tempNumber = 0
-    else if( index == 1 || index == 4 ) tempNumber = 2
+    if ( index == 0 || index == 5 ) tempNumber = 0
+    else if ( index == 1 || index == 4 ) tempNumber = 2
     else tempNumber = 1
 
-    if( isAdd )
+    if ( isAdd )
       newIndex -= tempNumber
     else newIndex += tempNumber
 
@@ -265,22 +266,24 @@ const RestoreSeedPageComponent = ( props ) => {
   )
 
   return (
-    <View style={{
-      flex: 1
-    }} >
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'sl' : 'height'}
+      style={{
+        flex: 1
+      }} >
       {partialSeedData && partialSeedData.length > 0 && partialSeedData[ currentPosition ] != undefined &&
-      partialSeedData[ currentPosition ] ? (
+        partialSeedData[ currentPosition ] ? (
           <AnimatedPagerView
             initialPage={0}
             ref={ref}
             style={{
-              flex:1
+              flex: 1
             }}
             onPageScroll={onPageScroll}
             onPageSelected={onPageSelected}
           >
             {partialSeedData.map( ( seedItem, seedIndex ) => (
-              <View  key={seedIndex} style={{
+              <View key={seedIndex} style={{
                 flex: 1, marginTop: 10
               }} >
                 <FlatList
@@ -290,7 +293,7 @@ const RestoreSeedPageComponent = ( props ) => {
                   showsVerticalScrollIndicator={false}
                   numColumns={2}
                   contentContainerStyle={{
-                    marginStart:15, zIndex:-100
+                    marginStart: 15, zIndex: -100
                   }}
                   renderItem={( { value, index } ) => {
                     return (
@@ -303,7 +306,7 @@ const RestoreSeedPageComponent = ( props ) => {
                         <TextInput
                           style={[ styles.modalInputBox,
                             partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name.length > 0 ? styles.selectedInput : null,
-                            // value?.name.length > 0 ? styles.selectedInput : null,
+                          // value?.name.length > 0 ? styles.selectedInput : null,
                           ]}
                           placeholder={`Enter ${getPlaceholder( getIndex( index, seedIndex ) )} word`}
                           placeholderTextColor={Colors.borderColor}
@@ -316,10 +319,10 @@ const RestoreSeedPageComponent = ( props ) => {
                           autoCorrect={false}
                           // editable={isEditable}
                           autoCapitalize="none"
-                          onSubmitEditing={() =>{
+                          onSubmitEditing={() => {
                             setSuggestedWords( [] )
                           }}
-                          onFocus={()=>{
+                          onFocus={() => {
                             setSuggestedWords( [] )
                             setOnChangeIndex( index )
                           }}
@@ -327,7 +330,7 @@ const RestoreSeedPageComponent = ( props ) => {
                             const data = [ ...partialSeedData ]
                             data[ currentPosition ][ getTextIndex( index ) ].name = text.trim()
                             setPartialSeedData( data )
-                            if( text.length > 1 ){
+                            if ( text.length > 1 ) {
                               setOnChangeIndex( index )
                               getSuggestedWords( text.toLowerCase() )
                             } else {
@@ -338,34 +341,39 @@ const RestoreSeedPageComponent = ( props ) => {
                       </TouchableOpacity>
                     )
                   }}
-                  ListFooterComponent={()=> seedIndex == 1 &&
+                  ListFooterComponent={() => seedIndex == 1 &&
                   <TouchableOpacity onPress={() => onCheckPressed()} style={{
-                    flexDirection:'row', alignItems:'center'
+                    flexDirection: 'row', alignItems: 'center'
                   }}>
-                    <Icon name={extraSeeds?'checkbox-marked':'checkbox-blank-outline'} size={24} color={Colors.blue} />
-                    <Text style={ {
-                      color: Colors.blue, marginStart:10
-                    } }>{'I have 24 seed words'}</Text>
+                    <Icon name={extraSeeds ? 'checkbox-marked' : 'checkbox-blank-outline'} size={24} color={Colors.blue} />
+                    <Text style={{
+                      color: Colors.blue, marginStart: 10
+                    }}>{'I have 24 seed words'}</Text>
                   </TouchableOpacity>}
                 />
                 {
                   suggestedWords?.length > 0 ?
                     <View style={{
-                      zIndex:1, position:'absolute',
+                      zIndex: 1,
+                      position: 'absolute',
                       // width:'80%',
-                      flex:1,
+                      flex: 1,
                       // minHeight:50,
-                      left:50,
-                      right:20,
-                      marginTop: ( getPosition( onChangeIndex ) ) * 65,
-                      flexDirection:'row',
-                      backgroundColor:'white',
+                      left: 50,
+                      right: 20,
+                      marginTop: ( onChangeIndex == 4 || onChangeIndex == 5 )
+                        ? 50 : ( getPosition( onChangeIndex ) ) * 65,
+                      flexDirection: 'row',
+                      backgroundColor: 'white',
                       padding: 10,
                       borderRadius: 10,
-                      flexWrap:'wrap'
+                      flexWrap: 'wrap',
+                      height: ( onChangeIndex == 4 || onChangeIndex == 5 )
+                        ? 85 : null,
+                      overflow: 'hidden'
                     }}>
                       {suggestedWords.map( ( word, wordIndex ) => {
-                        return(
+                        return (
                           <TouchableOpacity key={wordIndex} style={{
                             backgroundColor: Colors.lightBlue, padding: 5, borderRadius: 5,
                             margin: 5
@@ -383,7 +391,7 @@ const RestoreSeedPageComponent = ( props ) => {
                         )
                       } )}
                     </View>
-                    :null
+                    : null
                 }
                 {/* <BottomInfoBox
                   backgroundColor={Colors.white}
@@ -393,7 +401,7 @@ const RestoreSeedPageComponent = ( props ) => {
               </View>
             ) )}
           </AnimatedPagerView>
-        ): (
+        ) : (
           <View style={{
             flex: 1
           }}>
@@ -435,7 +443,7 @@ const RestoreSeedPageComponent = ( props ) => {
           {props.isChangeKeeperAllow ? (
             <TouchableOpacity
               disabled={props.disableChange ? props.disableChange : false}
-              onPress={() => { ( currentPosition  * 6 )!=0 ? onPreviousClick() : props.onPressChange() }}
+              onPress={() => { ( currentPosition * 6 ) != 0 ? onPreviousClick() : props.onPressChange() }}
               style={{
                 marginLeft: 10,
                 height: wp( '13%' ),
@@ -451,7 +459,7 @@ const RestoreSeedPageComponent = ( props ) => {
                   color: props.disableChange ? Colors.lightBlue : Colors.blue,
                 }}
               >
-                {(  currentPosition  * 6 )!=0 ? props.previousButtonText : props.changeButtonText}
+                {( currentPosition * 6 ) != 0 ? props.previousButtonText : props.changeButtonText}
               </Text>
             </TouchableOpacity>
           ) : null}
@@ -459,9 +467,9 @@ const RestoreSeedPageComponent = ( props ) => {
             flexDirection: 'row'
           }}>
             {
-              partialSeedData.map( ( item, index )=>{
-                return(
-                  <View key={( index )} style={currentPosition==index ? styles.selectedDot:styles.unSelectedDot} />
+              partialSeedData.map( ( item, index ) => {
+                return (
+                  <View key={( index )} style={currentPosition == index ? styles.selectedDot : styles.unSelectedDot} />
                 )
               } )
             }
@@ -469,7 +477,7 @@ const RestoreSeedPageComponent = ( props ) => {
         </View>
       </View> : null
       }
-      <ModalContainer onBackground={()=>{setShowAlertModal( false )}} visible={showAlertModal} closeBottomSheet={() => { }}>
+      <ModalContainer onBackground={() => { setShowAlertModal( false ) }} visible={showAlertModal} closeBottomSheet={() => { }}>
         <AlertModalContents
           // modalRef={this.ErrorBottomSheet}
           // title={''}
@@ -478,13 +486,11 @@ const RestoreSeedPageComponent = ( props ) => {
           onPressProceed={() => {
             setShowAlertModal( false )
           }}
-          isBottomImage={false}          
-          headerTextColor={Colors.blue}
-          buttonColor={Colors.blue}
-          // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+          isBottomImage={false}
+        // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>
-    </View>
+    </KeyboardAvoidingView>
   )
 }
 
@@ -618,18 +624,18 @@ const styles = StyleSheet.create( {
       height: 15,
     },
   },
-  selectedDot:{
-    width:25,
-    height:5,
-    borderRadius:5,
-    backgroundColor: '#EA4335',
-    marginEnd:5
+  selectedDot: {
+    width: 25,
+    height: 5,
+    borderRadius: 5,
+    backgroundColor: Colors.blue,
+    marginEnd: 5
   },
-  unSelectedDot:{
-    width:6,
-    height:5,
-    borderRadius:5,
-    backgroundColor: '#EE8C84',
-    marginEnd:5
+  unSelectedDot: {
+    width: 6,
+    height: 5,
+    borderRadius: 5,
+    backgroundColor: Colors.primaryAccentLighter2,
+    marginEnd: 5
   }
 } )

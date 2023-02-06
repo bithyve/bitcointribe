@@ -61,7 +61,8 @@ import {
   addNewAccountShellsWatcher,
   autoSyncShellsWatcher,
   createSmNResetTFAOrXPrivWatcher,
-  feeAndExchangeRatesWatcher,
+  fetchExchangeRatesWatcher,
+  fetchFeeRatesWatcher,
   generateGiftsWatcher,
   generateSecondaryXprivWatcher,
   mergeAccountShellsWatcher,
@@ -183,17 +184,6 @@ const config = {
   } )
 }
 
-
-
-
-
-
-
-
-
-
-
-
 const rootSaga = function* () {
   const sagas = [
     // wallet setup watcher
@@ -209,7 +199,8 @@ const rootSaga = function* () {
     testcoinsWatcher,
     generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
-    feeAndExchangeRatesWatcher,
+    fetchExchangeRatesWatcher,
+    fetchFeeRatesWatcher,
     updateDonationPreferencesWatcher,
     refreshAccountShellsWatcher,
     addNewAccountShellsWatcher,

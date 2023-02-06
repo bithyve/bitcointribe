@@ -113,7 +113,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           requestAnimationFrame( () => {
             dispatch( refreshAccountShells( [ sourceAccountShell ], {
               hardRefresh: true,
-              syncDonationAccount: account.type === AccountType.DONATION_ACCOUNT
             } ) )
           } )
           navigation.dispatch(

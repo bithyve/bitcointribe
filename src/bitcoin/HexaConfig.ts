@@ -9,6 +9,7 @@ import {
   RampDerivativeAccount,
   WyreDerivativeAccount,
   AccountType,
+  NetworkType,
 } from './utilities/Interface'
 import Config from 'react-native-config'
 import {
@@ -39,6 +40,8 @@ class HexaConfig {
   public VERSION: string = Config.VERSION ? Config.VERSION.trim() : '';
   public ENVIRONMENT: string;
   public NETWORK: bitcoinJS.Network;
+  public NETWORK_TYPE: NetworkType;
+
   public SECURE_WALLET_XPUB_PATH: string = Config.BIT_SECURE_WALLET_XPUB_PATH ? Config.BIT_SECURE_WALLET_XPUB_PATH.trim() : '2147483651/2147483649/';
   public SECURE_DERIVATION_BRANCH: string = Config.BIT_SECURE_DERIVATION_BRANCH ? Config.BIT_SECURE_DERIVATION_BRANCH.trim() : '1';
   public SSS_OTP_LENGTH: string = Config.BIT_SSS_OTP_LENGTH ? Config.BIT_SSS_OTP_LENGTH.trim() : '6';
@@ -278,8 +281,10 @@ class HexaConfig {
   public setNetwork = (): void => {
     if ( this.ENVIRONMENT === 'MAIN' ) {
       this.NETWORK = bitcoinJS.networks.bitcoin
+      this.NETWORK_TYPE = NetworkType.MAINNET
     } else {
       this.NETWORK = bitcoinJS.networks.testnet
+      this.NETWORK_TYPE = NetworkType.TESTNET
       this.DEFAULT_GIFT_VALIDITY = 10 * 60 * 1000
     }
   };

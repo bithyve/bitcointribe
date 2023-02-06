@@ -49,7 +49,7 @@ def enableHermes = project.ext.react.get("enableHermes", false);
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    // buildToolsVersion rootProject.ext.buildToolsVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     flavorDimensions "default"
     ndkVersion rootProject.ext.ndkVersion
 
@@ -57,8 +57,8 @@ android {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 531
-        versionName "2.1.1"
+        versionCode 542
+        versionName "2.1.3"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
         resValue "string", "build_config_package", "io.hexawallet.hexa"
@@ -91,7 +91,7 @@ android {
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.debug
+            // signingConfig signingConfigs.release
         }
     }
     productFlavors {
@@ -169,7 +169,7 @@ dependencies {
     implementation project(':react-native-camera')
 
     implementation project(':react-native-udp')
-    implementation project(':react-native-tcp')
+//    implementation project(':react-native-tcp')
     implementation project(':react-native-os')
     implementation project(':react-native-svg')
     implementation project(':react-native-video')

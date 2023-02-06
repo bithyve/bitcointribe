@@ -39,7 +39,6 @@ import messaging from '@react-native-firebase/messaging'
 import {
   updateFCMTokens,
 } from '../store/actions/notifications'
-import { autoSyncShells } from '../store/actions/accounts'
 import Relay from '../bitcoin/utilities/Relay'
 import { LocalizationContext } from '../common/content/LocContext'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
@@ -262,7 +261,6 @@ export default function Login( props ) {
         }
 
         bootStrapNotifications()
-        dispatch( autoSyncShells() )
       }
     }
   }, [ isAuthenticated, walletExists, processedLink ] )
