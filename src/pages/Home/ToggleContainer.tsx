@@ -37,7 +37,7 @@ const ToggleContainer = ( ) => {
       <CurrencyKindToggleSwitch
         fiatCurrencyCode={currencyCode}
         activeOnImage={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
-        inactiveOnImage={require( '../../assets/images/icons/icon_bitcoin_dark.png' )}
+        inactiveOnImage={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
         activeOffImage={
           materialIconCurrencyCodes.includes( currencyCode ) ?
             <MaterialCurrencyCodeIcon
@@ -51,13 +51,13 @@ const ToggleContainer = ( ) => {
           materialIconCurrencyCodes.includes( currencyCode ) ?
             <MaterialCurrencyCodeIcon
               currencyCode={currencyCode}
-              color={Colors.blue}
+              color={Colors.white}
               size={14}
             />
             : null
         }
         trackColor={Colors.lightBlue}
-        thumbColor={Colors.blue}
+        thumbColor={Colors.darkBlue}
         onpress={() => {
           dispatch( currencyKindSet(
             prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN

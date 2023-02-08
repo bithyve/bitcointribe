@@ -5,10 +5,11 @@ const Colors = {
   textColorGrey: '#6C6C6C',
   backgroundColor: '#F5F5F5',
   secondaryBackgroundColor: '#E5E5E5',
-  lightBlue: '#77B9EB',
+  lightBlue: '#FD746C',
   skyBlue: '#006DB42E',
-  darkBlue: '#006DB4',
-  blue: '#006CB4',
+  darkBlue: '#2C3E50',
+  // blue: '#006CB4',
+  blue:'#FD746C',
   green: '#70C1B3',
   purple: '#9D87E0',
   grayShade: '#53D592',
@@ -81,6 +82,7 @@ const Colors = {
   gray13: '#525252',
   black2: '#073B36',
   gray14:'#313131',
-  gray15: '#727272'
+  gray15: '#727272',
+  // BottomTabBackground:'#2C3E50',
 }
 export default Colors

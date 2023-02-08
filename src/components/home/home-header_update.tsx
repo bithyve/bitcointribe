@@ -24,6 +24,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { setCloudBackupStatus, setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
 import CloudStatus from '../../common/data/enums/CloudBackupStatus'
+import LinearGradient from 'react-native-linear-gradient'
 
 const currencyCode = [
   'BRL',

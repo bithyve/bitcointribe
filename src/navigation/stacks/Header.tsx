@@ -130,6 +130,7 @@ import { makeContactRecipientDescription } from '../../utils/sending/RecipientFa
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Relay from '../../bitcoin/utilities/Relay'
 import ClipboardAutoRead from '../../components/ClipboardAutoRead'
+import LinearGradient from 'react-native-linear-gradient'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -1755,8 +1756,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   : 0,
         }}
       >
-        <ImageBackground
-          source={require( '../../assets/images/home-bg.png' )}
+        {/* <ImageBackground
+          // source={require( '../../assets/images/home-bg.png' )}
           style={{
             width: '100%',
             height: '100%',
@@ -1765,9 +1766,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           imageStyle={{
             resizeMode: 'stretch',
           }}
-        >
+        > */}
+          <LinearGradient colors={[Colors.blue, Colors.darkBlue]} 
+          start={{x: 0, y: 0}} end={{x: 1, y: 0}} 
+          locations={[0,1]}
+          style={{
+            width: '100%',
+            height: '100%',
+            flex: 1,
+            // backgroundColor:'red'
+          }}>
           {this.props.clipboardAccess && <ClipboardAutoRead navigation={this.props.navigation} />}
-          <HomeHeader
+           <HomeHeader
             onPressNotifications={this.onPressNotifications}
             navigateToQRScreen={this.navigateToQRScreen}
             notificationData={this.props.messages}
@@ -1782,7 +1792,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           // setCurrencyToggleValue={this.setCurrencyToggleValue}
           // navigation={this.props.navigation}
           // overallHealth={overallHealth}
-          />
+          /> 
           <ModalContainer
             onBackground={() => {
               if ( this.state.currentBottomSheetKind === BottomSheetKind.GIFT_REQUEST ) {
@@ -1807,7 +1817,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           >
             {this.renderBottomSheetContent()}
           </ModalContainer>
-        </ImageBackground>
+          </LinearGradient>
+        {/* </ImageBackground> */}
       </View>
     )
   }
