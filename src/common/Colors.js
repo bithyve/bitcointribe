@@ -83,6 +83,7 @@ const Colors = {
   black2: '#073B36',
   gray14:'#313131',
   gray15: '#727272',
+  theam_icon_color:'#6a5059'
   // BottomTabBackground:'#2C3E50',
 }
 export default Colors

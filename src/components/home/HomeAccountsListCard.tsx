@@ -44,7 +44,7 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
   return (
     <View style={styles.headerSectionContainer}>
       <Image
-        style={styles.headerAccountSync}
+        style={[styles.headerAccountSync, {tintColor: Colors.theam_icon_color}]}
         source={getAccountSyncIcon( accountShell.syncStatus )}
       />
       <View style={styles.headerAccountImage} >
