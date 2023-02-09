@@ -94,6 +94,7 @@ import {
   addTransferDetails,
   fetchFeeRates,
   fetchExchangeRates,
+  recomputeNetBalance
 } from '../../store/actions/accounts'
 import {
   AccountType,
@@ -129,6 +130,7 @@ import { makeContactRecipientDescription } from '../../utils/sending/RecipientFa
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Relay from '../../bitcoin/utilities/Relay'
 import ClipboardAutoRead from '../../components/ClipboardAutoRead'
+import LinearGradient from 'react-native-linear-gradient'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -276,6 +278,7 @@ interface HomePropsTypes {
   walletId: string;
   notificationPressed: any;
   clipboardAccess: boolean;
+  recomputeNetBalance: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -847,6 +850,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.setVersion()
       this.props.fetchExchangeRates( this.props.currencyCode )
       this.props.fetchFeeRates()
+      this.props.recomputeNetBalance()
     } )
 
   };
@@ -909,11 +913,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   componentDidUpdate = ( prevProps, prevState ) => {
     if (
-      prevProps.accountsState.netBalance !==
+      this.state.netBalance !==
       this.props.accountsState.netBalance
-    )  this.setState( {
+    ) {
+    console.log('skk netBalance new', JSON.stringify(this.state.netBalance))
+    this.setState( {
       netBalance: this.props.accountsState.netBalance,
     } )
+  }
+    console.log('skk accountstate new', JSON.stringify(this.props.accountsState))
 
     if (
       prevProps.secondaryDeviceAddressValue !==
@@ -1020,6 +1028,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { navigation } = this.props
 
     this.focusListener = navigation.addListener( 'didFocus', () => {
+      this.props.recomputeNetBalance()
       this.setCurrencyCodeFromAsync()
       this.props.fetchExchangeRates( this.props.currencyCode )
       this.props.fetchFeeRates()
@@ -1747,8 +1756,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   : 0,
         }}
       >
-        <ImageBackground
-          source={require( '../../assets/images/home-bg.png' )}
+        {/* <ImageBackground
+          // source={require( '../../assets/images/home-bg.png' )}
           style={{
             width: '100%',
             height: '100%',
@@ -1757,9 +1766,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           imageStyle={{
             resizeMode: 'stretch',
           }}
-        >
+        > */}
+          <LinearGradient colors={[Colors.blue, Colors.darkBlue]} 
+          start={{x: 0, y: 0}} end={{x: 1, y: 0}} 
+          locations={[0,1]}
+          style={{
+            width: '100%',
+            height: '100%',
+            flex: 1,
+            // backgroundColor:'red'
+          }}>
           {this.props.clipboardAccess && <ClipboardAutoRead navigation={this.props.navigation} />}
-          <HomeHeader
+           <HomeHeader
             onPressNotifications={this.onPressNotifications}
             navigateToQRScreen={this.navigateToQRScreen}
             notificationData={this.props.messages}
@@ -1774,7 +1792,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           // setCurrencyToggleValue={this.setCurrencyToggleValue}
           // navigation={this.props.navigation}
           // overallHealth={overallHealth}
-          />
+          /> 
           <ModalContainer
             onBackground={() => {
               if ( this.state.currentBottomSheetKind === BottomSheetKind.GIFT_REQUEST ) {
@@ -1799,7 +1817,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           >
             {this.renderBottomSheetContent()}
           </ModalContainer>
-        </ImageBackground>
+          </LinearGradient>
+        {/* </ImageBackground> */}
       </View>
     )
   }
@@ -1866,7 +1885,7 @@ const mapStateToProps = ( state ) => {
   return {
     levelHealth: idx( state, ( _ ) => _.bhr.levelHealth ),
     notificationList: state.notifications.notifications,
-    accountsState: state.accounts,
+    accountsState: idx( state, ( _ ) => _.accounts ),
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
     walletName:
       idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
@@ -1924,6 +1943,7 @@ export default withNavigationFocus(
     updateSecondaryShard,
     rejectedExistingContactRequest,
     notificationPressed,
+    recomputeNetBalance
   } )( Home )
 )
 

@@ -24,6 +24,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { setCloudBackupStatus, setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
 import CloudStatus from '../../common/data/enums/CloudBackupStatus'
+import LinearGradient from 'react-native-linear-gradient'
 
 const currencyCode = [
   'BRL',
@@ -42,7 +43,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { currencyKindSet } from '../../store/actions/preferences'
-import { LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { KeeperType, LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import MaterialCurrencyCodeIcon, {
@@ -200,7 +201,10 @@ const HomeHeader = ( {
       onPress={()=> {
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
         levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){
-          if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+          if ( ( levelHealth.length == 0 ) || 
+          ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ||
+          ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == KeeperType.SECURITY_QUESTION )
+          ) {
             const navigationParams = {
               selectedTitle: navigationObj?.selectedKeeper?.name,
               SelectedRecoveryKeyNumber: 1,

@@ -21,6 +21,7 @@ import MaterialCurrencyCodeIcon from '../../components/MaterialCurrencyCodeIcon'
 import { getCurrencyImageByRegion, getCurrencyImageName } from '../../common/CommonFunctions'
 import { LocalizationContext } from '../../common/content/LocContext'
 import {Shadow} from 'react-native-shadow-2';
+import LinearGradient from 'react-native-linear-gradient'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -132,6 +133,21 @@ const HomeBuyCard = ( {
         </View>
       </View>
     <Shadow startColor={Colors.shadowBlue} distance={11} offset={[9 ,10] }>
+    <LinearGradient colors={[Colors.blue, Colors.darkBlue]} 
+          start={{x: 0, y: 0}} end={{x: 1, y: 0}} 
+          locations={[0.2,1]}
+          style={{
+            borderRadius: wp( 2 ),
+            paddingVertical: wp( 2.5 ),
+            paddingHorizontal: wp( 4 ),
+            backgroundColor: Colors.blue,
+            // shadowColor: Colors.shadowBlue,
+            // shadowOpacity: 1,
+            // shadowOffset: {
+            //   width: 9, height: 10
+            // },
+            // elevation: 15
+          }}>
       <TouchableOpacity
         // icon={
         //   <Image
@@ -143,18 +159,7 @@ const HomeBuyCard = ( {
         //     }}
         //   />
         // }
-        style={{
-          borderRadius: wp( 2 ),
-          paddingVertical: wp( 2.5 ),
-          paddingHorizontal: wp( 4 ),
-          backgroundColor: Colors.blue,
-          // shadowColor: Colors.shadowBlue,
-          // shadowOpacity: 1,
-          // shadowOffset: {
-          //   width: 9, height: 10
-          // },
-          // elevation: 15
-        }}
+        
         onPress={() =>
           openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
         }
@@ -165,6 +170,7 @@ const HomeBuyCard = ( {
           {strings.buy}
         </Text>
       </TouchableOpacity>
+      </LinearGradient>
     </Shadow>
   </Shadow>
   )

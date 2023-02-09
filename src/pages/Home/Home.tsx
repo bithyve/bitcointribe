@@ -3,7 +3,8 @@ import {
   StyleSheet,
   StatusBar,
   View,
-  Platform
+  Platform,
+  SafeAreaView
 } from 'react-native'
 import {
   heightPercentageToDP,
@@ -84,6 +85,7 @@ import { credsAuthenticated } from '../../store/actions/setupAndAuth'
 import { setShowAllAccount } from '../../store/actions/accounts'
 import HomeContainer from './HomeContainer'
 import ModalContainer from '../../components/home/ModalContainer'
+import LinearGradient from 'react-native-linear-gradient'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -520,9 +522,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   render() {
     return (
       <View style={{
-        backgroundColor: Colors.blue
+        backgroundColor: Colors.lightBlue
       }}>
-        <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
+         <LinearGradient colors={[Colors.blue, Colors.darkBlue]} 
+          start={{x: 0, y: 0}} end={{x: 0.5, y: 1}}>
+          <StatusBar translucent={true} backgroundColor={'transparent'} barStyle="light-content"/>
+        </LinearGradient>
+        {/* <StatusBar backgroundColor={Colors.blue} barStyle="light-content" /> */}
         <ModalContainer
           onBackground={()=>this.setState( {
             currentBottomSheetKind:null
