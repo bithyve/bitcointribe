@@ -8,4 +8,5 @@
     <string name="giftPrefix">/dev/GIFT</string>
     <string name="campaignPrefix">/dev/CAMPAIGN</string>
     <string name="contactGiftKeeperPrefix">/dev/CONTACT_GIFT</string>
+    <string name="deeplinkScheme">hexadev</string>
 </resources>
