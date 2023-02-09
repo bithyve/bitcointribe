@@ -83,6 +83,7 @@ export const PDF_UPGRADE = 'PDF_UPGRADE'
 export const RESET_LEVEL_AFTER_PASSWORD_CHANGE = 'RESET_LEVEL_AFTER_PASSWORD_CHANGE'
 export const SEED_BACKUP_HISTORY = 'SEED_BACKUP_HISTORY'
 export const RESTORE_SEED_WORD = 'RESTORE_SEED_WORD'
+export const SET_BACKUP_WITH_KEEPER_STATE = 'SET_BACKUP_WITH_KEEPER_STATE'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -836,5 +837,13 @@ export const upgradePDF = ( ) => {
 export const upgradeLevelOneKeeper = ( ) => {
   return {
     type: UPGRADE_LEVEL1_KEEPER
+  }
+}
+
+export const setBackupWithKeeperState = ( state ) => {
+  return {
+    type: SET_BACKUP_WITH_KEEPER_STATE, payload: {
+      state
+    }
   }
 }
