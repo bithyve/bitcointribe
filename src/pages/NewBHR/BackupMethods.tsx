@@ -12,8 +12,10 @@ import CommonStyles from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
 import { translations } from '../../common/content/LocContext'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { LevelData } from '../../bitcoin/utilities/Interface'
+import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
+import { setBackupWithKeeperState } from '../../store/actions/BHR'
 
 const styles = StyleSheet.create( {
   body: {
@@ -40,9 +42,18 @@ const styles = StyleSheet.create( {
 export default function BackupMethods( { navigation } ) {
   const strings  = translations[ 'bhr' ]
   const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
+  const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
+  const dispatch = useDispatch()
 
   function onKeeperButtonPress () {
     navigation.navigate( 'SeedBackupHistory' )
+  }
+
+  function onPressBackupWithKeeper() {
+    if( backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP ) {
+      navigation.navigate( 'BackupWithKeeper' )
+      dispatch( setBackupWithKeeperState( BackupWithKeeperState.INITIATED ) )
+    }
   }
 
   return (
@@ -118,20 +129,23 @@ export default function BackupMethods( { navigation } ) {
           style={{
             flexDirection: 'row',
           }}
-          onPress={() => navigation.navigate( 'BackupWithKeeper' )}
+          onPress={onPressBackupWithKeeper}
         >
           <View style={{
             width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, borderColor:
-  levelData[ 0 ].keeper1.status == 'accessible'
-    ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center', elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
+            backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP
+              ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center', elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
               width: 15, height: 15
             }
           }}
           >
             <View style={{
-              right: -4, height: 12, width: 12, borderRadius: 6, backgroundColor: levelData[ 0 ].keeper1.status == 'accessible' ? Colors.green : Colors.yellow, top: 0, justifyContent: 'center', alignItems: 'center'
+              right: -4, height: 12, width: 12, borderRadius: 6,
+              backgroundColor: backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP ? Colors.green : Colors.yellow, top: 0, justifyContent: 'center', alignItems: 'center'
             }}>
-              <FontAwesome name={levelData[ 0 ].keeper1.status == 'accessible' ? 'check' : 'exclamation' } color={Colors.white} size={7} />
+              <FontAwesome
+                name={backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP ? 'check' : 'exclamation' }
+                color={Colors.white} size={10} />
             </View>
             <Image style={{
               height: 20, width: 20

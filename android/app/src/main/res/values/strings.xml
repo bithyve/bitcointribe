@@ -13,4 +13,5 @@
     <string name="view_contact_request">View contact request</string>
     <string name="view_keeper_request">View keeper request</string>
     <string name="view_gift">View bitcoin gift</string>
+    <string name="deeplinkScheme">hexa</string>
 </resources>

@@ -504,7 +504,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           } )
           break
         case NotificationType.GIFT_REJECTED:
-          // console.log( 'message.AdditionalInfo', message.additionalInfo )
           this.setState( {
             notificationTitle: message.title,
             notificationInfo: message.info,
@@ -916,12 +915,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.state.netBalance !==
       this.props.accountsState.netBalance
     ) {
-    console.log('skk netBalance new', JSON.stringify(this.state.netBalance))
-    this.setState( {
-      netBalance: this.props.accountsState.netBalance,
-    } )
-  }
-    console.log('skk accountstate new', JSON.stringify(this.props.accountsState))
+      this.setState( {
+        netBalance: this.props.accountsState.netBalance,
+      } )
+    }
 
     if (
       prevProps.secondaryDeviceAddressValue !==
@@ -1402,18 +1399,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   moveToTransacation = ( notificationAdditionalInfo ) => {
-
-    // const primarySubAccount = usePrimarySubAccountForShell( accountShellInfo )
-
-    // alert(JSON.stringify(primarySubAccount));
     const accountShell = this.props.accountShells[ 1 ]
     const transaction = accountShell.primarySubAccount.transactions.find( tx => tx.txid === notificationAdditionalInfo.txid )
-    console.log( 'primarySubAccountShell '+ JSON.stringify( transaction ) )
     this.closeBottomSheet()
-    // alert(JSON.stringify(accountShell.primarySubAccount));
-
-    // console.log("bhumika " +JSON.stringify(this.props.accountShells))
-    // console.log("reddy " +JSON.stringify(this.props.accountsState))
     this.props.navigation.navigate( 'TransactionDetails', {
       transaction,
       accountShellID: accountShell.id,
@@ -1423,7 +1411,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   renderBottomSheetContent() {
     const { navigation } = this.props
     const { notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
-    // console.log( 'this.state.currentBottomSheetKind', this.state.currentBottomSheetKind )
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.TAB_BAR_BUY_MENU:
           return (
@@ -1767,9 +1754,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             resizeMode: 'stretch',
           }}
         > */}
-          <LinearGradient colors={[Colors.blue, Colors.darkBlue]} 
-          start={{x: 0, y: 0}} end={{x: 1, y: 0}} 
-          locations={[0,1]}
+        <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+          start={{
+            x: 0, y: 0
+          }} end={{
+            x: 1, y: 0
+          }}
+          locations={[ 0, 1 ]}
           style={{
             width: '100%',
             height: '100%',
@@ -1777,7 +1768,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             // backgroundColor:'red'
           }}>
           {this.props.clipboardAccess && <ClipboardAutoRead navigation={this.props.navigation} />}
-           <HomeHeader
+          <HomeHeader
             onPressNotifications={this.onPressNotifications}
             navigateToQRScreen={this.navigateToQRScreen}
             notificationData={this.props.messages}
@@ -1792,7 +1783,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           // setCurrencyToggleValue={this.setCurrencyToggleValue}
           // navigation={this.props.navigation}
           // overallHealth={overallHealth}
-          /> 
+          />
           <ModalContainer
             onBackground={() => {
               if ( this.state.currentBottomSheetKind === BottomSheetKind.GIFT_REQUEST ) {
@@ -1817,7 +1808,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           >
             {this.renderBottomSheetContent()}
           </ModalContainer>
-          </LinearGradient>
+        </LinearGradient>
         {/* </ImageBackground> */}
       </View>
     )

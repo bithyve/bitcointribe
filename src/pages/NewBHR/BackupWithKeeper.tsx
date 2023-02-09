@@ -12,13 +12,15 @@ import CommonStyles from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
 import { translations } from '../../common/content/LocContext'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { AccountType, Wallet } from '../../bitcoin/utilities/Interface'
 import dbManager from '../../storage/realm/dbManager'
 import QRCode from '../../components/QRCode'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import ButtonBlue from '../../components/ButtonBlue'
 import Toast from '../../components/Toast'
+import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
+import { setBackupWithKeeperState } from '../../store/actions/BHR'
 
 const styles = StyleSheet.create( {
   buttonText: {
@@ -35,6 +37,7 @@ export default function BackupWithKeeper( { navigation } ) {
   const [ path, setPath ] = useState( '' )
   const strings = translations[ 'bhr' ]
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
+  const dispatch = useDispatch()
 
   useEffect(  () => {
     init()
@@ -47,7 +50,7 @@ export default function BackupWithKeeper( { navigation } ) {
     setSeed( primaryMnemonic )
     const path = AccountUtilities.getDerivationPath( Config.NETWORK_TYPE, AccountType.CHECKING_ACCOUNT, 0 )
     setPath( path )
-    const url = `keeperdev://backup/${Buffer.from( `&seed=${primaryMnemonic.replace( / /g, ',' )}&path=${path}&name=hexa&appId=hexa`, 'utf8' ).toString(
+    const url = `keeperdev://backup/${Buffer.from( `&seed=${primaryMnemonic.replace( / /g, ',' )}&path=${path}&name=hexa&appId=hexadev`, 'utf8' ).toString(
       'base64',
     )}`
     setDeeplinkUrl( url )
@@ -133,6 +136,15 @@ export default function BackupWithKeeper( { navigation } ) {
           buttonDisable= {false}
         />
       </View>
+
+      <Text
+        onPress={()=> {
+          navigation.goBack()
+          dispatch( setBackupWithKeeperState( BackupWithKeeperState.BACKEDUP ) )
+        }}
+        style={{
+          textAlign: 'center', marginVertical: 40
+        }}>I have backed up with Keeper</Text>
 
     </View>
   )

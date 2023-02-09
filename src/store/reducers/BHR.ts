@@ -1,5 +1,6 @@
 import { BackupStreamData, ChannelAssets, KeeperInfoInterface, LevelData, LevelInfo, MetaShare, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 import { LevelDataVar } from '../../common/CommonVars/commonVars'
+import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import LevelStatus from '../../common/data/enums/LevelStatus'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import {
@@ -48,6 +49,7 @@ import {
   SET_PASSWORD_RESET_STATE,
   SEED_BACKUP_HISTORY,
   RESTORE_SEED_WORD,
+  SET_BACKUP_WITH_KEEPER_STATE,
 } from '../actions/BHR'
 
 interface historyObj {
@@ -137,6 +139,7 @@ const initialState: {
   pdfUpgrade: boolean;
   passwordResetState: string;
   seedBackupHistory: historyObj[];
+  backupWithKeeperStatus: BackupWithKeeperState
 } = {
   seedBackupHistory: [],
   mnemonic: '',
@@ -211,7 +214,8 @@ const initialState: {
   approvalContactData: null,
   IsCurrentLevel0: false,
   pdfUpgrade: false,
-  passwordResetState: ''
+  passwordResetState: '',
+  backupWithKeeperStatus: BackupWithKeeperState.NOT_SETUP
 }
 
 export default ( state = initialState, action ) => {
@@ -524,6 +528,11 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           seedBackupHistory: action.payload.seedBackupHistory,
+        }
+      case SET_BACKUP_WITH_KEEPER_STATE:
+        return {
+          ...state,
+          backupWithKeeperStatus: action.payload.state,
         }
   }
   return state
