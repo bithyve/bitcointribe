@@ -50,6 +50,7 @@ import AlertModalContents from '../components/AlertModalContents'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import BottomInputModalContainer from '../components/home/BottomInputModalContainer'
 import ConfirmSeedWordsModal from './NewBHR/ConfirmSeedWordsModal'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function Login( props ) {
   // const subPoints = [
@@ -603,30 +604,9 @@ export default function Login( props ) {
 
           <View style={{
             flexDirection: 'row',
-            alignItems: 'center'
+            alignItems: 'center',
+            justifyContent: 'flex-end'
           }}>
-            <TouchableOpacity
-              disabled={passcode.length !==4}
-              onPress={() => {
-                setCheckAuth( false )
-                setTimeout( () => {
-                  setIsDisabledProceed( true )
-                  setElevation( 0 )
-                }, 2 )
-                setTimeout( () => setloaderModal( true ), 2 )
-                handleLoaderMessages( passcode )
-              }}
-              style={{
-                ...styles.proceedButtonView,
-                elevation: Elevation,
-                backgroundColor: isDisabledProceed
-                  ? Colors.lightBlue
-                  : Colors.blue,
-              }}
-            >
-              <Text style={styles.proceedButtonText}>{common.proceed}</Text>
-            </TouchableOpacity>
-
             {
               attempts >= 3&&(
                 <TouchableOpacity
@@ -665,6 +645,27 @@ export default function Login( props ) {
                 </TouchableOpacity>
               )
             }
+            <TouchableOpacity
+              disabled={passcode.length !==4}
+              onPress={() => {
+                setCheckAuth( false )
+                setTimeout( () => {
+                  setIsDisabledProceed( true )
+                  setElevation( 0 )
+                }, 2 )
+                setTimeout( () => setloaderModal( true ), 2 )
+                handleLoaderMessages( passcode )
+              }}
+            >
+              <LinearGradient
+                start={[ 0, 0 ]}
+                end={[ 1, 1 ]}
+                colors={[ Colors.skyBlue, Colors.darkBlue ]}
+                style={styles.proceedButtonView}
+              >
+                <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -952,18 +953,13 @@ const styles = StyleSheet.create( {
     fontStyle: 'normal',
   },
   proceedButtonView: {
-    marginLeft: 20,
+    marginRight: 20,
     marginTop: hp( '15%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
   },
   proceedButtonText: {
     color: Colors.white,
