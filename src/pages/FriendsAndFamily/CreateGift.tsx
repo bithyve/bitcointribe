@@ -82,6 +82,7 @@ import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
+import LinearGradient from 'react-native-linear-gradient'
 
 const { height } = Dimensions.get( 'window' )
 
@@ -350,84 +351,92 @@ const CreateGift = ( { navigation }: Props ) => {
     }
 
     return (
-      <Shadow distance={2} startColor={Colors.shadowBlue} offset={[ 8, 8 ]}>
-        <TouchableOpacity
-          disabled={isDisabled}
-          onPress={() => {
-            if ( satCard ) {
-              setShowVerification( true )
-            } else {
-              console.log( 'condn', condn )
-              const giftInstances = Number( numbersOfGift )
-              const giftAmountInSats = prefersBitcoin
-                ? Number( amount )
-                : convertFiatToSats( parseFloat( amount ) )
-              const giftAmountsInSats = []
-              for ( let int = 0; int < giftInstances; int++ ) {
-                giftAmountsInSats.push( giftAmountInSats )
-              }
-              switch ( condn ) {
-                  case 'Invitation':
-                    if ( giftAmountsInSats.length ) {
-                      setInitGiftCreation( true )
-                      setShowLoader( true )
-                      dispatch(
-                        generateGifts( {
-                          amounts: giftAmountsInSats,
-                          accountId:
-                          selectedAccount &&
-                          selectedAccount.primarySubAccount &&
-                          selectedAccount.primarySubAccount.id
-                            ? selectedAccount.primarySubAccount.id
-                            : '',
-                          includeFee: includeFees,
-                          exclusiveGifts:
-                          giftAmountsInSats.length === 1 ? false : isExclusive,
-                        } )
-                      )
-                    }
-                    break
-                  case 'Create Gift':
-                  // creating multiple gift instances(based on giftInstances) of the same amount
-                    if ( giftAmountsInSats.length ) {
-                      setInitGiftCreation( true )
-                      setShowLoader( true )
-                      dispatch(
-                        generateGifts( {
-                          amounts: giftAmountsInSats,
-                          accountId:
-                          selectedAccount &&
-                          selectedAccount.primarySubAccount &&
-                          selectedAccount.primarySubAccount.id
-                            ? selectedAccount.primarySubAccount.id
-                            : '',
-                          includeFee: includeFees,
-                          exclusiveGifts:
-                          giftAmountsInSats.length === 1 ? false : isExclusive,
-                        } )
-                      )
-                    }
-                    break
-
-                  case 'Add F&F and Send':
-                    setGiftModal( false )
-                    navigation.navigate( 'AddContact', {
-                      fromScreen: 'Gift',
-                      giftId: ( createdGift as Gift ).id,
-                      setActiveTab: navigation.state.params.setActiveTab,
-                    } )
-                    break
-
-                  case 'Send Gift':
-                    setGiftModal( false )
-                    navigation.navigate( 'EnterGiftDetails', {
-                      giftId: ( createdGift as Gift ).id,
-                      setActiveTab: navigation.state.params.setActiveTab,
-                    } )
-                    break
-              }
+      <TouchableOpacity
+        disabled={isDisabled}
+        onPress={() => {
+          if ( satCard ) {
+            setShowVerification( true )
+          } else {
+            console.log( 'condn', condn )
+            const giftInstances = Number( numbersOfGift )
+            const giftAmountInSats = prefersBitcoin
+              ? Number( amount )
+              : convertFiatToSats( parseFloat( amount ) )
+            const giftAmountsInSats = []
+            for ( let int = 0; int < giftInstances; int++ ) {
+              giftAmountsInSats.push( giftAmountInSats )
             }
+            switch ( condn ) {
+                case 'Invitation':
+                  if ( giftAmountsInSats.length ) {
+                    setInitGiftCreation( true )
+                    setShowLoader( true )
+                    dispatch(
+                      generateGifts( {
+                        amounts: giftAmountsInSats,
+                        accountId:
+                          selectedAccount &&
+                          selectedAccount.primarySubAccount &&
+                          selectedAccount.primarySubAccount.id
+                            ? selectedAccount.primarySubAccount.id
+                            : '',
+                        includeFee: includeFees,
+                        exclusiveGifts:
+                          giftAmountsInSats.length === 1 ? false : isExclusive,
+                      } )
+                    )
+                  }
+                  break
+                case 'Create Gift':
+                  // creating multiple gift instances(based on giftInstances) of the same amount
+                  if ( giftAmountsInSats.length ) {
+                    setInitGiftCreation( true )
+                    setShowLoader( true )
+                    dispatch(
+                      generateGifts( {
+                        amounts: giftAmountsInSats,
+                        accountId:
+                          selectedAccount &&
+                          selectedAccount.primarySubAccount &&
+                          selectedAccount.primarySubAccount.id
+                            ? selectedAccount.primarySubAccount.id
+                            : '',
+                        includeFee: includeFees,
+                        exclusiveGifts:
+                          giftAmountsInSats.length === 1 ? false : isExclusive,
+                      } )
+                    )
+                  }
+                  break
+
+                case 'Add F&F and Send':
+                  setGiftModal( false )
+                  navigation.navigate( 'AddContact', {
+                    fromScreen: 'Gift',
+                    giftId: ( createdGift as Gift ).id,
+                    setActiveTab: navigation.state.params.setActiveTab,
+                  } )
+                  break
+
+                case 'Send Gift':
+                  setGiftModal( false )
+                  navigation.navigate( 'EnterGiftDetails', {
+                    giftId: ( createdGift as Gift ).id,
+                    setActiveTab: navigation.state.params.setActiveTab,
+                  } )
+                  break
+            }
+          }
+        }}
+
+      >
+        <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+          start={{
+            x: 0, y: 0
+          }} end={{
+            x: 1, y: 0
           }}
+          locations={[ 0.2, 1 ]}
           style={
             isDisabled
               ? {
@@ -439,8 +448,8 @@ const CreateGift = ( { navigation }: Props ) => {
           }
         >
           <Text style={styles.buttonText}>{text}</Text>
-        </TouchableOpacity>
-      </Shadow>
+        </LinearGradient>
+      </TouchableOpacity>
     )
   }
 
