@@ -146,9 +146,9 @@ const GradientTab = props => {
   return (
       <View style={{ backgroundColor: 'transparent' }}>
            <LinearGradient
-        colors={[Colors.blue,Colors.darkBlue]}
+        colors={[Colors.darkBlue,Colors.darkBlue]}
         start={{x:0, y:0}}
-        end={{x:0.1, y:1.0}}
+        end={{x:0.01, y:0.1}}
         // locations={[0.2, 1]}
         // style={{flex: 1}}
       >

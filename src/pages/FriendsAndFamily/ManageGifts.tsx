@@ -280,7 +280,7 @@ const ManageGifts = ( props ) => {
           marginHorizontal: 15, fontSize: RFValue( 11 ), color: '#525252', fontFamily: Fonts.FiraSansLight, marginTop: 18
         }}>{'Give sats as gifts to your friends and family, view and manage created gifts. '}
           <Text onPress={() => setKnowMore( true )} style={{
-            color:'#006CB4'
+            color:'#C36564'
           }}>{common[ 'knowMore' ]}</Text>
         </Text>
         <ScrollView

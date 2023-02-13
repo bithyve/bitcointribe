@@ -227,7 +227,7 @@ const AccountDetailsCard : React.FC<Props> = inject(
       >
         <Image
           source={require( '../../../assets/images/icons/icon_settings.png' )}
-          style={styles.settingsButtonImage}
+          style={[styles.settingsButtonImage, , {tintColor: Colors.theam_icon_color}]}
         />
       </TouchableOpacity>
     )

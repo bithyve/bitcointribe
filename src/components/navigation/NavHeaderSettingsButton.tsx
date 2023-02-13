@@ -1,6 +1,7 @@
 import React from 'react'
 import { StyleSheet, TouchableOpacity, Image } from 'react-native'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
+import Colors from '../../common/Colors';
 
 
 export type Props = {
@@ -28,7 +29,8 @@ const NavHeaderSettingsButton: React.FC<Props> = ( {
         source={accManagement ? require( '../../assets/images/icons/icon_settings_blue.png' ) : require( '../../assets/images/icons/icon_settings.png' )}
         style={{
           width: 22, height: 22,
-          marginTop: heightPercentageToDP( 0.5 )
+          marginTop: heightPercentageToDP( 0.5 ),
+          tintColor: Colors.theam_icon_color
         }}
       />
     </TouchableOpacity>
