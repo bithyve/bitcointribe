@@ -29,6 +29,7 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../components/ErrorModalContents'
 import ModalHeader from '../components/ModalHeader'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function SettingGetNewPin( props ) {
   const [ passcode, setPasscode ] = useState( '' )
@@ -562,12 +563,21 @@ export default function SettingGetNewPin( props ) {
                     setIsDisabled( true )
                   }, 2 )
                 }}
-                style={{
-                  ...styles.proceedButtonView,
-                  backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
-                }}
               >
-                <Text style={styles.proceedButtonText}>Proceed</Text>
+                <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                  start={{
+                    x: 0, y: 0
+                  }} end={{
+                    x: 1, y: 0
+                  }}
+                  locations={[ 0.2, 1 ]}
+                  style={{
+                    ...styles.proceedButtonView,
+                    backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
+                  }}
+                >
+                  <Text style={styles.proceedButtonText}>Proceed</Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           ) : null}
@@ -794,11 +804,6 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
   },
   proceedButtonText: {
     color: Colors.white,

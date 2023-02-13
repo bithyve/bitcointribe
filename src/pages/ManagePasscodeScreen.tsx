@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { translations } from '../common/content/LocContext'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function ManagePasscodeScreen( props ) {
   const strings  = translations[ 'login' ]
@@ -223,13 +224,22 @@ export default function ManagePasscodeScreen( props ) {
               //props.navigation.navigate('SettingGetNewPin')
               //PinChangeSuccessBottomSheet.current.snapTo(1);
             }}
-            style={{
-              ...styles.proceedButtonView,
-              backgroundColor:
-                pin.length == 4 ? Colors.blue : Colors.lightBlue,
-            }}
           >
-            <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+              start={{
+                x: 0, y: 0
+              }} end={{
+                x: 1, y: 0
+              }}
+              locations={[ 0.2, 1 ]}
+              style={{
+                ...styles.proceedButtonView,
+                backgroundColor:
+                  pin.length == 4 ? Colors.blue : Colors.lightBlue,
+              }}
+            >
+              <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       ) : (
@@ -416,11 +426,6 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
     marginBottom: heightPercentageToDP( '5%' ),
   },
   proceedButtonText: {

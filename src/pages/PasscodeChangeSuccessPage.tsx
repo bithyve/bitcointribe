@@ -17,21 +17,22 @@ import {
   changeAuthCred,
   switchCredsChanged,
 } from '../store/actions/setupAndAuth'
+import LinearGradient from 'react-native-linear-gradient'
 export default function PasscodeChangeSuccessPage( props ) {
   const dispatch = useDispatch()
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar />
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View style={{
-          ...styles.modalContentContainer, height: '100%', 
+          ...styles.modalContentContainer, height: '100%',
         }}>
           <View style={{
-            height: '100%' 
+            height: '100%'
           }}>
 
             <View style={styles.successModalHeaderView}>
@@ -39,22 +40,31 @@ export default function PasscodeChangeSuccessPage( props ) {
             </View>
             <View style={styles.successModalAmountView}>
               <Text style={{
-                ...styles.modalInfoText, marginBottom: hp( '1%' ), marginTop: 'auto' 
+                ...styles.modalInfoText, marginBottom: hp( '1%' ), marginTop: 'auto'
               }}>Please use your new passcode to login </Text>
             </View>
-            <View style={{ 
-              height: hp( '18%' ), flexDirection: 'row', marginTop: 'auto', alignItems: 'center', 
+            <View style={{
+              height: hp( '18%' ), flexDirection: 'row', marginTop: 'auto', alignItems: 'center',
             }} >
               <AppBottomSheetTouchableWrapper
                 onPress={() => {
                   dispatch( switchCredsChanged() )
                   props.navigation.popToTop()
                 }}
-                style={{
-                  ...styles.successModalButtonView 
-                }}
               >
-                <Text style={styles.proceedButtonText}>View Settings</Text>
+                <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                  start={{
+                    x: 0, y: 0
+                  }} end={{
+                    x: 1, y: 0
+                  }}
+                  locations={[ 0.2, 1 ]}
+                  style={{
+                    ...styles.successModalButtonView
+                  }}
+                >
+                  <Text style={styles.proceedButtonText}>View Settings</Text>
+                </LinearGradient>
               </AppBottomSheetTouchableWrapper>
               <Image source={require( '../assets/images/icons/noInternet.png' ) } style={styles.successModalImage} />
             </View>
@@ -98,11 +108,6 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15 
-    },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     marginLeft: wp( '8%' ),
