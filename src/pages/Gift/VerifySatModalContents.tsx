@@ -8,7 +8,6 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { LocalizationContext } from '../../common/content/LocContext'
 import LinearGradient from 'react-native-linear-gradient'

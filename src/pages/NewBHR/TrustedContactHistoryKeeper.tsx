@@ -940,7 +940,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
             // note remove PDF flow for level 2 & 3
             // if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
             // else
-             onPressChangeKeeperType( type, name )
+            onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           keeper={selectedKeeper}
