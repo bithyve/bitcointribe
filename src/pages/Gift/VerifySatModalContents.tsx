@@ -11,6 +11,7 @@ import {
 import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { LocalizationContext } from '../../common/content/LocContext'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function VerifySatModalContents( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -157,20 +158,24 @@ export default function VerifySatModalContents( props ) {
             marginEnd: RFValue( 20 )
           }}
         >
-          <Shadow viewStyle={{
-            ...styles.successModalButtonView,
-            backgroundColor: props.buttonColor
-              ? props.buttonColor
-              : Colors.blue,
-          }} distance={2}
-          startColor={props.buttonShadowColor
-            ? props.buttonShadowColor
-            : Colors.shadowBlue}
-          offset={[ 42, 14 ]}>
+          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            locations={[ 0.2, 1 ]}
+            style={{
+              ...styles.successModalButtonView,
+              backgroundColor: props.buttonColor
+                ? props.buttonColor
+                : Colors.blue,
+            }}
+          >
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressProceed()}
               style={{
-                // ...styles.successModalButtonView,
+              // ...styles.successModalButtonView,
                 shadowColor: props.buttonShadowColor
                   ? props.buttonShadowColor
                   : Colors.shadowBlue,
@@ -205,7 +210,7 @@ export default function VerifySatModalContents( props ) {
                 }
               </View>
             </AppBottomSheetTouchableWrapper>
-          </Shadow>
+          </LinearGradient>
         </View>
       </View>
     </View>
