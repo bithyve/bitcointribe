@@ -121,8 +121,8 @@ const SeedBackupHistory = ( props ) => {
 
     if ( ( levelHealth.length == 0 ) ||
     ( levelHealth.length && levelHealth[ 0 ].levelInfo.length &&
-      levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' )  || 
-      ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && 
+      levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' )  ||
+      ( levelHealth.length && levelHealth[ 0 ].levelInfo.length &&
         levelHealth[ 0 ].levelInfo[ 0 ].shareType == KeeperType.SECURITY_QUESTION ) ) {
       setSeedBackupModal( true )
     }
