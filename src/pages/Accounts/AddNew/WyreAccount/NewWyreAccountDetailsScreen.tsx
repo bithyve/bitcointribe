@@ -127,7 +127,7 @@ const NewWyreAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
             paddingTop: 0,
             paddingHorizontal: 12,
           }}
-          infoText={'Hexa Wyre Account enables BTC purchases using Apple Pay and debit cards.\n\nBy proceeding, you understand that Hexa does not operate the payment and processing of the Wyre service. BTC purchased will be transferred to the Hexa Wyre account.'}
+          infoText={'Tribe Bitcoin Wyre Account enables BTC purchases using Apple Pay and debit cards.\n\nBy proceeding, you understand that Tribe Bitcoin does not operate the payment and processing of the Wyre service. BTC purchased will be transferred to the Tribe Bitcoin Wyre account.'}
         />
       </View>
     </View>

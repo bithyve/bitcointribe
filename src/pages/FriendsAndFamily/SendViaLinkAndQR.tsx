@@ -80,7 +80,7 @@ export default function SendViaLinkAndQR( props ) {
       const options = Platform.select( {
         default: {
           title,
-          message: `You have received a bitcoin gift from ${senderName}. Click on the link and follow the steps to receive bitcoin in your Hexa 2.0 bitcoin wallet\n\n${link}`,
+          message: `You have received a bitcoin gift from ${senderName}. Click on the link and follow the steps to receive bitcoin in your Tribe Bitcoin bitcoin wallet\n\n${link}`,
         },
       } )
       Share.open( options )
@@ -234,7 +234,7 @@ export default function SendViaLinkAndQR( props ) {
         Platform.select( {
           default: {
             title: 'Share Gift Card',
-            message: 'Scan the QR and receive bitcoin in your Hexa 2.0 bitcoin wallet.',
+            message: 'Scan the QR and receive bitcoin in your Tribe Bitcoin bitcoin wallet.',
             url: `file://${uri}`,
           },
           // ios: {

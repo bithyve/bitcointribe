@@ -398,9 +398,9 @@ const PairNewWallet = ( props ) => {
         {showLoader ? <Loader isLoading={true}/> : null}
 
         <BottomInfoBox
-          title={'Pair Hexa with FastBitcoins'}
+          title={'Pair Tribe Bitcoin with FastBitcoins'}
           infoText={
-            'Scan the QR provided on your FastBitcoins account to pair your Hexa wallet'
+            'Scan the QR provided on your FastBitcoins account to pair your Tribe Bitcoin wallet'
           }
         />
 

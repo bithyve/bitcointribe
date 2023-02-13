@@ -62,7 +62,7 @@ export default function NewWalletNameRegenerateShare( props ) {
         >
           <ScrollView>
             <HeaderTitle
-              firstLineTitle={'New Hexa Wallet'}
+              firstLineTitle={'New Tribe Bitcoin Wallet'}
               secondLineTitle={''}
               infoTextNormal={'Please name your '}
               infoTextBold={'wallet'}

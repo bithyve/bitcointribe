@@ -64,7 +64,7 @@ export default function WalletBackupAndRecoveryContents(props) {
               fontFamily: Fonts.FiraSansMedium,
             }}
           >
-            Hexa
+            Tribe Bitcoin
           </Text>
           , you have full control over your bitcoin.{'\n'}This gives you{' '}
           <Text
@@ -118,7 +118,7 @@ export default function WalletBackupAndRecoveryContents(props) {
             fontFamily: Fonts.FiraSansRegular,
           }}
         >
-          Once backed up, Hexa's automated health check process ensures you have access to the backup anytime!
+          Once backed up, Tribe Bitcoin's automated health check process ensures you have access to the backup anytime!
         </Text>
         <Text
           style={{
@@ -349,7 +349,7 @@ export default function WalletBackupAndRecoveryContents(props) {
             fontFamily: Fonts.FiraSansRegular,
           }}
         >
-          Once you answer your Security Question, the wallet is recreated and you can use Hexa from your new device!
+          Once you answer your Security Question, the wallet is recreated and you can use Tribe Bitcoin from your new device!
         </Text>
       </View>
       <View

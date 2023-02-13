@@ -162,7 +162,7 @@ export default function RecoveryCommunication( props ) {
 
           const smsInfoText = `Click here to help ${
             wallet.walletName
-          } recover their Hexa wallet- link will expire in ${
+          } recover their Tribe Bitcoin wallet- link will expire in ${
             config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
           } hours`
 
@@ -196,7 +196,7 @@ export default function RecoveryCommunication( props ) {
 
           const emailInfoText = `Click here to help ${
             wallet.walletName
-          } recover their Hexa wallet- link will expire in ${
+          } recover their Tribe Bitcoin wallet- link will expire in ${
             config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
           } hours`
 

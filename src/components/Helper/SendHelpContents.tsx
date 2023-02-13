@@ -130,7 +130,7 @@ export default function SendHelpContents( props ) {
               marginTop: wp( '10%' ),
             }}
           >
-              Hexa has a unique Batch Send feature using which you can combine multiple transactions in one. This helps you save on some of the fee
+              Tribe Bitcoin has a unique Batch Send feature using which you can combine multiple transactions in one. This helps you save on some of the fee
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center'

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Tribe stage</string>
+    <string name="app_name">Tribe Bitcoin stage</string>
     <string name="contactPrefix">/sta/CONTACT</string>
     <string name="keeperPrefix">/sta/KEEPER</string>
     <string name="primaryKeeperPrefix">/sta/PRIMARY_KEEPER</string>

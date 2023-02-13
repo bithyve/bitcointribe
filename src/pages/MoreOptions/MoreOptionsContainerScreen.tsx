@@ -113,7 +113,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     },
     */
     // {
-    //   title: 'Hexa Community (Telegram)',
+    //   title: 'Tribe Bitcoin Community (Telegram)',
     //   imageSource: require( '../../assets/images/icons/telegram.png' ),
     //   subtitle: 'Questions, feedback and more',
     //   onOptionPressed: () => {
@@ -304,7 +304,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               }}
             >
               {
-                'Grant Hexa access to clipboard \nto copy and paste BTC addresses'
+                'Grant Tribe Bitcoin access to clipboard \nto copy and paste BTC addresses'
               }
             </Text>
             <View style={{

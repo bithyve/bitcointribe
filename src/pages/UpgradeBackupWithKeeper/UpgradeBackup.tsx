@@ -924,7 +924,7 @@ class UpgradeBackup extends Component<
       const granted = await this.requestStoragePermission()
       if ( !granted ) {
         this.setState( {
-          errorMessage: 'Cannot access files and storage. Permission denied.\nYou can enable files and storage from the phone settings page \n\n Settings > Hexa > Storage',
+          errorMessage: 'Cannot access files and storage. Permission denied.\nYou can enable files and storage from the phone settings page \n\n Settings > Tribe Bitcoin > Storage',
           hasStoragePermission: false
         } )
         this.storagePermissionBottomSheet.current.snapTo( 0 )
@@ -1044,7 +1044,7 @@ class UpgradeBackup extends Component<
       <ErrorModalContents
         modalRef={this.storagePermissionBottomSheet}
         title={'Why do we need access to your files and storage?'}
-        info={'File and Storage access will let Hexa save a pdf with your Recovery Keys. This will also let Hexa attach the pdf to emails, messages and to print in case you want to.\n\n'}
+        info={'File and Storage access will let Tribe Bitcoin save a pdf with your Recovery Keys. This will also let Tribe Bitcoin attach the pdf to emails, messages and to print in case you want to.\n\n'}
         otherText={'Don’t worry these are only sent to the email address you choose, in the next steps you will be able to choose how the pdf is shared.'}
         proceedButtonText={'Continue'}
         isIgnoreButton={false}
@@ -1297,7 +1297,7 @@ class UpgradeBackup extends Component<
                   'Completing the steps below secures your wallet at a basic level'
                 }
                 cardInfo={'Store Backup'}
-                cardTitle={'Hexa Wallet Backup'}
+                cardTitle={'Tribe Bitcoin Wallet Backup'}
                 cardSubInfo={Platform.OS == 'ios' ? 'iCloud' : 'GDrive' + ' backup'}
                 proceedButtonText={'Backup'}
                 backButtonText={'Back'}
