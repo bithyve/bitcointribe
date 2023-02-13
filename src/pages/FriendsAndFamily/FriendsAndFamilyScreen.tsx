@@ -56,6 +56,7 @@ import { LocalizationContext } from '../../common/content/LocContext'
 import Gift from '../../assets/images/svgs/icon_gift.svg'
 import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
 import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
+import LinearGradient from 'react-native-linear-gradient'
 interface FriendsAndFamilyPropTypes {
   navigation: any;
   isFocused: boolean;
@@ -571,17 +572,28 @@ class FriendsAndFamilyScreen extends React.Component<
                   isLoadContacts: true,
                 // addFnF: true
                 }, () => {
-                  navigation.navigate( 'AddContact',{fromScreen: "Invitation"} )
+                  navigation.navigate( 'AddContact', {
+                    fromScreen: 'Invitation'
+                  } )
                 } )
               }}
-              style={{
-                ...styles.selectedContactsView,backgroundColor: Colors.lightBlue,
-              }}
             >
-              <Text style={[ styles.contactText, {
-                fontSize: RFValue( 24 ), lineHeight:30
-              } ]}>+</Text>
-              <Text style={styles.contactText}>{this.strings[ 'AddNew' ]}</Text>
+              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                start={{
+                  x: 0, y: 0
+                }} end={{
+                  x: 1, y: 0
+                }}
+                locations={[ 0.2, 1 ]}
+                style={{
+                  ...styles.selectedContactsView, backgroundColor: Colors.lightBlue,
+                }}
+              >
+                <Text style={[ styles.contactText, {
+                  fontSize: RFValue( 24 ), lineHeight:30
+                } ]}>+</Text>
+                <Text style={styles.contactText}>{this.strings[ 'AddNew' ]}</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
           <ScrollView
