@@ -3,7 +3,7 @@
 
 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
   <g id="faq" transform="translate(-39 -598)">
-    <path id="icon_info" d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Z" transform="translate(37 596)" fill="#77b9eb"/>
+    <path id="icon_info" d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Z" transform="translate(37 596)" fill="#6a5059"/>
     <g id="Group_37676" data-name="Group 37676" transform="translate(-5.038 8.52)">
       <path id="Path_23648" data-name="Path 23648" d="M11,11.58a.26.26,0,0,1,.26-.26H12a1.032,1.032,0,1,0-1.04-1.06H9.22a.08.08,0,0,1-.08-.08h0A2.78,2.78,0,0,1,10.8,7.61a2.87,2.87,0,1,1,2,5.35v.65a.26.26,0,0,1-.26.26H11.23a.26.26,0,0,1-.26-.26Z" transform="translate(42 587)" fill="#fcfcfc"/>
       <path id="Path_23649" data-name="Path 23649" d="M12.29,14.88a.76.76,0,0,1,.45.46.92.92,0,0,1-1,1.29.91.91,0,0,1-.77-.76.93.93,0,0,1,1.32-.99Z" transform="translate(42 587)" fill="#fcfcfc"/>

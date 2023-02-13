@@ -244,6 +244,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             style={{
               width: widthPercentageToDP( 5 ),
               height: widthPercentageToDP( 6 ),
+              tintColor: Colors.theam_icon_color
             }}
           /> )
         case 'Enable Auto-Read from Clipboard':
@@ -484,7 +485,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                     width: widthPercentageToDP( '2.5%' ),
                     height: widthPercentageToDP( '2.5%' ),
                     alignSelf: 'center',
-                    resizeMode: 'contain'
+                    resizeMode: 'contain',
+                    tintColor: Colors.theam_icon_color
                   }}
                 />
 
@@ -517,7 +519,9 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 height: widthPercentageToDP( '2.5%' ),
                 alignSelf: 'center',
                 marginLeft: 'auto',
-                resizeMode: 'contain'
+                resizeMode: 'contain',
+                tintColor: Colors.theam_icon_color
+
               }}
             />
           </TouchableOpacity>
@@ -550,7 +554,9 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 width: widthPercentageToDP( 4 ),
                 height: widthPercentageToDP( 4 ),
                 resizeMode: 'contain',
-                marginLeft: 'auto'
+                marginLeft: 'auto',
+                tintColor: Colors.theam_icon_color
+
               }}
             />
           </TouchableOpacity>

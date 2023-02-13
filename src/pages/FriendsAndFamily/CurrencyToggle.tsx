@@ -44,7 +44,7 @@ const ToggleContainer = ( ) => {
           materialIconCurrencyCodes.includes( currencyCode ) ?
             <MaterialCurrencyCodeIcon
               currencyCode={currencyCode}
-              color={Colors.blue}
+              color={Colors.white}
               size={14}
             />
             : null

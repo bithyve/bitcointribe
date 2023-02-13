@@ -1251,6 +1251,7 @@ const CreateGift = ( { navigation }: Props ) => {
                     height: wp( '5%' ),
                     resizeMode: 'contain',
                     marginRight: wp( '5%' ),
+                    tintColor: Colors.theam_icon_color
                   }}
                   source={require( '../../assets/images/icons/icon_settings_blue.png' )}
                 />
