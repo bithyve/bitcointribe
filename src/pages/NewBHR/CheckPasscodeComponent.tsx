@@ -32,6 +32,7 @@ import AlertModalContents from '../../components/AlertModalContents'
 import { setCloudBackupStatus } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { setOpenToApproval } from '../../store/actions/BHR'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function CheckPasscodeComponent( props ) {
   const dispatch = useDispatch()
@@ -337,15 +338,24 @@ export default function CheckPasscodeComponent( props ) {
                 redirectToNextScreen()
                 setCreationFlag( true )
               }}
-              style={{
-                ...styles.proceedButtonView,
-                elevation: Elevation,
-                backgroundColor: isDisabledProceed
-                  ? Colors.lightBlue
-                  : Colors.blue,
-              }}
             >
-              <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                start={{
+                  x: 0, y: 0
+                }} end={{
+                  x: 1, y: 0
+                }}
+                locations={[ 0.2, 1 ]}
+                style={{
+                  ...styles.proceedButtonView,
+                  elevation: Elevation,
+                  backgroundColor: isDisabledProceed
+                    ? Colors.lightBlue
+                    : Colors.blue,
+                }}
+              >
+                <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+              </LinearGradient>
             </TouchableOpacity>
 
             {/* {
@@ -576,11 +586,6 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
   },
   proceedButtonText: {
     color: Colors.white,
