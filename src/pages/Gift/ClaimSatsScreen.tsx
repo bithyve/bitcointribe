@@ -349,7 +349,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
             }}>
               (Restricts the gift to <Text style={{
                 fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic
-              }}>one per Hexa app</Text> )
+              }}>one per Bitcoin Tribe app</Text> )
             </Text>
           </Text>
 

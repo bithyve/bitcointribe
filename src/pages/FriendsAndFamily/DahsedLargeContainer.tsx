@@ -127,7 +127,7 @@ const DashedLargeContainer = ( props ) => {
               }}>
                 {props.subText}
               </Text>
-              {!props.isAccept ? '\n\nScan the QR follow the steps to receive bitcoin in your Hexa 2.0 bitcoin wallet': '\n\nYou can either add the sats to an Account or retain it to forward to your loved ones.'}
+              {!props.isAccept ? '\n\nScan the QR follow the steps to receive bitcoin in your Bitcoin Tribe bitcoin wallet': '\n\nYou can either add the sats to an Account or retain it to forward to your loved ones.'}
             </Text>
           </View>
           {props.date &&

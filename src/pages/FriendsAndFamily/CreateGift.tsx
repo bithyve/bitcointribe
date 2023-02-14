@@ -890,7 +890,7 @@ const CreateGift = ( { navigation }: Props ) => {
                   fontFamily: Fonts.FiraSansItalic,
                 }}
               >
-                one per Hexa app
+                one per Bitcoin Tribe app
               </Text>{' '}
               )
             </Text>

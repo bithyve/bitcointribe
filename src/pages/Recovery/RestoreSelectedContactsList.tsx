@@ -173,7 +173,7 @@ export default function RestoreSelectedContactsList( props ) {
       <LoaderModal
         headerText={message}
         messageText={
-          'This may take some time while Hexa is using the Recovery Keys to recreate your wallet'
+          'This may take some time while Bitcoin Tribe is using the Recovery Keys to recreate your wallet'
         }
       />
     )

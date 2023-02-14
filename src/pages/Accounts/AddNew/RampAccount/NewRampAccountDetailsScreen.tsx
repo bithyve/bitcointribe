@@ -111,7 +111,7 @@ const NewRampAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
                   paddingHorizontal: 12,
 
                 }}
-                infoText={'Hexa Ramp Account enables BTC purchases using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available\n\nPayment methods available may vary based on your country. By proceeding, you understand that Hexa does not operate the payment and processing of the Ramp service. BTC purchased will be transferred to a new Hexa Ramp account.'}
+                infoText={'Bitcoin Tribe Ramp Account enables BTC purchases using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available\n\nPayment methods available may vary based on your country. By proceeding, you understand that Bitcoin Tribe does not operate the payment and processing of the Ramp service. BTC purchased will be transferred to a new Bitcoin Tribe Ramp account.'}
               />
             </View>
             <View style={styles.footerSection}>

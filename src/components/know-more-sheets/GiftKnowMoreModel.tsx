@@ -67,7 +67,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
                 marginBottom: wp( '1%' ),
               }}
             >
-              Hexa creates a link or QR code that allows you to send sats as gifts to anyone using Hexa Wallet
+              Bitcoin Tribe creates a link or QR code that allows you to send sats as gifts to anyone using Bitcoin Tribe Wallet
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
@@ -80,7 +80,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
                 marginBottom: wp( '15%' ),
               }}
             >
-              You can manage these Gifts from here. Send them when you want to and reclaim them if not accepted. The recipient will be directed to download Hexa wallet if they don't have it already
+              You can manage these Gifts from here. Send them when you want to and reclaim them if not accepted. The recipient will be directed to download Bitcoin Tribe wallet if they don't have it already
             </Text>
           </View>
         </ScrollView>
