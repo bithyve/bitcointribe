@@ -45,7 +45,7 @@ export default function ManageBackupHelpContents(props) {
               marginTop: wp('7%'),
             }}
           >
-            Backup ensures that you can recover your wallet even if you lose your phone or accidently delete the Hexa App from your phone – set this up ASAP!
+            Backup ensures that you can recover your wallet even if you lose your phone or accidently delete the Bitcoin Tribe App from your phone – set this up ASAP!
           </Text>
           <View style={styles.viewStyle}>
             <Image

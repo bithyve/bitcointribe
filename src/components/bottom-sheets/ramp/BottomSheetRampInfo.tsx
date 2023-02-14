@@ -21,6 +21,7 @@ import { newAccountsInfo } from '../../../store/sagas/accounts'
 import { addNewAccountShells } from '../../../store/actions/accounts'
 import DropDown from '../../../utils/Dropdown'
 import { LocalizationContext } from '../../../common/content/LocContext'
+import LinearGradient from 'react-native-linear-gradient'
 
 type Props = {
   rampDeepLinkContent: string | null;
@@ -231,12 +232,20 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         <AppBottomSheetTouchableWrapper
           disabled={rampFromBuyMenu ? hasButtonBeenPressed : false}
           onPress={rampFromBuyMenu ? handleProceedButtonPress : onClickSetting}
-          style={{
-            ...styles.successModalButtonView
-          }}
         >
-          <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? strings.buyBitCoin : common.ok}</Text>
-
+          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            locations={[ 0.2, 1 ]}
+            style={{
+              ...styles.successModalButtonView
+            }}
+          >
+            <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? strings.buyBitCoin : common.ok}</Text>
+          </LinearGradient>
         </AppBottomSheetTouchableWrapper>
       </View>
       {rampFromBuyMenu

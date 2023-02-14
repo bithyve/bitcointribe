@@ -78,7 +78,7 @@ export default function SecurityQuestionHelpContents(props) {
               fontFamily: Fonts.FiraSansRegular,
             }}
           >
-            Hexa will remind you of your Security Question routinely, helping you remember your question and answer. The Health Shield automatically updates when you answer correctly
+            Bitcoin Tribe will remind you of your Security Question routinely, helping you remember your question and answer. The Health Shield automatically updates when you answer correctly
           </Text>
           <Text
             style={{

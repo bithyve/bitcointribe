@@ -20,7 +20,7 @@ import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import MaterialCurrencyCodeIcon from '../../components/MaterialCurrencyCodeIcon'
 import { getCurrencyImageByRegion, getCurrencyImageName } from '../../common/CommonFunctions'
 import { LocalizationContext } from '../../common/content/LocContext'
-import {Shadow} from 'react-native-shadow-2';
+import { Shadow } from 'react-native-shadow-2'
 import LinearGradient from 'react-native-linear-gradient'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
@@ -90,9 +90,9 @@ const HomeBuyCard = ( {
   const { translations, formatString } = useContext( LocalizationContext )
   const strings = translations[ 'home' ]
   return (
-    <Shadow startColor={Colors.shadowColor} distance={0} offset={[8,8] }
+    <Shadow startColor={Colors.shadowColor} distance={0} offset={[ 8, 8 ] }
       viewStyle={cardContainer}
-     >
+    >
       <View>
         <Text style={{
           color: Colors.blue,
@@ -128,27 +128,33 @@ const HomeBuyCard = ( {
               {setCurrencyCodeToImage( getCurrencyImageName( currencyCode ), Colors.blue )}
             </Text>
           )}
-          <Text style={{fontSize:17,color:'#8B8B8B'}}>{amount ? amount : '--'}</Text>
+          <Text style={{
+            fontSize:17, color:'#8B8B8B'
+          }}>{amount ? amount : '--'}</Text>
           <Text>{incramount}</Text>
         </View>
       </View>
-    <Shadow startColor={Colors.shadowBlue} distance={11} offset={[9 ,10] }>
-    <LinearGradient colors={[Colors.blue, Colors.darkBlue]} 
-          start={{x: 0, y: 0}} end={{x: 1, y: 0}} 
-          locations={[0.2,1]}
-          style={{
-            borderRadius: wp( 2 ),
-            paddingVertical: wp( 2.5 ),
-            paddingHorizontal: wp( 4 ),
-            backgroundColor: Colors.blue,
-            // shadowColor: Colors.shadowBlue,
-            // shadowOpacity: 1,
-            // shadowOffset: {
-            //   width: 9, height: 10
-            // },
-            // elevation: 15
-          }}>
-      <TouchableOpacity
+
+      <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+        start={{
+          x: 0, y: 0
+        }} end={{
+          x: 1, y: 0
+        }}
+        locations={[ 0.2, 1 ]}
+        style={{
+          borderRadius: wp( 2 ),
+          paddingVertical: wp( 2.5 ),
+          paddingHorizontal: wp( 4 ),
+          backgroundColor: Colors.blue,
+          // shadowColor: Colors.shadowBlue,
+          // shadowOpacity: 1,
+          // shadowOffset: {
+          //   width: 9, height: 10
+          // },
+          // elevation: 15
+        }}>
+        <TouchableOpacity
         // icon={
         //   <Image
         //     source={require( '../../assets/images/icons/recurring_buy.png' )}
@@ -159,20 +165,19 @@ const HomeBuyCard = ( {
         //     }}
         //   />
         // }
-        
-        onPress={() =>
-          openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
-        }
-      >
-        <Text style={{
-          ...ButtonStyles.floatingActionButtonText,
-        }}>
-          {strings.buy}
-        </Text>
-      </TouchableOpacity>
+
+          onPress={() =>
+            openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
+          }
+        >
+          <Text style={{
+            ...ButtonStyles.floatingActionButtonText,
+          }}>
+            {strings.buy}
+          </Text>
+        </TouchableOpacity>
       </LinearGradient>
     </Shadow>
-  </Shadow>
   )
 }
 // const styles = StyleSheet.create( {

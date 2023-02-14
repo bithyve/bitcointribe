@@ -14,7 +14,7 @@ export default function RestoreWallet( props ) {
     <View style={styles.modalContentContainer}>
       <View style={styles.successModalHeaderView}>
         <Text style={styles.headerTitleText}>
-        Recover Hexa Wallet
+        Recover Bitcoin Tribe Wallet
         </Text>
         <Text style={styles.headerInfoText}>
         You have enough Recovery Keys to recover your wallet. Click Recover and you're all done

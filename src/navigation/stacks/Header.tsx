@@ -1327,7 +1327,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // }, 10);
     } else if ( item.title == 'Funding Sources' ) {
       navigation.navigate( 'ExistingSavingMethods' )
-    } else if ( item.title === 'Hexa Community (Telegram)' ) {
+    } else if ( item.title === 'Bitcoin Tribe Community (Telegram)' ) {
       const url = 'https://t.me/HexaWallet'
       Linking.openURL( url )
         .then( ( data ) => {} )

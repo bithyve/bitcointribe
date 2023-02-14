@@ -333,7 +333,7 @@ export default function AddContactSendRequest( props ) {
           contact={Contact ? Contact : null}
           infoText={`Click here to accept contact request from ${
             wallet.walletName
-          }' Hexa wallet - link will expire in ${
+          }' Bitcoin Tribe wallet - link will expire in ${
             config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
           } hours`}
           link={trustedLink}
@@ -368,7 +368,7 @@ export default function AddContactSendRequest( props ) {
       <SendViaQR
         isFromReceive={true}
         headerText={'Friends & Family Request'}
-        subHeaderText={'Scan the QR from your Contact\'s Hexa Wallet'}
+        subHeaderText={'Scan the QR from your Contact\'s Bitcoin Tribe Wallet'}
         contactText={contactText}
         contact={Contact}
         QR={trustedQR}
