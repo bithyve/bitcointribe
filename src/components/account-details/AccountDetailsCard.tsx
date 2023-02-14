@@ -48,11 +48,9 @@ function backgroundImageForAccountKind(
 ): ImageSourcePropType {
   switch ( primarySubAccount.kind ) {
       case SubAccountKind.TEST_ACCOUNT:
-        // return require( '../../assets/images/carouselImages/test_account_background.png' )
-        return '#69A2B0'
+        return require( '../../assets/images/carouselImages/test_account_background.png' )
       case SubAccountKind.REGULAR_ACCOUNT:
-        // return require( '../../assets/images/carouselImages/regular_account_background.png' )
-        return '#88B283'
+        return require( '../../assets/images/carouselImages/regular_account_background.png' )
       case SubAccountKind.SECURE_ACCOUNT:
         return require( '../../assets/images/carouselImages/savings_account_background.png' )
       case SubAccountKind.DONATION_ACCOUNT:
