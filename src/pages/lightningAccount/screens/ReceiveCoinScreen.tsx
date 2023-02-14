@@ -18,6 +18,7 @@ import FormStyles from '../../../common/Styles/FormStyles'
 import Toast from '../../../components/Toast'
 import HeaderTitle from '../../../components/HeaderTitle'
 import CommonStyles from '../../../common/Styles/Styles'
+import LinearGradient from 'react-native-linear-gradient'
 
 @inject( 'InvoicesStore' )
 @observer
@@ -146,13 +147,22 @@ export default class ReceiveCoinScreen extends Component {
           />
 
           <TouchableOpacity
-            style={styles.buttonView}
             activeOpacity={0.6}
             onPress={() => {
               this.createInvoice()
             }}
           >
-            <Text style={styles.buttonText}>Create Invoice</Text>
+            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+              start={{
+                x: 0, y: 0
+              }} end={{
+                x: 1, y: 0
+              }}
+              locations={[ 0.2, 1 ]}
+              style={styles.buttonView}
+            >
+              <Text style={styles.buttonText}>Create Invoice</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       )

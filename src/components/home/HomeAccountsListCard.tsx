@@ -44,7 +44,9 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
   return (
     <View style={styles.headerSectionContainer}>
       <Image
-        style={[styles.headerAccountSync, {tintColor: Colors.theam_icon_color}]}
+        style={[ styles.headerAccountSync, {
+          tintColor: Colors.theam_icon_color
+        } ]}
         source={getAccountSyncIcon( accountShell.syncStatus )}
       />
       <View style={styles.headerAccountImage} >
@@ -219,8 +221,8 @@ const styles = StyleSheet.create( {
     borderRadius: 8/2,
     backgroundColor: 'tomato',
     position: 'absolute',
-    left: widthPercentageToDP( 9 ),
-    top: heightPercentageToDP( 0.9 ),
+    left: widthPercentageToDP( 7 ),
+    top: heightPercentageToDP( 0.5 ),
   },
 
   headerAccountImage: {

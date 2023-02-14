@@ -18,6 +18,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import RecipientComponent from './RecipientComponent'
 import DeviceInfo from 'react-native-device-info'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function SendConfirmationContent( props ) {
   const renderRecipientItem = ( recipient: RecipientDescribing ) => {
@@ -88,11 +89,20 @@ export default function SendConfirmationContent( props ) {
       >
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressOk()}
-          style={{
-            ...styles.successModalButtonView
-          }}
         >
-          <Text style={styles.proceedButtonText}>{props.okButtonText}</Text>
+          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            locations={[ 0.2, 1 ]}
+            style={{
+              ...styles.successModalButtonView
+            }}
+          >
+            <Text style={styles.proceedButtonText}>{props.okButtonText}</Text>
+          </LinearGradient>
         </AppBottomSheetTouchableWrapper>
         {props.isCancel && (
           <AppBottomSheetTouchableWrapper
