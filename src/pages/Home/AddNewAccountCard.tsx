@@ -36,7 +36,7 @@ const AddNewAccountCard: React.FC<Props> = ( {
         >
           <Image
             style={{
-              width: 42, height: 42
+              width: 30, height: 30, marginBottom: 5
             }}
             source={require( '../../assets/images/icons/icon_add.png' )}
           />
