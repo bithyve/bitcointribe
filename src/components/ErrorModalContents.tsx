@@ -200,7 +200,8 @@ export default function ErrorModalContents( props ) {
                 width: wp( '27%' ),
                 justifyContent: 'center',
                 alignItems: 'center',
-                alignSelf: 'center',
+                alignSelf: 'flex-start',
+                marginTop: 5
                 // position: 'absolute',
                 // left: wp( 53 )
               }}
