@@ -50,7 +50,7 @@ function validateAllowedCharacters( answer: string ): boolean {
 export default function NewOwnQuestions( props ) {
   const [ message, setMessage ] = useState( 'Creating your wallet' )
   const [ subTextMessage, setSubTextMessage ] = useState(
-    'The Tribe Bitcoin wallet is non-custodial and is created locally on your phone so that you have full control of it',
+    'The Bitcoin Tribe wallet is non-custodial and is created locally on your phone so that you have full control of it',
   )
   const [ Elevation, setElevation ] = useState( 10 )
   const [ isLoaderStart, setIsLoaderStart ] = useState( false )
@@ -206,7 +206,7 @@ export default function NewOwnQuestions( props ) {
     setTimeout( () => {
       setMessage( 'Bootstrapping Accounts' )
       setSubTextMessage(
-        'Tribe Bitcoin has a multi-account model which lets you better manage your Bitcoin (sats)',
+        'Bitcoin Tribe has a multi-account model which lets you better manage your Bitcoin (sats)',
       )
       setTimeout( () => {
         setMessage( 'Filling Test Account with test sats' )
@@ -216,7 +216,7 @@ export default function NewOwnQuestions( props ) {
         setTimeout( () => {
           setMessage( 'Generating Recovery Keys' )
           setSubTextMessage(
-            'Recovery Keys help you recover your Tribe Bitcoin wallet in case your phone is lost',
+            'Recovery Keys help you recover your Bitcoin Tribe wallet in case your phone is lost',
           )
         }, 3000 )
       }, 3000 )
@@ -293,7 +293,7 @@ export default function NewOwnQuestions( props ) {
               disabled={isDisabled}
             >
               <HeaderTitle
-                firstLineTitle={'New Tribe Bitcoin Wallet'}
+                firstLineTitle={'New Bitcoin Tribe Wallet'}
                 secondLineTitle={''}
                 infoTextNormal={'Setup '}
                 infoTextBold={'Security Question and Answer'}

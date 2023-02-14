@@ -58,7 +58,7 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
     //   screenName: 'VersionHistory',
     // },
     // {
-    //   title: 'Tribe Bitcoin Release',
+    //   title: 'Bitcoin Tribe Release',
     //   subtitle: versionString,
     //   imageSource: require( '../../../assets/images/icons/settings.png' ),
     // },

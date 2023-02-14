@@ -38,7 +38,7 @@ export default function RestoreSuccess( props ) {
           <View style={{
             marginLeft: 10
           }}>
-            <Text style={styles.greyBoxText}>Tribe Bitcoin Wallet Backup</Text>
+            <Text style={styles.greyBoxText}>Bitcoin Tribe Wallet Backup</Text>
             <View
               style={{
                 flexDirection: 'row',

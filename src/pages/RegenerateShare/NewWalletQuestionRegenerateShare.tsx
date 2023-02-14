@@ -156,7 +156,7 @@ export default function NewWalletQuestionRegenerateShare( props ) {
           >
             <ScrollView>
               <HeaderTitle
-                firstLineTitle={'New Tribe Bitcoin Wallet'}
+                firstLineTitle={'New Bitcoin Tribe Wallet'}
                 secondLineTitle={''}
                 infoTextNormal={'Setup '}
                 infoTextBold={'Secret Question and answer'}

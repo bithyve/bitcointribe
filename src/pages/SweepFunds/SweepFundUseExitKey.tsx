@@ -453,7 +453,7 @@ SweepFundUseExitKeyPropsTypes,
             <LoaderModal
               headerText={'Creating your wallet'}
               messageText={
-                'This may take some time while Tribe Bitcoin is using the Recovery Keys to recreate your wallet'
+                'This may take some time while Bitcoin Tribe is using the Recovery Keys to recreate your wallet'
               }
             />
           )}

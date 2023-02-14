@@ -1102,7 +1102,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = HEXA/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Tribe Bitcoin";
+				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1140,7 +1140,7 @@
 				DEVELOPMENT_TEAM = Y5TCB759QL;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = Y5TCB759QL;
 				INFOPLIST_FILE = HEXA/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Tribe Bitcoin";
+				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1182,7 +1182,7 @@
 					"$(SRCROOT)/../node_modules/react-native-cloud-fs/ios",
 				);
 				INFOPLIST_FILE = "HEXA/HEXA.Dev-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Tribe Bitcoin dev";
+				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe dev";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1219,7 +1219,7 @@
 				CURRENT_PROJECT_VERSION = 544;
 				DEVELOPMENT_TEAM = Y5TCB759QL;
 				INFOPLIST_FILE = "HEXA/HEXA.Dev-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Tribe Bitcoin dev";
+				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe dev";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1257,7 +1257,7 @@
 				DEVELOPMENT_TEAM = Y5TCB759QL;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = "HEXA/HEXA.Stage-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Tribe Bitcoin stag";
+				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe stag";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1295,7 +1295,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Y5TCB759QL;
 				INFOPLIST_FILE = "HEXA/HEXA.Stage-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Tribe Bitcoin stag";
+				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe stag";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

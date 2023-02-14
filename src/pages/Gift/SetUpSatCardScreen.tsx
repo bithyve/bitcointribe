@@ -65,7 +65,7 @@ export default function SetUpSatCardScreen( props ) {
   //   'Getting the latest details'
   // ]
   // const [ bottomTextMessage, setBottomTextMessage ] = useState(
-  //   'Tribe Bitcoin uses the passcode and answer to the security question to encrypt different parts of your wallet',
+  //   'Bitcoin Tribe uses the passcode and answer to the security question to encrypt different parts of your wallet',
   // )
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
@@ -218,7 +218,7 @@ export default function SetUpSatCardScreen( props ) {
             'Security entry unavilable',
           )
           setJailBrokenInfo(
-            'Your phone does not have any secure entry like Pin or Biometric \n\n\nThis may be a security risk to your funds on Tribe Bitcoin',
+            'Your phone does not have any secure entry like Pin or Biometric \n\n\nThis may be a security risk to your funds on Bitcoin Tribe',
           )
           setElevation( 0 )
         }, 2 )

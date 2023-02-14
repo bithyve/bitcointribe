@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Tribe Bitcoin dev</string>
+    <string name="app_name">Bitcoin Tribe dev</string>
     <string name="contactPrefix">/dev/CONTACT</string>
     <string name="keeperPrefix">/dev/KEEPER</string>
     <string name="primaryKeeperPrefix">/dev/PRIMARY_KEEPER</string>

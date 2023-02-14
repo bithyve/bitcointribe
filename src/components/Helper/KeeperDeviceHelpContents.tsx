@@ -69,7 +69,7 @@ export default function KeeperDeviceHelpContents( props ) {
               marginRight: wp( '5%' ),
             }}
           >
-            Any other phone that has Tribe Bitcoin installed can become a “Keeper Device”. A Keeper Device stores one of your five Recovery Keys
+            Any other phone that has Bitcoin Tribe installed can become a “Keeper Device”. A Keeper Device stores one of your five Recovery Keys
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center'
@@ -248,7 +248,7 @@ export default function KeeperDeviceHelpContents( props ) {
             }}
           >
               The Keeper Device also acts as the host of your Exit Key, which
-              can be used to migrate from Tribe Bitcoin to another wallet at any time.
+              can be used to migrate from Bitcoin Tribe to another wallet at any time.
               Although, why would you want to do that!
           </Text>
         </View>

@@ -1113,7 +1113,7 @@ const VoucherScanner = ( props ) => {
                   }}
                 >
                   {
-                    'Go to your FastBitcoins.com account on this device and choose Tribe Bitcoin from "Linked Wallets"'
+                    'Go to your FastBitcoins.com account on this device and choose Bitcoin Tribe from "Linked Wallets"'
                   }
                 </Text>
               </View>

@@ -92,7 +92,7 @@ const AppInfo = ( props ) => {
     {
       title: 'Wallet ID',
       imageSource: require( '../../../assets/images/icons/icon_wallet_setting.png' ),
-      subtitle: 'Your Wallet ID is unique to your Tribe Bitcoin App',
+      subtitle: 'Your Wallet ID is unique to your Bitcoin Tribe App',
       screenName: '',
     },
     {
@@ -281,7 +281,7 @@ const AppInfo = ( props ) => {
                   <Text style={styles.headerTitleText}>{`${walletId.length > 22 ? walletId.substr( 0, 22 )+'...' : walletId}`}</Text>
                 }
                 { menuOption.title === 'Version History' &&
-                  <Text style={styles.headerTitleText}>{`Tribe Bitcoin ${DeviceInfo.getVersion()}`}</Text>
+                  <Text style={styles.headerTitleText}>{`Bitcoin Tribe ${DeviceInfo.getVersion()}`}</Text>
                 }
               </View>
             </View>

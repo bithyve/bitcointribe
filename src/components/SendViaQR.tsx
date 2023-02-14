@@ -154,7 +154,7 @@ export default function SendViaQR( props ) {
             >
               {props.subHeaderText
                 ? props.subHeaderText
-                : 'Scan the QR from your Contact\'s Tribe Bitcoin Wallet'}
+                : 'Scan the QR from your Contact\'s Bitcoin Tribe Wallet'}
             </Text>
           </View>
           <AppBottomSheetTouchableWrapper

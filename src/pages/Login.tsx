@@ -204,7 +204,7 @@ export default function Login( props ) {
             'Security entry unavilable',
           )
           setJailBrokenInfo(
-            'Your phone does not have any secure entry like Pin or Biometric \n\n\nThis may be a security risk to your funds on Tribe Bitcoin',
+            'Your phone does not have any secure entry like Pin or Biometric \n\n\nThis may be a security risk to your funds on Bitcoin Tribe',
           )
           setElevation( 0 )
         }, 2 )

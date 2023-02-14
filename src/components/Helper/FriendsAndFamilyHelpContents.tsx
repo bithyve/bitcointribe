@@ -68,7 +68,7 @@ export default function FriendsAndFamilyHelpContents( props ) {
               marginRight: wp( '5%' ),
             }}
           >
-            You can add two of your most trusted contacts as Keepers for your Recovery Keys if they have Tribe Bitcoin installed - choose your Keepers wisely!
+            You can add two of your most trusted contacts as Keepers for your Recovery Keys if they have Bitcoin Tribe installed - choose your Keepers wisely!
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center'
@@ -92,7 +92,7 @@ export default function FriendsAndFamilyHelpContents( props ) {
               marginRight: wp( '5%' ),
             }}
           >
-            Share a QR code or a link with your intended Keepers and ask them to open Tribe Bitcoin. The Keeper will have to either scan the QR code with Tribe Bitcoin or touch the link, which will open Tribe Bitcoin automatically
+            Share a QR code or a link with your intended Keepers and ask them to open Bitcoin Tribe. The Keeper will have to either scan the QR code with Bitcoin Tribe or touch the link, which will open Bitcoin Tribe automatically
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{
@@ -145,7 +145,7 @@ export default function FriendsAndFamilyHelpContents( props ) {
               marginRight: wp( '5%' ),
             }}
           >
-           Tribe Bitcoin requires access to your phone’s Address Book to help you add contacts as Keepers. This does not mean that BitHyve, the company behind Tribe Bitcoin, would have access to your personal information
+           Bitcoin Tribe requires access to your phone’s Address Book to help you add contacts as Keepers. This does not mean that BitHyve, the company behind Bitcoin Tribe, would have access to your personal information
           </Text>
           <View
             style={{

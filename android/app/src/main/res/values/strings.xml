@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Tribe Bitcoin</string>
+    <string name="app_name">Bitcoin Tribe</string>
     <string name="host">hexawallet.io</string>
     <string name="default_notification_channel_id">Default</string>
     <string name="contactPrefix">/app/CONTACT</string>

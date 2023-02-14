@@ -211,7 +211,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         modalRef={ServerNotRespondingBottomSheet}
         title={'The server is not responding?'}
         info={
-          'This may be due to network issues. Please try again. If it still does not work you can sweep the funds from Tribe Bitcoin using the Exit Key.'
+          'This may be due to network issues. Please try again. If it still does not work you can sweep the funds from Bitcoin Tribe using the Exit Key.'
         }
         proceedButtonText={'Try Again'}
         onPressProceed={() => {
