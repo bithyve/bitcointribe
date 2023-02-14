@@ -110,7 +110,7 @@ export default function BackupMethods( { navigation } ) {
               <FontAwesome name={levelData[ 0 ].keeper1.status == 'accessible' ? 'check' : 'exclamation' } color={Colors.white} size={7} />
             </View>
             <Image style={{
-              height: 20, width: 20
+              height: 20, width: 20, tintColor: Colors.blue
             }} resizeMode={'contain'} source={require( '../../assets/images/icons/seedwords.png' )} />
 
           </View>
@@ -148,7 +148,7 @@ export default function BackupMethods( { navigation } ) {
                 color={Colors.white} size={10} />
             </View>
             <Image style={{
-              height: 20, width: 20
+              height: 20, width: 20, tintColor: Colors.blue
             }} resizeMode={'contain'} source={require( '../../assets/images/icons/seedwords.png' )} />
 
           </View>
