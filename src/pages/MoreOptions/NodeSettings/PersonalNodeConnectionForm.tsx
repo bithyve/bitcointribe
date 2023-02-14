@@ -152,7 +152,7 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
         <Switch
           value={useSSL}
           onValueChange={onToggle}
-          thumbColor={useSSL ? Colors.blue : Colors.white}
+          thumbColor={useSSL ? Colors.white : Colors.white}
           trackColor={{
             false: Colors.borderColor, true: Colors.lightBlue
           }}

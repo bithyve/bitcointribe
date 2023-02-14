@@ -520,7 +520,7 @@ class FriendsAndFamilyScreen extends React.Component<
     } = this.state
     return (
       <View style={{
-        backgroundColor: ''
+        backgroundColor: Colors.darkBlue
       }}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         {/* <Header fromScreen={'F&F'} /> */}

@@ -666,7 +666,7 @@ class GiftScreen extends React.Component<
     } = this.state
     return (
       <View style={{
-        backgroundColor: Colors.lightBlue
+        backgroundColor: Colors.darkBlue
       }}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         <View style={styles.accountCardsSectionContainer}>
