@@ -181,7 +181,7 @@ const styles = StyleSheet.create( {
   successModalImage: {
     width: wp( windowHeight >= 850 ? '42%' : windowHeight >= 750 ? '35%' : windowHeight >= 650 && '27%' ),
     height: hp( windowHeight >= 850 ? '19%' : windowHeight >= 750 ? '17%' : windowHeight >= 650 && '15%' ),
-    resizeMode: 'contain',
+    resizeMode: 'contain'
   },
   proceedButtonText: {
     color: Colors.white,
