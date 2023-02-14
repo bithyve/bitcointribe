@@ -31,6 +31,7 @@ import SendConfirmationContent from '../Accounts/SendConfirmationContent'
 import { translations } from '../../common/content/LocContext'
 import ModalContainer from '../../components/home/ModalContainer'
 import ListStyles from '../../common/Styles/ListStyles'
+import LinearGradient from 'react-native-linear-gradient'
 
 interface InvoiceProps {
     exitSetup: any;
@@ -393,9 +394,6 @@ export default class PayInvoiceScreen extends React.Component<
               <View style={styles.button}>
 
                 <TouchableOpacity
-                  style={[ styles.buttonView, {
-                    opacity: loadingTx ? 0.5: 1
-                  } ]}
                   activeOpacity={0.6}
                   disabled={loadingTx}
                   onPress={() => {
@@ -417,7 +415,19 @@ export default class PayInvoiceScreen extends React.Component<
                     )
                   }}
                 >
-                  <Text style={styles.buttonText}>Pay Invoice</Text>
+                  <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                    start={{
+                      x: 0, y: 0
+                    }} end={{
+                      x: 1, y: 0
+                    }}
+                    locations={[ 0.2, 1 ]}
+                    style={[ styles.buttonView, {
+                      opacity: loadingTx ? 0.5: 1
+                    } ]}
+                  >
+                    <Text style={styles.buttonText}>Pay Invoice</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
 
               </View>

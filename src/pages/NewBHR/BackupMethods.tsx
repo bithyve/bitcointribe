@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Image, Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -60,8 +60,10 @@ export default function BackupMethods( { navigation } ) {
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
+      <StatusBar backgroundColor={ Colors.blue } barStyle="dark-content" />
       <View style={[ CommonStyles.headerContainer, {
-        backgroundColor: Colors.backgroundColor
+        backgroundColor: Colors.backgroundColor,
+        marginTop: hp( 5 )
       } ]}>
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}

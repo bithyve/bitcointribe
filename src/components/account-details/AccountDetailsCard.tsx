@@ -72,9 +72,9 @@ function backgroundImageForAccountKind(
 function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): string {
   switch ( primarySubAccount.kind ) {
       case SubAccountKind.TEST_ACCOUNT:
-        return Colors.blue
+        return Colors.testAccCard
       case SubAccountKind.REGULAR_ACCOUNT:
-        return Colors.yellow
+        return Colors.checkingAccCard
       case SubAccountKind.SECURE_ACCOUNT:
         return Colors.green
       case SubAccountKind.DONATION_ACCOUNT:
@@ -243,7 +243,9 @@ const AccountDetailsCard: React.FC<Props> = ( {
       >
         <Image
           source={require( '../../assets/images/icons/icon_settings.png' )}
-          style={[styles.settingsButtonImage, {tintColor: Colors.theam_icon_color}]}
+          style={[ styles.settingsButtonImage, {
+            tintColor: Colors.white
+          } ]}
         />
       </TouchableOpacity>
     )
@@ -272,18 +274,15 @@ const AccountDetailsCard: React.FC<Props> = ( {
         />
       </ModalContainer>
       }
-      <ImageBackground
-        source={backgroundImageForAccountKind( primarySubAccount )}
-        style={{
-          ...StyleSheet.absoluteFillObject,
-        }}
-        imageStyle={styles.cardImageContainer}
-      >
-        <View style={styles.mainContentContainer}>
-          <AccountKindDetailsSection />
-          <FooterSection />
-        </View>
-      </ImageBackground>
+      <View style={{
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: shadowColorForAccountKind( primarySubAccount ),
+        borderRadius: 15
+      }}></View>
+      <View style={styles.mainContentContainer}>
+        <AccountKindDetailsSection />
+        <FooterSection />
+      </View>
     </View>
   )
 }
@@ -295,7 +294,7 @@ const styles = StyleSheet.create( {
     width: '100%',
     // maxWidth: 440,
     // maxHeight: hp(250),
-    height: hp(210),
+    height: hp( 210 ),
     borderRadius: cardBorderRadius,
     elevation: 5,
     shadowOpacity: 0.62,

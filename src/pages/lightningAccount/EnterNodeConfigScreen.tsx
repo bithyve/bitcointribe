@@ -42,6 +42,7 @@ import { withNavigationFocus } from 'react-navigation'
 import Toast from '../../components/Toast'
 import { AccountType } from '../../bitcoin/utilities/Interface'
 import { goHomeAction } from '../../navigation/actions/NavigationActions'
+import LinearGradient from 'react-native-linear-gradient'
 
 const styles = StyleSheet.create( {
   viewContainer: {
@@ -120,14 +121,10 @@ const styles = StyleSheet.create( {
     height: wp( '12%' ),
     width: wp( '40%' ),
     paddingHorizontal: wp( 2 ),
+    alignSelf: 'flex-end',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
     backgroundColor: Colors.blue,
     marginHorizontal: wp( 4 ),
     marginVertical: hp( '2%' ),
@@ -1017,13 +1014,22 @@ render() {
         </View>
 
         <TouchableOpacity
-          style={styles.buttonView}
           activeOpacity={0.6}
           onPress={() => {
             this.saveNodeConfiguration()
           }}
         >
-          <Text style={styles.buttonText}>Connect</Text>
+          <LinearGradient
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            colors={[ Colors.skyBlue, Colors.darkBlue ]}
+            style={styles.buttonView}
+          >
+            <Text style={styles.buttonText}>Connect</Text>
+          </LinearGradient>
         </TouchableOpacity>
 
       </KeyboardAwareScrollView>
