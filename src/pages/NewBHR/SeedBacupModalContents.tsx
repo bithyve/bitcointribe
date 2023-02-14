@@ -8,10 +8,10 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { LocalizationContext } from '../../common/content/LocContext'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function SeedBacupModalContents( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -170,29 +170,26 @@ export default function SeedBacupModalContents( props ) {
           style={{
             height: hp( '12%' ),
             flexDirection: 'row',
-            marginTop: 'auto',
-            alignItems: 'flex-end',
+            alignItems: 'center',
           }}
         >
-          <Shadow viewStyle={{
-            ...styles.successModalButtonView,
-            backgroundColor: props.buttonColor
-              ? props.buttonColor
-              : Colors.blue,
-          }} distance={2}
-          startColor={props.buttonShadowColor
-            ? props.buttonShadowColor
-            : Colors.shadowBlue }
-          offset={[ 42, 14 ]}>
+
+          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            locations={[ 0.2, 1 ]}
+            style={{
+              ...styles.successModalButtonView,
+              backgroundColor: props.buttonColor
+                ? props.buttonColor
+                : Colors.blue,
+            }}
+          >
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressProceed()}
-              style={{
-                // ...styles.successModalButtonView,
-                shadowColor: props.buttonShadowColor
-                  ? props.buttonShadowColor
-                  : Colors.shadowBlue,
-
-              }}
               delayPressIn={0}
             >
               <Text
@@ -206,7 +203,7 @@ export default function SeedBacupModalContents( props ) {
                 {props.proceedButtonText}
               </Text>
             </AppBottomSheetTouchableWrapper>
-          </Shadow>
+          </LinearGradient>
 
           {props.isIgnoreButton && (
             <AppBottomSheetTouchableWrapper
@@ -214,11 +211,8 @@ export default function SeedBacupModalContents( props ) {
               style={{
                 height: wp( '12%' ),
                 width: wp( '27%' ),
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
                 alignItems: 'center',
-                alignSelf: 'center',
-                // position: 'absolute',
-                // left: wp( 53 )
               }}
               delayPressIn={0}
             >

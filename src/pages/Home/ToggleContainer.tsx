@@ -42,7 +42,7 @@ const ToggleContainer = ( ) => {
           materialIconCurrencyCodes.includes( currencyCode ) ?
             <MaterialCurrencyCodeIcon
               currencyCode={currencyCode}
-              color={Colors.white}
+              color={Colors.blue}
               size={14}
             />
             : null
@@ -57,7 +57,7 @@ const ToggleContainer = ( ) => {
             : null
         }
         trackColor={Colors.lightBlue}
-        thumbColor={Colors.darkBlue}
+        thumbColor={Colors.white}
         onpress={() => {
           dispatch( currencyKindSet(
             prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN

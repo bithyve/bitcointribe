@@ -60,6 +60,7 @@ import { translations } from '../../common/content/LocContext'
 import QRModal from '../Accounts/QRModal'
 import Loader from '../../components/loader'
 import AlertModalContents from '../../components/AlertModalContents'
+import LinearGradient from 'react-native-linear-gradient'
 
 const getImageIcon = ( item: ContactRecipientDescribing ) => {
   if ( Object.keys( item ).length ) {
@@ -1049,7 +1050,9 @@ class ContactDetails extends PureComponent<
         />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
         <View style={{
-          flexDirection: 'row'
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center'
         }}>
           <BackIconTitle />
           <TouchableOpacity
@@ -1062,21 +1065,30 @@ class ContactDetails extends PureComponent<
                 isKeeper: true, isPrimary: this.contact.displayedName == 'Personal Device 1' ? true : false
               } )
             }}
-            style={styles.resendContainer}
           >
-            {this.contact.lastSeenActive ? (
-              <Image
-                source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
-                style={styles.bitcoinIconStyle}
-              />
-            ) : null}
-            <Text style={styles.sendTextStyle}>
-              {this.contact.lastSeenActive
-                ? this.common[ 'send' ]
-                : this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER
-                  ? 'Reshare'
-                  : this.strings[ 'ResendRequest' ]}
-            </Text>
+            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+              start={{
+                x: 0, y: 0
+              }} end={{
+                x: 1, y: 0
+              }}
+              locations={[ 0.2, 1 ]}
+              style={styles.resendContainer}
+            >
+              {this.contact.lastSeenActive ? (
+                <Image
+                  source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
+                  style={styles.bitcoinIconStyle}
+                />
+              ) : null}
+              <Text style={styles.sendTextStyle}>
+                {this.contact.lastSeenActive
+                  ? this.common[ 'send' ]
+                  : this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER
+                    ? 'Reshare'
+                    : this.strings[ 'ResendRequest' ]}
+              </Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
 

@@ -19,6 +19,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { LocalizationContext } from '../../common/content/LocContext'
 import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function ConfirmSeedWordsModal( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -163,16 +164,20 @@ export default function ConfirmSeedWordsModal( props ) {
             alignItems: 'flex-end',
           }}
         >
-          <Shadow viewStyle={{
-            ...styles.successModalButtonView,
-            backgroundColor: props.buttonColor
-              ? props.buttonColor
-              : Colors.blue,
-          }} distance={2}
-          startColor={props.buttonShadowColor
-            ? props.buttonShadowColor
-            : Colors.shadowBlue }
-          offset={[ 42, 14 ]}>
+          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            locations={[ 0.2, 1 ]}
+            style={{
+              ...styles.successModalButtonView,
+              backgroundColor: props.buttonColor
+                ? props.buttonColor
+                : Colors.blue,
+            }}
+          >
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressProceed( word )}
               style={{
@@ -195,7 +200,7 @@ export default function ConfirmSeedWordsModal( props ) {
                 {props.proceedButtonText}
               </Text>
             </AppBottomSheetTouchableWrapper>
-          </Shadow>
+          </LinearGradient>
 
           {props.isIgnoreButton && (
             <AppBottomSheetTouchableWrapper
@@ -203,7 +208,7 @@ export default function ConfirmSeedWordsModal( props ) {
               style={{
                 height: wp( '12%' ),
                 width: wp( '27%' ),
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
                 alignItems: 'center',
                 alignSelf: 'center',
                 // position: 'absolute',
