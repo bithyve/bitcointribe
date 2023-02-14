@@ -148,10 +148,10 @@ export default function ErrorModalContents( props ) {
         ) : null}
         <View
           style={{
-            height: hp( '12%' ),
+            height: hp( '15%' ),
+            width: wp( '100%' ),
             flexDirection: 'row',
-            marginTop: 'auto',
-            alignItems: 'flex-end',
+            alignItems: 'center',
           }}
         >
           <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
@@ -198,11 +198,7 @@ export default function ErrorModalContents( props ) {
               style={{
                 height: wp( '12%' ),
                 width: wp( '27%' ),
-                justifyContent: 'center',
                 alignItems: 'center',
-                alignSelf: 'center',
-                // position: 'absolute',
-                // left: wp( 53 )
               }}
               delayPressIn={0}
             >

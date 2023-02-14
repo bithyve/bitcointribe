@@ -23,22 +23,22 @@ export default function HeaderTitle( props ) {
       </Text>
     </View>
     {
-      (props.secondLineBoldTitle || props.secondLineTitle) ?
-    <View style={{
-      flexDirection: 'row', alignItems: 'center',
-    }}>
-      <Text style={[ CommonStyles.subHeaderTitles, {
-        fontWeight: '500', width: wp( 65 )
-      } ]} >
-        {props.secondLineBoldTitle}
-        <Text style={[ CommonStyles.subHeaderTitles, {
-          fontWeight: 'normal', fontSize: RFValue( 14 ),
-        } ]} >
-          {props.secondLineTitle}
-        </Text>
-      </Text>
-    </View>
-    : null
+      ( props.secondLineBoldTitle || props.secondLineTitle ) ?
+        <View style={{
+          flexDirection: 'row', alignItems: 'center',
+        }}>
+          <Text style={[ CommonStyles.subHeaderTitles, {
+            fontWeight: '500', width: wp( 65 )
+          } ]} >
+            {props.secondLineBoldTitle}
+            <Text style={[ CommonStyles.subHeaderTitles, {
+              fontWeight: 'normal', fontSize: RFValue( 14 ),
+            } ]} >
+              {props.secondLineTitle}
+            </Text>
+          </Text>
+        </View>
+        : null
     }
 
     {props.isKnowMoreButton &&
@@ -46,12 +46,12 @@ export default function HeaderTitle( props ) {
                   marginLeft: 'auto', marginRight: 20
                 }} />
     }
-{props.infoTextNormal ?
-    <Text style={CommonStyles.headerTitlesInfoText} >
-      {props.infoTextNormal}
-    </Text>
-    :null
-}
+    {props.infoTextNormal ?
+      <Text style={CommonStyles.headerTitlesInfoText} >
+        {props.infoTextNormal}
+      </Text>
+      :null
+    }
   </View>
   )
 }
