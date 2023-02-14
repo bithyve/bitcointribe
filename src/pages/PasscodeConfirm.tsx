@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { storeCreds } from '../store/actions/setupAndAuth'
 import { LocalizationContext } from '../common/content/LocContext'
 import BottomInfoBox from '../components/BottomInfoBox'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function PasscodeConfirm( props ) {
   const [ passcode, setPasscode ] = useState( '' )
@@ -482,7 +483,9 @@ export default function PasscodeConfirm( props ) {
             </View>
           ) : null}
           {passcode.length != 4 &&
-            <View style={ { marginTop: 20 } }>
+            <View style={ {
+              marginTop: 20
+            } }>
               <BottomInfoBox
                 backgroundColor={Colors.white}
                 title={''}
@@ -494,13 +497,22 @@ export default function PasscodeConfirm( props ) {
             <TouchableOpacity
               disabled={passcode == confirmPasscode ? false : true}
               onPress={() => dispatch( storeCreds( passcode ) ) }
-              style={{
-                ...styles.proceedButtonView,
-                backgroundColor:
-                  passcode == confirmPasscode ? Colors.blue : Colors.lightBlue,
-              }}
             >
-              <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                start={{
+                  x: 0, y: 0
+                }} end={{
+                  x: 1, y: 0
+                }}
+                locations={[ 0.2, 1 ]}
+                style={{
+                  ...styles.proceedButtonView,
+                  backgroundColor:
+                  passcode == confirmPasscode ? Colors.blue : Colors.lightBlue,
+                }}
+              >
+                <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+              </LinearGradient>
             </TouchableOpacity>
           ) : null}
 
@@ -713,11 +725,6 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    }
   },
   proceedButtonText: {
     color: Colors.white,

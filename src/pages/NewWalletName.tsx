@@ -43,6 +43,7 @@ import { setVersion } from '../store/actions/versionHistory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { initNewBHRFlow } from '../store/actions/BHR'
 import LoaderModal from '../components/LoaderModal'
+import LinearGradient from 'react-native-linear-gradient'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -271,16 +272,7 @@ export default function NewWalletName( props ) {
           </View>
           <View style={styles.bottomButtonView}>
             {walletName.trim() != '' ? (
-              <View
-                style={{
-                  elevation: 10,
-                  shadowColor: Colors.shadowBlue,
-                  shadowOpacity: 1,
-                  shadowOffset: {
-                    width: 15, height: 15
-                  },
-                }}
-              >
+              <View>
                 <TouchableOpacity
                   onPress={() => {
                     setLoaderModal( true )
@@ -302,9 +294,18 @@ export default function NewWalletName( props ) {
                       AsyncStorage.setItem( 'securityQuestionHistory', JSON.stringify( securityQuestionHistory ) )
                     }, 1000 )
                   }}
-                  style={styles.buttonView}
                 >
-                  <Text style={styles.buttonText}>{common.proceed}</Text>
+                  <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                    start={{
+                      x: 0, y: 0
+                    }} end={{
+                      x: 1, y: 0
+                    }}
+                    locations={[ 0.2, 1 ]}
+                    style={styles.buttonView}
+                  >
+                    <Text style={styles.buttonText}>{common.proceed}</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
               </View>
             ) : null}
