@@ -51,8 +51,8 @@ const ManageGifts = ( props ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
-  const { navigation} = props;
-  const giftScreenNav = navigation.getParam('giftType');
+  const { navigation } = props
+  const giftScreenNav = navigation.getParam( 'giftType' )
   const [ timer, setTimer ] = useState( true )
   // const [ giftDetails, showGiftDetails ] = useState( false )
   // const [ giftInfo, setGiftInfo ] = useState( null )
@@ -66,12 +66,12 @@ const ManageGifts = ( props ) => {
   )
   const [ giftsArr, setGiftsArr ] = useState( null )
   let statusGift = GiftStatus.CREATED
-  if(giftScreenNav == 0 || giftScreenNav == '0'){
+  if( giftScreenNav == 0 || giftScreenNav == '0' ){
     statusGift = GiftStatus.CREATED
   } else {
     statusGift = GiftStatus.SENT
   }
-  const [ active, setActive ] = useState(statusGift )
+  const [ active, setActive ] = useState( statusGift )
   const [ knowMore, setKnowMore ] = useState( false )
   // const [ sentGifts, setSentClaimedGifts ] = useState( [] )
   // const [ receivedGifts, setReceicedGifts ] = useState( [] )
@@ -337,7 +337,12 @@ const ManageGifts = ( props ) => {
             flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 9 ),
             marginVertical: hp( 1 )
           }}>
-          <IconAddLight />
+          <Image
+            style={{
+              width: 30, height: 30
+            }}
+            source={require( '../../assets/images/icons/icon_add.png' )}
+          />
           <Text style={styles.createGiftText}>
           Create New Gift
           </Text>

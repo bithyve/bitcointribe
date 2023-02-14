@@ -11,6 +11,7 @@ import {
 import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import { LocalizationContext } from '../common/content/LocContext'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function AlertModalContents( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -156,26 +157,23 @@ export default function AlertModalContents( props ) {
             alignItems: 'flex-end',
           }}
         >
-          <Shadow viewStyle={{
-            ...styles.successModalButtonView,
-            backgroundColor: props.buttonColor
-              ? props.buttonColor
-              : Colors.blue,
-          }} distance={2}
-          startColor={props.buttonShadowColor
-            ? props.buttonShadowColor
-            : Colors.shadowBlue }
-          offset={[ 42, 14 ]}>
-            <AppBottomSheetTouchableWrapper
-              onPress={() => props.onPressProceed()}
-              style={{
-                // ...styles.successModalButtonView,
-                shadowColor: props.buttonShadowColor
-                  ? props.buttonShadowColor
-                  : Colors.shadowBlue,
-
+          <AppBottomSheetTouchableWrapper
+            onPress={() => props.onPressProceed()}
+            delayPressIn={0}
+          >
+            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+              start={{
+                x: 0, y: 0
+              }} end={{
+                x: 1, y: 0
               }}
-              delayPressIn={0}
+              locations={[ 0.2, 1 ]}
+              style={{
+                ...styles.successModalButtonView,
+                backgroundColor: props.buttonColor
+                  ? props.buttonColor
+                  : Colors.blue,
+              }}
             >
               <Text
                 style={{
@@ -187,8 +185,8 @@ export default function AlertModalContents( props ) {
               >
                 {props.proceedButtonText}
               </Text>
-            </AppBottomSheetTouchableWrapper>
-          </Shadow>
+            </LinearGradient>
+          </AppBottomSheetTouchableWrapper>
 
           {props.isIgnoreButton && (
             <AppBottomSheetTouchableWrapper
