@@ -36,6 +36,7 @@ import ModalContainer from '../../../components/home/ModalContainer'
 import { translations } from '../../../common/content/LocContext'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import { NetworkType } from '../../../bitcoin/utilities/Interface'
+import LinearGradient from 'react-native-linear-gradient'
 
 export type NavigationParams = {
 };
@@ -242,11 +243,20 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         <TouchableOpacity
           disabled={!selectedAmount}
           onPress={handleConfirmationButtonPress}
-          style={{
-            ...ButtonStyles.primaryActionButton, opacity: !selectedAmount ? 0.5: 1
-          }}
         >
-          <Text style={ButtonStyles.actionButtonText}>{common.confirmProceed}</Text>
+          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            locations={[ 0.2, 1 ]}
+            style={{
+              ...ButtonStyles.primaryActionButton, opacity: !selectedAmount ? 0.5: 1
+            }}
+          >
+            <Text style={ButtonStyles.actionButtonText}>{common.confirmProceed}</Text>
+          </LinearGradient>
         </TouchableOpacity>
 
         <TouchableOpacity
