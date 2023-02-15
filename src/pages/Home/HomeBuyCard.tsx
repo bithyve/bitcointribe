@@ -129,7 +129,8 @@ const HomeBuyCard = ( {
             </Text>
           )}
           <Text style={{
-            fontSize:17, color:'#8B8B8B'
+            fontSize:17, color:'#8B8B8B',
+            fontFamily: Fonts.Regular
           }}>{amount ? amount : '--'}</Text>
           <Text>{incramount}</Text>
         </View>

@@ -524,8 +524,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       <View style={{
         backgroundColor: Colors.darkBlue
       }}>
-         <LinearGradient colors={[Colors.blue, Colors.darkBlue]} 
-          start={{x: 0, y: 0}} end={{x: 0.5, y: 1}}>
+        <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+          start={{
+            x: 0, y: 0
+          }} end={{
+            x: 0.5, y: 1
+          }}>
           <StatusBar translucent={true} backgroundColor={'transparent'} barStyle="light-content"/>
         </LinearGradient>
         {/* <StatusBar backgroundColor={Colors.blue} barStyle="light-content" /> */}
