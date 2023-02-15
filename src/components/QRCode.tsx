@@ -24,7 +24,7 @@ const QRCode: React.FC<Props> = ( {
   return (
     <View style={styles.containerQrCode}>
       <QR
-        logo={require( '../assets/images/icons/icon_hexa.png' )}
+        // logo={require( '../assets/images/icons/icon_hexa.png' )}
         logoSize={50}
         logoMargin={2}
         logoBackgroundColor="white"
