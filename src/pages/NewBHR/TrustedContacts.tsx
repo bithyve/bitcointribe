@@ -75,7 +75,7 @@ const TrustedContacts = ( props ) => {
             justifyContent: 'center'
           }}
         >
-          <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
         </AppBottomSheetTouchableWrapper>
         <Text style={BackupStyles.modalHeaderTitleText}>
           Associate a contact

@@ -46,14 +46,14 @@ const GiftBoxComponent = ( props ) => {
           }}
         >
           <Text numberOfLines={3} style={styles.subText}>
-            {props.subTitleText}
+            {props.subTitleText} {props.pendingSubText}
           </Text>
-          {props.scSubText && (
+          {/* {props.scSubText && (
             <Text style={styles.scSubText}>{props.scSubText}</Text>
-          )}
-          {props.pendingSubText && (
+          )} */}
+          {/* {props.pendingSubText && (
             <Text style={styles.subText}>{props.pendingSubText}</Text>
-          )}
+          )} */}
         </View>
       </View>
     </TouchableOpacity>

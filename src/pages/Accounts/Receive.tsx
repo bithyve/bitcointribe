@@ -265,7 +265,7 @@ export default function Receive( props ) {
                 >
                   <FontAwesome
                     name="long-arrow-left"
-                    color={Colors.blue}
+                    color={Colors.homepageButtonColor}
                     size={17}
                   />
                 </TouchableOpacity>

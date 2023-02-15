@@ -27,7 +27,7 @@ const ShareContactRequest = ( { SelectedContact, navigation, headerText, headerS
               height: 30, width: 30, justifyContent: 'center'
             }}
           >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </TouchableOpacity>
           <View style={{
             flex: 1

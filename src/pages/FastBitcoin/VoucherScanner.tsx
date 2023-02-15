@@ -920,7 +920,7 @@ const VoucherScanner = ( props ) => {
             }}
             style={styles.backArrowView}
           >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </TouchableOpacity>
           <Text style={NavStyles.modalHeaderTitleText}>
             Scan a FastBitcoins voucher

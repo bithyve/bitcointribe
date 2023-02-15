@@ -48,7 +48,7 @@ export default function FastBitcoinCalculationModalContents( props ) {
               height: 30, width: 30
             }}
           >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </TouchableOpacity>
           <View>
             <Text style={styles.modalHeaderTitleText}>{props.pageTitle}</Text>

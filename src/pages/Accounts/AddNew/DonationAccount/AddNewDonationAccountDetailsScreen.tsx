@@ -151,7 +151,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
         behavior={Platform.OS == "ios" ? "padding" : "height"}
       >
         <TouchableOpacity onPress={() => navigation.pop()}>
-          <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
         </TouchableOpacity>
         <ScrollView
           style={styles.scrollContainer}

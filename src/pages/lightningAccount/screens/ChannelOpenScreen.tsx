@@ -122,7 +122,7 @@ export default class OpenChannelScreen extends Component {
 
             <FontAwesome
               name="long-arrow-left"
-              color={Colors.blue}
+              color={Colors.homepageButtonColor}
               size={20}
             />
           </TouchableOpacity>
