@@ -8,6 +8,7 @@ import QR from 'react-native-qrcode-svg'
 import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import Fonts from '../common/Fonts'
 
 export type Props = {
   value: string;
@@ -50,6 +51,7 @@ const styles = StyleSheet.create( {
     fontSize: 17,
     textAlign: 'center',
     paddingVertical: 7,
+    fontFamily: Fonts.Regular
   },
 } )
 
