@@ -16,7 +16,7 @@ const miniNavButton = {
 const miniNavButtonText = {
   color: Colors.white,
   fontSize: RFValue( 12 ),
-  fontFamily: Fonts.FiraSansRegular,
+  fontFamily: Fonts.Regular,
 }
 
 const actionButton = {
@@ -60,7 +60,7 @@ const disabledNewPrimaryActionButton = {
 const actionButtonText = {
   color: Colors.white,
   fontSize: RFValue( 13 ),
-  fontFamily: Fonts.FiraSansMedium,
+  fontFamily: Fonts.Medium,
 }
 
 

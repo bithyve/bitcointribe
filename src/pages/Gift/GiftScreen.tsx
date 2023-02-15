@@ -413,7 +413,7 @@ class GiftScreen extends React.Component<
               flex: 1,
             }} >
               <Text style={{
-                fontSize: RFValue( 13 ), fontFamily: activeIndex === 0 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.black
+                fontSize: RFValue( 13 ), fontFamily: activeIndex === 0 ? Fonts.Medium : Fonts.Regular, color: activeIndex === 0 ? Colors.white : Colors.black
               }}>
                 Add Contacts
               </Text>
@@ -458,7 +458,7 @@ class GiftScreen extends React.Component<
             }} >
 
               <Text style={{
-                fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 1 ? Colors.white : Colors.black
+                fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.Medium : Fonts.Regular, color: activeIndex === 1 ? Colors.white : Colors.black
               }}>
                 Add a Ward
               </Text>
@@ -501,7 +501,7 @@ class GiftScreen extends React.Component<
             </View>
 
             <Text style={{
-              fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey,
+              fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, color: Colors.textColorGrey,
               marginHorizontal: wp( 3 ),
               width: '95%', flex: 1
             }}>
@@ -689,7 +689,7 @@ class GiftScreen extends React.Component<
                 color: Colors.blue,
                 fontSize: RFValue( 16 ),
                 marginLeft: 2,
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
 
               }}>
               My Accounts
@@ -710,7 +710,7 @@ class GiftScreen extends React.Component<
             <ToggleContainer />
           </View>
           <Text style={{
-            marginHorizontal: 39, fontSize: RFValue( 11 ), color: '#525252', fontFamily: Fonts.FiraSansLight, marginTop: 18
+            marginHorizontal: 39, fontSize: RFValue( 11 ), color: '#525252', fontFamily: Fonts.Light, marginTop: 18
           }}>{'Give sats as gifts to your friends and family, view and manage created gifts.'}</Text>
           <ScrollView
             // refreshControl={
@@ -859,7 +859,7 @@ export default connect( mapStateToProps, {
 const styles = StyleSheet.create( {
   cardSubText: {
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   icon: {
     width: 27, height: 27, resizeMode: 'contain', marginHorizontal: wp( 3 )
@@ -916,17 +916,17 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   title: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 18 ),
     marginHorizontal: wp( 7 ),
     color: Colors.blue,
     marginVertical: hp( 1 )
   },
   subTitle: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     marginHorizontal: wp( 7 ),
     marginRight: wp( 9 ),
@@ -969,7 +969,7 @@ const styles = StyleSheet.create( {
     // marginLeft: 10,
     // marginHorizontal: wp ( 1 ),
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
     // padding: wp( 2 )
   },
@@ -977,7 +977,7 @@ const styles = StyleSheet.create( {
     marginTop: 3,
     marginLeft: 10,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
   selectedContactsView: {
@@ -1003,16 +1003,16 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     letterSpacing: 0.7,
-    // fontFamily: Fonts.FiraSansRegular,
-    fontFamily: Fonts.FiraSansMedium,
+    // fontFamily: Fonts.Regular,
+    fontFamily: Fonts.Medium,
     alignItems: 'center',
     marginHorizontal: wp( 4 ),
   },
   cardTitle: {
     color: Colors.blue,
     fontSize: RFValue( 12 ),
-    // fontFamily: Fonts.FiraSansRegular,
-    fontFamily: Fonts.FiraSansMedium,
+    // fontFamily: Fonts.Regular,
+    fontFamily: Fonts.Medium,
     marginVertical: wp( 2 ),
     marginHorizontal: wp( 4 )
   },
@@ -1020,7 +1020,7 @@ const styles = StyleSheet.create( {
     marginLeft: 30,
     color: Colors.textColorGrey,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: 3,
   },
   imageIconStyle: {

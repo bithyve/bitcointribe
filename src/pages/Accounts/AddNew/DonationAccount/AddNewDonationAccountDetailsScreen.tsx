@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: RFValue(25),
     color: Colors.darkBlue,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   uploadImgParrentView: {
     flexDirection: "row",
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
   },
   uploadImgText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue(11),
     marginTop: 10,
   },
@@ -328,14 +328,14 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingHorizontal: 20,
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue(12),
     textAlign: "left",
   },
   inputText: {
     paddingHorizontal: 20,
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue(12),
     textAlign: "left",
   },
@@ -347,17 +347,17 @@ const styles = StyleSheet.create({
   checkTwoFAuthText: {
     marginLeft: 10,
     color: Colors.gray4,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue(12),
   },
   agreeTermsText: {
     color: Colors.gray4,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue(11),
   },
   termsAndConditionText: {
     color: Colors.darkBlue,
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     fontSize: RFValue(11),
   },
   proceedBtnView: {
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
   },
   proceedBtnText: {
     color: Colors.white,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue(13),
   },
   footerSection: {

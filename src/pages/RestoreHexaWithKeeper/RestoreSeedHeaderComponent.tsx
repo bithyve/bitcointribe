@@ -55,7 +55,7 @@ const styles = StyleSheet.create( {
     marginLeft: wp( '4%' ),
     color: Colors.blue,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   headerImage: {
     width: wp( '9%' ),

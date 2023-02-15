@@ -30,7 +30,7 @@ export default function QuoteConfirmation( props ) {
           <Text
             style={{
               fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.Medium,
               color: Colors.lightTextColor,
             }}
           >
@@ -131,7 +131,7 @@ export default function QuoteConfirmation( props ) {
                 <Text
                   style={{
                     fontSize: RFValue( 12 ),
-                    fontFamily: Fonts.FiraSansMedium,
+                    fontFamily: Fonts.Medium,
                     color: Colors.lightTextColor,
                     lineHeight: RFValue( 12 ),
                     marginRight: 5,
@@ -216,12 +216,12 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   successModalButtonView: {
     height: wp( '13%' ),
@@ -242,7 +242,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   cardBitCoinImage: {
     width: wp( '5%' ),
@@ -254,14 +254,14 @@ const styles = StyleSheet.create( {
   cardAmountText: {
     fontSize: RFValue( 21 ),
     color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: 5,
     marginTop: 'auto',
     lineHeight: RFValue( 21 ),
   },
   cardAmountUnitText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     marginTop: 'auto',
     lineHeight: RFValue( 17 ),

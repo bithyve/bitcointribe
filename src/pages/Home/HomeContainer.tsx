@@ -161,7 +161,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             fontSize: RFValue( 19 ),
             marginTop: hp( 1 ),
             marginLeft:wp( 1 ),
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
             letterSpacing: 0.54
           }}>
             {this.state.strings.myaccounts}

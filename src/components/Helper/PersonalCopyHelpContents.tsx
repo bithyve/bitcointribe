@@ -25,7 +25,7 @@ export default function PersonalCopyHelpContents( props ) {
         <Text
           style={{
             color: Colors.white,
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
             fontSize: RFValue( 20 ),
             marginTop: hp( '1%' ),
             marginBottom: hp( '1%' ),
@@ -61,7 +61,7 @@ export default function PersonalCopyHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '7%' ),
               marginRight: wp( '7%' ),
             }}
@@ -85,7 +85,7 @@ export default function PersonalCopyHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '7%' ),
               marginRight: wp( '7%' ),
             }}
@@ -138,7 +138,7 @@ export default function PersonalCopyHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '7%' ),
               marginRight: wp( '7%' ),
             }}
@@ -165,7 +165,7 @@ export default function PersonalCopyHelpContents( props ) {
               fontSize: RFValue( 13 ),
               marginLeft: wp( '7%' ),
               marginRight: wp( '7%' ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
             }}
           >
             It's not a good idea to have multiple recovery keys on the same device as your device may get lost or stolen
@@ -218,7 +218,7 @@ export default function PersonalCopyHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '7%' ),
               marginRight: wp( '7%' ),
             }}
@@ -242,7 +242,7 @@ export default function PersonalCopyHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '7%' ),
               marginRight: wp( '7%' ),
             }}

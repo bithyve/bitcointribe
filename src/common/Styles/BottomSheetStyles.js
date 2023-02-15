@@ -8,7 +8,7 @@ const BottomSheetStyles = StyleSheet.create( {
   confirmationMessageHeading: {
     fontSize: RFValue( 18 ),
     marginBottom: 12,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     color: Colors.blue,
   },
 } )

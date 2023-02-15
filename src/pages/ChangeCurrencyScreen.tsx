@@ -32,19 +32,19 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.background,
   },
   textHeading: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 24 ),
     color: Colors.blue,
     marginBottom: wp( '5%' ),
     marginTop: wp( '10%' ),
   },
   textTitle: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 15 ),
     color: Colors.blue,
   },
   textSubtitle: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     color: Colors.textColorGrey,
   },
@@ -64,7 +64,7 @@ const styles = StyleSheet.create( {
     borderColor: Colors.borderColor,
   },
   textCurrency: {
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 18 ),
     color: Colors.textColorGrey,
   },
@@ -74,19 +74,19 @@ const styles = StyleSheet.create( {
     alignSelf: 'center',
   },
   textValue: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     marginLeft: wp( '3%' ),
   },
   textHelpUs: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 16 ),
     color: Colors.blue,
     marginLeft: wp( '3%' ),
   },
   textHelpUsSub: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     marginLeft: wp( '3%' ),
@@ -260,7 +260,7 @@ export default function ChangeCurrencyScreen( props ) {
                       >
                         <Text
                           style={{
-                            fontFamily: Fonts.FiraSansMedium,
+                            fontFamily: Fonts.Medium,
                             fontSize: RFValue( 13 ),
                             color: Colors.textColorGrey,
                           }}
@@ -281,7 +281,7 @@ export default function ChangeCurrencyScreen( props ) {
                       >
                         <Text
                           style={{
-                            fontFamily: Fonts.FiraSansRegular,
+                            fontFamily: Fonts.Regular,
                             fontSize: RFValue( 13 ),
                             color: Colors.textColorGrey,
                             marginLeft: wp( '3%' ),
@@ -368,7 +368,7 @@ export default function ChangeCurrencyScreen( props ) {
                     >
                       <Text
                         style={{
-                          fontFamily: Fonts.FiraSansRegular,
+                          fontFamily: Fonts.Regular,
                           fontSize: RFValue( 13 ),
                           color: Colors.textColorGrey,
                           marginLeft: wp( '3%' ),
@@ -447,7 +447,7 @@ export default function ChangeCurrencyScreen( props ) {
             style={{
               fontSize: RFValue( 13 ),
               color: Colors.white,
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.Medium,
             }}
           >
             {strings.SaveChanges}

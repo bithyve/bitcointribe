@@ -180,13 +180,13 @@ const styles = StyleSheet.create( {
 
   buttonTitleText: {
     color: Colors.black,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 15 ),
   },
 
   buttonSubtitleText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 9 ),
   },
 } )

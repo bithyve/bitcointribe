@@ -582,7 +582,7 @@ const CreateGift = ( { navigation }: Props ) => {
             <Text style={{
               color: Colors.textColorGrey,
               fontSize: RFValue( 12 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginHorizontal: wp( 3 )
             }}>
           Add recipient to Friends and Family
@@ -742,7 +742,7 @@ const CreateGift = ( { navigation }: Props ) => {
               style={{
                 color: Colors.blue,
                 fontSize: RFValue( 13 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
               }}
             >
               {title}
@@ -751,14 +751,14 @@ const CreateGift = ( { navigation }: Props ) => {
               style={{
                 color: Colors.gray3,
                 fontSize: RFValue( 11 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
               }}
             >
               Gift Sats created will be of the
               <Text
                 style={{
                   fontWeight: 'bold',
-                  fontFamily: Fonts.FiraSansItalic,
+                  fontFamily: Fonts.Italic,
                 }}
               >
                 {' '}
@@ -768,7 +768,7 @@ const CreateGift = ( { navigation }: Props ) => {
               <Text
                 style={{
                   fontWeight: 'bold',
-                  fontFamily: Fonts.FiraSansItalic,
+                  fontFamily: Fonts.Italic,
                 }}
               >
                 {' '}
@@ -821,7 +821,7 @@ const CreateGift = ( { navigation }: Props ) => {
               <Text
                 style={{
                   color: Colors.black,
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                   fontSize: RFValue( 18 ),
                 }}
               >
@@ -873,7 +873,7 @@ const CreateGift = ( { navigation }: Props ) => {
             style={{
               color: Colors.textColorGrey,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginHorizontal: wp( 3 ),
             }}
           >
@@ -887,7 +887,7 @@ const CreateGift = ( { navigation }: Props ) => {
               <Text
                 style={{
                   fontWeight: 'bold',
-                  fontFamily: Fonts.FiraSansItalic,
+                  fontFamily: Fonts.Italic,
                 }}
               >
                 one per Bitcoin Tribe app
@@ -931,13 +931,13 @@ const CreateGift = ( { navigation }: Props ) => {
             style={{
               color: Colors.blue,
               fontSize: RFValue( 20 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
             }}
           >
             Create Multiple Gift Sats
           </Text>
           {/* <Text style={{
-          color: Colors.gray3, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
+          color: Colors.gray3, fontSize: RFValue( 12 ), fontFamily: Fonts.Regular
         }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text> */}
         </View>
         <AdvanceGiftOptions
@@ -948,10 +948,10 @@ const CreateGift = ( { navigation }: Props ) => {
         />
         {/* <View>
         <Text style={{
-          color: Colors.blue, fontSize: RFValue( 18 ), fontFamily: Fonts.FiraSansRegular
+          color: Colors.blue, fontSize: RFValue( 18 ), fontFamily: Fonts.Regular
         }}>Customize Gift</Text>
         <Text style={{
-          color: Colors.gray3, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
+          color: Colors.gray3, fontSize: RFValue( 12 ), fontFamily: Fonts.Regular
         }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text>
       </View>
       <AdvanceGiftOptions
@@ -1009,7 +1009,7 @@ const CreateGift = ( { navigation }: Props ) => {
               width: '60%',
               fontWeight: '200',
               marginBottom: 30,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               letterSpacing: 0.54,
             }}
           >
@@ -1020,7 +1020,7 @@ const CreateGift = ( { navigation }: Props ) => {
               color: Colors.gray3,
               marginBottom: 10,
               fontSize: RFValue( 12 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
             }}
           >
             Please try again
@@ -1123,7 +1123,7 @@ const CreateGift = ( { navigation }: Props ) => {
                 style={{
                   color: Colors.gray4,
                   fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 {message}
@@ -1132,7 +1132,7 @@ const CreateGift = ( { navigation }: Props ) => {
                 style={{
                   color: Colors.black,
                   fontSize: RFValue( 14 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 {item.primarySubAccount.customDisplayName ??
@@ -1243,7 +1243,7 @@ const CreateGift = ( { navigation }: Props ) => {
                   fontSize: height < 720 ? RFValue( 20 ) : RFValue( 24 ),
                   letterSpacing: 0.01,
                   marginLeft: 20,
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 {'Create Gift'}
@@ -1353,7 +1353,7 @@ const CreateGift = ( { navigation }: Props ) => {
                     textAlign: 'center',
                     // paddingHorizontal: 10,
                     fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.FiraSansItalic,
+                    fontFamily: Fonts.Italic,
                   }}
                 >
                   {strings.SendMax}
@@ -1382,7 +1382,7 @@ const CreateGift = ( { navigation }: Props ) => {
                   {
                     fontSize: RFValue( 15 ),
                     color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     backgroundColor: Colors.backgroundColor,
                     alignSelf: 'center',
                     flex: 1,
@@ -1395,7 +1395,7 @@ const CreateGift = ( { navigation }: Props ) => {
                 <Text
                   style={{
                     color: Colors.black,
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     fontSize: RFValue( 12 ),
                   }}
                 >
@@ -1406,7 +1406,7 @@ const CreateGift = ( { navigation }: Props ) => {
               <Text
                 style={{
                   color: Colors.black,
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                   fontSize: RFValue( 12 ),
                   marginLeft: 'auto',
                   marginTop: hp( '0.5%' ),
@@ -1432,7 +1432,7 @@ const CreateGift = ( { navigation }: Props ) => {
               style={{
                 color: Colors.greyTextColor,
                 fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
               }}
             >
               Total Amount
@@ -1512,7 +1512,7 @@ const CreateGift = ( { navigation }: Props ) => {
             style={{
               color: Colors.textColorGrey,
               fontSize: RFValue( 11 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               // marginHorizontal: wp( 3 ),
             }}
           >
@@ -1520,7 +1520,7 @@ const CreateGift = ( { navigation }: Props ) => {
             <Text
               style={{
                 fontWeight: 'bold',
-                fontFamily: Fonts.FiraSansItalic,
+                fontFamily: Fonts.Italic,
               }}
             >
               {prefersBitcoin
@@ -1562,7 +1562,7 @@ const CreateGift = ( { navigation }: Props ) => {
               style={{
                 color: Colors.gray13,
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 letterSpacing: 0.5,
                 // marginTop: wp( '1.5%' )
               }}
@@ -1570,7 +1570,7 @@ const CreateGift = ( { navigation }: Props ) => {
               {'Include '}
               <Text
                 style={{
-                  fontFamily: Fonts.FiraSansSemiBold,
+                  fontFamily: Fonts.SemiBold,
                 }}
               >
                 {'Fee'}
@@ -1614,7 +1614,7 @@ const CreateGift = ( { navigation }: Props ) => {
                 <Text style={{
                   color: Colors.blue,
                   fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansSemiBold,
+                  fontFamily: Fonts.SemiBold,
                   marginHorizontal: wp( 3 )
                 }}>
                   Use SATSCARD™ to gift sats
@@ -1636,7 +1636,7 @@ const CreateGift = ( { navigation }: Props ) => {
             style={{
               color: Colors.textColorGrey,
               fontSize: RFValue( 14 ),
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.Medium,
             }}
           >
             Total Amount
@@ -1646,7 +1646,7 @@ const CreateGift = ( { navigation }: Props ) => {
               style={{
                 color: Colors.black,
                 fontSize: RFValue( 20 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
               }}
             >
               {Number( amount ) * numbersOfGift}
@@ -1655,7 +1655,7 @@ const CreateGift = ( { navigation }: Props ) => {
               style={{
                 color: Colors.textColorGrey,
                 fontSize: RFValue( 11 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
               }}
             >
               {prefersBitcoin ? ' sats' : ` ${currencyCode}`}
@@ -1891,7 +1891,7 @@ const styles = StyleSheet.create( {
     height: hp( '7%' ),
   },
   errorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     color: Colors.red,
     fontSize: RFValue( 11, 812 ),
     fontStyle: 'italic',
@@ -1906,7 +1906,7 @@ const styles = StyleSheet.create( {
   keyPadElementText: {
     color: Colors.blue,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontStyle: 'normal',
   },
   cardBitCoinImage: {
@@ -1919,13 +1919,13 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.54,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: wp( 10 ),
     letterSpacing: 0.6,
     marginBottom: hp( 2 ),
@@ -1941,7 +1941,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   buttonView: {
     height: wp( '12%' ),
@@ -1978,7 +1978,7 @@ const styles = StyleSheet.create( {
     flex: 1,
     fontSize: RFValue( 15 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     backgroundColor: Colors.white,
     alignSelf: 'center',
   },
@@ -2009,18 +2009,18 @@ const styles = StyleSheet.create( {
   availableToSpendText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     lineHeight: 15,
   },
   balanceText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
   },
   proceedButtonText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   selectedContactsView: {
     flexDirection: 'row',
@@ -2033,7 +2033,7 @@ const styles = StyleSheet.create( {
   },
   contactText: {
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
   },
   accountSelectionView: {
@@ -2058,13 +2058,13 @@ const styles = StyleSheet.create( {
     marginLeft: 'auto',
   },
   homeHeaderAmountText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 20 ),
     marginRight: 5,
     color: Colors.black,
   },
   homeHeaderAmountUnitText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     // marginBottom: 3,
     color: Colors.gray2,

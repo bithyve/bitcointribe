@@ -286,7 +286,7 @@ const styles = StyleSheet.create( {
   },
   titleText: {
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
   imageView: {
@@ -301,10 +301,10 @@ const styles = StyleSheet.create( {
     elevation: 10
   },
   accountName: {
-    color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 16 )
+    color: Colors.black, fontFamily: Fonts.Regular, fontSize: RFValue( 16 )
   },
   balanceText: {
-    color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic, fontSize: RFValue( 10 ), marginTop: 5
+    color: Colors.blue, fontFamily: Fonts.MediumItalic, fontSize: RFValue( 10 ), marginTop: 5
   },
 
   selectedView: {

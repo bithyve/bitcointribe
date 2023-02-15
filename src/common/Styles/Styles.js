@@ -31,7 +31,7 @@ export default StyleSheet.create( {
     fontSize: RFValue( 25 ),
     letterSpacing: 0.01,
     marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   //
   headerTitles1: {
@@ -39,13 +39,13 @@ export default StyleSheet.create( {
     fontSize: RFValue( 18 ),
     letterSpacing: 0.01,
     marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   subHeaderTitles: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 15 ),
     marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: heightPercentageToDP( 0.5 ),
     letterSpacing: 0.6
   },
@@ -54,7 +54,7 @@ export default StyleSheet.create( {
     color: Colors.blue,
     fontSize: RFValue( 23 ),
     marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: heightPercentageToDP( 0.5 ),
     letterSpacing: 0.6
   },
@@ -65,7 +65,7 @@ export default StyleSheet.create( {
     marginRight: 15,
     fontWeight: 'normal',
     marginTop: 3,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   headerTitlesInfoText: {
     color: Colors.textColorGrey,
@@ -74,17 +74,17 @@ export default StyleSheet.create( {
     fontWeight: 'normal',
     marginRight: 20,
     marginTop: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
 
   homepageAmountText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 21 ),
     marginRight: 5
   },
 
   homepageAmountUnitText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     marginBottom: 3
   },

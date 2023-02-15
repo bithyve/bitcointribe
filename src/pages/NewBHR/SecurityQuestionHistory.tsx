@@ -358,7 +358,7 @@ const SecurityQuestionHistory = ( props ) => {
             // marginBottom: wp( '%' ),
             color: Colors.blue,
             fontSize: RFValue( 18 ),
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             marginLeft: wp( '6%' )
           }} >{loginStrings.encryptionpassword}</Text>
           <View
@@ -591,7 +591,7 @@ const SecurityQuestionHistory = ( props ) => {
             <Text
               style={{
                 color: Colors.red,
-                fontFamily: Fonts.FiraSansMediumItalic,
+                fontFamily: Fonts.MediumItalic,
                 fontSize: RFValue( 10 ),
                 marginLeft: 'auto',
               }}
@@ -657,7 +657,7 @@ const SecurityQuestionHistory = ( props ) => {
             <Text style={{
               color: Colors.blue,
               fontSize: RFValue( 18 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
             }} >{loginStrings.HexaWalletcreated}</Text>
             <Text style={[ styles.bottomNoteInfoText, {
               color: Colors.lightTextColor,
@@ -722,7 +722,7 @@ const SecurityQuestionHistory = ( props ) => {
               <Text style={{
                 fontSize: RFValue( 13 ),
                 color: Colors.white,
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
                 alignSelf: 'center',
               }}>{`${loginStrings.UseStrongPasscode}`}</Text>
             </TouchableOpacity>
@@ -737,7 +737,7 @@ const SecurityQuestionHistory = ( props ) => {
               <Text style={{
                 fontSize: RFValue( 13 ),
                 color: Colors.blue,
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
                 alignSelf: 'center',
                 marginLeft: wp( '5%' )
               }}>{`${common.cancel}`}</Text>
@@ -927,7 +927,7 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
@@ -963,7 +963,7 @@ const styles = StyleSheet.create( {
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingLeft: 15,
 
   },
@@ -982,7 +982,7 @@ const styles = StyleSheet.create( {
   },
   dropdownBoxText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     marginRight: 15,
   },
@@ -1008,7 +1008,7 @@ const styles = StyleSheet.create( {
   helpText: {
     fontSize: RFValue( 10 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     marginRight: wp( 5 ),
     alignSelf: 'flex-end',
     width: wp( '54%' ),
@@ -1019,13 +1019,13 @@ const styles = StyleSheet.create( {
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.6,
     lineHeight: 18
   },
   contactText: {
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
   },
 
@@ -1041,14 +1041,14 @@ const styles = StyleSheet.create( {
   textPasscode: {
     fontSize: RFValue( 18 ),
     color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     flex: 1,
     marginLeft: 5
   },
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   bottomButtonView: {
     flexDirection: 'row',

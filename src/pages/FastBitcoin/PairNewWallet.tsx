@@ -513,7 +513,7 @@ const styles = StyleSheet.create( {
     paddingLeft: 15,
     paddingRight: 15,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     marginTop: wp( '10%' ),
   },
 } )

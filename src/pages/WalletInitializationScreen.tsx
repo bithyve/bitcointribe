@@ -210,7 +210,7 @@ let styles = StyleSheet.create( {
     fontSize: RFValue( 25 ),
     marginLeft: 15,
     marginRight: 15,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
@@ -219,7 +219,7 @@ let styles = StyleSheet.create( {
     marginRight: 15,
     fontWeight: 'normal',
     marginTop: 3,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     lineHeight: RFValue( 16 ),
   },
   NewWalletTouchableView: {
@@ -254,7 +254,7 @@ let styles = StyleSheet.create( {
   touchableText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   arrowIconView: {
     marginLeft: 10,

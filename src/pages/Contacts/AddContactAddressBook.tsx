@@ -469,7 +469,7 @@ export default function AddContactAddressBook( props ) {
               style={{
                 color: Colors.white,
                 fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
               }}
             >
               Skip
@@ -504,7 +504,7 @@ export default function AddContactAddressBook( props ) {
                     <Text style={styles.selectedContactNameText}>
                       {value.name ? value.name.split( ' ' )[ 0 ] : ''}{' '}
                       <Text style={{
-                        fontFamily: Fonts.FiraSansMedium
+                        fontFamily: Fonts.Medium
                       }}>
                         {value.name ? value.name.split( ' ' )[ 1 ] : ''}
                       </Text>
@@ -570,7 +570,7 @@ export default function AddContactAddressBook( props ) {
                   }}>
                     <Text
                       style={{
-                        fontFamily: Fonts.FiraSansRegular,
+                        fontFamily: Fonts.Regular,
                         color: Colors.secondaryText,
                         textAlign: 'center'
                       }}
@@ -624,7 +624,7 @@ export default function AddContactAddressBook( props ) {
                           ? item.name.split( ' ' )[ 0 ]
                           : ''}{' '}
                         <Text style={{
-                          fontFamily: Fonts.FiraSansMedium
+                          fontFamily: Fonts.Medium
                         }}>
                           {item.name && item.name.split( ' ' )[ 1 ]
                             ? item.name.split( ' ' )[ 1 ]
@@ -639,7 +639,7 @@ export default function AddContactAddressBook( props ) {
                             }}>
                               {index !== i - 1 ? `${x} ` :
                                 <Text style={{
-                                  fontFamily: Fonts.FiraSansMedium
+                                  fontFamily: Fonts.Medium
                                 }}>
                                   {x}
                                 </Text>
@@ -806,7 +806,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   },
   modalContentContainer: {
     height: '100%',
@@ -825,21 +825,21 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   TitleText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   buttonText: {
     color: Colors.white,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 13 ),
   },
   bottomButtonView: {
@@ -866,7 +866,7 @@ const styles = StyleSheet.create( {
   selectedContactNameText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   selectedContactContainer: {
     height: wp( '20%' ),
@@ -889,7 +889,7 @@ const styles = StyleSheet.create( {
   contactText: {
     marginLeft: 10,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   searchBoxContainer: {
     flexDirection: 'row',
@@ -904,7 +904,7 @@ const styles = StyleSheet.create( {
   searchBoxInput: {
     fontSize: RFValue( 12 ),
     color: Colors.black,
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     paddingLeft: wp( 1.5 )
   },
   searchBoxIcon: {

@@ -247,7 +247,7 @@ const styles = StyleSheet.create( {
   },
   headerTitleText: {
     color: Colors.white,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 25 ),
     marginBottom: wp( '3%' ),
   },
@@ -269,7 +269,7 @@ const styles = StyleSheet.create( {
 
   headerButtonText: {
     padding: 11,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 13 ),
     color: Colors.white,
   },

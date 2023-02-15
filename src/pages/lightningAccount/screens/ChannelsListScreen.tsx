@@ -288,7 +288,7 @@ export default class ChannelScreen extends Component {
 const styles = StyleSheet.create( {
   contactText: {
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.darkBlue,
     marginHorizontal: wp( 2 ),
   },
@@ -309,7 +309,7 @@ const styles = StyleSheet.create( {
     color: Colors.darkBlue,
     fontSize: RFValue( 25 ),
     paddingLeft: 10,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   activityIndicator: {
     paddingVertical: 40,
@@ -342,14 +342,14 @@ const styles = StyleSheet.create( {
   },
 
   title1Text: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 15 ),
     color: Colors.white,
     letterSpacing: 0.01,
   },
 
   title2Text: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     color: Colors.white,
     marginTop: 2,
@@ -364,7 +364,7 @@ const styles = StyleSheet.create( {
 
   balanceUnitText: {
     fontSize: 13,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   balanceCurrencyIcon: {
@@ -408,18 +408,18 @@ const styles = StyleSheet.create( {
     marginRight: 10,
   },
   totalInbound: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     color: Colors.textColorGrey,
   },
   priceText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 16 ),
     color: Colors.black,
     alignSelf:'auto'
   },
   sats: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 10 ),
     color: Colors.gray10,
   },

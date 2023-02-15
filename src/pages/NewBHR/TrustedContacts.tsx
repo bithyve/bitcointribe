@@ -94,7 +94,7 @@ const TrustedContacts = ( props ) => {
               ...{
                 color: Colors.white,
                 fontSize: RFValue( 13 ),
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
               },
               color: Colors.blue,
             }}
@@ -111,7 +111,7 @@ const TrustedContacts = ( props ) => {
           style={{
             marginLeft: 30,
             color: Colors.textColorGrey,
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             fontSize: RFValue( 12 ),
             marginTop: 5,
           }}
@@ -119,7 +119,7 @@ const TrustedContacts = ( props ) => {
           Associate contact to{' '}
           <Text
             style={{
-              fontFamily: Fonts.FiraSansMediumItalic,
+              fontFamily: Fonts.MediumItalic,
               fontWeight: 'bold',
             }}
           >

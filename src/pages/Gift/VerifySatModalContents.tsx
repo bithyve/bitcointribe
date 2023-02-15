@@ -55,7 +55,7 @@ export default function VerifySatModalContents( props ) {
                     ? props.headerTextColor
                     : Colors.blue,
                   fontSize: RFValue( 18 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                   letterSpacing: 0.01,
                   // marginTop: RFValue( 20 )
                 // width: wp( 65 )
@@ -120,27 +120,27 @@ export default function VerifySatModalContents( props ) {
               width:RFValue( 5 ), height:RFValue( 5 ), borderRadius: RFValue( 5 ), backgroundColor: Colors.blue, marginTop: RFValue( 5 )
             }}/> */}
             <Text style={{
-              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, marginStart: RFValue( 5 ), textAlign: 'center'
+              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.Regular, marginStart: RFValue( 5 ), textAlign: 'center'
             }}>
               {props.subPoints}
             </Text>
             { props.subPoints1 && <Text  style={{
-              fontSize: RFValue( 6 ), color:Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, lineHeight: 8
+              fontSize: RFValue( 6 ), color:Colors.textColorGrey, fontFamily: Fonts.Regular, lineHeight: 8
             }}>
               {props.subPoints1}
             </Text>}
             { props.subPoints2 && <Text style={{
-              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular
+              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.Regular
             }}>
               {props.subPoints2}
             </Text>}
             { props.subPoints3 && <Text style={{
-              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.Regular,
             }}>
               {props.subPoints3}
             </Text>}
             { props.subPoints4 && <Text style={{
-              fontSize: RFValue( 6 ), color:Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, lineHeight: 8
+              fontSize: RFValue( 6 ), color:Colors.textColorGrey, fontFamily: Fonts.Regular, lineHeight: 8
             }}>
               {props.subPoints4}
             </Text>}
@@ -231,7 +231,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     // opacity: 1,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.6
   },
   successModalAmountView: {
@@ -264,12 +264,12 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   proceedButtonSubText: {
     color: Colors.white,
     fontSize: RFValue( 8 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     lineHeight: 12
   },
   extraSubText:{
@@ -277,13 +277,13 @@ const styles = StyleSheet.create( {
     lineHeight:14,
     color: Colors.blue,
     letterSpacing: 0.7,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   scInfoText:{
     color: Colors.textColorGrey,
     // opacity: 1,
     fontSize: RFValue( 6 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.6,
     lineHeight: 8
   },

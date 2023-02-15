@@ -65,7 +65,7 @@ export default function GiftUnwrappedComponent( props ) {
               <Text style={{
                 color: Colors.gray4,
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
               }}>
                 {message}
               </Text>
@@ -73,7 +73,7 @@ export default function GiftUnwrappedComponent( props ) {
                 style={{
                   color: Colors.black,
                   fontSize: RFValue( 14 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                   marginVertical: RFValue( 4 )
                 }}
               >
@@ -145,7 +145,7 @@ export default function GiftUnwrappedComponent( props ) {
                   ? props.headerTextColor
                   : Colors.blue,
                 fontSize: RFValue( 18 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 letterSpacing: 0.01,
                 // marginTop: RFValue( 20 )
                 // width: wp( 65 )
@@ -180,7 +180,7 @@ export default function GiftUnwrappedComponent( props ) {
               {props.info2}
               <Text style={{
                 color:Colors.blue,
-                fontFamily: Fonts.FiraSansSemiBold,
+                fontFamily: Fonts.SemiBold,
                 fontStyle: 'italic'
               }}>{props.info2Selected}</Text>
             </Text>
@@ -292,7 +292,7 @@ const styles = StyleSheet.create( {
     color: Colors.lightTextColor,
     // opacity: 1,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.6
   },
   successModalAmountView: {
@@ -324,7 +324,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   accountSelectionView: {
     width: '90%',
@@ -343,12 +343,12 @@ const styles = StyleSheet.create( {
   availableToSpendText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     lineHeight: 15,
   },
   balanceText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
   },
 } )

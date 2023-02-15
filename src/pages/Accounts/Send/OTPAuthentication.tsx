@@ -420,7 +420,7 @@ export default function OTPAuthenticationScreen( { navigation } ) {
                 style={{
                   color: Colors.blue,
                   fontSize: RFValue( 13 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 Need Help?
@@ -503,12 +503,12 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   confirmModalButtonView: {
     height: wp( '13%' ),
@@ -527,7 +527,7 @@ const styles = StyleSheet.create( {
   confirmButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   passcodeTextInputView: {
     flexDirection: 'row',

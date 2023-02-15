@@ -80,7 +80,7 @@ export default function RequestModalContents( props ) {
                   <Text
                     style={{
                       color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
+                      fontFamily: Fonts.Regular,
                       fontSize: RFValue( 11 ),
                       marginLeft: 25,
                       paddingTop: 5,
@@ -105,7 +105,7 @@ export default function RequestModalContents( props ) {
                     <Text
                       style={{
                         color: Colors.textColorGrey,
-                        fontFamily: Fonts.FiraSansRegular,
+                        fontFamily: Fonts.Regular,
                         fontSize: RFValue( 10 ),
                         marginLeft: 25,
                         paddingTop: 3,
@@ -118,7 +118,7 @@ export default function RequestModalContents( props ) {
                     <Text
                       style={{
                         color: Colors.textColorGrey,
-                        fontFamily: Fonts.FiraSansRegular,
+                        fontFamily: Fonts.Regular,
                         fontSize: RFValue( 10 ),
                         marginLeft: 25,
                         paddingTop: 3,
@@ -258,14 +258,14 @@ const styles = StyleSheet.create( {
   },
   commModeModalHeaderText: {
     color: Colors.blue,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 18 ),
     marginLeft: 25,
     marginRight: 25,
   },
   commModeModalInfoText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     marginLeft: 25,
     marginRight: 25,
@@ -289,7 +289,7 @@ const styles = StyleSheet.create( {
   contactNameText: {
     color: Colors.black,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 25,
   },
   contactIconImage: {
@@ -313,7 +313,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 10,
   },
 } )

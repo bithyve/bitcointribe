@@ -49,7 +49,7 @@ const styles = StyleSheet.create( {
   },
   knowMoreButtonText: {
     color: Colors.white,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
   },
 } )

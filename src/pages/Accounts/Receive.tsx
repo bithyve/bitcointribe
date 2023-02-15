@@ -284,7 +284,7 @@ export default function Receive( props ) {
                   <Text
                     style={{
                       color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
+                      fontFamily: Fonts.Regular,
                       fontSize: RFValue( 12 ),
                     }}
                   >
@@ -455,7 +455,7 @@ const styles = StyleSheet.create( {
     flex: 1,
     paddingLeft: 20,
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 13 ),
   },
   QRView: {
@@ -468,7 +468,7 @@ const styles = StyleSheet.create( {
   },
   titleText: {
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
   text: {

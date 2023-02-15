@@ -32,7 +32,7 @@ export default function NoInternetModalContents( props ) {
       <Text style={{
         ...styles.modalInfoTextOpacity, marginTop: wp( '3%' )
       }}>{`${strings.there}\n`}<Text style={{
-          fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle: 'italic', color:'#605f5f'
+          fontFamily: Fonts.MediumItalic, fontWeight: 'bold', fontStyle: 'italic', color:'#605f5f'
         }}>{`${strings.internet}`}</Text></Text>
     </View>
     <View style={styles.successModalAmountView}>
@@ -107,7 +107,7 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     letterSpacing: 0.54,
     fontWeight:'400',
     marginTop:wp( '3%' )
@@ -115,14 +115,14 @@ const styles = StyleSheet.create( {
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.6,
     opacity: 1
   },
   modalInfoTextOpacity:{
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.6,
     opacity: 0.7,
     fontWeight:'400'
@@ -137,7 +137,7 @@ const styles = StyleSheet.create( {
   successModalWalletNameText: {
     color: Colors.black,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   successModalAmountImage: {
     width: wp( '3%' ),
@@ -148,13 +148,13 @@ const styles = StyleSheet.create( {
   },
   successModalAmountText: {
     color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 21 ),
     marginRight: 5
   },
   successModalAmountUnitText: {
     color: Colors.borderColor,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
   },
   successModalAmountInfoView: {
@@ -186,6 +186,6 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   },
 } )

@@ -215,7 +215,7 @@ const GiftDetails = ( { navigation } ) => {
                 style={{
                   color: Colors.lightTextColor,
                   fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                   fontWeight: '600',
                 }}
               >
@@ -225,7 +225,7 @@ const GiftDetails = ( { navigation } ) => {
                 style={{
                   color: Colors.lightTextColor,
                   fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 {moment( gift.timestamps.created ).format( 'lll' )}
@@ -264,7 +264,7 @@ const GiftDetails = ( { navigation } ) => {
                     style={{
                       color: Colors.textColorGrey,
                       fontSize: RFValue( 11 ),
-                      fontFamily: Fonts.FiraSansRegular,
+                      fontFamily: Fonts.Regular,
                       fontWeight: '600',
                     }}
                   >
@@ -285,7 +285,7 @@ const GiftDetails = ( { navigation } ) => {
                   style={{
                     color: Colors.black,
                     fontSize: RFValue( 18 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     marginHorizontal: wp( 2 ),
                   }}
                 >
@@ -294,7 +294,7 @@ const GiftDetails = ( { navigation } ) => {
                     style={{
                       color: Colors.lightTextColor,
                       fontSize: RFValue( 10 ),
-                      fontFamily: Fonts.FiraSansRegular,
+                      fontFamily: Fonts.Regular,
                     }}
                   >
                     {prefersBitcoin ? ' sats' : ` ${currencyCode}`}
@@ -322,7 +322,7 @@ const GiftDetails = ( { navigation } ) => {
                   style={{
                     color: Colors.lightTextColor,
                     fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     fontWeight: '600',
                   }}
                 >
@@ -375,7 +375,7 @@ const GiftDetails = ( { navigation } ) => {
                   style={{
                     color: Colors.lightTextColor,
                     fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     fontWeight: '600',
                   }}
                 >
@@ -398,7 +398,7 @@ const GiftDetails = ( { navigation } ) => {
                       color: Colors.textColorGrey,
                       fontSize: RFValue( 10 ),
                       letterSpacing: 0.5,
-                      fontFamily: Fonts.FiraSansRegular,
+                      fontFamily: Fonts.Regular,
                     }}
                   >
                     {gift.note}
@@ -424,7 +424,7 @@ const GiftDetails = ( { navigation } ) => {
                 style={{
                   ...styles.modalTitleText,
                   fontSize: 14,
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
               Second Factor used for encryption
@@ -471,7 +471,7 @@ const GiftDetails = ( { navigation } ) => {
                       style={{
                         color: Colors.lightTextColor,
                         fontSize: RFValue( 10 ),
-                        fontFamily: Fonts.FiraSansRegular,
+                        fontFamily: Fonts.Regular,
                         fontWeight: '600',
                       }}
                     >
@@ -542,7 +542,9 @@ const GiftDetails = ( { navigation } ) => {
         {gift.status === GiftStatus.SENT && gift.type === GiftType.SENT ? (
           bottomButton( () => {
             dispatch( reclaimGift( gift.id ) )
-            navigation.navigate( 'ManageGifts', {giftType : '1'})
+            navigation.navigate( 'ManageGifts', {
+              giftType : '1'
+            } )
           }, 'Reclaim' )
         ) : null}
         {/* Resend */}
@@ -581,7 +583,7 @@ const styles = StyleSheet.create( {
   subText: {
     color: Colors.lightTextColor,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   dot: {
     height: 8,
@@ -653,7 +655,7 @@ const styles = StyleSheet.create( {
     color: Colors.white,
     fontSize: RFValue( 11 ),
     letterSpacing: 0.5,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'center',
     width: wp( '46%' ),
   },
@@ -661,7 +663,7 @@ const styles = StyleSheet.create( {
     color: Colors.backgroundColor1,
     fontSize: RFValue( 15 ),
     letterSpacing: 0.01,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     // marginLeft: 10,
     // marginRight: 10,
     marginLeft: 0,
@@ -679,12 +681,12 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: wp( 10 ),
   },
   modalContentContainer: {
@@ -746,7 +748,7 @@ const styles = StyleSheet.create( {
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     backgroundColor: Colors.white,
   },
   inputBox: {
@@ -757,7 +759,7 @@ const styles = StyleSheet.create( {
     paddingLeft: 15,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   // inputBoxFocused: {
   //   borderWidth: 0.5,
@@ -779,18 +781,18 @@ const styles = StyleSheet.create( {
   availableToSpendText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     lineHeight: 15,
   },
   balanceText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
   },
   proceedButtonText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   selectedContactsView: {
     flexDirection: 'row',
@@ -803,7 +805,7 @@ const styles = StyleSheet.create( {
   },
   contactText: {
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
   },
   cardContainer:{
@@ -821,7 +823,7 @@ const styles = StyleSheet.create( {
     color:'#006DB4',
     fontSize:13,
     fontWeight:'400',
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
 
   },
   identificationDescription:{
@@ -829,7 +831,7 @@ const styles = StyleSheet.create( {
     fontSize:11,
     fontWeight:'400',
     width:225,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
 
   },
   radioBtnContainer:{
@@ -869,12 +871,12 @@ const styles = StyleSheet.create( {
     color: '#fff',
     fontWeight:'500',
     fontSize:15,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   deepLinkEncryptionText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: wp( 10 ),
     justifyContent:'center',
     textAlign: 'center',

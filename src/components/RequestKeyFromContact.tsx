@@ -36,7 +36,7 @@ function RequestKeyFromContact( props ) {
   const [ shareLink, setShareLink ] = useState( '' )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
-  const contact = props.contact && props.contact.contactDetails && props.contact.contactDetails[0]
+  const contact = props.contact && props.contact.contactDetails && props.contact.contactDetails[ 0 ]
   const [ serviceType, setServiceType ] = useState(
     props.serviceType ? props.serviceType : '',
   )
@@ -152,12 +152,12 @@ function RequestKeyFromContact( props ) {
             <View style={styles.contactProfileImageContainer}>
               {contact ? Object.keys( contact ).length !== 0 ? contact.imageAvailable ?
 
-               <Image
+                <Image
                   source={contact && contact.image}
                   style={{
                     ...styles.contactProfileImage
                   }}
-                /> 
+                />
 
 
                 : (
@@ -166,9 +166,9 @@ function RequestKeyFromContact( props ) {
                       alignItems: 'center',
                       justifyContent: 'center',
                       backgroundColor: Colors.backgroundColor,
-                      width: wp(15),
-                      height: wp(15),
-                      borderRadius: wp(7.5),
+                      width: wp( 15 ),
+                      height: wp( 15 ),
+                      borderRadius: wp( 7.5 ),
                       // shadowColor: Colors.shadowBlue,
                       // shadowOpacity: 1,
                       // shadowOffset: {
@@ -206,7 +206,7 @@ function RequestKeyFromContact( props ) {
               <Text style={{
                 color: Colors.lightTextColor,
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 marginTop: hp( 0.3 ),
                 lineHeight: 12
               }}>
@@ -219,7 +219,7 @@ function RequestKeyFromContact( props ) {
                   <Text style={{
                     color: Colors.blue,
                     fontSize: RFValue( 14 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     marginTop: hp( 0.01 ),
                     letterSpacing: 5,
                     lineHeight: 30,
@@ -232,7 +232,7 @@ function RequestKeyFromContact( props ) {
                   <Text style={{
                     color: Colors.blue,
                     fontSize: RFValue( 14 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     marginTop: hp( 0.01 ),
                     lineHeight: 30, width: wp( '54%' )
                   }}>
@@ -243,7 +243,7 @@ function RequestKeyFromContact( props ) {
                   <Text style={{
                     color: Colors.blue,
                     fontSize: RFValue( 14 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     marginTop: hp( 0.01 ),
                     letterSpacing: 5,
                     lineHeight: 30,
@@ -258,7 +258,7 @@ function RequestKeyFromContact( props ) {
                 <Text style={{
                   color: Colors.textColorGrey,
                   fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansMediumItalic,
+                  fontFamily: Fonts.MediumItalic,
                 }}>
                   {contact.name}
                 </Text>
@@ -267,13 +267,13 @@ function RequestKeyFromContact( props ) {
                   <Text style={{
                     color: Colors.lightTextColor,
                     fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     lineHeight: 27
                   }}>
                   from <Text style={{
                       color: Colors.textColorGrey,
                       fontSize: RFValue( 11 ),
-                      fontFamily: Fonts.FiraSansMediumItalic,
+                      fontFamily: Fonts.MediumItalic,
                     }}>
                       {props.accountName}
                     </Text>
@@ -281,7 +281,7 @@ function RequestKeyFromContact( props ) {
                   <Text style={{
                     color: Colors.lightTextColor,
                     fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     marginTop: hp( 0.3 ),
                     lineHeight: 12
                   }}>
@@ -298,13 +298,13 @@ function RequestKeyFromContact( props ) {
               {/* <Text style={{
               color: Colors.black,
               fontSize: RFValue( 24 ),
-              fontFamily: Fonts.FiraSansRegular
+              fontFamily: Fonts.Regular
             }}>
               {props.amt}
               <Text style={{
                 color: Colors.lightTextColor,
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular
+                fontFamily: Fonts.Regular
               }}> sats
               </Text>
             </Text> */}
@@ -323,7 +323,7 @@ function RequestKeyFromContact( props ) {
           fontSize: RFValue( 12 ),
           letterSpacing: 0.6,
           // marginBottom: 2,
-          // fontFamily: Fonts.FiraSansRegular,
+          // fontFamily: Fonts.Regular,
           marginHorizontal: wp( 6 ),
           marginRight: wp( 10 ),
           lineHeight: 18,
@@ -436,16 +436,16 @@ function RequestKeyFromContact( props ) {
 }
 const styles = StyleSheet.create( {
   contactProfileImage: {
-    width: wp(12),
-    height: wp(12),
+    width: wp( 12 ),
+    height: wp( 12 ),
     resizeMode: 'cover',
-    borderRadius: wp(6),
+    borderRadius: wp( 6 ),
   },
   contactProfileImageContainer: {
-    width: wp(15),
-    height: wp(15),
+    width: wp( 15 ),
+    height: wp( 15 ),
     resizeMode: 'cover',
-    borderRadius: wp(7.5),
+    borderRadius: wp( 7.5 ),
     backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
@@ -535,7 +535,7 @@ const styles = StyleSheet.create( {
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingLeft: 15,
     width: '90%'
 
@@ -544,7 +544,7 @@ const styles = StyleSheet.create( {
     width: wp( 90 ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'justify',
     lineHeight: 18,
     marginLeft: wp( 5 ),
@@ -553,13 +553,13 @@ const styles = StyleSheet.create( {
   titleStyle: {
     color: Colors.black,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 25,
   },
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalContainer: {
     backgroundColor: Colors.backgroundColor,
@@ -603,7 +603,7 @@ const styles = StyleSheet.create( {
   subHeaderText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingTop: 5,
   },
   mainView: {

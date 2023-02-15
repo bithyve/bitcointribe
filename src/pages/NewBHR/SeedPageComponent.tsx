@@ -427,7 +427,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   selectedHistoryCard: {
     margin: wp( '3%' ),
@@ -465,12 +465,12 @@ const styles = StyleSheet.create( {
   historyCardTitleText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   historyCardDateText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 9 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 'auto',
   },
   bottomButtonView: {
@@ -510,13 +510,13 @@ const styles = StyleSheet.create( {
   numberText: {
     color: Colors.numberFont,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     // marginEnd: 10
   },
   nameText: {
     color: Colors.greyTextColor,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginStart: 25
   },
   modalInputContainer:{
@@ -533,7 +533,7 @@ const styles = StyleSheet.create( {
     // height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     // borderRadius: 10,
     // borderColor: '#E3E3E3',
     // borderWidth: 1

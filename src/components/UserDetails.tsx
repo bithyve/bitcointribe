@@ -27,7 +27,7 @@ const styles = StyleSheet.create( {
   contactNameText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 25,
   },
   contactProfileImage: {
@@ -76,7 +76,7 @@ const styles = StyleSheet.create( {
   },
   contactText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     marginLeft: 25,
     paddingTop: 5,
@@ -84,14 +84,14 @@ const styles = StyleSheet.create( {
   },
   phoneNumber: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 10 ),
     marginLeft: 25,
     paddingTop: 3,
   },
   emailView: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 10 ),
     marginLeft: 25,
     paddingTop: 3,
@@ -99,7 +99,7 @@ const styles = StyleSheet.create( {
   },
   contactName: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 10 ),
     marginLeft: 25,
     paddingTop: 3,

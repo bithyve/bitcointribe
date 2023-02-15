@@ -86,26 +86,26 @@ export default function ConfirmSeedWordsModal( props ) {
           // marginBottom: wp( '%' ),
           color: Colors.blue,
           fontSize: RFValue( 18 ),
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Regular,
           marginHorizontal: wp( '5%' ),
           marginTop: 30
         }} >{'Confirm backup phrase'}</Text>
         <Text style={{
           color: Colors.lightTextColor,
           fontSize: RFValue( 11 ),
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Regular,
           marginHorizontal: wp( '5%' ),
           marginTop: 5
         }}>{'Key in the word exactly like it was displayed'}</Text>
         <Text style={{
           color: Colors.lightTextColor,
           fontSize: RFValue( 14 ),
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Regular,
           marginHorizontal: wp( '5%' ),
           marginTop: RFValue( 25 )
         }}>{'Enter the '}
           <Text style={{
-            fontFamily: Fonts.FiraSansMedium
+            fontFamily: Fonts.Medium
           }}>{getSeedNumber( props.seedNumber ) + ' word'}</Text></Text>
         <View
           style={{
@@ -266,7 +266,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   bottomButtonView: {
     flexDirection: 'row',
@@ -286,7 +286,7 @@ const styles = StyleSheet.create( {
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingLeft: 15,
 
   },
@@ -318,6 +318,6 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )

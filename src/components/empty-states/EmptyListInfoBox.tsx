@@ -34,13 +34,13 @@ const styles = StyleSheet.create({
   bodyText: {
     color: Colors.textColorGrey,
     fontSize: RFValue(12),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   headingText: {
     color: Colors.blue,
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 });
 

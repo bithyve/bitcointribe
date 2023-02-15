@@ -112,7 +112,7 @@ export default function HealthCheckSecurityQuestionModalContents( props ) {
                                 backgroundColor: dropdownBoxValue.id == value.id ? Colors.lightBlue : Colors.white,
                               }}>
                                 <Text style={{
-                                  color: dropdownBoxValue.id == value.id ? Colors.blue : Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 )
+                                  color: dropdownBoxValue.id == value.id ? Colors.blue : Colors.black, fontFamily: Fonts.Regular, fontSize: RFValue( 12 )
                                 }}>{value.question}</Text>
                               </AppBottomSheetTouchableWrapper>
                             )}
@@ -159,7 +159,7 @@ export default function HealthCheckSecurityQuestionModalContents( props ) {
           />
           {errorText ?
             <Text style={{
-              marginLeft: 'auto', color: Colors.red, fontSize: RFValue( 10 ), fontFamily: Fonts.FiraSansMediumItalic,
+              marginLeft: 'auto', color: Colors.red, fontSize: RFValue( 10 ), fontFamily: Fonts.MediumItalic,
             }}>{errorText}</Text> : null
           }
           <Text style={styles.modalInfoText}>Security question and answer is never stored anywhere{'\n'}and even your contacts don’t know this answer</Text>
@@ -193,16 +193,16 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalInfoText: {
     marginTop: hp( '6%' ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   dropdownBoxText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 )
   },
   dropdownBoxModal: {
@@ -280,7 +280,7 @@ const styles = StyleSheet.create( {
     paddingLeft: 15,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   inputBoxFocused: {
     borderWidth: 0.5,
@@ -297,11 +297,11 @@ const styles = StyleSheet.create( {
       width: 2, height: 2
     },
     backgroundColor: Colors.white,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   },
 } )

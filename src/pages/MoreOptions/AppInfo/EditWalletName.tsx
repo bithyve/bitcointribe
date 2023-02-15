@@ -91,7 +91,7 @@ export default function EditWalletName( props ) {
         >
           <Text
             style={{
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.Medium,
               color: Colors.blue
             }}
           >
@@ -314,7 +314,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   bottomButtonView: {
     flexDirection: 'row',
@@ -352,7 +352,7 @@ const styles = StyleSheet.create( {
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingLeft: 15,
     width: '80%'
 
@@ -380,21 +380,21 @@ const styles = StyleSheet.create( {
   modalBoldText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     letterSpacing: 0.6,
     lineHeight: 18
   },
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     // width: wp( 30 ),
   },
   modalInfoText: {
     marginRight: wp( 4 ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'justify',
     letterSpacing: 0.6,
     lineHeight: 18

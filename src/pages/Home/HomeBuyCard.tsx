@@ -98,7 +98,7 @@ const HomeBuyCard = ( {
           color: Colors.blue,
           fontSize: RFValue( 11 ),
           marginLeft: 5,
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Regular,
           alignSelf: 'flex-start',
           letterSpacing: 0.33,
           fontWeight:'500'
@@ -185,7 +185,7 @@ const HomeBuyCard = ( {
 //     color: Colors.blue,
 //     fontSize: RFValue( 11 ),
 //     letterSpacing: 0.33,
-//     fontFamily: Fonts.FiraSansRegular,
+//     fontFamily: Fonts.Regular,
 //   },
 //   subTitleStyle: {
 //     color: Colors.gray8,

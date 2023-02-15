@@ -334,14 +334,14 @@ const styles = StyleSheet.create( {
   },
 
   title1Text: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 15 ),
     color: Colors.white,
     letterSpacing: 0.01
   },
 
   title2Text: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     color: Colors.white,
     marginTop: 2,
@@ -355,13 +355,13 @@ const styles = StyleSheet.create( {
   },
 
   balanceAmountText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: 21,
   },
 
   balanceUnitText: {
     fontSize: 13,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   balanceCurrencyIcon: {

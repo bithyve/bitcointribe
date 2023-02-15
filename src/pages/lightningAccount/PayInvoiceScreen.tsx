@@ -266,7 +266,7 @@ export default class PayInvoiceScreen extends React.Component<
                       />
                       <Text style={{
                         ...ListStyles.listItemSubtitle,
-                        fontFamily: Fonts.FiraSansItalic,
+                        fontFamily: Fonts.Italic,
                       }}>{' sats'}</Text>
                     </View>
                   </View>
@@ -288,7 +288,7 @@ export default class PayInvoiceScreen extends React.Component<
                     </Text>
                     <Text style={{
                       ...ListStyles.listItemSubtitle,
-                      fontFamily: Fonts.FiraSansItalic,
+                      fontFamily: Fonts.Italic,
                       color: Colors.blue,
                     }}>{`Balance ${this.props.BalanceStore.lightningBalance} sats`}</Text>
                   </View>
@@ -495,7 +495,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   lineItem: {
     marginBottom: RFValue( 16 ),

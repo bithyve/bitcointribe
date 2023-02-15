@@ -443,7 +443,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   //                       paddingHorizontal: 15,
   //                       fontSize: RFValue( 13 ),
   //                       letterSpacing: 0.26,
-  //                       fontFamily: Fonts.FiraSansRegular,
+  //                       fontFamily: Fonts.Regular,
   //                     }}
   //                     placeholder={'Enter Address'}
   //                     placeholderTextColor={Colors.borderColor}
@@ -464,7 +464,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   //                       paddingHorizontal: 15,
   //                       fontSize: RFValue( 13 ),
   //                       letterSpacing: 0.26,
-  //                       fontFamily: Fonts.FiraSansRegular,
+  //                       fontFamily: Fonts.Regular,
   //                     }}
   //                     placeholder={'Enter Token'}
   //                     placeholderTextColor={Colors.borderColor}
@@ -656,7 +656,7 @@ const styles = StyleSheet.create( {
     paddingLeft: 30,
     color: Colors.lightTextColor,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontWeight: '600',
     marginTop: 3,
     backgroundColor: Colors.white,
@@ -668,7 +668,7 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     marginHorizontal: 20,
     marginVertical: 20,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   bodySection: {
     marginTop: 24,

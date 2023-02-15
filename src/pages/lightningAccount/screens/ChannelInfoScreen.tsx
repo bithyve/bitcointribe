@@ -286,7 +286,7 @@ export default class ChannelInfoScreen extends Component {
           }}>
             <Text style={{
               fontSize:RFValue( 17 ),
-              fontFamily:Fonts.FiraSansRegular,
+              fontFamily:Fonts.Regular,
               color:Colors.blue,
               marginBottom: 17
             }}>
@@ -379,7 +379,7 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     marginHorizontal: 20,
     marginVertical: 20,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   bodySection: {
@@ -412,7 +412,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     marginBottom: 2,
     // fontWeight: 'bold',
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   subtitleText: {
@@ -446,7 +446,7 @@ const styles = StyleSheet.create( {
     },
   },
   amountText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 17 ),
   },
   bitcoinImage: {
@@ -458,7 +458,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.black,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   buttonView: {
     flexDirection:'row',
@@ -551,12 +551,12 @@ const styles = StyleSheet.create( {
     width: '90%',
   },
   priceText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 16 ),
     color: Colors.black,
   },
   sats: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 10 ),
     color: Colors.gray10,
   },

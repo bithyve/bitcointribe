@@ -20,7 +20,7 @@ const NavStyles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     textAlign: 'left',
     marginHorizontal: 0,
   },
@@ -28,14 +28,14 @@ const NavStyles = StyleSheet.create( {
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: 10,
     flexWrap: 'wrap',
   },
 
   modalHeaderSubtitleText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
   },
 

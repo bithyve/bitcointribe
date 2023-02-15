@@ -165,7 +165,7 @@ const styles = StyleSheet.create( {
     borderRadius: wp( 14 )/2,
   },
   destinationTitleText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 20 ),
     color: Colors.black,
   },

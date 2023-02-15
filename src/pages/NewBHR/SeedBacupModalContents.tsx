@@ -47,7 +47,7 @@ export default function SeedBacupModalContents( props ) {
                 ? props.headerTextColor
                 : Colors.blue,
               fontSize: RFValue( 18 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               letterSpacing: 0.54
               // width: wp( 65 )
             }}
@@ -64,7 +64,7 @@ export default function SeedBacupModalContents( props ) {
 
                 color: Colors.lightTextColor,
                 fontSize: RFValue( 11 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 // marginHorizontal: wp( '5%' ),
                 // marginTop: 5
               }}
@@ -86,7 +86,7 @@ export default function SeedBacupModalContents( props ) {
                       height: 6, width: 6, borderRadius: 3, backgroundColor: Colors.gray4, alignSelf: 'center'
                     }}/>
                     <Text style={{
-                      color: Colors.textColorGrey, opacity: 1, fontSize: RFValue( 12 ), letterSpacing: 0.6, fontFamily: Fonts.FiraSansRegular, marginLeft: wp( 2 )
+                      color: Colors.textColorGrey, opacity: 1, fontSize: RFValue( 12 ), letterSpacing: 0.6, fontFamily: Fonts.Regular, marginLeft: wp( 2 )
                     }}>
                       {item}
                     </Text>
@@ -142,7 +142,7 @@ export default function SeedBacupModalContents( props ) {
                       height: hp( 2 ), width: wp( 0.3 ), backgroundColor: Colors.gray1, marginHorizontal: wp( 4 )
                     }} />
                     <Text style={{
-                      color: Colors.textColorGrey, opacity: 1, fontSize: RFValue( 11 ), letterSpacing: 0.6, fontFamily: Fonts.FiraSansRegular,
+                      color: Colors.textColorGrey, opacity: 1, fontSize: RFValue( 11 ), letterSpacing: 0.6, fontFamily: Fonts.Regular,
                     }}>
                       {item.link}
                     </Text>
@@ -259,7 +259,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     opacity: 1,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.6
   },
   successModalAmountView: {
@@ -292,6 +292,6 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )

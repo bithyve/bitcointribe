@@ -317,7 +317,7 @@ const GiftDetails = ({ navigation }) => {
             }}
           >
             <Text style={{
-              ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.FiraSansRegular
+              ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.Regular
             }}>Add Second Factor</Text>
           </View>
 
@@ -326,7 +326,7 @@ const GiftDetails = ({ navigation }) => {
               ...styles.modalInfoText,
               paddingTop: 8,
               marginLeft: 30,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: 14,
             }}
           >
@@ -338,7 +338,7 @@ const GiftDetails = ({ navigation }) => {
             ...styles.modalInfoText,
             paddingTop: 8,
             marginLeft: 30,
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             fontSize: 14,
             marginTop: 40
           }}>Use a different medium/app for sending the 2nd factor.(Not the same as the gift link/QR)</Text>
@@ -377,13 +377,13 @@ const GiftDetails = ({ navigation }) => {
             }}
           >
             <Text style={{
-              ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.FiraSansRegular, color: 'grey',
+              ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.Regular, color: 'grey',
             }}>Add Second Factor</Text>
             <Text
               style={{
                 ...styles.modalInfoText,
                 color: '#006DB4',
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: 18,
               }}
             >
@@ -396,7 +396,7 @@ const GiftDetails = ({ navigation }) => {
               ...styles.modalInfoText,
               paddingTop: 8,
               marginLeft: 30,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: 12,
             }}
           >
@@ -408,7 +408,7 @@ const GiftDetails = ({ navigation }) => {
             ...styles.modalInfoText,
             paddingTop: 8,
             marginLeft: 30,
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             fontSize: 14,
             marginTop: 50
           }}>The option selected above will be used to encrypt your Gift Sats. Don't use the medium</Text>
@@ -476,13 +476,13 @@ const GiftDetails = ({ navigation }) => {
             }}
           >
             <Text style={{
-              ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.FiraSansRegular, color: 'grey'
+              ...styles.modalTitleText, fontSize: 18, fontFamily: Fonts.Regular, color: 'grey'
             }}>Add Second Factor</Text>
             <Text
               style={{
                 ...styles.modalInfoText,
                 color: '#006DB4',
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: 18,
               }}
             >
@@ -941,7 +941,7 @@ const GiftDetails = ({ navigation }) => {
             style={[
               styles.modalInputBox,
               {
-                fontFamily: Fonts.FiraSansItalic,
+                fontFamily: Fonts.Italic,
               },
             ]}
             placeholder={`Add a personal note (${common.optional})`}
@@ -987,7 +987,7 @@ const GiftDetails = ({ navigation }) => {
             <Text style={{
               color: Colors.textColorGrey,
               fontSize: RFValue(12),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginHorizontal: wp(3)
             }}>
               Add recipient to Friends and Family
@@ -1031,7 +1031,7 @@ const styles = StyleSheet.create({
   titleText: {
     color: Colors.textColorGrey,
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginHorizontal: wp(2)
   },
   dropdownBox: {
@@ -1070,7 +1070,7 @@ const styles = StyleSheet.create({
   },
   dropdownBoxText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue(13),
     marginRight: 15,
   },
@@ -1129,7 +1129,7 @@ const styles = StyleSheet.create({
   subText: {
     color: Colors.lightTextColor,
     fontSize: RFValue(11),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginHorizontal: wp(2),
     width: 240,
   },
@@ -1201,7 +1201,7 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: RFValue(11),
     letterSpacing: 0.5,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'center',
     width: wp('46%')
   },
@@ -1209,7 +1209,7 @@ const styles = StyleSheet.create({
     color: Colors.backgroundColor1,
     fontSize: RFValue(15),
     letterSpacing: 0.01,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     // marginLeft: 10,
     // marginRight: 10,
     marginLeft: 0,
@@ -1227,12 +1227,12 @@ const styles = StyleSheet.create({
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue(12),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: wp(10)
   },
   modalContentContainer: {
@@ -1291,7 +1291,7 @@ const styles = StyleSheet.create({
     //height: 50,
     fontSize: RFValue(13),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingHorizontal: 15,
     width: '90%',
     paddingVertical: 7,
@@ -1329,18 +1329,18 @@ const styles = StyleSheet.create({
   availableToSpendText: {
     color: Colors.blue,
     fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     lineHeight: 15,
   },
   balanceText: {
     color: Colors.blue,
     fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
   },
   proceedButtonText: {
     color: Colors.blue,
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   },
   selectedContactsView: {
     flexDirection: 'row',
@@ -1353,7 +1353,7 @@ const styles = StyleSheet.create({
   },
   contactText: {
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
   },
   headerLeftIconInnerContainer: {
@@ -1374,7 +1374,7 @@ const styles = StyleSheet.create({
     color: '#006DB4',
     fontSize: 13,
     fontWeight: '400',
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
 
   },
   identificationDescription: {
@@ -1382,7 +1382,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '400',
     width: 225,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
 
   },
   radioBtnContainer: {
@@ -1423,7 +1423,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '500',
     fontSize: 15,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   menuIcon: {
     paddingTop: hp(0.6),

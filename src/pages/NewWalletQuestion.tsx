@@ -494,7 +494,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               style={{
                 color: Colors.blue,
                 fontSize: RFValue( 18 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
               }}
             >
               {strings.HexaWalletcreated}
@@ -590,7 +590,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                 style={{
                   fontSize: RFValue( 13 ),
                   color: Colors.white,
-                  fontFamily: Fonts.FiraSansMedium,
+                  fontFamily: Fonts.Medium,
                   alignSelf: 'center',
                 }}
               >{`${strings.UseStrongPasscode}`}</Text>
@@ -607,7 +607,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                 style={{
                   fontSize: RFValue( 13 ),
                   color: Colors.blue,
-                  fontFamily: Fonts.FiraSansMedium,
+                  fontFamily: Fonts.Medium,
                   alignSelf: 'center',
                   marginLeft: wp( '7%' ),
                 }}
@@ -670,7 +670,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               // marginBottom: wp( '%' ),
               color: Colors.blue,
               fontSize: RFValue( 18 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '8%' ),
             }}
           >
@@ -738,7 +738,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                 <Text
                   style={{
                     color: passwordScore > 3 ? Colors.green : passwordScore > 1 ? Colors.coral: Colors.red,
-                    fontFamily: Fonts.FiraSansItalic,
+                    fontFamily: Fonts.Italic,
                     fontSize: RFValue( 11 ),
                     marginLeft: 4,
                   }}
@@ -871,7 +871,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <Text
               style={{
                 color: Colors.red,
-                fontFamily: Fonts.FiraSansMediumItalic,
+                fontFamily: Fonts.MediumItalic,
                 fontSize: RFValue( 10 ),
                 marginLeft: 'auto',
               }}
@@ -957,7 +957,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               // marginBottom: wp( '%' ),
               color: Colors.blue,
               fontSize: RFValue( 18 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '6%' ),
             }}
           >
@@ -1011,7 +1011,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                     <Text
                       style={{
                         color: dropdownBoxValue.id == value.id ? Colors.blue : Colors.black,
-                        fontFamily: Fonts.FiraSansRegular,
+                        fontFamily: Fonts.Regular,
                         fontSize: RFValue( 12 ),
                       }}
                     >
@@ -1186,7 +1186,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <Text
               style={{
                 color: Colors.red,
-                fontFamily: Fonts.FiraSansMediumItalic,
+                fontFamily: Fonts.MediumItalic,
                 fontSize: RFValue( 10 ),
                 marginLeft: 'auto',
               }}
@@ -1229,7 +1229,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                         color: Colors.blue,
                         fontSize: RFValue( 13 ),
                         marginBottom: 2,
-                        fontFamily: Fonts.FiraSansRegular,
+                        fontFamily: Fonts.Regular,
                       }}
                     >
                       {strings.note}
@@ -1516,19 +1516,19 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         <WalletInitKnowMore index={knowMoreIndex} closeModal={() => setKnowMore( false )} />
       </ModalContainerScroll>
     </View>
-  ) 
+  )
 }
 
 const styles = StyleSheet.create( {
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.6,
     lineHeight: 18,
   },
   boldItalicText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     fontWeight: 'bold',
     fontStyle: 'italic',
     fontSize: RFValue( 12 ),
@@ -1585,7 +1585,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   bottomButtonView: {
     flexDirection: 'row',
@@ -1645,7 +1645,7 @@ const styles = StyleSheet.create( {
     height:30,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingLeft: 10,
   },
   modalInputBoxError:{
@@ -1653,13 +1653,13 @@ const styles = StyleSheet.create( {
     height:30,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingLeft: 10,
     width:wp( '60%' )
   },
   dropdownBoxText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     marginRight: 15,
   },
@@ -1686,7 +1686,7 @@ const styles = StyleSheet.create( {
   helpText: {
     fontSize: RFValue( 10 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     marginRight: wp( 5 ),
     alignSelf: 'flex-end',
     width: wp( '54%' ),
@@ -1718,13 +1718,13 @@ const styles = StyleSheet.create( {
   },
   contactText: {
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
   },
   textPasscode: {
     fontSize: RFValue( 18 ),
     color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     flex: 1,
     marginLeft: 8,
   },
@@ -1806,13 +1806,13 @@ const styles = StyleSheet.create( {
   checkBoxHeading:{
     color: Colors.checkBlue,
     fontSize: RFValue( 14 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft:wp( 4 )
   },
   checkBoxParagraph:{
     color: Colors.lightTextColor,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft:wp( 4 ),
     width:wp( '70%' ),
     marginTop:hp( 0.6 )
@@ -1826,6 +1826,6 @@ const styles = StyleSheet.create( {
     // color:Colors.green,
     fontSize: RFValue( 10 ),
     fontWeight:'600',
-    fontFamily: Fonts.FiraSansItalic
+    fontFamily: Fonts.Italic
   }
 } )

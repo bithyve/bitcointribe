@@ -117,7 +117,7 @@ export default function BackupMethods( { navigation } ) {
 
           </View>
           <Text style={{
-            fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: Colors.black, margin: 10, textAlign: 'center'
+            fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, color: Colors.black, margin: 10, textAlign: 'center'
           }}>
             { levelData[ 0 ].keeper1ButtonText}
           </Text>
@@ -155,7 +155,7 @@ export default function BackupMethods( { navigation } ) {
 
           </View>
           <Text style={{
-            fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: Colors.black, margin: 10, textAlign: 'center'
+            fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, color: Colors.black, margin: 10, textAlign: 'center'
           }}>
             Backup width Keeper
           </Text>

@@ -104,7 +104,7 @@ const DashedLargeContainer = ( props ) => {
             <Text style={{
               color: Colors.black,
               fontSize: RFValue( 14 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               // fontWeight: '700',
               letterSpacing: 0.01,
               lineHeight: 18
@@ -116,14 +116,14 @@ const DashedLargeContainer = ( props ) => {
               fontSize: RFValue( 11 ),
               letterSpacing: 0.55,
               lineHeight: RFValue( 15 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginRight: wp( 3 ),
             }}>
               {'You have received a bitcoin gift from '}
               <Text style={{
                 color: Colors.blue,
                 fontSize: RFValue( 11 ),
-                fontFamily: Fonts.FiraSansItalic,
+                fontFamily: Fonts.Italic,
               }}>
                 {props.subText}
               </Text>
@@ -136,7 +136,7 @@ const DashedLargeContainer = ( props ) => {
             fontSize: RFValue( 10 ),
             letterSpacing: 0.12,
             lineHeight: RFValue( 18 ),
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
 
           }}>
             {moment( props.date ).format( 'lll' )}
@@ -155,21 +155,21 @@ const DashedLargeContainer = ( props ) => {
               fontSize: RFValue( 12 ),
               letterSpacing: 0.12,
               lineHeight: 18,
-              fontFamily: Fonts.FiraSansItalic,
+              fontFamily: Fonts.Italic,
             }}>
               {props.extraText ? props.isSend ? props.extraText.replace( /%20/g, ' ' ): getText( props.extraText ) : ''}
             </Text>
             <Text style={{
               color: Colors.blue,
               fontSize: RFValue( 24 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginVertical: hp( 1 )
             }}>
               {getAmt( props.amt )}
               <Text style={{
                 color: Colors.lightTextColor,
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular
+                fontFamily: Fonts.Regular
               }}> {prefersBitcoin ? ' sats' : currencyCode}
               </Text>
             </Text>

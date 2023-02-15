@@ -63,7 +63,7 @@ const styles = StyleSheet.create( {
   textInputContent: {
     height: '100%',
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 13 ),
   },
 } )
@@ -193,7 +193,7 @@ const SendScreen = inject(
         </Text>
 
         <Text style={{
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Regular,
           fontSize: RFValue( 11 ),
           fontStyle: 'italic',
           color: Colors.blue,

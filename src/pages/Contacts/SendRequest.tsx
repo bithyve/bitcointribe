@@ -77,7 +77,7 @@ const SendRequest = ( props ) => {
                 style={{
                   color: Colors.white,
                   fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 Done

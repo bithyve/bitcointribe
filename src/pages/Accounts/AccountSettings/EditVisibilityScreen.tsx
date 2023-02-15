@@ -148,7 +148,7 @@ const styles = StyleSheet.create( {
   confirmButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )
 

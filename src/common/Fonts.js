@@ -1,9 +1,8 @@
 export default {
-  FiraSansRegular: 'Montserrat-Regular',
-  FiraSansItalic: 'Montserrat-Italic',
-  FiraSansMedium: 'Montserrat-Medium',
-  FiraSansLight: 'Montserrat-Regular',
-  FiraSansSemiBold: 'Montserrat-Medium',
-  FiraSansMediumItalic: 'Montserrat-MediumItalic',
-  OpenSans: 'OpenSans'
+  Regular: 'Montserrat-Regular',
+  Italic: 'Montserrat-Italic',
+  Medium: 'Montserrat-Medium',
+  Light: 'Montserrat-Regular',
+  SemiBold: 'Montserrat-Medium',
+  MediumItalic: 'Montserrat-MediumItalic',
 }
