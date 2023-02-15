@@ -24,7 +24,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6182F79E250B2742005B6ECE"
-               BuildableName = "HEXA Stage.app"
+               BuildableName = "Bitcoin Tribe Stag.app"
                BlueprintName = "HEXA Stage"
                ReferencedContainer = "container:HEXA.xcodeproj">
             </BuildableReference>
@@ -54,7 +54,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6182F79E250B2742005B6ECE"
-            BuildableName = "HEXA Stage.app"
+            BuildableName = "Bitcoin Tribe Stag.app"
             BlueprintName = "HEXA Stage"
             ReferencedContainer = "container:HEXA.xcodeproj">
          </BuildableReference>
@@ -71,7 +71,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6182F79E250B2742005B6ECE"
-            BuildableName = "HEXA Stage.app"
+            BuildableName = "Bitcoin Tribe Stag.app"
             BlueprintName = "HEXA Stage"
             ReferencedContainer = "container:HEXA.xcodeproj">
          </BuildableReference>

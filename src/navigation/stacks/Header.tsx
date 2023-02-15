@@ -1760,7 +1760,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           // }} end={{
           //   x: 0.1, y: 0.1
           // }}
-          locations={[ 0, 1 ]}
+          locations={[ 0.55, 1 ]}
           style={{
             width: '100%',
             height: '100%',

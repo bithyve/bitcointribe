@@ -24,7 +24,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6182F772250B23D7005B6ECE"
-               BuildableName = "HEXA Dev.app"
+               BuildableName = "Bitcoin Tribe Dev.app"
                BlueprintName = "HEXA Dev"
                ReferencedContainer = "container:HEXA.xcodeproj">
             </BuildableReference>
@@ -54,7 +54,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "6182F772250B23D7005B6ECE"
-            BuildableName = "HEXA Dev.app"
+            BuildableName = "Bitcoin Tribe Dev.app"
             BlueprintName = "HEXA Dev"
             ReferencedContainer = "container:HEXA.xcodeproj">
          </BuildableReference>

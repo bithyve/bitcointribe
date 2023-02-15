@@ -35,6 +35,7 @@ import ManageGiftsList from './ManageGiftsList'
 import IconAdd from '../../assets/images/svgs/icon_add.svg'
 import IconAddLight from '../../assets/images/svgs/icon_add_dark.svg'
 import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
+import AccountCheckingHome from '../../assets/images/accIcons/icon_checking.svg'
 import GiftKnowMore from '../../components/know-more-sheets/GiftKnowMoreModel'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import RecipientAvatar from '../../components/RecipientAvatar'
@@ -266,7 +267,7 @@ const ManageGifts = ( props ) => {
         <View style={{
           flexDirection: 'row', marginHorizontal: 15, marginTop: 6, alignItems: 'flex-end'
         }}>
-          <CheckingAcc height={57} width={53} />
+          <AccountCheckingHome height={57} width={53} />
           <Text style={[ styles.pageTitle, {
             fontSize: RFValue( 24 ),
             marginStart: 13,
