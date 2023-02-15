@@ -442,7 +442,7 @@ const FNFToKeeper = ( props ) => {
               justifyContent: 'center'
             }}
           >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </AppBottomSheetTouchableWrapper>
           <View style={{
             flex:1,

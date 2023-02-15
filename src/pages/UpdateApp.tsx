@@ -198,8 +198,8 @@ export default function UpdateApp( props ) {
                 }}
               >
                 <FontAwesome
-                  name="long-arrow-left"
-                  color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                   size={17}
                 />
               </TouchableOpacity> ) : null}

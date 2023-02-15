@@ -55,7 +55,7 @@ const GoogleAuthenticatorOTP = props => {
             hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
             style={{ height: 30, width: 30, justifyContent: 'center' }}
           >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </TouchableOpacity>
           <Text style={styles.modalHeaderTitleText}>{''}</Text>
         </View>

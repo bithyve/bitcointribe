@@ -750,7 +750,7 @@ class GiftScreen extends React.Component<
             <GiftBoxComponent
               titleText={'Claim SATSCARD'}
               scTitleText={'TM'}
-              subTitleText={'Move sats from your SATSCARD'}
+              subTitleText={'Move sats from your SATSCARD™'}
               scSubText={'TM'}
               pendingSubText={' into your account.'}
               onPress={() => this.setState( {

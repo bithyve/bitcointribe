@@ -165,7 +165,7 @@ export default function OTPAuthenticationScreen( { navigation } ) {
           }}
         >
           <View style={commonStyle.headerLeftIconInnerContainer}>
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </View>
         </TouchableOpacity>
       </View>

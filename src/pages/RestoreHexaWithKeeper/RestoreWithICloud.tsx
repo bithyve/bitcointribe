@@ -934,8 +934,8 @@ class RestoreWithICloud extends Component<
               style={styles.headerBackArrowView}
             >
               <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                 size={17}
               />
             </TouchableOpacity>

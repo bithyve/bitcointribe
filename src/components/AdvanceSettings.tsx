@@ -35,7 +35,7 @@ export default function AdvanceSettings( props ) {
               height: 30, width: 30, justifyContent: 'center'
             }}
           >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </AppBottomSheetTouchableWrapper>
           <View style={{
             marginRight: 30

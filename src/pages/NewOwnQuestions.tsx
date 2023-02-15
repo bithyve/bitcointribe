@@ -275,7 +275,7 @@ export default function NewOwnQuestions( props ) {
                 <View style={CommonStyles.headerLeftIconInnerContainer}>
                   <FontAwesome
                     name="long-arrow-left"
-                    color={Colors.blue}
+                    color={Colors.homepageButtonColor}
                     size={17}
                   />
                 </View>
