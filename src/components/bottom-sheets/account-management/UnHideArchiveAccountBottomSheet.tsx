@@ -13,6 +13,7 @@ import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccou
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import useAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountShell'
 import { translations } from '../../../common/content/LocContext'
+import LinearGradient from 'react-native-linear-gradient'
 
 export type Props = {
   onProceed: ( accountShell ) => void;
@@ -29,6 +30,8 @@ const renderAccount = ( accountInfo ) => {
       marginBottom: wp( 5 ),
       padding: 10,
       backgroundColor: Colors.backgroundColor1,
+      height: hp( 10 ),
+      alignItems: 'center'
     }}>
       <View>
         {getAvatarForSubAccount( accountInfo, false, true )}
@@ -99,9 +102,18 @@ const UnHideArchiveAccountBottomSheet: React.FC<Props> = ( {
           <View style={styles.actionButtonContainer}>
             <TouchableOpacity
               onPress={( ) => onProceed( accountShell )}
-              style={ButtonStyles.primaryActionButton}
             >
-              <Text style={ButtonStyles.actionButtonText}>{accountInfo.visibility === AccountVisibility.HIDDEN ? 'Unhide' : 'Restore'}</Text>
+              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                start={{
+                  x: 0, y: 0
+                }} end={{
+                  x: 1, y: 0
+                }}
+                locations={[ 0.2, 1 ]}
+                style={ButtonStyles.primaryActionButton}
+              >
+                <Text style={ButtonStyles.actionButtonText}>{accountInfo.visibility === AccountVisibility.HIDDEN ? 'Unhide' : 'Restore'}</Text>
+              </LinearGradient>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={onBack}

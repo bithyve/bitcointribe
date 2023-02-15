@@ -607,7 +607,7 @@ export default function AddContactAddressBook( props ) {
                       onPress={() => onContactSelect( index )}
                       style={{
                         ...styles.contactView,
-                        backgroundColor: selected ? 'rgba(119, 185, 235, 0.4)' : null,
+                        backgroundColor: selected ? 'rgba(105, 162, 176, 0.4)' : null,
                       }}
                       key={index}
                       activeOpacity={0.1}
@@ -635,7 +635,7 @@ export default function AddContactAddressBook( props ) {
                           const i = item.name.split( ' ' ).length
                           return (
                             <Text style={{
-                              color: selected ? Colors.blue : Colors.black
+                              color: selected ? Colors.white : Colors.black
                             }}>
                               {index !== i - 1 ? `${x} ` :
                                 <Text style={{
@@ -922,7 +922,7 @@ const styles = StyleSheet.create( {
   },
   selectedContact: {
     padding: 12,
-    backgroundColor: '#77B9EB',
+    backgroundColor: Colors.testAccCard,
     borderRadius: 10,
     flexDirection: 'row',
     alignItems: 'center',

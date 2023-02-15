@@ -6,6 +6,7 @@ import ListStyles from '../../../common/Styles/ListStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { translations } from '../../../common/content/LocContext'
+import LinearGradient from 'react-native-linear-gradient'
 
 export type Props = {
 	isError: boolean;
@@ -47,9 +48,18 @@ const AccountArchiveBottomSheet: React.FC<Props> = ( {
         <View style={styles.actionButtonContainer}>
           <TouchableOpacity
             onPress={isError ? onViewAccount : onProceed}
-            style={ButtonStyles.primaryActionButton}
           >
-            <Text style={ButtonStyles.actionButtonText}>{isError ? strings.ViewAccount : common.continue}</Text>
+            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+              start={{
+                x: 0, y: 0
+              }} end={{
+                x: 1, y: 0
+              }}
+              locations={[ 0.2, 1 ]}
+              style={ButtonStyles.primaryActionButton}
+            >
+              <Text style={ButtonStyles.actionButtonText}>{isError ? strings.ViewAccount : common.continue}</Text>
+            </LinearGradient>
           </TouchableOpacity>
 
           <TouchableOpacity

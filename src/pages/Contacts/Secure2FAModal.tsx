@@ -17,6 +17,7 @@ import idx from 'idx'
 import * as ExpoContacts from 'expo-contacts'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { translations } from '../../common/content/LocContext'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function Secure2FA( props ) {
   const strings = translations[ 'f&f' ]
@@ -110,12 +111,20 @@ export default function Secure2FA( props ) {
             //props.navigation.navigate('SettingGetNewPin')
             //PinChangeSuccessBottomSheet.current.snapTo(1);
           }}
-          style={{
-            ...styles.proceedButtonView,
-            backgroundColor:Colors.blue,
-          }}
         >
-          <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            locations={[ 0.2, 1 ]}
+            style={{
+              ...styles.proceedButtonView,
+            }}
+          >
+            <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
 
@@ -206,11 +215,6 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
     marginBottom: hp( '1%' ),
   },
   proceedButtonText: {
