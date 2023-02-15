@@ -530,7 +530,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }} end={{
             x: 0.5, y: 1
           }}>
-          <StatusBar translucent={true} backgroundColor={'transparent'} barStyle="light-content"/>
+          <StatusBar translucent={false} backgroundColor={'transparent'} barStyle="light-content"/>
         </LinearGradient>
         {/* <StatusBar backgroundColor={Colors.blue} barStyle="light-content" /> */}
         <ModalContainer
