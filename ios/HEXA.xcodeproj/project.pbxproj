@@ -7,14 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0ABCF5EEB6A24513A21B391F /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 599B38ECC3EC4E4CB38D4C8A /* OpenSans-Bold.ttf */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		1ADDFE9EF1EA44B39CDB9BC2 /* OpenSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AD12BB582E724B3887BFFE64 /* OpenSans-Light.ttf */; };
 		1FD7ACE44B524CC0B1241553 /* Montserrat-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 95620CD1F8B44203A87BE6F7 /* Montserrat-SemiBold.ttf */; };
 		237CDD8180521336E8E128D3 /* libPods-HEXA Stage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 949B4AD1F401C3AF3EF614E5 /* libPods-HEXA Stage.a */; };
-		2F039E5F6FF845818DEC1F4D /* OpenSans-SemiboldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DAD1674B7394413A82B21AF7 /* OpenSans-SemiboldItalic.ttf */; };
 		33C70E76106F4F649FE7BB6A /* Montserrat-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C4CEFC8792754D17B591C320 /* Montserrat-Light.ttf */; };
 		4929D5DDD981494BB7FF83DD /* Montserrat-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 63D24441726E4404BC7B7B2E /* Montserrat-Regular.ttf */; };
 		4D38330326009EDE00F82BDB /* iCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF1689125FB8FCF0038E126 /* iCloud.m */; };
@@ -25,7 +22,6 @@
 		4D3833092600BD1400F82BDB /* HexaWalletBackup.json in Resources */ = {isa = PBXBuildFile; fileRef = CCF1689425FB8FE60038E126 /* HexaWalletBackup.json */; };
 		4DA9C91C25CBC3DA00454AF7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 619CF234250654F600A8E6DF /* GoogleService-Info.plist */; };
 		4DA9C91D25CBC3E100454AF7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 619CF22F250654D100A8E6DF /* GoogleService-Info.plist */; };
-		5A9A412432B34690AD199B59 /* FiraSans-BookItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A35E966FF3B347CFA2E0CBE5 /* FiraSans-BookItalic.ttf */; };
 		5F6B7C2ABEB9E6279BD99C49 /* libPods-HEXA.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3B610F237A6F08F5F181419 /* libPods-HEXA.a */; };
 		6111482F2506463F00ED433D /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6111482E2506463F00ED433D /* CloudKit.framework */; };
 		611148352506478E00ED433D /* PdfGenerate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611148312506478E00ED433D /* PdfGenerate.swift */; };
@@ -37,22 +33,6 @@
 		6182F77B250B23D7005B6ECE /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6111482E2506463F00ED433D /* CloudKit.framework */; };
 		6182F77E250B23D7005B6ECE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		6182F77F250B23D7005B6ECE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		6182F780250B23D7005B6ECE /* FiraSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 262894C9A21E4EE48406A1D0 /* FiraSans-Bold.ttf */; };
-		6182F781250B23D7005B6ECE /* FiraSans-BookItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A35E966FF3B347CFA2E0CBE5 /* FiraSans-BookItalic.ttf */; };
-		6182F782250B23D7005B6ECE /* FiraSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E2EDF28037624796A9996D82 /* FiraSans-Italic.ttf */; };
-		6182F783250B23D7005B6ECE /* FiraSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9A4E6F5E9B5642DD8E860F82 /* FiraSans-Medium.ttf */; };
-		6182F784250B23D7005B6ECE /* FiraSans-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 158EFB7281D64BD3B2F784B3 /* FiraSans-MediumItalic.ttf */; };
-		6182F785250B23D7005B6ECE /* FiraSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7BBFAA85840C4C369964BD81 /* FiraSans-Regular.ttf */; };
-		6182F786250B23D7005B6ECE /* FiraSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D3784CB53EE4E7D914C42B4 /* FiraSans-SemiBold.ttf */; };
-		6182F787250B23D7005B6ECE /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 599B38ECC3EC4E4CB38D4C8A /* OpenSans-Bold.ttf */; };
-		6182F788250B23D7005B6ECE /* OpenSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9E29DABD5A154C1997E9AD44 /* OpenSans-BoldItalic.ttf */; };
-		6182F78A250B23D7005B6ECE /* OpenSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 39CE481CEF614843B40E1EC5 /* OpenSans-ExtraBold.ttf */; };
-		6182F78B250B23D7005B6ECE /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96E40822F039459A97686C32 /* OpenSans-Italic.ttf */; };
-		6182F78C250B23D7005B6ECE /* OpenSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AD12BB582E724B3887BFFE64 /* OpenSans-Light.ttf */; };
-		6182F78D250B23D7005B6ECE /* OpenSans-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F727B7636E8440F1BC2C78B2 /* OpenSans-LightItalic.ttf */; };
-		6182F78E250B23D7005B6ECE /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 466F94D18D9449A8957F3610 /* OpenSans-Regular.ttf */; };
-		6182F78F250B23D7005B6ECE /* OpenSans-Semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DF7107F6EA2D4846A469A116 /* OpenSans-Semibold.ttf */; };
-		6182F790250B23D7005B6ECE /* OpenSans-SemiboldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DAD1674B7394413A82B21AF7 /* OpenSans-SemiboldItalic.ttf */; };
 		6182F7A2250B2742005B6ECE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		6182F7A3250B2742005B6ECE /* PdfPassword.m in Sources */ = {isa = PBXBuildFile; fileRef = 61114839250647BD00ED433D /* PdfPassword.m */; };
 		6182F7A4250B2742005B6ECE /* PdfGenerate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611148312506478E00ED433D /* PdfGenerate.swift */; };
@@ -60,45 +40,18 @@
 		6182F7A7250B2742005B6ECE /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6111482E2506463F00ED433D /* CloudKit.framework */; };
 		6182F7AA250B2742005B6ECE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		6182F7AB250B2742005B6ECE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		6182F7AC250B2742005B6ECE /* FiraSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 262894C9A21E4EE48406A1D0 /* FiraSans-Bold.ttf */; };
-		6182F7AD250B2742005B6ECE /* FiraSans-BookItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A35E966FF3B347CFA2E0CBE5 /* FiraSans-BookItalic.ttf */; };
-		6182F7AE250B2742005B6ECE /* FiraSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E2EDF28037624796A9996D82 /* FiraSans-Italic.ttf */; };
-		6182F7AF250B2742005B6ECE /* FiraSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9A4E6F5E9B5642DD8E860F82 /* FiraSans-Medium.ttf */; };
-		6182F7B0250B2742005B6ECE /* FiraSans-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 158EFB7281D64BD3B2F784B3 /* FiraSans-MediumItalic.ttf */; };
-		6182F7B1250B2742005B6ECE /* FiraSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7BBFAA85840C4C369964BD81 /* FiraSans-Regular.ttf */; };
-		6182F7B2250B2742005B6ECE /* FiraSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D3784CB53EE4E7D914C42B4 /* FiraSans-SemiBold.ttf */; };
-		6182F7B3250B2742005B6ECE /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 599B38ECC3EC4E4CB38D4C8A /* OpenSans-Bold.ttf */; };
-		6182F7B4250B2742005B6ECE /* OpenSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9E29DABD5A154C1997E9AD44 /* OpenSans-BoldItalic.ttf */; };
-		6182F7B6250B2742005B6ECE /* OpenSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 39CE481CEF614843B40E1EC5 /* OpenSans-ExtraBold.ttf */; };
-		6182F7B7250B2742005B6ECE /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96E40822F039459A97686C32 /* OpenSans-Italic.ttf */; };
-		6182F7B8250B2742005B6ECE /* OpenSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AD12BB582E724B3887BFFE64 /* OpenSans-Light.ttf */; };
-		6182F7B9250B2742005B6ECE /* OpenSans-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F727B7636E8440F1BC2C78B2 /* OpenSans-LightItalic.ttf */; };
-		6182F7BA250B2742005B6ECE /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 466F94D18D9449A8957F3610 /* OpenSans-Regular.ttf */; };
-		6182F7BB250B2742005B6ECE /* OpenSans-Semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DF7107F6EA2D4846A469A116 /* OpenSans-Semibold.ttf */; };
-		6182F7BC250B2742005B6ECE /* OpenSans-SemiboldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DAD1674B7394413A82B21AF7 /* OpenSans-SemiboldItalic.ttf */; };
 		61B5223F25076DF5002F73B2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 619CF232250654E300A8E6DF /* GoogleService-Info.plist */; };
-		656E35D57E0B42E8B8745C5C /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 466F94D18D9449A8957F3610 /* OpenSans-Regular.ttf */; };
 		6D02694291194CBD9EB24B7D /* Montserrat-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7EBDAB1C01FE4D629B1A7C39 /* Montserrat-MediumItalic.ttf */; };
-		6FE58ECD5691497784662337 /* FiraSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D3784CB53EE4E7D914C42B4 /* FiraSans-SemiBold.ttf */; };
 		7848CC2319C5FD7B5C873A0C /* libPods-HEXA Dev.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F3C5E168310E57C2D9A6EDE /* libPods-HEXA Dev.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		84C34D93035D4E8CA3855535 /* FiraSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 262894C9A21E4EE48406A1D0 /* FiraSans-Bold.ttf */; };
-		931F7A4365DF468BADA226D2 /* OpenSans-Semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DF7107F6EA2D4846A469A116 /* OpenSans-Semibold.ttf */; };
 		9DFB7500BB9F4E4AAAACF109 /* Montserrat-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5676B1BA3B1B4E3F9D29308A /* Montserrat-Medium.ttf */; };
-		A0647B856EF5484EB9D37E71 /* FiraSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7BBFAA85840C4C369964BD81 /* FiraSans-Regular.ttf */; };
 		AA11C3A22548270900B032D1 /* HEXA.Dev-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AA11C3A12548270900B032D1 /* HEXA.Dev-Info.plist */; };
 		AA11C3A42548271A00B032D1 /* HEXA.Stage-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AA11C3A32548271A00B032D1 /* HEXA.Stage-Info.plist */; };
-		B8D1041D05D6411F9D52E7D6 /* OpenSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9E29DABD5A154C1997E9AD44 /* OpenSans-BoldItalic.ttf */; };
 		BA2B9238EA4D4D2B8EE7E075 /* Montserrat-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 196ECDEACD8644898512DACB /* Montserrat-Bold.ttf */; };
-		C0D2EBAD35E54C34BB47A2C0 /* FiraSans-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 158EFB7281D64BD3B2F784B3 /* FiraSans-MediumItalic.ttf */; };
 		CCF1689025FB8FC50038E126 /* iCloudHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCF1688F25FB8FC50038E126 /* iCloudHelper.swift */; };
 		CCF1689225FB8FCF0038E126 /* iCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF1689125FB8FCF0038E126 /* iCloud.m */; };
 		CCF1689525FB8FE60038E126 /* HexaWalletBackup.json in Resources */ = {isa = PBXBuildFile; fileRef = CCF1689425FB8FE60038E126 /* HexaWalletBackup.json */; };
 		D45D423F823D4B4F96F81CDC /* Montserrat-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FD2C9FFB56CD431FBFFABD4B /* Montserrat-Italic.ttf */; };
-		DF98272D8CB14F19972464BB /* OpenSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 96E40822F039459A97686C32 /* OpenSans-Italic.ttf */; };
-		E59524329FB64B6B9EB4F44A /* FiraSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E2EDF28037624796A9996D82 /* FiraSans-Italic.ttf */; };
-		EC871328B5214142B36CC294 /* FiraSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9A4E6F5E9B5642DD8E860F82 /* FiraSans-Medium.ttf */; };
-		ECA21601D47443C3B3738345 /* OpenSans-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F727B7636E8440F1BC2C78B2 /* OpenSans-LightItalic.ttf */; };
 		F450099E299BB94B009F3355 /* Montserrat-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 63D24441726E4404BC7B7B2E /* Montserrat-Regular.ttf */; };
 		F450099F299BB953009F3355 /* Montserrat-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 196ECDEACD8644898512DACB /* Montserrat-Bold.ttf */; };
 		F45009A0299BB959009F3355 /* Montserrat-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FD2C9FFB56CD431FBFFABD4B /* Montserrat-Italic.ttf */; };
@@ -112,8 +65,13 @@
 		F49AA81026A0284D0097D815 /* BackgroundViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F49AA80C26A0284D0097D815 /* BackgroundViewController.xib */; };
 		F49AA81126A0284D0097D815 /* BackgroundViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F49AA80C26A0284D0097D815 /* BackgroundViewController.xib */; };
 		F49AA81226A0284D0097D815 /* BackgroundViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F49AA80C26A0284D0097D815 /* BackgroundViewController.xib */; };
-		FC0B7DCBA7244209BE3D18FD /* FiraSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9963B02F45124E09B5D31DE8 /* FiraSans-Light.ttf */; };
-		FC9848DE447644B59209F6C3 /* OpenSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 39CE481CEF614843B40E1EC5 /* OpenSans-ExtraBold.ttf */; };
+		F4FBDE50299CCE9F00B3E6E2 /* Montserrat-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 63D24441726E4404BC7B7B2E /* Montserrat-Regular.ttf */; };
+		F4FBDE51299CCEA400B3E6E2 /* Montserrat-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 196ECDEACD8644898512DACB /* Montserrat-Bold.ttf */; };
+		F4FBDE52299CCEA900B3E6E2 /* Montserrat-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FD2C9FFB56CD431FBFFABD4B /* Montserrat-Italic.ttf */; };
+		F4FBDE53299CCEAC00B3E6E2 /* Montserrat-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C4CEFC8792754D17B591C320 /* Montserrat-Light.ttf */; };
+		F4FBDE54299CCEB000B3E6E2 /* Montserrat-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 95620CD1F8B44203A87BE6F7 /* Montserrat-SemiBold.ttf */; };
+		F4FBDE55299CCEB300B3E6E2 /* Montserrat-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5676B1BA3B1B4E3F9D29308A /* Montserrat-Medium.ttf */; };
+		F4FBDE56299CCEB800B3E6E2 /* Montserrat-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7EBDAB1C01FE4D629B1A7C39 /* Montserrat-MediumItalic.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -516,26 +474,9 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				84C34D93035D4E8CA3855535 /* FiraSans-Bold.ttf in Resources */,
-				5A9A412432B34690AD199B59 /* FiraSans-BookItalic.ttf in Resources */,
-				E59524329FB64B6B9EB4F44A /* FiraSans-Italic.ttf in Resources */,
-				EC871328B5214142B36CC294 /* FiraSans-Medium.ttf in Resources */,
-				C0D2EBAD35E54C34BB47A2C0 /* FiraSans-MediumItalic.ttf in Resources */,
-				A0647B856EF5484EB9D37E71 /* FiraSans-Regular.ttf in Resources */,
-				6FE58ECD5691497784662337 /* FiraSans-SemiBold.ttf in Resources */,
-				0ABCF5EEB6A24513A21B391F /* OpenSans-Bold.ttf in Resources */,
 				CCF1689525FB8FE60038E126 /* HexaWalletBackup.json in Resources */,
-				B8D1041D05D6411F9D52E7D6 /* OpenSans-BoldItalic.ttf in Resources */,
 				61B5223F25076DF5002F73B2 /* GoogleService-Info.plist in Resources */,
-				FC9848DE447644B59209F6C3 /* OpenSans-ExtraBold.ttf in Resources */,
-				DF98272D8CB14F19972464BB /* OpenSans-Italic.ttf in Resources */,
-				1ADDFE9EF1EA44B39CDB9BC2 /* OpenSans-Light.ttf in Resources */,
-				ECA21601D47443C3B3738345 /* OpenSans-LightItalic.ttf in Resources */,
-				656E35D57E0B42E8B8745C5C /* OpenSans-Regular.ttf in Resources */,
-				931F7A4365DF468BADA226D2 /* OpenSans-Semibold.ttf in Resources */,
 				F49AA81026A0284D0097D815 /* BackgroundViewController.xib in Resources */,
-				2F039E5F6FF845818DEC1F4D /* OpenSans-SemiboldItalic.ttf in Resources */,
-				FC0B7DCBA7244209BE3D18FD /* FiraSans-Light.ttf in Resources */,
 				BA2B9238EA4D4D2B8EE7E075 /* Montserrat-Bold.ttf in Resources */,
 				D45D423F823D4B4F96F81CDC /* Montserrat-Italic.ttf in Resources */,
 				33C70E76106F4F649FE7BB6A /* Montserrat-Light.ttf in Resources */,
@@ -560,24 +501,8 @@
 				4D3833052600A08900F82BDB /* HexaWalletBackup.json in Resources */,
 				6182F77E250B23D7005B6ECE /* LaunchScreen.storyboard in Resources */,
 				6182F77F250B23D7005B6ECE /* Images.xcassets in Resources */,
-				6182F780250B23D7005B6ECE /* FiraSans-Bold.ttf in Resources */,
-				6182F781250B23D7005B6ECE /* FiraSans-BookItalic.ttf in Resources */,
-				6182F782250B23D7005B6ECE /* FiraSans-Italic.ttf in Resources */,
-				6182F783250B23D7005B6ECE /* FiraSans-Medium.ttf in Resources */,
-				6182F784250B23D7005B6ECE /* FiraSans-MediumItalic.ttf in Resources */,
-				6182F785250B23D7005B6ECE /* FiraSans-Regular.ttf in Resources */,
-				6182F786250B23D7005B6ECE /* FiraSans-SemiBold.ttf in Resources */,
-				6182F787250B23D7005B6ECE /* OpenSans-Bold.ttf in Resources */,
-				6182F788250B23D7005B6ECE /* OpenSans-BoldItalic.ttf in Resources */,
 				F49AA81126A0284D0097D815 /* BackgroundViewController.xib in Resources */,
-				6182F78A250B23D7005B6ECE /* OpenSans-ExtraBold.ttf in Resources */,
-				6182F78B250B23D7005B6ECE /* OpenSans-Italic.ttf in Resources */,
-				6182F78C250B23D7005B6ECE /* OpenSans-Light.ttf in Resources */,
-				6182F78D250B23D7005B6ECE /* OpenSans-LightItalic.ttf in Resources */,
-				6182F78E250B23D7005B6ECE /* OpenSans-Regular.ttf in Resources */,
 				AA11C3A22548270900B032D1 /* HEXA.Dev-Info.plist in Resources */,
-				6182F78F250B23D7005B6ECE /* OpenSans-Semibold.ttf in Resources */,
-				6182F790250B23D7005B6ECE /* OpenSans-SemiboldItalic.ttf in Resources */,
 				4DA9C91C25CBC3DA00454AF7 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -586,27 +511,18 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F4FBDE56299CCEB800B3E6E2 /* Montserrat-MediumItalic.ttf in Resources */,
+				F4FBDE55299CCEB300B3E6E2 /* Montserrat-Medium.ttf in Resources */,
+				F4FBDE54299CCEB000B3E6E2 /* Montserrat-SemiBold.ttf in Resources */,
+				F4FBDE53299CCEAC00B3E6E2 /* Montserrat-Light.ttf in Resources */,
+				F4FBDE52299CCEA900B3E6E2 /* Montserrat-Italic.ttf in Resources */,
+				F4FBDE51299CCEA400B3E6E2 /* Montserrat-Bold.ttf in Resources */,
+				F4FBDE50299CCE9F00B3E6E2 /* Montserrat-Regular.ttf in Resources */,
 				4D3833092600BD1400F82BDB /* HexaWalletBackup.json in Resources */,
 				AA11C3A42548271A00B032D1 /* HEXA.Stage-Info.plist in Resources */,
 				6182F7AA250B2742005B6ECE /* LaunchScreen.storyboard in Resources */,
 				6182F7AB250B2742005B6ECE /* Images.xcassets in Resources */,
-				6182F7AC250B2742005B6ECE /* FiraSans-Bold.ttf in Resources */,
-				6182F7AD250B2742005B6ECE /* FiraSans-BookItalic.ttf in Resources */,
-				6182F7AE250B2742005B6ECE /* FiraSans-Italic.ttf in Resources */,
-				6182F7AF250B2742005B6ECE /* FiraSans-Medium.ttf in Resources */,
-				6182F7B0250B2742005B6ECE /* FiraSans-MediumItalic.ttf in Resources */,
-				6182F7B1250B2742005B6ECE /* FiraSans-Regular.ttf in Resources */,
-				6182F7B2250B2742005B6ECE /* FiraSans-SemiBold.ttf in Resources */,
-				6182F7B3250B2742005B6ECE /* OpenSans-Bold.ttf in Resources */,
 				F49AA81226A0284D0097D815 /* BackgroundViewController.xib in Resources */,
-				6182F7B4250B2742005B6ECE /* OpenSans-BoldItalic.ttf in Resources */,
-				6182F7B6250B2742005B6ECE /* OpenSans-ExtraBold.ttf in Resources */,
-				6182F7B7250B2742005B6ECE /* OpenSans-Italic.ttf in Resources */,
-				6182F7B8250B2742005B6ECE /* OpenSans-Light.ttf in Resources */,
-				6182F7B9250B2742005B6ECE /* OpenSans-LightItalic.ttf in Resources */,
-				6182F7BA250B2742005B6ECE /* OpenSans-Regular.ttf in Resources */,
-				6182F7BB250B2742005B6ECE /* OpenSans-Semibold.ttf in Resources */,
-				6182F7BC250B2742005B6ECE /* OpenSans-SemiboldItalic.ttf in Resources */,
 				4DA9C91D25CBC3E100454AF7 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

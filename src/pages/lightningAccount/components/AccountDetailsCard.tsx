@@ -328,7 +328,7 @@ const styles = StyleSheet.create( {
   },
 
   balanceAmountText: {
-    fontFamily: Fonts.OpenSans,
+    fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue( 20 ),
   },
 

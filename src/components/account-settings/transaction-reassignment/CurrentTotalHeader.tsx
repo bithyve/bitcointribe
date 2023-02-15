@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   },
 
   unitText: {
-    fontFamily: Fonts.OpenSans,
+    fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
     fontSize: RFValue(13),
   },

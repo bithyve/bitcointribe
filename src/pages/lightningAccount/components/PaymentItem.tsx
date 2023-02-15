@@ -65,7 +65,7 @@ const styles = StyleSheet.create( {
     },
   },
   amountText: {
-    fontFamily: Fonts.OpenSans,
+    fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue( 17 ),
   },
   bitcoinImage: {

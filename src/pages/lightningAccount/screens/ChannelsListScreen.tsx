@@ -362,11 +362,6 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-between',
   },
 
-  balanceAmountText: {
-    fontFamily: Fonts.OpenSans,
-    fontSize: 21,
-  },
-
   balanceUnitText: {
     fontSize: 13,
     fontFamily: Fonts.FiraSansRegular,
@@ -501,7 +496,7 @@ const styles = StyleSheet.create( {
     color: Colors.backgroundColor1,
     fontSize: RFValue( 12 ),
     marginLeft: 7,
-    minWidth: wp('5%')
+    minWidth: wp( '5%' )
   },
   channelSats: {
     color: Colors.backgroundColor1,

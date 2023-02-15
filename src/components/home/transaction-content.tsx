@@ -313,11 +313,11 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     marginRight: 5,
     fontSize: RFValue(20),
-    fontFamily: Fonts.OpenSans,
+    fontFamily: Fonts.FiraSansRegular,
   },
   transactionModalAmountUnitText: {
     color: Colors.textColorGrey,
     fontSize: RFValue(10),
-    fontFamily: Fonts.OpenSans,
+    fontFamily: Fonts.FiraSansRegular,
   },
 });
