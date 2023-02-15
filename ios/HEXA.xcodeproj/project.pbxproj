@@ -77,7 +77,7 @@
 /* Begin PBXFileReference section */
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* HEXATests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HEXATests.m; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* Hexa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hexa.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* Bitcoin Tribe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bitcoin Tribe.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = HEXA/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = HEXA/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = HEXA/Images.xcassets; sourceTree = "<group>"; };
@@ -107,8 +107,8 @@
 		61114839250647BD00ED433D /* PdfPassword.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PdfPassword.m; sourceTree = "<group>"; };
 		6111483C25064A4F00ED433D /* Hexa.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Hexa.entitlements; path = HEXA/Hexa.entitlements; sourceTree = "<group>"; };
 		617379E825066B5200D4DA9C /* HEXA-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HEXA-Bridging-Header.h"; sourceTree = "<group>"; };
-		6182F796250B23D7005B6ECE /* HEXA Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "HEXA Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6182F7C2250B2742005B6ECE /* HEXA Stage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "HEXA Stage.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6182F796250B23D7005B6ECE /* Bitcoin Tribe Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bitcoin Tribe Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6182F7C2250B2742005B6ECE /* Bitcoin Tribe Stag.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bitcoin Tribe Stag.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		619CF22F250654D100A8E6DF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "GoogleServicesPlist/Staging/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		619CF232250654E300A8E6DF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "GoogleServicesPlist/Production/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		619CF234250654F600A8E6DF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "GoogleServicesPlist/Development/GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -271,9 +271,9 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* Hexa.app */,
-				6182F796250B23D7005B6ECE /* HEXA Dev.app */,
-				6182F7C2250B2742005B6ECE /* HEXA Stage.app */,
+				13B07F961A680F5B00A75B9A /* Bitcoin Tribe.app */,
+				6182F796250B23D7005B6ECE /* Bitcoin Tribe Dev.app */,
+				6182F7C2250B2742005B6ECE /* Bitcoin Tribe Stag.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -372,7 +372,7 @@
 			);
 			name = HEXA;
 			productName = HEXA;
-			productReference = 13B07F961A680F5B00A75B9A /* Hexa.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* Bitcoin Tribe.app */;
 			productType = "com.apple.product-type.application";
 		};
 		6182F772250B23D7005B6ECE /* HEXA Dev */ = {
@@ -396,7 +396,7 @@
 			);
 			name = "HEXA Dev";
 			productName = HEXA;
-			productReference = 6182F796250B23D7005B6ECE /* HEXA Dev.app */;
+			productReference = 6182F796250B23D7005B6ECE /* Bitcoin Tribe Dev.app */;
 			productType = "com.apple.product-type.application";
 		};
 		6182F79E250B2742005B6ECE /* HEXA Stage */ = {
@@ -421,7 +421,7 @@
 			);
 			name = "HEXA Stage";
 			productName = HEXA;
-			productReference = 6182F7C2250B2742005B6ECE /* HEXA Stage.app */;
+			productReference = 6182F7C2250B2742005B6ECE /* Bitcoin Tribe Stag.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -1079,7 +1079,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa2;
-				PRODUCT_NAME = Hexa;
+				PRODUCT_NAME = "Bitcoin Tribe";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1117,7 +1117,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa2;
-				PRODUCT_NAME = Hexa;
+				PRODUCT_NAME = "Bitcoin Tribe";
 				PROVISIONING_PROFILE_SPECIFIER = "Hexa Production Dist";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Hexa 2.0 Distribution";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
@@ -1159,7 +1159,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.development;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Bitcoin Tribe Dev";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "$(PROJECT_NAME)-Swift.h";
@@ -1196,7 +1196,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.development;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Bitcoin Tribe Dev";
 				PROVISIONING_PROFILE_SPECIFIER = "Hexa Development Dev";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "$(PROJECT_NAME)-Swift.h";
@@ -1234,7 +1234,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.staging;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Bitcoin Tribe Stag";
 				PROVISIONING_PROFILE_SPECIFIER = "Hexa Staging Dev";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "$(PROJECT_NAME)-Swift.h";
@@ -1272,7 +1272,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.staging;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Bitcoin Tribe Stag";
 				PROVISIONING_PROFILE_SPECIFIER = "Hexa Staging Dev";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "$(PROJECT_NAME)-Swift.h";
