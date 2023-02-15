@@ -105,6 +105,13 @@
 	</dict>
 	<key>UIAppFonts</key>
 	<array>
+		<string>Montserrat-Bold.ttf</string>
+		<string>Montserrat-Italic.ttf</string>
+		<string>Montserrat-Light.ttf</string>
+		<string>Montserrat-Medium.ttf</string>
+		<string>Montserrat-MediumItalic.ttf</string>
+		<string>Montserrat-Regular.ttf</string>
+		<string>Montserrat-SemiBold.ttf</string>
 		<string>FiraSans-Bold.ttf</string>
 		<string>FiraSans-BookItalic.ttf</string>
 		<string>FiraSans-Italic.ttf</string>

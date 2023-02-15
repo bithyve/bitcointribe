@@ -59,8 +59,8 @@
 	<string>$(PRODUCT_NAME) would like to use NFC</string>
 	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
 	<array>
-	<string>D2760000850100</string>
-	<string>D2760000850101</string>
+		<string>D2760000850100</string>
+		<string>D2760000850101</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
@@ -111,6 +111,14 @@
 	</dict>
 	<key>UIAppFonts</key>
 	<array>
+		<string>FiraSans-Light.ttf</string>
+		<string>Montserrat-Bold.ttf</string>
+		<string>Montserrat-Italic.ttf</string>
+		<string>Montserrat-Light.ttf</string>
+		<string>Montserrat-Medium.ttf</string>
+		<string>Montserrat-MediumItalic.ttf</string>
+		<string>Montserrat-Regular.ttf</string>
+		<string>Montserrat-SemiBold.ttf</string>
 		<string>FiraSans-Bold.ttf</string>
 		<string>FiraSans-BookItalic.ttf</string>
 		<string>FiraSans-Italic.ttf</string>
