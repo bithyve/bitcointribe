@@ -78,10 +78,10 @@ const SweepFundsFromExistingAccount = props => {
           borderColor: Colors.borderColor,
         }}>
           <Text style={{
-            color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 14 )
+            color: Colors.blue, fontFamily: Fonts.Regular, fontSize: RFValue( 14 )
           }}>Your new wallet{'\n'}and back-up is ready</Text>
           <Text style={{
-            color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 10 )
+            color: Colors.textColorGrey, fontFamily: Fonts.Regular, fontSize: RFValue( 10 )
           }}>You can now sweep funds from your existing wallet to{'\n'}the new wallet</Text>
         </View>
       </View>
@@ -122,14 +122,14 @@ const SweepFundsFromExistingAccount = props => {
           }}><Text style={{
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansMedium
+              fontFamily: Fonts.Medium
             }}>Confirm</Text></TouchableOpacity>
           <TouchableOpacity style={{
             height: wp( '13%' ), width: wp( '30%' ), justifyContent: 'center', alignItems: 'center', borderRadius: 10
           }}><Text style={{
               color: Colors.blue,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansMedium
+              fontFamily: Fonts.Medium
             }}>Cancel</Text></TouchableOpacity>
         </View>
       </View>
@@ -143,7 +143,7 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
@@ -171,13 +171,13 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
     marginLeft: 13,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   listElementsInfo: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
     marginLeft: 13,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: hp( '0.5%' )
   },
   listElementsIconImage: {

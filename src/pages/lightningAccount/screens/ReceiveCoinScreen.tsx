@@ -100,7 +100,7 @@ export default class ReceiveCoinScreen extends Component {
           <Text style={{
             fontSize: RFValue( 16 ),
             color: Colors.blue,
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             marginLeft: 10
           } }>
           Invoice Expiration
@@ -117,7 +117,7 @@ export default class ReceiveCoinScreen extends Component {
               borderWidth: 0,
             }}
             textStyle={{
-              fontFamily: Fonts.FiraSansRegular
+              fontFamily: Fonts.Regular
             }}
             innerBorderStyle={{
               width: 0,
@@ -219,7 +219,7 @@ export default class ReceiveCoinScreen extends Component {
             width: 0,
           }}
           textStyle={{
-            fontFamily: Fonts.FiraSansRegular
+            fontFamily: Fonts.Regular
           }}
           containerStyle={{
             height: hp( '6%' ),
@@ -297,7 +297,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 
   buttonView: {

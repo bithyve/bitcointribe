@@ -155,7 +155,7 @@ function MBKeeperButton( props ) {
 const styles = StyleSheet.create( {
   cardButtonText: {
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
     width: wp( '24%' ),
   },

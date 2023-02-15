@@ -139,7 +139,7 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     marginHorizontal: 20,
     marginVertical: 20,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   bodySection: {

@@ -289,7 +289,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             <Text
               style={{
                 color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 20 ),
               }}
             >
@@ -298,7 +298,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             <Text
               style={{
                 fontSize: RFValue( 13 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 color: Colors.gray8,
                 lineHeight: RFValue( 20 ),
               }}
@@ -315,7 +315,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                   alignSelf: 'center',
                   color: Colors.textColorGrey,
                   fontSize: RFValue( 16 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 Allow auto-read access
@@ -344,7 +344,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               <Text
                 style={{
                   color: Colors.white,
-                  fontFamily: Fonts.FiraSansSemiBold,
+                  fontFamily: Fonts.SemiBold,
                 }}
               >
                 Proceed
@@ -371,7 +371,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           fontSize: RFValue( 18 ),
           letterSpacing: 0.54,
           // marginLeft: 2,
-          fontFamily: Fonts.FiraSansMedium,
+          fontFamily: Fonts.Medium,
           paddingTop: heightPercentageToDP( 4 ),
           paddingLeft: widthPercentageToDP( 4 ),
           paddingBottom: heightPercentageToDP( 1 )
@@ -708,7 +708,7 @@ const styles = StyleSheet.create( {
   addModalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
 
   textBeta: {
@@ -731,7 +731,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
     marginTop: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
 
   modalElementInfoView: {

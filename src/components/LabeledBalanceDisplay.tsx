@@ -188,7 +188,7 @@ const defaultStyles = StyleSheet.create( {
   },
 
   amountText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 14.5 ),
     marginRight: wp( 1 ),
     // alignItems: 'baseline',
@@ -196,7 +196,7 @@ const defaultStyles = StyleSheet.create( {
   },
 
   unitText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     // alignItems: 'baseline',
   },
 } )

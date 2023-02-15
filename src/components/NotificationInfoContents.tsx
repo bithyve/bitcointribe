@@ -25,7 +25,7 @@ export default function NotificationInfoContents( props ) {
                 ? props.headerTextColor
                 : Colors.blue,
               fontSize: RFValue( 18 ),
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.Medium,
             }}
           >
             {props.title}
@@ -37,7 +37,7 @@ export default function NotificationInfoContents( props ) {
               backgroundColor: Colors.lightBlue,
               borderWidth: 1,
               borderColor: Colors.borderColor,
-              borderRadius: wp(4),
+              borderRadius: wp( 4 ),
               marginLeft: 'auto',
               justifyContent: 'center',
               alignItems: 'center',
@@ -46,7 +46,7 @@ export default function NotificationInfoContents( props ) {
             onPress={() => {
               props.onPressClose()
             }}>
-              <CrossButton />
+            <CrossButton />
           </AppBottomSheetTouchableWrapper>
 
         </View>
@@ -64,7 +64,7 @@ export default function NotificationInfoContents( props ) {
                   marginLeft: wp( '2%' ),
                   color: Colors.greyTextColor,
                   fontSize: RFValue( 13 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 {props.info}
@@ -83,7 +83,7 @@ export default function NotificationInfoContents( props ) {
               marginLeft: wp( '2%' ),
               color: Colors.blue,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
             }}
           >
             {props.releaseNotes}
@@ -109,7 +109,7 @@ export default function NotificationInfoContents( props ) {
                   marginLeft: wp( '2%' ),
                   color: Colors.blue,
                   fontSize: RFValue( 13 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 {value}
@@ -236,7 +236,7 @@ const styles = StyleSheet.create( {
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   successModalAmountView: {
     justifyContent: 'center',
@@ -270,6 +270,6 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )

@@ -198,7 +198,7 @@ function ManageBackupCard( props ) {
                   numberOfLines={2}
                   style={{
                     color: textColor,
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     fontSize: RFValue( 10 ),
                   }}
                 >
@@ -281,18 +281,18 @@ const styles = StyleSheet.create( {
   },
   cardButtonText: {
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
     width: wp( '24%' ),
   },
   levelText: {
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
   },
   levelInfoText: {
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
   },
   manageButton: {
@@ -303,7 +303,7 @@ const styles = StyleSheet.create( {
   },
   manageButtonText: {
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
     marginRight: 5,
   },

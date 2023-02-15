@@ -171,14 +171,14 @@ const styles = StyleSheet.create( {
   },
   modalInfoText: {
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: wp( '1.5%' ),
     color: Colors.lightTextColor,
   },
   headerText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   grayBox: {
     justifyContent: 'center',
@@ -207,7 +207,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   contactProfileView: {
     flexDirection: 'row',
@@ -257,7 +257,7 @@ const styles = StyleSheet.create( {
   },
   addingAsContactText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     marginLeft: 5,
     paddingTop: 5,
@@ -265,14 +265,14 @@ const styles = StyleSheet.create( {
   },
   selectedContactPhoneNumber: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 10 ),
     marginLeft: 5,
     paddingTop: 3,
   },
   selectedContactEmail: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 10 ),
     marginLeft: 5,
     paddingTop: 3,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create( {
   contactNameText: {
     color: Colors.black,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 5,
   },
   bottomButtonsView: {

@@ -14,7 +14,7 @@ const ScreenHeaderStyles = StyleSheet.create( {
   smallHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'center',
   },
 } )

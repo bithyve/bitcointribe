@@ -101,7 +101,7 @@ export default function ShareOtpWithTrustedContact( props ) {
                 }}
                 digitTxtStyle={{
                   color: Colors.blue, fontSize: RFValue( 19 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
                 separatorStyle={{
                   color: Colors.blue,
@@ -132,7 +132,7 @@ export default function ShareOtpWithTrustedContact( props ) {
               style={{
                 color: Colors.white,
                 fontSize: RFValue( 13 ),
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
               }}
             >
               Yes, I have shared
@@ -161,12 +161,12 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: hp( '0.7%' ),
     marginRight: 20,
     flexWrap: 'wrap',
@@ -178,7 +178,7 @@ const styles = StyleSheet.create( {
   },
   otpText: {
     color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 23 ),
   },
   otpTextView: {
@@ -213,7 +213,7 @@ const styles = StyleSheet.create( {
   timerText: {
     color: Colors.blue,
     fontSize: RFValue( 19 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 10,
   },
 } )

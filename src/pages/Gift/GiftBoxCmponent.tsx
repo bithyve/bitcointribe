@@ -84,14 +84,14 @@ const styles = StyleSheet.create( {
   pageTitle: {
     color: Colors.blue,
     letterSpacing: 0.7,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     alignItems: 'center',
     fontSize: RFValue( 15 )
   },
   subText:{
     color: Colors.gray3,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     // marginTop: RFValue( 4 ),
     letterSpacing: .75,
     lineHeight: RFValue(15)
@@ -99,7 +99,7 @@ const styles = StyleSheet.create( {
   scSubText:{
     color: Colors.textColorGrey,
     fontSize: RFValue( 6 ),
-    fontFamily: Fonts.FiraSansLight,
+    fontFamily: Fonts.Light,
     //marginTop: RFValue( 2 ),
     letterSpacing: 0.5,
     lineHeight: 8,
@@ -109,6 +109,6 @@ const styles = StyleSheet.create( {
     lineHeight: 12,
     color: Colors.blue,
     letterSpacing: 0.7,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   }
 } )

@@ -14,43 +14,43 @@ const ListStyles = StyleSheet.create( {
   infoHeaderTitleText: {
     fontSize: RFValue( 13 ),
     color: Colors.blue,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   infoHeaderSubtitleText: {
     fontSize: RFValue( 11 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.1
   },
   listItemTitleTransaction: {
     color: Colors.blue,
     fontSize: RFValue( 15 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   listItemTitle: {
     color: Colors.black,
     fontSize: RFValue( 15 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   disabledListItemTitle: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   listItemSubtitle: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: 3,
     letterSpacing: RFValue( 0 ),
     lineHeight: RFValue( 13 )
   },
   textAmt: {
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
   listItemContentContainer: {
@@ -73,7 +73,7 @@ const ListStyles = StyleSheet.create( {
     marginLeft: widthPercentageToDP( '7%' ),
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: RFValue( 0.54 )
   }
 } )

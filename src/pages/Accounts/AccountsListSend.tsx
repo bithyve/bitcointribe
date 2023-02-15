@@ -152,7 +152,7 @@ const styles = StyleSheet.create( {
   },
   accountBalance: {
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'center',
     marginTop: 5,
     alignSelf: 'center',

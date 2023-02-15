@@ -36,7 +36,7 @@ const ButtonGroupWithIcon = ( props ) => {
         <Text style={{
           color: Colors.white,
           fontSize: RFValue( 12 ),
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Regular,
           marginHorizontal: wp( 2 )
         }}>
           {props.buttonOneText}
@@ -53,7 +53,7 @@ const ButtonGroupWithIcon = ( props ) => {
         <Text style={{
           color: Colors.white,
           fontSize: RFValue( 12 ),
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Regular,
           marginHorizontal: wp( 2 )
         }}>
           {props.buttonTwoText}

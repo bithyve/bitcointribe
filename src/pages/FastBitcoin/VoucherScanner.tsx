@@ -1097,7 +1097,7 @@ const VoucherScanner = ( props ) => {
                   color: props.titleColor ? props.titleColor : Colors.blue,
                   fontSize: RFValue( 13 ),
                   marginBottom: 2,
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 {'Already registered with FastBitcoins?'}
@@ -1109,7 +1109,7 @@ const VoucherScanner = ( props ) => {
                   style={{
                     color: Colors.textColorGrey,
                     fontSize: RFValue( 12 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                   }}
                 >
                   {
@@ -1127,7 +1127,7 @@ const VoucherScanner = ( props ) => {
             paddingLeft: 20,
             paddingRight: 15,
             fontSize: RFValue( 11 ),
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
             color: Colors.textColorGrey,
           }}
         >
@@ -1345,7 +1345,7 @@ const styles = StyleSheet.create( {
   },
   cardAmountText: {
     color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 17 ),
     marginRight: 5,
     marginTop: 'auto',
@@ -1353,7 +1353,7 @@ const styles = StyleSheet.create( {
   },
   cardAmountUnitText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     marginTop: 'auto',
     lineHeight: RFValue( 17 ),
@@ -1383,7 +1383,7 @@ const styles = StyleSheet.create( {
   },
   dropDownElementTitleText: {
     color: Colors.blue,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     marginBottom: 5,
   },
@@ -1397,7 +1397,7 @@ const styles = StyleSheet.create( {
     paddingLeft: 15,
     paddingRight: 15,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )
 

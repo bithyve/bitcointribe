@@ -97,7 +97,7 @@ const styles = StyleSheet.create( {
   },
   headerText: {
     color: Colors.backgroundColor1,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 18 ),
     letterSpacing: 0.54,
     marginTop: hp( '1%' ),
@@ -115,21 +115,21 @@ const styles = StyleSheet.create( {
     color: Colors.backgroundColor1,
     fontSize: RFValue( 12 ),
     letterSpacing: 0.6,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: wp( '10%' ),
     marginRight: wp( '10%' ),
   },
   clickHereText: {
     color: Colors.backgroundColor1,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textDecorationLine: 'underline',
     textAlign: 'center',
   },
   toKnowMoreText: {
     color: Colors.backgroundColor1,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   linkView: {
     flexDirection: 'row',

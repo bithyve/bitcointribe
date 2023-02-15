@@ -120,7 +120,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
             <Text
               style={{
                 color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 14 ),
               }}
             >
@@ -131,7 +131,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
             <Text
               style={{
                 color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
                 marginTop: heightPercentageToDP( '1%' ),
               }}
@@ -165,7 +165,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
           <Text
             style={{
               color: Colors.blue,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 12 ),
             }}
           >
@@ -189,7 +189,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
             <Text
               style={{
                 color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
                 marginLeft: 3,
               }}
@@ -199,7 +199,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
             <Text
               style={{
                 color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
                 marginLeft: 3,
               }}
@@ -214,7 +214,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
             <Text
               style={{
                 color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
               }}
             >
@@ -226,7 +226,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
               <Text
                 style={{
                   color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                   fontSize: RFValue( 12 ),
                   marginTop: heightPercentageToDP( '0.5%' ),
                 }}
@@ -241,7 +241,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
             <Text
               style={{
                 color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
               }}
             >
@@ -253,7 +253,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
               <Text
                 style={{
                   color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                   fontSize: RFValue( 12 ),
                   marginTop: heightPercentageToDP( '0.5%' ),
                 }}
@@ -267,7 +267,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
           <Text
             style={{
               color: Colors.blue,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 12 ),
             }}
           >
@@ -276,7 +276,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 12 ),
               marginTop: heightPercentageToDP( '0.5%' ),
             }}
@@ -290,7 +290,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
             <Text
               style={{
                 color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
               }}
             >
@@ -299,7 +299,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
             <Text
               style={{
                 color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
                 marginTop: heightPercentageToDP( '0.5%' ),
               }}
@@ -312,7 +312,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
           <Text
             style={{
               color: Colors.blue,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 12 ),
             }}
           >
@@ -331,7 +331,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
             <Text
               style={{
                 color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
                 marginTop: heightPercentageToDP( '0.5%' ),
               }}
@@ -344,7 +344,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
           <Text
             style={{
               color: Colors.blue,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 12 ),
             }}
           >
@@ -353,7 +353,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 12 ),
               marginTop: heightPercentageToDP( '0.5%' ),
             }}

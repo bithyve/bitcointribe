@@ -293,7 +293,7 @@ export default function TwoFASweepFunds( props ) {
                         style={{
                           color: Colors.blue,
                           fontSize: RFValue( 13 ),
-                          fontFamily: Fonts.FiraSansRegular,
+                          fontFamily: Fonts.Regular,
                         }}
                       >
                         Transaction Priority
@@ -302,7 +302,7 @@ export default function TwoFASweepFunds( props ) {
                         style={{
                           color: Colors.textColorGrey,
                           fontSize: RFValue( 12 ),
-                          fontFamily: Fonts.FiraSansRegular,
+                          fontFamily: Fonts.Regular,
                         }}
                       >
                         Set priority for your transaction
@@ -379,7 +379,7 @@ export default function TwoFASweepFunds( props ) {
                             style={{
                               color: Colors.textColorGrey,
                               fontSize: RFValue( 10 ),
-                              fontFamily: Fonts.FiraSansRegular,
+                              fontFamily: Fonts.Regular,
                               textAlign: 'center',
                               flex: 1,
                               flexWrap: 'wrap',
@@ -396,7 +396,7 @@ export default function TwoFASweepFunds( props ) {
                             style={{
                               color: Colors.textColorGrey,
                               fontSize: RFValue( 10 ),
-                              fontFamily: Fonts.FiraSansRegular,
+                              fontFamily: Fonts.Regular,
                               textAlign: 'center',
                               flex: 1,
                               flexWrap: 'wrap',
@@ -413,7 +413,7 @@ export default function TwoFASweepFunds( props ) {
                             style={{
                               color: Colors.textColorGrey,
                               fontSize: RFValue( 10 ),
-                              fontFamily: Fonts.FiraSansRegular,
+                              fontFamily: Fonts.Regular,
                               textAlign: 'center',
                               flex: 1,
                               flexWrap: 'wrap',
@@ -524,7 +524,7 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   textBoxView: {
     flexDirection: 'row',
@@ -544,7 +544,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   confirmButtonView: {
     width: wp( '50%' ),
@@ -557,11 +557,11 @@ const styles = StyleSheet.create( {
     flex: 1,
     paddingLeft: 20,
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 13 ),
   },
   errorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     color: Colors.red,
     fontSize: RFValue( 11 ),
     fontStyle: 'italic',

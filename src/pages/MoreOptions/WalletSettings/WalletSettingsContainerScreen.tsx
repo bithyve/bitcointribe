@@ -194,12 +194,12 @@ const styles = StyleSheet.create( {
   },
   titleText: {
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.blue,
   },
   infoText: {
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
     marginTop: 5,
   },

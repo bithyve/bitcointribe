@@ -27,7 +27,7 @@ export default function KeeperDeviceHelpContents( props ) {
         <Text
           style={{
             color: Colors.white,
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
             fontSize: RFValue( 20 ),
             marginTop: hp( '1%' ),
             marginBottom: hp( '1%' ),
@@ -64,7 +64,7 @@ export default function KeeperDeviceHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}
@@ -88,7 +88,7 @@ export default function KeeperDeviceHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}
@@ -141,7 +141,7 @@ export default function KeeperDeviceHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}
@@ -165,7 +165,7 @@ export default function KeeperDeviceHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}
@@ -218,7 +218,7 @@ export default function KeeperDeviceHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}
@@ -242,7 +242,7 @@ export default function KeeperDeviceHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' )
             }}

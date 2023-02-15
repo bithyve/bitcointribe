@@ -259,7 +259,7 @@ export default function RestoreWalletBySecondaryDevice( props ) {
                   style={{
                     color: Colors.white,
                     fontSize: RFValue( 13 ),
-                    fontFamily: Fonts.FiraSansMedium,
+                    fontFamily: Fonts.Medium,
                   }}
                 >
                   Yes, I have scanned
@@ -289,7 +289,7 @@ export default function RestoreWalletBySecondaryDevice( props ) {
                   style={{
                     color: Colors.white,
                     fontSize: RFValue( 13 ),
-                    fontFamily: Fonts.FiraSansMedium,
+                    fontFamily: Fonts.Medium,
                   }}
                 >
                   Scan

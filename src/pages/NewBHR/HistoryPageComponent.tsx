@@ -144,7 +144,7 @@ const HistoryPageComponent = ( props ) => {
           <Text
             style={[ styles.proceedButtonText, {
               fontSize: RFValue( 12 ),
-              // fontFamily: Fonts.FiraSansRegular,
+              // fontFamily: Fonts.Regular,
               color: Colors.white,
             } ]}
           >
@@ -168,7 +168,7 @@ const HistoryPageComponent = ( props ) => {
             <Text
               style={{
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 color: Colors.textColorGrey,
               }}
             >
@@ -272,7 +272,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   selectedHistoryCard: {
     margin: wp( '3%' ),
@@ -288,12 +288,12 @@ const styles = StyleSheet.create( {
   selectedHistoryCardTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   selectedHistoryCardDateText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 9 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: hp( '0.3%' ),
   },
   historyCard: {
@@ -310,12 +310,12 @@ const styles = StyleSheet.create( {
   historyCardTitleText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   historyCardDateText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 9 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 'auto',
   },
   waterMarkCard: {

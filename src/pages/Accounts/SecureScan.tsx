@@ -191,7 +191,7 @@ const SecureScan = props => {
               style={{
                 color: Colors.white,
                 fontSize: RFValue( 13 ),
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
               }}
             >
               Continue
@@ -213,7 +213,7 @@ const SecureScan = props => {
               style={{
                 color: Colors.blue,
                 fontSize: RFValue( 13 ),
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
               }}
             >
               Activate Later

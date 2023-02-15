@@ -220,7 +220,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
                     textAlign: 'center',
                     // paddingHorizontal: 10,
                     fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.FiraSansItalic,
+                    fontFamily: Fonts.Italic,
                   }}
                 >
                   {strings.SendMax}
@@ -307,7 +307,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
                     textAlign: 'center',
                     paddingRight: 10,
                     fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.FiraSansItalic,
+                    fontFamily: Fonts.Italic,
                   }}
                 >
                   {strings.SendMax}
@@ -378,7 +378,7 @@ const styles = StyleSheet.create( {
   textInputContent: {
     height: '100%',
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( placeholder ),
     padding: 0,
   },

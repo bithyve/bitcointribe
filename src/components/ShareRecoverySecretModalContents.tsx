@@ -48,7 +48,7 @@ export default function ShareRecoverySecretModalContents( props ) {
               <Text style={styles.contactNameText}>{props.name}</Text>
               <Text style={{
                 color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 13 ),
                 marginLeft: 25,
               }}>{props.contactInfo}</Text>
@@ -85,11 +85,11 @@ export default function ShareRecoverySecretModalContents( props ) {
               flexDirection:'row', alignItems:'center', justifyContent:'space-between'
             }}>
               <Text style={{
-                color:Colors.textColorGrey, fontSize:RFValue( 11 ), fontFamily:Fonts.FiraSansRegular
+                color:Colors.textColorGrey, fontSize:RFValue( 11 ), fontFamily:Fonts.Regular
               }}>Enter OTP</Text>
               {passcode.length==6 && passcode != correctPasscode ?
                 <Text style={{
-                  color:Colors.red, fontSize:RFValue( 10 ), fontFamily:Fonts.FiraSansMediumItalic
+                  color:Colors.red, fontSize:RFValue( 10 ), fontFamily:Fonts.MediumItalic
                 }}>Incorrect OTP, Try Again</Text>: null}
             </View>
             <View style={styles.passcodeTextInputView}>
@@ -268,14 +268,14 @@ const styles = StyleSheet.create( {
   },
   commModeModalHeaderText: {
     color: Colors.blue,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 18 ),
     marginLeft: 25,
     marginRight: 25
   },
   commModeModalInfoText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     marginLeft: 25,
     marginRight: 25,
@@ -299,7 +299,7 @@ const styles = StyleSheet.create( {
   contactNameText: {
     color: Colors.black,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 25
   },
   contactIconImage: {
@@ -322,7 +322,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   passcodeTextInputView: {
     flexDirection: 'row',

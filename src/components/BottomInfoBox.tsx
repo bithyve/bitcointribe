@@ -30,20 +30,22 @@ export default function BottomInfoBox( props ) {
             color: props.titleColor ? props.titleColor : Colors.blue,
             fontSize: RFValue( 13 ),
             marginBottom: 2,
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
           }}
         >
           {props.title}
         </Text>
         }
-        <Text style={props.icon ? [ styles.bottomNoteInfoText, styles.extraPadding ] : {...styles.bottomNoteInfoText, width : props?.width}}>
+        <Text style={props.icon ? [ styles.bottomNoteInfoText, styles.extraPadding ] : {
+          ...styles.bottomNoteInfoText, width : props?.width
+        }}>
           {props.infoText}
           {props.linkText ? (
             <Text
               style={{
                 color: Colors.textColorGrey,
                 fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 textDecorationLine: 'underline',
               }}
               onPress={props.onPress ? props.onPress : () => {}}
@@ -54,7 +56,7 @@ export default function BottomInfoBox( props ) {
           {props.italicText ? (
             <Text
               style={{
-                fontFamily: Fonts.FiraSansMediumItalic,
+                fontFamily: Fonts.MediumItalic,
                 fontWeight: 'bold',
                 fontStyle: 'italic',
                 fontSize: RFValue( 12 ),
@@ -75,7 +77,7 @@ const styles = StyleSheet.create( {
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.6,
     lineHeight: 18
   },

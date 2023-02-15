@@ -62,11 +62,11 @@ const styles = StyleSheet.create( {
   },
   contactText: {
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
   },
   textSubtitle: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     color: Colors.textColorGrey,
   },
@@ -87,12 +87,12 @@ const styles = StyleSheet.create( {
     marginBottom: 20
   },
   textTitle: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 15 ),
     color: Colors.blue,
   },
   textCurrency: {
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 15 ),
     color: Colors.textColorGrey,
   },
@@ -102,7 +102,7 @@ const styles = StyleSheet.create( {
     alignSelf: 'center',
   },
   textValue: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 15 ),
     color: Colors.textColorGrey,
     marginLeft: wp( '3%' ),
@@ -115,7 +115,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   buttonView: {
     height: wp( '12%' ),
@@ -597,7 +597,7 @@ render() {
                     >
                       <Text
                         style={{
-                          fontFamily: Fonts.FiraSansRegular,
+                          fontFamily: Fonts.Regular,
                           fontSize: RFValue( 13 ),
                           color: Colors.textColorGrey,
                           marginLeft: wp( '3%' ),
@@ -984,7 +984,7 @@ render() {
               <Text style={{
                 color: Colors.textColorGrey,
                 fontSize: RFValue( 14 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 marginHorizontal: wp( 3 )
               }}>
               Connect via Tor

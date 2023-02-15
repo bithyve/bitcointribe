@@ -143,7 +143,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
             <Text
               style={{
                 color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 14 ),
               }}
             >
@@ -154,7 +154,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
             <Text
               style={{
                 color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
                 marginTop: hp( '1%' ),
               }}
@@ -193,7 +193,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
           <Text
             style={{
               color: Colors.blue,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 12 ),
             }}
           >
@@ -217,7 +217,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
             <Text
               style={{
                 color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
                 marginLeft: 3,
               }}
@@ -227,7 +227,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
             <Text
               style={{
                 color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
                 marginLeft: 3,
               }}
@@ -241,7 +241,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
             <Text
               style={{
                 color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
               }}
             >
@@ -253,7 +253,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
               <Text
                 style={{
                   color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                   fontSize: RFValue( 12 ),
                   marginTop: hp( '0.5%' ),
                 }}
@@ -268,7 +268,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
             <Text
               style={{
                 color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
               }}
             >
@@ -280,7 +280,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
               <Text
                 style={{
                   color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                   fontSize: RFValue( 12 ),
                   marginTop: hp( '0.5%' ),
                 }}
@@ -294,7 +294,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
           <Text
             style={{
               color: Colors.blue,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 12 ),
             }}
           >
@@ -303,7 +303,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 12 ),
               marginTop: hp( '0.5%' ),
             }}
@@ -317,7 +317,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
             <Text
               style={{
                 color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
               }}
             >
@@ -326,7 +326,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
             <Text
               style={{
                 color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
                 marginTop: hp( '0.5%' ),
               }}
@@ -339,7 +339,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
           <Text
             style={{
               color: Colors.blue,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 12 ),
             }}
           >
@@ -357,7 +357,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
             <Text
               style={{
                 color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
                 marginTop: hp( '0.5%' ),
               }}
@@ -370,7 +370,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
           <Text
             style={{
               color: Colors.blue,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 12 ),
             }}
           >
@@ -379,7 +379,7 @@ export default function TransactionDetailsBottomSheetContent( props ) {
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 12 ),
               marginTop: hp( '0.5%' ),
             }}
@@ -421,7 +421,7 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   infoCardView: {
     backgroundColor: Colors.white,

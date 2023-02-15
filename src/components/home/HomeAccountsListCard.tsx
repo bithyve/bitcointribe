@@ -177,7 +177,7 @@ const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: 
 
 const styles = StyleSheet.create( {
   boldItalicText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     fontWeight: 'bold',
     fontStyle: 'italic',
     fontSize: RFValue( 11 ),
@@ -248,7 +248,7 @@ const styles = StyleSheet.create( {
     marginLeft: 'auto',
     color: Colors.blue,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   bodyContainer: {
@@ -257,14 +257,14 @@ const styles = StyleSheet.create( {
   },
 
   titleText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.blue,
     fontSize: RFValue( 10 ),
   },
 
   subtitleText: {
     marginTop: widthPercentageToDP( 1 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
     fontSize: RFValue( 10 ),
   },

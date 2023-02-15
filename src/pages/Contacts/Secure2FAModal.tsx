@@ -136,7 +136,7 @@ const styles = StyleSheet.create( {
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: wp( 8 ),
     marginVertical: wp( 4 ),
     width: '85%'
@@ -164,14 +164,14 @@ const styles = StyleSheet.create( {
   modalBoldText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     letterSpacing: 0.6,
     lineHeight: 18
   },
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.54
     // width: wp( 30 ),
   },
@@ -179,7 +179,7 @@ const styles = StyleSheet.create( {
     marginRight: wp( 4 ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'justify',
     letterSpacing: 0.6,
     lineHeight: 18
@@ -189,7 +189,7 @@ const styles = StyleSheet.create( {
     height: hp( '8%' ),
   },
   errorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     color: Colors.red,
     fontSize: RFValue( 11, 812 ),
     fontStyle: 'italic',
@@ -204,7 +204,7 @@ const styles = StyleSheet.create( {
   keyPadElementText: {
     color: Colors.blue,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontStyle: 'normal',
   },
   proceedButtonView: {
@@ -220,7 +220,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   passcodeTextInputText: {
     color: Colors.blue,
@@ -273,7 +273,7 @@ const styles = StyleSheet.create( {
     marginBottom: hp( '2%' ),
   },
   boldItalicText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     fontWeight: 'bold',
     fontStyle: 'italic',
   },
@@ -282,13 +282,13 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 25 ),
     marginLeft: wp( 6 ),
     marginTop: hp( '10%' ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   headerInfoText: {
     marginTop: hp( '2%' ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     marginLeft: wp( 6 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 } )

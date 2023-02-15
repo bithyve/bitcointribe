@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     width: wp('14%'),
     color: Colors.black,
     fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'center',
     marginTop: 5,
   },

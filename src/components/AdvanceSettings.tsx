@@ -1,43 +1,51 @@
-import React, { useState } from 'react';
-import { View, Image, Text, StyleSheet, Linking } from 'react-native';
+import React, { useState } from 'react'
+import { View, Image, Text, StyleSheet, Linking } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
-import { ScrollView } from 'react-native-gesture-handler';
-import BottomInfoBox from './BottomInfoBox';
+} from 'react-native-responsive-screen'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper'
+import { ScrollView } from 'react-native-gesture-handler'
+import BottomInfoBox from './BottomInfoBox'
 
-export default function AdvanceSettings(props) {
-  const [PageData, setPageData] = useState([
+export default function AdvanceSettings( props ) {
+  const [ PageData, setPageData ] = useState( [
     {
       title: 'Use Exit key',
       info: 'Lorem ipsum dolor sit amet, consectetur ',
-      image: require('../assets/images/icons/icon_key.png'),
+      image: require( '../assets/images/icons/icon_key.png' ),
       type: 'UseExitKey',
     },
-  ]);
+  ] )
 
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{
+          flexDirection: 'row', alignItems: 'center'
+        }}>
           <AppBottomSheetTouchableWrapper
             onPress={() => props.ooBackPress()}
-            style={{ height: 30, width: 30, justifyContent: 'center' }}
+            style={{
+              height: 30, width: 30, justifyContent: 'center'
+            }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </AppBottomSheetTouchableWrapper>
-          <View style={{ marginRight: 30}}>
+          <View style={{
+            marginRight: 30
+          }}>
             <Text style={styles.modalHeaderTitleText}>
               {'Advanced Settings'}
             </Text>
-            <Text style={{ ...styles.infoText, marginRight: 20}}>
+            <Text style={{
+              ...styles.infoText, marginRight: 20
+            }}>
               {
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'
               }
@@ -45,44 +53,50 @@ export default function AdvanceSettings(props) {
           </View>
         </View>
       </View>
-      <ScrollView style={{ flex: 1 }}>
-        {PageData.map((item) => {
+      <ScrollView style={{
+        flex: 1
+      }}>
+        {PageData.map( ( item ) => {
           return (
             <AppBottomSheetTouchableWrapper
-              onPress={() => props.onPressAdvanceSetting(item.type)}
+              onPress={() => props.onPressAdvanceSetting( item.type )}
               style={styles.selectedContactsView}
             >
               <Image
                 source={item.image}
                 style={{
-                  width: wp('7%'),
-                  height: wp('7%'),
+                  width: wp( '7%' ),
+                  height: wp( '7%' ),
                   resizeMode: 'contain',
-                  marginLeft: wp('3%'),
-                  marginRight: wp('3%'),
+                  marginLeft: wp( '3%' ),
+                  marginRight: wp( '3%' ),
                 }}
               />
               <View
-                style={{ justifyContent: 'center', marginRight: 10, flex: 1 }}
+                style={{
+                  justifyContent: 'center', marginRight: 10, flex: 1
+                }}
               >
                 <Text style={styles.titleText}>{item.title}</Text>
                 <Text style={styles.infoText}>{item.info}</Text>
               </View>
-              <View style={{ marginLeft: 'auto' }}>
+              <View style={{
+                marginLeft: 'auto'
+              }}>
                 <Ionicons
                   name="ios-arrow-forward"
                   color={Colors.textColorGrey}
                   size={15}
                   style={{
-                    marginLeft: wp('3%'),
-                    marginRight: wp('3%'),
+                    marginLeft: wp( '3%' ),
+                    marginRight: wp( '3%' ),
                     alignSelf: 'center',
                   }}
                 />
               </View>
             </AppBottomSheetTouchableWrapper>
-          );
-        })}
+          )
+        } )}
       </ScrollView>
       <BottomInfoBox
         backgroundColor={Colors.white}
@@ -92,9 +106,9 @@ export default function AdvanceSettings(props) {
         }
       />
     </View>
-  );
+  )
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContainer: {
     height: '100%',
     backgroundColor: Colors.backgroundColor1,
@@ -112,8 +126,8 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 18 ),
+    fontFamily: Fonts.Regular,
   },
   modalContentView: {
     flex: 1,
@@ -129,12 +143,12 @@ const styles = StyleSheet.create({
   },
   contactText: {
     marginLeft: 10,
-    fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.Regular,
   },
   contactIndexText: {
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.Regular,
   },
   contactIndexView: {
     flex: 0.5,
@@ -152,19 +166,19 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   titleText: {
-    fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.Regular,
     color: Colors.blue,
   },
   infoText: {
-    fontSize: RFValue(11),
-    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 11 ),
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
     marginTop: 5,
   },
   shareButtonView: {
-    height: wp('8%'),
-    width: wp('15%'),
+    height: wp( '8%' ),
+    width: wp( '15%' ),
     backgroundColor: Colors.backgroundColor,
     borderWidth: 1,
     borderColor: Colors.borderColor,
@@ -174,24 +188,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   shareButtonText: {
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
   pageTitle: {
     marginLeft: 30,
     color: Colors.blue,
-    fontSize: RFValue(14),
-    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 14 ),
+    fontFamily: Fonts.Regular,
   },
   pageInfoText: {
     marginLeft: 30,
     color: Colors.textColorGrey,
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.Regular,
   },
   addModalTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(14),
+    fontSize: RFValue( 14 ),
   },
-});
+} )

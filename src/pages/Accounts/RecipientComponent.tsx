@@ -83,7 +83,7 @@ function RecipientComponent( {
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 11 ),
               marginBottom: 3,
             }}
@@ -125,7 +125,7 @@ function RecipientComponent( {
             <Text
               style={{
                 color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
               }}
             >
@@ -136,7 +136,7 @@ function RecipientComponent( {
               style={{
                 width: wp( '70%' ),
                 color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
                 marginTop: 5,
               }}
@@ -176,7 +176,7 @@ const styles = StyleSheet.create( {
   contactNameText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     width: wp( '50%' ),
   },
   contactIconImage: {
@@ -187,7 +187,7 @@ const styles = StyleSheet.create( {
 
   amountText: {
     ...HeadingStyles.captionText,
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     color: Colors.blue,
     marginTop: 3,
   }

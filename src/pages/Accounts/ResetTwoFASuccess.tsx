@@ -26,7 +26,7 @@ export default function ResetTwoFASuccess( props ) {
         <Text style={{
           color: props.headerTextColor ? props.headerTextColor : Colors.blue,
           fontSize: RFValue( 18 ),
-          fontFamily: Fonts.FiraSansMedium,
+          fontFamily: Fonts.Medium,
         }}>{props.title}{props.titleNextLine ? '\n' + props.titleNextLine : null}</Text>
         {props.info ? <Text style={{
           ...styles.modalInfoText, marginTop: wp( '1.5%' )
@@ -91,7 +91,7 @@ const styles = StyleSheet.create( {
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   successModalAmountView: {
     justifyContent: 'center',
@@ -121,6 +121,6 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   },
 } )

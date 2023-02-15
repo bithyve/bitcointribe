@@ -93,7 +93,7 @@ export default function GiftAddedModal( { onCancel, formattedUnitText, renderBut
           <Text style={{
             color: Colors.gray4,
             fontSize: RFValue( 10 ),
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
           }}>
             Bitcoin will be transferred to
           </Text>
@@ -101,7 +101,7 @@ export default function GiftAddedModal( { onCancel, formattedUnitText, renderBut
             style={{
               color: Colors.black,
               fontSize: RFValue( 14 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginVertical: hp( 0.3 )
             }}
           >
@@ -182,7 +182,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   successModalAmountImage: {
     width: wp( '10%' ),
@@ -193,13 +193,13 @@ const styles = StyleSheet.create( {
     resizeMode: 'contain',
   },
   phoneNumberInfoText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     color: Colors.textColorGrey,
     marginBottom: wp( '5%' ),
   },
   inputErrorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     fontSize: RFValue( 10 ),
     color: Colors.red,
     marginTop: wp( '2%' ),
@@ -217,7 +217,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
   },
   countryCodeText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     paddingRight: 15,
   },
@@ -283,7 +283,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   buttonView: {
     height: wp( '14%' ),
@@ -301,25 +301,25 @@ const styles = StyleSheet.create( {
   availableToSpendText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     lineHeight: 15,
   },
   balanceText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
   },
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalInfoText: {
     // marginTop: hp( '3%' ),
     marginTop: hp( 0.5 ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: wp( 12 ),
     letterSpacing: 0.6
   },

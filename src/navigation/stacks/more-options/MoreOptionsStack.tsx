@@ -99,7 +99,7 @@ const MoreOptionsStack = createStackNavigator(
           headerTitleStyle:{
             color: Colors.blue,
             fontSize: RFValue( 18 ),
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
             textAlign: 'left',
             marginHorizontal: 0
           },

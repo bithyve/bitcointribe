@@ -148,7 +148,7 @@ export default function SendViaQR( props ) {
               style={{
                 color: Colors.textColorGrey,
                 fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 paddingTop: 5,
               }}
             >
@@ -175,7 +175,7 @@ export default function SendViaQR( props ) {
               style={{
                 color: Colors.white,
                 fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
               }}
             >
               Done
@@ -219,7 +219,7 @@ export default function SendViaQR( props ) {
                           <Text
                             style={{
                               color: Colors.textColorGrey,
-                              fontFamily: Fonts.FiraSansRegular,
+                              fontFamily: Fonts.Regular,
                               fontSize: RFValue( 11 ),
                               marginLeft: 25,
                               paddingTop: 5,
@@ -241,7 +241,7 @@ export default function SendViaQR( props ) {
                           <Text
                             style={{
                               color: Colors.textColorGrey,
-                              fontFamily: Fonts.FiraSansRegular,
+                              fontFamily: Fonts.Regular,
                               fontSize: RFValue( 10 ),
                               marginLeft: 25,
                               paddingTop: 3,
@@ -293,7 +293,7 @@ export default function SendViaQR( props ) {
                     style={{
                       color: Colors.textColorGrey,
                       fontSize: RFValue( 12 ),
-                      fontFamily: Fonts.FiraSansRegular,
+                      fontFamily: Fonts.Regular,
                       textAlign: 'center',
                     }}
                   >
@@ -317,7 +317,7 @@ export default function SendViaQR( props ) {
                     style={{
                       color: Colors.blue,
                       fontSize: RFValue( 13 ),
-                      fontFamily: Fonts.FiraSansRegular,
+                      fontFamily: Fonts.Regular,
                       marginLeft: 5,
                     }}
                   >
@@ -348,7 +348,7 @@ export default function SendViaQR( props ) {
                         style={{
                           color: Colors.black,
                           fontSize: RFValue( 20 ),
-                          fontFamily: Fonts.FiraSansRegular,
+                          fontFamily: Fonts.Regular,
                           marginLeft: 10,
                         }}
                       >
@@ -358,7 +358,7 @@ export default function SendViaQR( props ) {
                         style={{
                           color: Colors.textColorGrey,
                           fontSize: RFValue( 13 ),
-                          fontFamily: Fonts.FiraSansRegular,
+                          fontFamily: Fonts.Regular,
                           marginRight: 5,
                         }}
                       >
@@ -415,7 +415,7 @@ export default function SendViaQR( props ) {
               style={{
                 color: Colors.white,
                 fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
               }}
             >
               Yes, this was scanned
@@ -443,7 +443,7 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: hp( 2 )
   },
   modalContainer: {
@@ -479,7 +479,7 @@ const styles = StyleSheet.create( {
   contactNameText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 25,
   },
   contactIconImage: {
@@ -503,7 +503,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 10,
   },
   amountContainer: {
@@ -553,7 +553,7 @@ const styles = StyleSheet.create( {
     paddingLeft: 15,
   },
   boldItalicText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     fontStyle: 'italic',
     color: Colors.blue,
   },

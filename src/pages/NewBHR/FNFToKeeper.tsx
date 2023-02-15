@@ -155,10 +155,10 @@ const FNFToKeeper = ( props ) => {
           alignItems: 'flex-start'
         }}>
           <Text style={{
-            textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: contact.length && contact[ 0 ].id == contactDescription.contactDetails.id && contact[ 0 ].isExisting ? Colors.white : Colors.textColorGrey
+            textAlign: 'center', fontFamily: Fonts.Regular, color: contact.length && contact[ 0 ].id == contactDescription.contactDetails.id && contact[ 0 ].isExisting ? Colors.white : Colors.textColorGrey
           }}>{firstNamePieceText( contactDescription.contactDetails )}
             <Text style={{
-              ...styles.secondNamePieceText, fontFamily: Fonts.FiraSansMedium
+              ...styles.secondNamePieceText, fontFamily: Fonts.Medium
             }}>{secondNamePieceText( contactDescription.contactDetails )}</Text>
           </Text>
         </View>
@@ -451,7 +451,7 @@ const FNFToKeeper = ( props ) => {
             <Text numberOfLines={2} style={{
               color: Colors.textColorGrey,
               fontSize: RFValue( 12 ),
-              fontFamily: Fonts.FiraSansRegular
+              fontFamily: Fonts.Regular
             }} >
               {strings.sendRecoveryKeyTo}
             </Text>
@@ -470,7 +470,7 @@ const FNFToKeeper = ( props ) => {
                 ...{
                   color: Colors.white,
                   fontSize: RFValue( 13 ),
-                  fontFamily: Fonts.FiraSansMedium,
+                  fontFamily: Fonts.Medium,
                 },
                 color: Colors.blue,
               }}
@@ -483,7 +483,7 @@ const FNFToKeeper = ( props ) => {
           <Text style={{
             marginHorizontal: wp( 2 ),
             color: Colors.blue,
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             fontSize: RFValue( 16 ),
             marginLeft: wp( 4 ),
             marginBottom: wp( 2 ),
@@ -516,7 +516,7 @@ const FNFToKeeper = ( props ) => {
         <Text style={{
           marginHorizontal: wp( 2 ),
           color: Colors.blue,
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Regular,
           fontSize: RFValue( 16 ),
           marginLeft: wp( 4 ),
           marginBottom: wp( 2 ),
@@ -532,7 +532,7 @@ const FNFToKeeper = ( props ) => {
                   <Text style={styles.selectedContactNameText}>
                     {value.name ? value.name.split( ' ' )[ 0 ] : ''}{' '}
                     <Text style={{
-                      fontFamily: Fonts.FiraSansMedium
+                      fontFamily: Fonts.Medium
                     }}>
                       {value.name ? value.name.split( ' ' )[ 1 ] : ''}
                     </Text>
@@ -617,7 +617,7 @@ const FNFToKeeper = ( props ) => {
                           ? item.name.split( ' ' )[ 0 ]
                           : ''}{' '}
                         <Text style={{
-                          fontFamily: Fonts.FiraSansMedium
+                          fontFamily: Fonts.Medium
                         }}>
                           {item.name && item.name.split( ' ' )[ 1 ]
                             ? item.name.split( ' ' )[ 1 ]
@@ -721,11 +721,11 @@ const styles = StyleSheet.create( {
   contactText: {
     marginLeft: 10,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   contactIndexText: {
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   contactIndexView: {
     flex: 0.5,
@@ -770,7 +770,7 @@ const styles = StyleSheet.create( {
   },
   buttonText: {
     color: Colors.white,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 13 ),
   },
   selectedContactContainer: {
@@ -794,7 +794,7 @@ const styles = StyleSheet.create( {
   selectedContactNameText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 } )
 

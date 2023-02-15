@@ -55,7 +55,7 @@ export type Props = {
   version?: string
 };
 
-const NUMBER_OF_INPUTS = 6;
+const NUMBER_OF_INPUTS = 6
 
 export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject, version }: Props ) {
   const dispatch = useDispatch()
@@ -176,26 +176,26 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       setIsDisabled( true )
     }
   }
-  const itemsRef = useRef<Array<TextInput | null>>([]);
+  const itemsRef = useRef<Array<TextInput | null>>( [] )
 
-  const applyOTPCodeToInputs = (code: string) => {
+  const applyOTPCodeToInputs = ( code: string ) => {
     // split up code and apply it to all inputs
-    const codeArray = code.split('');
-    codeArray.forEach((char, index) => {
-    const input = itemsRef.current[index];
-      if (input) {
-        input.setNativeProps({
+    const codeArray = code.split( '' )
+    codeArray.forEach( ( char, index ) => {
+      const input = itemsRef.current[ index ]
+      if ( input ) {
+        input.setNativeProps( {
           text: char,
-        });
+        } )
       }
-    });
+    } )
     // focus on last input as a cherry on top
-    const lastInput = itemsRef.current[itemsRef.current.length - 1];
-    if (lastInput) {
-      lastInput.focus();
+    const lastInput = itemsRef.current[ itemsRef.current.length - 1 ]
+    if ( lastInput ) {
+      lastInput.focus()
       // otpCodeChanged(code);
     }
-  };
+  }
 
   const getInputBox = () => {
     if ( inputType == DeepLinkEncryptionType.EMAIL ) {
@@ -368,79 +368,81 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               />
             )
           } )} */}
-          {Array.from({ length: NUMBER_OF_INPUTS }, (_, i) => (
-        <TextInput
-          // style={{
-          //   paddingLeft: Platform.OS === 'ios' ? 0 : 0,
-          //   paddingRight: Platform.OS === 'ios' ? 10 : 0,
-          //   color: 'red'
-          // }}
-          style={getStyle( i )}
-          ref={(el) => (itemsRef.current[i] = el)}
-          key={i}
-          returnKeyType="done"
-          returnKeyLabel="Done"
-          keyboardType={
-            Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
-          }
-          placeholder={'-'}
-          value={passcodeArray[i]}
-          defaultValue=""
-          // first input can have a length of 6 because they paste their code into it
-          maxLength={i === 0 ? NUMBER_OF_INPUTS : 1}
-          onChange={(event) => {
-            const { text } = event.nativeEvent;
-            // console.log('skk text', text)
-            // console.log('skk event.nativeEvent', event.nativeEvent)
-
-            // only continue one if we see a text of length 1 or 6
-            // if (text.length === 0 || text.length === 1 || text.length === 6) {
-            if (text.length > 1) {
-              applyOTPCodeToInputs(text);
-              // determine new value
-              const newValues = [...passcodeArray];
-              newValues[i] = text.charAt(0);
-  
-              // update state
-              setPasscodeArray(newValues);
-              return;
-            }
-            // going forward, only if text is not empty
-            if (text.length === 1 && i !== NUMBER_OF_INPUTS - 1) {
-              const nextInput = itemsRef.current[i + 1];
-              if (nextInput) {
-                nextInput.focus();
+          {Array.from( {
+            length: NUMBER_OF_INPUTS
+          }, ( _, i ) => (
+            <TextInput
+              // style={{
+              //   paddingLeft: Platform.OS === 'ios' ? 0 : 0,
+              //   paddingRight: Platform.OS === 'ios' ? 10 : 0,
+              //   color: 'red'
+              // }}
+              style={getStyle( i )}
+              ref={( el ) => ( itemsRef.current[ i ] = el )}
+              key={i}
+              returnKeyType="done"
+              returnKeyLabel="Done"
+              keyboardType={
+                Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
               }
-            }
-            // }
-            // determine new value
-            const newValues = [...passcodeArray];
-            newValues[i] = text;
+              placeholder={'-'}
+              value={passcodeArray[ i ]}
+              defaultValue=""
+              // first input can have a length of 6 because they paste their code into it
+              maxLength={i === 0 ? NUMBER_OF_INPUTS : 1}
+              onChange={( event ) => {
+                const { text } = event.nativeEvent
+                // console.log('skk text', text)
+                // console.log('skk event.nativeEvent', event.nativeEvent)
 
-            // update state
-            setPasscodeArray(newValues);
-            // also call callback as a flat string
-            // otpCodeChanged(newValues?.join('')); 
-          }}
-          onKeyPress={(event) => {
-            if (event.nativeEvent.key === 'Backspace') {
-              // going backward:
-              if (i !== 0) {
-                console.log('skk on key press i', i)
-                const previousInput = itemsRef.current[i - 1];
-                console.log('skk on key press previous input', previousInput)
-                if (previousInput) {
-                  previousInput.focus();
-                  return;
+                // only continue one if we see a text of length 1 or 6
+                // if (text.length === 0 || text.length === 1 || text.length === 6) {
+                if ( text.length > 1 ) {
+                  applyOTPCodeToInputs( text )
+                  // determine new value
+                  const newValues = [ ...passcodeArray ]
+                  newValues[ i ] = text.charAt( 0 )
+
+                  // update state
+                  setPasscodeArray( newValues )
+                  return
                 }
-              }
-            }
-          }}
-          // textContentType="oneTimeCode"
-          autoCorrect={false}
-          autoCompleteType="off"
-        />
-      ))}
+                // going forward, only if text is not empty
+                if ( text.length === 1 && i !== NUMBER_OF_INPUTS - 1 ) {
+                  const nextInput = itemsRef.current[ i + 1 ]
+                  if ( nextInput ) {
+                    nextInput.focus()
+                  }
+                }
+                // }
+                // determine new value
+                const newValues = [ ...passcodeArray ]
+                newValues[ i ] = text
+
+                // update state
+                setPasscodeArray( newValues )
+                // also call callback as a flat string
+                // otpCodeChanged(newValues?.join(''));
+              }}
+              onKeyPress={( event ) => {
+                if ( event.nativeEvent.key === 'Backspace' ) {
+                  // going backward:
+                  if ( i !== 0 ) {
+                    console.log( 'skk on key press i', i )
+                    const previousInput = itemsRef.current[ i - 1 ]
+                    console.log( 'skk on key press previous input', previousInput )
+                    if ( previousInput ) {
+                      previousInput.focus()
+                      return
+                    }
+                  }
+                }
+              }}
+              // textContentType="oneTimeCode"
+              autoCorrect={false}
+              autoCompleteType="off"
+            />
+          ) )}
         </View>
       )
     } else if ( inputType == DeepLinkEncryptionType.LONG_OTP || inputType == DeepLinkEncryptionType.SECRET_PHRASE ) {
@@ -610,7 +612,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           >
             <Text
               style={{
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
                 color: Colors.blue
               }}
             >
@@ -672,10 +674,10 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       <>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => { 
-            setAcceptGiftModal( false ); 
-            closeModal(); 
-            dispatch( giftAccepted( '' ) );
+          onPress={() => {
+            setAcceptGiftModal( false )
+            closeModal()
+            dispatch( giftAccepted( '' ) )
             navigation.navigate( 'ManageGifts', {
               giftType : '0'
             } )
@@ -746,12 +748,12 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                   <Text style={{
                     color: Colors.textColorGrey,
                     fontSize: RFValue( 13 ),
-                    // fontFamily: Fonts.FiraSansRegular,
+                    // fontFamily: Fonts.Regular,
                   }}>{walletName}</Text>
                   <Text style={{
                     color: Colors.lightTextColor,
                     fontSize: RFValue( 12 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     letterSpacing: 0.6,
                     marginTop: hp( 1 )
                   }}>
@@ -768,18 +770,18 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 <Text style={{
                   color: Colors.blue,
                   fontSize: RFValue( 18 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}>Gift Sats</Text>
                 <Text style={{
                   color: Colors.black,
                   fontSize: RFValue( 24 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}>
                   {numberWithCommas( giftAmount )}
                   <Text style={{
                     color: Colors.lightTextColor,
                     fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                   }}>
                     {' sats'}
                   </Text>
@@ -814,7 +816,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               <Text style={{
                 color: Colors.gray4,
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
               }}>
                 Bitcoin will be transferred to
               </Text>
@@ -822,7 +824,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 style={{
                   color: Colors.black,
                   fontSize: RFValue( 14 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                   marginVertical: hp( 0.3 )
                 }}
               >
@@ -842,7 +844,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             color: Colors.gray4,
             fontSize: RFValue( 13 ),
             letterSpacing: 0.6,
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             marginHorizontal: wp( 5 ),
             marginVertical: wp( 2 ),
           }}>
@@ -856,7 +858,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             color: Colors.gray4,
             fontSize: RFValue( 13 ),
             letterSpacing: 0.6,
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             marginHorizontal: wp( 5 ),
             marginVertical: wp( 2 ),
           }}>
@@ -904,7 +906,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           >
             <Text
               style={{
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
                 color: Colors.blue
               }}
             >
@@ -1014,7 +1016,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   successModalAmountImage: {
     width: wp( '10%' ),
@@ -1025,13 +1027,13 @@ const styles = StyleSheet.create( {
     resizeMode: 'contain',
   },
   phoneNumberInfoText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     color: Colors.textColorGrey,
     marginBottom: wp( '5%' ),
   },
   inputErrorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     fontSize: RFValue( 10 ),
     color: Colors.red,
     marginTop: wp( '2%' ),
@@ -1050,7 +1052,7 @@ const styles = StyleSheet.create( {
     marginTop: 10,
   },
   countryCodeText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     paddingRight: 15,
   },
@@ -1116,7 +1118,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   buttonView: {
     height: wp( '14%' ),
@@ -1134,25 +1136,25 @@ const styles = StyleSheet.create( {
   availableToSpendText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     lineHeight: 15,
   },
   balanceText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
   },
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalInfoText: {
     // marginTop: hp( '3%' ),
     marginTop: hp( 0.5 ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: wp( 12 ),
     letterSpacing: 0.6,
     marginBottom: hp( 2 )

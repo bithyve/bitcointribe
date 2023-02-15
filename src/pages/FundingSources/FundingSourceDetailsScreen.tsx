@@ -114,7 +114,7 @@ export default function FundingSourceDetails( props ) {
                 <Text
                   style={{
                     color: Colors.blue,
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     fontSize: RFValue( 13 ),
                   }}
                 >
@@ -123,7 +123,7 @@ export default function FundingSourceDetails( props ) {
                 <Text
                   style={{
                     color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     fontSize: RFValue( 10 ),
                     marginLeft: 'auto',
                   }}
@@ -136,7 +136,7 @@ export default function FundingSourceDetails( props ) {
               <Text
                 style={{
                   color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                   fontSize: RFValue( 10 ),
                   marginTop: 5,
                 }}
@@ -162,7 +162,7 @@ export default function FundingSourceDetails( props ) {
                 <Text
                   style={{
                     color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     fontSize: RFValue( 10 ),
                   }}
                 >
@@ -171,7 +171,7 @@ export default function FundingSourceDetails( props ) {
                 <Text
                   style={{
                     color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     fontSize: RFValue( 10 ),
                     marginLeft: 'auto',
                   }}
@@ -243,7 +243,7 @@ export default function FundingSourceDetails( props ) {
           <Text
             style={{
               color: Colors.black,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 13 ),
             }}
           >
@@ -252,7 +252,7 @@ export default function FundingSourceDetails( props ) {
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 13 ),
               marginTop: 5,
             }}
@@ -276,7 +276,7 @@ export default function FundingSourceDetails( props ) {
           <Text
             style={{
               color: Colors.black,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 13 ),
             }}
           >
@@ -285,7 +285,7 @@ export default function FundingSourceDetails( props ) {
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 13 ),
               marginTop: 5,
             }}
@@ -309,7 +309,7 @@ export default function FundingSourceDetails( props ) {
           <Text
             style={{
               color: Colors.black,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 13 ),
             }}
           >
@@ -318,7 +318,7 @@ export default function FundingSourceDetails( props ) {
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 13 ),
               marginTop: 5,
             }}
@@ -342,7 +342,7 @@ export default function FundingSourceDetails( props ) {
           <Text
             style={{
               color: Colors.black,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 13 ),
             }}
           >
@@ -351,7 +351,7 @@ export default function FundingSourceDetails( props ) {
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 13 ),
               marginTop: 5,
             }}
@@ -375,7 +375,7 @@ export default function FundingSourceDetails( props ) {
           <Text
             style={{
               color: Colors.black,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 13 ),
             }}
           >
@@ -384,7 +384,7 @@ export default function FundingSourceDetails( props ) {
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 13 ),
               marginTop: 5,
             }}
@@ -408,7 +408,7 @@ export default function FundingSourceDetails( props ) {
           <Text
             style={{
               color: Colors.black,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 13 ),
             }}
           >
@@ -417,7 +417,7 @@ export default function FundingSourceDetails( props ) {
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 13 ),
               marginTop: 5,
             }}
@@ -444,13 +444,13 @@ const styles = StyleSheet.create( {
   transactionModalAmountText: {
     marginRight: 5,
     fontSize: RFValue( 17 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
   transactionModalAmountUnitText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     lineHeight: RFValue( 18 ),
   },
 } )

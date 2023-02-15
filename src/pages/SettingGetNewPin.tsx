@@ -792,7 +792,7 @@ const styles = StyleSheet.create( {
   keyPadElementText: {
     color: Colors.blue,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontStyle: 'normal',
   },
   proceedButtonView: {
@@ -808,10 +808,10 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   boldItalicText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     fontWeight: 'bold',
     fontStyle: 'italic',
   },
@@ -820,13 +820,13 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 25 ),
     marginLeft: 20,
     marginTop: hp( '10%' ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: hp( 1 )
   },
   passcodeTextInputText: {
@@ -853,7 +853,7 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalContentView: {
     flex: 1,

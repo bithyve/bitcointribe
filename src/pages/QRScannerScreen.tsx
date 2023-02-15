@@ -83,7 +83,7 @@ const QRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
               style={{
                 color: Colors.blue,
                 fontSize: RFValue( 18 ),
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
               }}
             >
               {title ? title : 'Scan QR code'}

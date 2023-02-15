@@ -465,7 +465,7 @@ export default function AddContactSendRequest( props ) {
                 ...{
                   color: Colors.backgroundColor1,
                   fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }
               }}
             >
@@ -708,7 +708,7 @@ const styles = StyleSheet.create( {
   contactNameText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 25,
   },
   buttonInnerView: {
@@ -727,7 +727,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 10,
   },
 } )

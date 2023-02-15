@@ -166,7 +166,7 @@ const styles = StyleSheet.create( {
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   }
 } )
 

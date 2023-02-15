@@ -255,7 +255,7 @@ export default class OpenChannelScreen extends Component {
             <Text style={{
               color: Colors.textColorGrey,
               fontSize: RFValue( 14 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginHorizontal: wp( 2 )
             }}>
               Keep channel private
@@ -332,7 +332,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   buttonView: {
     height: wp( '12%' ),

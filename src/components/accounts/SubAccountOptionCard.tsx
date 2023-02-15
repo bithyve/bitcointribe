@@ -67,7 +67,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
     return {
       ...styles.subtitleText,
       color: isSelected ? Colors.offWhite : Colors.gray8,
-      fontFamily: Fonts.FiraSansRegular
+      fontFamily: Fonts.Regular
     }
   }, [ isSelected ] )
 
@@ -141,7 +141,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
         </View>
 
         {!AllowSecureAccount && subAccountInfo.type == 'SAVINGS_ACCOUNT' ? <Text style={{
-          color: Colors.blue, fontSize: RFValue( 10 ), fontFamily: Fonts.FiraSansRegular
+          color: Colors.blue, fontSize: RFValue( 10 ), fontFamily: Fonts.Regular
         }}>Level up to use</Text> :
           isDisabled == false && (
             <View style={selectionIndicatorContainerStyle}>

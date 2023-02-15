@@ -257,7 +257,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
       >
         <Text
           style={{
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
             color: Colors.blue
           }}
         >
@@ -379,7 +379,7 @@ const styles = StyleSheet.create( {
     marginRight: 14,
   },
   destinationTitleText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 20 ),
     color: Colors.black,
   },
@@ -393,14 +393,14 @@ const styles = StyleSheet.create( {
     marginBottom: wp( '4%' ),
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: wp( '6%' )
   },
   modalInfoText: {
     marginLeft: wp( '6%' ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'justify',
     // marginTop: wp( 1 ),
     marginBottom: wp( 4 ),
@@ -428,7 +428,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   },
   errorImage: {
     width: wp( '31%' ),

@@ -286,7 +286,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 color: Colors.blue,
                 fontSize: RFValue( 16 ),
                 marginLeft: 2,
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
 
               }}>
                             Buy
@@ -324,7 +324,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                       }}>
                       <Text style={{
                         margin: hp( 0.5 ), color: item.active ? Colors.white : Colors.gray2, alignSelf: 'center',
-                        fontFamily: Fonts.FiraSansMedium,
+                        fontFamily: Fonts.Medium,
                         textAlign: 'center'
                       }}>
                         {item.title}

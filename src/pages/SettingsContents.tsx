@@ -201,7 +201,7 @@ export default function SettingsContents( props ) {
                 style={{
                   color: Colors.blue,
                   fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                   marginLeft: 10,
                   textAlign: 'center'
                 }}
@@ -403,7 +403,7 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalContentView: {
     flex: 1,
@@ -420,11 +420,11 @@ const styles = StyleSheet.create( {
   contactText: {
     marginLeft: 10,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   contactIndexText: {
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   contactIndexView: {
     flex: 0.5,
@@ -443,12 +443,12 @@ const styles = StyleSheet.create( {
   },
   titleText: {
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.blue,
   },
   infoText: {
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
     marginTop: 5,
   },
@@ -465,7 +465,7 @@ const styles = StyleSheet.create( {
   },
   shareButtonText: {
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
   headerSettingImage: {
@@ -476,13 +476,13 @@ const styles = StyleSheet.create( {
     marginLeft: 30,
     color: Colors.blue,
     fontSize: RFValue( 14 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   pageInfoText: {
     marginLeft: 30,
     color: Colors.textColorGrey,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   addModalTitleText: {
     color: Colors.blue,

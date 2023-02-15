@@ -355,7 +355,7 @@ export default function TrustedContactRequest( props ) {
                 <Text
                   style={{
                     fontSize: RFValue( 18 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                     color: Colors.blue,
                   }}
                 >
@@ -411,12 +411,12 @@ export default function TrustedContactRequest( props ) {
                     ? 'email address, '
                     : 'otp, '}
                 <Text style={{
-                  fontFamily: Fonts.FiraSansMediumItalic
+                  fontFamily: Fonts.MediumItalic
                 }}>
                   to accept the request
                 </Text>
               </Text>
-              {/* <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
+              {/* <Text style={{ fontFamily: Fonts.MediumItalic }}>
                 {props.inputType === 'phone'
                   ? `${props.hint.charAt(0)}XXX XXX X${props.hint.substring(1)}`
                   : props.inputType === 'email'
@@ -528,12 +528,12 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   successModalButtonView: {
     height: wp( '13%' ),
@@ -553,7 +553,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   successModalAmountImage: {
     width: wp( '10%' ),
@@ -564,13 +564,13 @@ const styles = StyleSheet.create( {
     resizeMode: 'contain',
   },
   phoneNumberInfoText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     color: Colors.textColorGrey,
     marginBottom: wp( '5%' ),
   },
   inputErrorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     fontSize: RFValue( 10 ),
     color: Colors.red,
     marginTop: wp( '2%' ),
@@ -588,7 +588,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
   },
   countryCodeText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     paddingRight: 15,
   },

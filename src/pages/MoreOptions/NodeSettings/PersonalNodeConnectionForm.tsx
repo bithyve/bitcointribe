@@ -244,7 +244,7 @@ const styles = StyleSheet.create( {
   useFallbackText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   useFallbackCheckView: {
     width: wp( '7%' ),
@@ -267,7 +267,7 @@ const styles = StyleSheet.create( {
   proceedBtnText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   }
 } )
 

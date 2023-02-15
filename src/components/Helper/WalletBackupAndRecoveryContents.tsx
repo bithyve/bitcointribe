@@ -1,19 +1,21 @@
-import React from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import React from 'react'
+import { View, Image, Text, StyleSheet } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
-import { ScrollView } from 'react-native-gesture-handler';
+} from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
+import { ScrollView } from 'react-native-gesture-handler'
 
-export default function WalletBackupAndRecoveryContents(props) {
+export default function WalletBackupAndRecoveryContents( props ) {
   return (
     <ScrollView style={styles.modalContainer}>
-      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{
+        justifyContent: 'center', alignItems: 'center'
+      }}>
         {/* <AppBottomSheetTouchableWrapper onPress={()=>props.onPressManageBackup()} style={{
                 width: wp('50%'), height: wp('13%'), backgroundColor: Colors.homepageButtonColor,
                 borderRadius: 10,
@@ -24,35 +26,39 @@ export default function WalletBackupAndRecoveryContents(props) {
         <Text
           style={{
             color: Colors.white,
-            fontFamily: Fonts.FiraSansMedium,
-            fontSize: RFValue(20),
-            marginTop: hp('1%'),
-            marginBottom: hp('1%'),
+            fontFamily: Fonts.Medium,
+            fontSize: RFValue( 20 ),
+            marginTop: hp( '1%' ),
+            marginBottom: hp( '1%' ),
           }}
         >
           Manage Backup
         </Text>
         {/* </AppBottomSheetTouchableWrapper> */}
       </View>
-      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{
+        justifyContent: 'center', alignItems: 'center'
+      }}>
         <Image
-          source={require('../../assets/images/icons/shieldWithRoundBorder.png')}
-          style={{ width: wp('50%'), height: wp('50%'), resizeMode: 'contain' }}
+          source={require( '../../assets/images/icons/shieldWithRoundBorder.png' )}
+          style={{
+            width: wp( '50%' ), height: wp( '50%' ), resizeMode: 'contain'
+          }}
         />
       </View>
       <View
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          marginTop: hp('2%'),
+          marginTop: hp( '2%' ),
         }}
       >
         <Text
           style={{
             textAlign: 'center',
             color: Colors.white,
-            fontSize: RFValue(13),
-            fontFamily: Fonts.FiraSansRegular,
+            fontSize: RFValue( 13 ),
+            fontFamily: Fonts.Regular,
           }}
         >
           With{' '}
@@ -60,8 +66,8 @@ export default function WalletBackupAndRecoveryContents(props) {
             style={{
               textAlign: 'center',
               color: Colors.white,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansMedium,
+              fontSize: RFValue( 13 ),
+              fontFamily: Fonts.Medium,
             }}
           >
             Bitcoin Tribe
@@ -70,8 +76,8 @@ export default function WalletBackupAndRecoveryContents(props) {
           <Text
             style={{
               color: Colors.white,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansMedium,
+              fontSize: RFValue( 13 ),
+              fontFamily: Fonts.Medium,
             }}
           >
             better privacy and security
@@ -82,22 +88,26 @@ export default function WalletBackupAndRecoveryContents(props) {
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          marginTop: hp('2%'),
-          marginBottom: hp('2%'),
+          marginTop: hp( '2%' ),
+          marginBottom: hp( '2%' ),
         }}
       >
         <Image
-          source={require('../../assets/images/icons/mobileWithCircle.png')}
-          style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
+          source={require( '../../assets/images/icons/mobileWithCircle.png' )}
+          style={{
+            width: wp( '25%' ), height: wp( '25%' ), resizeMode: 'contain'
+          }}
         />
       </View>
-      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{
+        justifyContent: 'center', alignItems: 'center'
+      }}>
         <Text
           style={{
             textAlign: 'center',
             color: Colors.white,
-            fontSize: RFValue(13),
-            fontFamily: Fonts.FiraSansRegular,
+            fontSize: RFValue( 13 ),
+            fontFamily: Fonts.Regular,
           }}
         >
           As only you can access your wallet, it is important to manage your backup health for easy recovery in case you lose your phone.
@@ -107,15 +117,15 @@ export default function WalletBackupAndRecoveryContents(props) {
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          marginTop: hp('5%'),
+          marginTop: hp( '5%' ),
         }}
       >
         <Text
           style={{
             textAlign: 'center',
             color: Colors.white,
-            fontSize: RFValue(13),
-            fontFamily: Fonts.FiraSansRegular,
+            fontSize: RFValue( 13 ),
+            fontFamily: Fonts.Regular,
           }}
         >
           Once backed up, Bitcoin Tribe's automated health check process ensures you have access to the backup anytime!
@@ -125,8 +135,8 @@ export default function WalletBackupAndRecoveryContents(props) {
             marginTop: 5,
             textAlign: 'center',
             color: Colors.white,
-            fontSize: RFValue(13),
-            fontFamily: Fonts.FiraSansMedium,
+            fontSize: RFValue( 13 ),
+            fontFamily: Fonts.Medium,
           }}
         >
           The Health Shield tells you{'\n'}how ready your backup is.
@@ -135,8 +145,8 @@ export default function WalletBackupAndRecoveryContents(props) {
       <View
         style={{
           flexDirection: 'row',
-          marginTop: hp('2%'),
-          marginBottom: hp('2%'),
+          marginTop: hp( '2%' ),
+          marginBottom: hp( '2%' ),
           justifyContent: 'center',
           alignItems: 'center',
         }}
@@ -144,8 +154,8 @@ export default function WalletBackupAndRecoveryContents(props) {
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onStartBackup()}
           style={{
-            width: wp('30%'),
-            height: wp('13%'),
+            width: wp( '30%' ),
+            height: wp( '13%' ),
             backgroundColor: Colors.white,
             borderRadius: 10,
             justifyContent: 'center',
@@ -155,8 +165,8 @@ export default function WalletBackupAndRecoveryContents(props) {
           <Text
             style={{
               color: Colors.blue,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue( 13 ),
+              fontFamily: Fonts.Regular,
             }}
           >
             Start Backup
@@ -165,8 +175,8 @@ export default function WalletBackupAndRecoveryContents(props) {
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onSkip()}
           style={{
-            width: wp('20%'),
-            height: wp('13%'),
+            width: wp( '20%' ),
+            height: wp( '13%' ),
             borderRadius: 10,
             justifyContent: 'center',
             alignItems: 'center',
@@ -175,8 +185,8 @@ export default function WalletBackupAndRecoveryContents(props) {
           <Text
             style={{
               color: Colors.white,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue( 13 ),
+              fontFamily: Fonts.Regular,
             }}
           >
             Skip
@@ -197,7 +207,7 @@ export default function WalletBackupAndRecoveryContents(props) {
             borderWidth: 1,
             borderRadius: 1,
             borderColor: Colors.white,
-            width: wp('30%'),
+            width: wp( '30%' ),
             height: 0,
           }}
         />
@@ -205,8 +215,8 @@ export default function WalletBackupAndRecoveryContents(props) {
           style={{
             textAlign: 'center',
             color: Colors.white,
-            fontSize: RFValue(16),
-            fontFamily: Fonts.FiraSansMedium,
+            fontSize: RFValue( 16 ),
+            fontFamily: Fonts.Medium,
           }}
         >
           How It Works
@@ -217,7 +227,7 @@ export default function WalletBackupAndRecoveryContents(props) {
             borderWidth: 1,
             borderRadius: 1,
             borderColor: Colors.white,
-            width: wp('30%'),
+            width: wp( '30%' ),
             height: 0,
           }}
         />
@@ -226,15 +236,15 @@ export default function WalletBackupAndRecoveryContents(props) {
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          marginTop: hp('4%'),
+          marginTop: hp( '4%' ),
         }}
       >
         <Text
           style={{
             textAlign: 'center',
             color: Colors.white,
-            fontSize: RFValue(13),
-            fontFamily: Fonts.FiraSansRegular,
+            fontSize: RFValue( 13 ),
+            fontFamily: Fonts.Regular,
           }}
         >
           The app creates five Recovery Keys for your wallet.
@@ -244,15 +254,15 @@ export default function WalletBackupAndRecoveryContents(props) {
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          marginTop: hp('4%'),
+          marginTop: hp( '4%' ),
         }}
       >
         <Text
           style={{
             textAlign: 'center',
             color: Colors.white,
-            fontSize: RFValue(13),
-            fontFamily: Fonts.FiraSansRegular,
+            fontSize: RFValue( 13 ),
+            fontFamily: Fonts.Regular,
           }}
         >
           All you need to do is follow the outlined steps and send these Keys to five different locations, or "Keepers".
@@ -262,15 +272,15 @@ export default function WalletBackupAndRecoveryContents(props) {
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          marginTop: hp('2%'),
+          marginTop: hp( '2%' ),
         }}
       >
         <Text
           style={{
             textAlign: 'center',
             color: Colors.white,
-            fontSize: RFValue(13),
-            fontFamily: Fonts.FiraSansRegular,
+            fontSize: RFValue( 13 ),
+            fontFamily: Fonts.Regular,
           }}
         >
           Keepers can only help you recover your wallet and cannot see your balance or use your bitcoin.
@@ -280,36 +290,38 @@ export default function WalletBackupAndRecoveryContents(props) {
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          marginTop: hp('2%'),
-          marginBottom: hp('2%'),
+          marginTop: hp( '2%' ),
+          marginBottom: hp( '2%' ),
         }}
       >
         <Image
-          source={require('../../assets/images/icons/walletBackupIllutration.png')}
-          style={{ width: wp('90%'), height: wp('80%'), resizeMode: 'contain' }}
+          source={require( '../../assets/images/icons/walletBackupIllutration.png' )}
+          style={{
+            width: wp( '90%' ), height: wp( '80%' ), resizeMode: 'contain'
+          }}
         />
       </View>
       <View
         style={{
           backgroundColor: Colors.homepageButtonColor,
           height: 1,
-          marginLeft: wp('5%'),
-          marginRight: wp('5%'),
+          marginLeft: wp( '5%' ),
+          marginRight: wp( '5%' ),
         }}
       />
       <View
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          marginTop: hp('5%'),
+          marginTop: hp( '5%' ),
         }}
       >
         <Text
           style={{
             textAlign: 'center',
             color: Colors.white,
-            fontSize: RFValue(13),
-            fontFamily: Fonts.FiraSansRegular,
+            fontSize: RFValue( 13 ),
+            fontFamily: Fonts.Regular,
           }}
         >
           If you lose your phone, all you have to do is request{' '}
@@ -318,8 +330,8 @@ export default function WalletBackupAndRecoveryContents(props) {
               marginTop: 5,
               textAlign: 'center',
               color: Colors.white,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansMedium,
+              fontSize: RFValue( 13 ),
+              fontFamily: Fonts.Medium,
             }}
           >
             three of the five
@@ -331,22 +343,26 @@ export default function WalletBackupAndRecoveryContents(props) {
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          marginTop: hp('2%'),
-          marginBottom: hp('2%'),
+          marginTop: hp( '2%' ),
+          marginBottom: hp( '2%' ),
         }}
       >
         <Image
-          source={require('../../assets/images/icons/walletbackupRequestBackupThree.png')}
-          style={{ width: wp('90%'), height: wp('80%'), resizeMode: 'contain' }}
+          source={require( '../../assets/images/icons/walletbackupRequestBackupThree.png' )}
+          style={{
+            width: wp( '90%' ), height: wp( '80%' ), resizeMode: 'contain'
+          }}
         />
       </View>
-      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{
+        justifyContent: 'center', alignItems: 'center'
+      }}>
         <Text
           style={{
             textAlign: 'center',
             color: Colors.white,
-            fontSize: RFValue(13),
-            fontFamily: Fonts.FiraSansRegular,
+            fontSize: RFValue( 13 ),
+            fontFamily: Fonts.Regular,
           }}
         >
           Once you answer your Security Question, the wallet is recreated and you can use Bitcoin Tribe from your new device!
@@ -356,28 +372,30 @@ export default function WalletBackupAndRecoveryContents(props) {
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          marginTop: hp('1%'),
-          marginBottom: hp('2%'),
+          marginTop: hp( '1%' ),
+          marginBottom: hp( '2%' ),
         }}
       >
         <Image
-          source={require('../../assets/images/icons/Walletbackupwalletrecreate.png')}
-          style={{ width: wp('90%'), height: wp('50%'), resizeMode: 'contain' }}
+          source={require( '../../assets/images/icons/Walletbackupwalletrecreate.png' )}
+          style={{
+            width: wp( '90%' ), height: wp( '50%' ), resizeMode: 'contain'
+          }}
         />
       </View>
       <View
         style={{
           backgroundColor: Colors.homepageButtonColor,
           height: 1,
-          marginLeft: wp('5%'),
-          marginRight: wp('5%'),
+          marginLeft: wp( '5%' ),
+          marginRight: wp( '5%' ),
         }}
       />
       <View
         style={{
           flexDirection: 'row',
-          marginTop: hp('2%'),
-          marginBottom: hp('2%'),
+          marginTop: hp( '2%' ),
+          marginBottom: hp( '2%' ),
           justifyContent: 'center',
           alignItems: 'center',
         }}
@@ -385,8 +403,8 @@ export default function WalletBackupAndRecoveryContents(props) {
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onStartBackup()}
           style={{
-            width: wp('30%'),
-            height: wp('13%'),
+            width: wp( '30%' ),
+            height: wp( '13%' ),
             backgroundColor: Colors.white,
             borderRadius: 10,
             justifyContent: 'center',
@@ -396,8 +414,8 @@ export default function WalletBackupAndRecoveryContents(props) {
           <Text
             style={{
               color: Colors.blue,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue( 13 ),
+              fontFamily: Fonts.Regular,
             }}
           >
             Start Backup
@@ -406,8 +424,8 @@ export default function WalletBackupAndRecoveryContents(props) {
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onSkip()}
           style={{
-            width: wp('20%'),
-            height: wp('13%'),
+            width: wp( '20%' ),
+            height: wp( '13%' ),
             borderRadius: 10,
             justifyContent: 'center',
             alignItems: 'center',
@@ -416,8 +434,8 @@ export default function WalletBackupAndRecoveryContents(props) {
           <Text
             style={{
               color: Colors.white,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue( 13 ),
+              fontFamily: Fonts.Regular,
             }}
           >
             Skip
@@ -425,18 +443,20 @@ export default function WalletBackupAndRecoveryContents(props) {
         </AppBottomSheetTouchableWrapper>
       </View>
     </ScrollView>
-  );
+  )
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContainer: {
     height: '100%',
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('4%'),
+    paddingBottom: hp( '4%' ),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0, height: 2
+    },
   },
-});
+} )

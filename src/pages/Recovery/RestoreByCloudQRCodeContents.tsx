@@ -199,7 +199,7 @@ export default function RestoreByCloudQRCodeContents( props ) {
             style={{
               color: Colors.blue,
               fontSize: RFValue( 13, 812 ),
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.Medium,
             }}
           >
             Step {counter == 9 ? 8 : counter} of 8
@@ -209,7 +209,7 @@ export default function RestoreByCloudQRCodeContents( props ) {
             style={{
               color: Colors.textColorGrey,
               fontSize: RFValue( 11, 812 ),
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.Medium,
             }}
           >
             {props.pageInfo}Please scan the{' '}

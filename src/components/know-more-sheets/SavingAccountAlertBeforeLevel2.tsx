@@ -34,7 +34,7 @@ export default function SavingAccountAlertBeforeLevel2( props ) {
           <Text
             style={{
               color: Colors.white,
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.Medium,
               fontSize: RFValue( 20 ),
               marginTop: hp( '1%' ),
               marginBottom: hp( '1%' ),
@@ -119,7 +119,7 @@ const styles = StyleSheet.create( {
     textAlign: 'center',
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: wp( '8%' ),
     marginRight: wp( '8%' ),
   },

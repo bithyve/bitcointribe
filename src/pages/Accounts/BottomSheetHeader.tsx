@@ -45,7 +45,7 @@ const styles = StyleSheet.create( {
     marginLeft: wp( '7%' ),
     color: Colors.lightTextColor,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 )

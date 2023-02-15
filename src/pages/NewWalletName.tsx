@@ -252,13 +252,13 @@ export default function NewWalletName( props ) {
             }}>
               <Text style={{
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
+                fontFamily: Fonts.Italic, color: Colors.textColorGrey,
                 alignSelf: 'flex-end'
               }}>
                 {strings.WalletCreationNumbers}</Text>
               {/* <Text style={{
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
+                fontFamily: Fonts.Italic, color: Colors.textColorGrey,
                 alignSelf: 'flex-end'
               }}>
                 {strings.numbers}</Text> */}
@@ -345,13 +345,13 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 25 ),
     marginLeft: 20,
     marginBottom: 5,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   labelStyle: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     marginLeft: 15,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   inputBox: {
     borderRadius: 10,
@@ -362,7 +362,7 @@ const styles = StyleSheet.create( {
     paddingLeft: 15,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginBottom: hp( 1 ),
     backgroundColor: Colors.backgroundColor1,
   },
@@ -382,19 +382,19 @@ const styles = StyleSheet.create( {
       width: 2, height: 2
     },
     backgroundColor: Colors.backgroundColor1,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginBottom: hp( 1 ),
   },
   bottomNoteText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
     marginBottom: 5,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   buttonView: {
     height: wp( '13%' ),
@@ -407,7 +407,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   bottomButtonView: {
     flexDirection: 'row',
@@ -463,6 +463,6 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.backgroundColor,
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 } )

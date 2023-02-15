@@ -142,12 +142,12 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   successModalAmountView: {
     marginRight: wp( '10%' ),
@@ -156,13 +156,13 @@ const styles = StyleSheet.create( {
   successModalWalletNameText: {
     color: Colors.black,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'left'
   },
   successModalHeaderText: {
     color: Colors.black,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'left',
     paddingBottom: 5,
     paddingTop: 5
@@ -177,13 +177,13 @@ const styles = StyleSheet.create( {
   },
   successModalAmountText: {
     color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 21 ),
     marginLeft: 5
   },
   successModalAmountUnitText: {
     color: Colors.borderColor,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 )
   },
   successModalAmountInfoView: {
@@ -210,7 +210,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   },
   separator: {
     height: 2,

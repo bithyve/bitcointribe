@@ -30,11 +30,11 @@ export default function LoaderModal( props ) {
           marginLeft: wp( '8%' ), marginRight:  props.subPoints ? wp( '12%' ) : wp( '30%' ), marginTop: wp( '8%' ),
         }}>
           <Text style={{
-            color: Colors.blue, fontSize: RFValue( 18 ), fontFamily: Fonts.FiraSansRegular, letterSpacing: 0.54
+            color: Colors.blue, fontSize: RFValue( 18 ), fontFamily: Fonts.Regular, letterSpacing: 0.54
             // letterSpacing: 0.54
           }}>{props.headerText}</Text>
           <Text style={{
-            color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' ), letterSpacing: 0.6
+            color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.Regular, marginTop: wp( '3%' ), letterSpacing: 0.6
             // letterSpacing: 0.6
           }}>{props.messageText}</Text>
           {props.subPoints &&
@@ -50,7 +50,7 @@ export default function LoaderModal( props ) {
                     height: 6, width: 6, borderRadius: 3, backgroundColor: Colors.gray4, alignSelf: 'center'
                   }}/>
                   <Text style={{
-                    color: Colors.textColorGrey, fontSize: RFValue( 12 ), letterSpacing: 0.6, fontFamily: Fonts.FiraSansRegular, marginLeft: wp( 2 )
+                    color: Colors.textColorGrey, fontSize: RFValue( 12 ), letterSpacing: 0.6, fontFamily: Fonts.Regular, marginLeft: wp( 2 )
                   }}>
                     {item}
                   </Text>
@@ -61,11 +61,11 @@ export default function LoaderModal( props ) {
           }
           {props.bottomText &&
           <Text style={{
-            color: Colors.textColorGrey, fontSize: RFValue( 12 ), letterSpacing: 0.6, fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' ), width: '65%'
+            color: Colors.textColorGrey, fontSize: RFValue( 12 ), letterSpacing: 0.6, fontFamily: Fonts.Regular, marginTop: wp( '3%' ), width: '65%'
           }}>{props.bottomText}</Text>
           }
           <Text style={{
-            marginRight: wp( '3%' ), color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' ), letterSpacing: 0.6
+            marginRight: wp( '3%' ), color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.Regular, marginTop: wp( '3%' ), letterSpacing: 0.6
           }}>{props.messageText2 ? props.messageText2 : ''}</Text>
         </View>
       }

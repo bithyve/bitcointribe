@@ -250,7 +250,7 @@ export default function NewRecoveryOwnQuestions( props ) {
                 <Text
                   style={{
                     color: Colors.red,
-                    fontFamily: Fonts.FiraSansMediumItalic,
+                    fontFamily: Fonts.MediumItalic,
                     fontSize: RFValue( 10 ),
                     marginLeft: 'auto',
                   }}
@@ -293,12 +293,12 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   buttonView: {
     height: wp( '13%' ),
@@ -316,7 +316,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   bottomButtonView: {
     flexDirection: 'row',
@@ -371,12 +371,12 @@ const styles = StyleSheet.create( {
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingLeft: 15,
   },
   dropdownBoxText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     marginRight: 15,
   },

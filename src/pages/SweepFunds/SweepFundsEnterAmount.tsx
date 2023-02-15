@@ -411,7 +411,7 @@ class SweepFundsEnterAmount extends Component<
               style={{
                 color: Colors.blue,
                 fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansItalic,
+                fontFamily: Fonts.Italic,
               }}
             >
               {serviceType == 'TEST_ACCOUNT'
@@ -554,7 +554,7 @@ class SweepFundsEnterAmount extends Component<
                           textAlign: 'center',
                           paddingHorizontal: 10,
                           fontSize: RFValue( 10 ),
-                          fontFamily: Fonts.FiraSansItalic,
+                          fontFamily: Fonts.Italic,
                         }}
                       >
                         Send Max
@@ -649,7 +649,7 @@ class SweepFundsEnterAmount extends Component<
                           textAlign: 'center',
                           paddingHorizontal: 10,
                           fontSize: RFValue( 10 ),
-                          fontFamily: Fonts.FiraSansItalic,
+                          fontFamily: Fonts.Italic,
                         }}
                       >
                         Send Max
@@ -687,7 +687,7 @@ class SweepFundsEnterAmount extends Component<
                 >
                   <Text
                     style={{
-                      fontFamily: Fonts.FiraSansMediumItalic,
+                      fontFamily: Fonts.MediumItalic,
                       fontWeight: 'bold',
                       fontStyle: 'italic',
                       fontSize: RFValue( 13 ),
@@ -699,7 +699,7 @@ class SweepFundsEnterAmount extends Component<
                   </Text>
                   <Text
                     style={{
-                      fontFamily: Fonts.FiraSansRegular,
+                      fontFamily: Fonts.Regular,
                       fontSize: RFValue( 12 ),
                       color: Colors.textColorGrey,
                     }}
@@ -807,7 +807,7 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   view: {
     flex: 1,
@@ -823,7 +823,7 @@ const styles = StyleSheet.create( {
   name: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'center',
     marginTop: 5,
     width: wp( '15%' ),
@@ -831,12 +831,12 @@ const styles = StyleSheet.create( {
   amountText: {
     color: Colors.black,
     fontSize: RFValue( 21 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   balanceText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
   },
   parentView: {
     flex: 1,
@@ -851,7 +851,7 @@ const styles = StyleSheet.create( {
   },
   sendText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     marginTop: 5,
   },
@@ -903,22 +903,22 @@ const styles = StyleSheet.create( {
   availableToSpendText: {
     color: Colors.blue,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     lineHeight: 15,
     textAlign: 'center',
   },
   addessText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
   },
   textTsats: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 7 ),
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
   },
   errorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     color: Colors.red,
     fontSize: RFValue( 11 ),
     fontStyle: 'italic',
@@ -968,7 +968,7 @@ const styles = StyleSheet.create( {
   textBox: {
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   confirmButtonView: {
     width: wp( '50%' ),
@@ -980,7 +980,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   circleShapeView: {
     width: wp( '14%' ),
@@ -1019,19 +1019,19 @@ const styles = StyleSheet.create( {
   totalAmountText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 5,
   },
   totalAmountSubText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 5,
   },
   sweepingFromText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 5,
   },
   totalAmountOuterView: {
@@ -1055,7 +1055,7 @@ const styles = StyleSheet.create( {
   amountUnitText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: 5,
   },
 } )
