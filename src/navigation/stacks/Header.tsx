@@ -1755,11 +1755,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }}
         > */}
         <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-          start={{
-            x: 0, y: 0
-          }} end={{
-            x: 1, y: 0
-          }}
+          // start={{
+          //   x: 0, y: 0.2
+          // }} end={{
+          //   x: 0.1, y: 0.1
+          // }}
           locations={[ 0, 1 ]}
           style={{
             width: '100%',

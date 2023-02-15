@@ -204,7 +204,8 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey
   },
   imageStyle: {
-    width: wp( 4 ), height: wp( 4 )
+    width: wp( 4 ), height: wp( 4 ),
+    tintColor: Colors.theam_icon_color
   },
   learnMore: {
     fontFamily: Fonts.FiraSansMediumItalic,

@@ -321,7 +321,7 @@ const SeedBackupHistory = ( props ) => {
           ? getTime( selectedKeeper?.updatedAt )
           : 'Never'}
         moreInfo={''}
-        tintColor={Colors.deepBlue}
+        tintColor={Colors.blue}
         headerImage={require( '../../assets/images/icons/seedwords.png' )}
       />
       <View style={{

@@ -70,7 +70,7 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
       disabled={disabled}
       style={{
         flexDirection: isVertical ? 'column' : 'row',
-        backgroundColor: trackColor || '#1E82C2',
+        backgroundColor: trackColor || Colors.blue,
         height: isVertical ? wp( '17%' ) : changeSettingToggle ? wp( '7%' ) : wp( '9%' ),
         width: isVertical ? wp( '10%' ) : changeSettingToggle ? wp( '14%' ) : wp( '17%' ),
         borderRadius: wp( '10%' ) / 2,
@@ -96,10 +96,11 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
               ( !isNotImage && materialIconCurrencyCodes.includes( fiatCurrencyCode ) ) && (
                 <CurrencyCodeIcon
                   currencyCode={fiatCurrencyCode}
-                  color={Colors.currencyGray}
+                  color={Colors.blue}
                 />
               )
-              || (
+              ||
+               (
                 <Image
                   source={
                     inactiveOffImage || getCurrencyImageByRegion( fiatCurrencyCode, 'light' )
@@ -108,14 +109,18 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
                     width: wp( '3.5%' ),
                     height: wp( '3.5%' ),
                     resizeMode: 'contain',
+                    tintColor:Colors.blue
                   }}
                 />
-              ) )}
+              )
+               )}
           </View>
 
           <View
             style={{
-              backgroundColor: thumbColor || Colors.white,
+              backgroundColor: 
+              // thumbColor || 
+              Colors.white,
               height: thumbSize || wp( '8%' ),
               width: thumbSize || wp( '8%' ),
               borderRadius: thumbSize || wp( '8%' ) / 2,
@@ -134,6 +139,7 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
                   width: wp( '3.5%' ),
                   height: wp( '3.5%' ),
                   resizeMode: 'contain',
+                  tintColor: Colors.blue
                 }}
               />
             )}
@@ -145,9 +151,9 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
         }}>
           <View
             style={{
-              backgroundColor: thumbColor
-                ? thumbColor
-                : Colors.white,
+              backgroundColor:
+              //  thumbColor ? thumbColor : 
+               Colors.white,
               height: thumbSize || wp( '8%' ),
               width: thumbSize || wp( '8%' ),
               borderRadius: thumbSize || wp( '8%' ) / 2,
@@ -174,6 +180,8 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
                       width: wp( '3.5%' ),
                       height: wp( '3.5%' ),
                       resizeMode: 'contain',
+                      tintColor:Colors.blue
+
                     }}
                   />
                 ) )}
@@ -199,6 +207,8 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
                   width: wp( '3.5%' ),
                   height: wp( '3.5%' ),
                   resizeMode: 'contain',
+                  tintColor:Colors.white
+
                 }}
               />
             )}

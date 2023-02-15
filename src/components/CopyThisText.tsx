@@ -81,7 +81,7 @@ export default function CopyThisText( props ) {
           {!props.openLink ?
             <Image
               style={{
-                width: 18, height: 20
+                width: 18, height: 20, tintColor: Colors.theam_icon_color
               }}
               source={require( '../assets/images/icons/icon-copy.png' )}
             />

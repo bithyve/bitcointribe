@@ -1009,9 +1009,9 @@ class RestoreWithICloud extends Component<
                       {item.title}
                     </Text>
                     <Text style={styles.cardsInfoText}>{item.info}</Text>
-                    <Text style={styles.cardsInfoText}>
+                    {/* <Text style={styles.cardsInfoText}>
                       {strings[ 'Lastbackup' ]} {item.time}
-                    </Text>
+                    </Text> */}
                   </View>
                   {item.status == 'received' ? (
                     <View
