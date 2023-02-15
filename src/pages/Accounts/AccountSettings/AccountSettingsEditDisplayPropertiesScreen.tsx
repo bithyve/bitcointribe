@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { Input } from 'react-native-elements'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -10,8 +10,8 @@ import useAccountSettingsUpdatedEffect from '../../../utils/hooks/account-effect
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import { useDispatch } from 'react-redux'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import ButtonBlue from '../../../components/ButtonBlue'
 import { translations } from '../../../common/content/LocContext'
+import LinearGradient from 'react-native-linear-gradient'
 
 export type Props = {
   navigation: any;
@@ -107,11 +107,19 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
       </View>
 
       <View style={styles.listFooterSection}>
-        <ButtonBlue
-          buttonText={common.confirmProceed}
-          handleButtonPress={handleSaveButtonPress}
-          buttonDisable={canSaveChanges === false}
-        />
+        <TouchableOpacity onPress={handleSaveButtonPress} disabled={canSaveChanges === false}>
+          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            locations={[ 0.2, 1 ]}
+            style={styles.confirmButtonView}
+          >
+            <Text style={styles.confirmButtonText}>{common.confirmProceed}</Text>
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
     </View>
   )
@@ -144,6 +152,20 @@ const styles = StyleSheet.create( {
   listFooterSection: {
     // paddingHorizontal: 16,
     alignItems: 'flex-start',
+  },
+  confirmButtonView: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    elevation: 10,
+    alignSelf: 'center',
+    marginLeft: 15,
+    padding: 15
+  },
+  confirmButtonText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansMedium,
   },
 } )
 

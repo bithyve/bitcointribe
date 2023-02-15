@@ -8,11 +8,13 @@ import ListStyles from '../../../common/Styles/ListStyles'
 import VisibilityOptionsList from '../../../components/account-settings/visibility/VisibilityOptionsList'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import { updateAccountSettings } from '../../../store/actions/accounts'
-import ButtonBlue from '../../../components/ButtonBlue'
+import Fonts from '../../../common/Fonts'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import Colors from '../../../common/Colors'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import { translations } from '../../../common/content/LocContext'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.DEFAULT,
@@ -81,10 +83,19 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
           }
         />
         <View style={styles.actionButtonContainer}>
-          <ButtonBlue
-            buttonText={common.confirm}
-            handleButtonPress={handleSaveButtonPress}
-          />
+          <TouchableOpacity onPress={handleSaveButtonPress}>
+            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+              start={{
+                x: 0, y: 0
+              }} end={{
+                x: 1, y: 0
+              }}
+              locations={[ 0.2, 1 ]}
+              style={styles.confirmButtonView}
+            >
+              <Text style={styles.confirmButtonText}>{common.confirm}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={onDismiss}
             style={{
@@ -111,7 +122,6 @@ const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
   },
-
   proceedButtonContainer: {
     zIndex: 2,
     elevation: 2,
@@ -125,6 +135,20 @@ const styles = StyleSheet.create( {
     marginRight: 30,
     flexDirection: 'row',
     justifyContent: 'flex-start',
+  },
+  confirmButtonView: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    elevation: 10,
+    alignSelf: 'center',
+    marginLeft: 15,
+    padding: 15
+  },
+  confirmButtonText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansMedium,
   },
 } )
 
