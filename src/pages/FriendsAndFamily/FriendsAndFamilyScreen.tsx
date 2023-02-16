@@ -883,11 +883,11 @@ const styles = StyleSheet.create( {
     paddingHorizontal: wp( 2 )
   },
   pageTitle: {
-    color: Colors.blue,
-    fontSize: RFValue( 18 ),
+    color: Colors.THEAM_TEXT_COLOR,
+    fontSize: RFValue( 16 ),
     letterSpacing: 0.54,
     // fontFamily: Fonts.Regular,
-    fontFamily: Fonts.Medium,
+    fontFamily: Fonts.SemiBold,
     alignItems: 'center',
     marginHorizontal: wp ( 4 ),
   },

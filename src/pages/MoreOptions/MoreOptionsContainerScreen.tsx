@@ -244,7 +244,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             style={{
               width: widthPercentageToDP( 5 ),
               height: widthPercentageToDP( 6 ),
-              tintColor: Colors.theam_icon_color
+              tintColor: Colors.THEAM_TEXT_COLOR
             }}
           /> )
         case 'Enable Auto-Read from Clipboard':
@@ -367,14 +367,14 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       </ModalContainer>
       <View style={styles.accountCardsSectionContainer}>
         <Text style={{
-          color: Colors.blue,
-          fontSize: RFValue( 18 ),
-          letterSpacing: 0.54,
+          color: Colors.THEAM_TEXT_COLOR,
+          fontSize: RFValue( 16 ),
+          // letterSpacing: 0.54,
           // marginLeft: 2,
-          fontFamily: Fonts.Medium,
+          fontFamily: Fonts.SemiBold,
           paddingTop: heightPercentageToDP( 4 ),
           paddingLeft: widthPercentageToDP( 4 ),
-          paddingBottom: heightPercentageToDP( 1 )
+          // paddingBottom: heightPercentageToDP( 1 )
         }}>
           {strings.settingsAndMore}
         </Text>
@@ -520,7 +520,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 alignSelf: 'center',
                 marginLeft: 'auto',
                 resizeMode: 'contain',
-                tintColor: Colors.theam_icon_color
+                tintColor: Colors.THEAM_INFO_TEXT_COLOR
 
               }}
             />
@@ -555,7 +555,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 height: widthPercentageToDP( 4 ),
                 resizeMode: 'contain',
                 marginLeft: 'auto',
-                tintColor: Colors.theam_icon_color
+                tintColor: Colors.THEAM_INFO_TEXT_COLOR
 
               }}
             />
@@ -706,8 +706,8 @@ const styles = StyleSheet.create( {
   },
 
   addModalTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 13 ),
+    color: Colors.THEAM_INFO_TEXT_COLOR,
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.Regular
   },
 
@@ -728,7 +728,7 @@ const styles = StyleSheet.create( {
   },
 
   addModalInfoText: {
-    color: Colors.textColorGrey,
+    color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
     fontSize: RFValue( 11 ),
     marginTop: 5,
     fontFamily: Fonts.Regular

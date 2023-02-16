@@ -915,7 +915,7 @@ const styles = StyleSheet.create( {
     height: wp( '13%' ),
     width: wp( '13%' ),
     borderRadius: 7,
-    marginLeft: 20,
+    marginLeft: 30,
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 1,
@@ -976,22 +976,23 @@ const styles = StyleSheet.create( {
   },
   errorText: {
     fontFamily: Fonts.MediumItalic,
-    color: Colors.tomatoRed,
+    color: Colors.THEAM_ERROR_RED_TEXT_COLOR,
     fontSize: RFValue( 10 ),
     fontStyle: 'italic',
     letterSpacing: 0.5
   },
   headerTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 25 ),
-    marginLeft: 20,
+    color: Colors.THEAM_TEXT_COLOR,
+    fontSize: RFValue( 22 ),
+    marginLeft: 30,
     marginTop: hp( '10%' ),
     fontFamily: Fonts.Regular,
   },
   headerInfoText: {
-    color: Colors.textColorGrey,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     fontSize: RFValue( 12 ),
-    marginLeft: 20,
+    marginLeft: 30,
+    marginTop: hp( '1%' ),
     fontFamily: Fonts.Regular,
   },
   passcodeTextInputText: {

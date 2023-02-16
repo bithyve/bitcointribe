@@ -27,10 +27,10 @@ export default function BottomInfoBox( props ) {
         {props.title !== '' &&
         <Text
           style={{
-            color: props.titleColor ? props.titleColor : Colors.blue,
-            fontSize: RFValue( 13 ),
+            color: props.titleColor ? props.titleColor : Colors.THEAM_TEXT_COLOR,
+            fontSize: RFValue( 12 ),
             marginBottom: 2,
-            fontFamily: Fonts.Regular,
+            fontFamily: Fonts.SemiBold,
           }}
         >
           {props.title}
@@ -43,9 +43,9 @@ export default function BottomInfoBox( props ) {
           {props.linkText ? (
             <Text
               style={{
-                color: Colors.textColorGrey,
+                color: Colors.THEAM_INFO_TEXT_COLOR,
                 fontSize: RFValue( 12 ),
-                fontFamily: Fonts.Regular,
+                fontFamily: Fonts.SemiBold,
                 textDecorationLine: 'underline',
               }}
               onPress={props.onPress ? props.onPress : () => {}}

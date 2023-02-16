@@ -278,9 +278,9 @@ const HomeHeader = ( {
             ? 'Wallet backup phrase will expire soon'
             : levelData[ 0 ].keeper1.shareType == ''
               // ? strings.Backupyour
-              ? 'Confirm backup phrase'
+              ? 'Confirm Backup Phrase'
               : ( levelData[ 0 ].keeper1.shareType == 'seed'
-                ? 'Wallet backup confirmed' : 'Confirm backup phrase' )}
+                ? 'Wallet backup confirmed' : 'Confirm Backup Phrase' )}
       </Text>
 
       {/* {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
@@ -535,7 +535,7 @@ const styles = StyleSheet.create( {
   headerTitleText: {
     color: Colors.white,
     fontFamily: Fonts.Regular,
-    fontSize: RFValue( 25 ),
+    fontSize: RFValue( 24 ),
     marginBottom: wp( '1%' ),
     letterSpacing: RFValue( 0.01 )
   },

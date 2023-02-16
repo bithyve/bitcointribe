@@ -29,7 +29,7 @@ const GiftBoxComponent = ( props ) => {
           style={{
             flexDirection: "row",
             alignItems: "flex-start",
-            marginTop: height > 720 ? 12 : wp(3),
+            marginTop: height > 720 ? 6 : wp(2),
           }}
         >
           <Text style={[styles.pageTitle]}>{props.titleText}</Text>
@@ -82,19 +82,19 @@ const styles = StyleSheet.create( {
     justifyContent:'center',
   },
   pageTitle: {
-    color: Colors.blue,
+    color: Colors.THEAM_TEXT_COLOR,
     letterSpacing: 0.7,
     fontFamily: Fonts.Medium,
     alignItems: 'center',
-    fontSize: RFValue( 15 )
+    fontSize: RFValue( 13 )
   },
   subText:{
-    color: Colors.gray3,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     fontSize: RFValue( 10 ),
     fontFamily: Fonts.Regular,
     // marginTop: RFValue( 4 ),
     letterSpacing: .75,
-    lineHeight: RFValue(15)
+    lineHeight: RFValue(11)
   },
   scSubText:{
     color: Colors.textColorGrey,
