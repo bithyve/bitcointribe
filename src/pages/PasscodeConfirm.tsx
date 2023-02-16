@@ -738,15 +738,16 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
   },
   headerTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 28 ),
+    color: Colors.THEAM_TEXT_COLOR,
+    fontSize: RFValue( 22 ),
     marginLeft: 20,
-    marginTop: hp( '3%' ),
+    marginTop: hp( '4%' ),
     fontFamily: Fonts.Regular
   },
   headerInfoText: {
-    color: Colors.textColorGrey,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     fontSize: RFValue( 12 ),
+    marginTop: hp( '1%' ),
     marginLeft: 20,
     fontFamily: Fonts.Regular
   },
@@ -754,7 +755,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.Regular,
-    fontWeight: '600',
+    // fontWeight: '600',
   },
   passcodeTextInputText: {
     color: Colors.blue,

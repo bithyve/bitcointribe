@@ -42,7 +42,7 @@ const ToggleContainer = ( ) => {
           materialIconCurrencyCodes.includes( currencyCode ) ?
             <MaterialCurrencyCodeIcon
               currencyCode={currencyCode}
-              color={Colors.blue}
+              color={Colors.THEAM_TEXT_COLOR}
               size={14}
             />
             : null
@@ -56,7 +56,7 @@ const ToggleContainer = ( ) => {
             />
             : null
         }
-        trackColor={Colors.lightBlue}
+        trackColor={Colors.THEAM_TEXT_COLOR}
         thumbColor={Colors.white}
         onpress={() => {
           dispatch( currencyKindSet(

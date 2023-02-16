@@ -70,7 +70,7 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
       disabled={disabled}
       style={{
         flexDirection: isVertical ? 'column' : 'row',
-        backgroundColor: trackColor || Colors.blue,
+        backgroundColor: trackColor || Colors.THEAM_TEXT_COLOR,
         height: isVertical ? wp( '17%' ) : changeSettingToggle ? wp( '7%' ) : wp( '9%' ),
         width: isVertical ? wp( '10%' ) : changeSettingToggle ? wp( '14%' ) : wp( '17%' ),
         borderRadius: wp( '10%' ) / 2,
@@ -96,7 +96,7 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
               ( !isNotImage && materialIconCurrencyCodes.includes( fiatCurrencyCode ) ) && (
                 <CurrencyCodeIcon
                   currencyCode={fiatCurrencyCode}
-                  color={Colors.blue}
+                  color={Colors.THEAM_TEXT_COLOR}
                 />
               )
               ||
@@ -109,7 +109,7 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
                     width: wp( '3.5%' ),
                     height: wp( '3.5%' ),
                     resizeMode: 'contain',
-                    tintColor:Colors.blue
+                    tintColor:Colors.THEAM_TEXT_COLOR
                   }}
                 />
               )
@@ -139,7 +139,7 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
                   width: wp( '3.5%' ),
                   height: wp( '3.5%' ),
                   resizeMode: 'contain',
-                  tintColor: Colors.blue
+                  tintColor: Colors.THEAM_TEXT_COLOR
                 }}
               />
             )}
@@ -168,7 +168,7 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
               ( !isNotImage && materialIconCurrencyCodes.includes( fiatCurrencyCode ) ) && (
                 <CurrencyCodeIcon
                   currencyCode={fiatCurrencyCode}
-                  color={Colors.blue}
+                  color={Colors.THEAM_TEXT_COLOR}
                 />
               )
                 || (
@@ -180,7 +180,7 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
                       width: wp( '3.5%' ),
                       height: wp( '3.5%' ),
                       resizeMode: 'contain',
-                      tintColor:Colors.blue
+                      tintColor:Colors.THEAM_TEXT_COLOR
 
                     }}
                   />

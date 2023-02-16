@@ -95,13 +95,13 @@ const HomeBuyCard = ( {
     >
       <View>
         <Text style={{
-          color: Colors.blue,
+          color: Colors.THEAM_TEXT_COLOR,
           fontSize: RFValue( 11 ),
           marginLeft: 5,
-          fontFamily: Fonts.Regular,
+          fontFamily: Fonts.Medium,
           alignSelf: 'flex-start',
           letterSpacing: 0.33,
-          fontWeight:'500'
+          // fontWeight:'500'
         }}>
           {formatString( strings.btcTo, fiatCurrencyCode )}
         </Text>
@@ -115,7 +115,7 @@ const HomeBuyCard = ( {
           // )
             <MaterialCurrencyCodeIcon
               currencyCode={fiatCurrencyCode}
-              color={Colors.gray9}
+              color={Colors.GRAY_ICON}
               size={wp( '3.5%' )}
               style={{
                 width: wp( 4 )
@@ -129,8 +129,8 @@ const HomeBuyCard = ( {
             </Text>
           )}
           <Text style={{
-            fontSize:17, color:'#8B8B8B',
-            fontFamily: Fonts.Regular
+            fontSize:RFValue(16), color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
+            fontFamily: Fonts.SemiBold
           }}>{amount ? amount : '--'}</Text>
           <Text>{incramount}</Text>
         </View>

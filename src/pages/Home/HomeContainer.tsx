@@ -157,11 +157,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           // backgroundColor: 'red'
         }}>
           <Text style={{
-            color: Colors.blue,
-            fontSize: RFValue( 19 ),
+            color: Colors.THEAM_TEXT_COLOR,
+            fontSize: RFValue( 16 ),
             marginTop: hp( 1 ),
             marginLeft:wp( 1 ),
-            fontFamily: Fonts.Medium,
+            fontFamily: Fonts.SemiBold,
             letterSpacing: 0.54
           }}>
             {this.state.strings.myaccounts}

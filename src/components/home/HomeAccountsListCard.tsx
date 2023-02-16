@@ -258,14 +258,14 @@ const styles = StyleSheet.create( {
 
   titleText: {
     fontFamily: Fonts.Regular,
-    color: Colors.blue,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     fontSize: RFValue( 10 ),
   },
 
   subtitleText: {
     marginTop: widthPercentageToDP( 1 ),
     fontFamily: Fonts.Regular,
-    color: Colors.textColorGrey,
+    color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
     fontSize: RFValue( 10 ),
   },
 

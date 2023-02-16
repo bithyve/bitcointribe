@@ -6,6 +6,7 @@ import Colors from '../../common/Colors'
 import { LocalizationContext } from '../../common/content/LocContext'
 import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import { AccountType } from '../../bitcoin/utilities/Interface'
+import Fonts from './../../common/Fonts'
 
 export type Props = {
   onPress: () => void;
@@ -36,15 +37,15 @@ const AddNewAccountCard: React.FC<Props> = ( {
         >
           <Image
             style={{
-              width: 30, height: 30, marginBottom: 5
+              width: 30, height: 30, marginBottom: 10
             }}
             source={require( '../../assets/images/icons/icon_add.png' )}
           />
           <Text
             style={{
-              color: Colors.textColorGrey,
-              fontSize: RFValue( 12 ),
-              fontWeight: '500',
+              color: Colors.THEAM_INFO_TEXT_COLOR,
+              fontSize: RFValue( 11 ),
+              fontFamily: Fonts.SemiBold
             }}
           >
             Add Lightning Wallet

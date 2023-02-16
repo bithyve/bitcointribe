@@ -23,6 +23,8 @@ import {
 } from 'react-native-responsive-screen'
 
 import Add_gifts from '../../assets/images/satCards/Add_gifts.svg'
+import Add from '../../assets/images/svgs/add.svg'
+
 import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
 import AlertModalContents from '../../components/AlertModalContents'
 import BottomInfoBox from '../../components/BottomInfoBox'
@@ -697,20 +699,23 @@ class GiftScreen extends React.Component<
               <ToggleContainer />
             </View> */}
           <View style={{
-            flexDirection: 'row', marginHorizontal: 35, marginTop: 6, alignItems: 'flex-end'
+            flexDirection: 'row', marginHorizontal: 30, marginTop: 15, alignItems: 'flex-end'
           }}>
-            <CheckingAcc height={57} width={53} />
+            {/* <CheckingAcc height={57} width={53} /> */}
             <Text style={[ styles.pageTitle, {
-              fontSize: RFValue( 24 ),
-              marginStart: 13,
+              fontSize: RFValue( 16 ),
+              marginStart: 10,
               marginBottom: 5,
             } ]}>
               {this.strings[ 'giftsats' ]}
             </Text>
+            {/* <View style={{marginTop: 10, justifyContent: 'center', alignSelf: 'flex-end'}}> */}
+
             <ToggleContainer />
+            {/* </View> */}
           </View>
           <Text style={{
-            marginHorizontal: 39, fontSize: RFValue( 11 ), color: '#525252', fontFamily: Fonts.Light, marginTop: 18
+            marginHorizontal: 39, fontSize: RFValue( 11 ), color: Colors.THEAM_INFO_TEXT_COLOR, fontFamily: Fonts.Ragular, marginTop: 18
           }}>{'Give sats as gifts to your friends and family, view and manage created gifts.'}</Text>
           <ScrollView
             // refreshControl={
@@ -737,7 +742,7 @@ class GiftScreen extends React.Component<
                 this.props.navigation.navigate( 'CreateGift', {
                 // setActiveTab: buttonPress
                 } )}}
-              image={<Add_gifts />}
+              image={<Add />}
             />
             <GiftBoxComponent
               titleText={'Available Gifts'}
@@ -1000,16 +1005,16 @@ const styles = StyleSheet.create( {
     paddingHorizontal: wp( 2 )
   },
   pageTitle: {
-    color: Colors.blue,
-    fontSize: RFValue( 18 ),
-    letterSpacing: 0.7,
+    color: Colors.THEAM_TEXT_COLOR,
+    fontSize: RFValue( 16 ),
+    // letterSpacing: 0.7,
     // fontFamily: Fonts.Regular,
-    fontFamily: Fonts.Medium,
+    fontFamily: Fonts.SemiBold,
     alignItems: 'center',
     marginHorizontal: wp( 4 ),
   },
   cardTitle: {
-    color: Colors.blue,
+    color: Colors.THEAM_TEXT_COLOR,
     fontSize: RFValue( 12 ),
     // fontFamily: Fonts.Regular,
     fontFamily: Fonts.Medium,

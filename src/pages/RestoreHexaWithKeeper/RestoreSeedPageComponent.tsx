@@ -504,8 +504,8 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 8,
     // elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
+    // shadowColor: Colors.shadowBlue,
+    // shadowOpacity: 1,
     shadowOffset: {
       width: 15,
       height: 15,
@@ -635,7 +635,7 @@ const styles = StyleSheet.create( {
     width: 6,
     height: 5,
     borderRadius: 5,
-    backgroundColor: Colors.primaryAccentLighter2,
+    backgroundColor: Colors.THEAM_ERROR_RED_TEXT_COLOR,
     marginEnd: 5
   }
 } )

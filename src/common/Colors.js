@@ -1,11 +1,17 @@
 const Colors = {
+  THEAM_TEXT_COLOR: '#A36363',
+  THEAM_INFO_TEXT_COLOR: '#2C3E50',
+  THEAM_INFO_LIGHT_TEXT_COLOR: '#6C7074',
+  THEAM_ERROR_RED_TEXT_COLOR: '#FD746C',
+  GRAY_ICON: '#ABB2B9',
+
   borderColor: '#E3E3E3',
   black: '#2F2F2F',
   shadowBlue: '#DDECF5',
   textColorGrey: '#6C6C6C',
   backgroundColor: '#F5F5F5',
   secondaryBackgroundColor: '#E5E5E5',
-  lightBlue: '#C36564',
+  lightBlue: '#FD746C',
   skyBlue: '#C36564',
   darkBlue: '#5A4A56',
   // blue: '#006CB4',
@@ -69,8 +75,8 @@ const Colors = {
   secondaryText: '#8B8B8B',
 
   primaryAccent: '#006CB4',
-  primaryAccentLighter1: '#61ACE1',
-  primaryAccentLighter2: '#77B9EB',
+  primaryAccentLighter1: '#FD746C',
+  primaryAccentLighter2: '#FD746C',
 
   // lightning account
   orange: '#FF7761',
