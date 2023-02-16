@@ -495,7 +495,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           />
           <TouchableOpacity
             onPress={() => {
-              Linking.openURL( 'https://hexawallet.io/faq/' )
+              Linking.openURL( 'https://bitcointribe.app/faq/' )
                 .then( ( _data ) => { } )
                 .catch( ( _error ) => {
                 } )
@@ -527,7 +527,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              Linking.openURL( 'https://t.me/HexaWallet' )
+              Linking.openURL( 'https://t.me/bitcoinTribe_' )
                 .then( ( _data ) => { } )
                 .catch( ( _error ) => {
                   alert( 'Make sure Telegram installed on your device' )
