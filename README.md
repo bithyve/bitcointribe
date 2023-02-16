@@ -50,7 +50,7 @@ cp .env.example .env
 ```
 
 
-## Building and Running Hexa Wallet
+## Building and Running Bitcoin Tribe
 
 ### Running on simulator
 
