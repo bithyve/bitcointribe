@@ -96,11 +96,11 @@ const styles = StyleSheet.create( {
   headerTouchableText: {
     color: Colors.white,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.Italic,
+    fontFamily: Fonts.Medium,
   },
   viewMoreWrapper: {
-    height: 22,
-    width: 80,
+    height: 26,
+    minWidth: 90,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 3,

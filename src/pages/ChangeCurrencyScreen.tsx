@@ -11,6 +11,8 @@ import {
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP,
+  heightPercentageToDP,
 } from 'react-native-responsive-screen'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
@@ -32,21 +34,21 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.background,
   },
   textHeading: {
-    fontFamily: Fonts.Regular,
-    fontSize: RFValue( 24 ),
-    color: Colors.blue,
+    fontFamily: Fonts.Medium,
+    fontSize: RFValue( 22 ),
+    color: Colors.THEAM_TEXT_COLOR,
     marginBottom: wp( '5%' ),
     marginTop: wp( '10%' ),
   },
   textTitle: {
-    fontFamily: Fonts.Regular,
-    fontSize: RFValue( 15 ),
-    color: Colors.blue,
+    fontFamily: Fonts.Medium,
+    fontSize: RFValue( 13 ),
+    color: Colors.THEAM_TEXT_COLOR,
   },
   textSubtitle: {
     fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
-    color: Colors.textColorGrey,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
   },
   row: {
     flexDirection: 'row',
@@ -65,8 +67,8 @@ const styles = StyleSheet.create( {
   },
   textCurrency: {
     fontFamily: Fonts.Medium,
-    fontSize: RFValue( 18 ),
-    color: Colors.textColorGrey,
+    fontSize: RFValue( 16 ),
+    color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
   },
   icArrow: {
     marginLeft: wp( '3%' ),
@@ -76,22 +78,41 @@ const styles = StyleSheet.create( {
   textValue: {
     fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
-    color: Colors.textColorGrey,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     marginLeft: wp( '3%' ),
   },
   textHelpUs: {
-    fontFamily: Fonts.Regular,
-    fontSize: RFValue( 16 ),
-    color: Colors.blue,
+    fontFamily: Fonts.SemiBold,
+    fontSize: RFValue( 12 ),
+    color: Colors.THEAM_TEXT_COLOR,
     marginLeft: wp( '3%' ),
   },
   textHelpUsSub: {
     fontFamily: Fonts.Regular,
-    fontSize: RFValue( 13 ),
-    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     marginLeft: wp( '3%' ),
     marginTop: wp( '1%' ),
-  }
+  },
+  addModalView: {
+    backgroundColor: Colors.gray7,
+    paddingVertical: 14,
+    paddingHorizontal: widthPercentageToDP( 1 ),
+    flexDirection: 'row',
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginTop: heightPercentageToDP( '3' ),
+    alignSelf: 'center',
+    borderRadius: widthPercentageToDP( '2' ),
+    marginBottom: heightPercentageToDP( '1.2' ),
+    shadowOpacity: 0.05,
+    // shadowColor: Colors.shadowColor,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 6,
+    elevation: 6,
+  },
 } )
 
 
@@ -162,6 +183,7 @@ export default function ChangeCurrencyScreen( props ) {
             borderBottomLeftRadius: 10,
             justifyContent: 'center',
             alignItems: 'center',
+            
           }}
         >
           <Text
@@ -393,18 +415,25 @@ export default function ChangeCurrencyScreen( props ) {
           onPress={()=> Linking.openURL( 'https://crowdin.com/project/hexa-wallet' )
           }
           activeOpacity={0.6}
-          style={[ {
-            marginTop: 20,
-            borderRadius: 10,
-            borderWidth: 1,
-            borderColor: Colors.borderColor,
-            paddingVertical: 5,
-            flexDirection: 'row'
-          } ]}
+          style={styles.addModalView
+          //   [ {
+          //   marginTop: 20,
+          //   borderRadius: 10,
+          //   // borderWidth: 1,
+          //   // borderColor: Colors.borderColor,
+          //   paddingVertical: 5,
+          //   flexDirection: 'row',
+            
+          // } ]
+        }
         >
-          <View style={{
-            flex: 1
-          }}>
+          <View style={ 
+            // styles.addModalView
+            {
+            flex: 1,
+            
+          }
+          }>
             <Text
               style={styles.textHelpUs}
             >

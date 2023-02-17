@@ -2,7 +2,7 @@
   <defs>
     <linearGradient id="linear-gradient" x1="0.946" y1="0.886" x2="0.16" y2="0.139" gradientUnits="objectBoundingBox">
       <stop offset="0" stop-color="#5a4a56"/>
-      <stop offset="1" stop-color="#c36564"/>
+      <stop offset="1" stop-color="#A36363"/>
     </linearGradient>
   </defs>
   <g id="add" transform="translate(-256 -476)">

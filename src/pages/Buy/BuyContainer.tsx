@@ -283,7 +283,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               alignItems: 'center'
             }}>
               <Text style={{
-                color: Colors.blue,
+                color: Colors.THEAM_TEXT_COLOR,
                 fontSize: RFValue( 16 ),
                 marginLeft: 2,
                 fontFamily: Fonts.Medium,

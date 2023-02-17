@@ -32,7 +32,7 @@ export default function HeaderTitle( props ) {
           } ]} >
             {props.secondLineBoldTitle}
             <Text style={[ CommonStyles.subHeaderTitles, {
-              fontWeight: 'normal', fontSize: RFValue( 14 ),
+              fontWeight: 'normal', fontSize: RFValue( 12 ),
             } ]} >
               {props.secondLineTitle}
             </Text>
