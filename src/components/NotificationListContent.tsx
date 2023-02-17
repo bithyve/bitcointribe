@@ -71,7 +71,7 @@ export default function NotificationListContent( props ) {
                   <Image
                     source={
                       value.type == releaseNotificationTopic
-                        ? require( '../assets/images/icons/icon_hexa.png' )
+                        ? require( '../assets/images/icons/icon_qr_logo.png' )
                         : require( '../assets/images/icons/icon_receive.png' )
                     }
                     style={styles.notificationElementImage}
