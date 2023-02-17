@@ -1541,16 +1541,16 @@ const CreateGift = ( { navigation }: Props ) => {
               style={{
                 transform: [
                   {
-                    scaleX: Platform.OS == 'ios' ? 0.4 : 0.7,
+                    scaleX: Platform.OS == 'ios' ? 0.5 : 0.7,
                   },
                   {
-                    scaleY: Platform.OS == 'ios' ? 0.4 : 0.7,
+                    scaleY: Platform.OS == 'ios' ? 0.5 : 0.7,
                   },
                 ],
               }}
               trackColor={{
                 false: '#C4C4C4',
-                true: '#81b0ff',
+                true: Colors.blue,
               }}
               thumbColor={includeFees ? '#fff' : '#fff'}
               ios_backgroundColor="#3e3e3e"
