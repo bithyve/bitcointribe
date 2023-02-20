@@ -27,7 +27,7 @@ export default function HomePageShield( props ) {
       radius={wp( '4%' )}
       borderWidth={2}
       color={Colors.white}
-      shadowColor={props.circleShadowColor ? props.circleShadowColor :'#C36564'}
+      shadowColor={props.circleShadowColor ? props.circleShadowColor :'#A36363'}
       bgColor={props.shieldStatus == 0 ? Colors.red : props.shieldStatus > 0 && props.shieldStatus <= 50 ? Colors.yellow : props.shieldStatus > 50 && props.shieldStatus <= 100 ? Colors.green : Colors.red}
     >
       <View style={{

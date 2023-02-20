@@ -156,7 +156,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
         <View style={{
           flexDirection: 'row',
           alignItems: 'flex-start',
-          marginBottom: 8,
+          // marginBottom: 4,
         }}>
           <View style={styles.accountKindBadgeImage} >
             {getAvatarForSubAccount( primarySubAccount, false, false, true )}
@@ -172,7 +172,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           flexDirection: 'row',
           alignItems: 'flex-start',
           justifyContent: 'space-between',
-          marginBottom: 8,
+          marginBottom: 3,
         }}>
           <Text style={styles.title1Text}>
             {primarySubAccount.customDisplayName ||
@@ -294,7 +294,7 @@ const styles = StyleSheet.create( {
     width: '100%',
     // maxWidth: 440,
     // maxHeight: hp(250),
-    height: hp( 210 ),
+    height: hp( 165 ),
     borderRadius: cardBorderRadius,
     elevation: 5,
     shadowOpacity: 0.62,
@@ -344,7 +344,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     color: Colors.white,
-    marginTop: 2,
+    marginTop: 1,
   },
 
   footerSection: {

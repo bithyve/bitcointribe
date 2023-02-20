@@ -31,7 +31,7 @@ export default function MBNewBhrKnowMoreSheetContents( props ) {
             width: wp(8),
             height: wp(8),
             borderRadius: wp(4),
-            backgroundColor: Colors.lightBlue,
+            backgroundColor: Colors.blue,
             justifyContent: 'center',
             alignItems: 'center',
             marginRight: wp(2),

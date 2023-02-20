@@ -39,7 +39,7 @@ const getAvatarForSubAccount = (
   //     case SubAccountKind.SECURE_ACCOUNT:
   //       return require( '../../assets/images/icons/icon_secureaccount.png' )
   //     case SubAccountKind.TRUSTED_CONTACTS:
-  //       return require( '../../assets/images/icons/icon_hexa.png' )
+  //       return require( '../../assets/images/icons/icon_qr_logo.png' )
   //     case SubAccountKind.DONATION_ACCOUNT:
   //       return require( '../../assets/images/icons/icon_donation_hexa.png' )
   //     case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
@@ -49,7 +49,7 @@ const getAvatarForSubAccount = (
   //     case SubAccountKind.SERVICE:
   //       return getAvatarForServiceAccountKind( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind )
   //     default:
-  //       return require( '../../assets/images/icons/icon_hexa.png' )
+  //       return require( '../../assets/images/icons/icon_qr_logo.png' )
   // }
   switch ( subAccount.kind ) {
       case SubAccountKind.TEST_ACCOUNT:

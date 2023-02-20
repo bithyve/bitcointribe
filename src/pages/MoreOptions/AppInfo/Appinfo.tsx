@@ -295,7 +295,7 @@ const AppInfo = ( props ) => {
 
 const styles = StyleSheet.create( {
   headerTitleText: {
-    color: Colors.black,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     fontFamily: Fonts.Regular,
     fontSize: RFValue( 16 ),
     // marginBottom: wp( '1%' ),
@@ -324,15 +324,15 @@ const styles = StyleSheet.create( {
   },
 
   addModalTitleText: {
-    color: Colors.blue,
+    color: Colors.THEAM_TEXT_COLOR,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.Regular,
+    fontFamily: Fonts.Medium,
     letterSpacing: 0.01
   },
 
   addModalInfoText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    color: Colors.THEAM_INFO_TEXT_COLOR,
+    fontSize: RFValue( 12 ),
     marginTop: 5,
     fontFamily: Fonts.Regular
   },

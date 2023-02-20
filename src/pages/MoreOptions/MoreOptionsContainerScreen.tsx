@@ -270,7 +270,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         }}>
           <AppBottomSheetTouchableWrapper
             style={{
-              backgroundColor: Colors.lightBlue,
+              backgroundColor: Colors.blue,
               width: 30,
               height: 30,
               borderRadius: 15,

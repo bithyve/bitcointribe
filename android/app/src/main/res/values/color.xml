@@ -2,7 +2,7 @@
     <color name="white">#FFFFFF</color>
     <color name="notification">#00A300</color>
     <color name="blue">#5A4A56</color>
-    <color name="gradient1">#C36564</color>
+    <color name="gradient1">#A36363</color>
      <color name="gradient2">#5A4A56</color>
-    <color name="colorAccent">#C36564</color>
+    <color name="colorAccent">#A36363</color>
 </resources>

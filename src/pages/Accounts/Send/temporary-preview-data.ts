@@ -35,7 +35,7 @@ export const sampleContactRecipients: ContactRecipientDescribing[] = [
     displayedName: 'Ada Lovelace',
     amount: 0,
     walletName: 'Wallet With Really Long Name',
-    avatarImageSource: require( '../../../assets/images/icons/icon_hexa.png' ),
+    avatarImageSource: require( '../../../assets/images/icons/icon_qr_logo.png' ),
     initiatedAt: Date.now() - ( 1000 * 60 * 60 * 24 * 3 ),
     lastSeenActive: Date.now() - ( 1000 * 60 * 60 * 24 * 0.1 ),
     trustKind: ContactTrustKind.OTHER,

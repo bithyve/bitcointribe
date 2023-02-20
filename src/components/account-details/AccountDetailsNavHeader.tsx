@@ -123,7 +123,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
                   />
                   : null
               }
-              trackColor={Colors.lightBlue}
+              trackColor={Colors.blue}
               thumbColor={Colors.blue}
               onpress={() => {
                 ( exchangeRates && exchangeRates[ currencyCode ] )

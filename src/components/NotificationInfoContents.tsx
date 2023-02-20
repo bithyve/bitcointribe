@@ -34,7 +34,7 @@ export default function NotificationInfoContents( props ) {
             style={{
               height: wp( '8%' ),
               width: wp( '8%' ),
-              backgroundColor: Colors.lightBlue,
+              backgroundColor: Colors.blue,
               borderWidth: 1,
               borderColor: Colors.borderColor,
               borderRadius: wp( 4 ),

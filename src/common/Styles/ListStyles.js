@@ -12,14 +12,14 @@ const ListStyles = StyleSheet.create( {
   },
 
   infoHeaderTitleText: {
-    fontSize: RFValue( 13 ),
-    color: Colors.blue,
+    fontSize: RFValue( 12 ),
+    color: Colors.THEAM_TEXT_COLOR,
     fontFamily: Fonts.Regular,
   },
 
   infoHeaderSubtitleText: {
-    fontSize: RFValue( 11 ),
-    color: Colors.textColorGrey,
+    fontSize: RFValue( 10 ),
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     fontFamily: Fonts.Regular,
     letterSpacing: 0.1
   },
