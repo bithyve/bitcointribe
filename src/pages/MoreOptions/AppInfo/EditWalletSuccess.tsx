@@ -119,7 +119,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   addModalView: {
     backgroundColor: Colors.gray7,
@@ -138,14 +138,14 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     // width: wp( 30 ),
   },
   modalInfoText: {
     marginRight: wp( 4 ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'justify',
     letterSpacing: 0.6,
     lineHeight: 18
@@ -154,6 +154,6 @@ const styles = StyleSheet.create( {
     color: Colors.black,
     fontSize: RFValue( 18 ),
     marginLeft: wp( 6 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 } )

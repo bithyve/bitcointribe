@@ -16,6 +16,7 @@ import Fonts from '../../../common/Fonts'
 import { translations } from '../../../common/content/LocContext'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import PersonalNode from '../../../common/data/models/PersonalNode'
+import LinearGradient from 'react-native-linear-gradient'
 
 export type PersonalNodeFormData = {
   ipAddress: string;
@@ -34,13 +35,13 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
   const activePersonalNode = useActivePersonalNode()
   const strings  = translations[ 'settings' ]
   const common  = translations[ 'common' ]
-  
-  const [useKeeperNode, setuseKeeperNode] = useState(params?.useKeeperNode);
-  const [useSSL, setUseSSL] = useState(params?.useSSL);
-  const [host, setHost] = useState(params?.host || '');
-  const [port, setPort] = useState(params?.port || '');
-  const [isHostValid, setIsHostValid] = useState(true);
-  const [isPortValid, setIsPortValid] = useState(true);
+
+  const [ useKeeperNode, setuseKeeperNode ] = useState( params?.useKeeperNode )
+  const [ useSSL, setUseSSL ] = useState( params?.useSSL )
+  const [ host, setHost ] = useState( params?.host || '' )
+  const [ port, setPort ] = useState( params?.port || '' )
+  const [ isHostValid, setIsHostValid ] = useState( true )
+  const [ isPortValid, setIsPortValid ] = useState( true )
 
   const ipAddressInputRef = useRef<Input>( null )
 
@@ -52,14 +53,14 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
   }, [ host, port ] )
 
   function handleProceedButtonPress() {
-    if (host === null || host.length === 0) {
-      setIsHostValid(false);
+    if ( host === null || host.length === 0 ) {
+      setIsHostValid( false )
     }
 
-    if (port === null || port.length === 0) {
-      setIsPortValid(false);
+    if ( port === null || port.length === 0 ) {
+      setIsPortValid( false )
     }
-    if (host !== null && host.length !== 0 && port !== null && port.length !== 0) {
+    if ( host !== null && host.length !== 0 && port !== null && port.length !== 0 ) {
       const nodeDetails: PersonalNode = {
         id: params.id,
         host,
@@ -67,8 +68,8 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
         useKeeperNode,
         isConnected: params.isConnected,
         useSSL,
-      };
-      onSubmit(nodeDetails);
+      }
+      onSubmit( nodeDetails )
     }
   }
 
@@ -77,7 +78,7 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
   }, [] )
 
   function onToggle() {
-    setUseSSL(!useSSL)
+    setUseSSL( !useSSL )
   }
 
   return (
@@ -89,19 +90,29 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-        <Text style={ListStyles.infoHeaderTitleText}>{strings.SetupPersonal}</Text>
+          <Text style={ListStyles.infoHeaderTitleText}>{strings.SetupPersonal}</Text>
 
-<TouchableOpacity onPress={onCloseClick} style={ButtonStyles.miniNavButton}>
-  <Text style={ButtonStyles.miniNavButtonText}>{'Close'}</Text>
-</TouchableOpacity>
-        {/* <Button
+          <TouchableOpacity onPress={onCloseClick}>
+            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+              start={{
+                x: 0, y: 0
+              }} end={{
+                x: 1, y: 0
+              }}
+              locations={[ 0.2, 1 ]}
+              style={ButtonStyles.miniNavButton}
+            >
+              <Text style={ButtonStyles.miniNavButtonText}>{'Close'}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          {/* <Button
             raised
             buttonStyle={ButtonStyles.miniNavButton}
             title="Close"
             titleStyle={ButtonStyles.miniNavButtonText}
             onPress={onCloseClick}
           /> */}
-          </View>
+        </View>
       </View>
 
       <View style={styles.bodySection}>
@@ -115,9 +126,9 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
           placeholderTextColor={FormStyles.placeholderText.color}
           underlineColorAndroid={'transparent'}
           value={host}
-          onChangeText={(text) => {
-            setIsHostValid(!(text === null || text.length === 0));
-            setHost(text);
+          onChangeText={( text ) => {
+            setIsHostValid( !( text === null || text.length === 0 ) )
+            setHost( text )
           }}
           keyboardType="numbers-and-punctuation"
           numberOfLines={1}
@@ -134,9 +145,9 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
           placeholderTextColor={FormStyles.placeholderText.color}
           underlineColorAndroid={'transparent'}
           value={port}
-          onChangeText={(text) => {
-            setIsPortValid(!(text === null || text.length === 0));
-            setPort(text);
+          onChangeText={( text ) => {
+            setIsPortValid( !( text === null || text.length === 0 ) )
+            setPort( text )
           }}
           keyboardType="number-pad"
           numberOfLines={1}
@@ -144,7 +155,9 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
       </View>
 
       <View
-        style={[styles.useFallbackTouchable, {justifyContent:'space-between'}]}
+        style={[ styles.useFallbackTouchable, {
+          justifyContent:'space-between'
+        } ]}
       >
         <Text style={styles.useFallbackText}>
           {'Use SSL for this node '}
@@ -152,7 +165,7 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
         <Switch
           value={useSSL}
           onValueChange={onToggle}
-          thumbColor={useSSL ? Colors.blue : Colors.white}
+          thumbColor={useSSL ? Colors.white : Colors.white}
           trackColor={{
             false: Colors.borderColor, true: Colors.lightBlue
           }}
@@ -180,11 +193,19 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
       </TouchableOpacity>
 
       <View style={styles.footerSection}>
-        <ButtonBlue
-          buttonText={common.proceed}
-          handleButtonPress={handleProceedButtonPress}
-          buttonDisable={canProceed === false}
-        />
+        <TouchableOpacity disabled={canProceed === false} onPress={handleProceedButtonPress}>
+          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            locations={[ 0.2, 1 ]}
+            style={styles.proceedBtnWrapper}
+          >
+            <Text style={styles.proceedBtnText}>{common.proceed}</Text>
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
 
     </View>
@@ -223,7 +244,7 @@ const styles = StyleSheet.create( {
   useFallbackText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   useFallbackCheckView: {
     width: wp( '7%' ),
@@ -236,6 +257,18 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'center',
   },
+  proceedBtnWrapper: {
+    height: wp( '13%' ),
+    width: wp( '35%' ),
+    justifyContent: 'center',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  proceedBtnText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.Medium
+  }
 } )
 
 export default PersonalNodeConnectionForm

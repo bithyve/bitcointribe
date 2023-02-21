@@ -1,4 +1,4 @@
-import React, { Component, memo } from 'react';
+import React, { Component, memo } from 'react'
 import {
   View,
   Image,
@@ -6,27 +6,29 @@ import {
   Text,
   StyleSheet,
   Platform
-} from 'react-native';
-import Colors from "../common/Colors";
-import Fonts from "../common/Fonts";
-import { RFValue } from 'react-native-responsive-fontsize';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
+} from 'react-native'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 
-const ModalHeader = (props) => {
+const ModalHeader = ( props ) => {
   //console.log("ModalHeader rendered")
   return <AppBottomSheetTouchableWrapper
     activeOpacity={10}
     onPress={() => props.onPressHeader && props.onPressHeader()}
-    style={{ ...styles.modalHeaderContainer, backgroundColor: props.backgroundColor ? props.backgroundColor : Colors.white, borderLeftColor: props.borderColor ? props.borderColor : Colors.borderColor, borderRightColor: props.borderColor ? props.borderColor : Colors.borderColor, borderTopColor: props.borderColor ? props.borderColor : Colors.borderColor }}
+    style={{
+      ...styles.modalHeaderContainer, backgroundColor: props.backgroundColor ? props.backgroundColor : Colors.white, borderLeftColor: props.borderColor ? props.borderColor : Colors.borderColor, borderRightColor: props.borderColor ? props.borderColor : Colors.borderColor, borderTopColor: props.borderColor ? props.borderColor : Colors.borderColor
+    }}
   >
     <View style={styles.modalHeaderHandle} />
   </AppBottomSheetTouchableWrapper>
 }
 
-export default memo(ModalHeader)
+export default memo( ModalHeader )
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalHeaderContainer: {
     marginTop: 'auto',
     flex: 1,
@@ -48,8 +50,8 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 18 ),
+    fontFamily: Fonts.Regular,
     marginLeft: 15,
   },
-})
+} )

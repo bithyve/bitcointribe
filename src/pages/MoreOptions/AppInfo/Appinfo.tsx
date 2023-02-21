@@ -92,7 +92,7 @@ const AppInfo = ( props ) => {
     {
       title: 'Wallet ID',
       imageSource: require( '../../../assets/images/icons/icon_wallet_setting.png' ),
-      subtitle: 'Your Wallet ID is unique to your Hexa App',
+      subtitle: 'Your Wallet ID is unique to your Bitcoin Tribe App',
       screenName: '',
     },
     {
@@ -227,7 +227,7 @@ const AppInfo = ( props ) => {
           <View style={CommonStyles.headerLeftIconInnerContainer}>
             <FontAwesome
               name="long-arrow-left"
-              color={Colors.blue}
+              color={Colors.homepageButtonColor}
               size={17}
             />
           </View>
@@ -281,7 +281,7 @@ const AppInfo = ( props ) => {
                   <Text style={styles.headerTitleText}>{`${walletId.length > 22 ? walletId.substr( 0, 22 )+'...' : walletId}`}</Text>
                 }
                 { menuOption.title === 'Version History' &&
-                  <Text style={styles.headerTitleText}>{`Hexa ${DeviceInfo.getVersion()}`}</Text>
+                  <Text style={styles.headerTitleText}>{`Bitcoin Tribe ${DeviceInfo.getVersion()}`}</Text>
                 }
               </View>
             </View>
@@ -295,8 +295,8 @@ const AppInfo = ( props ) => {
 
 const styles = StyleSheet.create( {
   headerTitleText: {
-    color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 16 ),
     // marginBottom: wp( '1%' ),
     alignSelf: 'center',
@@ -324,17 +324,17 @@ const styles = StyleSheet.create( {
   },
 
   addModalTitleText: {
-    color: Colors.blue,
+    color: Colors.THEAM_TEXT_COLOR,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Medium,
     letterSpacing: 0.01
   },
 
   addModalInfoText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    color: Colors.THEAM_INFO_TEXT_COLOR,
+    fontSize: RFValue( 12 ),
     marginTop: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
 
   modalElementInfoView: {

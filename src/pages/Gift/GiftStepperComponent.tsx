@@ -50,7 +50,7 @@ const styles = StyleSheet.create( {
     width: 18, height:18, borderRadius:18
   },
   setUpText:{
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginStart: 8,
     fontSize: RFValue( 16 ),
     letterSpacing: 0.8,

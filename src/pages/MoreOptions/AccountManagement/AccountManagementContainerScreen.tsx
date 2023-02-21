@@ -31,6 +31,7 @@ import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Int
 import { recreateAccounts, syncMissingAccounts, updateSynchedMissingAccount } from '../../../store/actions/upgrades'
 import { sweepMissingAccounts } from '../../../store/actions/upgrades'
 import { TextInput } from 'react-native-paper'
+import LinearGradient from 'react-native-linear-gradient'
 
 export type Props = {
   navigation: any;
@@ -277,19 +278,6 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
 
         </ListItem.Content>
         { ( primarySubAccount.type ) != 'SAVINGS_ACCOUNT' ? primarySubAccount.visibility === AccountVisibility.HIDDEN || primarySubAccount.visibility === AccountVisibility.ARCHIVED ? <TouchableOpacity
-          style={{
-            backgroundColor: Colors.lightBlue,
-            marginLeft: 'auto',
-            borderRadius: 7,
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingLeft: 10,
-            paddingRight: 10,
-            paddingTop: 5,
-            paddingBottom: 5,
-            borderColor: Colors.borderColor,
-            borderWidth: 1,
-          }}
           onPress={() => {
             setTimeout( () => {
               setSelectedAccount( primarySubAccount )
@@ -300,16 +288,38 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
             }
           }}
         >
-          <Text
+          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            locations={[ 0.2, 1 ]}
             style={{
-              color: Colors.white,
-              fontSize: RFValue( 12 ),
+              backgroundColor: Colors.lightBlue,
               marginLeft: 'auto',
-              fontWeight: '700'
+              borderRadius: 7,
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingLeft: 10,
+              paddingRight: 10,
+              paddingTop: 5,
+              paddingBottom: 5,
+              borderColor: Colors.borderColor,
+              borderWidth: 1,
             }}
           >
-            {primarySubAccount.visibility === AccountVisibility.HIDDEN ? strings.Unhide :strings.Restore}
-          </Text>
+            <Text
+              style={{
+                color: Colors.white,
+                fontSize: RFValue( 12 ),
+                marginLeft: 'auto',
+                fontWeight: '700'
+              }}
+            >
+              {primarySubAccount.visibility === AccountVisibility.HIDDEN ? strings.Unhide :strings.Restore}
+            </Text>
+          </LinearGradient>
         </TouchableOpacity> : null : null}
       </ListItem>
     )
@@ -433,7 +443,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   //                       paddingHorizontal: 15,
   //                       fontSize: RFValue( 13 ),
   //                       letterSpacing: 0.26,
-  //                       fontFamily: Fonts.FiraSansRegular,
+  //                       fontFamily: Fonts.Regular,
   //                     }}
   //                     placeholder={'Enter Address'}
   //                     placeholderTextColor={Colors.borderColor}
@@ -454,7 +464,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   //                       paddingHorizontal: 15,
   //                       fontSize: RFValue( 13 ),
   //                       letterSpacing: 0.26,
-  //                       fontFamily: Fonts.FiraSansRegular,
+  //                       fontFamily: Fonts.Regular,
   //                     }}
   //                     placeholder={'Enter Token'}
   //                     placeholderTextColor={Colors.borderColor}
@@ -516,8 +526,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
             >
               <View style={CommonStyles.headerLeftIconInnerContainer}>
                 <FontAwesome
-                  name="long-arrow-left"
-                  color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                   size={17}
                 />
               </View>
@@ -646,7 +656,7 @@ const styles = StyleSheet.create( {
     paddingLeft: 30,
     color: Colors.lightTextColor,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontWeight: '600',
     marginTop: 3,
     backgroundColor: Colors.white,
@@ -658,7 +668,7 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     marginHorizontal: 20,
     marginVertical: 20,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   bodySection: {
     marginTop: 24,

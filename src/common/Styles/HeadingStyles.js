@@ -8,7 +8,7 @@ const HeadingStyles = StyleSheet.create( {
   listSectionHeading: {
     fontSize: RFValue( 14 ),
     fontWeight: '300',
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.blue,
     paddingHorizontal: 16,
   },
@@ -16,27 +16,27 @@ const HeadingStyles = StyleSheet.create( {
   screenHeadingLarge: {
     fontSize: RFValue( 24 ),
     fontWeight: '600',
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.blue,
   },
 
   captionText: {
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.gray6,
   },
 
   labelText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   sectionSubHeadingText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     fontWeight: 'normal',
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
 } )
 

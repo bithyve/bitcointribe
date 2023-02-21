@@ -15,6 +15,7 @@ import { LocalizationContext } from '../../common/content/LocContext'
 import BottomInfoBox from '../BottomInfoBox'
 import Ramp from '../../assets/images/svgs/ramp.svg'
 import Wyre from  '../../assets/images/svgs/wyre.svg'
+import LinearGradient from 'react-native-linear-gradient'
 
 export type Props = {
   onMenuItemSelected: ( menuItem: BuyBitcoinBottomSheetMenuItem ) => void;
@@ -124,11 +125,20 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, onPre
 
           <TouchableOpacity
             onPress={() => { onMenuItemSelected( menuItem ) }}
-            disabled={menuItem.disabled}
-            style={styles.buyContainer}>
-            <Text style={styles.buyButton}>
-              {strings.buyBitCoin}
-            </Text>
+            disabled={menuItem.disabled}>
+            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+              start={{
+                x: 0, y: 0
+              }} end={{
+                x: 1, y: 0
+              }}
+              locations={[ 0.2, 1 ]}
+              style={styles.buyContainer}
+            >
+              <Text style={styles.buyButton}>
+                {strings.buyBitCoin}
+              </Text>
+            </LinearGradient>
           </TouchableOpacity>
         </ListItem>
         <TouchableOpacity style={styles.linkContainer}
@@ -194,10 +204,11 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey
   },
   imageStyle: {
-    width: wp( 4 ), height: wp( 4 )
+    width: wp( 4 ), height: wp( 4 ),
+    tintColor: Colors.theam_icon_color
   },
   learnMore: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     color: Colors.blue
   },
   linkContainer: {
@@ -208,7 +219,7 @@ const styles = StyleSheet.create( {
     paddingHorizontal: wp( 6 )
   },
   buyButton: {
-    margin: hp( 0.5 ), color: Colors.white, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
+    margin: hp( 0.5 ), color: Colors.white, fontSize: RFValue( 12 ), fontFamily: Fonts.Regular
   },
   buyContainer: {
     backgroundColor: Colors.blue,

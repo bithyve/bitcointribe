@@ -35,7 +35,7 @@ const PersonalNodeSettingsHeader: React.FC<Props> = ( {
       >
         <Image
           source={require( '../../../assets/images/icons/icon_contact.png' )}
-          style={styles.thumbnailImage}
+          style={[styles.thumbnailImage, {tintColor: Colors.theam_icon_color}]}
           resizeMode="contain"
         />
 
@@ -58,7 +58,7 @@ const PersonalNodeSettingsHeader: React.FC<Props> = ( {
         <Switch
           value={isConnectionEnabled}
           onValueChange={onToggle}
-          thumbColor={isConnectionEnabled ? Colors.blue : Colors.white}
+          thumbColor={isConnectionEnabled ? Colors.white : Colors.white}
           trackColor={{
             false: Colors.borderColor, true: Colors.lightBlue
           }}

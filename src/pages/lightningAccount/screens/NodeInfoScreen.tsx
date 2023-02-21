@@ -265,7 +265,7 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     marginHorizontal: 20,
     marginVertical: 20,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   bodySection: {
@@ -308,6 +308,6 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )

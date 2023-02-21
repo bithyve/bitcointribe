@@ -50,6 +50,7 @@ import AlertModalContents from '../components/AlertModalContents'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import BottomInputModalContainer from '../components/home/BottomInputModalContainer'
 import ConfirmSeedWordsModal from './NewBHR/ConfirmSeedWordsModal'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function Login( props ) {
   // const subPoints = [
@@ -203,7 +204,7 @@ export default function Login( props ) {
             'Security entry unavilable',
           )
           setJailBrokenInfo(
-            'Your phone does not have any secure entry like Pin or Biometric \n\n\nThis may be a security risk to your funds on Hexa',
+            'Your phone does not have any secure entry like Pin or Biometric \n\n\nThis may be a security risk to your funds on Bitcoin Tribe',
           )
           setElevation( 0 )
         }, 2 )
@@ -603,30 +604,9 @@ export default function Login( props ) {
 
           <View style={{
             flexDirection: 'row',
-            alignItems: 'center'
+            alignItems: 'center',
+            justifyContent: 'flex-end'
           }}>
-            <TouchableOpacity
-              disabled={passcode.length !==4}
-              onPress={() => {
-                setCheckAuth( false )
-                setTimeout( () => {
-                  setIsDisabledProceed( true )
-                  setElevation( 0 )
-                }, 2 )
-                setTimeout( () => setloaderModal( true ), 2 )
-                handleLoaderMessages( passcode )
-              }}
-              style={{
-                ...styles.proceedButtonView,
-                elevation: Elevation,
-                backgroundColor: isDisabledProceed
-                  ? Colors.lightBlue
-                  : Colors.blue,
-              }}
-            >
-              <Text style={styles.proceedButtonText}>{common.proceed}</Text>
-            </TouchableOpacity>
-
             {
               attempts >= 3&&(
                 <TouchableOpacity
@@ -660,11 +640,35 @@ export default function Login( props ) {
                   }}>
                   <Text style={{
                     color: Colors.blue,
-                    fontFamily: Fonts.FiraSansMedium
+                    fontFamily: Fonts.Medium
                   }}>{strings.ForgotPasscode}</Text>
                 </TouchableOpacity>
               )
             }
+            <TouchableOpacity
+              disabled={passcode.length !==4}
+              onPress={() => {
+                setCheckAuth( false )
+                setTimeout( () => {
+                  setIsDisabledProceed( true )
+                  setElevation( 0 )
+                }, 2 )
+                setTimeout( () => setloaderModal( true ), 2 )
+                handleLoaderMessages( passcode )
+              }}
+            >
+              <LinearGradient
+                start={{
+                  x: 0, y: 0
+                }} end={{
+                  x: 1, y: 0
+                }}
+                colors={[ Colors.skyBlue, Colors.darkBlue ]}
+                style={styles.proceedButtonView}
+              >
+                <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -911,7 +915,7 @@ const styles = StyleSheet.create( {
     height: wp( '13%' ),
     width: wp( '13%' ),
     borderRadius: 7,
-    marginLeft: 20,
+    marginLeft: 30,
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 1,
@@ -948,52 +952,48 @@ const styles = StyleSheet.create( {
   keyPadElementText: {
     color: Colors.blue,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontStyle: 'normal',
   },
   proceedButtonView: {
-    marginLeft: 20,
+    marginRight: 20,
     marginTop: hp( '15%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
   },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   boldItalicText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     fontWeight: 'bold',
     fontStyle: 'italic',
   },
   errorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
-    color: Colors.tomatoRed,
+    fontFamily: Fonts.MediumItalic,
+    color: Colors.THEAM_ERROR_RED_TEXT_COLOR,
     fontSize: RFValue( 10 ),
     fontStyle: 'italic',
     letterSpacing: 0.5
   },
   headerTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 25 ),
-    marginLeft: 20,
+    color: Colors.THEAM_TEXT_COLOR,
+    fontSize: RFValue( 22 ),
+    marginLeft: 30,
     marginTop: hp( '10%' ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   headerInfoText: {
-    color: Colors.textColorGrey,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     fontSize: RFValue( 12 ),
-    marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular,
+    marginLeft: 30,
+    marginTop: hp( '1%' ),
+    fontFamily: Fonts.Regular,
   },
   passcodeTextInputText: {
     color: Colors.blue,

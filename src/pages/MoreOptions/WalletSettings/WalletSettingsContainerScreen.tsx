@@ -58,7 +58,7 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
     //   screenName: 'VersionHistory',
     // },
     // {
-    //   title: 'Hexa Release',
+    //   title: 'Bitcoin Tribe Release',
     //   subtitle: versionString,
     //   imageSource: require( '../../../assets/images/icons/settings.png' ),
     // },
@@ -194,13 +194,13 @@ const styles = StyleSheet.create( {
   },
   titleText: {
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
-    color: Colors.blue,
+    fontFamily: Fonts.Medium,
+    color: Colors.THEAM_TEXT_COLOR,
   },
   infoText: {
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
-    color: Colors.textColorGrey,
+    fontFamily: Fonts.Regular,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     marginTop: 5,
   },
 } )

@@ -1,4 +1,4 @@
-## Setting up Hexa Wallet
+## Setting up Bitcoin Tribe
 
 ### Prerequisites:
 
@@ -11,8 +11,8 @@
 Make sure you have `rn-nodeify` as a global dependency. If you don't, run `npm install -g rn-nodeify`.
 
 ```sh
-git clone https://github.com/bithyve/hexa.git
-cd hexa
+git clone https://github.com/bithyve/bitcointribe.git
+cd bitcointribe
 yarn install
 ```
 
@@ -50,7 +50,7 @@ cp .env.example .env
 ```
 
 
-## Building and Running Hexa Wallet
+## Building and Running Bitcoin Tribe
 
 ### Running on simulator
 

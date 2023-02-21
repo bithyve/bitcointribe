@@ -43,11 +43,11 @@ const styles = StyleSheet.create( {
   },
   modalInfoText: {
     marginLeft: wp( '7%' ),
-    color: Colors.lightTextColor,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'justify',
-    letterSpacing: RFValue( 0.6 ),
+    letterSpacing: RFValue( 0.2 ),
     lineHeight: RFValue( 18 )
   },
 } )

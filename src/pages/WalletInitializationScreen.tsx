@@ -54,7 +54,9 @@ const WalletInitializationScreen = props => {
           />
           <View style={styles.textView}>
             <Text style={styles.touchableText}>
-              {`${strings.Createanew} wallet`}
+              {
+              //` ${strings.Createanew}
+              `Start with a new Tribe Wallet wallet`}
             </Text>
           </View>
           <View style={styles.arrowIconView}>
@@ -206,20 +208,20 @@ export default WalletInitializationScreen
 
 let styles = StyleSheet.create( {
   headerTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 25 ),
+    color: Colors.THEAM_TEXT_COLOR,
+    fontSize: RFValue( 22 ),
     marginLeft: 15,
     marginRight: 15,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   headerInfoText: {
-    color: Colors.textColorGrey,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     fontSize: RFValue( 12 ),
     marginLeft: 15,
     marginRight: 15,
     fontWeight: 'normal',
-    marginTop: 3,
-    fontFamily: Fonts.FiraSansRegular,
+    marginTop: 5,
+    fontFamily: Fonts.Regular,
     lineHeight: RFValue( 16 ),
   },
   NewWalletTouchableView: {
@@ -231,13 +233,13 @@ let styles = StyleSheet.create( {
     borderRadius: 10,
     marginLeft: wp( '5%' ),
     marginRight: wp( '5%' ),
-    shadowOffset: {
-      width: 5,
-      height: 5,
-    },
-    shadowOpacity: 1,
-    shadowRadius: 5,
-    shadowColor: Colors.borderColor,
+    // shadowOffset: {
+    //   width: 5,
+    //   height: 5,
+    // },
+    // shadowOpacity: 1,
+    // shadowRadius: 5,
+    // shadowColor: Colors.borderColor,
     elevation: 6,
   },
   iconImage: {
@@ -252,9 +254,9 @@ let styles = StyleSheet.create( {
     justifyContent: 'center',
   },
   touchableText: {
-    color: Colors.blue,
+    color: Colors.THEAM_TEXT_COLOR,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   arrowIconView: {
     marginLeft: 10,

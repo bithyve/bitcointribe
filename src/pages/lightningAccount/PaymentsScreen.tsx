@@ -46,7 +46,7 @@ const styles = StyleSheet.create( {
     color: Colors.darkBlue,
     fontSize: RFValue( 25 ),
     paddingLeft: 10,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   activityIndicator: {
     paddingVertical: 40,

@@ -60,6 +60,7 @@ import { translations } from '../../common/content/LocContext'
 import QRModal from '../Accounts/QRModal'
 import Loader from '../../components/loader'
 import AlertModalContents from '../../components/AlertModalContents'
+import LinearGradient from 'react-native-linear-gradient'
 
 const getImageIcon = ( item: ContactRecipientDescribing ) => {
   if ( Object.keys( item ).length ) {
@@ -1049,7 +1050,9 @@ class ContactDetails extends PureComponent<
         />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
         <View style={{
-          flexDirection: 'row'
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center'
         }}>
           <BackIconTitle />
           <TouchableOpacity
@@ -1062,21 +1065,30 @@ class ContactDetails extends PureComponent<
                 isKeeper: true, isPrimary: this.contact.displayedName == 'Personal Device 1' ? true : false
               } )
             }}
-            style={styles.resendContainer}
           >
-            {this.contact.lastSeenActive ? (
-              <Image
-                source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
-                style={styles.bitcoinIconStyle}
-              />
-            ) : null}
-            <Text style={styles.sendTextStyle}>
-              {this.contact.lastSeenActive
-                ? this.common[ 'send' ]
-                : this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER
-                  ? 'Reshare'
-                  : this.strings[ 'ResendRequest' ]}
-            </Text>
+            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+              start={{
+                x: 0, y: 0
+              }} end={{
+                x: 1, y: 0
+              }}
+              locations={[ 0.2, 1 ]}
+              style={styles.resendContainer}
+            >
+              {this.contact.lastSeenActive ? (
+                <Image
+                  source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
+                  style={styles.bitcoinIconStyle}
+                />
+              ) : null}
+              <Text style={styles.sendTextStyle}>
+                {this.contact.lastSeenActive
+                  ? this.common[ 'send' ]
+                  : this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER
+                    ? 'Reshare'
+                    : this.strings[ 'ResendRequest' ]}
+              </Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
 
@@ -1106,13 +1118,13 @@ class ContactDetails extends PureComponent<
                 <Text style={styles.lastSeenText}>{`${this.strings[ 'lastSeen' ]} `}</Text>
                 {Number.isFinite( this.contact.lastSeenActive ) ? (
                   <Text style={[ styles.lastSeenText, {
-                    fontFamily: Fonts.FiraSansMediumItalic,
+                    fontFamily: Fonts.MediumItalic,
                   } ]}>
                     {agoTextForLastSeen( this.contact.lastSeenActive ) === 'today' ? this.common[ 'today' ] : agoTextForLastSeen( this.contact.lastSeenActive )}
                   </Text>
                 ) : (
                   <Text style={[ styles.lastSeenText, {
-                    fontFamily: Fonts.FiraSansMediumItalic,
+                    fontFamily: Fonts.MediumItalic,
                     // fontSize: RFValue( 9 )
                   } ]}>
                     {this.common[ 'unknown' ]}
@@ -1202,7 +1214,7 @@ class ContactDetails extends PureComponent<
                         style={{
                           color: Colors.blue,
                           fontSize: RFValue( 13 ),
-                          fontFamily: Fonts.FiraSansRegular,
+                          fontFamily: Fonts.Regular,
                         }}
                       >
                         {value.title}
@@ -1211,7 +1223,7 @@ class ContactDetails extends PureComponent<
                           style={{
                             color: Colors.textColorGrey,
                             fontSize: RFValue(10),
-                            fontFamily: Fonts.FiraSansRegular,
+                            fontFamily: Fonts.Regular,
                             marginTop: 5,
                           }}
                         >
@@ -1236,7 +1248,7 @@ class ContactDetails extends PureComponent<
                           style={{
                             color: Colors.textColorGrey,
                             fontSize: RFValue( 10 ),
-                            fontFamily: Fonts.FiraSansRegular,
+                            fontFamily: Fonts.Regular,
                           }}
                         >
                           {value.title}
@@ -1249,7 +1261,7 @@ class ContactDetails extends PureComponent<
                           style={{
                             color: Colors.textColorGrey,
                             fontSize: RFValue(8),
-                            fontFamily: Fonts.FiraSansRegular,
+                            fontFamily: Fonts.Regular,
                             marginTop: 5,
                           }}
                         >
@@ -1533,14 +1545,14 @@ const styles = StyleSheet.create( {
     paddingVertical: hp( 2 )
   },
   titleText: {
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 12 ),
     letterSpacing: 0.24,
     color: Colors.textColorGrey,
     marginTop: hp( 2 )
   },
   titleSubText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     marginRight: wp( 3 )
@@ -1548,12 +1560,12 @@ const styles = StyleSheet.create( {
   lastSeenText: {
     // marginBottom: 3,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
   headerTitleText: {
     color: Colors.blue,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 14 ),
     // marginBottom: wp( '1%' ),
     alignSelf: 'center',
@@ -1586,7 +1598,7 @@ const styles = StyleSheet.create( {
   contactTextBold: {
     marginLeft: 10,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     color: Colors.blue,
     letterSpacing: 0.01,
   },
@@ -1594,14 +1606,14 @@ const styles = StyleSheet.create( {
     marginLeft: 10,
     fontSize: RFValue( 20 ),
     letterSpacing: 0.01,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.blue,
   },
   phoneText: {
     marginTop: 3,
     marginLeft: 10,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
   filterButton: {
@@ -1660,7 +1672,7 @@ const styles = StyleSheet.create( {
     color: Colors.white,
     fontSize: RFValue( 11 ),
     letterSpacing: 0.5,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'center',
     width: wp( '46%' )
   },
@@ -1668,7 +1680,7 @@ const styles = StyleSheet.create( {
     color: Colors.backgroundColor1,
     fontSize: RFValue( 15 ),
     letterSpacing: 0.01,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     // marginLeft: 10,
     // marginRight: 10,
     marginLeft: 0,
@@ -1679,7 +1691,7 @@ const styles = StyleSheet.create( {
   buttonInfo: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 9 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: 5,
     marginLeft: 10,
   },
@@ -1702,7 +1714,7 @@ const styles = StyleSheet.create( {
   },
   contactTypeText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 10 ),
     marginLeft: 10,
   },
@@ -1727,7 +1739,7 @@ const styles = StyleSheet.create( {
   },
   sendTextStyle: {
     color: Colors.white,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 10 ),
     marginLeft: 2,
   },
@@ -1758,7 +1770,7 @@ const styles = StyleSheet.create( {
   dateTextStyle: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 9 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: hp( '0.3%' ),
   },
   selectOptionSecond: {
@@ -1775,7 +1787,7 @@ const styles = StyleSheet.create( {
   dateTextSecondStyle: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 9 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 'auto',
   },
   keeperViewStyle: {

@@ -151,7 +151,7 @@ const styles = StyleSheet.create( {
 
   amountText: {
     ...HeadingStyles.captionText,
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     color: Colors.blue,
   },
 

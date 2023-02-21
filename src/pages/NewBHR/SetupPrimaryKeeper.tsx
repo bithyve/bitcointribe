@@ -99,14 +99,14 @@ const styles = StyleSheet.create({
   },
   modalInfoText: {
     fontSize: RFValue(11),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: wp('1.5%'),
     color: Colors.lightTextColor,
   },
   headerText: {
     color: Colors.blue,
     fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   grayBox: {
     justifyContent: 'center',
@@ -133,6 +133,6 @@ const styles = StyleSheet.create({
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 });

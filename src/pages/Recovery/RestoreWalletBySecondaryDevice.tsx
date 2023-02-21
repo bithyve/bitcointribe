@@ -180,8 +180,8 @@ export default function RestoreWalletBySecondaryDevice( props ) {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>
@@ -259,7 +259,7 @@ export default function RestoreWalletBySecondaryDevice( props ) {
                   style={{
                     color: Colors.white,
                     fontSize: RFValue( 13 ),
-                    fontFamily: Fonts.FiraSansMedium,
+                    fontFamily: Fonts.Medium,
                   }}
                 >
                   Yes, I have scanned
@@ -289,7 +289,7 @@ export default function RestoreWalletBySecondaryDevice( props ) {
                   style={{
                     color: Colors.white,
                     fontSize: RFValue( 13 ),
-                    fontFamily: Fonts.FiraSansMedium,
+                    fontFamily: Fonts.Medium,
                   }}
                 >
                   Scan

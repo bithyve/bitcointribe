@@ -316,7 +316,7 @@ const styles = StyleSheet.create( {
     marginRight: 14,
   },
   destinationTitleText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 20 ),
     color: Colors.black,
     alignContent: 'center',
@@ -329,7 +329,7 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     width: wp( 30 ),
     marginLeft: 10
   },
@@ -338,7 +338,7 @@ const styles = StyleSheet.create( {
     marginRight: wp( '11%' ),
     color: Colors.lightTextColor,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'justify',
     letterSpacing: RFValue( 0.6 ),
     lineHeight: RFValue( 18 ),
@@ -373,7 +373,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   },
 } )
 

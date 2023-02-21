@@ -20,7 +20,8 @@ import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import MaterialCurrencyCodeIcon from '../../components/MaterialCurrencyCodeIcon'
 import { getCurrencyImageByRegion, getCurrencyImageName } from '../../common/CommonFunctions'
 import { LocalizationContext } from '../../common/content/LocContext'
-import {Shadow} from 'react-native-shadow-2';
+import { Shadow } from 'react-native-shadow-2'
+import LinearGradient from 'react-native-linear-gradient'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -89,18 +90,18 @@ const HomeBuyCard = ( {
   const { translations, formatString } = useContext( LocalizationContext )
   const strings = translations[ 'home' ]
   return (
-    <Shadow startColor={Colors.shadowColor} distance={0} offset={[8,8] }
+    <Shadow startColor={Colors.shadowColor} distance={0} offset={[ 8, 8 ] }
       viewStyle={cardContainer}
-     >
+    >
       <View>
         <Text style={{
-          color: Colors.blue,
+          color: Colors.THEAM_TEXT_COLOR,
           fontSize: RFValue( 11 ),
           marginLeft: 5,
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Medium,
           alignSelf: 'flex-start',
           letterSpacing: 0.33,
-          fontWeight:'500'
+          // fontWeight:'500'
         }}>
           {formatString( strings.btcTo, fiatCurrencyCode )}
         </Text>
@@ -114,7 +115,7 @@ const HomeBuyCard = ( {
           // )
             <MaterialCurrencyCodeIcon
               currencyCode={fiatCurrencyCode}
-              color={Colors.gray9}
+              color={Colors.GRAY_ICON}
               size={wp( '3.5%' )}
               style={{
                 width: wp( 4 )
@@ -127,22 +128,21 @@ const HomeBuyCard = ( {
               {setCurrencyCodeToImage( getCurrencyImageName( currencyCode ), Colors.blue )}
             </Text>
           )}
-          <Text style={{fontSize:17,color:'#8B8B8B'}}>{amount ? amount : '--'}</Text>
+          <Text style={{
+            fontSize:RFValue(16), color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
+            fontFamily: Fonts.SemiBold
+          }}>{amount ? amount : '--'}</Text>
           <Text>{incramount}</Text>
         </View>
       </View>
-    <Shadow startColor={Colors.shadowBlue} distance={11} offset={[9 ,10] }>
-      <TouchableOpacity
-        // icon={
-        //   <Image
-        //     source={require( '../../assets/images/icons/recurring_buy.png' )}
-        //     style={{
-        //       width: wp( 6 ),
-        //       height: wp( 6 ),
-        //       resizeMode: 'contain'
-        //     }}
-        //   />
-        // }
+
+      <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+        start={{
+          x: 0, y: 0
+        }} end={{
+          x: 1, y: 0
+        }}
+        locations={[ 0.2, 1 ]}
         style={{
           borderRadius: wp( 2 ),
           paddingVertical: wp( 2.5 ),
@@ -154,19 +154,31 @@ const HomeBuyCard = ( {
           //   width: 9, height: 10
           // },
           // elevation: 15
-        }}
-        onPress={() =>
-          openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
-        }
-      >
-        <Text style={{
-          ...ButtonStyles.floatingActionButtonText,
         }}>
-          {strings.buy}
-        </Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+        // icon={
+        //   <Image
+        //     source={require( '../../assets/images/icons/recurring_buy.png' )}
+        //     style={{
+        //       width: wp( 6 ),
+        //       height: wp( 6 ),
+        //       resizeMode: 'contain'
+        //     }}
+        //   />
+        // }
+
+          onPress={() =>
+            openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
+          }
+        >
+          <Text style={{
+            ...ButtonStyles.floatingActionButtonText,
+          }}>
+            {strings.buy}
+          </Text>
+        </TouchableOpacity>
+      </LinearGradient>
     </Shadow>
-  </Shadow>
   )
 }
 // const styles = StyleSheet.create( {
@@ -174,7 +186,7 @@ const HomeBuyCard = ( {
 //     color: Colors.blue,
 //     fontSize: RFValue( 11 ),
 //     letterSpacing: 0.33,
-//     fontFamily: Fonts.FiraSansRegular,
+//     fontFamily: Fonts.Regular,
 //   },
 //   subTitleStyle: {
 //     color: Colors.gray8,

@@ -38,7 +38,7 @@ export type Props = {
   amountTextStyle?: Record<string, unknown>;
   unitTextStyle?: Record<string, unknown>;
   isTestAccount?: boolean;
-  verticalAlignUnit?: "center" | "bottom" | "auto" | "top";
+  verticalAlignUnit?: 'center' | 'bottom' | 'auto' | 'top';
 };
 
 /**
@@ -134,7 +134,7 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
           }}
         />
       )
-    } 
+    }
     else {
       return (
         <Image
@@ -166,9 +166,9 @@ const LabeledBalanceDisplay: React.FC<Props> = ( {
       >
         {formattedBalanceText}
       </Text>
-      <Text style={[unitTextStyles, {
+      <Text style={[ unitTextStyles, {
         // textAlignVertical: verticalAlignUnit
-      }]}>{`${formattedUnitText}`}</Text>
+      } ]}>{`${formattedUnitText}`}</Text>
     </View>
   )
 }
@@ -184,11 +184,11 @@ const defaultStyles = StyleSheet.create( {
     width: wp( 3 ),
     height: wp( 4 ),
     resizeMode: 'contain',
-    marginTop: wp(0.3)
+    marginTop: wp( 0.3 )
   },
 
   amountText: {
-    fontFamily: Fonts.OpenSans,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 14.5 ),
     marginRight: wp( 1 ),
     // alignItems: 'baseline',
@@ -196,7 +196,7 @@ const defaultStyles = StyleSheet.create( {
   },
 
   unitText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     // alignItems: 'baseline',
   },
 } )

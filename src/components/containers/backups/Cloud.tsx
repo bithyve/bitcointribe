@@ -51,7 +51,7 @@ const Cloud = props => {
           style={{
             marginLeft: 30,
             color: Colors.textColorGrey,
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             fontSize: RFValue(12),
             marginTop: 5,
             marginBottom: 5
@@ -60,7 +60,7 @@ const Cloud = props => {
           Select cloud drive to{" "}
           <Text
             style={{
-              fontFamily: Fonts.FiraSansMediumItalic,
+              fontFamily: Fonts.MediumItalic,
               fontWeight: "bold"
             }}
           >
@@ -115,14 +115,14 @@ const styles = StyleSheet.create({
     color: Colors.blue,
     fontSize: RFValue(13),
     marginLeft: 13,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   listElementsInfo: {
     color: Colors.textColorGrey,
     fontSize: RFValue(11),
     marginLeft: 13,
     marginTop: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   listElementIcon: {
     paddingRight: 5,

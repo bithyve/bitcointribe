@@ -91,7 +91,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
           >
             <FontAwesome
               name="long-arrow-left"
-              color={Colors.blue}
+              color={Colors.homepageButtonColor}
               size={17}
             />
           </TouchableOpacity>
@@ -109,7 +109,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
                 materialIconCurrencyCodes.includes( currencyCode ) ?
                   <MaterialCurrencyCodeIcon
                     currencyCode={currencyCode}
-                    color={Colors.white}
+                    color={Colors.blue}
                     size={14}
                   />
                   : null
@@ -118,12 +118,12 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
                 materialIconCurrencyCodes.includes( currencyCode ) ?
                   <MaterialCurrencyCodeIcon
                     currencyCode={currencyCode}
-                    color={Colors.blue}
+                    color={Colors.white}
                     size={14}
                   />
                   : null
               }
-              trackColor={Colors.lightBlue}
+              trackColor={Colors.blue}
               thumbColor={Colors.blue}
               onpress={() => {
                 ( exchangeRates && exchangeRates[ currencyCode ] )

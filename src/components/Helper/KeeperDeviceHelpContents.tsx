@@ -27,7 +27,7 @@ export default function KeeperDeviceHelpContents( props ) {
         <Text
           style={{
             color: Colors.white,
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
             fontSize: RFValue( 20 ),
             marginTop: hp( '1%' ),
             marginBottom: hp( '1%' ),
@@ -64,12 +64,12 @@ export default function KeeperDeviceHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}
           >
-            Any other phone that has Hexa installed can become a “Keeper Device”. A Keeper Device stores one of your five Recovery Keys
+            Any other phone that has Bitcoin Tribe installed can become a “Keeper Device”. A Keeper Device stores one of your five Recovery Keys
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center'
@@ -88,7 +88,7 @@ export default function KeeperDeviceHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}
@@ -141,7 +141,7 @@ export default function KeeperDeviceHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}
@@ -165,7 +165,7 @@ export default function KeeperDeviceHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}
@@ -218,7 +218,7 @@ export default function KeeperDeviceHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}
@@ -242,13 +242,13 @@ export default function KeeperDeviceHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' )
             }}
           >
               The Keeper Device also acts as the host of your Exit Key, which
-              can be used to migrate from Hexa to another wallet at any time.
+              can be used to migrate from Bitcoin Tribe to another wallet at any time.
               Although, why would you want to do that!
           </Text>
         </View>

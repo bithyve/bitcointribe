@@ -129,8 +129,8 @@ export default function NewWalletQuestionRegenerateShare( props ) {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>
@@ -156,7 +156,7 @@ export default function NewWalletQuestionRegenerateShare( props ) {
           >
             <ScrollView>
               <HeaderTitle
-                firstLineTitle={'New Hexa Wallet'}
+                firstLineTitle={'New Bitcoin Tribe Wallet'}
                 secondLineTitle={''}
                 infoTextNormal={'Setup '}
                 infoTextBold={'Secret Question and answer'}
@@ -217,7 +217,7 @@ export default function NewWalletQuestionRegenerateShare( props ) {
                             dropdownBoxValue.id == value.id
                               ? Colors.blue
                               : Colors.black,
-                          fontFamily: Fonts.FiraSansRegular,
+                          fontFamily: Fonts.Regular,
                           fontSize: RFValue( 12 ),
                         }}
                       >
@@ -351,7 +351,7 @@ export default function NewWalletQuestionRegenerateShare( props ) {
                 <Text
                   style={{
                     color: Colors.red,
-                    fontFamily: Fonts.FiraSansMediumItalic,
+                    fontFamily: Fonts.MediumItalic,
                     fontSize: RFValue( 10 ),
                     marginLeft: 'auto',
                   }}
@@ -443,7 +443,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   bottomButtonView: {
     flexDirection: 'row',
@@ -494,12 +494,12 @@ const styles = StyleSheet.create( {
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingLeft: 15,
   },
   dropdownBoxText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
   },
   dropdownBoxModal: {

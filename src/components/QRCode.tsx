@@ -8,6 +8,7 @@ import QR from 'react-native-qrcode-svg'
 import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import Fonts from '../common/Fonts'
 
 export type Props = {
   value: string;
@@ -24,7 +25,7 @@ const QRCode: React.FC<Props> = ( {
   return (
     <View style={styles.containerQrCode}>
       <QR
-        logo={require( '../assets/images/icons/icon_hexa.png' )}
+        logo={require( '../assets/images/icons/icon_qr_logo.png' )}
         logoSize={50}
         logoMargin={2}
         logoBackgroundColor="white"
@@ -50,6 +51,7 @@ const styles = StyleSheet.create( {
     fontSize: 17,
     textAlign: 'center',
     paddingVertical: 7,
+    fontFamily: Fonts.Regular
   },
 } )
 

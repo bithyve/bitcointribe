@@ -32,7 +32,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   buttonView: {
     height: wp( '12%' ),
@@ -81,7 +81,7 @@ export default function ScanNodeConfig( { navigation } ) {
           <View style={CommonStyles.headerLeftIconInnerContainer}>
             <FontAwesome
               name="long-arrow-left"
-              color={Colors.blue}
+              color={Colors.homepageButtonColor}
               size={17}
             />
           </View>

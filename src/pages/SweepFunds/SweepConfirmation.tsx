@@ -193,8 +193,8 @@ class SweepConfirmation extends Component<
               }}
             >
               <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                 size={17}
               />
             </TouchableOpacity>
@@ -228,7 +228,7 @@ class SweepConfirmation extends Component<
                       fontSize: RFValue( 9 ),
                       color: Colors.blue,
                       alignSelf: 'center',
-                      fontFamily: Fonts.FiraSansMediumItalic,
+                      fontFamily: Fonts.MediumItalic,
                     }}
                   >
                     {item.balance + ' sats'}
@@ -252,7 +252,7 @@ class SweepConfirmation extends Component<
                     style={{
                       color: Colors.blue,
                       fontSize: RFValue( 12 ),
-                      fontFamily: Fonts.FiraSansItalic,
+                      fontFamily: Fonts.Italic,
                     }}
                   >
                     {item.account_name + ', '}
@@ -321,7 +321,7 @@ class SweepConfirmation extends Component<
                   onpress={() => this.onPrioritySelect( 'High Fee' )}
                 />
                 <Text style={{
-                  color: Colors.greyTextColor, fontSize: RFValue( 10 ), fontFamily: Fonts.FiraSansMedium, marginLeft: wp( '2%' )
+                  color: Colors.greyTextColor, fontSize: RFValue( 10 ), fontFamily: Fonts.Medium, marginLeft: wp( '2%' )
                 }}>
                   High
                 </Text>
@@ -663,12 +663,12 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalHeaderTitleView: {
     alignItems: 'center',
@@ -696,7 +696,7 @@ const styles = StyleSheet.create( {
   accountTypeTextBalanceView: {
     color: Colors.blue,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
   },
   totalMountView: {
     flexDirection: 'row',
@@ -713,7 +713,7 @@ const styles = StyleSheet.create( {
   totalAmountText: {
     color: Colors.greyTextColor,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 5,
   },
   totalAmountOuterView: {
@@ -737,13 +737,13 @@ const styles = StyleSheet.create( {
   amountText: {
     color: Colors.black,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 10,
   },
   amountUnitText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: 5,
   },
   transactionPriorityView: {
@@ -755,25 +755,25 @@ const styles = StyleSheet.create( {
   transactionPriorityText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 5,
   },
   transactionPriorityInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 5,
   },
   tableHeadingText: {
     color: Colors.greyTextColor,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   priorityTableText: {
     fontSize: RFValue( 12 ),
     lineHeight: RFValue( 12 ),
     color: Colors.greyTextColor,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   priorityTableContainer: {
     flexDirection: 'row',
@@ -798,7 +798,7 @@ const styles = StyleSheet.create( {
   name: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 9 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'center',
     marginTop: 5,
     width: wp( '15%' ),
@@ -829,7 +829,7 @@ const styles = StyleSheet.create( {
   sweepingFromText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 5,
   },
   priorityValues: {

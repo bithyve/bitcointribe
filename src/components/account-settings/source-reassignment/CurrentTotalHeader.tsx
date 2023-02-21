@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   selectedTotalHeading: {
     textAlign: 'right',
     color: Colors.blue,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: 11,
   },
 
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     color: Colors.blue,
     paddingLeft: 10,
     marginBottom: -4,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: 16,
   },
 
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   },
 
   amountText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue(20),
     marginRight: 6,
   },

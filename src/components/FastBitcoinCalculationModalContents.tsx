@@ -48,7 +48,7 @@ export default function FastBitcoinCalculationModalContents( props ) {
               height: 30, width: 30
             }}
           >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </TouchableOpacity>
           <View>
             <Text style={styles.modalHeaderTitleText}>{props.pageTitle}</Text>
@@ -71,7 +71,7 @@ export default function FastBitcoinCalculationModalContents( props ) {
             paddingLeft: 30,
             paddingRight: 30
           }}
-         >
+        >
           <View style={styles.textBoxView}>
             <View style={styles.amountInputImage}>
               <Ionicons name={'hashtag'} size={20} color={'#C6C6C6'} />
@@ -161,7 +161,7 @@ export default function FastBitcoinCalculationModalContents( props ) {
                             dropdownBoxValue.id == value.id
                               ? Colors.blue
                               : Colors.black,
-                          fontFamily: Fonts.FiraSansRegular,
+                          fontFamily: Fonts.Regular,
                           fontSize: RFValue( 12 )
                         }}
                       >
@@ -224,7 +224,7 @@ export default function FastBitcoinCalculationModalContents( props ) {
             style={{
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansMedium
+              fontFamily: Fonts.Medium
             }}
           >
             {props.proceedButtonText}
@@ -256,12 +256,12 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: hp( '0.7%' )
   },
   textBoxView: {
@@ -286,7 +286,7 @@ const styles = StyleSheet.create( {
     flex: 1,
     paddingLeft: 20,
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 13 )
   },
   textBoxImage: {
@@ -295,7 +295,7 @@ const styles = StyleSheet.create( {
     resizeMode: 'contain'
   },
   dropdownBoxText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 )
   },
   dropdownBoxModal: {

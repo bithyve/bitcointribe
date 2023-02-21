@@ -132,7 +132,7 @@ const SecureScan = props => {
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </View>
         </TouchableOpacity>
       </View>
@@ -191,7 +191,7 @@ const SecureScan = props => {
               style={{
                 color: Colors.white,
                 fontSize: RFValue( 13 ),
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
               }}
             >
               Continue
@@ -213,7 +213,7 @@ const SecureScan = props => {
               style={{
                 color: Colors.blue,
                 fontSize: RFValue( 13 ),
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
               }}
             >
               Activate Later

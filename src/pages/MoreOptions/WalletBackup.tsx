@@ -686,13 +686,13 @@ const WalletBackup = ( props, navigation ) => {
     return (
       <>
         {isFirstMessageBold ? <Text numberOfLines={1} style={{
-          fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6, marginStart: 20
+          fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.Light, marginTop: 6, marginStart: 20
         }}><Text style={{
-            fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6, marginStart: 20
+            fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.Light, marginTop: 6, marginStart: 20
           }}>{messageOne}</Text>{messageTwo}</Text> : <Text ellipsizeMode="middle" numberOfLines={1} style={{
-          fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6, marginStart: 20
+          fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.Light, marginTop: 6, marginStart: 20
         }}>{messageOne} <Text style={{
-            fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6, marginStart: 20
+            fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.Light, marginTop: 6, marginStart: 20
           }}>{messageTwo}</Text></Text>}
       </>
     )
@@ -810,11 +810,11 @@ const WalletBackup = ( props, navigation ) => {
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
+            {/* <FontAwesome
               name="long-arrow-left"
-              color={Colors.blue}
+              color={Colors.homepageButtonColor}
               size={17}
-            />
+            /> */}
           </View>
         </TouchableOpacity>
       </View>
@@ -827,10 +827,10 @@ const WalletBackup = ( props, navigation ) => {
         step={''}
       />
       {/* <Text style={{
-        fontSize: 16, color: Colors.blue, fontFamily: Fonts.FiraSansRegular, marginTop: 10, marginStart: 20
+        fontSize: 16, color: Colors.blue, fontFamily: Fonts.Regular, marginTop: 10, marginStart: 20
       }}>{( levelData && levelData[ 0 ]?.status == 'notSetup' ) ? 'No backup created' : 'Backup created'}</Text> */}
       {/* <Text style={{
-        fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6, marginStart: 20
+        fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.Light, marginTop: 6, marginStart: 20
       }}>{levelData[ 0 ].keeper1.shareType == '' || levelData[ 0 ].keeper1.shareType == 'notSetup' ? strings.Backupyour : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Seed backup is Completed' : 'Wallet backup not complete' )}</Text> */}
       {/* {showBackupMessage()} */}
 
@@ -856,12 +856,12 @@ const WalletBackup = ( props, navigation ) => {
                     width: 32, height: 32
                   }} resizeMode={'contain'} source={getKeeperIcon( item, index )} />
                   <Text style={{
-                    fontSize: 16, color: Colors.blue, fontFamily: Fonts.FiraSansRegular, marginTop: 10,
+                    fontSize: 16, color: Colors.blue, fontFamily: Fonts.Regular, marginTop: 10,
                   }}>
                     {index % 2 == 0 ? ( ( item.keeper1ButtonText == 'Seed' ? 'Backup phrase' : ( item.keeper1ButtonText == 'Write down seed-words' ? 'Backup phrase' : item.keeper1ButtonText ) ) || 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
                   </Text>
                   <Text style={{
-                    fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.FiraSansLight, marginTop: 6,
+                    fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.Light, marginTop: 6,
                   }}>{index == 0 && ( item.keeper1ButtonText == 'Seed' || item.keeper1ButtonText == 'Write down seed-words' )
                       ? ( item.keeper1ButtonText == 'Seed' ? 'Wallet backup confirmed' : 'Confirm backup phrase to secure your wallet' ) : 'Encrypt and backup wallet on your cloud'}</Text>
                 </View>
@@ -1174,7 +1174,7 @@ const WalletBackup = ( props, navigation ) => {
 const styles = StyleSheet.create( {
   headerTitleText: {
     color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 16 ),
     // marginBottom: wp( '1%' ),
     alignSelf: 'center',
@@ -1215,7 +1215,7 @@ const styles = StyleSheet.create( {
   addModalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.01
   },
 
@@ -1223,7 +1223,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
     marginTop: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   successModalButtonView: {
     height: wp( '12%' ),
@@ -1242,7 +1242,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )
 

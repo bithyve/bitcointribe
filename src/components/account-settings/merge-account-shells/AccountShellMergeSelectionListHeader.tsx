@@ -67,19 +67,19 @@ const styles = StyleSheet.create( {
 
   accountShellItemTitleText: {
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   titleLabelText: {
     fontSize: RFValue( 10 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 
   balanceCaptionText: {
     fontSize: RFValue( 10 ),
     color: Colors.blue,
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
   },
 
   avatarImage: {

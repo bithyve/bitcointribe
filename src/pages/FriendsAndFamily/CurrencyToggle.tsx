@@ -35,7 +35,7 @@ const ToggleContainer = ( ) => {
           materialIconCurrencyCodes.includes( currencyCode ) ?
             <MaterialCurrencyCodeIcon
               currencyCode={currencyCode}
-              color={Colors.white}
+              color={Colors.THEAM_TEXT_COLOR}
               size={14}
             />
             : null
@@ -44,13 +44,13 @@ const ToggleContainer = ( ) => {
           materialIconCurrencyCodes.includes( currencyCode ) ?
             <MaterialCurrencyCodeIcon
               currencyCode={currencyCode}
-              color={Colors.blue}
+              color={Colors.white}
               size={14}
             />
             : null
         }
-        trackColor={Colors.lightBlue}
-        thumbColor={Colors.blue}
+        trackColor={Colors.THEAM_TEXT_COLOR}
+        thumbColor={Colors.THEAM_TEXT_COLOR}
         onpress={() => {
           dispatch( giftCurrencyKindSet(
             prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN

@@ -1,43 +1,47 @@
-import React from "react";
-import { View, Image, TouchableOpacity, Text, StyleSheet } from "react-native";
-import Colors from "../../common/Colors";
-import Fonts from "../../common/Fonts";
-import { RFValue } from "react-native-responsive-fontsize";
+import React from 'react'
+import { View, Image, TouchableOpacity, Text, StyleSheet } from 'react-native'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
-} from "react-native-responsive-screen";
-import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
+} from 'react-native-responsive-screen'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 
-export default function CustodianRequestModalContents(props) {
+export default function CustodianRequestModalContents( props ) {
   return (
-    <View style={{ ...styles.modalContentContainer, height: "100%" }}>
+    <View style={{
+      ...styles.modalContentContainer, height: '100%'
+    }}>
       <View>
         <View
           style={{
             ...styles.successModalHeaderView,
-            marginRight: wp("8%"),
-            marginLeft: wp("8%")
+            marginRight: wp( '8%' ),
+            marginLeft: wp( '8%' )
           }}
         >
           <Text style={styles.modalTitleText}>
-            You have been selected as a{"\n"}Keeper for Hexa Wallet
+            You have been selected as a{'\n'}Keeper for Bitcoin Tribe Wallet
           </Text>
-          <Text style={{ ...styles.modalInfoText, marginTop: wp("1.5%") }}>
-            Please contact the sender to get{"\n"}the OTP and accept the secret
+          <Text style={{
+            ...styles.modalInfoText, marginTop: wp( '1.5%' )
+          }}>
+            Please contact the sender to get{'\n'}the OTP and accept the secret
           </Text>
         </View>
         <View style={styles.box}>
           <View
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: hp("2%")
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginBottom: hp( '2%' )
             }}
           >
             <Image
               style={styles.successModalAmountImage}
-              source={require("../../assets/images/icons/icon_wallet.png")}
+              source={require( '../../assets/images/icons/icon_wallet.png' )}
             />
             <Text style={styles.successModalWalletNameText}>
               {props.userName}
@@ -46,59 +50,67 @@ export default function CustodianRequestModalContents(props) {
           <View style={styles.separator} />
           <View
             style={{
-              marginTop: hp("2%"),
-              marginLeft: wp("2%"),
-              marginRight: wp("2%")
+              marginTop: hp( '2%' ),
+              marginLeft: wp( '2%' ),
+              marginRight: wp( '2%' )
             }}
           >
             <Text
-              style={{ ...styles.modalTitleText, fontSize: RFValue(11) }}
+              style={{
+                ...styles.modalTitleText, fontSize: RFValue( 11 )
+              }}
             >
               Message from the Sender
             </Text>
-            <Text style={{ ...styles.modalInfoText }}>
-              Please accept my request, this will help me recover{"\n"}my wallet
+            <Text style={{
+              ...styles.modalInfoText
+            }}>
+              Please accept my request, this will help me recover{'\n'}my wallet
               later
             </Text>
           </View>
         </View>
         <View
           style={{
-            flexDirection: "row",
-            marginTop: "auto",
-            alignItems: "center"
+            flexDirection: 'row',
+            marginTop: 'auto',
+            alignItems: 'center'
           }}
         >
           <AppBottomSheetTouchableWrapper
             onPress={() => {
-              props.onPressAcceptSecret();
+              props.onPressAcceptSecret()
             }}
-            style={{ ...styles.successModalButtonView }}
+            style={{
+              ...styles.successModalButtonView
+            }}
           >
             <Text style={styles.proceedButtonText}>Accept Secret</Text>
           </AppBottomSheetTouchableWrapper>
           <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressRejectSecret()}
             style={{
-              height: wp("13%"),
-              width: wp("35%"),
-              justifyContent: "center",
-              alignItems: "center"
+              height: wp( '13%' ),
+              width: wp( '35%' ),
+              justifyContent: 'center',
+              alignItems: 'center'
             }}
           >
-            <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
+            <Text style={{
+              ...styles.proceedButtonText, color: Colors.blue
+            }}>
               Reject Secret
             </Text>
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
     </View>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: "50%",
+    height: '50%',
     backgroundColor: Colors.white,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
@@ -111,85 +123,87 @@ const styles = StyleSheet.create({
   },
   box: {
     backgroundColor: Colors.backgroundColor1,
-    marginRight: wp("5%"),
-    marginLeft: wp("5%"),
-    paddingTop: hp("2%"),
-    paddingBottom: hp("2%"),
-    marginBottom: hp("3%"),
+    marginRight: wp( '5%' ),
+    marginLeft: wp( '5%' ),
+    paddingTop: hp( '2%' ),
+    paddingBottom: hp( '2%' ),
+    marginBottom: hp( '3%' ),
     borderRadius: 10,
-    justifyContent: "center"
+    justifyContent: 'center'
   },
   successModalHeaderView: {
-    marginTop: hp("5%"),
-    marginBottom: hp("3%")
+    marginTop: hp( '5%' ),
+    marginBottom: hp( '3%' )
   },
   modalTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansMedium
+    fontSize: RFValue( 18 ),
+    fontFamily: Fonts.Medium
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
-    fontFamily: Fonts.FiraSansRegular
+    fontSize: RFValue( 11 ),
+    fontFamily: Fonts.Regular
   },
   successModalAmountView: {
-    marginRight: wp("10%"),
-    marginLeft: wp("10%")
+    marginRight: wp( '10%' ),
+    marginLeft: wp( '10%' )
   },
   successModalWalletNameText: {
     color: Colors.black,
-    fontSize: RFValue(25),
-    fontFamily: Fonts.FiraSansRegular,
-    textAlign: "center"
+    fontSize: RFValue( 25 ),
+    fontFamily: Fonts.Regular,
+    textAlign: 'center'
   },
   successModalAmountImage: {
-    width: wp("15%"),
-    height: wp("15%"),
+    width: wp( '15%' ),
+    height: wp( '15%' ),
     marginRight: 15,
     marginLeft: 10,
-    marginBottom: wp("1%"),
-    resizeMode: "contain"
+    marginBottom: wp( '1%' ),
+    resizeMode: 'contain'
   },
   successModalAmountText: {
     color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(21),
+    fontFamily: Fonts.Regular,
+    fontSize: RFValue( 21 ),
     marginLeft: 5
   },
   successModalAmountUnitText: {
     color: Colors.borderColor,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11)
+    fontFamily: Fonts.Regular,
+    fontSize: RFValue( 11 )
   },
   successModalAmountInfoView: {
     flex: 0.4,
-    marginRight: wp("10%"),
-    marginLeft: wp("10%")
+    marginRight: wp( '10%' ),
+    marginLeft: wp( '10%' )
   },
   successModalButtonView: {
-    height: wp("13%"),
-    width: wp("35%"),
-    justifyContent: "center",
-    alignItems: "center",
+    height: wp( '13%' ),
+    width: wp( '35%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: {
+      width: 15, height: 15
+    },
     backgroundColor: Colors.blue,
-    alignSelf: "center",
-    marginLeft: wp("8%")
+    alignSelf: 'center',
+    marginLeft: wp( '8%' )
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansMedium
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.Medium
   },
   separator: {
     height: 2,
-    marginLeft: wp("2%"),
-    marginRight: wp("2%"),
+    marginLeft: wp( '2%' ),
+    marginRight: wp( '2%' ),
     backgroundColor: Colors.borderColor
   }
-});
+} )

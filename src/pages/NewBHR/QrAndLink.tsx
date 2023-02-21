@@ -206,8 +206,8 @@ export default function QrAndLink( props ) {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>
@@ -310,7 +310,7 @@ const styles = StyleSheet.create( {
   contactNameText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 25,
   },
   buttonInnerView: {
@@ -329,7 +329,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 10,
   },
 } )

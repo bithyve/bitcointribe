@@ -62,7 +62,7 @@ export default function SecondaryDeviceModelContents( props ) {
         color: Colors.textColorGrey,
         fontSize: RFValue( 12 ),
         letterSpacing: 0.1,
-        fontFamily: Fonts.FiraSansRegular,
+        fontFamily: Fonts.Regular,
         marginLeft: 20,
         marginRight: wp( 8 )
       }}>
@@ -79,7 +79,7 @@ export default function SecondaryDeviceModelContents( props ) {
           <QRCode title={props.qrTitle ? props.qrTitle : 'Keeper request'} value={props.secondaryQR} size={hp( '27%' )} />
         )}
         {!props.secondaryQR?<Text style={{
-          fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 13 ), color: Colors.textColorGrey, marginTop: 5
+          fontFamily: Fonts.Regular, fontSize: RFValue( 13 ), color: Colors.textColorGrey, marginTop: 5
         }}>{'Generating your Recovery Key. Hold on.\nDo not try to go back or close the app.'}</Text>: null}
         <AppBottomSheetTouchableWrapper
           disabled={props.secondaryQR ? false : true}
@@ -99,7 +99,7 @@ export default function SecondaryDeviceModelContents( props ) {
             style={{
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.Medium,
             }}
           >
             {strings.Ihavescanned}

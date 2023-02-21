@@ -170,13 +170,13 @@ const styles = StyleSheet.create( {
 
   confirmationsText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     marginTop: RFValue( 4 ),
   },
 
   amountText: {
-    fontFamily: Fonts.OpenSans,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 17 ),
   },
 } )

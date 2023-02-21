@@ -15,6 +15,7 @@ import {
 } from 'react-native-responsive-screen'
 import { translations } from '../common/content/LocContext'
 import Link from '../assets/images/svgs/link_blue.svg'
+import Fonts from '../common/Fonts'
 
 export default function CopyThisText( props ) {
   const common  = translations[ 'common' ]
@@ -62,6 +63,7 @@ export default function CopyThisText( props ) {
             style={{
               fontSize: RFValue( 13 ),
               color: Colors.lightBlue,
+              fontFamily: Fonts.Regular
             }}
           >
             {props.text}
@@ -81,7 +83,7 @@ export default function CopyThisText( props ) {
           {!props.openLink ?
             <Image
               style={{
-                width: 18, height: 20
+                width: 18, height: 20, tintColor: Colors.theam_icon_color
               }}
               source={require( '../assets/images/icons/icon-copy.png' )}
             />

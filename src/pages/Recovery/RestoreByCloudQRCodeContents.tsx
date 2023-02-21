@@ -199,7 +199,7 @@ export default function RestoreByCloudQRCodeContents( props ) {
             style={{
               color: Colors.blue,
               fontSize: RFValue( 13, 812 ),
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.Medium,
             }}
           >
             Step {counter == 9 ? 8 : counter} of 8
@@ -209,7 +209,7 @@ export default function RestoreByCloudQRCodeContents( props ) {
             style={{
               color: Colors.textColorGrey,
               fontSize: RFValue( 11, 812 ),
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.Medium,
             }}
           >
             {props.pageInfo}Please scan the{' '}
@@ -230,7 +230,7 @@ export default function RestoreByCloudQRCodeContents( props ) {
           <Text style={{
             ...NavStyles.modalHeaderSubtitleText, fontSize: RFValue( 15 )
           }}>
-            Scan a Bitcoin address or any Hexa QR
+            Scan a Bitcoin address or any Bitcoin Tribe QR
           </Text>
 
           <CoveredQRCodeScanner onCodeScanned={( { data: dataString }: { data: string } ) => {

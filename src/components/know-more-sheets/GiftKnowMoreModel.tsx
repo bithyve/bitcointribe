@@ -67,7 +67,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
                 marginBottom: wp( '1%' ),
               }}
             >
-              Hexa creates a link or QR code that allows you to send sats as gifts to anyone using Hexa Wallet
+              Bitcoin Tribe creates a link or QR code that allows you to send sats as gifts to anyone using Bitcoin Tribe Wallet
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
@@ -80,7 +80,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
                 marginBottom: wp( '15%' ),
               }}
             >
-              You can manage these Gifts from here. Send them when you want to and reclaim them if not accepted. The recipient will be directed to download Hexa wallet if they don't have it already
+              You can manage these Gifts from here. Send them when you want to and reclaim them if not accepted. The recipient will be directed to download Bitcoin Tribe wallet if they don't have it already
             </Text>
           </View>
         </ScrollView>
@@ -97,7 +97,7 @@ const styles = StyleSheet.create( {
   },
   headerText: {
     color: Colors.backgroundColor1,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 18 ),
     letterSpacing: 0.54,
     marginTop: hp( '1%' ),
@@ -115,21 +115,21 @@ const styles = StyleSheet.create( {
     color: Colors.backgroundColor1,
     fontSize: RFValue( 12 ),
     letterSpacing: 0.6,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: wp( '10%' ),
     marginRight: wp( '10%' ),
   },
   clickHereText: {
     color: Colors.backgroundColor1,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textDecorationLine: 'underline',
     textAlign: 'center',
   },
   toKnowMoreText: {
     color: Colors.backgroundColor1,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   linkView: {
     flexDirection: 'row',

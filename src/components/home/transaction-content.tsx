@@ -296,12 +296,12 @@ const styles = StyleSheet.create({
     color: Colors.blue,
     fontSize: RFValue(12),
     marginBottom: 3,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   transactionModalDateText: {
     color: Colors.textColorGrey,
     fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   transactionModalAmountView: {
     padding: 10,
@@ -313,11 +313,11 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     marginRight: 5,
     fontSize: RFValue(20),
-    fontFamily: Fonts.OpenSans,
+    fontFamily: Fonts.Regular,
   },
   transactionModalAmountUnitText: {
     color: Colors.textColorGrey,
     fontSize: RFValue(10),
-    fontFamily: Fonts.OpenSans,
+    fontFamily: Fonts.Regular,
   },
 });

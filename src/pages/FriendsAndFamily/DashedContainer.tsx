@@ -57,7 +57,7 @@ const DashedContainer = ( props ) => {
             <Text style={{
               color: Colors.lightTextColor,
               fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontWeight: '700',
               letterSpacing: 0.8,
 
@@ -67,7 +67,7 @@ const DashedContainer = ( props ) => {
             <Text style={{
               color: Colors.lightTextColor,
               fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               width: wp( '45%' )
             }}>
               {props.subText}
@@ -77,7 +77,7 @@ const DashedContainer = ( props ) => {
           <Text style={{
             color: Colors.lightTextColor,
             fontSize: RFValue( 10 ),
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
 
           }}>
             {moment( props.date ).format( 'lll' )}
@@ -90,13 +90,13 @@ const DashedContainer = ( props ) => {
           <Text style={{
             color: Colors.black,
             fontSize: RFValue( 24 ),
-            fontFamily: Fonts.FiraSansRegular
+            fontFamily: Fonts.Regular
           }}>
             {props.amt}
             <Text style={{
               color: Colors.lightTextColor,
               fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular
+              fontFamily: Fonts.Regular
             }}> {props.currencyCode? props.currencyCode: 'sats'}
             </Text>
           </Text>

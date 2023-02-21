@@ -27,7 +27,7 @@ export default function HomePageShield( props ) {
       radius={wp( '4%' )}
       borderWidth={2}
       color={Colors.white}
-      shadowColor={props.circleShadowColor ? props.circleShadowColor :'#006CB4'}
+      shadowColor={props.circleShadowColor ? props.circleShadowColor :'#A36363'}
       bgColor={props.shieldStatus == 0 ? Colors.red : props.shieldStatus > 0 && props.shieldStatus <= 50 ? Colors.yellow : props.shieldStatus > 50 && props.shieldStatus <= 100 ? Colors.green : Colors.red}
     >
       <View style={{
@@ -40,7 +40,7 @@ export default function HomePageShield( props ) {
           <AntDesign size={20} color={Colors.white} name={'exclamation'} /> :
           props.shieldStatus > 0 && props.shieldStatus < 100 ?
             <Text style={{
-              color:Colors.white, fontSize:RFValue( 11 ), fontFamily:Fonts.FiraSansRegular
+              color:Colors.white, fontSize:RFValue( 11 ), fontFamily:Fonts.Regular
             }}>{props.shieldStatus}%</Text> :
             props.shieldStatus == 100 ?
               <AntDesign size={20} color={Colors.white} name={'check'} />

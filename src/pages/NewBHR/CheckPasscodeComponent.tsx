@@ -32,6 +32,7 @@ import AlertModalContents from '../../components/AlertModalContents'
 import { setCloudBackupStatus } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { setOpenToApproval } from '../../store/actions/BHR'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function CheckPasscodeComponent( props ) {
   const dispatch = useDispatch()
@@ -337,15 +338,24 @@ export default function CheckPasscodeComponent( props ) {
                 redirectToNextScreen()
                 setCreationFlag( true )
               }}
-              style={{
-                ...styles.proceedButtonView,
-                elevation: Elevation,
-                backgroundColor: isDisabledProceed
-                  ? Colors.lightBlue
-                  : Colors.blue,
-              }}
             >
-              <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                start={{
+                  x: 0, y: 0
+                }} end={{
+                  x: 1, y: 0
+                }}
+                locations={[ 0.2, 1 ]}
+                style={{
+                  ...styles.proceedButtonView,
+                  elevation: Elevation,
+                  backgroundColor: isDisabledProceed
+                    ? Colors.lightBlue
+                    : Colors.blue,
+                }}
+              >
+                <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+              </LinearGradient>
             </TouchableOpacity>
 
             {/* {
@@ -361,7 +371,7 @@ export default function CheckPasscodeComponent( props ) {
                   }}>
                   <Text style={{
                     color: Colors.blue,
-                    fontFamily: Fonts.FiraSansMedium
+                    fontFamily: Fonts.Medium
                   }}>{strings.ForgotPasscode}</Text>
                 </TouchableOpacity>
               )
@@ -565,7 +575,7 @@ const styles = StyleSheet.create( {
   keyPadElementText: {
     color: Colors.blue,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontStyle: 'normal',
   },
   proceedButtonView: {
@@ -576,24 +586,19 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
   },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   boldItalicText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     fontWeight: 'bold',
     fontStyle: 'italic',
   },
   errorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     color: Colors.tomatoRed,
     fontSize: RFValue( 10 ),
     fontStyle: 'italic',
@@ -604,13 +609,13 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 25 ),
     marginLeft: 20,
     // marginTop: hp( '10%' ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   passcodeTextInputText: {
     color: Colors.blue,

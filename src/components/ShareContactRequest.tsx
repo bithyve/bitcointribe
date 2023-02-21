@@ -1,35 +1,41 @@
-import React, { useState, memo } from 'react';
-import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, memo } from 'react'
+import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { RFValue } from 'react-native-responsive-fontsize';
-import BottomInfoBox from './BottomInfoBox';
-import { nameToInitials } from '../common/CommonFunctions';
+} from 'react-native-responsive-screen'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { RFValue } from 'react-native-responsive-fontsize'
+import BottomInfoBox from './BottomInfoBox'
+import { nameToInitials } from '../common/CommonFunctions'
 
-const ShareContactRequest = ({ SelectedContact, navigation, headerText, headerSubText, isDoneButton, contactHeader,noteHeader, note, createTrustedContact, sendViaQr, sendViaLink }) => {
-  
+const ShareContactRequest = ( { SelectedContact, navigation, headerText, headerSubText, isDoneButton, contactHeader, noteHeader, note, createTrustedContact, sendViaQr, sendViaLink } ) => {
+
   return (
     <View style={styles.modalContainer}>
       <View style={styles.headerView}>
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{
+          flex: 1, flexDirection: 'row', alignItems: 'center'
+        }}>
           <TouchableOpacity
             onPress={() => {
-              navigation.goBack();
+              navigation.goBack()
             }}
-            style={{ height: 30, width: 30, justifyContent: 'center' }}
+            style={{
+              height: 30, width: 30, justifyContent: 'center'
+            }}
           >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </TouchableOpacity>
-          <View style={{ flex: 1 }}>
+          <View style={{
+            flex: 1
+          }}>
             <Text
               style={{
                 ...styles.modalHeaderTitleText,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
               }}
             >
               {headerText}{' '}
@@ -37,8 +43,8 @@ const ShareContactRequest = ({ SelectedContact, navigation, headerText, headerSu
             <Text
               style={{
                 color: Colors.textColorGrey,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue( 12 ),
+                fontFamily: Fonts.Regular,
                 paddingTop: 5,
               }}
             >
@@ -47,12 +53,12 @@ const ShareContactRequest = ({ SelectedContact, navigation, headerText, headerSu
           </View>
           {isDoneButton ? <TouchableOpacity
             onPress={() => {
-              createTrustedContact();
-              navigation.goBack();
+              createTrustedContact()
+              navigation.goBack()
             }}
             style={{
-              height: wp('8%'),
-              width: wp('18%'),
+              height: wp( '8%' ),
+              width: wp( '18%' ),
               flexDirection: 'row',
               alignItems: 'center',
               backgroundColor: Colors.lightBlue,
@@ -64,8 +70,8 @@ const ShareContactRequest = ({ SelectedContact, navigation, headerText, headerSu
             <Text
               style={{
                 color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue( 12 ),
+                fontFamily: Fonts.Regular,
               }}
             >
               Done
@@ -74,7 +80,9 @@ const ShareContactRequest = ({ SelectedContact, navigation, headerText, headerSu
         </View>
       </View>
       <View style={styles.contactProfileView}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{
+          flexDirection: 'row', alignItems: 'center'
+        }}>
           <View
             style={{
               flexDirection: 'row',
@@ -86,12 +94,14 @@ const ShareContactRequest = ({ SelectedContact, navigation, headerText, headerSu
               borderRadius: 10,
             }}
           >
-            <View style={{ marginLeft: 70 }}>
+            <View style={{
+              marginLeft: 70
+            }}>
               <Text
                 style={{
                   color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(11),
+                  fontFamily: Fonts.Regular,
+                  fontSize: RFValue( 11 ),
                   marginLeft: 25,
                   paddingTop: 5,
                   paddingBottom: 3,
@@ -103,35 +113,35 @@ const ShareContactRequest = ({ SelectedContact, navigation, headerText, headerSu
                 {SelectedContact.firstName && SelectedContact.lastName
                   ? SelectedContact.firstName + ' ' + SelectedContact.lastName
                   : SelectedContact.firstName && !SelectedContact.lastName
-                  ? SelectedContact.firstName
-                  : !SelectedContact.firstName && SelectedContact.lastName
-                  ? SelectedContact.lastName
-                  : ''}
+                    ? SelectedContact.firstName
+                    : !SelectedContact.firstName && SelectedContact.lastName
+                      ? SelectedContact.lastName
+                      : ''}
               </Text>
               {SelectedContact.phoneNumbers && SelectedContact.phoneNumbers.length ? (
                 <Text
                   style={{
                     color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(10),
+                    fontFamily: Fonts.Regular,
+                    fontSize: RFValue( 10 ),
                     marginLeft: 25,
                     paddingTop: 3,
                   }}
                 >
-                  {SelectedContact.phoneNumbers[0].digits}
+                  {SelectedContact.phoneNumbers[ 0 ].digits}
                 </Text>
               ) : SelectedContact.emails && SelectedContact.emails.length ? (
                 <Text
                   style={{
                     color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(10),
+                    fontFamily: Fonts.Regular,
+                    fontSize: RFValue( 10 ),
                     marginLeft: 25,
                     paddingTop: 3,
                     paddingBottom: 5,
                   }}
                 >
-                  {SelectedContact.emails[0].email}
+                  {SelectedContact.emails[ 0 ].email}
                 </Text>
               ) : null}
             </View>
@@ -145,12 +155,16 @@ const ShareContactRequest = ({ SelectedContact, navigation, headerText, headerSu
                 alignItems: 'center',
                 justifyContent: 'center',
                 shadowOpacity: 1,
-                shadowOffset: { width: 2, height: 2 },
+                shadowOffset: {
+                  width: 2, height: 2
+                },
               }}
             >
               <Image
                 source={SelectedContact.image}
-                style={{ ...styles.contactProfileImage }}
+                style={{
+                  ...styles.contactProfileImage
+                }}
               />
             </View>
           ) : (
@@ -167,32 +181,38 @@ const ShareContactRequest = ({ SelectedContact, navigation, headerText, headerSu
                 borderRadius: 70 / 2,
                 shadowColor: Colors.shadowBlue,
                 shadowOpacity: 1,
-                shadowOffset: { width: 2, height: 2 },
+                shadowOffset: {
+                  width: 2, height: 2
+                },
               }}
             >
               <Text
                 style={{
                   textAlign: 'center',
-                  fontSize: RFValue(20),
-                  lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                  fontSize: RFValue( 20 ),
+                  lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
                 }}
               >
                 {nameToInitials(
                   SelectedContact.firstName && SelectedContact.lastName
                     ? SelectedContact.firstName + ' ' + SelectedContact.lastName
                     : SelectedContact.firstName && !SelectedContact.lastName
-                    ? SelectedContact.firstName
-                    : !SelectedContact.firstName && SelectedContact.lastName
-                    ? SelectedContact.lastName
-                    : '',
+                      ? SelectedContact.firstName
+                      : !SelectedContact.firstName && SelectedContact.lastName
+                        ? SelectedContact.lastName
+                        : '',
                 )}
               </Text>
             </View>
           )}
         </View>
       </View>
-      <View style={{ marginTop: 'auto' }}>
-        <View style={{ marginBottom: hp('1%') }}>
+      <View style={{
+        marginTop: 'auto'
+      }}>
+        <View style={{
+          marginBottom: hp( '1%' )
+        }}>
           <BottomInfoBox
             title={noteHeader}
             infoText={note}
@@ -206,39 +226,43 @@ const ShareContactRequest = ({ SelectedContact, navigation, headerText, headerSu
             borderRadius: 10,
             marginLeft: 25,
             marginRight: 25,
-            marginBottom: hp('4%'),
+            marginBottom: hp( '4%' ),
             justifyContent: 'space-evenly',
             alignItems: 'center',
             shadowColor: Colors.shadowBlue,
             shadowOpacity: 1,
-            shadowOffset: { width: 15, height: 15 },
+            shadowOffset: {
+              width: 15, height: 15
+            },
           }}
         >
           <TouchableOpacity
             onPress={() => {
-              createTrustedContact();
-              sendViaLink();
+              createTrustedContact()
+              sendViaLink()
             }}
             style={styles.buttonInnerView}
           >
             <Image
-              source={require('../assets/images/icons/openlink.png')}
+              source={require( '../assets/images/icons/openlink.png' )}
               style={styles.buttonImage}
             />
             <Text style={styles.buttonText}>Share</Text>
           </TouchableOpacity>
           <View
-            style={{ width: 1, height: 30, backgroundColor: Colors.white }}
+            style={{
+              width: 1, height: 30, backgroundColor: Colors.white
+            }}
           />
           <TouchableOpacity
             style={styles.buttonInnerView}
             onPress={() => {
-              createTrustedContact();
-              sendViaQr();
+              createTrustedContact()
+              sendViaQr()
             }}
           >
             <Image
-              source={require('../assets/images/icons/qr-code.png')}
+              source={require( '../assets/images/icons/qr-code.png' )}
               style={styles.buttonImage}
             />
             <Text style={styles.buttonText}>QR</Text>
@@ -246,9 +270,9 @@ const ShareContactRequest = ({ SelectedContact, navigation, headerText, headerSu
         </View>
       </View>
     </View>
-  );
+  )
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContainer: {
     height: '100%',
     width: '100%',
@@ -257,23 +281,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     paddingRight: 10,
-    paddingBottom: hp('1.5%'),
-    paddingTop: hp('1%'),
+    paddingBottom: hp( '1.5%' ),
+    paddingTop: hp( '1%' ),
     marginLeft: 10,
     marginRight: 10,
-    marginBottom: hp('1.5%'),
+    marginBottom: hp( '1.5%' ),
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue( 18 ),
+    fontFamily: Fonts.Medium,
   },
   contactProfileView: {
     flexDirection: 'row',
     marginLeft: 20,
     marginRight: 20,
     alignItems: 'center',
-    marginTop: hp('1.7%'),
+    marginTop: hp( '1.7%' ),
   },
   contactProfileImage: {
     borderRadius: 60 / 2,
@@ -282,12 +306,14 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: {
+      width: 15, height: 15
+    },
   },
   contactNameText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(20),
-    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 20 ),
+    fontFamily: Fonts.Regular,
     marginLeft: 25,
   },
   contactIconImage: {
@@ -300,7 +326,7 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    width: wp('30%'),
+    width: wp( '30%' ),
   },
   buttonImage: {
     width: 20,
@@ -310,17 +336,17 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue(12),
-    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.Regular,
     marginLeft: 10,
   },
   commModeModalInfoText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
+    fontFamily: Fonts.Regular,
+    fontSize: RFValue( 11 ),
     marginLeft: 25,
     marginRight: 25,
-    marginTop: hp('0.7%'),
+    marginTop: hp( '0.7%' ),
   },
-});
-export default memo(ShareContactRequest);
+} )
+export default memo( ShareContactRequest )

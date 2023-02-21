@@ -46,7 +46,7 @@ export default function WalletNameRecovery( props ) {
             }}
           >
             <View style={commonStyle.headerLeftIconInnerContainer}>
-              <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+              <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
             </View>
           </TouchableOpacity>
         </View>
@@ -64,7 +64,7 @@ export default function WalletNameRecovery( props ) {
               style={{
                 color: Colors.blue,
                 fontSize: RFValue( 18 ),
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
                 marginLeft: 20,
               }}
             >
@@ -76,7 +76,7 @@ export default function WalletNameRecovery( props ) {
                Your contacts will see this to{' '}
               <Text
                 style={{
-                  fontFamily: Fonts.FiraSansMediumItalic,
+                  fontFamily: Fonts.MediumItalic,
                   fontWeight: 'bold',
                   fontStyle: 'italic'
                 }}
@@ -182,7 +182,7 @@ const styles = StyleSheet.create( {
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   inputBox: {
     borderColor: Colors.borderColor,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create( {
     paddingLeft: 15,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   inputBoxFocused: {
     borderColor: Colors.borderColor,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create( {
       width: 2, height: 2
     },
     backgroundColor: Colors.white,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   proceedButtonView: {
     height: wp( '13%' ),
@@ -233,7 +233,7 @@ const styles = StyleSheet.create( {
 
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   }
 } )
 

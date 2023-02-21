@@ -162,8 +162,8 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
             >
               <View style={CommonStyles.headerLeftIconInnerContainer}>
                 <FontAwesome
-                  name="long-arrow-left"
-                  color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                   size={17}
                 />
               </View>
@@ -246,14 +246,14 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
                     }}>
                       <Text style={{
                         marginBottom: hp( 1 ),
-                        fontSize: RFValue( 12 ), fontFamily:  Fonts.FiraSansRegular, color: selected ? Colors.white : Colors.black
+                        fontSize: RFValue( 12 ), fontFamily:  Fonts.Regular, color: selected ? Colors.white : Colors.black
                       }}>
                         {item.title}
                       </Text>
                       <Text style={{
                         // flex: 1,
                         marginRight: wp( 10 ),
-                        fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: selected ? Colors.white : Colors.textColorGrey
+                        fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, color: selected ? Colors.white : Colors.textColorGrey
                       }}>
                         {item.subtitle}
                       </Text>
@@ -330,12 +330,12 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
                   alignItems: 'center'
                 }}>
                   <Text style={{
-                    marginTop: hp( 1 ), marginBottom: hp( 4 ), color: Colors.backgroundColor1, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 18 )
+                    marginTop: hp( 1 ), marginBottom: hp( 4 ), color: Colors.backgroundColor1, fontFamily: Fonts.Regular, fontSize: RFValue( 18 )
                   }}>Savings Account</Text>
                   <Text style={{
                     textAlign: 'center',
                     marginHorizontal: hp( 2 ),
-                    color: Colors.backgroundColor1, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 )
+                    color: Colors.backgroundColor1, fontFamily: Fonts.Regular, fontSize: RFValue( 12 )
                   }}>Use this account to store, or hold bitcoin and sats long term</Text>
 
                   <View style={{
@@ -363,7 +363,7 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
                   <Text style={{
                     textAlign: 'center',
                     margin: hp( 2 ),
-                    color: Colors.backgroundColor1, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 )
+                    color: Colors.backgroundColor1, fontFamily: Fonts.Regular, fontSize: RFValue( 12 )
                   }}>Be careful: If you end up spending sats from your Checking account to your Savings account and then decide to spend sats from your Savings account, it will cost you much more in transaction fees every time.</Text>
                 </View>
 
@@ -392,7 +392,7 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
         >
           <Text style={{
             color: Colors.blue,
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
             alignSelf: 'center',
             marginLeft: wp( '5%' )
           }}>Skip</Text>
@@ -453,7 +453,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   bottomButtonView: {
     flexDirection: 'row',
@@ -508,12 +508,12 @@ const styles = StyleSheet.create( {
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingLeft: 15,
   },
   dropdownBoxText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     marginRight: 15,
   },

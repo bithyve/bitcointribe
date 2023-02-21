@@ -313,7 +313,7 @@ const PairNewWallet = ( props ) => {
             }}
             style={styles.backArrowView}
           >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </TouchableOpacity>
           <Text style={NavStyles.modalHeaderTitleText}>
             Pair a new wallet
@@ -398,9 +398,9 @@ const PairNewWallet = ( props ) => {
         {showLoader ? <Loader isLoading={true}/> : null}
 
         <BottomInfoBox
-          title={'Pair Hexa with FastBitcoins'}
+          title={'Pair Bitcoin Tribe with FastBitcoins'}
           infoText={
-            'Scan the QR provided on your FastBitcoins account to pair your Hexa wallet'
+            'Scan the QR provided on your FastBitcoins account to pair your Bitcoin Tribe wallet'
           }
         />
 
@@ -513,7 +513,7 @@ const styles = StyleSheet.create( {
     paddingLeft: 15,
     paddingRight: 15,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     marginTop: wp( '10%' ),
   },
 } )

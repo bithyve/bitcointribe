@@ -94,6 +94,7 @@ import {
   addTransferDetails,
   fetchFeeRates,
   fetchExchangeRates,
+  recomputeNetBalance
 } from '../../store/actions/accounts'
 import {
   AccountType,
@@ -129,6 +130,7 @@ import { makeContactRecipientDescription } from '../../utils/sending/RecipientFa
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Relay from '../../bitcoin/utilities/Relay'
 import ClipboardAutoRead from '../../components/ClipboardAutoRead'
+import LinearGradient from 'react-native-linear-gradient'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -276,6 +278,7 @@ interface HomePropsTypes {
   walletId: string;
   notificationPressed: any;
   clipboardAccess: boolean;
+  recomputeNetBalance: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -501,7 +504,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           } )
           break
         case NotificationType.GIFT_REJECTED:
-          // console.log( 'message.AdditionalInfo', message.additionalInfo )
           this.setState( {
             notificationTitle: message.title,
             notificationInfo: message.info,
@@ -847,6 +849,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.setVersion()
       this.props.fetchExchangeRates( this.props.currencyCode )
       this.props.fetchFeeRates()
+      this.props.recomputeNetBalance()
     } )
 
   };
@@ -909,11 +912,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   componentDidUpdate = ( prevProps, prevState ) => {
     if (
-      prevProps.accountsState.netBalance !==
+      this.state.netBalance !==
       this.props.accountsState.netBalance
-    )  this.setState( {
-      netBalance: this.props.accountsState.netBalance,
-    } )
+    ) {
+      this.setState( {
+        netBalance: this.props.accountsState.netBalance,
+      } )
+    }
 
     if (
       prevProps.secondaryDeviceAddressValue !==
@@ -1020,6 +1025,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { navigation } = this.props
 
     this.focusListener = navigation.addListener( 'didFocus', () => {
+      this.props.recomputeNetBalance()
       this.setCurrencyCodeFromAsync()
       this.props.fetchExchangeRates( this.props.currencyCode )
       this.props.fetchFeeRates()
@@ -1321,7 +1327,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // }, 10);
     } else if ( item.title == 'Funding Sources' ) {
       navigation.navigate( 'ExistingSavingMethods' )
-    } else if ( item.title === 'Hexa Community (Telegram)' ) {
+    } else if ( item.title === 'Bitcoin Tribe Community (Telegram)' ) {
       const url = 'https://t.me/HexaWallet'
       Linking.openURL( url )
         .then( ( data ) => {} )
@@ -1393,18 +1399,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   moveToTransacation = ( notificationAdditionalInfo ) => {
-
-    // const primarySubAccount = usePrimarySubAccountForShell( accountShellInfo )
-
-    // alert(JSON.stringify(primarySubAccount));
     const accountShell = this.props.accountShells[ 1 ]
     const transaction = accountShell.primarySubAccount.transactions.find( tx => tx.txid === notificationAdditionalInfo.txid )
-    console.log( 'primarySubAccountShell '+ JSON.stringify( transaction ) )
     this.closeBottomSheet()
-    // alert(JSON.stringify(accountShell.primarySubAccount));
-
-    // console.log("bhumika " +JSON.stringify(this.props.accountShells))
-    // console.log("reddy " +JSON.stringify(this.props.accountsState))
     this.props.navigation.navigate( 'TransactionDetails', {
       transaction,
       accountShellID: accountShell.id,
@@ -1414,7 +1411,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   renderBottomSheetContent() {
     const { navigation } = this.props
     const { notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
-    // console.log( 'this.state.currentBottomSheetKind', this.state.currentBottomSheetKind )
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.TAB_BAR_BUY_MENU:
           return (
@@ -1747,8 +1743,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   : 0,
         }}
       >
-        <ImageBackground
-          source={require( '../../assets/images/home-bg.png' )}
+        {/* <ImageBackground
+          // source={require( '../../assets/images/home-bg.png' )}
           style={{
             width: '100%',
             height: '100%',
@@ -1757,7 +1753,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           imageStyle={{
             resizeMode: 'stretch',
           }}
-        >
+        > */}
+        <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+          // start={{
+          //   x: 0, y: 0.2
+          // }} end={{
+          //   x: 0.1, y: 0.1
+          // }}
+          locations={[ 0.55, 1 ]}
+          style={{
+            width: '100%',
+            height: '100%',
+            flex: 1,
+            // backgroundColor:'red'
+          }}>
           {this.props.clipboardAccess && <ClipboardAutoRead navigation={this.props.navigation} />}
           <HomeHeader
             onPressNotifications={this.onPressNotifications}
@@ -1799,7 +1808,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           >
             {this.renderBottomSheetContent()}
           </ModalContainer>
-        </ImageBackground>
+        </LinearGradient>
+        {/* </ImageBackground> */}
       </View>
     )
   }
@@ -1809,7 +1819,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   buttonView: {
     height: widthPercentageToDP( '12%' ),
@@ -1827,25 +1837,25 @@ const styles = StyleSheet.create( {
   availableToSpendText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     lineHeight: 15,
   },
   balanceText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
   },
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalInfoText: {
     // marginTop: hp( '3%' ),
     marginTop: heightPercentageToDP( 0.5 ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: widthPercentageToDP( 12 ),
     letterSpacing: 0.6
   },
@@ -1866,7 +1876,7 @@ const mapStateToProps = ( state ) => {
   return {
     levelHealth: idx( state, ( _ ) => _.bhr.levelHealth ),
     notificationList: state.notifications.notifications,
-    accountsState: state.accounts,
+    accountsState: idx( state, ( _ ) => _.accounts ),
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
     walletName:
       idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
@@ -1924,6 +1934,7 @@ export default withNavigationFocus(
     updateSecondaryShard,
     rejectedExistingContactRequest,
     notificationPressed,
+    recomputeNetBalance
   } )( Home )
 )
 

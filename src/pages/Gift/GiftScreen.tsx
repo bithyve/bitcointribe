@@ -23,6 +23,8 @@ import {
 } from 'react-native-responsive-screen'
 
 import Add_gifts from '../../assets/images/satCards/Add_gifts.svg'
+import Add from '../../assets/images/svgs/add.svg'
+
 import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
 import AlertModalContents from '../../components/AlertModalContents'
 import BottomInfoBox from '../../components/BottomInfoBox'
@@ -413,7 +415,7 @@ class GiftScreen extends React.Component<
               flex: 1,
             }} >
               <Text style={{
-                fontSize: RFValue( 13 ), fontFamily: activeIndex === 0 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.black
+                fontSize: RFValue( 13 ), fontFamily: activeIndex === 0 ? Fonts.Medium : Fonts.Regular, color: activeIndex === 0 ? Colors.white : Colors.black
               }}>
                 Add Contacts
               </Text>
@@ -458,7 +460,7 @@ class GiftScreen extends React.Component<
             }} >
 
               <Text style={{
-                fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 1 ? Colors.white : Colors.black
+                fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.Medium : Fonts.Regular, color: activeIndex === 1 ? Colors.white : Colors.black
               }}>
                 Add a Ward
               </Text>
@@ -501,7 +503,7 @@ class GiftScreen extends React.Component<
             </View>
 
             <Text style={{
-              fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey,
+              fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, color: Colors.textColorGrey,
               marginHorizontal: wp( 3 ),
               width: '95%', flex: 1
             }}>
@@ -666,7 +668,7 @@ class GiftScreen extends React.Component<
     } = this.state
     return (
       <View style={{
-        backgroundColor: Colors.blue
+        backgroundColor: Colors.darkBlue
       }}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         <View style={styles.accountCardsSectionContainer}>
@@ -689,7 +691,7 @@ class GiftScreen extends React.Component<
                 color: Colors.blue,
                 fontSize: RFValue( 16 ),
                 marginLeft: 2,
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
 
               }}>
               My Accounts
@@ -697,20 +699,23 @@ class GiftScreen extends React.Component<
               <ToggleContainer />
             </View> */}
           <View style={{
-            flexDirection: 'row', marginHorizontal: 35, marginTop: 6, alignItems: 'flex-end'
+            flexDirection: 'row', marginHorizontal: 30, marginTop: 15, alignItems: 'flex-end'
           }}>
-            <CheckingAcc height={57} width={53} />
+            {/* <CheckingAcc height={57} width={53} /> */}
             <Text style={[ styles.pageTitle, {
-              fontSize: RFValue( 24 ),
-              marginStart: 13,
+              fontSize: RFValue( 16 ),
+              marginStart: 10,
               marginBottom: 5,
             } ]}>
               {this.strings[ 'giftsats' ]}
             </Text>
+            {/* <View style={{marginTop: 10, justifyContent: 'center', alignSelf: 'flex-end'}}> */}
+
             <ToggleContainer />
+            {/* </View> */}
           </View>
           <Text style={{
-            marginHorizontal: 39, fontSize: RFValue( 11 ), color: '#525252', fontFamily: Fonts.FiraSansLight, marginTop: 18
+            marginHorizontal: 39, fontSize: RFValue( 11 ), color: Colors.THEAM_INFO_TEXT_COLOR, fontFamily: Fonts.Ragular, marginTop: 18
           }}>{'Give sats as gifts to your friends and family, view and manage created gifts.'}</Text>
           <ScrollView
             // refreshControl={
@@ -737,18 +742,20 @@ class GiftScreen extends React.Component<
                 this.props.navigation.navigate( 'CreateGift', {
                 // setActiveTab: buttonPress
                 } )}}
-              image={<Add_gifts />}
+              image={<Add />}
             />
             <GiftBoxComponent
               titleText={'Available Gifts'}
               subTitleText={'All the gifts you have created, not sent, \nand gifts you have received are shown here'}
-              onPress={() => this.props.navigation.navigate( 'ManageGifts',{giftType : '0'} )}
+              onPress={() => this.props.navigation.navigate( 'ManageGifts', {
+                giftType : '0'
+              } )}
               image={<Gifts />}
             />
             <GiftBoxComponent
               titleText={'Claim SATSCARD'}
               scTitleText={'TM'}
-              subTitleText={'Move sats from your SATSCARD'}
+              subTitleText={'Move sats from your SATSCARD™'}
               scSubText={'TM'}
               pendingSubText={' into your account.'}
               onPress={() => this.setState( {
@@ -857,7 +864,7 @@ export default connect( mapStateToProps, {
 const styles = StyleSheet.create( {
   cardSubText: {
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   icon: {
     width: 27, height: 27, resizeMode: 'contain', marginHorizontal: wp( 3 )
@@ -914,17 +921,17 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   title: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 18 ),
     marginHorizontal: wp( 7 ),
     color: Colors.blue,
     marginVertical: hp( 1 )
   },
   subTitle: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     marginHorizontal: wp( 7 ),
     marginRight: wp( 9 ),
@@ -967,7 +974,7 @@ const styles = StyleSheet.create( {
     // marginLeft: 10,
     // marginHorizontal: wp ( 1 ),
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
     // padding: wp( 2 )
   },
@@ -975,7 +982,7 @@ const styles = StyleSheet.create( {
     marginTop: 3,
     marginLeft: 10,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
   selectedContactsView: {
@@ -998,19 +1005,19 @@ const styles = StyleSheet.create( {
     paddingHorizontal: wp( 2 )
   },
   pageTitle: {
-    color: Colors.blue,
-    fontSize: RFValue( 18 ),
-    letterSpacing: 0.7,
-    // fontFamily: Fonts.FiraSansRegular,
-    fontFamily: Fonts.FiraSansMedium,
+    color: Colors.THEAM_TEXT_COLOR,
+    fontSize: RFValue( 16 ),
+    // letterSpacing: 0.7,
+    // fontFamily: Fonts.Regular,
+    fontFamily: Fonts.SemiBold,
     alignItems: 'center',
     marginHorizontal: wp( 4 ),
   },
   cardTitle: {
-    color: Colors.blue,
+    color: Colors.THEAM_TEXT_COLOR,
     fontSize: RFValue( 12 ),
-    // fontFamily: Fonts.FiraSansRegular,
-    fontFamily: Fonts.FiraSansMedium,
+    // fontFamily: Fonts.Regular,
+    fontFamily: Fonts.Medium,
     marginVertical: wp( 2 ),
     marginHorizontal: wp( 4 )
   },
@@ -1018,7 +1025,7 @@ const styles = StyleSheet.create( {
     marginLeft: 30,
     color: Colors.textColorGrey,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: 3,
   },
   imageIconStyle: {

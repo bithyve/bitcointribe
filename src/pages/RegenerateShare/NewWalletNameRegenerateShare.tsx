@@ -46,8 +46,8 @@ export default function NewWalletNameRegenerateShare( props ) {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>
@@ -62,7 +62,7 @@ export default function NewWalletNameRegenerateShare( props ) {
         >
           <ScrollView>
             <HeaderTitle
-              firstLineTitle={'New Hexa Wallet'}
+              firstLineTitle={'New Bitcoin Tribe Wallet'}
               secondLineTitle={''}
               infoTextNormal={'Please name your '}
               infoTextBold={'wallet'}
@@ -124,13 +124,13 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 25 ),
     marginLeft: 20,
     marginBottom: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   labelStyle: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     marginLeft: 15,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   inputBox: {
     borderColor: Colors.borderColor,
@@ -143,7 +143,7 @@ const styles = StyleSheet.create( {
     paddingLeft: 15,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginBottom: 20
   },
   inputBoxFocused: {
@@ -164,19 +164,19 @@ const styles = StyleSheet.create( {
       width: 2, height: 2 
     },
     backgroundColor: Colors.white,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginBottom: 20
   },
   bottomNoteText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
     marginBottom: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   buttonView: {
     height: wp( '13%' ),
@@ -189,7 +189,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   },
   bottomButtonView: {
     flexDirection: 'row',

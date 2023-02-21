@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">hexa</string>
+    <string name="app_name">Bitcoin Tribe</string>
     <string name="host">hexawallet.io</string>
     <string name="default_notification_channel_id">Default</string>
     <string name="contactPrefix">/app/CONTACT</string>
@@ -13,4 +13,5 @@
     <string name="view_contact_request">View contact request</string>
     <string name="view_keeper_request">View keeper request</string>
     <string name="view_gift">View bitcoin gift</string>
+    <string name="deeplinkScheme">hexa</string>
 </resources>

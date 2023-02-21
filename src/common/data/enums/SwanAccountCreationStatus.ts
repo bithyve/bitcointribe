@@ -16,12 +16,12 @@ enum SwanAccountCreationStatus {
   BUY_MENU_CLICKED = 'BUY_MENU_CLICKED',
 
   /**
-   * Hexa is communicating with Swan to authenticate and create a withdrawal wallet.
+   * Bitcoin Tribe is communicating with Swan to authenticate and create a withdrawal wallet.
    */
    AUTHENTICATION_IN_PROGRESS = 'AUTHENTICATION_IN_PROGRESS',
 
   /**
-   * Hexa account has been linked to Swan wallet
+   * Bitcoin Tribe account has been linked to Swan wallet
   */
   WALLET_LINKED_SUCCESSFULLY = 'WALLET_LINKED_SUCCESSFULLY',
 
