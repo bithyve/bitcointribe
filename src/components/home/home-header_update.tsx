@@ -24,6 +24,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { setCloudBackupStatus, setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
 import CloudStatus from '../../common/data/enums/CloudBackupStatus'
+import LinearGradient from 'react-native-linear-gradient'
 
 const currencyCode = [
   'BRL',
@@ -42,7 +43,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { currencyKindSet } from '../../store/actions/preferences'
-import { LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { KeeperType, LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import MaterialCurrencyCodeIcon, {
@@ -200,7 +201,10 @@ const HomeHeader = ( {
       onPress={()=> {
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
         levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){
-          if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+          if ( ( levelHealth.length == 0 ) || 
+          ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ||
+          ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == KeeperType.SECURITY_QUESTION )
+          ) {
             const navigationParams = {
               selectedTitle: navigationObj?.selectedKeeper?.name,
               SelectedRecoveryKeyNumber: 1,
@@ -263,30 +267,30 @@ const HomeHeader = ( {
         </View>
       }
       {/* { <Text ellipsizeMode="middle" numberOfLines={1} style={{
-        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, marginTop: wp( 0.8 )
       }}>{ levelData[ 0 ].keeper1.shareType == '' ? 'Confirm backup phrase' : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Wallet backup confirmed' : 'Confirm backup phrase' )}</Text> } */}
 
       <Text ellipsizeMode="middle" numberOfLines={1} style={{
-        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, marginTop: wp( 0.8 )
       }}>{days > 180
           ? 'Wallet backup phrase is expired'
           : days > 150
             ? 'Wallet backup phrase will expire soon'
             : levelData[ 0 ].keeper1.shareType == ''
               // ? strings.Backupyour
-              ? 'Confirm backup phrase'
+              ? 'Confirm Backup Phrase'
               : ( levelData[ 0 ].keeper1.shareType == 'seed'
-                ? 'Wallet backup confirmed' : 'Confirm backup phrase' )}
+                ? 'Wallet backup confirmed' : 'Confirm Backup Phrase' )}
       </Text>
 
       {/* {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
-        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( 0.8 )
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, marginTop: wp( 0.8 )
       }}><Text style={{
-          fontFamily: Fonts.FiraSansMediumItalic
+          fontFamily: Fonts.MediumItalic
         }}>{messageOne}</Text>{messageTwo}</Text> : <Text ellipsizeMode="middle" numberOfLines={1} style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), marginTop: wp( 0.8 )
       }}>{messageOne} <Text style={{
-          fontFamily: Fonts.FiraSansMediumItalic
+          fontFamily: Fonts.MediumItalic
         }}>{messageTwo}</Text></Text>} */}
     </TouchableOpacity>
   }
@@ -530,8 +534,8 @@ const styles = StyleSheet.create( {
   },
   headerTitleText: {
     color: Colors.white,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue( 25 ),
+    fontFamily: Fonts.Regular,
+    fontSize: RFValue( 24 ),
     marginBottom: wp( '1%' ),
     letterSpacing: RFValue( 0.01 )
   },
@@ -555,22 +559,22 @@ const styles = StyleSheet.create( {
   },
   manageBackupMessageTextHighlight: {
     color: Colors.white,
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     fontSize: RFValue( 13 ),
   },
   manageBackupMessageText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     color: Colors.white,
   },
   homeHeaderAmountText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 19 ),
     marginRight: 5,
     color: Colors.white,
   },
   homeHeaderAmountUnitText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 10 ),
     // marginBottom: 3,
     color: Colors.white,

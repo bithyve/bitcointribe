@@ -48,8 +48,8 @@ const SendRequest = ( props ) => {
               }}
             >
               <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                 size={17}
               />
             </TouchableOpacity>
@@ -77,7 +77,7 @@ const SendRequest = ( props ) => {
                 style={{
                   color: Colors.white,
                   fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 Done

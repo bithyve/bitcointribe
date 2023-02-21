@@ -274,17 +274,17 @@ const ClaimSatsScreen = ( { navigation } ) => {
             marginRight: wp( '2%' )
           }}>
             <Text style={{
-              color: Colors.blue, fontSize: RFValue( 13 ), fontFamily: Fonts.FiraSansRegular
+              color: Colors.blue, fontSize: RFValue( 13 ), fontFamily: Fonts.Regular
             }}>{title}</Text>
             <Text style={{
-              color: Colors.gray3, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular
+              color: Colors.gray3, fontSize: RFValue( 11 ), fontFamily: Fonts.Regular
             }}>Gift Sats created will be of the
               <Text style={{
-                fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic
+                fontWeight: 'bold', fontFamily: Fonts.Italic
               }}>{' '}same amount</Text>
               {' '}and can be
               <Text style={{
-                fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic
+                fontWeight: 'bold', fontFamily: Fonts.Italic
               }}>{' '}sent separately</Text></Text>
           </View>
           <View style={{
@@ -302,7 +302,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
                 width: 7, height: 7
               }, shadowRadius: 5, elevation: 5
             }}><Text style={{
-                color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 18 )
+                color: Colors.black, fontFamily: Fonts.Regular, fontSize: RFValue( 18 )
               }}>{stateToUpdate == 'gift'
                   ? counter :
                   stateToUpdate == 'timeLock' ?
@@ -338,7 +338,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
           <Text style={{
             color: Colors.textColorGrey,
             fontSize: RFValue( 13 ),
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             marginHorizontal: wp( 3 )
           }}>
             <Text>
@@ -348,8 +348,8 @@ const ClaimSatsScreen = ( { navigation } ) => {
               fontSize: RFValue( 11 ),
             }}>
               (Restricts the gift to <Text style={{
-                fontWeight: 'bold', fontFamily: Fonts.FiraSansItalic
-              }}>one per Hexa app</Text> )
+                fontWeight: 'bold', fontFamily: Fonts.Italic
+              }}>one per Bitcoin Tribe app</Text> )
             </Text>
           </Text>
 
@@ -378,10 +378,10 @@ const ClaimSatsScreen = ( { navigation } ) => {
         flexDirection: 'column'
       }}>
         <Text style={{
-          color: Colors.blue, fontSize: RFValue( 20 ), fontFamily: Fonts.FiraSansRegular
+          color: Colors.blue, fontSize: RFValue( 20 ), fontFamily: Fonts.Regular
         }}>Create Multiple Gift Sats</Text>
         {/* <Text style={{
-          color: Colors.gray3, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
+          color: Colors.gray3, fontSize: RFValue( 12 ), fontFamily: Fonts.Regular
         }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text> */}
       </View>
       <AdvanceGiftOptions
@@ -432,7 +432,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
               <Text style={{
                 color: Colors.gray4,
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
               }}>
                 {message}
               </Text>
@@ -440,7 +440,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
                 style={{
                   color: Colors.black,
                   fontSize: RFValue( 14 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                   marginVertical: RFValue( 4 )
 
                 }}
@@ -519,7 +519,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
         // backgroundColor:'red'
         }} onPress={onCancelClick}>
           <Text style={{
-            fontSize:RFValue( 13 ), color:Colors.blue, fontFamily:Fonts.FiraSansMedium
+            fontSize:RFValue( 13 ), color:Colors.blue, fontFamily:Fonts.Medium
           }}>{'Cancel'}</Text>
         </TouchableOpacity>
       </View>
@@ -590,8 +590,8 @@ const ClaimSatsScreen = ( { navigation } ) => {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>
@@ -602,7 +602,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
           fontSize: height < 720 ? RFValue( 20 ) : RFValue( 24 ),
           letterSpacing: 0.01,
           marginLeft: 20,
-          fontFamily: Fonts.FiraSansRegular
+          fontFamily: Fonts.Regular
         }} >
           {'Claim Sats'}
         </Text>
@@ -611,20 +611,20 @@ const ClaimSatsScreen = ( { navigation } ) => {
           fontSize: RFValue( 12 ),
           letterSpacing: 0.6,
           marginHorizontal: 20,
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Regular,
           marginTop: 16
         }} >
           {'Note that this transfers the available sats in the card to your Checking Account'}
         </Text>
         {accountElement( selectedAccount, () => setAccountListModal( !accountListModal ) )}
         <Text style={{
-          fontFamily:Fonts.FiraSansRegular, fontSize: RFValue( 12 ),
+          fontFamily:Fonts.Regular, fontSize: RFValue( 12 ),
           letterSpacing: 0.48, color: Colors.gray13,
           marginTop: RFValue( 10 ), marginStart:20
         }}>
           {'Enter the '}
           <Text style={{
-            fontFamily: Fonts.FiraSansSemiBold, fontStyle: 'italic'
+            fontFamily: Fonts.SemiBold, fontStyle: 'italic'
           }}>{'Spend Code'}</Text>
         </Text>
         <Shadow viewStyle={{
@@ -858,7 +858,7 @@ const styles = StyleSheet.create( {
     height: hp( '8%' ),
   },
   errorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     color: Colors.red,
     fontSize: RFValue( 11, 812 ),
     fontStyle: 'italic',
@@ -873,7 +873,7 @@ const styles = StyleSheet.create( {
   keyPadElementText: {
     color: Colors.blue,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontStyle: 'normal',
   },
   cardBitCoinImage: {
@@ -886,13 +886,13 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.54
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: wp( 10 ),
     letterSpacing: 0.6,
     marginBottom: hp( 2 )
@@ -908,7 +908,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   buttonView: {
     height: wp( '12%' ),
@@ -957,7 +957,7 @@ const styles = StyleSheet.create( {
     // height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingLeft: 15,
     borderRadius: 10,
     // justifyContent: 'center',
@@ -992,18 +992,18 @@ const styles = StyleSheet.create( {
   availableToSpendText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     lineHeight: 15,
   },
   balanceText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
   },
   proceedButtonText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   },
   selectedContactsView: {
     flexDirection: 'row',
@@ -1016,7 +1016,7 @@ const styles = StyleSheet.create( {
   },
   contactText: {
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
   },
   accountSelectionView: {
@@ -1043,13 +1043,13 @@ const styles = StyleSheet.create( {
     marginLeft: 'auto'
   },
   homeHeaderAmountText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 20 ),
     marginRight: 5,
     color: Colors.black,
   },
   homeHeaderAmountUnitText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     // marginBottom: 3,
     color: Colors.gray2,

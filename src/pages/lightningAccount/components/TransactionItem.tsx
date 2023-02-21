@@ -31,7 +31,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     marginBottom: 2,
     // fontWeight: 'bold',
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   subtitleText: {
@@ -64,7 +64,7 @@ const styles = StyleSheet.create( {
     },
   },
   amountText: {
-    fontFamily: Fonts.OpenSans,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 17 ),
   },
   bitcoinImage: {
@@ -75,7 +75,7 @@ const styles = StyleSheet.create( {
   },
   confirmationsText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     marginTop: RFValue( 4 ),
   },

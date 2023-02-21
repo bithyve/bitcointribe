@@ -197,7 +197,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
         >
           <FontAwesome
             name="long-arrow-left"
-            color={Colors.blue}
+            color={Colors.homepageButtonColor}
             size={17}
           />
         </TouchableOpacity>
@@ -207,7 +207,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
           <Text
             style={{
               ...NavStyles.modalHeaderTitleText,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue( 25 ),
               marginLeft: wp( '5%' ),
               marginTop: hp( '3%' ),
@@ -220,7 +220,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
             style={{
               color: Colors.textColorGrey,
               fontSize: RFValue( 12 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               paddingTop: 5,
             }}
           >
@@ -311,7 +311,7 @@ const styles = StyleSheet.create( {
     paddingHorizontal: wp( 6 ),
     letterSpacing: 0.06,
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11.5 ),
     marginBottom: hp( 1 ),
 

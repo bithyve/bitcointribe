@@ -33,7 +33,7 @@ export default function SavingsAccountKnowMoreSheetContents( props ) {
           <Text
             style={{
               color: Colors.white,
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.Medium,
               fontSize: RFValue( 20 ),
               marginTop: hp( '1%' ),
               marginBottom: hp( '1%' ),
@@ -47,7 +47,7 @@ export default function SavingsAccountKnowMoreSheetContents( props ) {
             width: wp(8),
             height: wp(8),
             borderRadius: wp(4),
-            backgroundColor: Colors.lightBlue,
+            backgroundColor: Colors.blue,
             justifyContent: 'center',
             alignItems: 'center',
             marginRight: wp(2),
@@ -240,7 +240,7 @@ const styles = StyleSheet.create( {
     textAlign: 'center',
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: wp( '8%' ),
     marginRight: wp( '8%' ),
   },

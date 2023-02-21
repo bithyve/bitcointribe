@@ -183,7 +183,7 @@ function SecurityQuestion( props ) {
                     marginLeft: 'auto',
                     color: Colors.red,
                     fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.FiraSansMediumItalic,
+                    fontFamily: Fonts.MediumItalic,
                   }}
                 >
                   {errorText}
@@ -204,7 +204,7 @@ function SecurityQuestion( props ) {
                   style={{
                     fontSize: RFValue( 13 ),
                     color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                   }}
                 >
                   {securityAnswer}
@@ -278,7 +278,7 @@ function SecurityQuestion( props ) {
           >
             <Text
               style={{
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
                 color: Colors.blue
               }}
             >
@@ -316,7 +316,7 @@ const styles = StyleSheet.create( {
   modalBoldText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     letterSpacing: 0.6,
     lineHeight: 18
   },
@@ -327,16 +327,16 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalInfoText: {
     // marginTop: hp( '3%' ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   dropdownBoxText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     color: Colors.black,
   },
@@ -368,12 +368,12 @@ const styles = StyleSheet.create( {
     paddingLeft: 15,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     backgroundColor: Colors.white
   },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )

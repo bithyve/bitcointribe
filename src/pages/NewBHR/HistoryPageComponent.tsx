@@ -16,6 +16,7 @@ import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { translations } from '../../common/content/LocContext'
+import LinearGradient from 'react-native-linear-gradient'
 
 const HistoryPageComponent = ( props ) => {
   const strings  = translations[ 'bhr' ]
@@ -143,7 +144,7 @@ const HistoryPageComponent = ( props ) => {
           <Text
             style={[ styles.proceedButtonText, {
               fontSize: RFValue( 12 ),
-              // fontFamily: Fonts.FiraSansRegular,
+              // fontFamily: Fonts.Regular,
               color: Colors.white,
             } ]}
           >
@@ -167,7 +168,7 @@ const HistoryPageComponent = ( props ) => {
             <Text
               style={{
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 color: Colors.textColorGrey,
               }}
             >
@@ -193,25 +194,35 @@ const HistoryPageComponent = ( props ) => {
                     ? props.onPressReshare()
                     : props.onPressConfirm()
                 }}
-                style={{
-                  ...styles.successModalButtonView,
-                  backgroundColor: props.confirmDisable
-                    ? Colors.lightBlue
-                    : Colors.blue,
-                }}
+
                 delayPressIn={0}
                 disabled={props.confirmDisable ? props.confirmDisable : false}
               >
-                <Text
+                <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                  start={{
+                    x: 0, y: 0
+                  }} end={{
+                    x: 1, y: 0
+                  }}
+                  locations={[ 0.2, 1 ]}
                   style={{
-                    ...styles.proceedButtonText,
-                    color: Colors.white,
+                    ...styles.successModalButtonView,
+                    backgroundColor: props.confirmDisable
+                      ? Colors.lightBlue
+                      : Colors.blue,
                   }}
                 >
-                  {props.IsReshare
-                    ? props.reshareButtonText
-                    : props.confirmButtonText}
-                </Text>
+                  <Text
+                    style={{
+                      ...styles.proceedButtonText,
+                      color: Colors.white,
+                    }}
+                  >
+                    {props.IsReshare
+                      ? props.reshareButtonText
+                      : props.confirmButtonText}
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
             ) : null}
           {!props.isVersionMismatch &&
@@ -255,19 +266,13 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 8,
     // elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15,
-      height: 15,
-    },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
   },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   selectedHistoryCard: {
     margin: wp( '3%' ),
@@ -283,12 +288,12 @@ const styles = StyleSheet.create( {
   selectedHistoryCardTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   selectedHistoryCardDateText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 9 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: hp( '0.3%' ),
   },
   historyCard: {
@@ -305,12 +310,12 @@ const styles = StyleSheet.create( {
   historyCardTitleText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   historyCardDateText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 9 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 'auto',
   },
   waterMarkCard: {

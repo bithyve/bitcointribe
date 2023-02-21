@@ -458,7 +458,7 @@ const styles = StyleSheet.create( {
   },
 
   scrollViewContainer: {
-    paddingTop: 20,
+    paddingTop: 10,
     // height: '100%',
     paddingHorizontal: 0,
     backgroundColor: Colors.backgroundColor,

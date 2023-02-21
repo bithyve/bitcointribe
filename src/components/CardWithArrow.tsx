@@ -59,7 +59,7 @@ export default function CardWithArrow( { onPress, icon, mainText, subText } ) {
       }}>
         <Text style={{
           fontSize: RFValue( 13 ),
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Regular,
           color: Colors.blue,
           marginBottom: hp( 0.5 ), letterSpacing: 0.01
         }}>
@@ -67,7 +67,7 @@ export default function CardWithArrow( { onPress, icon, mainText, subText } ) {
         </Text>
         <Text style={{
           fontSize: RFValue( 11 ),
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Regular,
           color: Colors.textColorGrey,
           width: wp( 65 )
         }}>

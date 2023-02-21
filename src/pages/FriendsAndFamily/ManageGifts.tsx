@@ -35,6 +35,7 @@ import ManageGiftsList from './ManageGiftsList'
 import IconAdd from '../../assets/images/svgs/icon_add.svg'
 import IconAddLight from '../../assets/images/svgs/icon_add_dark.svg'
 import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
+import AccountCheckingHome from '../../assets/images/accIcons/icon_checking.svg'
 import GiftKnowMore from '../../components/know-more-sheets/GiftKnowMoreModel'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import RecipientAvatar from '../../components/RecipientAvatar'
@@ -51,8 +52,8 @@ const ManageGifts = ( props ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
-  const { navigation} = props;
-  const giftScreenNav = navigation.getParam('giftType');
+  const { navigation } = props
+  const giftScreenNav = navigation.getParam( 'giftType' )
   const [ timer, setTimer ] = useState( true )
   // const [ giftDetails, showGiftDetails ] = useState( false )
   // const [ giftInfo, setGiftInfo ] = useState( null )
@@ -66,12 +67,12 @@ const ManageGifts = ( props ) => {
   )
   const [ giftsArr, setGiftsArr ] = useState( null )
   let statusGift = GiftStatus.CREATED
-  if(giftScreenNav == 0 || giftScreenNav == '0'){
+  if( giftScreenNav == 0 || giftScreenNav == '0' ){
     statusGift = GiftStatus.CREATED
   } else {
     statusGift = GiftStatus.SENT
   }
-  const [ active, setActive ] = useState(statusGift )
+  const [ active, setActive ] = useState( statusGift )
   const [ knowMore, setKnowMore ] = useState( false )
   // const [ sentGifts, setSentClaimedGifts ] = useState( [] )
   // const [ receivedGifts, setReceicedGifts ] = useState( [] )
@@ -254,8 +255,8 @@ const ManageGifts = ( props ) => {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>
@@ -266,7 +267,7 @@ const ManageGifts = ( props ) => {
         <View style={{
           flexDirection: 'row', marginHorizontal: 15, marginTop: 6, alignItems: 'flex-end'
         }}>
-          <CheckingAcc height={57} width={53} />
+          <AccountCheckingHome height={57} width={53} />
           <Text style={[ styles.pageTitle, {
             fontSize: RFValue( 24 ),
             marginStart: 13,
@@ -277,10 +278,10 @@ const ManageGifts = ( props ) => {
           <ToggleContainer />
         </View>
         <Text style={{
-          marginHorizontal: 15, fontSize: RFValue( 11 ), color: '#525252', fontFamily: Fonts.FiraSansLight, marginTop: 18
+          marginHorizontal: 15, fontSize: RFValue( 11 ), color: '#525252', fontFamily: Fonts.Light, marginTop: 18
         }}>{'Give sats as gifts to your friends and family, view and manage created gifts. '}
           <Text onPress={() => setKnowMore( true )} style={{
-            color:'#006CB4'
+            color:'#A36363'
           }}>{common[ 'knowMore' ]}</Text>
         </Text>
         <ScrollView
@@ -302,7 +303,7 @@ const ManageGifts = ( props ) => {
                   onPress={() => buttonPress( item )}
                 >
                   <Text style={{
-                    color: Colors.blue, fontSize: RFValue( 14 ), fontFamily: Fonts.FiraSansMedium
+                    color: Colors.blue, fontSize: RFValue( 14 ), fontFamily: Fonts.Medium
                   }} >
                     {item === GiftStatus.CREATED && 'Available'}
                     {item === GiftStatus.EXPIRED && 'Expired'}
@@ -337,7 +338,12 @@ const ManageGifts = ( props ) => {
             flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 9 ),
             marginVertical: hp( 1 )
           }}>
-          <IconAddLight />
+          <Image
+            style={{
+              width: 30, height: 30
+            }}
+            source={require( '../../assets/images/icons/icon_add.png' )}
+          />
           <Text style={styles.createGiftText}>
           Create New Gift
           </Text>
@@ -448,13 +454,13 @@ const ManageGifts = ( props ) => {
                             color: Colors.gray13,
                             fontSize: RFValue( 8 ),
                             letterSpacing: 0.4,
-                            fontFamily: Fonts.FiraSansRegular,
+                            fontFamily: Fonts.Regular,
                             // fontWeight: '600'
                           }}>
                             {title}
                           </Text>
                           <Text style={{
-                            fontFamily: Fonts.FiraSansMedium,
+                            fontFamily: Fonts.Medium,
                             fontSize: RFValue( 12 ),
                             // textAlign: 'center',
                             color: Colors.gray13,
@@ -467,7 +473,7 @@ const ManageGifts = ( props ) => {
                             color: Colors.gray13,
                             fontSize: RFValue( 8 ),
                             letterSpacing: 0.4,
-                            fontFamily: Fonts.FiraSansRegular,
+                            fontFamily: Fonts.Regular,
                           }}>
                             {moment( item.timestamps?.created ).format( 'lll' )}
                           </Text>
@@ -479,14 +485,14 @@ const ManageGifts = ( props ) => {
                           <Text style={{
                             color: Colors.gray13,
                             fontSize: RFValue( 16 ),
-                            fontFamily: Fonts.FiraSansSemiBold,
+                            fontFamily: Fonts.SemiBold,
                           }}>
                             {getAmt( item.amount )}
                             <Text style={{
                               color: Colors.gray13,
                               fontSize: RFValue( 8 ),
                               letterSpacing: 0.24,
-                              fontFamily: Fonts.FiraSansRegular
+                              fontFamily: Fonts.Regular
                             }}>{prefersBitcoin ? ' sats' : currencyCode}
                             </Text>
                           </Text>
@@ -546,7 +552,7 @@ const styles = StyleSheet.create( {
     color: Colors.blueTextNew,
     fontSize: RFValue( 12 ),
     letterSpacing: 0.3,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     marginHorizontal: wp( 2 )
   },
   centeredView: {
@@ -555,7 +561,7 @@ const styles = StyleSheet.create( {
   },
   buttonText: {
     color: Colors.gray2,
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   },
   buttonNavigator: {
     width: wp( '20%' ),
@@ -570,7 +576,7 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   secondNamePieceText: {
     fontSize: RFValue( 10 ),
@@ -599,7 +605,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   },
   modalContentContainer: {
     height: '100%',
@@ -631,15 +637,15 @@ const styles = StyleSheet.create( {
   },
   contactText: {
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
   },
   pageTitle: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     letterSpacing: 0.7,
-    // fontFamily: Fonts.FiraSansRegular,
-    fontFamily: Fonts.FiraSansMedium,
+    // fontFamily: Fonts.Regular,
+    fontFamily: Fonts.Medium,
     alignItems: 'center',
     marginHorizontal: wp( 4 ),
   },

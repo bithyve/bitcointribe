@@ -28,6 +28,8 @@ import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transacti
 import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
 import WalletBackupStack from './WalletBackupStack'
 import WalletOption from '../../../pages/MoreOptions/WalletOption/WalletOption'
+import BackupWithKeeper from '../../../pages/NewBHR/BackupWithKeeper'
+import BackupMethods from '../../../pages/NewBHR/BackupMethods'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -77,6 +79,18 @@ const MoreOptionsStack = createStackNavigator(
         title: 'Friends & Family',
       },
     },
+    BackupWithKeeper: {
+      screen: BackupWithKeeper,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    BackupMethods: {
+      screen: BackupMethods,
+      navigationOptions: {
+        header: null,
+      },
+    },
     NodeSettings: {
       screen: NodeSettingsContainerScreen,
       navigationOptions: ( { navigation } ) => {
@@ -85,7 +99,7 @@ const MoreOptionsStack = createStackNavigator(
           headerTitleStyle:{
             color: Colors.blue,
             fontSize: RFValue( 18 ),
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
             textAlign: 'left',
             marginHorizontal: 0
           },

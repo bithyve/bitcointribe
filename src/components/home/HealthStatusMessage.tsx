@@ -24,7 +24,7 @@ const HealthStatusMessage = ( { health } ) => {
 
 const styles = StyleSheet.create( {
   headerInfoText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     color: Colors.white,
   },

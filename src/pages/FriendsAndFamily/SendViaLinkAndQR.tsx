@@ -80,7 +80,7 @@ export default function SendViaLinkAndQR( props ) {
       const options = Platform.select( {
         default: {
           title,
-          message: `You have received a bitcoin gift from ${senderName}. Click on the link and follow the steps to receive bitcoin in your Hexa 2.0 bitcoin wallet\n\n${link}`,
+          message: `You have received a bitcoin gift from ${senderName}. Click on the link and follow the steps to receive bitcoin in your Bitcoin Tribe bitcoin wallet\n\n${link}`,
         },
       } )
       Share.open( options )
@@ -135,7 +135,7 @@ export default function SendViaLinkAndQR( props ) {
               style={{
                 ...styles.modalTitleText,
                 fontSize: 18,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
               }}
             >
               Show Second Factor
@@ -148,7 +148,7 @@ export default function SendViaLinkAndQR( props ) {
               ...styles.modalInfoText,
               paddingTop: 8,
               marginLeft: 30,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: 14,
             }}
           >
@@ -188,7 +188,7 @@ export default function SendViaLinkAndQR( props ) {
                 marginLeft: 35,
                 color: '#6C6C6C',
                 width:'85%',
-                fontFamily: Fonts.FiraSansRegular
+                fontFamily: Fonts.Regular
               }}
             >
               Use a medium/ app different to that used for sending the gift
@@ -234,7 +234,7 @@ export default function SendViaLinkAndQR( props ) {
         Platform.select( {
           default: {
             title: 'Share Gift Card',
-            message: 'Scan the QR and receive bitcoin in your Hexa 2.0 bitcoin wallet.',
+            message: 'Scan the QR and receive bitcoin in your Bitcoin Tribe bitcoin wallet.',
             url: `file://${uri}`,
           },
           // ios: {
@@ -285,7 +285,7 @@ export default function SendViaLinkAndQR( props ) {
           <View style={CommonStyles.headerLeftIconInnerContainer}>
             <FontAwesome
               name="long-arrow-left"
-              color={Colors.blue}
+              color={Colors.homepageButtonColor}
               size={17}
             />
           </View>
@@ -389,7 +389,7 @@ export default function SendViaLinkAndQR( props ) {
       <Text style={{
         color: Colors.lightTextColor,
         fontSize: RFValue( 14 ),
-        fontFamily: Fonts.FiraSansRegular,
+        fontFamily: Fonts.Regular,
         // fontWeight: '700',
         letterSpacing: 0.01,
         lineHeight: 18,
@@ -501,12 +501,12 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: wp( 10 )
   },
   otpContainer:{
@@ -557,6 +557,6 @@ const styles = StyleSheet.create( {
     color: '#fff',
     fontWeight:'500',
     fontSize:15,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   }
 } )

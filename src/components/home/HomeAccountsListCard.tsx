@@ -44,7 +44,9 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
   return (
     <View style={styles.headerSectionContainer}>
       <Image
-        style={styles.headerAccountSync}
+        style={[ styles.headerAccountSync, {
+          // tintColor: Colors.theam_icon_color
+        } ]}
         source={getAccountSyncIcon( accountShell.syncStatus )}
       />
       <View style={styles.headerAccountImage} >
@@ -175,7 +177,7 @@ const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: 
 
 const styles = StyleSheet.create( {
   boldItalicText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     fontWeight: 'bold',
     fontStyle: 'italic',
     fontSize: RFValue( 11 ),
@@ -219,8 +221,8 @@ const styles = StyleSheet.create( {
     borderRadius: 8/2,
     backgroundColor: 'tomato',
     position: 'absolute',
-    left: widthPercentageToDP( 9 ),
-    top: heightPercentageToDP( 0.9 ),
+    left: widthPercentageToDP( 7 ),
+    top: heightPercentageToDP( 0.5 ),
   },
 
   headerAccountImage: {
@@ -246,7 +248,7 @@ const styles = StyleSheet.create( {
     marginLeft: 'auto',
     color: Colors.blue,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   bodyContainer: {
@@ -255,15 +257,15 @@ const styles = StyleSheet.create( {
   },
 
   titleText: {
-    fontFamily: Fonts.FiraSansRegular,
-    color: Colors.blue,
+    fontFamily: Fonts.Regular,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     fontSize: RFValue( 10 ),
   },
 
   subtitleText: {
     marginTop: widthPercentageToDP( 1 ),
-    fontFamily: Fonts.FiraSansRegular,
-    color: Colors.textColorGrey,
+    fontFamily: Fonts.Regular,
+    color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
     fontSize: RFValue( 10 ),
   },
 

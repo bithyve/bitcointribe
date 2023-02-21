@@ -1,1 +1,3 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><defs><style>.a{fill:#77b9eb;}</style></defs><path class="a" d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm1,14a1,1,0,0,1-2,0V11a1,1,0,0,1,2,0ZM12,9a1,1,0,1,1,1-1A1,1,0,0,1,12,9Z" transform="translate(-2 -2)"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+  <path id="icon_info" d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm1,14a1,1,0,0,1-2,0V11a1,1,0,0,1,2,0ZM12,9a1,1,0,1,1,1-1A1,1,0,0,1,12,9Z" transform="translate(-2 -2)" fill="#a36363"/>
+</svg>

@@ -42,6 +42,7 @@ import { withNavigationFocus } from 'react-navigation'
 import Toast from '../../components/Toast'
 import { AccountType } from '../../bitcoin/utilities/Interface'
 import { goHomeAction } from '../../navigation/actions/NavigationActions'
+import LinearGradient from 'react-native-linear-gradient'
 
 const styles = StyleSheet.create( {
   viewContainer: {
@@ -61,11 +62,11 @@ const styles = StyleSheet.create( {
   },
   contactText: {
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
   },
   textSubtitle: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     color: Colors.textColorGrey,
   },
@@ -86,12 +87,12 @@ const styles = StyleSheet.create( {
     marginBottom: 20
   },
   textTitle: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 15 ),
     color: Colors.blue,
   },
   textCurrency: {
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 15 ),
     color: Colors.textColorGrey,
   },
@@ -101,7 +102,7 @@ const styles = StyleSheet.create( {
     alignSelf: 'center',
   },
   textValue: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 15 ),
     color: Colors.textColorGrey,
     marginLeft: wp( '3%' ),
@@ -114,20 +115,16 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   buttonView: {
     height: wp( '12%' ),
     width: wp( '40%' ),
     paddingHorizontal: wp( 2 ),
+    alignSelf: 'flex-end',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
     backgroundColor: Colors.blue,
     marginHorizontal: wp( 4 ),
     marginVertical: hp( '2%' ),
@@ -600,7 +597,7 @@ render() {
                     >
                       <Text
                         style={{
-                          fontFamily: Fonts.FiraSansRegular,
+                          fontFamily: Fonts.Regular,
                           fontSize: RFValue( 13 ),
                           color: Colors.textColorGrey,
                           marginLeft: wp( '3%' ),
@@ -637,7 +634,7 @@ render() {
           <View style={CommonStyles.headerLeftIconInnerContainer}>
             <FontAwesome
               name="long-arrow-left"
-              color={Colors.blue}
+              color={Colors.homepageButtonColor}
               size={17}
             />
           </View>
@@ -987,7 +984,7 @@ render() {
               <Text style={{
                 color: Colors.textColorGrey,
                 fontSize: RFValue( 14 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 marginHorizontal: wp( 3 )
               }}>
               Connect via Tor
@@ -1017,13 +1014,22 @@ render() {
         </View>
 
         <TouchableOpacity
-          style={styles.buttonView}
           activeOpacity={0.6}
           onPress={() => {
             this.saveNodeConfiguration()
           }}
         >
-          <Text style={styles.buttonText}>Connect</Text>
+          <LinearGradient
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            colors={[ Colors.skyBlue, Colors.darkBlue ]}
+            style={styles.buttonView}
+          >
+            <Text style={styles.buttonText}>Connect</Text>
+          </LinearGradient>
         </TouchableOpacity>
 
       </KeyboardAwareScrollView>

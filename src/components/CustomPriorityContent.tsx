@@ -119,8 +119,8 @@ export default function CustomPriorityContent( props ) {
           keyboardType={'numeric'}
           onChangeText={( value ) => {
             const regEx = /^[0-9]+$/
-            if (value === '') {
-              setAmount('')
+            if ( value === '' ) {
+              setAmount( '' )
             } else if( regEx.test( value ) ) {
               onCustomFeeChange( value )
             }
@@ -150,7 +150,7 @@ export default function CustomPriorityContent( props ) {
           style={{
             color: Colors.black,
             fontSize: RFValue( 11 ),
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
             marginRight: 5,
           }}
         >
@@ -160,7 +160,7 @@ export default function CustomPriorityContent( props ) {
           style={{
             color: Colors.textColorGrey,
             fontSize: RFValue( 11 ),
-            fontFamily: Fonts.FiraSansItalic,
+            fontFamily: Fonts.Italic,
           }}
         >
           {customEstimatedBlock
@@ -216,12 +216,12 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   successModalButtonView: {
     height: wp( '13%' ),
@@ -242,7 +242,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   inputBoxFocused: {
     borderRadius: 10,
@@ -274,10 +274,10 @@ const styles = StyleSheet.create( {
   textBox: {
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   errorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     color: Colors.red,
     fontSize: RFValue( 11 ),
     fontStyle: 'italic',

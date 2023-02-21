@@ -64,7 +64,7 @@ export default function RecoveryQuestionScreen( props ) {
           }}
         >
           <View style={commonStyle.headerLeftIconInnerContainer}>
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </View>
         </TouchableOpacity>
       </View>
@@ -167,7 +167,7 @@ export default function RecoveryQuestionScreen( props ) {
                               dropdownBoxValue.id == value.id
                                 ? Colors.blue
                                 : Colors.black,
-                            fontFamily: Fonts.FiraSansRegular,
+                            fontFamily: Fonts.Regular,
                             fontSize: RFValue( 12 ),
                           }}
                         >
@@ -216,7 +216,7 @@ export default function RecoveryQuestionScreen( props ) {
               } )}>
                 <Text
                   style={{
-                    fontFamily: Fonts.FiraSansMediumItalic,
+                    fontFamily: Fonts.MediumItalic,
                     fontWeight: 'bold',
                     fontStyle: 'italic',
                     fontSize: RFValue( 12 ),
@@ -263,16 +263,16 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   dropdownBoxText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     marginRight: 15,
   },
@@ -355,7 +355,7 @@ const styles = StyleSheet.create( {
     paddingLeft: 15,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   inputBoxFocused: {
     borderColor: Colors.borderColor,
@@ -373,11 +373,11 @@ const styles = StyleSheet.create( {
       width: 2, height: 2
     },
     backgroundColor: Colors.white,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )

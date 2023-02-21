@@ -257,8 +257,8 @@ SweepFundUseExitKeyPropsTypes,
               style={styles.headerBackArrowView}
             >
               <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                 size={17}
               />
             </TouchableOpacity>
@@ -453,7 +453,7 @@ SweepFundUseExitKeyPropsTypes,
             <LoaderModal
               headerText={'Creating your wallet'}
               messageText={
-                'This may take some time while Hexa is using the Recovery Keys to recreate your wallet'
+                'This may take some time while Bitcoin Tribe is using the Recovery Keys to recreate your wallet'
               }
             />
           )}
@@ -513,12 +513,12 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: hp( '0.7%' ),
     marginBottom: hp( '1.5%' ),
   },
@@ -543,12 +543,12 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 10,
   },
   cardsInfoText: {
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
   cardsView: {
@@ -581,7 +581,7 @@ const styles = StyleSheet.create( {
   },
   statusText: {
     fontSize: RFValue( 9 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
 } )

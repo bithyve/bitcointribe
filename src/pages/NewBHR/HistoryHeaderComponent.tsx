@@ -27,7 +27,8 @@ const HistoryHeaderComponent = ( props ) => {
           <Image
             source={require( '../../assets/images/icons/icon_back.png' )}
             style={{
-              width: wp( '5%' ), height: wp( '2%' )
+              width: wp( '5%' ), height: wp( '2%' ),
+              tintColor: Colors.blue
             }}
           />
         </TouchableOpacity>
@@ -49,7 +50,7 @@ const HistoryHeaderComponent = ( props ) => {
             <Text style={styles.infoText}>
               {`${strings.Lastbackup}: `}
               <Text style={{
-                fontFamily: Fonts.FiraSansMediumItalic
+                fontFamily: Fonts.MediumItalic
               }}>
                 {props.selectedTime.replace( 'approximately', '' ).trim()}
               </Text>
@@ -73,7 +74,7 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
@@ -88,13 +89,13 @@ const styles = StyleSheet.create( {
   },
   infoText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
   },
   titleText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   headerImageView: {
     backgroundColor: Colors.white,

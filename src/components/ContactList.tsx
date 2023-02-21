@@ -415,7 +415,7 @@ export default function ContactList( props ) {
                 <Text style={styles.selectedContactNameText}>
                   {value.name ? value.name.split( ' ' )[ 0 ] : ''}{' '}
                   <Text style={{
-                    fontFamily: Fonts.FiraSansMedium
+                    fontFamily: Fonts.Medium
                   }}>
                     {value.name ? value.name.split( ' ' )[ 1 ] : ''}
                   </Text>
@@ -496,7 +496,7 @@ export default function ContactList( props ) {
                       ? item.name.split( ' ' )[ 0 ]
                       : ''}{' '}
                     <Text style={{
-                      fontFamily: Fonts.FiraSansMedium
+                      fontFamily: Fonts.Medium
                     }}>
                       {item.name && item.name.split( ' ' )[ 1 ]
                         ? item.name.split( ' ' )[ 1 ]
@@ -576,7 +576,7 @@ export default function ContactList( props ) {
 const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 13 ),
   },
   bottomButtonView: {
@@ -607,7 +607,7 @@ const styles = StyleSheet.create( {
   selectedContactNameText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   selectedContactContainer: {
     height: wp( '20%' ),
@@ -626,11 +626,11 @@ const styles = StyleSheet.create( {
   contactText: {
     marginLeft: 10,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   contactIndexText: {
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   contactIndexView: {
     flex: 0.5,

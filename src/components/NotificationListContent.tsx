@@ -71,7 +71,7 @@ export default function NotificationListContent( props ) {
                   <Image
                     source={
                       value.type == releaseNotificationTopic
-                        ? require( '../assets/images/icons/icon_hexa.png' )
+                        ? require( '../assets/images/icons/icon_qr_logo.png' )
                         : require( '../assets/images/icons/icon_receive.png' )
                     }
                     style={styles.notificationElementImage}
@@ -145,7 +145,7 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     marginHorizontal: wp( 4 )
   },
   notificationElement: {
@@ -163,13 +163,13 @@ const styles = StyleSheet.create( {
   notificationElementTitle: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: wp( '1.5%' )
   },
   notificationElementTimeText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: wp( '2%' ),
     width: 'auto',
     marginLeft: 'auto'
@@ -177,7 +177,7 @@ const styles = StyleSheet.create( {
   notificationElementInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingTop: wp( '2%' ),
     marginLeft: 3,
   },
@@ -193,12 +193,12 @@ const styles = StyleSheet.create( {
   waterMarkInfoBoxTitle: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   waterMarkInfoBoxInfo: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   EmptyListLoaderView: {
     flexDirection: 'row',
@@ -257,11 +257,11 @@ const styles = StyleSheet.create( {
   infoBoxTitle: {
     color: Colors.black,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   infoBoxInfo: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 } )

@@ -76,14 +76,14 @@ const QRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
                 height: 30, width: 30, justifyContent: 'center'
               }}
             >
-              <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+              <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
             </TouchableOpacity>
 
             <Text
               style={{
                 color: Colors.blue,
                 fontSize: RFValue( 18 ),
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
               }}
             >
               {title ? title : 'Scan QR code'}

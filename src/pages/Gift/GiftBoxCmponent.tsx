@@ -29,7 +29,7 @@ const GiftBoxComponent = ( props ) => {
           style={{
             flexDirection: "row",
             alignItems: "flex-start",
-            marginTop: height > 720 ? 12 : wp(3),
+            marginTop: height > 720 ? 6 : wp(2),
           }}
         >
           <Text style={[styles.pageTitle]}>{props.titleText}</Text>
@@ -46,14 +46,14 @@ const GiftBoxComponent = ( props ) => {
           }}
         >
           <Text numberOfLines={3} style={styles.subText}>
-            {props.subTitleText}
+            {props.subTitleText} {props.pendingSubText}
           </Text>
-          {props.scSubText && (
+          {/* {props.scSubText && (
             <Text style={styles.scSubText}>{props.scSubText}</Text>
-          )}
-          {props.pendingSubText && (
+          )} */}
+          {/* {props.pendingSubText && (
             <Text style={styles.subText}>{props.pendingSubText}</Text>
-          )}
+          )} */}
         </View>
       </View>
     </TouchableOpacity>
@@ -82,24 +82,24 @@ const styles = StyleSheet.create( {
     justifyContent:'center',
   },
   pageTitle: {
-    color: Colors.blue,
+    color: Colors.THEAM_TEXT_COLOR,
     letterSpacing: 0.7,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     alignItems: 'center',
-    fontSize: RFValue( 15 )
+    fontSize: RFValue( 13 )
   },
   subText:{
-    color: Colors.gray3,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     // marginTop: RFValue( 4 ),
     letterSpacing: .75,
-    lineHeight: RFValue(15)
+    lineHeight: RFValue(11)
   },
   scSubText:{
     color: Colors.textColorGrey,
     fontSize: RFValue( 6 ),
-    fontFamily: Fonts.FiraSansLight,
+    fontFamily: Fonts.Light,
     //marginTop: RFValue( 2 ),
     letterSpacing: 0.5,
     lineHeight: 8,
@@ -109,6 +109,6 @@ const styles = StyleSheet.create( {
     lineHeight: 12,
     color: Colors.blue,
     letterSpacing: 0.7,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   }
 } )

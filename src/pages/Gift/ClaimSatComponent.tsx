@@ -54,7 +54,7 @@ export default function ClaimSatComponent( props ) {
                   ? props.headerTextColor
                   : Colors.blue,
                 fontSize: RFValue( 18 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 letterSpacing: 0.01,
                 // marginTop: RFValue( 20 )
                 // width: wp( 65 )
@@ -77,12 +77,12 @@ export default function ClaimSatComponent( props ) {
             </Text>
           ) : null}
           <Text style={{
-            fontFamily:Fonts.FiraSansRegular, fontSize: RFValue( 12 ), letterSpacing: 0.48, color: Colors.gray13,
+            fontFamily:Fonts.Regular, fontSize: RFValue( 12 ), letterSpacing: 0.48, color: Colors.gray13,
             marginTop: RFValue( 35 )
           }}>
             {props.firstHalfLbl}
             <Text style={{
-              fontFamily: Fonts.FiraSansSemiBold, fontStyle: 'italic'
+              fontFamily: Fonts.SemiBold, fontStyle: 'italic'
             }}>{props.secondHalfLbl}</Text>
           </Text>
           <Shadow viewStyle={{
@@ -166,7 +166,7 @@ export default function ClaimSatComponent( props ) {
             // backgroundColor:'red'
           }} onPress={props.onCancelClick}>
             <Text style={{
-              fontSize:RFValue( 13 ), color:Colors.blue, fontFamily:Fonts.FiraSansMedium
+              fontSize:RFValue( 13 ), color:Colors.blue, fontFamily:Fonts.Medium
             }}>{props.cancelText}</Text>
           </TouchableOpacity>
         </View>
@@ -190,7 +190,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     // opacity: 1,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.6
   },
   successModalAmountView: {
@@ -223,7 +223,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   shadowModalInput:{
     // height: 50,
@@ -238,7 +238,7 @@ const styles = StyleSheet.create( {
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingLeft: 15,
     borderRadius: 10
   },

@@ -24,7 +24,7 @@ const FormStyles = StyleSheet.create( {
     flex: 1,
     paddingHorizontal: 20,
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 13 ),
     textAlign: 'left',
   },
@@ -34,13 +34,13 @@ const FormStyles = StyleSheet.create( {
   },
 
   errorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     color: Colors.red,
     fontSize: RFValue( 11 ),
   },
 
   hintText: {
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     color: Colors.textColorGrey,
     fontSize: RFValue( 10 ),
   },

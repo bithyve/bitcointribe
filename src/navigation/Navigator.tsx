@@ -33,7 +33,7 @@ import Intermediate from '../pages/Intermediate'
 
 import RestoreWithICloud from '../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
-import { createBottomTabNavigator } from 'react-navigation-tabs'
+import { BottomTabBar, createBottomTabNavigator } from 'react-navigation-tabs'
 import { Text, View, Image, StyleSheet } from 'react-native'
 import {
   heightPercentageToDP as hp,
@@ -60,6 +60,7 @@ import RestoreSeedWordsContent from '../pages/RestoreHexaWithKeeper/RestoreSeedW
 import GiftStack from './stacks/gift/GiftStack'
 import Filled_gift_tab from '../assets/images/satCards/filled_gift_tab.svg'
 import Gift_tab from '../assets/images/satCards/gift_tab.svg'
+import LinearGradient from 'react-native-linear-gradient'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -140,6 +141,22 @@ const styles= StyleSheet.create( {
     // backgroundColor: Colors.white
   }
 } )
+
+const GradientTab = props => {
+  return (
+      <View style={{ backgroundColor: 'transparent' }}>
+           <LinearGradient
+        colors={[Colors.darkBlue,Colors.darkBlue]}
+        start={{x:0, y:0}}
+        end={{x:0.01, y:0.1}}
+        // locations={[0.2, 1]}
+        // style={{flex: 1}}
+      >
+              <BottomTabBar {...props} />
+          </LinearGradient>
+      </View >
+  )
+};
 
 const Bottomtab = createBottomTabNavigator(
   {
@@ -307,10 +324,20 @@ const Bottomtab = createBottomTabNavigator(
     // swipeEnabled: false,
     // animationEnabled: false,
     // lazy: false,
+    // tabBarComponent:(props) => (
+    //   <LinearGradient
+    //     colors={['#f5f5f5', '#DBDBDB']}
+    //     start={[1, 0]}
+    //     end={[0, 0]}
+    //   >
+    //    <TabBarComponent {...props} style={{ borderTopColor: '#605F60' }} />
+    //   </LinearGradient>
+    // ),
+    tabBarComponent: GradientTab,
     tabBarOptions: {
       showLabel: false,
       style: {
-        backgroundColor: Colors.blue
+        backgroundColor: 'transparent',
       },
       // barStyle: {
       //   // flex: 1,

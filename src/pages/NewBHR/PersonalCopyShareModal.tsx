@@ -93,7 +93,7 @@ export default function PersonalCopyShareModal( props ) {
             height: wp( '15%' ), width: wp( '15%' )
           }} source={require( '../../assets/images/icons/ios_mail.png' )} />
           <Text style={{
-            color: Colors.textColorGrey, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: 5,
+            color: Colors.textColorGrey, fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, marginTop: 5,
           }}>Mail</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{
@@ -107,7 +107,7 @@ export default function PersonalCopyShareModal( props ) {
             height: wp( '15%' ), width: wp( '15%' ), borderWidth: 1, borderColor: Colors.textColorGrey, borderRadius: 10
           }} source={require( '../../assets/images/icons/icon_more.png' )} />
           <Text style={{
-            color: Colors.textColorGrey, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: 5,
+            color: Colors.textColorGrey, fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, marginTop: 5,
           }}>More Options</Text>
         </TouchableOpacity>
       </View>
@@ -135,7 +135,7 @@ export default function PersonalCopyShareModal( props ) {
           style={{
             color: Colors.blue,
             fontSize: RFValue( 18 ),
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
           }}
         >
           Store PDF via
@@ -283,11 +283,11 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     marginTop: 5,
   },
@@ -304,14 +304,14 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
     marginLeft: 13,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   listElementsInfo: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
     marginLeft: 13,
     marginTop: 5,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     width: wp( 60 )
   },
   listElementIcon: {
@@ -344,6 +344,6 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )

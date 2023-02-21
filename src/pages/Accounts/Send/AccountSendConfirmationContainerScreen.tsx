@@ -250,7 +250,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         </Text>
 
         <Text style={{
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Regular,
           fontSize: RFValue( 11 ),
           fontStyle: 'italic',
           color: Colors.blue,
@@ -374,7 +374,7 @@ const styles = StyleSheet.create( {
     height: height > 720 ? 50 : 40,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingLeft: 15,
     width: '90%',
     paddingTop: height > 720 ? 17 : 0
@@ -383,7 +383,7 @@ const styles = StyleSheet.create( {
     width: widthPercentageToDP( 90 ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'justify',
     lineHeight: 18,
     marginLeft: widthPercentageToDP( 5 ),

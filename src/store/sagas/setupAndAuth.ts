@@ -132,9 +132,7 @@ function* credentialsStorageWorker( { payload } ) {
   yield put( credsStored() )
 
   // connect electrum-client
-  const privateNodes = yield select((state) => state.nodeSettings.personalNodes);
-  ElectrumClient.setActivePeer(privateNodes);
-  yield call( ElectrumClient.connect )
+
 }
 
 export const credentialStorageWatcher = createWatcher(
@@ -209,8 +207,8 @@ function* credentialsAuthWorker( { payload } ) {
     // t.stop()
     yield put( keyFetched( key ) )
 
-    const privateNodes = yield select((state) => state.nodeSettings.personalNodes);
-    ElectrumClient.setActivePeer(privateNodes);
+    const privateNodes = yield select( ( state ) => state.nodeSettings.personalNodes )
+    ElectrumClient.setActivePeer( privateNodes )
 
     yield call( ElectrumClient.connect )
 

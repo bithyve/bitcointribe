@@ -78,7 +78,7 @@ export default function RecoveryTrustedQR( props ) {
             style={{
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.Medium,
             }}
           >
             {strings.Ihavescanned}

@@ -1,10 +1,8 @@
 export default {
-  FiraSansRegular: 'FiraSans-Regular',
-  FiraSansItalic: 'FiraSans-Italic',
-  FiraSansMedium: 'FiraSans-Medium',
-  FiraSansLight: 'FiraSans-Regular',
-  FiraSansSemiBold: 'FiraSans-Medium',
-  // FiraSansLight: 'FiraSans-Light',
-  FiraSansMediumItalic: 'FiraSans-MediumItalic',
-  OpenSans: 'OpenSans'
+  Regular: 'Montserrat-Regular',
+  Italic: 'Montserrat-Italic',
+  Medium: 'Montserrat-Medium',
+  Light: 'Montserrat-Regular',
+  SemiBold: 'Montserrat-Medium',
+  MediumItalic: 'Montserrat-MediumItalic',
 }

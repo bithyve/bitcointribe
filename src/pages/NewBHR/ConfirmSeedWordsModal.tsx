@@ -19,6 +19,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { LocalizationContext } from '../../common/content/LocContext'
 import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function ConfirmSeedWordsModal( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -85,26 +86,26 @@ export default function ConfirmSeedWordsModal( props ) {
           // marginBottom: wp( '%' ),
           color: Colors.blue,
           fontSize: RFValue( 18 ),
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Regular,
           marginHorizontal: wp( '5%' ),
           marginTop: 30
         }} >{'Confirm backup phrase'}</Text>
         <Text style={{
           color: Colors.lightTextColor,
           fontSize: RFValue( 11 ),
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Regular,
           marginHorizontal: wp( '5%' ),
           marginTop: 5
         }}>{'Key in the word exactly like it was displayed'}</Text>
         <Text style={{
           color: Colors.lightTextColor,
           fontSize: RFValue( 14 ),
-          fontFamily: Fonts.FiraSansRegular,
+          fontFamily: Fonts.Regular,
           marginHorizontal: wp( '5%' ),
           marginTop: RFValue( 25 )
         }}>{'Enter the '}
           <Text style={{
-            fontFamily: Fonts.FiraSansMedium
+            fontFamily: Fonts.Medium
           }}>{getSeedNumber( props.seedNumber ) + ' word'}</Text></Text>
         <View
           style={{
@@ -163,16 +164,20 @@ export default function ConfirmSeedWordsModal( props ) {
             alignItems: 'flex-end',
           }}
         >
-          <Shadow viewStyle={{
-            ...styles.successModalButtonView,
-            backgroundColor: props.buttonColor
-              ? props.buttonColor
-              : Colors.blue,
-          }} distance={2}
-          startColor={props.buttonShadowColor
-            ? props.buttonShadowColor
-            : Colors.shadowBlue }
-          offset={[ 42, 14 ]}>
+          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            locations={[ 0.2, 1 ]}
+            style={{
+              ...styles.successModalButtonView,
+              backgroundColor: props.buttonColor
+                ? props.buttonColor
+                : Colors.blue,
+            }}
+          >
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressProceed( word )}
               style={{
@@ -195,7 +200,7 @@ export default function ConfirmSeedWordsModal( props ) {
                 {props.proceedButtonText}
               </Text>
             </AppBottomSheetTouchableWrapper>
-          </Shadow>
+          </LinearGradient>
 
           {props.isIgnoreButton && (
             <AppBottomSheetTouchableWrapper
@@ -203,7 +208,7 @@ export default function ConfirmSeedWordsModal( props ) {
               style={{
                 height: wp( '12%' ),
                 width: wp( '27%' ),
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
                 alignItems: 'center',
                 alignSelf: 'center',
                 // position: 'absolute',
@@ -261,7 +266,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   bottomButtonView: {
     flexDirection: 'row',
@@ -281,7 +286,7 @@ const styles = StyleSheet.create( {
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingLeft: 15,
 
   },
@@ -313,6 +318,6 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )

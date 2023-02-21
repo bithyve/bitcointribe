@@ -187,7 +187,7 @@ const ReceivingAddress = ( props ) => {
                   style={{
                     color: Colors.white,
                     fontSize: RFValue( 13 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                   }}
                 >
                   Ok, I understand
@@ -205,7 +205,7 @@ const ReceivingAddress = ( props ) => {
                   style={{
                     color: Colors.blue,
                     fontSize: RFValue( 13 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                   }}
                 >
                   Manage Backup
@@ -287,8 +287,8 @@ const ReceivingAddress = ( props ) => {
                 }}
               >
                 <FontAwesome
-                  name="long-arrow-left"
-                  color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                   size={17}
                 />
               </TouchableOpacity>
@@ -354,7 +354,7 @@ const ReceivingAddress = ( props ) => {
                 style={{
                   color: Colors.textColorGrey,
                   fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 Add sender to Friends & Family

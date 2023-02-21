@@ -924,7 +924,7 @@ class UpgradeBackup extends Component<
       const granted = await this.requestStoragePermission()
       if ( !granted ) {
         this.setState( {
-          errorMessage: 'Cannot access files and storage. Permission denied.\nYou can enable files and storage from the phone settings page \n\n Settings > Hexa > Storage',
+          errorMessage: 'Cannot access files and storage. Permission denied.\nYou can enable files and storage from the phone settings page \n\n Settings > Bitcoin Tribe > Storage',
           hasStoragePermission: false
         } )
         this.storagePermissionBottomSheet.current.snapTo( 0 )
@@ -1044,7 +1044,7 @@ class UpgradeBackup extends Component<
       <ErrorModalContents
         modalRef={this.storagePermissionBottomSheet}
         title={'Why do we need access to your files and storage?'}
-        info={'File and Storage access will let Hexa save a pdf with your Recovery Keys. This will also let Hexa attach the pdf to emails, messages and to print in case you want to.\n\n'}
+        info={'File and Storage access will let Bitcoin Tribe save a pdf with your Recovery Keys. This will also let Bitcoin Tribe attach the pdf to emails, messages and to print in case you want to.\n\n'}
         otherText={'Don’t worry these are only sent to the email address you choose, in the next steps you will be able to choose how the pdf is shared.'}
         proceedButtonText={'Continue'}
         isIgnoreButton={false}
@@ -1086,8 +1086,8 @@ class UpgradeBackup extends Component<
               style={styles.headerBackArrowView}
             >
               <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                 size={17}
               />
             </TouchableOpacity>
@@ -1166,7 +1166,7 @@ class UpgradeBackup extends Component<
                   >
                     Upgrade{' '}
                     <Text style={{
-                      fontFamily: Fonts.FiraSansMedium
+                      fontFamily: Fonts.Medium
                     }}>
                       {item.title}
                     </Text>
@@ -1189,7 +1189,7 @@ class UpgradeBackup extends Component<
                   <Text
                     style={{
                       color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
+                      fontFamily: Fonts.Regular,
                       fontSize: RFValue( 10 ),
                     }}
                   >
@@ -1213,7 +1213,7 @@ class UpgradeBackup extends Component<
                       <Text
                         style={{
                           color: item.status == 'accessible' ? Colors.darkGreen : Colors.textColorGrey,
-                          fontFamily: Fonts.FiraSansRegular,
+                          fontFamily: Fonts.Regular,
                           fontSize: RFValue( 9 ),
                         }}
                       >
@@ -1297,7 +1297,7 @@ class UpgradeBackup extends Component<
                   'Completing the steps below secures your wallet at a basic level'
                 }
                 cardInfo={'Store Backup'}
-                cardTitle={'Hexa Wallet Backup'}
+                cardTitle={'Bitcoin Tribe Wallet Backup'}
                 cardSubInfo={Platform.OS == 'ios' ? 'iCloud' : 'GDrive' + ' backup'}
                 proceedButtonText={'Backup'}
                 backButtonText={'Back'}
@@ -1575,12 +1575,12 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: hp( '0.7%' ),
     marginBottom: hp( '0.7%' ),
   },
@@ -1605,12 +1605,12 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 10,
   },
   cardsInfoText: {
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
   cardsView: {
@@ -1643,7 +1643,7 @@ const styles = StyleSheet.create( {
   },
   statusText: {
     fontSize: RFValue( 9 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
   greyBox: {
@@ -1674,7 +1674,7 @@ const styles = StyleSheet.create( {
   },
   greyBoxText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 10 ),
   },
   successModalImage: {

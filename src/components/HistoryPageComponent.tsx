@@ -59,7 +59,7 @@ const HistoryPageComponent = ( props ) => {
                       style={{
                         color: Colors.blue,
                         fontSize: RFValue( 13 ),
-                        fontFamily: Fonts.FiraSansRegular,
+                        fontFamily: Fonts.Regular,
                       }}
                     >
                       {value.title}
@@ -68,7 +68,7 @@ const HistoryPageComponent = ( props ) => {
                       style={{
                         color: Colors.textColorGrey,
                         fontSize: RFValue( 9 ),
-                        fontFamily: Fonts.FiraSansRegular,
+                        fontFamily: Fonts.Regular,
                         marginTop: hp( '0.3%' ),
                       }}
                     >
@@ -100,7 +100,7 @@ const HistoryPageComponent = ( props ) => {
                       style={{
                         color: Colors.textColorGrey,
                         fontSize: RFValue( 10 ),
-                        fontFamily: Fonts.FiraSansRegular,
+                        fontFamily: Fonts.Regular,
                       }}
                     >
                       {value.title}
@@ -109,7 +109,7 @@ const HistoryPageComponent = ( props ) => {
                       style={{
                         color: Colors.textColorGrey,
                         fontSize: RFValue( 9 ),
-                        fontFamily: Fonts.FiraSansRegular,
+                        fontFamily: Fonts.Regular,
                         marginLeft: 'auto',
                       }}
                     >
@@ -197,7 +197,7 @@ const HistoryPageComponent = ( props ) => {
               marginBottom: hp( '1%' ),
               color: Colors.textColorGrey,
               fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
             }}
           >
             {props.reshareInfo}
@@ -223,7 +223,7 @@ const HistoryPageComponent = ( props ) => {
               marginBottom: hp( '1%' ),
               color: Colors.textColorGrey,
               fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
             }}
           >
             {props.changeInfo}
@@ -269,7 +269,7 @@ const HistoryPageComponent = ( props ) => {
               style={{
                 color: Colors.white,
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
               }}
             >
               Confirm
@@ -301,7 +301,7 @@ const HistoryPageComponent = ( props ) => {
               style={{
                 color: Colors.white,
                 fontSize: RFValue( 10 ),
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
               }}
             >
               Backup Now

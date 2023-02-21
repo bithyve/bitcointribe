@@ -46,7 +46,7 @@ function AccountComponent(props) {
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               fontSize: RFValue(11),
               paddingTop: 5,
               paddingBottom: 3,
@@ -61,7 +61,7 @@ function AccountComponent(props) {
             <Text
               style={{
                 color: Colors.blue,
-                fontFamily: Fonts.FiraSansMediumItalic,
+                fontFamily: Fonts.MediumItalic,
                 fontSize: RFValue(10),
                 paddingTop: 3,
               }}
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   contactNameText: {
     color: Colors.textColorGrey,
     fontSize: RFValue(20),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     width: wp('50%'),
   },
   contactIconImage: {

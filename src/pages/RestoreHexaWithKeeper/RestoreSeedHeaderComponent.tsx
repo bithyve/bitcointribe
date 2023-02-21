@@ -23,7 +23,7 @@ const RestoreSeedHeaderComponent = ( props ) => {
         <Image
           source={require( '../../assets/images/icons/icon_back.png' )}
           style={{
-            width: wp( '5%' ), height: wp( '2%' )
+            width: wp( '5%' ), height: wp( '2%' ), tintColor: Colors.homepageButtonColor
           }}
         />
       </TouchableOpacity>
@@ -53,9 +53,9 @@ const styles = StyleSheet.create( {
   },
   titleText: {
     marginLeft: wp( '4%' ),
-    color: Colors.blue,
+    color: Colors.THEAM_TEXT_COLOR,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   headerImage: {
     width: wp( '9%' ),

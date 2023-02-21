@@ -173,7 +173,7 @@ export default function RestoreSelectedContactsList( props ) {
       <LoaderModal
         headerText={message}
         messageText={
-          'This may take some time while Hexa is using the Recovery Keys to recreate your wallet'
+          'This may take some time while Bitcoin Tribe is using the Recovery Keys to recreate your wallet'
         }
       />
     )
@@ -486,7 +486,7 @@ export default function RestoreSelectedContactsList( props ) {
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </View>
         </TouchableOpacity>
       </View>
@@ -662,7 +662,7 @@ export default function RestoreSelectedContactsList( props ) {
                           ? contact.name.split( ' ' )[ 0 ]
                           : ''}{' '}
                         <Text style={{
-                          fontFamily: Fonts.FiraSansMedium
+                          fontFamily: Fonts.Medium
                         }}>
                           {contact.name && contact.name.split( ' ' )[ 0 ]
                             ? contact.name.split( ' ' )[ 1 ]
@@ -1052,13 +1052,13 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     marginLeft: 13,
     marginBottom: 5,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   listElementsInfo: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
     marginLeft: 13,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   listElementIcon: {
     paddingRight: 5,
@@ -1102,7 +1102,7 @@ const styles = StyleSheet.create( {
   selectedContactName: {
     marginLeft: 10,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
   secretReceivedView: {
@@ -1115,7 +1115,7 @@ const styles = StyleSheet.create( {
   },
   secretReceivedText: {
     fontSize: RFValue( 9 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   secretReceivedCheckSignView: {
     backgroundColor: Colors.green,
@@ -1143,6 +1143,6 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )

@@ -55,7 +55,7 @@ const styles = StyleSheet.create( {
 
   headingText: {
     color: Colors.btextColorGreylue,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: 12,
   },
 
@@ -71,7 +71,7 @@ const styles = StyleSheet.create( {
   },
 
   amountText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 20 ),
     marginRight: 6,
   },

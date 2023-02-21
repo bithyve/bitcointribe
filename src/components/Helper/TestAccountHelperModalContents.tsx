@@ -1,87 +1,87 @@
-import React from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import React from 'react'
+import { View, Image, Text, StyleSheet } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
-import { ScrollView } from 'react-native-gesture-handler';
-export default function TestAccountHelperModalContents(props) {
+} from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
+import { ScrollView } from 'react-native-gesture-handler'
+export default function TestAccountHelperModalContents( props ) {
   const mainView = () =>{
-    return (<View
+    return ( <View
+      style={{
+        height: '100%',
+        marginLeft: wp( '8%' ),
+        marginRight: wp( '8%' ),
+      }}
+    >
+      <View
+        style={{
+          marginTop: hp( '1%' ),
+        }}
+      >
+        <Text
           style={{
-            height: '100%',
-            marginLeft: wp('8%'),
-            marginRight: wp('8%'),
+            color: Colors.white,
+            fontFamily: Fonts.Medium,
+            fontSize: RFValue( 15 ),
+            fontWeight: 'bold',
+            marginTop: hp( '1%' ),
+            marginBottom: hp( '1%' ),
           }}
         >
-          <View
+          {props.topButtonText}
+        </Text>
+      </View>
+      {props.boldPara ? (
+        <View
+          style={{
+            marginTop: hp( '1%' ),
+          }}
+        >
+          <Text
             style={{
-              marginTop: hp('1%'),
+              color: Colors.white,
+              fontSize: RFValue( 13 ),
+              fontFamily: Fonts.Medium,
             }}
           >
-            <Text
-              style={{
-                color: Colors.white,
-                fontFamily: Fonts.FiraSansMedium,
-                fontSize: RFValue(15),
-                fontWeight: 'bold',
-                marginTop: hp('1%'),
-                marginBottom: hp('1%'),
-              }}
-            >
-              {props.topButtonText}
-            </Text>
-          </View>
-          {props.boldPara ? (
-            <View
-              style={{
-                marginTop: hp('1%'),
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.white,
-                  fontSize: RFValue(13),
-                  fontFamily: Fonts.FiraSansMedium,
-                }}
-              >
-                {props.boldPara}
-              </Text>
-            </View>
-          ) : null}
-
-          <View
-            style={{
-              marginTop: hp('1%'),
-            }}
-          >
-            <Text
-              style={{
-                color: Colors.white,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              {props.helperInfo}
-            </Text>
-          </View>
+            {props.boldPara}
+          </Text>
         </View>
+      ) : null}
+
+      <View
+        style={{
+          marginTop: hp( '1%' ),
+        }}
+      >
+        <Text
+          style={{
+            color: Colors.white,
+            fontSize: RFValue( 13 ),
+            fontFamily: Fonts.Regular,
+          }}
+        >
+          {props.helperInfo}
+        </Text>
+      </View>
+    </View>
     )
   }
   return (
     <View style={styles.modalContainer}>
       {
         props.topButtonText == 'Receiving bitcoin'?
-        (<ScrollView>
-          {mainView()}
-        </ScrollView>) : 
-        (<View>
-        {mainView()}
-        </View>)
+          ( <ScrollView>
+            {mainView()}
+          </ScrollView> ) :
+          ( <View>
+            {mainView()}
+          </View> )
       }
       {/* <View
         style={{
@@ -107,7 +107,7 @@ export default function TestAccountHelperModalContents(props) {
             style={{
               color: Colors.blue,
               fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
             }}
           >
             {props.continueButtonText}
@@ -127,35 +127,39 @@ export default function TestAccountHelperModalContents(props) {
             style={{
               color: Colors.white,
               fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
             }}
           >
             {props.quitButtonText}
           </Text>
-        </AppBottomSheetTouchableWrapper> 
+        </AppBottomSheetTouchableWrapper>
       </View>*/}
       {props.image ? (
-        <View style={{ marginTop: 'auto', marginLeft: 'auto' }}>
+        <View style={{
+          marginTop: 'auto', marginLeft: 'auto'
+        }}>
           <Image
             source={props.image}
             style={{
-              width: wp('28%'),
-              height: wp('28%'),
+              width: wp( '28%' ),
+              height: wp( '28%' ),
               resizeMode: 'contain',
             }}
           />
         </View>
       ) : null}
     </View>
-  );
+  )
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContainer: {
     height: '100%',
     backgroundColor: Colors.blue,
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0, height: 2
+    },
   },
-});
+} )

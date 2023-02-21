@@ -241,7 +241,7 @@ const styles = StyleSheet.create( {
   tableHeadingText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 
   priorityTableText: {
@@ -298,7 +298,7 @@ const styles = StyleSheet.create( {
   customPriorityGroupBoxLabel: {
     color: Colors.blue,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
   },
 
   headingLabelText: {

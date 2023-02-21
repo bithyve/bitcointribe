@@ -65,7 +65,7 @@ export default function SetUpSatCardScreen( props ) {
   //   'Getting the latest details'
   // ]
   // const [ bottomTextMessage, setBottomTextMessage ] = useState(
-  //   'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
+  //   'Bitcoin Tribe uses the passcode and answer to the security question to encrypt different parts of your wallet',
   // )
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
@@ -218,7 +218,7 @@ export default function SetUpSatCardScreen( props ) {
             'Security entry unavilable',
           )
           setJailBrokenInfo(
-            'Your phone does not have any secure entry like Pin or Biometric \n\n\nThis may be a security risk to your funds on Hexa',
+            'Your phone does not have any secure entry like Pin or Biometric \n\n\nThis may be a security risk to your funds on Bitcoin Tribe',
           )
           setElevation( 0 )
         }, 2 )
@@ -482,7 +482,7 @@ export default function SetUpSatCardScreen( props ) {
           <View style={CommonStyles.headerLeftIconInnerContainer}>
             <FontAwesome
               name="long-arrow-left"
-              color={Colors.blue}
+              color={Colors.homepageButtonColor}
               size={17}
             />
           </View>
@@ -703,7 +703,7 @@ export default function SetUpSatCardScreen( props ) {
 
           <Text style={{
             fontSize: RFValue( 12 ),
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             color: Colors.black2,
             letterSpacing: 0.65,
             marginStart: 20,
@@ -1029,7 +1029,7 @@ const styles = StyleSheet.create( {
   keyPadElementText: {
     color: Colors.blue,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontStyle: 'normal',
   },
   proceedButtonView: {
@@ -1048,15 +1048,15 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   boldItalicText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     fontWeight: 'bold',
     fontStyle: 'italic',
   },
   errorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     color: Colors.tomatoRed,
     fontSize: RFValue( 10 ),
     fontStyle: 'italic',
@@ -1067,14 +1067,14 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 16 ),
     marginLeft: 20,
     marginTop: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.8
   },
   headerInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: RFValue( 5 ),
     letterSpacing: 1.3
   },
