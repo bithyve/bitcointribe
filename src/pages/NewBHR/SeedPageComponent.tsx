@@ -25,6 +25,7 @@ import { translations } from '../../common/content/LocContext'
 import { Wallet } from '../../bitcoin/utilities/Interface'
 import { PagerView, PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEventData } from 'react-native-pager-view'
 import dbManager from '../../storage/realm/dbManager'
+import LinearGradient from 'react-native-linear-gradient'
 
 const AnimatedPagerView = Animated.createAnimatedComponent( PagerView )
 
@@ -341,23 +342,32 @@ const SeedPageComponent = ( props ) => {
           {props.confirmButtonText ? (
             <TouchableOpacity
               onPress={() => { ( currentPosition + 1 ) * 12 < total ? onNextClick() : onProceedClick() }}
-              style={{
-                ...styles.successModalButtonView,
-                backgroundColor: props.confirmDisable
-                  ? Colors.lightBlue
-                  : Colors.blue,
-              }}
               delayPressIn={0}
               disabled={props.confirmDisable ? props.confirmDisable : false}
             >
-              <Text
+              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                start={{
+                  x: 0, y: 0
+                }} end={{
+                  x: 1, y: 0
+                }}
+                locations={[ 0.2, 1 ]}
                 style={{
-                  ...styles.proceedButtonText,
-                  color: Colors.white,
+                  ...styles.successModalButtonView,
+                  backgroundColor: props.confirmDisable
+                    ? Colors.lightBlue
+                    : Colors.blue,
                 }}
               >
-                {( currentPosition + 1 ) * 12 < total ? props.confirmButtonText : props.proceedButtonText}
-              </Text>
+                <Text
+                  style={{
+                    ...styles.proceedButtonText,
+                    color: Colors.white,
+                  }}
+                >
+                  {( currentPosition + 1 ) * 12 < total ? props.confirmButtonText : props.proceedButtonText}
+                </Text>
+              </LinearGradient>
             </TouchableOpacity>
           ) : null}
           {props.isChangeKeeperAllow ? (
@@ -411,19 +421,13 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 8,
     // elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15,
-      height: 15,
-    },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
   },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   selectedHistoryCard: {
     margin: wp( '3%' ),
@@ -461,12 +465,12 @@ const styles = StyleSheet.create( {
   historyCardTitleText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   historyCardDateText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 9 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 'auto',
   },
   bottomButtonView: {
@@ -506,13 +510,13 @@ const styles = StyleSheet.create( {
   numberText: {
     color: Colors.numberFont,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     // marginEnd: 10
   },
   nameText: {
     color: Colors.greyTextColor,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginStart: 25
   },
   modalInputContainer:{
@@ -529,7 +533,7 @@ const styles = StyleSheet.create( {
     // height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     // borderRadius: 10,
     // borderColor: '#E3E3E3',
     // borderWidth: 1

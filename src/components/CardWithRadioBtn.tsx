@@ -1,15 +1,15 @@
-import React, { Component } from 'react';
-import { View, Image, TouchableOpacity, Text, Dimensions } from 'react-native';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { RFValue } from 'react-native-responsive-fontsize';
-import CheckMark from '../assets/images/svgs/checkmark.svg';
-import Arrow from '../assets/images/svgs/icon_arrow.svg';
+import React, { Component } from 'react'
+import { View, Image, TouchableOpacity, Text, Dimensions } from 'react-native'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import { RFValue } from 'react-native-responsive-fontsize'
+import CheckMark from '../assets/images/svgs/checkmark.svg'
+import Arrow from '../assets/images/svgs/icon_arrow.svg'
 
-const {width} = Dimensions.get('window')
+const { width } = Dimensions.get( 'window' )
 
-export default function CardWithRadioBtn({
+export default function CardWithRadioBtn( {
   setActiveIndex,
   geticon = undefined,
   mainText,
@@ -21,18 +21,18 @@ export default function CardWithRadioBtn({
   boldText,
   hideRadioBtn = false,
   tag = '',
-}) {
+} ) {
   return (
     <TouchableOpacity
-      onPress={() => setActiveIndex(index)}
+      onPress={() => setActiveIndex( index )}
       style={{
         width: '95%',
-        height: hp('11%'),
+        height: hp( '11%' ),
         backgroundColor: isSelected && changeBgColor ? Colors.lightBlue : Colors.white,
         alignSelf: 'center',
         justifyContent: 'center',
-        borderRadius: wp('4'),
-        marginVertical: hp('1%'),
+        borderRadius: wp( '4' ),
+        marginVertical: hp( '1%' ),
       }}
     >
       <View
@@ -41,9 +41,9 @@ export default function CardWithRadioBtn({
           alignItems: 'center',
           // justifyContent: 'space-between',
 
-          marginHorizontal: wp('4%'),
+          marginHorizontal: wp( '4%' ),
           flex: 1,
-          marginVertical: hp('1.8%'),
+          marginVertical: hp( '1.8%' ),
         }}
       >
         {!hideRadioBtn && (
@@ -79,7 +79,7 @@ export default function CardWithRadioBtn({
         {geticon !== '' && (
           <View
             style={{
-              marginLeft: wp('3%'),
+              marginLeft: wp( '3%' ),
             }}
           >
             {geticon()}
@@ -88,7 +88,7 @@ export default function CardWithRadioBtn({
         <View
           style={{
             flex: 1,
-            marginLeft: width > 450 ? 15 : wp(4)
+            marginLeft: width > 450 ? 15 : wp( 4 )
           }}
         >
           <View
@@ -107,10 +107,10 @@ export default function CardWithRadioBtn({
               <Text>
                 <Text
                   style={{
-                    fontSize: RFValue(12.8),
-                    fontFamily: isSelected && changeBgColor ? Fonts.FiraSansMedium : Fonts.FiraSansRegular,
+                    fontSize: RFValue( 12.8 ),
+                    fontFamily: isSelected && changeBgColor ? Fonts.Medium : Fonts.Regular,
                     color: isSelected && changeBgColor ? Colors.backgroundColor1 : Colors.blue,
-                    marginBottom: hp(0.5),
+                    marginBottom: hp( 0.5 ),
                   }}
                 >
                   {`${mainText} `}
@@ -130,8 +130,8 @@ export default function CardWithRadioBtn({
               >
                 <Text
                   style={{
-                    fontSize: RFValue(9),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue( 9 ),
+                    fontFamily: Fonts.Regular,
                     color: isSelected ? Colors.lightBlue : Colors.white,
                   }}
                 >
@@ -141,12 +141,14 @@ export default function CardWithRadioBtn({
             )}
           </View>
 
-          <View style={{ paddingTop: 5 }}>
+          <View style={{
+            paddingTop: 5
+          }}>
             {subText !== '' && (
               <Text
                 style={{
-                  fontSize: RFValue(11),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue( 11 ),
+                  fontFamily: Fonts.Regular,
                   color: isSelected && changeBgColor ? Colors.backgroundColor1 : Colors.textColorGrey,
                 }}
               >
@@ -165,10 +167,10 @@ export default function CardWithRadioBtn({
             {italicText !== '' && (
               <Text
                 style={{
-                  fontSize: RFValue(11),
-                  fontFamily: Fonts.FiraSansItalic,
+                  fontSize: RFValue( 11 ),
+                  fontFamily: Fonts.Italic,
                   color: isSelected && changeBgColor ? Colors.backgroundColor1 : Colors.textColorGrey,
-                  width: wp(65),
+                  width: wp( 65 ),
                   fontWeight: '600',
                 }}
               >
@@ -191,5 +193,5 @@ export default function CardWithRadioBtn({
 
       {/* )} */}
     </TouchableOpacity>
-  );
+  )
 }

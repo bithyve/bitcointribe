@@ -394,7 +394,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
             <Text style={{
               color: Colors.blue,
               fontSize: RFValue(18),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
             }} >{strings.HexaWalletcreated}</Text>
             <Text style={[styles.bottomNoteInfoText, {
               color: Colors.lightTextColor,
@@ -463,7 +463,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
               <Text style={{
                 fontSize: RFValue(13),
                 color: Colors.white,
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
                 alignSelf: 'center',
               }}>{`${strings.UseStrongPasscode}`}</Text>
             </TouchableOpacity>
@@ -478,7 +478,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
               <Text style={{
                 fontSize: RFValue(13),
                 color: Colors.blue,
-                fontFamily: Fonts.FiraSansMedium,
+                fontFamily: Fonts.Medium,
                 alignSelf: 'center',
                 marginLeft: wp('7%')
               }}>{`${common.cancel}`}</Text>
@@ -561,7 +561,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
             marginTop: wp('5%'),
             color: Colors.blue,
             fontSize: RFValue(18),
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             marginLeft: wp('8%')
           }} >{strings.encryptionpassword}</Text>
           <View
@@ -649,7 +649,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
                 <Text
                   style={{
                     color: passwordScore > 3 ? Colors.green : passwordScore > 1 ? Colors.coral : Colors.red,
-                    fontFamily: Fonts.FiraSansItalic,
+                    fontFamily: Fonts.Italic,
                     fontSize: RFValue(11),
                     marginLeft: 4,
                   }}
@@ -748,7 +748,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
                 <Text
                   style={{
                     color: confirmpasswordScore > 3 ? Colors.green : confirmpasswordScore > 1 ? Colors.coral: Colors.red,
-                    fontFamily: Fonts.FiraSansItalic,
+                    fontFamily: Fonts.Italic,
                     fontSize: RFValue( 11 ),
                     marginLeft: 4,
                   }}
@@ -828,7 +828,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
             <Text
               style={{
                 color: Colors.red,
-                fontFamily: Fonts.FiraSansMediumItalic,
+                fontFamily: Fonts.MediumItalic,
                 fontSize: RFValue(10),
                 marginLeft: 'auto',
               }}
@@ -904,7 +904,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
             // marginBottom: wp( '%' ),
             color: Colors.blue,
             fontSize: RFValue(18),
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             marginLeft: wp('6%')
           }} >{strings.AnswerSecurityQuestion}</Text>
           <TouchableOpacity
@@ -974,7 +974,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
                           dropdownBoxValue.id == value.id
                             ? Colors.blue
                             : Colors.black,
-                        fontFamily: Fonts.FiraSansRegular,
+                        fontFamily: Fonts.Regular,
                         fontSize: RFValue(12),
                       }}
                     >
@@ -1159,7 +1159,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
             <Text
               style={{
                 color: Colors.red,
-                fontFamily: Fonts.FiraSansMediumItalic,
+                fontFamily: Fonts.MediumItalic,
                 fontSize: RFValue(10),
                 marginLeft: 'auto',
               }}
@@ -1231,8 +1231,8 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
             >
               <View style={CommonStyles.headerLeftIconInnerContainer}>
                 <FontAwesome
-                  name="long-arrow-left"
-                  color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                   size={17}
                 />
               </View>
@@ -1350,7 +1350,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
         >
           <Text style={{
             color: Colors.blue,
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
             alignSelf: 'center',
             marginLeft: wp( '5%' )
           }}>{common.cancel}</Text>
@@ -1437,7 +1437,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: Colors.white,
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   bottomButtonView: {
     flexDirection: 'row',
@@ -1494,13 +1494,13 @@ const styles = StyleSheet.create({
     height: 50,
     fontSize: RFValue(13),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingLeft: 15,
 
   },
   dropdownBoxText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue(13),
     marginRight: 15,
   },
@@ -1525,14 +1525,14 @@ const styles = StyleSheet.create({
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.6,
     lineHeight: 18
   },
   helpText: {
     fontSize: RFValue(10),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     marginRight: wp(5),
     alignSelf: 'flex-end',
     width: wp('54%'),
@@ -1552,7 +1552,7 @@ const styles = StyleSheet.create({
   textPasscode: {
     fontSize: RFValue(18),
     color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     flex: 1,
     marginLeft: 5
   },
@@ -1572,7 +1572,7 @@ const styles = StyleSheet.create({
 
   contactText: {
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
   },
 })

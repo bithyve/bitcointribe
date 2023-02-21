@@ -32,7 +32,7 @@ const styles = StyleSheet.create( {
     width: wp( 90 ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'justify',
     lineHeight: 18,
     marginLeft: wp( 5 ),

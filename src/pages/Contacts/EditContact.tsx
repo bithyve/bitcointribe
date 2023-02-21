@@ -73,7 +73,7 @@ const EditContactScreen: React.FC<Props> = ( { closeModal, contact }: Props ) =>
             paddingHorizontal: 15,
             fontSize: RFValue( 13 ),
             letterSpacing: 0.26,
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
           }}
           placeholder={'Enter Name'}
           placeholderTextColor={Colors.borderColor}
@@ -153,14 +153,14 @@ const styles = StyleSheet.create( {
   addModalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
 
   addModalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
     marginTop: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
 
   modalElementInfoView: {

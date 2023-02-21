@@ -27,7 +27,7 @@ export default function VoucherRedeemSuccess( props ) {
           <Text
             style={{
               fontSize: RFValue( 25 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               color: Colors.gray5,
             }}
           >
@@ -118,12 +118,12 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   successModalButtonView: {
     height: wp( '13%' ),
@@ -144,7 +144,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   cardBitCoinImage: {
     width: wp( '4%' ),
@@ -156,14 +156,14 @@ const styles = StyleSheet.create( {
   cardAmountText: {
     fontSize: RFValue( 21 ),
     color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: 5,
     marginTop: 'auto',
     lineHeight: RFValue( 21 ),
   },
   cardAmountUnitText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     marginTop: 'auto',
     lineHeight: RFValue( 21 ),

@@ -101,10 +101,10 @@ export default function AccountSelectionModalContents( props ) {
                 marginLeft: wp( '2%' ), alignSelf:'center'
               }}>
                 <Text style={{
-                  color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 20 )
+                  color: Colors.black, fontFamily: Fonts.Regular, fontSize: RFValue( 20 )
                 }}>{item.accountName}</Text>
                 <Text style={{
-                  color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic, fontSize: RFValue( 10 ), marginTop: 5
+                  color: Colors.blue, fontFamily: Fonts.MediumItalic, fontSize: RFValue( 10 ), marginTop: 5
                 }}>{`${strings.availableToSpend} ${item.accountBalance} sats`}</Text>
               </View>
             </AppBottomSheetTouchableWrapper>
@@ -166,12 +166,12 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   successModalButtonView: {
     height: wp( '13%' ),
@@ -192,6 +192,6 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )

@@ -52,7 +52,7 @@ export default function SweepFundsQrScanner( props ) {
               height: 30, width: 30, justifyContent: 'center'
             }}
           >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </AppBottomSheetTouchableWrapper>
           <Text style={styles.modalHeaderTitleText}>{'Sweep Funds'}</Text>
         </View>
@@ -179,7 +179,7 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalContentView: {
     flex: 1,
@@ -196,11 +196,11 @@ const styles = StyleSheet.create( {
   contactText: {
     marginLeft: 10,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   contactIndexText: {
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   contactIndexView: {
     flex: 0.5,
@@ -219,7 +219,7 @@ const styles = StyleSheet.create( {
   },
   titleText: {
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.blue,
   },
   textBoxView: {
@@ -231,7 +231,7 @@ const styles = StyleSheet.create( {
   },
   infoText: {
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
     marginTop: 5,
   },
@@ -248,7 +248,7 @@ const styles = StyleSheet.create( {
   },
   shareButtonText: {
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
   textBox: {
@@ -261,7 +261,7 @@ const styles = StyleSheet.create( {
     paddingLeft: 15,
     paddingRight: 15,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   cameraView: {
     width: wp( '90%' ),
@@ -330,7 +330,7 @@ const styles = StyleSheet.create( {
     borderRadius: 20,
   },
   errorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     color: Colors.red,
     fontSize: RFValue( 11 ),
     fontStyle: 'italic',

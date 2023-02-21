@@ -25,7 +25,7 @@ export default function FriendsAndFamilyHelpContents( props ) {
         <Text
           style={{
             color: Colors.white,
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
             fontSize: RFValue( 20 ),
             marginTop: hp( '1%' ),
             marginBottom: hp( '1%' ),
@@ -63,12 +63,12 @@ export default function FriendsAndFamilyHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}
           >
-            You can add two of your most trusted contacts as Keepers for your Recovery Keys if they have Hexa installed - choose your Keepers wisely!
+            You can add two of your most trusted contacts as Keepers for your Recovery Keys if they have Bitcoin Tribe installed - choose your Keepers wisely!
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center'
@@ -87,12 +87,12 @@ export default function FriendsAndFamilyHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}
           >
-            Share a QR code or a link with your intended Keepers and ask them to open Hexa. The Keeper will have to either scan the QR code with Hexa or touch the link, which will open Hexa automatically
+            Share a QR code or a link with your intended Keepers and ask them to open Bitcoin Tribe. The Keeper will have to either scan the QR code with Bitcoin Tribe or touch the link, which will open Bitcoin Tribe automatically
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{
@@ -140,12 +140,12 @@ export default function FriendsAndFamilyHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}
           >
-           Hexa requires access to your phone’s Address Book to help you add contacts as Keepers. This does not mean that BitHyve, the company behind Hexa, would have access to your personal information
+           Bitcoin Tribe requires access to your phone’s Address Book to help you add contacts as Keepers. This does not mean that BitHyve, the company behind Bitcoin Tribe, would have access to your personal information
           </Text>
           <View
             style={{
@@ -169,7 +169,7 @@ export default function FriendsAndFamilyHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}
@@ -209,7 +209,7 @@ export default function FriendsAndFamilyHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}
@@ -238,7 +238,7 @@ export default function FriendsAndFamilyHelpContents( props ) {
               textAlign: 'center',
               color: Colors.white,
               fontSize: RFValue( 13 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginLeft: wp( '5%' ),
               marginRight: wp( '5%' ),
             }}

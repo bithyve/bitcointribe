@@ -12,6 +12,7 @@ import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUn
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import { shadowColorForAccountKind } from '../../../components/account-details/AccountDetailsCard'
 import { translations } from '../../../common/content/LocContext'
+import LinearGradient from 'react-native-linear-gradient'
 
 export type Props = {
   availableBalance: Satoshis;
@@ -55,14 +56,21 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
         <Text style={styles.headerDateText}>{strings.RecentTransactions}</Text>
 
         <TouchableOpacity
-          style={{
-            marginLeft: 'auto', flex: 0
-          }}
           onPress={onViewMorePressed}
         >
-          <Text style={styles.headerTouchableText}>
-            {strings.ViewMore}
-          </Text>
+          <LinearGradient
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            colors={[ Colors.skyBlue, Colors.darkBlue ]}
+            style={styles.viewMoreWrapper}
+          >
+            <Text style={styles.headerTouchableText}>
+              {strings.ViewMore}
+            </Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     </View>
@@ -82,16 +90,22 @@ const styles = StyleSheet.create( {
   headerDateText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   headerTouchableText: {
-    color: Colors.textColorGrey,
+    color: Colors.white,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansItalic,
-    textDecorationLine: 'underline',
-    marginLeft: 'auto',
+    fontFamily: Fonts.Medium,
   },
+  viewMoreWrapper: {
+    height: 26,
+    minWidth: 90,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 3,
+    borderRadius: 5
+  }
 } )
 
 export default TransactionPreviewHeader

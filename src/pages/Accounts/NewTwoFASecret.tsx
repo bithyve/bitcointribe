@@ -100,7 +100,7 @@ const NewTwoFASecret = props => {
                 color: Colors.blue,
                 fontSize: RFValue( 13 ),
                 marginBottom: 2,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
               }}
             >
               Scan in Authenticator
@@ -159,7 +159,7 @@ const styles = StyleSheet.create( {
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 } )
 

@@ -211,7 +211,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         modalRef={ServerNotRespondingBottomSheet}
         title={'The server is not responding?'}
         info={
-          'This may be due to network issues. Please try again. If it still does not work you can sweep the funds from Hexa using the Exit Key.'
+          'This may be due to network issues. Please try again. If it still does not work you can sweep the funds from Bitcoin Tribe using the Exit Key.'
         }
         proceedButtonText={'Try Again'}
         onPressProceed={() => {
@@ -268,8 +268,8 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
               }}
             >
               <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                 size={17}
               />
             </AppBottomSheetTouchableWrapper>
@@ -457,12 +457,12 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalContentView: {
     flex: 1,
@@ -507,12 +507,12 @@ const styles = StyleSheet.create( {
   },
   titleText: {
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.blue,
   },
   infoText: {
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
     marginTop: 5,
   },

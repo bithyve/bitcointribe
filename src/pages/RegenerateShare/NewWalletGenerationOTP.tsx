@@ -71,7 +71,7 @@ const NewWalletGenerationOTP = props => {
               height: 30, width: 30, justifyContent: 'center'
             }}
           >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </TouchableOpacity>
           <Text style={styles.modalHeaderTitleText}>{''}</Text>
         </View>
@@ -127,7 +127,7 @@ const NewWalletGenerationOTP = props => {
                       style={{
                         color: Colors.textColorGrey,
                         fontSize: RFValue( 11 ),
-                        fontFamily: Fonts.FiraSansRegular,
+                        fontFamily: Fonts.Regular,
                       }}
                     >
                       Enter OTP
@@ -138,7 +138,7 @@ const NewWalletGenerationOTP = props => {
                           style={{
                             color: Colors.red,
                             fontSize: RFValue( 10 ),
-                            fontFamily: Fonts.FiraSansMediumItalic,
+                            fontFamily: Fonts.MediumItalic,
                           }}
                         >
                         Incorrect OTP, Try Again
@@ -320,7 +320,7 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
@@ -340,14 +340,14 @@ const styles = StyleSheet.create( {
   },
   commModeModalHeaderText: {
     color: Colors.blue,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 18 ),
     marginLeft: 25,
     marginRight: 25,
   },
   commModeModalInfoText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     marginLeft: 25,
     marginRight: 25,
@@ -371,7 +371,7 @@ const styles = StyleSheet.create( {
   contactNameText: {
     color: Colors.black,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 25,
   },
   contactIconImage: {
@@ -394,7 +394,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   passcodeTextInputView: {
     flexDirection: 'row',

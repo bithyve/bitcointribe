@@ -333,7 +333,7 @@ export default function AddContactSendRequest( props ) {
           contact={Contact ? Contact : null}
           infoText={`Click here to accept contact request from ${
             wallet.walletName
-          }' Hexa wallet - link will expire in ${
+          }' Bitcoin Tribe wallet - link will expire in ${
             config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
           } hours`}
           link={trustedLink}
@@ -368,7 +368,7 @@ export default function AddContactSendRequest( props ) {
       <SendViaQR
         isFromReceive={true}
         headerText={'Friends & Family Request'}
-        subHeaderText={'Scan the QR from your Contact\'s Hexa Wallet'}
+        subHeaderText={'Scan the QR from your Contact\'s Bitcoin Tribe Wallet'}
         contactText={contactText}
         contact={Contact}
         QR={trustedQR}
@@ -441,8 +441,8 @@ export default function AddContactSendRequest( props ) {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>
@@ -465,7 +465,7 @@ export default function AddContactSendRequest( props ) {
                 ...{
                   color: Colors.backgroundColor1,
                   fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }
               }}
             >
@@ -708,7 +708,7 @@ const styles = StyleSheet.create( {
   contactNameText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 25,
   },
   buttonInnerView: {
@@ -727,7 +727,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 10,
   },
 } )

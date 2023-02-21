@@ -43,7 +43,7 @@ export default function TwoFASetupWarningModal(props) {
                 style={{
                   color: Colors.white,
                   fontSize: RFValue(13),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 Ok, I understand
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   manageBackupButtonText: {
     color: Colors.blue,
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   bottomButtonView: {
     paddingLeft: 20,

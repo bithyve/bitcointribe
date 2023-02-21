@@ -8,7 +8,7 @@ import { heightPercentageToDP } from 'react-native-responsive-screen'
 const styles = StyleSheet.create( {
   dropdownBoxText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     marginRight: 15,
   },
@@ -71,7 +71,7 @@ const DropDown = ( { onClose, dropdownBoxList } ) => {
                 //     dropdownBoxValue.id == value.id
                 //       ? Colors.blue
                 //       : Colors.black,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 12 ),
               }}
             >

@@ -13,6 +13,7 @@ import { ListItem } from 'react-native-elements'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import Invoice from '../../../models/Invoice'
 import InvoiceItem from './InvoiceItem'
+import LinearGradient from 'react-native-linear-gradient'
 
 const styles = StyleSheet.create( {
   rootContainer: {
@@ -27,20 +28,26 @@ const styles = StyleSheet.create( {
   headerDateText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   headerTouchableText: {
-    color: Colors.textColorGrey,
+    color: Colors.white,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansItalic,
-    textDecorationLine: 'underline',
-    marginLeft: 'auto',
+    fontFamily: Fonts.Italic,
   },
 
   activityIndicator: {
     paddingVertical: 40,
     color: 'grey'
+  },
+  viewMoreWrapper: {
+    height: 22,
+    width: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 3,
+    borderRadius: 5
   }
 } )
 
@@ -101,14 +108,21 @@ const TransactionsList: React.FC<Props> = ( {
         <Text style={styles.headerDateText}>{strings.RecentInvoices}</Text>
 
         <TouchableOpacity
-          style={{
-            marginLeft: 'auto', flex: 0
-          }}
           onPress={onViewMorePressed}
         >
-          <Text style={styles.headerTouchableText}>
-            {strings.ViewMore}
-          </Text>
+          <LinearGradient
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            colors={[ Colors.skyBlue, Colors.darkBlue ]}
+            style={styles.viewMoreWrapper}
+          >
+            <Text style={styles.headerTouchableText}>
+              {strings.ViewMore}
+            </Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
       {

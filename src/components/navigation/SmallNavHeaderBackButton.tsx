@@ -20,7 +20,7 @@ const SmallNavHeaderBackButton: React.FC<Props> = ({
     >
       <FontAwesome
         name="long-arrow-left"
-        color={Colors.blue}
+        color={Colors.homepageButtonColor}
         size={20}
       />
     </TouchableOpacity>

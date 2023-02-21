@@ -90,13 +90,13 @@ const styles = StyleSheet.create( {
   recipientNameText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'center',
   },
 
   recipientBalanceText: {
     ...HeadingStyles.captionText,
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     color: Colors.blue,
     textAlign: 'center',
   },

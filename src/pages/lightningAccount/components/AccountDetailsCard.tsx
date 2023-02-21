@@ -227,7 +227,9 @@ const AccountDetailsCard : React.FC<Props> = inject(
       >
         <Image
           source={require( '../../../assets/images/icons/icon_settings.png' )}
-          style={styles.settingsButtonImage}
+          style={[ styles.settingsButtonImage, , {
+            tintColor: Colors.white
+          } ]}
         />
       </TouchableOpacity>
     )
@@ -305,14 +307,14 @@ const styles = StyleSheet.create( {
   },
 
   title1Text: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 15 ),
     color: Colors.white,
     letterSpacing: 0.01
   },
 
   title2Text: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     color: Colors.white,
     marginTop: 2,
@@ -326,13 +328,13 @@ const styles = StyleSheet.create( {
   },
 
   balanceAmountText: {
-    fontFamily: Fonts.OpenSans,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 20 ),
   },
 
   balanceUnitText: {
     fontSize: 13,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   balanceCurrencyIcon: {
@@ -354,7 +356,7 @@ const styles = StyleSheet.create( {
   },
 
   textChainType: {
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 12 ),
     color: Colors.mango,
   },
@@ -367,7 +369,7 @@ const styles = StyleSheet.create( {
     paddingHorizontal: 5
   },
   transactionsText:{
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     color: Colors.white,
     fontWeight:'400',

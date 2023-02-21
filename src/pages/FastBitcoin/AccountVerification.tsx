@@ -24,7 +24,7 @@ export default function AccountVerification( props ) {
                 ? props.headerTextColor
                 : Colors.blue,
               fontSize: RFValue( 18 ),
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.Medium,
             }}
           >
             {'FastBitcoins voucher scanned'}
@@ -76,7 +76,7 @@ const styles = StyleSheet.create( {
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   successModalAmountView: {
     justifyContent: 'center',

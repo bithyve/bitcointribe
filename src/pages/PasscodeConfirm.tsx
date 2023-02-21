@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { storeCreds } from '../store/actions/setupAndAuth'
 import { LocalizationContext } from '../common/content/LocContext'
 import BottomInfoBox from '../components/BottomInfoBox'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function PasscodeConfirm( props ) {
   const [ passcode, setPasscode ] = useState( '' )
@@ -482,7 +483,9 @@ export default function PasscodeConfirm( props ) {
             </View>
           ) : null}
           {passcode.length != 4 &&
-            <View style={ { marginTop: 20 } }>
+            <View style={ {
+              marginTop: 20
+            } }>
               <BottomInfoBox
                 backgroundColor={Colors.white}
                 title={''}
@@ -494,13 +497,22 @@ export default function PasscodeConfirm( props ) {
             <TouchableOpacity
               disabled={passcode == confirmPasscode ? false : true}
               onPress={() => dispatch( storeCreds( passcode ) ) }
-              style={{
-                ...styles.proceedButtonView,
-                backgroundColor:
-                  passcode == confirmPasscode ? Colors.blue : Colors.lightBlue,
-              }}
             >
-              <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                start={{
+                  x: 0, y: 0
+                }} end={{
+                  x: 1, y: 0
+                }}
+                locations={[ 0.2, 1 ]}
+                style={{
+                  ...styles.proceedButtonView,
+                  backgroundColor:
+                  passcode == confirmPasscode ? Colors.blue : Colors.lightBlue,
+                }}
+              >
+                <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+              </LinearGradient>
             </TouchableOpacity>
           ) : null}
 
@@ -701,7 +713,7 @@ const styles = StyleSheet.create( {
   keyPadElementText: {
     color: Colors.blue,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontStyle: 'normal'
   },
   proceedButtonView: {
@@ -713,41 +725,37 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    }
   },
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   },
   boldItalicText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     fontWeight: 'bold',
     fontStyle: 'italic',
     fontSize: RFValue( 12 ),
   },
   headerTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 28 ),
+    color: Colors.THEAM_TEXT_COLOR,
+    fontSize: RFValue( 22 ),
     marginLeft: 20,
-    marginTop: hp( '3%' ),
-    fontFamily: Fonts.FiraSansRegular
+    marginTop: hp( '4%' ),
+    fontFamily: Fonts.Regular
   },
   headerInfoText: {
-    color: Colors.textColorGrey,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     fontSize: RFValue( 12 ),
+    marginTop: hp( '1%' ),
     marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   headerInfoBoldText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
-    fontWeight: '600',
+    fontFamily: Fonts.Regular,
+    // fontWeight: '600',
   },
   passcodeTextInputText: {
     color: Colors.blue,
@@ -762,7 +770,7 @@ const styles = StyleSheet.create( {
   mismatchError:{
     color:'#FF7861',
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     fontWeight:'500',
     width: wp( '72%' ),
     textAlign:'right',

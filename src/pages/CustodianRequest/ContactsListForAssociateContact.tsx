@@ -53,7 +53,7 @@ const ContactsListForAssociateContact = ( props ) => {
               height: 30, width: 30, justifyContent: 'center'
             }}
           >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </TouchableOpacity>
           <View style={{
             flex: 1
@@ -92,7 +92,7 @@ const ContactsListForAssociateContact = ( props ) => {
                 style={{
                   color: Colors.white,
                   fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 Skip
@@ -144,12 +144,12 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalSubheaderText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 20,
   },
 } )

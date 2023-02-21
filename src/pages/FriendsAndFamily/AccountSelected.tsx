@@ -117,7 +117,7 @@ export default function AccountSelected( { giftAmount, onAccountChange, sourcePr
           <Text style={{
             color: Colors.gray4,
             fontSize: RFValue( 10 ),
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
           }}>
               Bitcoin will be transferred to
           </Text>
@@ -125,7 +125,7 @@ export default function AccountSelected( { giftAmount, onAccountChange, sourcePr
             style={{
               color: Colors.black,
               fontSize: RFValue( 14 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               marginVertical: hp( 0.3 )
             }}
           >
@@ -156,13 +156,13 @@ const styles = StyleSheet.create( {
   availableToSpendText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
     lineHeight: 15,
   },
   balanceText: {
     color: Colors.blue,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansItalic,
+    fontFamily: Fonts.Italic,
   },
   statusIndicatorView: {
     flexDirection: 'row',
@@ -185,7 +185,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   buttonView: {
     height: wp( '14%' ),
@@ -205,14 +205,14 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalInfoText: {
     // marginTop: hp( '3%' ),
     marginTop: hp( 0.5 ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginRight: wp( 12 ),
     letterSpacing: 0.6
   },

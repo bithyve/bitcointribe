@@ -22,7 +22,8 @@ import SwanAccountCreationStatus from '../../../common/data/enums/SwanAccountCre
 import { ListItem } from 'react-native-elements'
 import BottomInfoBox from '../../BottomInfoBox'
 import { translations } from '../../../common/content/LocContext'
-import Close from '../../../assets/images/svgs/close.svg';
+import Close from '../../../assets/images/svgs/close.svg'
+import LinearGradient from 'react-native-linear-gradient'
 
 const swanAccountCount = 0
 
@@ -148,10 +149,12 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           }} />
         </TouchableOpacity> */}
         <View style={styles.successModalHeaderView}>
-            <TouchableOpacity style={{marginLeft: wp('86%')}} >
-              <Close  />
-            </TouchableOpacity>
-            <Text style={styles.modalTitleText}>{swanTitle}</Text>
+          <TouchableOpacity style={{
+            marginLeft: wp( '86%' )
+          }} >
+            <Close  />
+          </TouchableOpacity>
+          <Text style={styles.modalTitleText}>{swanTitle}</Text>
 
           <Text style={{
             ...styles.modalInfoText,
@@ -217,7 +220,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
     return ( <View style={{
       flexDirection: 'row', marginTop: 'auto', alignItems: 'flex-start'
     }} >
-     
+
       <AppBottomSheetTouchableWrapper
         disabled={hasButtonBeenPressed? true : false}
         onPress={()=> {
@@ -227,11 +230,20 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
             setIsConfirm( true )
           }
         }}
-        style={{
-          ...styles.successModalButtonView
-        }}
       >
-        <Text style={styles.proceedButtonText}>{!isConfirm ? 'Next' : 'Link Swan'}</Text>
+        <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+          start={{
+            x: 0, y: 0
+          }} end={{
+            x: 1, y: 0
+          }}
+          locations={[ 0.2, 1 ]}
+          style={{
+            ...styles.successModalButtonView
+          }}
+        >
+          <Text style={styles.proceedButtonText}>{!isConfirm ? 'Next' : 'Link Swan'}</Text>
+        </LinearGradient>
       </AppBottomSheetTouchableWrapper>
       <AppBottomSheetTouchableWrapper
         onPress={() => {onPress()}}
@@ -245,7 +257,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
       >
         <Text
           style={{
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
             color: Colors.blue
           }}
         >
@@ -282,11 +294,20 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
     }} >
       <AppBottomSheetTouchableWrapper
         onPress={onClickSetting}
-        style={{
-          ...styles.successModalButtonView
-        }}
       >
-        <Text style={styles.proceedButtonText}>{'Done'}</Text>
+        <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+          start={{
+            x: 0, y: 0
+          }} end={{
+            x: 1, y: 0
+          }}
+          locations={[ 0.2, 1 ]}
+          style={{
+            ...styles.successModalButtonView
+          }}
+        >
+          <Text style={styles.proceedButtonText}>{'Done'}</Text>
+        </LinearGradient>
       </AppBottomSheetTouchableWrapper>
       {/* <Image
         source={require( '../../../assets/images/icons/success.png' )
@@ -358,7 +379,7 @@ const styles = StyleSheet.create( {
     marginRight: 14,
   },
   destinationTitleText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 20 ),
     color: Colors.black,
   },
@@ -372,14 +393,14 @@ const styles = StyleSheet.create( {
     marginBottom: wp( '4%' ),
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: wp( '6%' )
   },
   modalInfoText: {
     marginLeft: wp( '6%' ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'justify',
     // marginTop: wp( 1 ),
     marginBottom: wp( 4 ),
@@ -398,11 +419,6 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 11,
     elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
     marginTop: 'auto',
     backgroundColor: Colors.blue,
     alignSelf: 'flex-start',
@@ -412,7 +428,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.Medium
   },
   errorImage: {
     width: wp( '31%' ),

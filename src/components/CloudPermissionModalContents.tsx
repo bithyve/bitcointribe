@@ -69,7 +69,7 @@ export default function CloudPermissionModalContents( props ) {
               ? props.headerTextColor
               : Colors.blue,
             fontSize: RFValue( 18 ),
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
           }}
         >
           {props.title}
@@ -202,7 +202,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     opacity: 1,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.6,
     marginRight: wp( 10 )
   },
@@ -238,6 +238,6 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )

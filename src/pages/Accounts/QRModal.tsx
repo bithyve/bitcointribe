@@ -42,7 +42,7 @@ export default function QRModal( props ) {
           >
             <FontAwesome
               name="long-arrow-left"
-              color={Colors.blue}
+              color={Colors.homepageButtonColor}
               size={17}
             />
           </AppBottomSheetTouchableWrapper>
@@ -236,7 +236,7 @@ export default function QRModal( props ) {
                 color: Colors.blue,
                 fontSize: RFValue( 13 ),
                 marginBottom: 2,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
               }}
             >
               {props.title}
@@ -248,7 +248,7 @@ export default function QRModal( props ) {
                     style={{
                       color: Colors.textColorGrey,
                       fontSize: RFValue(12),
-                      fontFamily: Fonts.FiraSansRegular,
+                      fontFamily: Fonts.Regular,
                       textDecorationLine: 'underline',
                     }}
                     onPress={props.onPress ? props.onPress : () => {}}
@@ -259,7 +259,7 @@ export default function QRModal( props ) {
                 {props.italicText ? (
                   <Text
                     style={{
-                      fontFamily: Fonts.FiraSansMediumItalic,
+                      fontFamily: Fonts.MediumItalic,
                       fontWeight: 'bold',
                       fontStyle: 'italic',
                       fontSize: RFValue(12),
@@ -308,7 +308,7 @@ const styles = StyleSheet.create( {
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalContentContainer: {
     // height: '100%',
@@ -338,7 +338,7 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   successModalButtonView: {
     height: wp( '13%' ),
@@ -358,7 +358,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   bottomButtonView: {
     height: 'auto',

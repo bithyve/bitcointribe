@@ -98,7 +98,7 @@ export default function GiftCreatedScreen( props ) {
           <View style={CommonStyles.headerLeftIconInnerContainer}>
             <FontAwesome
               name="long-arrow-left"
-              color={Colors.blue}
+              color={Colors.homepageButtonColor}
               size={17}
             />
           </View>
@@ -106,7 +106,7 @@ export default function GiftCreatedScreen( props ) {
       </View>
       <Text style={{
         fontSize: RFValue( 24 ), marginHorizontal: 20, marginTop: 10,
-        fontFamily: Fonts.FiraSansRegular, letterSpacing: 0.01, color: Colors.blue
+        fontFamily: Fonts.Regular, letterSpacing: 0.01, color: Colors.blue
       }}>{slotFromIndex == 1 ? 'Gift Created'
           : slotFromIndex == 2 ? 'Sats Detected'
             : slotFromIndex == 3 ? 'SATSCARD™ Detected'
@@ -114,7 +114,7 @@ export default function GiftCreatedScreen( props ) {
                 :''}</Text>
       <Text style={{
         fontSize: RFValue( 16 ), marginHorizontal: 20, marginTop: 8,
-        fontFamily: Fonts.FiraSansMedium, letterSpacing: 0.01, color: Colors.gray13
+        fontFamily: Fonts.Medium, letterSpacing: 0.01, color: Colors.gray13
       }}>
         {slotFromIndex == 1 ? 'Sats have been transferred into your SATSCARD™'
           :slotFromIndex == 2 ?'Clear the balance from your SATSCARD™'
@@ -134,7 +134,7 @@ export default function GiftCreatedScreen( props ) {
           alignSelf: 'center',
         }}>
           <Text style={{
-            fontFamily: Fonts.FiraSansSemiBold, fontSize: RFValue( 29 ),
+            fontFamily: Fonts.SemiBold, fontSize: RFValue( 29 ),
             // top:62, position:'absolute',
             color: Colors.gray14, alignSelf: 'center',
             // backgroundColor:'red'
@@ -328,7 +328,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   slotView: {
     width: RFValue( 13 ), height: RFValue( 6 ), borderRadius: RFValue( 3 ),
@@ -343,7 +343,7 @@ const styles = StyleSheet.create( {
   infoText:{
     color: Colors.black,
     fontSize: RFValue( 8 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     // lineHeight: 13,
     // backgroundColor: Colors.white,
     padding:RFValue( 10 )

@@ -27,64 +27,64 @@ export default StyleSheet.create( {
   },
 
   headerTitles: {
-    color: Colors.blue,
-    fontSize: RFValue( 25 ),
+    color: Colors.THEAM_TEXT_COLOR,
+    fontSize: RFValue( 22 ),
     letterSpacing: 0.01,
     marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Medium
   },
   //
   headerTitles1: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue( 18 ),
+    color: Colors.THEAM_INFO_TEXT_COLOR,
+    fontSize: RFValue( 16 ),
     letterSpacing: 0.01,
     marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
   subHeaderTitles: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue( 15 ),
+    color: Colors.THEAM_INFO_TEXT_COLOR,
+    fontSize: RFValue( 12 ),
     marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: heightPercentageToDP( 0.5 ),
     letterSpacing: 0.6
   },
   //
   subHeaderTitlesBold: {
-    color: Colors.blue,
+    color: Colors.THEAM_TEXT_COLOR,
     fontSize: RFValue( 23 ),
     marginLeft: 20,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: heightPercentageToDP( 0.5 ),
     letterSpacing: 0.6
   },
   headerInfoText: {
-    color: Colors.textColorGrey,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     fontSize: RFValue( 12 ),
     marginLeft: 15,
     marginRight: 15,
     fontWeight: 'normal',
     marginTop: 3,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   headerTitlesInfoText: {
-    color: Colors.textColorGrey,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
     fontSize: RFValue( 12 ),
     marginLeft: 20,
     fontWeight: 'normal',
     marginRight: 20,
     marginTop: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
 
   homepageAmountText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 21 ),
     marginRight: 5
   },
 
   homepageAmountUnitText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     marginBottom: 3
   },

@@ -1,7 +1,6 @@
-
-<svg xmlns="http://www.w3.org/2000/svg" width="46.875" height="49.545" viewBox="0 0 46.875 49.545">
-  <g id="Group_35586" data-name="Group 35586" transform="translate(-32.001 -185)">
-    <path id="Path_6080" data-name="Path 6080" d="M27.673,0H13.578A6.531,6.531,0,0,0,7.922,3.266L.875,15.472A6.531,6.531,0,0,0,.875,22L7.922,34.209a6.531,6.531,0,0,0,5.656,3.266H27.673a6.531,6.531,0,0,0,5.656-3.266L40.376,22a6.531,6.531,0,0,0,0-6.531L33.329,3.266A6.531,6.531,0,0,0,27.673,0Z" transform="matrix(-0.259, -0.966, 0.966, -0.259, 42.677, 234.545)" fill="#fafafa"/>
-    <path id="lightning" d="M.2,12.9S1.787,5.848,5.136,1.334L16.586.85S11.008,6.1,9.393,8.955l6.68-.5S5.531,16.024,1.986,23.73c0,0-.77-6.343,2.846-11.312Z" transform="translate(47.045 198.926)" fill="#faba5f"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="47" height="47" viewBox="0 0 47 47">
+  <g id="Lightning" transform="translate(-36 -141)">
+    <circle id="Ellipse_2030" data-name="Ellipse 2030" cx="23.5" cy="23.5" r="23.5" transform="translate(36 141)" fill="#f8f8f8"/>
+    <path id="lightning-2" data-name="lightning" d="M.2,14.858s1.844-8.2,5.737-13.445L19.244.85s-6.482,6.107-8.36,9.42l7.763-.58S6.4,18.485,2.276,27.441c0,0-.894-7.371,3.307-13.147Z" transform="translate(50.778 151.354)" fill="#e9b455"/>
   </g>
 </svg>

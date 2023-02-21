@@ -24,20 +24,20 @@ const ReceiveHelpContents: React.FC<{titleClicked: () => void}> = ( props ) => {
       }}>
         <View
           style={{
-            justifyContent: 'center', alignItems: 'center', 
+            justifyContent: 'center', alignItems: 'center',
             flexDirection: 'row'
           }}
         >
           <Text style={styles.headerText}>{strings.ReceiveBitcoins}</Text>
           <AppBottomSheetTouchableWrapper style={{
-            width: wp(8),
-            height: wp(8),
-            borderRadius: wp(4),
-            backgroundColor: Colors.lightBlue,
+            width: wp( 8 ),
+            height: wp( 8 ),
+            borderRadius: wp( 4 ),
+            backgroundColor: Colors.blue,
             justifyContent: 'center',
             alignItems: 'center',
-            marginRight: wp(2),
-            marginLeft: -wp(10)
+            marginRight: wp( 2 ),
+            marginLeft: -wp( 10 )
           }}
           onPress={props.titleClicked}>
             <CrossButton />
@@ -179,7 +179,7 @@ const ReceiveHelpContents: React.FC<{titleClicked: () => void}> = ( props ) => {
                     color: Colors.white,
                     // textAlign: 'center',
                     fontSize: RFValue( 13 ),
-                    fontFamily: Fonts.FiraSansRegular,
+                    fontFamily: Fonts.Regular,
                   }}
                 >
                   {strings.toknowmore}
@@ -198,7 +198,7 @@ const ReceiveHelpContents: React.FC<{titleClicked: () => void}> = ( props ) => {
                     style={{
                       color: Colors.white,
                       fontSize: RFValue( 13 ),
-                      fontFamily: Fonts.FiraSansRegular,
+                      fontFamily: Fonts.Regular,
                       textDecorationLine: 'underline',
                       textAlign: 'center',
                     }}
@@ -232,7 +232,7 @@ const styles = StyleSheet.create( {
   },
   headerText: {
     color: Colors.white,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 20 ),
     marginTop: hp( '1%' ),
     marginBottom: hp( '1%' ),
@@ -250,21 +250,21 @@ const styles = StyleSheet.create( {
     textAlign: 'center',
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: wp( '10%' ),
     marginRight: wp( '10%' ),
   },
   clickHereText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textDecorationLine: 'underline',
     textAlign: 'center',
   },
   toKnowMoreText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   linkView: {
     flexDirection: 'row',
@@ -310,7 +310,7 @@ const styles = StyleSheet.create( {
 //         <Text
 //           style={{
 //             color: Colors.white,
-//             fontFamily: Fonts.FiraSansMedium,
+//             fontFamily: Fonts.Medium,
 //             fontSize: RFValue( 14 ),
 //             paddingVertical: 22,
 //             textAlign: 'center',
@@ -449,7 +449,7 @@ const styles = StyleSheet.create( {
 //                 color: Colors.white,
 //                 // textAlign: 'center',
 //                 fontSize: RFValue( 13 ),
-//                 fontFamily: Fonts.FiraSansRegular,
+//                 fontFamily: Fonts.Regular,
 //               }}
 //             >
 //               To know more,
@@ -468,7 +468,7 @@ const styles = StyleSheet.create( {
 //                 style={{
 //                   color: Colors.white,
 //                   fontSize: RFValue( 13 ),
-//                   fontFamily: Fonts.FiraSansRegular,
+//                   fontFamily: Fonts.Regular,
 //                   textDecorationLine: 'underline',
 //                   textAlign: 'center',
 //                 }}
@@ -500,7 +500,7 @@ const styles = StyleSheet.create( {
 //     textAlign: 'center',
 //     color: Colors.white,
 //     fontSize: RFValue( 12 ),
-//     fontFamily: Fonts.FiraSansRegular,
+//     fontFamily: Fonts.Regular,
 //     marginLeft: wp( '10%' ),
 //     marginRight: wp( '10%' ),
 //     lineHeight: RFValue( 18 ),

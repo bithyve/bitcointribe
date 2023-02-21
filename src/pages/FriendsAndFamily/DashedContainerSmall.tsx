@@ -56,7 +56,7 @@ const DashedContainerSmall = ( props ) => {
           <Text style={{
             color: Colors.gray4,
             fontSize: RFValue( 12 ),
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             alignSelf: 'center',
             marginHorizontal: wp( 1 )
           }}>
@@ -65,7 +65,7 @@ const DashedContainerSmall = ( props ) => {
           <Text style={{
             color: Colors.blue,
             fontSize: RFValue( 24 ),
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             alignSelf: 'center',
             marginLeft: 'auto',
             width: 'auto'
@@ -74,7 +74,7 @@ const DashedContainerSmall = ( props ) => {
             <Text style={{
               color: Colors.lightTextColor,
               fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular
+              fontFamily: Fonts.Regular
             }}> {props.currency}
             </Text>
           </Text>

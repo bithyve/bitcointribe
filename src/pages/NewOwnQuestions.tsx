@@ -50,7 +50,7 @@ function validateAllowedCharacters( answer: string ): boolean {
 export default function NewOwnQuestions( props ) {
   const [ message, setMessage ] = useState( 'Creating your wallet' )
   const [ subTextMessage, setSubTextMessage ] = useState(
-    'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it',
+    'The Bitcoin Tribe wallet is non-custodial and is created locally on your phone so that you have full control of it',
   )
   const [ Elevation, setElevation ] = useState( 10 )
   const [ isLoaderStart, setIsLoaderStart ] = useState( false )
@@ -206,7 +206,7 @@ export default function NewOwnQuestions( props ) {
     setTimeout( () => {
       setMessage( 'Bootstrapping Accounts' )
       setSubTextMessage(
-        'Hexa has a multi-account model which lets you better manage your Bitcoin (sats)',
+        'Bitcoin Tribe has a multi-account model which lets you better manage your Bitcoin (sats)',
       )
       setTimeout( () => {
         setMessage( 'Filling Test Account with test sats' )
@@ -216,7 +216,7 @@ export default function NewOwnQuestions( props ) {
         setTimeout( () => {
           setMessage( 'Generating Recovery Keys' )
           setSubTextMessage(
-            'Recovery Keys help you recover your Hexa wallet in case your phone is lost',
+            'Recovery Keys help you recover your Bitcoin Tribe wallet in case your phone is lost',
           )
         }, 3000 )
       }, 3000 )
@@ -275,7 +275,7 @@ export default function NewOwnQuestions( props ) {
                 <View style={CommonStyles.headerLeftIconInnerContainer}>
                   <FontAwesome
                     name="long-arrow-left"
-                    color={Colors.blue}
+                    color={Colors.homepageButtonColor}
                     size={17}
                   />
                 </View>
@@ -293,7 +293,7 @@ export default function NewOwnQuestions( props ) {
               disabled={isDisabled}
             >
               <HeaderTitle
-                firstLineTitle={'New Hexa Wallet'}
+                firstLineTitle={'New Bitcoin Tribe Wallet'}
                 secondLineTitle={''}
                 infoTextNormal={'Setup '}
                 infoTextBold={'Security Question and Answer'}
@@ -493,7 +493,7 @@ export default function NewOwnQuestions( props ) {
                 <Text
                   style={{
                     color: Colors.red,
-                    fontFamily: Fonts.FiraSansMediumItalic,
+                    fontFamily: Fonts.MediumItalic,
                     fontSize: RFValue( 10 ),
                     marginLeft: 'auto',
                   }}
@@ -598,7 +598,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   bottomButtonView: {
     flexDirection: 'row',
@@ -653,12 +653,12 @@ const styles = StyleSheet.create( {
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     paddingLeft: 15,
   },
   dropdownBoxText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     marginRight: 15,
   },

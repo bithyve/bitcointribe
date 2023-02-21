@@ -15,7 +15,7 @@ import DocumentPad from '../../assets/images/svgs/icons_document_copy.svg'
 import QueActive from '../../assets/images/svgs/question_inactive.svg'
 import Telegram from '../../assets/images/svgs/icon_telegram.svg'
 import { LocalizationContext } from '../../common/content/LocContext'
-import { LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { LevelData, LevelHealthInterface, KeeperType } from '../../bitcoin/utilities/Interface'
 import ModalContainer from '../../components/home/ModalContainer'
 import CrossButton from '../../assets/images/svgs/icons_close.svg'
 import { toggleClipboardAccess } from '../../store/actions/misc'
@@ -113,7 +113,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     },
     */
     // {
-    //   title: 'Hexa Community (Telegram)',
+    //   title: 'Bitcoin Tribe Community (Telegram)',
     //   imageSource: require( '../../assets/images/icons/telegram.png' ),
     //   subtitle: 'Questions, feedback and more',
     //   onOptionPressed: () => {
@@ -204,7 +204,11 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       if( menuOption.screenName == 'WalletBackup' ) {
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
         levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){
-          if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+          if ( ( levelHealth.length == 0 ) ||
+          ( levelHealth.length && levelHealth[ 0 ].levelInfo.length &&
+            levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ||
+            ( levelHealth.length && levelHealth[ 0 ].levelInfo.length &&
+              levelHealth[ 0 ].levelInfo[ 0 ].shareType == KeeperType.SECURITY_QUESTION ) ) {
             // if( levelData[ 0 ].status == 'notSetup' )
             // navigation.navigate( 'BackupSeedWordsContent' )
             const navigationParams = {
@@ -213,7 +217,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               selectedKeeper: navigationObj?.selectedKeeper,
               selectedLevelId: levelData[ 0 ].id
             }
-            navigation.navigate( 'SeedBackupHistory', navigationParams )
+            navigation.navigate( 'WalletBackup', navigationParams )
           } else {
             setSelectedKeeper( levelData[ 0 ].keeper1 )
             dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
@@ -240,6 +244,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             style={{
               width: widthPercentageToDP( 5 ),
               height: widthPercentageToDP( 6 ),
+              tintColor: Colors.THEAM_TEXT_COLOR
             }}
           /> )
         case 'Enable Auto-Read from Clipboard':
@@ -265,7 +270,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         }}>
           <AppBottomSheetTouchableWrapper
             style={{
-              backgroundColor: Colors.lightBlue,
+              backgroundColor: Colors.blue,
               width: 30,
               height: 30,
               borderRadius: 15,
@@ -284,7 +289,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             <Text
               style={{
                 color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 fontSize: RFValue( 20 ),
               }}
             >
@@ -293,13 +298,13 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             <Text
               style={{
                 fontSize: RFValue( 13 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 color: Colors.gray8,
                 lineHeight: RFValue( 20 ),
               }}
             >
               {
-                'Grant Hexa access to clipboard \nto copy and paste BTC addresses'
+                'Grant Bitcoin Tribe access to clipboard \nto copy and paste BTC addresses'
               }
             </Text>
             <View style={{
@@ -310,7 +315,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                   alignSelf: 'center',
                   color: Colors.textColorGrey,
                   fontSize: RFValue( 16 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 Allow auto-read access
@@ -339,7 +344,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               <Text
                 style={{
                   color: Colors.white,
-                  fontFamily: Fonts.FiraSansSemiBold,
+                  fontFamily: Fonts.SemiBold,
                 }}
               >
                 Proceed
@@ -353,7 +358,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   return (
     <View style={{
-      backgroundColor: Colors.blue
+      backgroundColor: Colors.darkBlue
     }}>
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
       {/* <Header from={'More'} /> */}
@@ -362,14 +367,14 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       </ModalContainer>
       <View style={styles.accountCardsSectionContainer}>
         <Text style={{
-          color: Colors.blue,
-          fontSize: RFValue( 18 ),
-          letterSpacing: 0.54,
+          color: Colors.THEAM_TEXT_COLOR,
+          fontSize: RFValue( 16 ),
+          // letterSpacing: 0.54,
           // marginLeft: 2,
-          fontFamily: Fonts.FiraSansMedium,
+          fontFamily: Fonts.SemiBold,
           paddingTop: heightPercentageToDP( 4 ),
           paddingLeft: widthPercentageToDP( 4 ),
-          paddingBottom: heightPercentageToDP( 1 )
+          // paddingBottom: heightPercentageToDP( 1 )
         }}>
           {strings.settingsAndMore}
         </Text>
@@ -480,7 +485,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                     width: widthPercentageToDP( '2.5%' ),
                     height: widthPercentageToDP( '2.5%' ),
                     alignSelf: 'center',
-                    resizeMode: 'contain'
+                    resizeMode: 'contain',
+                    tintColor: Colors.theam_icon_color
                   }}
                 />
 
@@ -489,7 +495,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           />
           <TouchableOpacity
             onPress={() => {
-              Linking.openURL( 'https://hexawallet.io/faq/' )
+              Linking.openURL( 'https://bitcointribe.app/faq/' )
                 .then( ( _data ) => { } )
                 .catch( ( _error ) => {
                 } )
@@ -513,13 +519,15 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 height: widthPercentageToDP( '2.5%' ),
                 alignSelf: 'center',
                 marginLeft: 'auto',
-                resizeMode: 'contain'
+                resizeMode: 'contain',
+                tintColor: Colors.THEAM_INFO_TEXT_COLOR
+
               }}
             />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              Linking.openURL( 'https://t.me/HexaWallet' )
+              Linking.openURL( 'https://t.me/bitcoinTribe_' )
                 .then( ( _data ) => { } )
                 .catch( ( _error ) => {
                   alert( 'Make sure Telegram installed on your device' )
@@ -546,7 +554,9 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 width: widthPercentageToDP( 4 ),
                 height: widthPercentageToDP( 4 ),
                 resizeMode: 'contain',
-                marginLeft: 'auto'
+                marginLeft: 'auto',
+                tintColor: Colors.THEAM_INFO_TEXT_COLOR
+
               }}
             />
           </TouchableOpacity>
@@ -696,9 +706,9 @@ const styles = StyleSheet.create( {
   },
 
   addModalTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular
+    color: Colors.THEAM_INFO_TEXT_COLOR,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.Regular
   },
 
   textBeta: {
@@ -718,10 +728,10 @@ const styles = StyleSheet.create( {
   },
 
   addModalInfoText: {
-    color: Colors.textColorGrey,
+    color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
     fontSize: RFValue( 11 ),
     marginTop: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
 
   modalElementInfoView: {

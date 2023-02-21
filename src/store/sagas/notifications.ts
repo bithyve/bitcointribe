@@ -70,12 +70,10 @@ export function* getMessageWorker() {
   const timeStamp = yield select(
     ( state ) => state.notifications.timeStamp,
   )
-  console.log( 'messages timeStamp', timeStamp )
 
   const { messages } = yield call( Relay.getMessages, walletId, timeStamp )
   if( !storedMessages ) return
   const newMessageArray = storedMessages.concat( messages.filter( ( { notificationId } ) => !storedMessages.find( f => f.notificationId == notificationId ) ) )
-  console.log( 'newMessageArray', newMessageArray )
 
   yield put( messageFetched( newMessageArray ) )
   yield put( storeMessagesTimeStamp() )

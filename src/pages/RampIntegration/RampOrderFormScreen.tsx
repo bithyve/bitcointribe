@@ -101,7 +101,7 @@ const RampOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           <Text style={{
             textAlign: 'justify', ...ListStyles.infoHeaderSubtitleText
           }}>
-            {'Hexa Ramp Account enables BTC purchases using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available\n\nPayment methods available may vary based on your country. By proceeding, you understand that Hexa does not operate the payment and processing of the Ramp service. BTC purchased will be transferred to the Hexa Ramp account address displayed above.'}
+            {'Bitcoin Tribe Ramp Account enables BTC purchases using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available\n\nPayment methods available may vary based on your country. By proceeding, you understand that Bitcoin Tribe does not operate the payment and processing of the Ramp service. BTC purchased will be transferred to the Bitcoin Tribe Ramp account address displayed above.'}
           </Text>
         </View>
 
@@ -166,7 +166,7 @@ const styles = StyleSheet.create( {
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   }
 } )
 

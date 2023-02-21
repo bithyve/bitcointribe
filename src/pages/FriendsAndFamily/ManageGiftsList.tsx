@@ -61,7 +61,7 @@ const ManageGiftsList = ( props ) => {
           <Text style={{
             color: Colors.gray13,
             fontSize: RFValue( 10 ),
-            fontFamily: Fonts.FiraSansRegular,
+            fontFamily: Fonts.Regular,
             letterSpacing: 0.3,
             marginTop:RFValue( 5 )
           }}>
@@ -77,7 +77,7 @@ const ManageGiftsList = ( props ) => {
           <Text style={{
             color: Colors.blue,
             fontSize: RFValue( 10 ),
-            fontFamily: Fonts.FiraSansMedium,
+            fontFamily: Fonts.Medium,
             // fontWeight: '700',
             letterSpacing: 0.3,
             marginTop:RFValue( 6 ),
@@ -88,7 +88,7 @@ const ManageGiftsList = ( props ) => {
           {/* <Text style={{
               color: Colors.lightTextColor,
               fontSize: RFValue( 10 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
 
             }}>
               {props.subText}
@@ -100,14 +100,14 @@ const ManageGiftsList = ( props ) => {
             <Text style={{
               color: Colors.gray13,
               fontSize: RFValue( 16 ),
-              fontFamily: Fonts.FiraSansSemiBold,
+              fontFamily: Fonts.SemiBold,
               letterSpacing:0.48
             }}>
               {props.amt}
               <Text style={{
                 color: Colors.gray13,
                 fontSize: RFValue( 8 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 letterSpacing:0.24
               }}> {props.currency? props.currency: 'sats'}
               </Text>

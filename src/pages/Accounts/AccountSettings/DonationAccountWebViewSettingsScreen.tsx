@@ -202,7 +202,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                 style={{
                   color: Colors.white,
                   fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 Save
@@ -462,7 +462,7 @@ const styles = StyleSheet.create( {
     flex: 1,
     paddingLeft: 20,
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 13 ),
   },
   confirmButtonView: {
@@ -482,7 +482,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   rowContainer: {
     flexDirection: 'row',
@@ -507,12 +507,12 @@ const styles = StyleSheet.create( {
   titleTextStyle: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 } )
 

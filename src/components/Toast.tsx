@@ -11,7 +11,7 @@ export default ( message, toastPosition=-15 ) => {
     hideOnPress: true,
     delay: 0,
     opacity: 0.9,
-    backgroundColor: 'rgba(0, 108, 180, 0.5)',
+    backgroundColor: 'rgba(163, 99, 99, 0.5)',
     textColor: Colors.white,
   } )
 }

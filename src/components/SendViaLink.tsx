@@ -260,7 +260,7 @@ export default function SendViaLink( props ) {
               style={{
                 color: Colors.textColorGrey,
                 fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 paddingTop: 5,
               }}
             >
@@ -288,7 +288,7 @@ export default function SendViaLink( props ) {
                 style={{
                   color: Colors.white,
                   fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                 }}
               >
                 Done
@@ -332,7 +332,7 @@ export default function SendViaLink( props ) {
                           <Text
                             style={{
                               color: Colors.textColorGrey,
-                              fontFamily: Fonts.FiraSansRegular,
+                              fontFamily: Fonts.Regular,
                               fontSize: RFValue( 11 ),
                               marginLeft: 25,
                               paddingTop: 5,
@@ -353,7 +353,7 @@ export default function SendViaLink( props ) {
                             <Text
                               style={{
                                 color: Colors.textColorGrey,
-                                fontFamily: Fonts.FiraSansRegular,
+                                fontFamily: Fonts.Regular,
                                 fontSize: RFValue( 10 ),
                                 marginLeft: 25,
                                 paddingTop: 3,
@@ -368,7 +368,7 @@ export default function SendViaLink( props ) {
                               <Text
                                 style={{
                                   color: Colors.textColorGrey,
-                                  fontFamily: Fonts.FiraSansRegular,
+                                  fontFamily: Fonts.Regular,
                                   fontSize: RFValue( 10 ),
                                   marginLeft: 25,
                                   paddingTop: 3,
@@ -454,7 +454,7 @@ export default function SendViaLink( props ) {
                     style={{
                       color: Colors.textColorGrey,
                       fontSize: RFValue( 12 ),
-                      fontFamily: Fonts.FiraSansRegular,
+                      fontFamily: Fonts.Regular,
                       textAlign: 'center',
                     }}
                   >
@@ -483,7 +483,7 @@ export default function SendViaLink( props ) {
                     style={{
                       color: Colors.blue,
                       fontSize: RFValue( 13 ),
-                      fontFamily: Fonts.FiraSansRegular,
+                      fontFamily: Fonts.Regular,
                       marginLeft: 5,
                     }}
                   >
@@ -514,7 +514,7 @@ export default function SendViaLink( props ) {
                         style={{
                           color: Colors.black,
                           fontSize: RFValue( 20 ),
-                          fontFamily: Fonts.FiraSansRegular,
+                          fontFamily: Fonts.Regular,
                           marginLeft: 10,
                         }}
                       >
@@ -524,7 +524,7 @@ export default function SendViaLink( props ) {
                         style={{
                           color: Colors.textColorGrey,
                           fontSize: RFValue( 13 ),
-                          fontFamily: Fonts.FiraSansRegular,
+                          fontFamily: Fonts.Regular,
                           marginRight: 5,
                         }}
                       >
@@ -542,7 +542,7 @@ export default function SendViaLink( props ) {
                 style={{
                   color: Colors.textColorGrey,
                   fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.Regular,
                   paddingTop: 5,
                 }}
               >
@@ -571,7 +571,7 @@ export default function SendViaLink( props ) {
               style={{
                 color: Colors.lightBlue,
                 fontSize: RFValue( 13 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
                 paddingTop: 5,
               }}
               numberOfLines={2}
@@ -688,13 +688,13 @@ const styles = StyleSheet.create( {
   addModalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: 35,
   },
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalContainer: {
     // height: '100%',
@@ -730,7 +730,7 @@ const styles = StyleSheet.create( {
   contactNameText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 25,
   },
   contactIconImage: {
@@ -754,7 +754,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 10,
   },
   amountInputImage: {
@@ -771,7 +771,7 @@ const styles = StyleSheet.create( {
     resizeMode: 'contain',
   },
   boldItalicText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
+    fontFamily: Fonts.MediumItalic,
     fontStyle: 'italic',
     color: Colors.blue,
   },

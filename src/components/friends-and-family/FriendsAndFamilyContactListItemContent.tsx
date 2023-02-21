@@ -75,13 +75,13 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, ind
           {Number.isFinite( contact.lastSeenActive ) ? (
 
             <Text style={{
-              fontFamily: Fonts.FiraSansMediumItalic
+              fontFamily: Fonts.MediumItalic
             }}>
               {lastSeenDays === 'today'? common.today : lastSeenDays}
             </Text>
           ) : (
             <Text style={{
-              fontFamily: Fonts.FiraSansMediumItalic
+              fontFamily: Fonts.MediumItalic
             }}>
               {common.unknown}
             </Text>
@@ -136,14 +136,14 @@ const styles = StyleSheet.create( {
   trustKindText: {
     marginTop: 3,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
 
   lastSeenText: {
     marginBottom: 3,
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
   },
 

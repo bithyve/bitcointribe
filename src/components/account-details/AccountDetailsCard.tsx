@@ -72,9 +72,9 @@ function backgroundImageForAccountKind(
 function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): string {
   switch ( primarySubAccount.kind ) {
       case SubAccountKind.TEST_ACCOUNT:
-        return Colors.blue
+        return Colors.testAccCard
       case SubAccountKind.REGULAR_ACCOUNT:
-        return Colors.yellow
+        return Colors.checkingAccCard
       case SubAccountKind.SECURE_ACCOUNT:
         return Colors.green
       case SubAccountKind.DONATION_ACCOUNT:
@@ -156,7 +156,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
         <View style={{
           flexDirection: 'row',
           alignItems: 'flex-start',
-          marginBottom: 8,
+          // marginBottom: 4,
         }}>
           <View style={styles.accountKindBadgeImage} >
             {getAvatarForSubAccount( primarySubAccount, false, false, true )}
@@ -172,7 +172,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           flexDirection: 'row',
           alignItems: 'flex-start',
           justifyContent: 'space-between',
-          marginBottom: 8,
+          marginBottom: 3,
         }}>
           <Text style={styles.title1Text}>
             {primarySubAccount.customDisplayName ||
@@ -243,7 +243,9 @@ const AccountDetailsCard: React.FC<Props> = ( {
       >
         <Image
           source={require( '../../assets/images/icons/icon_settings.png' )}
-          style={styles.settingsButtonImage}
+          style={[ styles.settingsButtonImage, {
+            tintColor: Colors.white
+          } ]}
         />
       </TouchableOpacity>
     )
@@ -272,18 +274,15 @@ const AccountDetailsCard: React.FC<Props> = ( {
         />
       </ModalContainer>
       }
-      <ImageBackground
-        source={backgroundImageForAccountKind( primarySubAccount )}
-        style={{
-          ...StyleSheet.absoluteFillObject,
-        }}
-        imageStyle={styles.cardImageContainer}
-      >
-        <View style={styles.mainContentContainer}>
-          <AccountKindDetailsSection />
-          <FooterSection />
-        </View>
-      </ImageBackground>
+      <View style={{
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: shadowColorForAccountKind( primarySubAccount ),
+        borderRadius: 15
+      }}></View>
+      <View style={styles.mainContentContainer}>
+        <AccountKindDetailsSection />
+        <FooterSection />
+      </View>
     </View>
   )
 }
@@ -295,7 +294,7 @@ const styles = StyleSheet.create( {
     width: '100%',
     // maxWidth: 440,
     // maxHeight: hp(250),
-    height: hp(210),
+    height: hp( 165 ),
     borderRadius: cardBorderRadius,
     elevation: 5,
     shadowOpacity: 0.62,
@@ -335,17 +334,17 @@ const styles = StyleSheet.create( {
   },
 
   title1Text: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 15 ),
     color: Colors.white,
     letterSpacing: 0.01
   },
 
   title2Text: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     color: Colors.white,
-    marginTop: 2,
+    marginTop: 1,
   },
 
   footerSection: {
@@ -356,13 +355,13 @@ const styles = StyleSheet.create( {
   },
 
   balanceAmountText: {
-    fontFamily: Fonts.OpenSans,
+    fontFamily: Fonts.Regular,
     fontSize: 21,
   },
 
   balanceUnitText: {
     fontSize: 13,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
 
   balanceCurrencyIcon: {

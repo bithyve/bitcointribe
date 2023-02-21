@@ -41,7 +41,7 @@ const WalletCreationSuccess = props => {
               height: 30, width: 30, justifyContent: 'center'
             }}
           >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </TouchableOpacity>
           <Text style={styles.modalHeaderTitleText}>{''}</Text>
         </View>
@@ -64,7 +64,7 @@ const WalletCreationSuccess = props => {
               <Text style={styles.commModeModalInfoText}>
                 Congratulations! You can now use your{' '}
                 <Text style={{
-                  fontFamily: Fonts.FiraSansMediumItalic
+                  fontFamily: Fonts.MediumItalic
                 }}>
                   Wallet
                 </Text>
@@ -145,7 +145,7 @@ const WalletCreationSuccess = props => {
           <Text
             style={{
               color: Colors.white,
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.Medium,
               fontSize: RFValue( 13 ),
             }}
           >
@@ -169,7 +169,7 @@ const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
@@ -189,14 +189,14 @@ const styles = StyleSheet.create( {
   },
   commModeModalHeaderText: {
     color: Colors.blue,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 18 ),
     marginLeft: 25,
     marginRight: 25,
   },
   commModeModalInfoText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     marginLeft: 25,
     marginRight: 25,
@@ -213,7 +213,7 @@ const styles = StyleSheet.create( {
   successModalWalletNameText: {
     color: Colors.black,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   successModalAmountImage: {
     width: wp( '15%' ),

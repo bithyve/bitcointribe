@@ -420,7 +420,7 @@ export default function ManageBackup( props ) {
           marginTop: hp( 0.5 ),
           alignSelf: 'center',
           fontSize: RFValue( 10 ),
-          fontFamily: Fonts.FiraSansRegular
+          fontFamily: Fonts.Regular
         }}>{contactDescription.displayedName.split( ' ' )[ 0 ] + ' '} </Text>
       </TouchableOpacity>
     )
@@ -676,7 +676,7 @@ export default function ManageBackup( props ) {
           color: Colors.blue,
           fontSize: RFValue( 18 ),
           letterSpacing: 0.54,
-          fontFamily: Fonts.FiraSansMedium,
+          fontFamily: Fonts.Medium,
           marginTop: hp( 4 ),
           marginHorizontal: wp( 4 ),
           paddingBottom: hp( 1 )
@@ -704,7 +704,7 @@ export default function ManageBackup( props ) {
               <Text style={{
                 color: Colors.blue,
                 fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular
+                fontFamily: Fonts.Regular
               }}>{strings[ 'WalletBackup' ]}</Text>
               <Text style={styles.headerMessageText}>{levelData[ 0 ].keeper1.status == 'notSetup' ? strings[ 'WalletBackupInfo1' ] : strings[ 'WalletBackupInfo3' ]}</Text>
             </View>
@@ -755,7 +755,7 @@ export default function ManageBackup( props ) {
                         }} resizeMode={'contain'} source={getKeeperIcon( item, index )} />
                       </TouchableOpacity>
                       <Text style={{
-                        fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: Colors.black, marginTop: 5, textAlign: 'center'
+                        fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, color: Colors.black, marginTop: 5, textAlign: 'center'
                       }}>
                         {index % 2 == 0 ? ( item.keeper1ButtonText || 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
                       </Text>
@@ -1064,16 +1064,16 @@ const styles = StyleSheet.create( {
   pageTitle: {
     color: Colors.blue,
     fontSize: RFValue( 16 ),
-    // fontFamily: Fonts.FiraSansRegular,
+    // fontFamily: Fonts.Regular,
     paddingTop: wp( '2%' ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     // paddingLeft: wp ( '4%' )
   },
   cardTitle: {
     color: Colors.blue,
     fontSize: RFValue( 12 ),
-    // fontFamily: Fonts.FiraSansRegular,
-    fontFamily: Fonts.FiraSansMedium,
+    // fontFamily: Fonts.Regular,
+    fontFamily: Fonts.Medium,
     marginVertical: wp( 2 ),
     // marginHorizontal: wp( 4 )
   },
@@ -1082,20 +1082,20 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     letterSpacing: 0.5,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginTop: 3,
   },
   addModalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
 
   addModalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
     marginTop: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.Regular
   },
 
   modalElementInfoView: {
@@ -1156,12 +1156,12 @@ const styles = StyleSheet.create( {
   },
   backupText: {
     color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 15 ),
   },
   backupInfoText: {
     color: Colors.blue,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 18 ),
   },
   cardView: {
@@ -1200,13 +1200,13 @@ const styles = StyleSheet.create( {
   },
   cardButtonText: {
     fontSize: RFValue( 10 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
     width: wp( '24%' ),
   },
   levelText: {
     fontSize: RFValue( 16 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     color: Colors.white,
   },
   levelInfoText: {
@@ -1233,7 +1233,7 @@ const styles = StyleSheet.create( {
   headerMessageText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     // textAlign: 'center'
   },
   body1: {

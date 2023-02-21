@@ -66,7 +66,7 @@ export default function DonationWebPageBottomSheet( props ) {
               style={{
                 color: Colors.blue,
                 fontSize: RFValue( 18 ),
-                fontFamily: Fonts.FiraSansRegular,
+                fontFamily: Fonts.Regular,
               }}
             >
                 Donation web view
@@ -178,12 +178,12 @@ const styles = StyleSheet.create( {
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   titleTextStyle: {
     color: Colors.blue,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   rowContainer: {
     flexDirection: 'row',
@@ -217,7 +217,7 @@ const styles = StyleSheet.create( {
   },
   buttonText: {
     color: Colors.white,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 13 ),
   },
   deeplinkContainerStyle: {

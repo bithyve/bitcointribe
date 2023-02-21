@@ -18,6 +18,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import RecipientComponent from './RecipientComponent'
 import DeviceInfo from 'react-native-device-info'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function SendConfirmationContent( props ) {
   const renderRecipientItem = ( recipient: RecipientDescribing ) => {
@@ -88,11 +89,20 @@ export default function SendConfirmationContent( props ) {
       >
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressOk()}
-          style={{
-            ...styles.successModalButtonView
-          }}
         >
-          <Text style={styles.proceedButtonText}>{props.okButtonText}</Text>
+          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            locations={[ 0.2, 1 ]}
+            style={{
+              ...styles.successModalButtonView
+            }}
+          >
+            <Text style={styles.proceedButtonText}>{props.okButtonText}</Text>
+          </LinearGradient>
         </AppBottomSheetTouchableWrapper>
         {props.isCancel && (
           <AppBottomSheetTouchableWrapper
@@ -150,12 +160,12 @@ const styles = StyleSheet.create( {
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
   },
   successModalAmountView: {
     marginRight: wp( '10%' ),
@@ -164,7 +174,7 @@ const styles = StyleSheet.create( {
   successModalWalletNameText: {
     color: Colors.black,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     textAlign: 'center',
     paddingRight: 10,
     flex: 1,
@@ -179,13 +189,13 @@ const styles = StyleSheet.create( {
   },
   successModalAmountText: {
     color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 21 ),
     marginLeft: 5,
   },
   successModalAmountUnitText: {
     color: Colors.borderColor,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
   },
   successModalAmountInfoView: {
@@ -212,7 +222,7 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
   separator: {
     height: 2,
@@ -228,7 +238,7 @@ const styles = StyleSheet.create( {
   },
   sendSuccessInfoTitle: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
   },
   contactProfileView: {
@@ -250,7 +260,7 @@ const styles = StyleSheet.create( {
   contactNameText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 20 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 25,
   },
   contactIconImage: {

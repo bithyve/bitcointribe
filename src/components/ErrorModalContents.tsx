@@ -11,6 +11,7 @@ import {
 import { Shadow } from 'react-native-shadow-2'
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper'
 import { LocalizationContext } from '../common/content/LocContext'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function ErrorModalContents( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -46,7 +47,7 @@ export default function ErrorModalContents( props ) {
                 ? props.headerTextColor
                 : Colors.blue,
               fontSize: RFValue( 18 ),
-              fontFamily: Fonts.FiraSansRegular,
+              fontFamily: Fonts.Regular,
               letterSpacing: 0.54
               // width: wp( 65 )
             }}
@@ -79,7 +80,7 @@ export default function ErrorModalContents( props ) {
                       height: 6, width: 6, borderRadius: 3, backgroundColor: Colors.gray4, alignSelf: 'center'
                     }}/>
                     <Text style={{
-                      color: Colors.textColorGrey, opacity: 1, fontSize: RFValue( 12 ), letterSpacing: 0.6, fontFamily: Fonts.FiraSansRegular, marginLeft: wp( 2 )
+                      color: Colors.textColorGrey, opacity: 1, fontSize: RFValue( 12 ), letterSpacing: 0.6, fontFamily: Fonts.Regular, marginLeft: wp( 2 )
                     }}>
                       {item}
                     </Text>
@@ -121,7 +122,7 @@ export default function ErrorModalContents( props ) {
                       height: hp( 2 ), width: wp( 0.3 ), backgroundColor: Colors.gray1, marginHorizontal: wp( 4 )
                     }} />
                     <Text style={{
-                      color: Colors.textColorGrey, opacity: 1, fontSize: RFValue( 11 ), letterSpacing: 0.6, fontFamily: Fonts.FiraSansRegular,
+                      color: Colors.textColorGrey, opacity: 1, fontSize: RFValue( 11 ), letterSpacing: 0.6, fontFamily: Fonts.Regular,
                     }}>
                       {item.link}
                     </Text>
@@ -147,22 +148,26 @@ export default function ErrorModalContents( props ) {
         ) : null}
         <View
           style={{
-            height: hp( '12%' ),
+            height: hp( '15%' ),
+            width: wp( '100%' ),
             flexDirection: 'row',
-            marginTop: 'auto',
-            alignItems: 'flex-end',
+            alignItems: 'center',
           }}
         >
-          <Shadow viewStyle={{
-            ...styles.successModalButtonView,
-            backgroundColor: props.buttonColor
-              ? props.buttonColor
-              : Colors.blue,
-          }} distance={2}
-          startColor={props.buttonShadowColor
-            ? props.buttonShadowColor
-            : Colors.shadowBlue }
-          offset={[ 42, 14 ]}>
+          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            locations={[ 0.2, 1 ]}
+            style={{
+              ...styles.successModalButtonView,
+              backgroundColor: props.buttonColor
+                ? props.buttonColor
+                : Colors.blue,
+            }}
+          >
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressProceed()}
               style={{
@@ -185,7 +190,7 @@ export default function ErrorModalContents( props ) {
                 {props.proceedButtonText}
               </Text>
             </AppBottomSheetTouchableWrapper>
-          </Shadow>
+          </LinearGradient>
 
           {props.isIgnoreButton && (
             <AppBottomSheetTouchableWrapper
@@ -193,11 +198,7 @@ export default function ErrorModalContents( props ) {
               style={{
                 height: wp( '12%' ),
                 width: wp( '27%' ),
-                justifyContent: 'center',
                 alignItems: 'center',
-                alignSelf: 'center',
-                // position: 'absolute',
-                // left: wp( 53 )
               }}
               delayPressIn={0}
             >
@@ -244,7 +245,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     opacity: 1,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     letterSpacing: 0.6
   },
   successModalAmountView: {
@@ -283,6 +284,6 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )

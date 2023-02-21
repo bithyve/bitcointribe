@@ -162,7 +162,7 @@ export default function RecoveryCommunication( props ) {
 
           const smsInfoText = `Click here to help ${
             wallet.walletName
-          } recover their Hexa wallet- link will expire in ${
+          } recover their Bitcoin Tribe wallet- link will expire in ${
             config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
           } hours`
 
@@ -196,7 +196,7 @@ export default function RecoveryCommunication( props ) {
 
           const emailInfoText = `Click here to help ${
             wallet.walletName
-          } recover their Hexa wallet- link will expire in ${
+          } recover their Bitcoin Tribe wallet- link will expire in ${
             config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
           } hours`
 
@@ -335,7 +335,7 @@ export default function RecoveryCommunication( props ) {
             }}
           >
             <View style={commonStyle.headerLeftIconInnerContainer}>
-              <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+              <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
             </View>
           </TouchableOpacity>
         </View>
@@ -489,14 +489,14 @@ const styles = StyleSheet.create( {
   },
   commModeModalHeaderText: {
     color: Colors.blue,
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
     fontSize: RFValue( 18 ),
     marginLeft: 20,
     marginRight: 20,
   },
   commModeModalInfoText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     marginLeft: 20,
     marginRight: 20,
@@ -520,7 +520,7 @@ const styles = StyleSheet.create( {
   contactNameText: {
     color: Colors.black,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     marginLeft: 25,
   },
   contactIconImage: {
@@ -536,7 +536,7 @@ const styles = StyleSheet.create( {
     marginBottom: hp( '2%' ),
   },
   contactInfoText: {
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 13 ),
     marginLeft: 10,
   },
@@ -557,6 +557,6 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.Medium,
   },
 } )
