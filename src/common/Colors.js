@@ -4,7 +4,8 @@ const Colors = {
   THEAM_INFO_LIGHT_TEXT_COLOR: '#6C7074',
   THEAM_ERROR_RED_TEXT_COLOR: '#FD746C',
   GRAY_ICON: '#ABB2B9',
-
+  CLOSE_ICON_COLOR: '#69A2B0',
+  LIGHT_BACKGROUND: '#F2F2F2',
   borderColor: '#E3E3E3',
   black: '#2F2F2F',
   shadowBlue: '#DDECF5',

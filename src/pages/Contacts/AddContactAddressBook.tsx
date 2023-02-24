@@ -663,11 +663,11 @@ export default function AddContactAddressBook( props ) {
               position: 'absolute',
               bottom: 0,
               // left: hp(1),
-              // width: wp( '50%' ),
+              width: wp( '95%' ),
               // alignSelf: 'center',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              flexDirection: 'row-reverse',
+              // justifyContent: 'flex-end',
+              alignItems: 'flex-end',
               // backgroundColor: 'red'
             }}
           >
@@ -717,7 +717,7 @@ export default function AddContactAddressBook( props ) {
               </AppBottomSheetTouchableWrapper>
             }
 
-            {
+            {/* {
               <View style={styles.statusIndicatorView}>
 
                 <View style={styles.statusIndicatorActiveView} />
@@ -725,7 +725,7 @@ export default function AddContactAddressBook( props ) {
                 <View style={styles.statusIndicatorInactiveView} />
               </View>
 
-            }
+            } */}
 
           </View>
           {/* )} */}
