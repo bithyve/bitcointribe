@@ -24,7 +24,7 @@ const RestoreSeedHeaderComponent = ( props ) => {
           source={require( '../../assets/images/icons/icon_back.png' )}
           style={{
             width: wp( '5%' ), height: wp( '2%' ),
-            tintColor: Colors.skyBlue
+            tintColor: Colors.homepageButtonColor
           }}
         />
       </TouchableOpacity>

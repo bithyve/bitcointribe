@@ -18,7 +18,7 @@ import CommonStyles from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { LocalizationContext } from '../../common/content/LocContext'
-import HeaderTitle from '../../components/HeaderTitle'
+import HeaderTitle1 from '../../components/HeaderTitle1'
 import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import LndConnectUtils from '../../utils/ln/LndConnectUtils'
@@ -27,7 +27,7 @@ import Toast from '../../components/Toast'
 const styles = StyleSheet.create( {
   viewContainer: {
     flex: 1,
-    backgroundColor: Colors.backgroundColor,
+    backgroundColor: Colors.LIGHT_BACKGROUND,
   },
   buttonText: {
     color: Colors.white,
@@ -40,11 +40,11 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
+    // shadowColor: Colors.shadowBlue,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 15, height: 15
+    // },
     backgroundColor: Colors.blue,
     marginHorizontal: wp( 4 ),
     marginVertical: hp( '2%' ),
@@ -135,9 +135,9 @@ export default function ScanNodeConfig( { navigation } ) {
           flexGrow: 1
         }}
         keyboardShouldPersistTaps='handled'>
-        <HeaderTitle
-          firstLineTitle={strings.Connectyournode}
-          secondLineTitle={strings.SetupLightningAccount}
+        <HeaderTitle1
+          firstLineTitle={'Set up Lighting Account'}
+          secondLineTitle={strings.Connectyournode}
           infoTextNormal={''}
           infoTextBold={''}
           infoTextNormal1={''}
@@ -160,15 +160,19 @@ export default function ScanNodeConfig( { navigation } ) {
           <Text style={styles.buttonText}>{strings.Entermanually}</Text>
         </TouchableOpacity>
 
-        {/* <BottomInfoBox
+        <BottomInfoBox
           containerStyle={{
             paddingRight: wp( 15 ),
-            backgroundColor: 'transparent',
-            marginTop: hp( -1 )
+            // backgroundColor: 'transparent',
+            // marginTop: hp( -1 )
           }}
-          title={strings.NoLNDnode}
-          infoText={strings.NoLNDnodeSub}
-        /> */}
+          onPress={() => {
+            navigation.navigate( 'EnterNodeConfig' )
+          }}
+          title={strings.Entermanually}
+          // infoText={strings.NoLNDnodeSub}
+          infoText={'Customize your set up'}
+        />
       </ScrollView>
 
 

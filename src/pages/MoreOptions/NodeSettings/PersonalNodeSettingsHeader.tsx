@@ -60,7 +60,7 @@ const PersonalNodeSettingsHeader: React.FC<Props> = ( {
           onValueChange={onToggle}
           thumbColor={isConnectionEnabled ? Colors.white : Colors.white}
           trackColor={{
-            false: Colors.borderColor, true: Colors.lightBlue
+            false: Colors.borderColor, true: Colors.THEAM_TEXT_COLOR
           }}
           onTintColor={Colors.blue}
         />

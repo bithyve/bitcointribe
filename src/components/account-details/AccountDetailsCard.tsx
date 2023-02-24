@@ -172,7 +172,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           flexDirection: 'row',
           alignItems: 'flex-start',
           justifyContent: 'space-between',
-          marginBottom: 3,
+          marginBottom: 4,
         }}>
           <Text style={styles.title1Text}>
             {primarySubAccount.customDisplayName ||
