@@ -85,7 +85,7 @@ const AppInfo = ( props ) => {
   const menuOptions: MenuOption[] = [
     {
       title: 'Wallet Name',
-      imageSource: require( '../../../assets/images/icons/icon_wallet_setting.png' ),
+      imageSource: require( '../../../assets/images/icons/icon_wallet_id.png' ),
       subtitle: strings.Edityourwalletnamehere,
       onOptionPressed: () => showModal()
     },
@@ -271,7 +271,7 @@ const AppInfo = ( props ) => {
                 <Image
                   source={menuOption.imageSource}
                   style={{
-                    width: 36, height: 36, resizeMode: 'contain'
+                    width: menuOption.title === 'Wallet Name' ? 22 : 30, height:  menuOption.title === 'Wallet Name' ? 28 : 30, resizeMode: 'contain'
                   }}
                 />
                 {menuOption.title === 'Wallet Name' &&

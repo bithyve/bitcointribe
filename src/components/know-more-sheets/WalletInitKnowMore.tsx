@@ -50,7 +50,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
         <TouchableOpacity
           style={{
             justifyContent: 'center', alignItems: 'center',
-            backgroundColor: Colors.lightBlue,
+            backgroundColor: Colors.CLOSE_ICON_COLOR,
             height: 30,
             width: 30,
             borderRadius: 15,

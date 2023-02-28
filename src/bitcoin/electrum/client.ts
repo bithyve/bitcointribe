@@ -35,8 +35,8 @@ export default class ElectrumClient {
       }
 
       ELECTRUM_CLIENT.electrumClient = new ElectrumCli(
-        global.net,
-        global.tls,
+        ( global as any ).net,
+        ( global as any ).tls,
         ELECTRUM_CLIENT.activePeer?.ssl || ELECTRUM_CLIENT.activePeer?.tcp,
         ELECTRUM_CLIENT.activePeer?.host,
         ELECTRUM_CLIENT.activePeer?.ssl ? 'tls' : 'tcp'
@@ -344,8 +344,8 @@ export default class ElectrumClient {
   public static async testConnection( host, tcpPort, sslPort ) {
     console.log( 'testConnection', host, tcpPort, sslPort )
     const client = new ElectrumCli(
-      global.net,
-      global.tls,
+      ( global as any ).net,
+      ( global as any ).tls,
       sslPort || tcpPort,
       host,
       sslPort ? 'tls' : 'tcp'
@@ -366,6 +366,9 @@ export default class ElectrumClient {
       await client.server_ping()
       return true
     } catch ( _ ) {
+      console.log( {
+        _
+      } )
     } finally {
       if ( timeoutId ) clearTimeout( timeoutId )
       client.close()

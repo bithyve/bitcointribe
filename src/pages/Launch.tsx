@@ -27,6 +27,7 @@ import {
 import { LocalizationContext } from '../common/content/LocContext'
 import ElectrumClient from '../bitcoin/electrum/client'
 import PersonalNode from '../common/data/models/PersonalNode'
+import TestElectrumClient from '../bitcoin/electrum/test-client'
 // import RestClient from '../services/rest/RestClient'
 
 type LaunchScreenProps = {
@@ -56,6 +57,7 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
   componentDidMount = async() => {
     ElectrumClient.setActivePeer( this.props.personalNodes )
     ElectrumClient.connect()
+    TestElectrumClient.connect()
     AppState.addEventListener( 'change', this.handleAppStateChange )
     Linking.addEventListener( 'url', this.handleDeepLinkEvent )
     Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {

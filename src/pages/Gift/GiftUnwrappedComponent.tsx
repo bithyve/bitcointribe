@@ -124,7 +124,7 @@ export default function GiftUnwrappedComponent( props ) {
               marginRight: wp( '4%' ),
               width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
               alignSelf: 'flex-end',
-              backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+              backgroundColor: Colors.CLOSE_ICON_COLOR, alignItems: 'center', justifyContent: 'center',
               // marginTop: wp( 3 )
             }}
           >

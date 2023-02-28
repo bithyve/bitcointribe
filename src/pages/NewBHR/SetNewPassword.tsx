@@ -542,7 +542,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
           <TouchableOpacity
             style={{
               justifyContent: 'center', alignItems: 'center',
-              backgroundColor: Colors.lightBlue,
+              backgroundColor: Colors.CLOSE_ICON_COLOR,
               height: 30,
               width: 30,
               borderRadius: 15,
@@ -892,7 +892,7 @@ export default function SetNewPassword(props: { navigation: { getParam: (arg0: s
             style={{
               width: wp(7), height: wp(7), borderRadius: wp(7 / 2),
               alignSelf: 'flex-end',
-              backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+              backgroundColor: Colors.CLOSE_ICON_COLOR, alignItems: 'center', justifyContent: 'center',
               marginTop: wp(3), marginRight: wp(3)
             }}
           >

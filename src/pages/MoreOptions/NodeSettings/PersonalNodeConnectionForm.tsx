@@ -167,7 +167,7 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
           onValueChange={onToggle}
           thumbColor={useSSL ? Colors.white : Colors.white}
           trackColor={{
-            false: Colors.borderColor, true: Colors.lightBlue
+            false: Colors.borderColor, true: Colors.THEAM_TEXT_COLOR
           }}
           onTintColor={Colors.blue}
         />
