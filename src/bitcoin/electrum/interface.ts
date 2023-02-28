@@ -39,3 +39,12 @@ export type ElectrumTransaction = {
   time: number;
   blocktime: number;
 };
+
+export interface NodeDetail {
+  id: number;
+  host: string;
+  port: string;
+  isConnected: boolean;
+  useKeeperNode: boolean;
+  useSSL: boolean;
+}
