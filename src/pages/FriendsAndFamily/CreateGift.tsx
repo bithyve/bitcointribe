@@ -502,7 +502,7 @@ const CreateGift = ( { navigation }: Props ) => {
             height: wp( 7 ),
             borderRadius: wp( 7 / 2 ),
             alignSelf: 'flex-end',
-            backgroundColor: Colors.lightBlue,
+            backgroundColor: Colors.THEAM_TEXT_COLOR,
             alignItems: 'center',
             justifyContent: 'center',
             marginTop: wp( 3 ),
@@ -792,7 +792,7 @@ const CreateGift = ( { navigation }: Props ) => {
                 width: wp( '5%' ),
                 height: wp( '5%' ),
                 borderRadius: wp( '5%' ) / 2,
-                backgroundColor: Colors.lightBlue,
+                backgroundColor: Colors.THEAM_TEXT_COLOR,
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginRight: wp( '4%' ),
@@ -842,7 +842,7 @@ const CreateGift = ( { navigation }: Props ) => {
                 width: wp( '5%' ),
                 height: wp( '5%' ),
                 borderRadius: wp( '5%' ) / 2,
-                backgroundColor: Colors.lightBlue,
+                backgroundColor: Colors.THEAM_TEXT_COLOR,
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginLeft: wp( '4%' ),
@@ -1330,7 +1330,7 @@ const CreateGift = ( { navigation }: Props ) => {
               {showKeyboard && (
                 <Text
                   style={{
-                    color: Colors.lightBlue,
+                    color: Colors.THEAM_TEXT_COLOR,
                     fontSize: RFValue( 18 ),
                   }}
                 >
@@ -1958,7 +1958,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    backgroundColor: Colors.lightBlue,
+    backgroundColor: Colors.THEAM_TEXT_COLOR,
   },
   imageView: {
     width: 18,
@@ -2052,7 +2052,7 @@ const styles = StyleSheet.create( {
     width: wp( 7 ),
     height: wp( 7 ),
     borderRadius: wp( 7 / 2 ),
-    backgroundColor: Colors.lightBlue,
+    backgroundColor: Colors.CLOSE_ICON_COLOR,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 'auto',

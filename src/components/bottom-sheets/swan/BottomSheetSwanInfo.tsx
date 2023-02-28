@@ -140,7 +140,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           style={{
             width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
             alignSelf: 'flex-end',
-            backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+            backgroundColor: Colors.CLOSE_ICON_COLOR, alignItems: 'center', justifyContent: 'center',
             marginTop: wp( 3 ), marginRight: wp( 3 )
           }}
           >
@@ -151,7 +151,8 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
         <View style={styles.successModalHeaderView}>
           <TouchableOpacity style={{
             marginLeft: wp( '86%' )
-          }} >
+          }} 
+          onPress={() => {onPress()}}>
             <Close  />
           </TouchableOpacity>
           <Text style={styles.modalTitleText}>{swanTitle}</Text>
@@ -327,7 +328,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
       style={{
         width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
         alignSelf: 'flex-end',
-        backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+        backgroundColor: Colors.CLOSE_ICON_COLOR, alignItems: 'center', justifyContent: 'center',
         marginTop: wp( 3 ), marginRight: wp( 3 )
       }}
     >
