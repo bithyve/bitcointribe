@@ -47,7 +47,7 @@ export default function SecondaryDeviceModelContents( props ) {
           }}
           style={{
             width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
-            backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+            backgroundColor: Colors.CLOSE_ICON_COLOR, alignItems: 'center', justifyContent: 'center',
             marginTop: wp( 3 ), marginRight: wp( 3 )
           }}
         >

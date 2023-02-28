@@ -34,6 +34,7 @@ import crypto from 'crypto'
 import idx from 'idx'
 import wif from 'wif'
 import ElectrumClient from '../../electrum/client'
+import TestElectrumClient from '../../electrum/test-client'
 
 export default class AccountOperations {
 
@@ -126,20 +127,22 @@ export default class AccountOperations {
     internalAddresses: { [address: string]: number },
     network: bitcoinJS.Network
   ) => {
-    const { historyByAddress, txids, txidToAddress } = await ElectrumClient.syncHistoryByAddress(
+
+    const client = network === bitcoinJS.networks.bitcoin? ElectrumClient: TestElectrumClient
+    const { historyByAddress, txids, txidToAddress } = await client.syncHistoryByAddress(
       addresses,
       network
     )
 
     const transactions: Transaction[] = []
-    const txs = await ElectrumClient.getTransactionsById( txids )
+    const txs = await client.getTransactionsById( txids )
 
     // saturate transaction:  inputs-params, type, amount
     const inputTxIds = []
     for ( const txid in txs ) {
       for ( const vin of txs[ txid ].vin ) inputTxIds.push( vin.txid )
     }
-    const inputTxs = await ElectrumClient.getTransactionsById( inputTxIds )
+    const inputTxs = await client.getTransactionsById( inputTxIds )
 
     let lastUsedAddressIndex = account.nextFreeAddressIndex - 1
     let lastUsedChangeAddressIndex = account.nextFreeChangeAddressIndex - 1
@@ -488,8 +491,9 @@ export default class AccountOperations {
         addresses.push( address )
       }
 
+      const client = network === bitcoinJS.networks.bitcoin? ElectrumClient: TestElectrumClient
       // sync utxos & balances
-      const utxosByAddress = await ElectrumClient.syncUTXOByAddress( addresses, network )
+      const utxosByAddress = await client.syncUTXOByAddress( addresses, network )
 
       const balances: Balances = {
         confirmed: 0,
@@ -1215,7 +1219,8 @@ export default class AccountOperations {
       txHex = signedTxb.build().toHex()
     }
 
-    const txid = await ElectrumClient.broadcast( txHex )
+    const client = network === bitcoinJS.networks.bitcoin? ElectrumClient: TestElectrumClient
+    const txid = await client.broadcast( txHex )
     if ( !txid ) throw new Error( 'Failed to broadcast transaction, txid missing' )
 
     if ( txid.includes( 'sendrawtransaction RPC error' ) ) {
