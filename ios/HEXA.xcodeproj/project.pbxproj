@@ -1082,6 +1082,7 @@
 				PRODUCT_NAME = "Bitcoin Tribe";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
+				SWIFT_OBJC_INTERFACE_HEADER_NAME = "HEXA-Swift.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1121,6 +1122,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "Hexa Production Dist";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Hexa 2.0 Distribution";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
+				SWIFT_OBJC_INTERFACE_HEADER_NAME = "HEXA-Swift.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
