@@ -66,7 +66,9 @@ export default function BackupMethods( { navigation } ) {
         marginTop: hp( 5 )
       } ]}>
         <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
+          style={[ CommonStyles.headerLeftIconContainer, {
+            marginTop: 20
+          } ]}
           onPress={() => {
             navigation.goBack()
           }}
@@ -157,7 +159,7 @@ export default function BackupMethods( { navigation } ) {
           <Text style={{
             fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, color: Colors.black, margin: 10, textAlign: 'center'
           }}>
-            Backup width Keeper
+            Backup with Keeper
           </Text>
         </TouchableOpacity>
 
