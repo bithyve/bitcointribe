@@ -33,7 +33,7 @@ Then, from the command prompt, run:
 setup.bat
 ```
 
-### Configuring Environment Variables
+<!-- ### Configuring Environment Variables
 
 **Mainnet configuration**
 
@@ -47,7 +47,7 @@ Copy the contents on `.env.example` to a new `.env` file.
 
 ```sh
 cp .env.example .env
-```
+``` -->
 
 
 ## Building and Running Hexa Wallet
