@@ -663,12 +663,12 @@ export default function AddContactAddressBook( props ) {
               position: 'absolute',
               bottom: 0,
               // left: hp(1),
-              width: wp( '95%' ),
+              width: wp( '100%' ),
               // alignSelf: 'center',
               flexDirection: 'row-reverse',
-              // justifyContent: 'flex-end',
+              justifyContent: 'center',
               alignItems: 'flex-end',
-              // backgroundColor: 'red'
+              backgroundColor: Colors.backgroundColor
             }}
           >
             {
