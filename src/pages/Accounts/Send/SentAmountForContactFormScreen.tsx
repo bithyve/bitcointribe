@@ -209,20 +209,20 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         alignItems: 'center',
         paddingHorizontal: 24,
         marginBottom: 24,
+        flexWrap:'wrap'
       }}>
         <Text style={{
           marginRight: RFValue( 4 )
         }}>
-          {`${strings.SendingFrom}:`}
-        </Text>
-
-        <Text style={{
-          fontFamily: Fonts.Regular,
-          fontSize: RFValue( 11 ),
-          fontStyle: 'italic',
-          color: Colors.blue,
-        }}>
-          {sourceAccountHeadlineText}
+          {`${strings.SendingFrom}: `}
+          <Text style={{
+            fontFamily: Fonts.Regular,
+            fontSize: RFValue( 11 ),
+            fontStyle: 'italic',
+            color: Colors.blue,
+          }}>
+            {sourceAccountHeadlineText}
+          </Text>
         </Text>
       </View>
 

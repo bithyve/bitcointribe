@@ -50,10 +50,10 @@ export default function BackupMethods( { navigation } ) {
   }
 
   function onPressBackupWithKeeper() {
-    if( backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP ) {
-      navigation.navigate( 'BackupWithKeeper' )
-      dispatch( setBackupWithKeeperState( BackupWithKeeperState.INITIATED ) )
-    }
+    // if( backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP ) {
+    navigation.navigate( 'BackupWithKeeper' )
+    dispatch( setBackupWithKeeperState( BackupWithKeeperState.INITIATED ) )
+    // }
   }
 
   return (
@@ -137,7 +137,7 @@ export default function BackupMethods( { navigation } ) {
         >
           <View style={{
             width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, borderColor:
-            backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP
+            backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP
               ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center', elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
               width: 15, height: 15
             }

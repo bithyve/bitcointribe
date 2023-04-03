@@ -11,6 +11,8 @@ import {
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP,
+  heightPercentageToDP,
 } from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
@@ -23,6 +25,7 @@ import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCod
 import BottomInfoBox from '../../components/BottomInfoBox'
 import LndConnectUtils from '../../utils/ln/LndConnectUtils'
 import Toast from '../../components/Toast'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 const styles = StyleSheet.create( {
   viewContainer: {
@@ -48,6 +51,49 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.blue,
     marginHorizontal: wp( 4 ),
     marginVertical: hp( '2%' ),
+  },
+  icArrow: {
+    marginLeft: wp( '3%' ),
+    marginRight: wp( '3%' ),
+    alignSelf: 'center',
+  },
+  textValue: {
+    fontFamily: Fonts.Regular,
+    fontSize: RFValue( 13 ),
+    color: Colors.THEAM_INFO_TEXT_COLOR,
+    marginLeft: wp( '3%' ),
+  },
+  textHelpUs: {
+    fontFamily: Fonts.SemiBold,
+    fontSize: RFValue( 12 ),
+    color: Colors.THEAM_TEXT_COLOR,
+    marginLeft: wp( '3%' ),
+  },
+  textHelpUsSub: {
+    fontFamily: Fonts.Regular,
+    fontSize: RFValue( 12 ),
+    color: Colors.THEAM_INFO_TEXT_COLOR,
+    marginLeft: wp( '3%' ),
+    marginTop: wp( '1%' ),
+  },
+  addModalView: {
+    backgroundColor: Colors.gray7,
+    paddingVertical: 25,
+    paddingHorizontal: widthPercentageToDP( 1 ),
+    flexDirection: 'row',
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginTop: heightPercentageToDP( '5' ),
+    alignSelf: 'center',
+    borderRadius: widthPercentageToDP( '2' ),
+    marginBottom: heightPercentageToDP( '1.2' ),
+    shadowOpacity: 0.05,
+    // shadowColor: Colors.shadowColor,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 6,
+    elevation: 6,
   },
 } )
 
@@ -150,7 +196,7 @@ export default function ScanNodeConfig( { navigation } ) {
             marginBottom: 16
           }}
         />
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.buttonView}
           activeOpacity={0.6}
           onPress={() => {
@@ -158,21 +204,37 @@ export default function ScanNodeConfig( { navigation } ) {
           }}
         >
           <Text style={styles.buttonText}>{strings.Entermanually}</Text>
-        </TouchableOpacity>
-
-        <BottomInfoBox
-          containerStyle={{
-            paddingRight: wp( 15 ),
-            // backgroundColor: 'transparent',
-            // marginTop: hp( -1 )
-          }}
+        </TouchableOpacity> */}
+        <TouchableOpacity
           onPress={() => {
             navigation.navigate( 'EnterNodeConfig' )
           }}
-          title={strings.Entermanually}
-          // infoText={strings.NoLNDnodeSub}
-          infoText={'Customize your set up'}
-        />
+          activeOpacity={0.6}
+          style={styles.addModalView
+          }
+        >
+          <View style={{
+            flex: 0.9,
+          }
+          }>
+            <Text
+              style={styles.textHelpUs}
+            >
+              {strings.Entermanually}
+            </Text>
+            <Text
+              style={styles.textHelpUsSub}
+            >
+              {'Customize your set up'}
+            </Text>
+          </View>
+          <Ionicons
+            name={'chevron-forward'}
+            color={Colors.textColorGrey}
+            size={22}
+            style={styles.icArrow}
+          />
+        </TouchableOpacity>
       </ScrollView>
 
 

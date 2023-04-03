@@ -165,11 +165,13 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       } )
     else {
       setHandleButton( false )
-      dispatch( executeSendStage2( {
-        accountShell: sourceAccountShell,
-        txnPriority: transactionPriority,
-        note
-      } ) )
+      setTimeout( () => {
+        dispatch( executeSendStage2( {
+          accountShell: sourceAccountShell,
+          txnPriority: transactionPriority,
+          note
+        } ) )
+      }, 200 )
     }
   }
 
@@ -241,21 +243,21 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         alignItems: 'center',
         paddingHorizontal: 24,
         marginBottom: height > 720 ? heightPercentageToDP( '1%' ) : 0,
-        marginTop: height > 720 ? heightPercentageToDP( '2%' ) : 5
+        marginTop: height > 720 ? heightPercentageToDP( '2%' ) : 5,
+        flexWrap:'wrap'
       }}>
         <Text style={{
           marginRight: RFValue( 4 )
         }}>
-          {`${strings.SendingFrom}:`}
-        </Text>
-
-        <Text style={{
-          fontFamily: Fonts.Regular,
-          fontSize: RFValue( 11 ),
-          fontStyle: 'italic',
-          color: Colors.blue,
-        }}>
-          {sourceAccountHeadlineText}
+          {`${strings.SendingFrom}: `}
+          <Text style={{
+            fontFamily: Fonts.Regular,
+            fontSize: RFValue( 11 ),
+            fontStyle: 'italic',
+            color: Colors.blue,
+          }}>
+            {sourceAccountHeadlineText}
+          </Text>
         </Text>
       </View>
       <View style={styles.headerSection}>
