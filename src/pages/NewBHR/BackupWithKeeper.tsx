@@ -25,6 +25,7 @@ import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState
 import { setBackupWithKeeperState } from '../../store/actions/BHR'
 import CopyThisText from '../../components/CopyThisText'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import CheckMark from '../../assets/images/svgs/checkmark.svg'
 
 const styles = StyleSheet.create( {
   buttonText: {
@@ -70,6 +71,21 @@ const styles = StyleSheet.create( {
     marginRight: wp( '3%' ),
     alignSelf: 'center',
   },
+  imageView: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: Colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 6,
+    paddingHorizontal:10,
+    shadowOpacity: 0.1,
+    shadowOffset: {
+      width: 1,
+      height: 1,
+    },
+  },
 } )
 
 export default function BackupWithKeeper( { navigation } ) {
@@ -80,6 +96,7 @@ export default function BackupWithKeeper( { navigation } ) {
   const strings = translations[ 'bhr' ]
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const dispatch = useDispatch()
+  const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
 
   useEffect(  () => {
     init()
@@ -90,6 +107,7 @@ export default function BackupWithKeeper( { navigation } ) {
     const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
     const primaryMnemonic = walletObj.primaryMnemonic
     setSeed( primaryMnemonic )
+
     const path = AccountUtilities.getDerivationPath( Config.NETWORK_TYPE, AccountType.CHECKING_ACCOUNT, 0 )
     setPath( path )
     const url = `keeperdev://backup/${Buffer.from( `&seed=${primaryMnemonic.replace( / /g, ',' )}&path=${path}&name=hexa&appId=hexadev`, 'utf8' ).toString(
@@ -101,6 +119,7 @@ export default function BackupWithKeeper( { navigation } ) {
   }
 
   async function openInKeeper () {
+
     try {
       if( isKeeperInstalled ) {
         await Linking.openURL( deeplinkUrl )
@@ -232,33 +251,50 @@ export default function BackupWithKeeper( { navigation } ) {
         style={{
           textAlign: 'center', marginVertical: 40
         }}>I have backed up with Keeper</Text> */}
-      <TouchableOpacity
-        // onPress={()=> }
-        activeOpacity={0.6}
+      <View
         style={styles.addModalView}
       >
         <View style={ {
-          flex: 1
+          flex: 0.9
         }
         }>
-          <Text
-            style={styles.titleText}
-          >
-            {'I have backed up with Keeper'}
-          </Text>
-          <Text
-            style={styles.subText}
-          >
-            {'Lorem ipsum dolor sit amet, consec tetur '}
-          </Text>
-        </View>
-        <Ionicons
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingLeft:10,
+          }}>
+            <View style={styles.imageView}>
+              {backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP &&
+              <CheckMark style={{
+                marginLeft: 6,
+                marginTop: 6
+              }} />
+              }
+            </View>
+            <TouchableOpacity  onPress={()=> {
+              navigation.goBack()
+              dispatch( setBackupWithKeeperState( BackupWithKeeperState.BACKEDUP ) )
+            }} >
+              <Text
+                style={styles.titleText}
+              >
+                {'I have backed up with Keeper'}
+              </Text>
+              <Text
+                style={styles.subText}
+              >
+                {'Check the health of your Backup in the Keeper app'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {/* <Ionicons
           name={'chevron-forward'}
           color={Colors.textColorGrey}
           size={22}
           style={styles.icArrow}
-        />
-      </TouchableOpacity>
+        /> */}
+        </View>
+      </View>
       <TouchableOpacity
         onPress={()=> openInKeeper() }
         activeOpacity={0.6}
@@ -276,7 +312,7 @@ export default function BackupWithKeeper( { navigation } ) {
           <Text
             style={styles.subText}
           >
-            {'Lorem ipsum dolor sit amet, consec tetur '}
+            {'Once setup, return here to Backup with Keeper'}
           </Text>
         </View>
         <Ionicons
