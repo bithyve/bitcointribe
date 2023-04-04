@@ -867,7 +867,9 @@ class ContactDetails extends PureComponent<
         <View style={styles.headerRowContainer}>
           {getImageIcon( this.contact )}
           <Text
-            style={styles.contactText}
+            style={[ styles.contactText, {
+              fontSize: RFValue( 16 )
+            } ]}
             ellipsizeMode="clip"
             numberOfLines={1}
           >{this.firstNamePieceText()}
@@ -1132,7 +1134,9 @@ class ContactDetails extends PureComponent<
                 )}
               </View>
               <Text
-                style={styles.contactText}
+                style={[ styles.contactText, {
+                  fontSize: RFValue( 16 )
+                } ]}
                 ellipsizeMode="clip"
                 numberOfLines={1}
               >{this.firstNamePieceText()}
@@ -1156,7 +1160,7 @@ class ContactDetails extends PureComponent<
         </TouchableOpacity>
         {Loading ? (
           <View style={{
-            flex: 1
+            flex: 0.97
           }}>
             {/* <ScrollView style={{
               flex: 1
@@ -1197,7 +1201,7 @@ class ContactDetails extends PureComponent<
           </View>
         ) : (
           <View style={{
-            flex: 1
+            flex: 0.97
           }}>
             <ScrollView style={{
               flex: 1
@@ -1562,6 +1566,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
+    paddingBottom:5
   },
   headerTitleText: {
     color: Colors.blue,
@@ -1597,7 +1602,7 @@ const styles = StyleSheet.create( {
   },
   contactTextBold: {
     marginLeft: 10,
-    fontSize: RFValue( 20 ),
+    fontSize: RFValue( 16 ),
     fontFamily: Fonts.MediumItalic,
     color: Colors.blue,
     letterSpacing: 0.01,
@@ -1717,6 +1722,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Regular,
     fontSize: RFValue( 10 ),
     marginLeft: 10,
+    paddingTop:5
   },
   resendContainer: {
     height: wp( '6%' ),

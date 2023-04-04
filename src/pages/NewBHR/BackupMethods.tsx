@@ -152,8 +152,9 @@ export default function BackupMethods( { navigation } ) {
                 color={Colors.white} size={10} />
             </View>
             <Image style={{
-              height: 20, width: 20, tintColor: Colors.blue
-            }} resizeMode={'contain'} source={require( '../../assets/images/icons/seedwords.png' )} />
+              height: 20, width: 20
+              // , tintColor: Colors.blue
+            }} resizeMode={'contain'} source={require( '../../assets/images/icons/keeper.png' )} />
 
           </View>
           <Text style={{
