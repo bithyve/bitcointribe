@@ -724,7 +724,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
+    // elevation: 10,
   },
   proceedButtonText: {
     color: Colors.white,
