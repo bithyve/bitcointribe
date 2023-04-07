@@ -103,9 +103,10 @@ export default function BackupMethods( { navigation } ) {
           <View style={{
             width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, borderColor:
           levelData[ 0 ].keeper1.status == 'accessible'
-            ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center', elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
-              width: 15, height: 15
-            }
+            ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center'
+            // , elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
+            //   width: 15, height: 15
+            // }
           }}
           >
             <View style={{
@@ -138,9 +139,10 @@ export default function BackupMethods( { navigation } ) {
           <View style={{
             width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, borderColor:
             backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP
-              ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center', elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
-              width: 15, height: 15
-            }
+              ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center',
+            //   elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
+            //   width: 15, height: 15
+            // }
           }}
           >
             <View style={{

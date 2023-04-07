@@ -849,7 +849,7 @@ const styles = StyleSheet.create( {
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 10,
+    // elevation: 10,
     marginBottom: 20,
     marginLeft: wp( 9 ),
   },
