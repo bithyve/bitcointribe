@@ -91,11 +91,12 @@ This will work when Android development environment is setup correctly. Further 
 
 1. Build fails with one or more errors
    Makes sure `yarn install` was done after switching to a new branch.
-   If that doesn't help please use `yarn deep-clean` this will remove node modules, flush node cache, fluch metro cache, reinstall node dependencies and re install pods. 
+   If that doesn't help please use `yarn deep-clean` this will remove node modules, flush node cache, fluch metro cache, reinstall node dependencies and re install pods.
 2. Always make sure metro is running in a new terminal window. If its not it can be started by running `yarn start`in a new termimal from project root.
 3. Notifications dont work in ios simulator and this will show up as an error in the console. Notifications will work when running in a iOS device.
 4. If Apple id or google id is not setup in the simulator then cloud backup will not work and cloud errors will be seen in the console.
 5. Scanner will not work in a simulator so a device will be required to test and debug scanner related features.
+6. If `yarn install` fails use the comand `sudo npm install -g yarn` before yarn install.
 
 ## Verify Authenticity of Android APK
 
