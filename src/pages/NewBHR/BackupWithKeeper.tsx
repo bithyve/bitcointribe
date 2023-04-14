@@ -26,7 +26,6 @@ import { setBackupWithKeeperState } from '../../store/actions/BHR'
 import CopyThisText from '../../components/CopyThisText'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CheckMark from '../../assets/images/svgs/checkmark.svg'
-import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
 
 const styles = StyleSheet.create( {
   buttonText: {
@@ -96,7 +95,6 @@ export default function BackupWithKeeper( { navigation } ) {
   const [ path, setPath ] = useState( '' )
   const strings = translations[ 'bhr' ]
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
-  const accounts = useAccountsState().accounts
   const dispatch = useDispatch()
   const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
 
@@ -109,13 +107,8 @@ export default function BackupWithKeeper( { navigation } ) {
     const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
     const primaryMnemonic = walletObj.primaryMnemonic
     setSeed( primaryMnemonic )
-    let derivationPath = ''
-    Object.values( accounts ).forEach( account => {
-      if( account.type === AccountType.CHECKING_ACCOUNT ){
-        derivationPath = account.derivationPath
-      }
-    } )
-    const path = derivationPath
+
+    const path = AccountUtilities.getDerivationPath( Config.NETWORK_TYPE, AccountType.CHECKING_ACCOUNT, 0 )
     setPath( path )
     const url = `keeperdev://backup/${Buffer.from( `&seed=${primaryMnemonic.replace( / /g, ',' )}&path=${path}&name=hexa&appId=hexadev`, 'utf8' ).toString(
       'base64',
