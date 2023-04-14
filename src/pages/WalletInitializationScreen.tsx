@@ -22,6 +22,7 @@ import { LocalizationContext } from '../common/content/LocContext'
 import { useDispatch } from 'react-redux'
 import { setCloudDataRecovery, setIsFileReading } from '../store/actions/cloud'
 import { setDownloadedBackupData } from '../store/actions/BHR'
+import { hp } from '../common/data/responsiveness/responsive'
 
 const WalletInitializationScreen = props => {
   const { translations } = useContext( LocalizationContext )
@@ -55,8 +56,39 @@ const WalletInitializationScreen = props => {
           <View style={styles.textView}>
             <Text style={styles.touchableText}>
               {
-              //` ${strings.Createanew}
-              `Start with a new Tribe Wallet wallet`}
+                'Start with a new Tribe Wallet wallet'
+              }
+            </Text>
+          </View>
+          <View style={styles.arrowIconView}>
+            <MaterialIcons
+              name="arrow-forward-ios"
+              color={Colors.borderColor}
+              size={15}
+              style={{
+                alignSelf: 'center'
+              }}
+            />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => props.navigation.navigate( 'CreateKeeperScreen' )}
+          style={[ styles.NewWalletTouchableView, {
+            marginTop: hp( 20 )
+          } ]}
+        >
+          <Image
+            style={{
+              ...styles.iconImage, width: wp( 7 ),
+              height: wp( 7 ), marginBottom: wp( 2 )
+            }}
+            source={require( '../assets/images/icons/icon_createwk.png' )}
+          />
+          <View style={styles.textView}>
+            <Text style={styles.touchableText}>
+              {
+                'Create with BitcoinKeeper'
+              }
             </Text>
           </View>
           <View style={styles.arrowIconView}>
