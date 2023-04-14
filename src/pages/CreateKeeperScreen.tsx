@@ -91,6 +91,7 @@ const styles = StyleSheet.create( {
     marginHorizontal: widthPercentageToDP( 5 ),
     // flexDirection: 'row',
     display: 'flex',
+    width: '90%',
     justifyContent: 'space-between',
     // marginTop: heightPercentageToDP( '5' ),
     alignSelf: 'center',
@@ -247,9 +248,9 @@ export default function CreateKeeperScreen( { navigation } ) {
             {'Note'}
           </Text>
           <Text
-            style={styles.textHelpUsSub} numberOfLines={2}
+            style={styles.textHelpUsSub} numberOfLines={3}
           >
-            {'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'}
+            {'With this option your wallet would be backedup with Keeper automatically'}
           </Text>
         </View>
       </ScrollView>
