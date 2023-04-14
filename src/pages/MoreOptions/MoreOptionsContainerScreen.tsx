@@ -205,7 +205,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       // if( menuOption.screenName == 'WalletBackup' ) {
         if( menuOption.screenName == 'BackupMethods' ) {
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
-        levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){
+        levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup phrase' ){
           if ( ( levelHealth.length == 0 ) ||
           ( levelHealth.length && levelHealth[ 0 ].levelInfo.length &&
             levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ||
