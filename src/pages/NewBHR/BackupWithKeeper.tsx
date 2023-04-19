@@ -126,8 +126,8 @@ export default function BackupWithKeeper( { navigation } ) {
       } else{
         const url =
         Platform.OS == 'ios'
-          ? 'https://apps.apple.com/us/app/bitcoin-wallet-hexa-2-0/id1586334138'
-          : 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa2&hl=en'
+          ? 'https://https://apps.apple.com/us/app/bitcoin-keeper/id1545535925'
+          : 'https://play.google.com/store/search?q=bitcoin%20keeper&c=apps&hl=en&gl=US'
         Linking.canOpenURL( url ).then( ( supported ) => {
           if ( supported ) {
             Linking.openURL( url )
