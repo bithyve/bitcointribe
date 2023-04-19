@@ -718,7 +718,7 @@
   "lightningAccount": {
     "Connectyournode": "Connect your node",
     "SetupLightningAccount": "Scan lndconnect/ BTCPay config QR",
-    "Entermanually": "or Enter Manually",
+    "Entermanually": "Enter Manually",
     "NoLNDnode": "No LND node",
     "NoLNDnodeSub": "Elit culpa consectetur elit ex consectetur quis culpa veniam est consequat.",
     "Enternode": "Enter node details"
