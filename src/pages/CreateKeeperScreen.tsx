@@ -139,38 +139,25 @@ export default function CreateKeeperScreen( { navigation } ) {
   }, [ restoreSeedData ] )
 
   async function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
-    console.log( 'skkk data', scannedData )
     if( scannedData != null && scannedData.length > 0 ){
       setShowLoader( true )
       let mnemonicData = scannedData.toString()
-      mnemonicData = mnemonicData.replace( /,/g, ' ' )
+      mnemonicData = mnemonicData.replace( /,/g, ' ' ).replace( /"/g, '' ).replace( '[', '' ).replace( ']', '' )
+
       setMnemonic( mnemonicData )
-      setTimeout( () => {
-        // const isValidMnemonic = bip39.validateMnemonic( mnemonic )
-        // if ( !isValidMnemonic ) {
-        //   setShowLoader( false )
-        //   Toast( 'Invalid QR' )
-        //   return
-        // }
-        setTimeout( () => {
-          dispatch( recoverWalletUsingMnemonic( mnemonic ) )
-        }, 500 )
-      }, 1000 )
-    } else {
-      const {
-        host,
-        port,
-        macaroonHex
-      } = LndConnectUtils.processLndConnectUrl( scannedData )
-      if( host &&  macaroonHex ) {
-        navigation.navigate( 'EnterNodeConfig', {
-          node: {
-            host: host, port: port, macaroonHex: macaroonHex
-          },
-        } )
-      } else {
-        Toast( 'Invalid QR' )
+      // setTimeout( () => {
+      const isValidMnemonic = bip39.validateMnemonic( mnemonicData )
+      if ( !isValidMnemonic ) {
+        setShowLoader( false )
+        Toast( 'Invalid QR code' )
+        return
       }
+      // setTimeout( () => {
+      dispatch( recoverWalletUsingMnemonic( mnemonicData ) )
+      // }, 1000 )
+      // }, 2000 )
+    } else {
+      Toast( 'Invalid QR' )
     }
   }
 
