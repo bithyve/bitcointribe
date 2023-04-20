@@ -164,14 +164,14 @@ const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: 
   const opacityChange = cardDisabled || ( accountShell.primarySubAccount.visibility !== AccountVisibility.DEFAULT && showAllAccount === true )  ? true : false
 
   return (
-    <Shadow  distance={10} startColor={Colors.shadowColor}  offset={[ 7, 7 ]}>
-      <View style={opacityChange ? {
-        ...styles.rootContainer, opacity:0.3
-      } : styles.rootContainer}>
-        <HeaderSection accountShell={accountShell} cardDisabled={cardDisabled}/>
-        <BodySection accountShell={accountShell} cardDisabled={cardDisabled}/>
-      </View>
-    </Shadow>
+    // <Shadow  distance={10} startColor={Colors.shadowColor}  offset={[ 7, 7 ]}>
+    <View style={opacityChange ? {
+      ...styles.rootContainer, opacity:0.3
+    } : styles.rootContainer}>
+      <HeaderSection accountShell={accountShell} cardDisabled={cardDisabled}/>
+      <BodySection accountShell={accountShell} cardDisabled={cardDisabled}/>
+    </View>
+    // </Shadow>
   )
 }
 

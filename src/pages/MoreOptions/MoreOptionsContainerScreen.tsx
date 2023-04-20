@@ -78,7 +78,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           ? 'Wallet backup confirmed'
           :'Confirm backup phrase',
       title: bhrStrings[ 'WalletBackup' ],
-      screenName: 'WalletBackup',
+      // screenName: 'WalletBackup',
+      screenName: 'BackupMethods',
     },
     {
       title: strings.accountManagement,
@@ -201,9 +202,10 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     if ( typeof menuOption.onOptionPressed === 'function' ) {
       menuOption.onOptionPressed()
     } else if ( menuOption.screenName !== undefined ) {
-      if( menuOption.screenName == 'WalletBackup' ) {
+      // if( menuOption.screenName == 'WalletBackup' ) {
+        if( menuOption.screenName == 'BackupMethods' ) {
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
-        levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){
+        levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup phrase' ){
           if ( ( levelHealth.length == 0 ) ||
           ( levelHealth.length && levelHealth[ 0 ].levelInfo.length &&
             levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ||
@@ -217,7 +219,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               selectedKeeper: navigationObj?.selectedKeeper,
               selectedLevelId: levelData[ 0 ].id
             }
-            navigation.navigate( 'WalletBackup', navigationParams )
+            // navigation.navigate( 'WalletBackup', navigationParams )
+            navigation.navigate( 'BackupMethods', navigationParams )
           } else {
             setSelectedKeeper( levelData[ 0 ].keeper1 )
             dispatch( onPressKeeper( levelData[ 0 ], 1 ) )

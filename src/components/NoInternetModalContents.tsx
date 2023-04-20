@@ -168,12 +168,12 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 0.9,
-    shadowOffset: {
-      width: 12, height: 13
-    },
+    // elevation: 10,
+    // // shadowColor: Colors.shadowBlue,
+    // shadowOpacity: 0.9,
+    // shadowOffset: {
+    //   width: 12, height: 13
+    // },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     marginLeft: wp( '10%' ),

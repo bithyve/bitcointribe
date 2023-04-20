@@ -661,14 +661,14 @@ export default function AddContactAddressBook( props ) {
           <View
             style={{
               position: 'absolute',
-              bottom: 0,
+              bottom: hp( -4 ),
               // left: hp(1),
-              width: wp( '95%' ),
+              width: wp( '100%' ),
               // alignSelf: 'center',
               flexDirection: 'row-reverse',
-              // justifyContent: 'flex-end',
+              justifyContent: 'center',
               alignItems: 'flex-end',
-              // backgroundColor: 'red'
+              backgroundColor: Colors.backgroundColor
             }}
           >
             {
@@ -701,9 +701,9 @@ export default function AddContactAddressBook( props ) {
                 style={{
                   // height: wp( '8%' ),
                   marginTop: hp( 1.8 ),
-                  width: wp( '25%' ),
+                  width: wp( '28%' ),
                   alignSelf: 'flex-start',
-                  paddingLeft: wp( '8%' ),
+                  paddingLeft: wp( '9%' ),
                 }}
               >
                 <Text
@@ -849,7 +849,7 @@ const styles = StyleSheet.create( {
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 10,
+    // elevation: 10,
     marginBottom: 20,
     marginLeft: wp( 9 ),
   },

@@ -58,11 +58,18 @@ export default function CopyThisText( props ) {
             justifyContent: 'center',
           }}
         >
+          {props.title && <Text style={{
+            fontSize: RFValue( 10 ),
+            marginBottom: RFValue( 2 ),
+            color: Colors.THEAM_INFO_TEXT_COLOR,
+            fontFamily: Fonts.Regular
+          }}>{props.title}</Text>
+          }
           <Text
             numberOfLines={1}
             style={{
               fontSize: RFValue( 13 ),
-              color: Colors.lightBlue,
+              color: props.title ? Colors.CLOSE_ICON_COLOR : Colors.lightBlue,
               fontFamily: Fonts.Regular
             }}
           >

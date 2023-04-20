@@ -419,7 +419,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 11,
-    elevation: 10,
+    // elevation: 10,
     marginTop: 'auto',
     backgroundColor: Colors.blue,
     alignSelf: 'flex-start',
