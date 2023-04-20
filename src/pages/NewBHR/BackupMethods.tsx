@@ -50,10 +50,10 @@ export default function BackupMethods( { navigation } ) {
   }
 
   function onPressBackupWithKeeper() {
-    if( backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP ) {
-      navigation.navigate( 'BackupWithKeeper' )
-      dispatch( setBackupWithKeeperState( BackupWithKeeperState.INITIATED ) )
-    }
+    // if( backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP ) {
+    navigation.navigate( 'BackupWithKeeper' )
+    dispatch( setBackupWithKeeperState( BackupWithKeeperState.INITIATED ) )
+    // }
   }
 
   return (
@@ -66,7 +66,9 @@ export default function BackupMethods( { navigation } ) {
         marginTop: hp( 5 )
       } ]}>
         <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
+          style={[ CommonStyles.headerLeftIconContainer, {
+            marginTop: 20
+          } ]}
           onPress={() => {
             navigation.goBack()
           }}
@@ -101,9 +103,10 @@ export default function BackupMethods( { navigation } ) {
           <View style={{
             width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, borderColor:
           levelData[ 0 ].keeper1.status == 'accessible'
-            ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center', elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
-              width: 15, height: 15
-            }
+            ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center'
+            // , elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
+            //   width: 15, height: 15
+            // }
           }}
           >
             <View style={{
@@ -135,10 +138,11 @@ export default function BackupMethods( { navigation } ) {
         >
           <View style={{
             width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, borderColor:
-            backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP
-              ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center', elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
-              width: 15, height: 15
-            }
+            backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP
+              ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center',
+            //   elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
+            //   width: 15, height: 15
+            // }
           }}
           >
             <View style={{
@@ -150,14 +154,15 @@ export default function BackupMethods( { navigation } ) {
                 color={Colors.white} size={10} />
             </View>
             <Image style={{
-              height: 20, width: 20, tintColor: Colors.blue
-            }} resizeMode={'contain'} source={require( '../../assets/images/icons/seedwords.png' )} />
+              height: 20, width: 20
+              // , tintColor: Colors.blue
+            }} resizeMode={'contain'} source={require( '../../assets/images/icons/keeper.png' )} />
 
           </View>
           <Text style={{
             fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, color: Colors.black, margin: 10, textAlign: 'center'
           }}>
-            Backup width Keeper
+            Backup with Keeper
           </Text>
         </TouchableOpacity>
 

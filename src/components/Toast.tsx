@@ -10,8 +10,8 @@ export default ( message, toastPosition=-15 ) => {
     animation: true,
     hideOnPress: true,
     delay: 0,
-    opacity: 0.9,
-    backgroundColor: 'rgba(163, 99, 99, 0.5)',
+    opacity: 1,
+    backgroundColor: Colors.CLOSE_ICON_COLOR,
     textColor: Colors.white,
   } )
 }

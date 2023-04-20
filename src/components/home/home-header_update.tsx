@@ -200,7 +200,7 @@ const HomeHeader = ( {
     return <TouchableOpacity
       onPress={()=> {
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
-        levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){
+        levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup phrase' ){
           if ( ( levelHealth.length == 0 ) || 
           ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ||
           ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == KeeperType.SECURITY_QUESTION )

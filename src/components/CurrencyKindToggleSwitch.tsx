@@ -96,30 +96,30 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
               ( !isNotImage && materialIconCurrencyCodes.includes( fiatCurrencyCode ) ) && (
                 <CurrencyCodeIcon
                   currencyCode={fiatCurrencyCode}
-                  color={Colors.THEAM_TEXT_COLOR}
+                  color={Colors.white}
                 />
               )
               ||
                (
-                <Image
-                  source={
-                    inactiveOffImage || getCurrencyImageByRegion( fiatCurrencyCode, 'light' )
-                  }
-                  style={{
-                    width: wp( '3.5%' ),
-                    height: wp( '3.5%' ),
-                    resizeMode: 'contain',
-                    tintColor:Colors.THEAM_TEXT_COLOR
-                  }}
-                />
-              )
-               )}
+                 <Image
+                   source={
+                     inactiveOffImage || getCurrencyImageByRegion( fiatCurrencyCode, 'light' )
+                   }
+                   style={{
+                     width: wp( '3.5%' ),
+                     height: wp( '3.5%' ),
+                     resizeMode: 'contain',
+                     tintColor:Colors.THEAM_TEXT_COLOR
+                   }}
+                 />
+               )
+            )}
           </View>
 
           <View
             style={{
-              backgroundColor: 
-              // thumbColor || 
+              backgroundColor:
+              // thumbColor ||
               Colors.white,
               height: thumbSize || wp( '8%' ),
               width: thumbSize || wp( '8%' ),
@@ -152,7 +152,7 @@ const CurrencyKindToggleSwitch: React.FC<Props> = ( {
           <View
             style={{
               backgroundColor:
-              //  thumbColor ? thumbColor : 
+              //  thumbColor ? thumbColor :
                Colors.white,
               height: thumbSize || wp( '8%' ),
               width: thumbSize || wp( '8%' ),

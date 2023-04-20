@@ -393,7 +393,7 @@ const SeedPageComponent = ( props ) => {
               </Text>
             </TouchableOpacity>
           ) : null}
-          <View style={{
+          {seedData.length > 12 && <View style={{
             flexDirection: 'row'
           }}>
             {
@@ -403,7 +403,7 @@ const SeedPageComponent = ( props ) => {
                 )
               } )
             }
-          </View>
+          </View>}
         </View>
       </View> : null
       }

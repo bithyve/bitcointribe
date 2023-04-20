@@ -7,6 +7,7 @@ import {
   Text,
   StatusBar,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -14,18 +15,25 @@ import {
   widthPercentageToDP,
   heightPercentageToDP,
 } from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import CommonStyles from '../../common/Styles/Styles'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import CommonStyles from '../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { LocalizationContext } from '../../common/content/LocContext'
-import HeaderTitle1 from '../../components/HeaderTitle1'
-import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import LndConnectUtils from '../../utils/ln/LndConnectUtils'
-import Toast from '../../components/Toast'
+import { LocalizationContext } from '../common/content/LocContext'
+import HeaderTitle1 from '../components/HeaderTitle1'
+import CoveredQRCodeScanner from '../components/qr-code-scanning/CoveredQRCodeScanner'
+import BottomInfoBox from '../components/BottomInfoBox'
+import LndConnectUtils from '../utils/ln/LndConnectUtils'
+import Toast from '../components/Toast'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { recoverWalletUsingMnemonic } from '../store/actions/BHR'
+import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
+import * as bip39 from 'bip39'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { completedWalletSetup } from '../store/actions/setupAndAuth'
+import { setVersion } from '../store/actions/versionHistory'
+import { Wallet } from '../bitcoin/utilities/Interface'
 
 const styles = StyleSheet.create( {
   viewContainer: {
@@ -78,12 +86,14 @@ const styles = StyleSheet.create( {
   },
   addModalView: {
     backgroundColor: Colors.gray7,
-    paddingVertical: 25,
+    paddingVertical: 15,
     paddingHorizontal: widthPercentageToDP( 1 ),
-    flexDirection: 'row',
+    marginHorizontal: widthPercentageToDP( 5 ),
+    // flexDirection: 'row',
     display: 'flex',
+    width: '90%',
     justifyContent: 'space-between',
-    marginTop: heightPercentageToDP( '5' ),
+    // marginTop: heightPercentageToDP( '5' ),
     alignSelf: 'center',
     borderRadius: widthPercentageToDP( '2' ),
     marginBottom: heightPercentageToDP( '1.2' ),
@@ -98,60 +108,77 @@ const styles = StyleSheet.create( {
 } )
 
 
-export default function ScanNodeConfig( { navigation } ) {
+export default function CreateKeeperScreen( { navigation } ) {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'lightningAccount' ]
   const common = translations[ 'common' ]
   const [ knowMore, setKnowMore ] = useState( true )
+  const [ showLoader, setShowLoader ] = useState( false )
+  const dispatch = useDispatch()
+  const restoreSeedData = useSelector( ( state ) => state.bhr.loading.restoreSeedData )
+  const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
+  const [ mnemonic, setMnemonic ] = useState( null )
+
+  useEffect( () => {
+    setShowLoader( false )
+    if ( wallet ) {
+      dispatch( completedWalletSetup() )
+      AsyncStorage.setItem( 'walletRecovered', 'true' )
+      dispatch( setVersion( 'Restored' ) )
+      navigation.navigate( 'HomeNav' )
+    }
+  }, [ wallet ] )
+
+  useEffect( () => {
+    if( restoreSeedData == 'restoreSeedDataFailed' ){
+      setShowLoader( false )
+      navigation.navigate( 'NewWalletName', {
+        mnemonic,
+      } )
+    }
+  }, [ restoreSeedData ] )
 
   async function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
-    if( scannedData.includes( 'config' ) ){
-      const url = scannedData.split( 'config=' )[ 1 ]
-      LndConnectUtils.procesBtcPayConfig( url ).then(
-        res=> {
-          console.log( res )
-          const {
-            uri,
-            macaroon,
-            chainType,
-            port
-          } = res.configurations[ 0 ]
-          if ( uri && macaroon ) {
-            navigation.navigate( 'EnterNodeConfig', {
-              node: {
-                host: uri, port, macaroonHex: macaroon
-              },
-            } )
-          } else {
-            Toast( 'Error fetching config' )
-          }
-        }
-      ).catch( e=> {
-        console.log( e )
-        Toast( 'Error fetching config' )
+    if( scannedData != null && scannedData.length > 0 ){
+      setShowLoader( true )
+      let mnemonicData = scannedData.toString()
+      mnemonicData = mnemonicData.replace( /,/g, ' ' ).replace( /"/g, '' ).replace( '[', '' ).replace( ']', '' )
 
-      } )
-    } else {
-      const {
-        host,
-        port,
-        macaroonHex
-      } = LndConnectUtils.processLndConnectUrl( scannedData )
-      if( host &&  macaroonHex ) {
-        navigation.navigate( 'EnterNodeConfig', {
-          node: {
-            host: host, port: port, macaroonHex: macaroonHex
-          },
-        } )
-      } else {
-        Toast( 'Invalid QR' )
+      setMnemonic( mnemonicData )
+      // setTimeout( () => {
+      const isValidMnemonic = bip39.validateMnemonic( mnemonicData )
+      if ( !isValidMnemonic ) {
+        setShowLoader( false )
+        Toast( 'Invalid QR code' )
+        return
       }
+      // setTimeout( () => {
+      dispatch( recoverWalletUsingMnemonic( mnemonicData ) )
+      // }, 1000 )
+      // }, 2000 )
+    } else {
+      Toast( 'Invalid QR' )
     }
   }
 
   return (
 
     <SafeAreaView style={styles.viewContainer}>
+      {
+        showLoader &&
+        <View style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10
+        }}>
+          <ActivityIndicator size="large" color={Colors.babyGray} />
+        </View>
+      }
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
       <View style={[ CommonStyles.headerContainer, {
         backgroundColor: Colors.backgroundColor,
@@ -182,8 +209,8 @@ export default function ScanNodeConfig( { navigation } ) {
         }}
         keyboardShouldPersistTaps='handled'>
         <HeaderTitle1
-          firstLineTitle={'Set up Lighting Account'}
-          secondLineTitle={strings.Connectyournode}
+          firstLineTitle={'Create with Keeper'}
+          secondLineTitle={'Scan QR'}
           infoTextNormal={''}
           infoTextBold={''}
           infoTextNormal1={''}
@@ -196,45 +223,23 @@ export default function ScanNodeConfig( { navigation } ) {
             marginBottom: 16
           }}
         />
-        {/* <TouchableOpacity
-          style={styles.buttonView}
-          activeOpacity={0.6}
-          onPress={() => {
-            navigation.navigate( 'EnterNodeConfig' )
-          }}
+        <View style={{
+          flex:1
+        }}/>
+        <View
+          style={styles.addModalView}
         >
-          <Text style={styles.buttonText}>{strings.Entermanually}</Text>
-        </TouchableOpacity> */}
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate( 'EnterNodeConfig' )
-          }}
-          activeOpacity={0.6}
-          style={styles.addModalView
-          }
-        >
-          <View style={{
-            flex: 0.9,
-          }
-          }>
-            <Text
-              style={styles.textHelpUs}
-            >
-              {strings.Entermanually}
-            </Text>
-            <Text
-              style={styles.textHelpUsSub}
-            >
-              {'Customize your set up'}
-            </Text>
-          </View>
-          <Ionicons
-            name={'chevron-forward'}
-            color={Colors.textColorGrey}
-            size={22}
-            style={styles.icArrow}
-          />
-        </TouchableOpacity>
+          <Text
+            style={styles.textHelpUs}
+          >
+            {'Note'}
+          </Text>
+          <Text
+            style={styles.textHelpUsSub} numberOfLines={3}
+          >
+            {'With this option your wallet would be backedup with Keeper automatically'}
+          </Text>
+        </View>
       </ScrollView>
 
 

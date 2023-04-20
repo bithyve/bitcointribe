@@ -30,6 +30,7 @@ import HomeStack from './stacks/home/HomeStack'
 import FriendsAndFamily from './stacks/F&F/F&FStack'
 import Colors from '../common/Colors'
 import Intermediate from '../pages/Intermediate'
+import CreateKeeperScreen from '../pages/CreateKeeperScreen'
 
 import RestoreWithICloud from '../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
@@ -82,6 +83,7 @@ const SetupNavigator = createStackNavigator(
     },
     PasscodeConfirm,
     NewWalletName,
+    CreateKeeperScreen,
     AccountSelection,
     NewWalletQuestion,
     WalletInitialization: WalletInitializationScreen,

@@ -90,8 +90,9 @@ const HomeBuyCard = ( {
   const { translations, formatString } = useContext( LocalizationContext )
   const strings = translations[ 'home' ]
   return (
-    <Shadow startColor={Colors.shadowColor} distance={0} offset={[ 8, 8 ] }
-      viewStyle={cardContainer}
+    <View
+    // startColor={Colors.shadowColor} distance={0} offset={[ 8, 8 ] }
+      style={cardContainer}
     >
       <View>
         <Text style={{
@@ -129,7 +130,7 @@ const HomeBuyCard = ( {
             </Text>
           )}
           <Text style={{
-            fontSize:RFValue(16), color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
+            fontSize:RFValue( 16 ), color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
             fontFamily: Fonts.SemiBold
           }}>{amount ? amount : '--'}</Text>
           <Text>{incramount}</Text>
@@ -178,7 +179,7 @@ const HomeBuyCard = ( {
           </Text>
         </TouchableOpacity>
       </LinearGradient>
-    </Shadow>
+    </View>
   )
 }
 // const styles = StyleSheet.create( {
