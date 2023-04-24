@@ -33,7 +33,10 @@ import * as bip39 from 'bip39'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { completedWalletSetup } from '../store/actions/setupAndAuth'
 import { setVersion } from '../store/actions/versionHistory'
-import { Wallet } from '../bitcoin/utilities/Interface'
+import { AccountType, Wallet } from '../bitcoin/utilities/Interface'
+import AccountUtilities from '../bitcoin/utilities/accounts/AccountUtilities'
+import Config from '../bitcoin/HexaConfig'
+
 
 const styles = StyleSheet.create( {
   viewContainer: {
@@ -118,6 +121,7 @@ export default function CreateKeeperScreen( { navigation } ) {
   const restoreSeedData = useSelector( ( state ) => state.bhr.loading.restoreSeedData )
   const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
   const [ mnemonic, setMnemonic ] = useState( null )
+  const path = AccountUtilities.getDerivationPath( Config.NETWORK_TYPE, AccountType.CHECKING_ACCOUNT, 0 )
 
   useEffect( () => {
     setShowLoader( false )
@@ -216,13 +220,77 @@ export default function CreateKeeperScreen( { navigation } ) {
           infoTextNormal1={''}
           step={''}
         />
-
         <CoveredQRCodeScanner
           onCodeScanned={handleBarcodeRecognized}
           containerStyle={{
             marginBottom: 16
           }}
         />
+        <View
+          style={{
+          // flex: 1,
+            width:wp( '82%' ),
+            backgroundColor: Colors.white,
+            // borderRadius: wp( 3 ),
+            borderRadius: wp( 3 ),
+            height: wp( '13%' ),
+            paddingLeft: 15,
+            paddingRight: 15,
+            justifyContent: 'center',
+            alignSelf: 'center'
+          }}
+        >
+          <Text style={{
+            fontSize: RFValue( 10 ),
+            marginBottom: RFValue( 2 ),
+            color: Colors.THEAM_INFO_TEXT_COLOR,
+            fontFamily: Fonts.Regular
+          }}>{'Path'}</Text>
+
+          <Text
+            numberOfLines={1}
+            style={{
+              fontSize: RFValue( 13 ),
+              color: Colors.CLOSE_ICON_COLOR,
+              fontFamily: Fonts.Regular
+            }}
+          >
+            {path}
+          </Text>
+        </View>
+        <View
+          style={{
+          // flex: 1,
+            width:wp( '82%' ),
+            backgroundColor: Colors.white,
+            // borderRadius: wp( 3 ),
+            borderRadius: wp( 3 ),
+            height: wp( '13%' ),
+            paddingLeft: 15,
+            paddingRight: 15,
+            justifyContent: 'center',
+            alignSelf: 'center',
+            marginTop:wp( 3 )
+          }}
+        >
+          <Text style={{
+            fontSize: RFValue( 10 ),
+            marginBottom: RFValue( 2 ),
+            color: Colors.THEAM_INFO_TEXT_COLOR,
+            fontFamily: Fonts.Regular
+          }}>{'Purpose'}</Text>
+
+          <Text
+            numberOfLines={1}
+            style={{
+              fontSize: RFValue( 13 ),
+              color: Colors.CLOSE_ICON_COLOR,
+              fontFamily: Fonts.Regular
+            }}
+          >
+            {'P2SH-P2WPKH: Wrapped segwit'}
+          </Text>
+        </View>
         <View style={{
           flex:1
         }}/>
