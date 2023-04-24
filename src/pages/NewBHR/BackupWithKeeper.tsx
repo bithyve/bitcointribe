@@ -110,7 +110,7 @@ export default function BackupWithKeeper( { navigation } ) {
 
     const path = AccountUtilities.getDerivationPath( Config.NETWORK_TYPE, AccountType.CHECKING_ACCOUNT, 0 )
     setPath( path )
-    const url = `keeperdev://backup/${Buffer.from( `&seed=${primaryMnemonic.replace( / /g, ',' )}&path=${path}&name=hexa&appId=hexadev`, 'utf8' ).toString(
+    const url = `keeperdev://backup/${Buffer.from( `&seed=${primaryMnemonic.replace( / /g, ',' )}&path=${path}&purpose=${'P2SH-P2WPKH: Wrapped segwit'}&name=hexa&appId=hexadev`, 'utf8' ).toString(
       'base64',
     )}`
     setDeeplinkUrl( url )
@@ -307,7 +307,7 @@ export default function BackupWithKeeper( { navigation } ) {
           <Text
             style={styles.titleText}
           >
-            {'Download Keeper from App Store'}
+            {isKeeperInstalled ? 'Open Keeper App':'Download Keeper from App Store'}
           </Text>
           <Text
             style={styles.subText}
