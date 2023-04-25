@@ -107,6 +107,7 @@ const styles = StyleSheet.create( {
     },
     shadowRadius: 6,
     elevation: 6,
+    marginTop:20,
   },
 } )
 
@@ -205,8 +206,8 @@ export default function CreateKeeperScreen( { navigation } ) {
 
       </View>
       <ScrollView
-        overScrollMode="never"
-        bounces={false}
+        // overScrollMode="never"
+        // bounces={false}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           flexGrow: 1
@@ -220,16 +221,26 @@ export default function CreateKeeperScreen( { navigation } ) {
           infoTextNormal1={''}
           step={''}
         />
+        <Text style={{
+          fontSize: RFValue( 11 ),
+          marginBottom: RFValue( 2 ),
+          color: Colors.THEAM_INFO_TEXT_COLOR,
+          fontFamily: Fonts.Regular, 
+          paddingHorizontal: RFValue( 20 )
+        }}>{'Open the Keeper App > Go to Linked Wallets >  Select Wallet Seed Words > Enter your Keeper passcode > There beneath the hidden Seed Words click on Show as QR. Please scan that QR'}</Text>
         <CoveredQRCodeScanner
           onCodeScanned={handleBarcodeRecognized}
           containerStyle={{
-            marginBottom: 16
+            marginBottom: 16,
+            height: hp( 35 ),
+            width: hp( 40 ),
+            marginTop: 20
           }}
         />
         <View
           style={{
           // flex: 1,
-            width:wp( '82%' ),
+            width:wp( '85%' ),
             backgroundColor: Colors.white,
             // borderRadius: wp( 3 ),
             borderRadius: wp( 3 ),
@@ -261,7 +272,7 @@ export default function CreateKeeperScreen( { navigation } ) {
         <View
           style={{
           // flex: 1,
-            width:wp( '82%' ),
+            width:wp( '85%' ),
             backgroundColor: Colors.white,
             // borderRadius: wp( 3 ),
             borderRadius: wp( 3 ),
