@@ -283,7 +283,7 @@ export default function BackupWithKeeper( { navigation } ) {
               <Text
                 style={styles.subText}
               >
-                {'Check the health of your Backup in the Keeper app'}
+                {backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP ? 'You can also view the backed-up wallet on the Keeper app' : 'Check the health of your Backup in the Keeper app'}
               </Text>
             </TouchableOpacity>
           </View>
