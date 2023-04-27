@@ -91,7 +91,12 @@
             "heading": "Nu gave med SATSCARD",
             "text": "Brug SATSCARD til at sende og modtage gaver med dine kære",
             "subText": ""
-          }
+          },
+          {
+            "heading": "Tribe wordt nu ondersteund door Keeper",
+            "text": "Maak een nieuwe portemonnee aan of maak een back-up van een bestaande met Bitcoin Keeper",
+            "subText": ""
+        }
       ],
       "Hello": "Hallo!",
       "create": "Login erstellen",

@@ -283,7 +283,7 @@ export default function BackupWithKeeper( { navigation } ) {
               <Text
                 style={styles.subText}
               >
-                {'Check the health of your Backup in the Keeper app'}
+                {backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP ? 'You can also view the backed-up wallet on the Keeper app' : 'Check the health of your Backup in the Keeper app'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -307,7 +307,7 @@ export default function BackupWithKeeper( { navigation } ) {
           <Text
             style={styles.titleText}
           >
-            {isKeeperInstalled ? 'Open Keeper App':'Download Keeper from App Store'}
+            {isKeeperInstalled ? 'Open Keeper App': Platform.OS == 'ios' ? 'Download Keeper from App Store' : 'Download Keeper from Play Store'}
           </Text>
           <Text
             style={styles.subText}
