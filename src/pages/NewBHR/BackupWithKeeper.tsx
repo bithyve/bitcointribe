@@ -9,7 +9,6 @@ import {
   widthPercentageToDP,
   heightPercentageToDP,
 } from 'react-native-responsive-screen'
-import Config from '../../bitcoin/HexaConfig'
 import CommonStyles from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
@@ -26,6 +25,8 @@ import { setBackupWithKeeperState } from '../../store/actions/BHR'
 import CopyThisText from '../../components/CopyThisText'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CheckMark from '../../assets/images/svgs/checkmark.svg'
+import HexaConfig from '../../bitcoin/HexaConfig'
+import { APP_STAGE } from '../../common/interfaces/Interfaces'
 
 const styles = StyleSheet.create( {
   buttonText: {
@@ -110,7 +111,7 @@ export default function BackupWithKeeper( { navigation } ) {
     setSeed( primaryMnemonic )
     const path = checkingAccount[ 0 ].derivationPath
     setPath( path )
-    const url = `keeperdev://backup/${Buffer.from( `&seed=${primaryMnemonic.replace( / /g, ',' )}&path=${path}&purpose=${'P2SH-P2WPKH: Wrapped segwit'}&name=tribe&appId=hexadev`, 'utf8' ).toString(
+    const url = `${HexaConfig.APP_STAGE === APP_STAGE.DEVELOPMENT ? 'keeperdev': 'keeper'}://backup/${Buffer.from( `&seed=${primaryMnemonic.replace( / /g, ',' )}&path=${path}&purpose=${'P2SH-P2WPKH: Wrapped segwit'}&name=tribe&appId=${HexaConfig.APP_STAGE === APP_STAGE.DEVELOPMENT ? 'hexadev': 'hexa'}`, 'utf8' ).toString(
       'base64',
     )}`
     setDeeplinkUrl( url )
@@ -283,7 +284,7 @@ export default function BackupWithKeeper( { navigation } ) {
               <Text
                 style={styles.subText}
               >
-                {'Check the health of your Backup in the Keeper app'}
+                {backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP ? 'You can also view the backed-up wallet on the Keeper app' : 'Check the health of your Backup in the Keeper app'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -307,7 +308,7 @@ export default function BackupWithKeeper( { navigation } ) {
           <Text
             style={styles.titleText}
           >
-            {isKeeperInstalled ? 'Open Keeper App':'Download Keeper from App Store'}
+            {isKeeperInstalled ? 'Open Keeper App': Platform.OS == 'ios' ? 'Download Keeper from App Store' : 'Download Keeper from Play Store'}
           </Text>
           <Text
             style={styles.subText}

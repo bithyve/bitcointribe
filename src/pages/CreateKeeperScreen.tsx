@@ -33,9 +33,10 @@ import * as bip39 from 'bip39'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { completedWalletSetup } from '../store/actions/setupAndAuth'
 import { setVersion } from '../store/actions/versionHistory'
-import { AccountType, Wallet } from '../bitcoin/utilities/Interface'
+import { AccountType, NetworkType, Wallet } from '../bitcoin/utilities/Interface'
 import AccountUtilities from '../bitcoin/utilities/accounts/AccountUtilities'
 import Config from '../bitcoin/HexaConfig'
+import { config } from 'process'
 
 
 const styles = StyleSheet.create( {
@@ -122,7 +123,7 @@ export default function CreateKeeperScreen( { navigation } ) {
   const restoreSeedData = useSelector( ( state ) => state.bhr.loading.restoreSeedData )
   const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
   const [ mnemonic, setMnemonic ] = useState( null )
-  const path = AccountUtilities.getDerivationPath( Config.NETWORK_TYPE, AccountType.CHECKING_ACCOUNT, 0 )
+  const path = AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
 
   useEffect( () => {
     setShowLoader( false )
