@@ -9,13 +9,12 @@ import {
   widthPercentageToDP,
   heightPercentageToDP,
 } from 'react-native-responsive-screen'
-import Config from '../../bitcoin/HexaConfig'
 import CommonStyles from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
 import { translations } from '../../common/content/LocContext'
 import { useDispatch, useSelector } from 'react-redux'
-import { AccountType, Wallet } from '../../bitcoin/utilities/Interface'
+import { Accounts, AccountType, Wallet } from '../../bitcoin/utilities/Interface'
 import dbManager from '../../storage/realm/dbManager'
 import QRCode from '../../components/QRCode'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
@@ -26,6 +25,8 @@ import { setBackupWithKeeperState } from '../../store/actions/BHR'
 import CopyThisText from '../../components/CopyThisText'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CheckMark from '../../assets/images/svgs/checkmark.svg'
+import HexaConfig from '../../bitcoin/HexaConfig'
+import { APP_STAGE } from '../../common/interfaces/Interfaces'
 
 const styles = StyleSheet.create( {
   buttonText: {
@@ -97,7 +98,8 @@ export default function BackupWithKeeper( { navigation } ) {
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const dispatch = useDispatch()
   const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
-
+  const accounts: Accounts = useSelector( state => state.accounts.accounts )
+  const checkingAccount = Object.values( accounts ).filter( acc => acc.type === AccountType.CHECKING_ACCOUNT )
   useEffect(  () => {
     init()
   }, [] )
@@ -107,10 +109,9 @@ export default function BackupWithKeeper( { navigation } ) {
     const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
     const primaryMnemonic = walletObj.primaryMnemonic
     setSeed( primaryMnemonic )
-
-    const path = AccountUtilities.getDerivationPath( Config.NETWORK_TYPE, AccountType.CHECKING_ACCOUNT, 0 )
+    const path = checkingAccount[ 0 ].derivationPath
     setPath( path )
-    const url = `keeperdev://backup/${Buffer.from( `&seed=${primaryMnemonic.replace( / /g, ',' )}&path=${path}&purpose=${'P2SH-P2WPKH: Wrapped segwit'}&name=hexa&appId=hexadev`, 'utf8' ).toString(
+    const url = `${HexaConfig.APP_STAGE === APP_STAGE.DEVELOPMENT ? 'keeperdev': 'keeper'}://backup/${Buffer.from( `&seed=${primaryMnemonic.replace( / /g, ',' )}&path=${path}&purpose=${'P2SH-P2WPKH: Wrapped segwit'}&name=tribe&appId=${HexaConfig.APP_STAGE === APP_STAGE.DEVELOPMENT ? 'hexadev': 'hexa'}`, 'utf8' ).toString(
       'base64',
     )}`
     setDeeplinkUrl( url )
@@ -187,7 +188,7 @@ export default function BackupWithKeeper( { navigation } ) {
           alignItems: 'center', marginVertical: 20
         }}
       >
-        <QRCode title="Seed" value={seed} size={hp( '25%' )} />
+        <QRCode title="Backup Phrase" value={seed} size={hp( '25%' )} />
       </View>
 
       <CopyThisText
@@ -283,7 +284,7 @@ export default function BackupWithKeeper( { navigation } ) {
               <Text
                 style={styles.subText}
               >
-                {'Check the health of your Backup in the Keeper app'}
+                {backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP ? 'You can also view the backed-up wallet on the Keeper app' : 'Check the health of your Backup in the Keeper app'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -307,7 +308,7 @@ export default function BackupWithKeeper( { navigation } ) {
           <Text
             style={styles.titleText}
           >
-            {isKeeperInstalled ? 'Open Keeper App':'Download Keeper from App Store'}
+            {isKeeperInstalled ? 'Open Keeper App': Platform.OS == 'ios' ? 'Download Keeper from App Store' : 'Download Keeper from Play Store'}
           </Text>
           <Text
             style={styles.subText}
