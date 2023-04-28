@@ -86,7 +86,12 @@
             "heading": "Agora presenteie com SATSCARD",
             "text": "Use SATSCARD para enviar e receber presentes com seus entes queridos",
             "subText": ""
-          }
+          },
+          {
+            "heading": "Tribe agora suportado pelo Keeper",
+            "text": "Crie uma nova carteira ou faça backup de uma já existente com o Bitcoin Keeper",
+            "subText": ""
+        }
       ],
       "Hello": "Olá!",
       "create": "Crie um login",

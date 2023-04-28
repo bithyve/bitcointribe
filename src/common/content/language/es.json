@@ -86,7 +86,12 @@
             "heading": "Nun donacu per SATSCARDO",
             "text": "Uzu SATSCARD por sendi kaj ricevi donacojn kun viaj amatoj",
             "subText": ""
-          }
+          },
+          {
+            "heading": "Tribe nun apogita fare de Keeper",
+            "text": "Kreu novan monujon aŭ sekurigu ekzistantan per Bitcoin Keeper",
+            "subText": ""
+        }
       ],
       "Hello": "¡Hola!",
       "create": "Crear un inicio de sesión",
