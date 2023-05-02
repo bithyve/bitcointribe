@@ -23,7 +23,7 @@ export default function BackupTypeModalContent( props ) {
     },
     {
       name: 'Seed Words',
-      info: 'Make a note of your seed words',
+      info: 'Make a note of your Backup Phrase',
       image: require( '../../assets/images/icons/seedwords.png' ),
     },
   ]

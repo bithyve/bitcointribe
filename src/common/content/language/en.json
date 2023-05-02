@@ -645,7 +645,7 @@
     "Multi-Key Backup": "Multi-Key Backup",
     "HealthCheckConfirmPassword": "Health Check Confirm Password",
     "Specifythepassword": "Specify the password as you did at the time of setting up the wallet",
-    "SpecifytheSeedWord": "Specify the Seecond Seed Word as you did at the time of setting up the wallet",
+    "SpecifytheSeedWord": "Specify the Seecond Backup Phrase as you did at the time of setting up the wallet",
     "Hint": "Hint",
     "Backupwithcloud": "Backup on cloud",
     "BackupwithcloudSub": "Backup the Recovery Key on cloud",

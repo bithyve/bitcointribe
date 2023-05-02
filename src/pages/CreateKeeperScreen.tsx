@@ -228,7 +228,7 @@ export default function CreateKeeperScreen( { navigation } ) {
           color: Colors.THEAM_INFO_TEXT_COLOR,
           fontFamily: Fonts.Regular, 
           paddingHorizontal: RFValue( 20 )
-        }}>{'Open the Keeper App > Go to Linked Wallets >  Select Wallet Seed Words > Enter your Keeper passcode > There beneath the hidden Seed Words click on Show as QR. Please scan that QR'}</Text>
+        }}>{'Open the Keeper App > Go to Linked Wallets >  Select Wallet Backup Phrase > Enter your Keeper passcode > There beneath the hidden Backup Phrase click on Show as QR. Please scan that QR'}</Text>
         <CoveredQRCodeScanner
           onCodeScanned={handleBarcodeRecognized}
           containerStyle={{

@@ -69,7 +69,7 @@ function SecuritySeedWord( props ) {
         return
       }
       // setErrorText( security && security.questionId == '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
-      setErrorText( 'Entered Seed word is incorrect' )
+      setErrorText( 'Entered Backup Phrase is incorrect' )
 
     } else {
       setErrorText( '' )
@@ -276,7 +276,7 @@ function SecuritySeedWord( props ) {
                 // }
               } else {
                 // setErrorText( security && security.questionId == '0' ? stringsLogin.passwordisincorrect : stringsLogin.Answerisincorrect )
-                setErrorText ( 'Entered seed word is incorrect' )
+                setErrorText ( 'Entered Backup Phrase is incorrect' )
               }
               setIsDisabled( false )
             }}
