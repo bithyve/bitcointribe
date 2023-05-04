@@ -93,7 +93,6 @@ const SeedPageComponent = ( props ) => {
     const nextPosition = currentPosition + 1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
-    // props.setHeaderMessage( 'Last 12 seed words' )
     props.setHeaderMessage( 'Last 12 Backup phrase' )
   }
 
@@ -110,7 +109,7 @@ const SeedPageComponent = ( props ) => {
       else seed = seed + ' ' + name
     } )
     if ( showValidation ) {
-      Alert.alert( 'Please fill all seed words' )
+      Alert.alert( 'Please fill all Backup Phrase' )
     } else {
       props.onPressConfirm( seed, seedData )
     }
@@ -121,7 +120,6 @@ const SeedPageComponent = ( props ) => {
     const nextPosition = currentPosition - 1
     setCurrentPosition( nextPosition )
     ref.current?.setPage( nextPosition )
-    // props.setHeaderMessage( 'First 12 seed words' )
     props.setHeaderMessage( 'Backup phrase' )
   }
 
@@ -209,10 +207,8 @@ const SeedPageComponent = ( props ) => {
           listener: ( { nativeEvent: { position } } ) => {
             setCurrentPosition( position )
             if ( position == 0 )
-              // props.setHeaderMessage( 'First 12 seed words' )
               props.setHeaderMessage( 'Backup phrase' )
             else
-              // props.setHeaderMessage( 'Last 12 seed words' )
               props.setHeaderMessage( 'Last 12 Backup phrase' )
           },
           useNativeDriver: true,

@@ -50,6 +50,7 @@ import {
   SEED_BACKUP_HISTORY,
   RESTORE_SEED_WORD,
   SET_BACKUP_WITH_KEEPER_STATE,
+  CREATE_WITH_KEEPER_STATE
 } from '../actions/BHR'
 
 interface historyObj {
@@ -140,6 +141,7 @@ const initialState: {
   passwordResetState: string;
   seedBackupHistory: historyObj[];
   backupWithKeeperStatus: BackupWithKeeperState
+  createWithKeeperStatus: BackupWithKeeperState
 } = {
   seedBackupHistory: [],
   mnemonic: '',
@@ -215,7 +217,8 @@ const initialState: {
   IsCurrentLevel0: false,
   pdfUpgrade: false,
   passwordResetState: '',
-  backupWithKeeperStatus: BackupWithKeeperState.NOT_SETUP
+  backupWithKeeperStatus: BackupWithKeeperState.NOT_SETUP,
+  createWithKeeperStatus: BackupWithKeeperState.NOT_SETUP
 }
 
 export default ( state = initialState, action ) => {
@@ -533,6 +536,11 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           backupWithKeeperStatus: action.payload.state,
+        }
+      case CREATE_WITH_KEEPER_STATE:
+        return {
+          ...state,
+          createWithKeeperStatus: action.payload.state,
         }
   }
   return state

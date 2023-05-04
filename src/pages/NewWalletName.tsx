@@ -94,7 +94,7 @@ export default function NewWalletName( props ) {
       // headerText={'Gift Sats'}
       // messageText={'Send sats as gifts to your friends and family.'}
       headerText={'Backup phrase'}
-      messageText={'New backup method: Now note down twelve-word phrase (seed words) to backup your wallet'}
+      messageText={'New backup method: Now note down twelve-word phrase (Backup Phrase) to backup your wallet'}
       showGif={false}
     />
   }, [ message, subTextMessage, loaderModal ] )

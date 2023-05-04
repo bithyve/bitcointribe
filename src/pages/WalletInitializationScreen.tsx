@@ -56,7 +56,7 @@ const WalletInitializationScreen = props => {
           <View style={styles.textView}>
             <Text style={styles.touchableText}>
               {
-                'Start with a new Tribe Wallet wallet'
+                'Start with a new Tribe Wallet'
               }
             </Text>
           </View>
@@ -87,7 +87,7 @@ const WalletInitializationScreen = props => {
           <View style={styles.textView}>
             <Text style={styles.touchableText}>
               {
-                'Create with BitcoinKeeper'
+                'Create with Bitcoin Keeper'
               }
             </Text>
           </View>
@@ -112,7 +112,7 @@ const WalletInitializationScreen = props => {
           <Text style={styles.headerTitleText}>{`${strings.Existing} Wallet`}</Text>
           <Text style={styles.headerInfoText}>
             {/* {strings.previously} */}
-            {'Use Backup Phrase if you have 12/18/24 word seed phrase. Recovery Keys are for legacy users'}
+            {'Use Backup Phrase if you have 12/18/24 word Backup Phrase. Recovery Keys are for legacy users'}
           </Text>
         </View>
         <TouchableOpacity
@@ -128,7 +128,7 @@ const WalletInitializationScreen = props => {
             source={require( '../assets/images/icons/seedwords.png' )}
           />
           <View style={styles.textView}>
-            <Text style={styles.touchableText}>Using Backup phrase</Text>
+            <Text style={styles.touchableText}>Using Backup Phrase</Text>
           </View>
           <View style={styles.arrowIconView}>
             <MaterialIcons
@@ -200,7 +200,7 @@ const WalletInitializationScreen = props => {
             source={require( '../assets/images/icons/seedwords.png' )}
           />
           <View style={styles.textView}>
-            <Text style={styles.touchableText}>Using Seed Words</Text>
+            <Text style={styles.touchableText}>Using Backup Phrase</Text>
           </View>
           <View style={styles.arrowIconView}>
             <MaterialIcons

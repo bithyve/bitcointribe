@@ -999,10 +999,10 @@ const WalletBackup = ( props, navigation ) => {
       <ModalContainer onBackground={() => setSeedBackupModal( false )} visible={seedBackupModal}
         closeBottomSheet={() => setSeedBackupModal( false )}>
         <SeedBacupModalContents
-          // title={'Backup using \nSeed Words'}
+          // title={'Backup using \nBackup Phrase'}
           title={'Backup using phrase'}
           // info={'You will be shown 12 English words that you need to write down privately\n\nMake sure you keep them safe'}
-          info={'Twelve-word backup phrase (Seed Words)\nMake sure you note them down in private and keep them secure.\n'}
+          info={'Twelve-word backup phrase (Backup Phrase)\nMake sure you note them down in private and keep them secure.\n'}
           note={'If someone gets access to these, they can withdraw all the funds. If you lose them, you will not be able to restore the wallet'}
           proceedButtonText={'Proceed'}
           bottomBoxInfo={true}

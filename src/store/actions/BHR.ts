@@ -84,6 +84,7 @@ export const RESET_LEVEL_AFTER_PASSWORD_CHANGE = 'RESET_LEVEL_AFTER_PASSWORD_CHA
 export const SEED_BACKUP_HISTORY = 'SEED_BACKUP_HISTORY'
 export const RESTORE_SEED_WORD = 'RESTORE_SEED_WORD'
 export const SET_BACKUP_WITH_KEEPER_STATE = 'SET_BACKUP_WITH_KEEPER_STATE'
+export const CREATE_WITH_KEEPER_STATE = 'CREATE_WITH_KEEPER_STATE'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -843,6 +844,14 @@ export const upgradeLevelOneKeeper = ( ) => {
 export const setBackupWithKeeperState = ( state ) => {
   return {
     type: SET_BACKUP_WITH_KEEPER_STATE, payload: {
+      state
+    }
+  }
+}
+
+export const createWithKeeperState = ( state ) => {
+  return {
+    type: CREATE_WITH_KEEPER_STATE, payload: {
       state
     }
   }

@@ -38,7 +38,7 @@ const BackupSeedWordsContent = ( props ) => {
   const [ seedData, setSeedData ] = useState( [] )
   const [ seedPosition, setSeedPosition ] = useState( 0 )
   const [ headerTitle, setHeaderTitle ]=useState( 'Backup phrase' )
-  // const [ headerTitle, setHeaderTitle ]=useState( 'First 6 Seed Words' )
+  // const [ headerTitle, setHeaderTitle ]=useState( 'First 6 Backup Phrase' )
 
   const dispatch = useDispatch()
   const fromHistory = props.navigation.getParam( 'fromHistory' )

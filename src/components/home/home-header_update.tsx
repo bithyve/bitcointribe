@@ -54,6 +54,7 @@ import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import moment from 'moment'
 import { onPressKeeper } from '../../store/actions/BHR'
+import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -105,6 +106,7 @@ const HomeHeader = ( {
     ( state ) => state.preferences.currencyCode
   )
   const cloudErrorMessage: string = useSelector( ( state ) => state.cloud.cloudErrorMessage )
+  const createWithKeeperStatus: CreateWithKeeperState  =useSelector( ( state ) => state.bhr.createWithKeeperStatus )
   const stringsBhr  = translations[ 'bhr' ]
   const common  = translations[ 'common' ]
   const iCloudErrors  = translations[ 'iCloudErrors' ]
@@ -201,7 +203,7 @@ const HomeHeader = ( {
       onPress={()=> {
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
         levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup phrase' ){
-          if ( ( levelHealth.length == 0 ) || 
+          if ( ( levelHealth.length == 0 ) ||
           ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ||
           ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == KeeperType.SECURITY_QUESTION )
           ) {
@@ -246,7 +248,7 @@ const HomeHeader = ( {
           alignItems:'center',
           justifyContent: 'center'
         }}>
-          {/* { levelData[ 0 ].keeper1.status == 'accessible' && levelData[ 0 ].keeper1.shareType == 'seed' ? 
+          {/* { levelData[ 0 ].keeper1.status == 'accessible' && levelData[ 0 ].keeper1.shareType == 'seed' ?
           <Image
             source={ require( '../../assets/images/icons/check_white.png' )}
             style={{
@@ -255,14 +257,14 @@ const HomeHeader = ( {
             }}
             resizeMode={'contain'}
           /> : */}
-            <Image
-              source={levelData[ 0 ].keeper1.shareType !== 'seed' ? require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
-              style={{
-                width: wp( '2.7%' ), height: wp( '2.7%' ),
-                // tintColor: Colors.white
-              }}
-              resizeMode={'contain'}
-            />
+          <Image
+            source={levelData[ 0 ].keeper1.shareType !== 'seed' ? require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
+            style={{
+              width: wp( '2.7%' ), height: wp( '2.7%' ),
+              // tintColor: Colors.white
+            }}
+            resizeMode={'contain'}
+          />
           {/* } */}
         </View>
       }
@@ -276,11 +278,13 @@ const HomeHeader = ( {
           ? 'Wallet backup phrase is expired'
           : days > 150
             ? 'Wallet backup phrase will expire soon'
-            : levelData[ 0 ].keeper1.shareType == ''
+            : createWithKeeperStatus == CreateWithKeeperState.BACKEDUP
+              ? 'Wallet backup confirmed'
+              :levelData[ 0 ].keeper1.shareType == ''
               // ? strings.Backupyour
-              ? 'Confirm Backup Phrase'
-              : ( levelData[ 0 ].keeper1.shareType == 'seed'
-                ? 'Wallet backup confirmed' : 'Confirm Backup Phrase' )}
+                ? 'Confirm Backup Phrase'
+                : ( levelData[ 0 ].keeper1.shareType == 'seed'
+                  ? 'Wallet backup confirmed' : 'Confirm Backup Phrase' )}
       </Text>
 
       {/* {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{

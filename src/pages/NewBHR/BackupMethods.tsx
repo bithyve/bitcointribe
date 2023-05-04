@@ -15,7 +15,7 @@ import { translations } from '../../common/content/LocContext'
 import { useDispatch, useSelector } from 'react-redux'
 import { LevelData } from '../../bitcoin/utilities/Interface'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
-import { setBackupWithKeeperState } from '../../store/actions/BHR'
+import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
 
 const styles = StyleSheet.create( {
   body: {
@@ -43,6 +43,8 @@ export default function BackupMethods( { navigation } ) {
   const strings  = translations[ 'bhr' ]
   const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
   const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
+  const createWithKeeperStatus: CreateWithKeeperState  = useSelector( ( state ) => state.bhr.createWithKeeperStatus )
+
   const dispatch = useDispatch()
 
   function onKeeperButtonPress () {
@@ -52,7 +54,7 @@ export default function BackupMethods( { navigation } ) {
   function onPressBackupWithKeeper() {
     // if( backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP ) {
     navigation.navigate( 'BackupWithKeeper' )
-    dispatch( setBackupWithKeeperState( BackupWithKeeperState.INITIATED ) )
+    // dispatch( setBackupWithKeeperState( BackupWithKeeperState.INITIATED ) )
     // }
   }
 
@@ -85,7 +87,14 @@ export default function BackupMethods( { navigation } ) {
       </View>
       <HeaderTitle
         firstLineTitle={strings.WalletBackup}
-        secondLineTitle={strings.WalletBackupInfo1}
+        secondLineTitle={createWithKeeperStatus == CreateWithKeeperState.BACKEDUP
+          ? 'Wallet backup confirmed' : backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP
+            ? 'Wallet backup confirmed'
+            : levelData[ 0 ].keeper1.status == 'notSetup'
+              ? 'Confirm backup phrase'
+              : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
+                ? 'Wallet backup confirmed'
+                :'Confirm backup phrase'}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}
