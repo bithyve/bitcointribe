@@ -89,7 +89,7 @@ export default function ConfirmSeedWordsModal( props ) {
           fontFamily: Fonts.Regular,
           marginHorizontal: wp( '5%' ),
           marginTop: 30
-        }} >{'Confirm backup phrase'}</Text>
+        }} >{'Confirm Backup Phrase'}</Text>
         <Text style={{
           color: Colors.lightTextColor,
           fontSize: RFValue( 11 ),

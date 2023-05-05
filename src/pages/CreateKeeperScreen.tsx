@@ -23,11 +23,8 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { LocalizationContext } from '../common/content/LocContext'
 import HeaderTitle1 from '../components/HeaderTitle1'
 import CoveredQRCodeScanner from '../components/qr-code-scanning/CoveredQRCodeScanner'
-import BottomInfoBox from '../components/BottomInfoBox'
-import LndConnectUtils from '../utils/ln/LndConnectUtils'
 import Toast from '../components/Toast'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import { recoverWalletUsingMnemonic } from '../store/actions/BHR'
+import { createWithKeeperState, recoverWalletUsingMnemonic, setBackupWithKeeperState } from '../store/actions/BHR'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
 import * as bip39 from 'bip39'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -37,6 +34,8 @@ import { AccountType, NetworkType, Wallet } from '../bitcoin/utilities/Interface
 import AccountUtilities from '../bitcoin/utilities/accounts/AccountUtilities'
 import Config from '../bitcoin/HexaConfig'
 import { config } from 'process'
+import CreateWithKeeperState from '../common/data/enums/CreateWithKeeperState'
+import BackupWithKeeperState from '../common/data/enums/BackupWithKeeperState'
 
 
 const styles = StyleSheet.create( {
@@ -138,9 +137,13 @@ export default function CreateKeeperScreen( { navigation } ) {
   useEffect( () => {
     if( restoreSeedData == 'restoreSeedDataFailed' ){
       setShowLoader( false )
-      navigation.navigate( 'NewWalletName', {
-        mnemonic,
-      } )
+      // dispatch( createWithKeeperState( CreateWithKeeperState.BACKEDUP ) )
+      dispatch( setBackupWithKeeperState( BackupWithKeeperState.BACKEDUP ) )
+      setTimeout( () => {
+        navigation.navigate( 'NewWalletName', {
+          mnemonic,
+        } )
+      }, 1500 )
     }
   }, [ restoreSeedData ] )
 
@@ -226,9 +229,9 @@ export default function CreateKeeperScreen( { navigation } ) {
           fontSize: RFValue( 11 ),
           marginBottom: RFValue( 2 ),
           color: Colors.THEAM_INFO_TEXT_COLOR,
-          fontFamily: Fonts.Regular, 
+          fontFamily: Fonts.Regular,
           paddingHorizontal: RFValue( 20 )
-        }}>{'Open the Keeper App > Go to Linked Wallets >  Select Wallet Seed Words > Enter your Keeper passcode > There beneath the hidden Seed Words click on Show as QR. Please scan that QR'}</Text>
+        }}>{'Open the Keeper App > Go to Linked Wallets >  Select Wallet Backup Phrase > Enter your Keeper passcode > There beneath the hidden Backup Phrase click on Show as QR. Please scan that QR'}</Text>
         <CoveredQRCodeScanner
           onCodeScanned={handleBarcodeRecognized}
           containerStyle={{
