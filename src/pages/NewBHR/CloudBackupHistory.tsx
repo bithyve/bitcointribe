@@ -395,7 +395,7 @@ const CloudBackupHistory = ( props ) => {
         <AlertModalContents
           // modalRef={this.ErrorBottomSheet}
           // title={''}
-          info={'Cloud backup is completed you can delete Seed words'}
+          info={'Cloud backup is completed you can delete Backup Phrase'}
           proceedButtonText={'Okay'}
           onPressProceed={() => {
             setShowAlertModal( false )

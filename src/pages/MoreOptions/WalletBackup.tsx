@@ -584,7 +584,7 @@ const WalletBackup = ( props, navigation ) => {
     levelData.map( ( item, index ) => {
       if ( isSeed ) return
       if ( item.keeper1.status != 'notSetup' || index == 0 ) {
-        if ( item.keeper1.shareType == 'seed' || item.keeper1ButtonText == 'Write down Backup phrase' ) {
+        if ( item.keeper1.shareType == 'seed' || item.keeper1ButtonText == 'Write down Backup Phrase' ) {
           tempData.push( item )
           isSeed = true
           return
@@ -858,12 +858,12 @@ const WalletBackup = ( props, navigation ) => {
                   <Text style={{
                     fontSize: 16, color: Colors.blue, fontFamily: Fonts.Regular, marginTop: 10,
                   }}>
-                    {index % 2 == 0 ? ( ( item.keeper1ButtonText == 'Seed' ? 'Backup phrase' : ( item.keeper1ButtonText == 'Write down Backup phrase' ? 'Backup phrase' : item.keeper1ButtonText ) ) || 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
+                    {index % 2 == 0 ? ( ( item.keeper1ButtonText == 'Seed' ? 'Backup phrase' : ( item.keeper1ButtonText == 'Write down Backup Phrase' ? 'Backup phrase' : item.keeper1ButtonText ) ) || 'Share Recovery Key 1' ) : item.keeper2ButtonText || 'Share Recovery Key 2'}
                   </Text>
                   <Text style={{
                     fontSize: 12, color: Colors.lightTextColor, fontFamily: Fonts.Light, marginTop: 6,
-                  }}>{index == 0 && ( item.keeper1ButtonText == 'Seed' || item.keeper1ButtonText == 'Write down Backup phrase' )
-                      ? ( item.keeper1ButtonText == 'Seed' ? 'Wallet backup confirmed' : 'Confirm backup phrase to secure your wallet' ) : 'Encrypt and backup wallet on your cloud'}</Text>
+                  }}>{index == 0 && ( item.keeper1ButtonText == 'Seed' || item.keeper1ButtonText == 'Write down Backup Phrase' )
+                      ? ( item.keeper1ButtonText == 'Seed' ? 'Wallet backup confirmed' : 'Confirm Backup Phrase to secure your wallet' ) : 'Encrypt and backup wallet on your cloud'}</Text>
                 </View>
                 {
                   showSeedAcion ?
@@ -999,10 +999,10 @@ const WalletBackup = ( props, navigation ) => {
       <ModalContainer onBackground={() => setSeedBackupModal( false )} visible={seedBackupModal}
         closeBottomSheet={() => setSeedBackupModal( false )}>
         <SeedBacupModalContents
-          // title={'Backup using \nSeed Words'}
+          // title={'Backup using \nBackup Phrase'}
           title={'Backup using phrase'}
           // info={'You will be shown 12 English words that you need to write down privately\n\nMake sure you keep them safe'}
-          info={'Twelve-word backup phrase (Seed Words)\nMake sure you note them down in private and keep them secure.\n'}
+          info={'Twelve-word backup phrase (Backup Phrase)\nMake sure you note them down in private and keep them secure.\n'}
           note={'If someone gets access to these, they can withdraw all the funds. If you lose them, you will not be able to restore the wallet'}
           proceedButtonText={'Proceed'}
           bottomBoxInfo={true}
