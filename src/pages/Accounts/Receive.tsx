@@ -181,7 +181,7 @@ export default function Receive( props ) {
 
     if ( ( levelData[ 0 ].keeper1.status === 'notSetup' ) ||
       ( levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' &&
-        levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'Write down Backup phrase' ) ) {
+        levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'Write down Backup Phrase' ) ) {
       setTimeout( () => {
         setBackupReminder( true )
       }, 500 )
@@ -394,7 +394,7 @@ export default function Receive( props ) {
             setBackupReminder( false )
             // props.navigation.navigate( 'WalletBackupAlert' )
             if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
-              levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup phrase' ){
+              levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup Phrase' ){
               if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
                 const navigationParams = {
                   selectedTitle: navigationObj?.selectedKeeper?.name,

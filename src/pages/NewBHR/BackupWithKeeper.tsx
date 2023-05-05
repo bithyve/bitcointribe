@@ -265,7 +265,7 @@ export default function BackupWithKeeper( { navigation } ) {
             paddingLeft:10,
           }}>
             <View style={styles.imageView}>
-              {backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP &&
+              {backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP &&
               <CheckMark style={{
                 marginLeft: 6,
                 marginTop: 6
@@ -284,7 +284,7 @@ export default function BackupWithKeeper( { navigation } ) {
               <Text
                 style={styles.subText}
               >
-                {backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP ? 'You can also view the backed-up wallet on the Keeper app' : 'Check the health of your Backup in the Keeper app'}
+                {backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP ? 'You can also view the backed-up wallet on the Keeper app' : 'Check the health of your Backup in the Keeper app'}
               </Text>
             </TouchableOpacity>
           </View>

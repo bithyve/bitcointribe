@@ -21,6 +21,7 @@ import CrossButton from '../../assets/images/svgs/icons_close.svg'
 import { toggleClipboardAccess } from '../../store/actions/misc'
 import { onPressKeeper } from '../../store/actions/BHR'
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
+import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 
 export type Props = {
   navigation: any;
@@ -48,6 +49,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
   const createWithKeeperStatus: CreateWithKeeperState  = useSelector( ( state ) => state.bhr.createWithKeeperStatus )
+  const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
+
   const navigationObj: any = useSelector( ( state ) => state.bhr.navigationObj )
   const [ isEnabled, setIsEnabled ] = useState( false )
   const toggleSwitch = () => setIsEnabled( previousState => !previousState )
@@ -74,12 +77,12 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     // },
     {
       imageSource: require( '../../assets/images/icons/icon_info.png' ),
-      subtitle: createWithKeeperStatus == CreateWithKeeperState.BACKEDUP
-        ?'Wallet backup confirmed' : levelData[ 0 ].keeper1.status == 'notSetup'
-          ? 'Confirm backup phrase'
-          : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
-            ? 'Wallet backup confirmed'
-            :'Confirm backup phrase',
+      subtitle:  levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
+        ? 'Wallet backup confirmed': createWithKeeperStatus == CreateWithKeeperState.BACKEDUP
+          ?'Your wallet is backed up with Keeper' : backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP
+            ? 'Your wallet is backed up with Keeper' : levelData[ 0 ].keeper1.status == 'notSetup'
+              ? 'Confirm Backup Phrase'
+              :'Confirm Backup Phrase',
       title: bhrStrings[ 'WalletBackup' ],
       // screenName: 'WalletBackup',
       screenName: 'BackupMethods',
@@ -209,7 +212,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       if( menuOption.screenName == 'BackupMethods' ) {
         // console.log( 'skk leveldata===>' + JSON.stringify( levelData ) )
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
-        levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup phrase' ){
+        levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup Phrase' ){
           if ( ( levelHealth.length == 0 ) ||
           ( levelHealth.length && levelHealth[ 0 ].levelInfo.length &&
             levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ||
