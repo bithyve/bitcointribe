@@ -87,14 +87,13 @@ export default function BackupMethods( { navigation } ) {
       </View>
       <HeaderTitle
         firstLineTitle={strings.WalletBackup}
-        secondLineTitle={createWithKeeperStatus == CreateWithKeeperState.BACKEDUP
-          ? 'Wallet backup confirmed' : backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP
-            ? 'Wallet backup confirmed'
-            : levelData[ 0 ].keeper1.status == 'notSetup'
-              ? 'Confirm backup phrase'
-              : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
-                ? 'Wallet backup confirmed'
-                :'Confirm backup phrase'}
+        secondLineTitle={ levelData[ 0 ].keeper1.status == 'notSetup'
+          ? 'Confirm Backup Phrase'
+          : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
+            ? 'Wallet backup confirmed': createWithKeeperStatus == CreateWithKeeperState.BACKEDUP
+              ? 'Your wallet is backed up with Keeper' : backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP
+                ? 'Your wallet is backed up with Keeper'
+                :'Confirm Backup Phrase'}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}

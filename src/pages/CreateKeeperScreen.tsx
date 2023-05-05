@@ -24,7 +24,7 @@ import { LocalizationContext } from '../common/content/LocContext'
 import HeaderTitle1 from '../components/HeaderTitle1'
 import CoveredQRCodeScanner from '../components/qr-code-scanning/CoveredQRCodeScanner'
 import Toast from '../components/Toast'
-import { createWithKeeperState, recoverWalletUsingMnemonic } from '../store/actions/BHR'
+import { createWithKeeperState, recoverWalletUsingMnemonic, setBackupWithKeeperState } from '../store/actions/BHR'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
 import * as bip39 from 'bip39'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -35,6 +35,7 @@ import AccountUtilities from '../bitcoin/utilities/accounts/AccountUtilities'
 import Config from '../bitcoin/HexaConfig'
 import { config } from 'process'
 import CreateWithKeeperState from '../common/data/enums/CreateWithKeeperState'
+import BackupWithKeeperState from '../common/data/enums/BackupWithKeeperState'
 
 
 const styles = StyleSheet.create( {
@@ -136,7 +137,8 @@ export default function CreateKeeperScreen( { navigation } ) {
   useEffect( () => {
     if( restoreSeedData == 'restoreSeedDataFailed' ){
       setShowLoader( false )
-      dispatch( createWithKeeperState( CreateWithKeeperState.BACKEDUP ) )
+      // dispatch( createWithKeeperState( CreateWithKeeperState.BACKEDUP ) )
+      dispatch( setBackupWithKeeperState( BackupWithKeeperState.BACKEDUP ) )
       setTimeout( () => {
         navigation.navigate( 'NewWalletName', {
           mnemonic,
