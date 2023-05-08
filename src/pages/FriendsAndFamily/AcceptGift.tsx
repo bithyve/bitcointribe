@@ -161,6 +161,14 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     }
   }
 
+  useEffect( ()=>{
+    if ( passcodeArray[ 5 ] != '' ) {
+      setIsDisabled( false )
+    } else {
+      setIsDisabled( true )
+    }
+  }, [ passcodeArray ] )
+
   function onPressNumber( text, i ) {
     const tempPasscode = passcodeArray
     tempPasscode[ i ] = text
@@ -405,8 +413,14 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
 
                   // update state
                   setPasscodeArray( newValues )
+                  // if( text.length >= 6 ) {
+                  //   setIsDisabled( false )
+                  // } else setIsDisabled( true )
                   return
                 }
+                // if( text.length == 1 && i==NUMBER_OF_INPUTS-1 ) {
+                //   setIsDisabled( false )
+                // } else setIsDisabled( true )
                 // going forward, only if text is not empty
                 if ( text.length === 1 && i !== NUMBER_OF_INPUTS - 1 ) {
                   const nextInput = itemsRef.current[ i + 1 ]
@@ -528,7 +542,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
         }}
         style={{
           ...styles.buttonView,
-          backgroundColor: isDisabled && buttonIsDisabled ? Colors.lightBlue : Colors.blue,
+          backgroundColor:
+          // isDisabled && buttonIsDisabled ? Colors.lightBlue :
+          Colors.blue,
         }}
       >
         <Text style={styles.buttonText}>{text}</Text>
@@ -1126,11 +1142,11 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
+    // shadowColor: Colors.shadowBlue,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 15, height: 15
+    // },
     backgroundColor: Colors.blue,
   },
   availableToSpendText: {
