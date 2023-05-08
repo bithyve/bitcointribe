@@ -60,7 +60,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 564
-        versionName "2.1.5"
+        versionName "2.1.6"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
         resValue "string", "build_config_package", "io.hexawallet.hexa"
