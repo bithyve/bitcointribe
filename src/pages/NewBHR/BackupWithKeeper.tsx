@@ -313,7 +313,7 @@ export default function BackupWithKeeper( { navigation } ) {
           <Text
             style={styles.subText}
           >
-            {'Once setup, return here to Backup with Keeper'}
+            {isKeeperInstalled ? ' View your Backup in the Keeper App' :'Once setup, return here to Backup with Keeper'}
           </Text>
         </View>
         <Ionicons

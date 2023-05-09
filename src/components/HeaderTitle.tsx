@@ -28,7 +28,8 @@ export default function HeaderTitle( props ) {
           flexDirection: 'row', alignItems: 'center',
         }}>
           <Text style={[ CommonStyles.subHeaderTitles, {
-            fontWeight: '500', width: wp( 65 )
+            fontWeight: '500',
+            // width: wp( 65 )
           } ]} >
             {props.secondLineBoldTitle}
             <Text style={[ CommonStyles.subHeaderTitles, {
