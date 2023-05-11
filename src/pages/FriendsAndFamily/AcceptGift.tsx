@@ -400,9 +400,6 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               maxLength={i === 0 ? NUMBER_OF_INPUTS : 1}
               onChange={( event ) => {
                 const { text } = event.nativeEvent
-                // console.log('skk text', text)
-                // console.log('skk event.nativeEvent', event.nativeEvent)
-
                 // only continue one if we see a text of length 1 or 6
                 // if (text.length === 0 || text.length === 1 || text.length === 6) {
                 if ( text.length > 1 ) {
@@ -442,9 +439,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 if ( event.nativeEvent.key === 'Backspace' ) {
                   // going backward:
                   if ( i !== 0 ) {
-                    console.log( 'skk on key press i', i )
                     const previousInput = itemsRef.current[ i - 1 ]
-                    console.log( 'skk on key press previous input', previousInput )
                     if ( previousInput ) {
                       previousInput.focus()
                       return
@@ -498,7 +493,6 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       <TouchableOpacity
         disabled={!buttonIsDisabled ? buttonIsDisabled : isDisabled}
         onPress={() => {
-
           if ( text === 'Add to Account' ) {
             setGiftAcceptedModel( false )
             // setShowAccounts( true )
@@ -524,6 +518,8 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                   case DeepLinkEncryptionType.SECRET_PHRASE:
                     key = passcode
                     break
+                  case DeepLinkEncryptionType.DEFAULT:
+                    setIsDisabled( false )
 
                   default:
                     break
@@ -534,7 +530,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               }, 2 )
               onPressAccept( key )
             } else {
-              onGiftRequestAccepted( passcode )
+              if( inputType === DeepLinkEncryptionType.OTP ){
+                onGiftRequestAccepted( passcodeArray.toString().replaceAll( ',', '' ) )
+              } else onGiftRequestAccepted( passcode )
             }
             // setAcceptGiftModal( false )
             // setGiftAcceptedModel( true )
@@ -716,7 +714,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             marginLeft: wp( 6 ),
           }}>
             <Text style={styles.modalTitleText}>Accept Gift Sats</Text>
-            {inputType !== DeepLinkEncryptionType.DEFAULT?
+            {inputType !== DeepLinkEncryptionType.DEFAULT ?
               <Text style={{
                 ...styles.modalInfoText,
               }}>{`The gift is encrypted with ${inputType == DeepLinkEncryptionType.EMAIL ? 'an email' : inputType == DeepLinkEncryptionType.NUMBER ? 'number' : 'an OTP'}`}</Text>
@@ -855,6 +853,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           </TouchableOpacity> */}
 
         </View>
+        {/* {inputType === DeepLinkEncryptionType.DEFAULT ?  setIsDisabled( false ) : null} */}
         {inputType === DeepLinkEncryptionType.SECRET_PHRASE && hint &&
           <Text style={{
             color: Colors.gray4,
@@ -902,7 +901,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ),
           marginTop: hp( 5 )
         }}>
-          {renderButton( 'Accept', true )}
+          {renderButton( 'Accept', inputType == DeepLinkEncryptionType.DEFAULT ? false : true )}
           <TouchableOpacity
             onPress={() => {
               if ( isGiftWithFnF ) {

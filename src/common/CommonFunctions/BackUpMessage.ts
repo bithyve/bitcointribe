@@ -14,7 +14,7 @@ export function backUpMessage( days, levelData, createWithKeeperStatus,
   if( ( createWithKeeperStatus == CreateWithKeeperState.BACKEDUP ||
       backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP ) &&
       levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed' &&
-    levelData[ 0 ].status != 'notSetup' )
+    levelData[ 0 ].keeper1.status != 'notSetup' )
     return 'Your wallet is backup with keeper & backup Phrase confirmed'
   if( createWithKeeperStatus == CreateWithKeeperState.BACKEDUP ||
     backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP )
@@ -22,7 +22,7 @@ export function backUpMessage( days, levelData, createWithKeeperStatus,
   // if( levelData[ 0 ].keeper1.shareType == '' )
   //   return 'Confirm Backup Phrase'
   if ( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed' &&
-    levelData[ 0 ].status != 'notSetup' )
+    levelData[ 0 ].keeper1.status != 'notSetup' )
     return 'Wallet backup confirmed'
   return 'Backup to safeguard your wallet'
 }
