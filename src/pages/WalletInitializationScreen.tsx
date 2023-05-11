@@ -112,7 +112,7 @@ const WalletInitializationScreen = props => {
           <Text style={styles.headerTitleText}>{`${strings.Existing} Wallet`}</Text>
           <Text style={styles.headerInfoText}>
             {/* {strings.previously} */}
-            {'Use Backup Phrase if you have 12/18/24 word Backup Phrase. Recovery Keys are for legacy users'}
+            {'Use Backup Phrase if you have 12/24 word Backup Phrase. Recovery Keys are for legacy users'}
           </Text>
         </View>
         <TouchableOpacity

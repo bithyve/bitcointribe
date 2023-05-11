@@ -531,7 +531,11 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               onPressAccept( key )
             } else {
               if( inputType === DeepLinkEncryptionType.OTP ){
-                onGiftRequestAccepted( passcodeArray.toString().replaceAll( ',', '' ) )
+                let data = ''
+                passcodeArray.map( ( item )=> {
+                  data+=item
+                } )
+                onGiftRequestAccepted( data )
               } else onGiftRequestAccepted( passcode )
             }
             // setAcceptGiftModal( false )
