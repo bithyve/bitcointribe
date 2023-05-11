@@ -56,6 +56,7 @@ import moment from 'moment'
 import { onPressKeeper } from '../../store/actions/BHR'
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
+import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -275,19 +276,9 @@ const HomeHeader = ( {
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, marginTop: wp( 0.8 )
       }}>{ levelData[ 0 ].keeper1.shareType == '' ? 'Confirm Backup Phrase' : ( levelData[ 0 ].keeper1.shareType == 'seed' ? 'Wallet backup confirmed' : 'Confirm Backup Phrase' )}</Text> } */}
 
-      <Text ellipsizeMode="middle" numberOfLines={1} style={{
+      <Text ellipsizeMode="middle" style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, marginTop: wp( 0.8 )
-      }}>{days > 180
-          ? 'Wallet backup phrase is expired'
-          : days > 150
-            ? 'Wallet backup phrase will expire soon'
-            :levelData[ 0 ].keeper1.shareType == ''
-            // ? strings.Backupyour
-              ? 'Confirm Backup Phrase'
-              : ( levelData[ 0 ].keeper1.shareType == 'seed'
-                ? 'Wallet backup confirmed' : createWithKeeperStatus == CreateWithKeeperState.BACKEDUP
-                  ? 'Your wallet is backed up with Keeper' : backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP
-                    ? 'Your wallet is backed up with Keeper' : 'Confirm Backup Phrase' )}
+      }}>{backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus )}
       </Text>
 
       {/* {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{

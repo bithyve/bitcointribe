@@ -130,6 +130,8 @@ export default function CreateKeeperScreen( { navigation } ) {
       dispatch( completedWalletSetup() )
       AsyncStorage.setItem( 'walletRecovered', 'true' )
       dispatch( setVersion( 'Restored' ) )
+      // dispatch( createWithKeeperState( CreateWithKeeperState.BACKEDUP ) )
+      dispatch( setBackupWithKeeperState( BackupWithKeeperState.BACKEDUP ) )
       navigation.navigate( 'HomeNav' )
     }
   }, [ wallet ] )
@@ -137,8 +139,6 @@ export default function CreateKeeperScreen( { navigation } ) {
   useEffect( () => {
     if( restoreSeedData == 'restoreSeedDataFailed' ){
       setShowLoader( false )
-      // dispatch( createWithKeeperState( CreateWithKeeperState.BACKEDUP ) )
-      dispatch( setBackupWithKeeperState( BackupWithKeeperState.BACKEDUP ) )
       setTimeout( () => {
         navigation.navigate( 'NewWalletName', {
           mnemonic,
