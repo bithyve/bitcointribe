@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Image, Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
@@ -16,6 +16,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { LevelData } from '../../bitcoin/utilities/Interface'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
+import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
+import moment from 'moment'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const styles = StyleSheet.create( {
   body: {
@@ -44,8 +47,23 @@ export default function BackupMethods( { navigation } ) {
   const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
   const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
   const createWithKeeperStatus: CreateWithKeeperState  = useSelector( ( state ) => state.bhr.createWithKeeperStatus )
+  const [ days, setDays ] = useState( 0 )
 
   const dispatch = useDispatch()
+
+  useEffect( () => {
+    async function fetchWalletDays() {
+      const walletBackupDate = await AsyncStorage.getItem( 'walletBackupDate' )
+      if( walletBackupDate && walletBackupDate != null ){
+        const backedupDate = moment( JSON.parse( walletBackupDate ) )
+        // const currentDate = moment( '2023-04-10T11:27:25.000Z' )
+        const currentDate = moment( Date() )
+        setDays( currentDate.diff( backedupDate, 'days' ) )
+      }
+    }
+
+    fetchWalletDays()
+  }, [] )
 
   function onKeeperButtonPress () {
     navigation.navigate( 'SeedBackupHistory' )
@@ -87,13 +105,7 @@ export default function BackupMethods( { navigation } ) {
       </View>
       <HeaderTitle
         firstLineTitle={strings.WalletBackup}
-        secondLineTitle={ levelData[ 0 ].keeper1.status == 'notSetup'
-          ? 'Confirm Backup Phrase'
-          : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
-            ? 'Wallet backup confirmed': createWithKeeperStatus == CreateWithKeeperState.BACKEDUP
-              ? 'Your wallet is backed up with Keeper' : backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP
-                ? 'Your wallet is backed up with Keeper'
-                :'Confirm Backup Phrase'}
+        secondLineTitle={ backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus )}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}

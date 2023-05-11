@@ -22,6 +22,9 @@ import { toggleClipboardAccess } from '../../store/actions/misc'
 import { onPressKeeper } from '../../store/actions/BHR'
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
+import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import moment from 'moment'
 
 export type Props = {
   navigation: any;
@@ -50,6 +53,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
   const createWithKeeperStatus: CreateWithKeeperState  = useSelector( ( state ) => state.bhr.createWithKeeperStatus )
   const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
+  const [ days, setDays ] = useState( 0 )
 
   const navigationObj: any = useSelector( ( state ) => state.bhr.navigationObj )
   const [ isEnabled, setIsEnabled ] = useState( false )
@@ -77,12 +81,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     // },
     {
       imageSource: require( '../../assets/images/icons/icon_info.png' ),
-      subtitle:  levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
-        ? 'Wallet backup confirmed': createWithKeeperStatus == CreateWithKeeperState.BACKEDUP
-          ?'Your wallet is backed up with Keeper' : backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP
-            ? 'Your wallet is backed up with Keeper' : levelData[ 0 ].keeper1.status == 'notSetup'
-              ? 'Confirm Backup Phrase'
-              :'Confirm Backup Phrase',
+      subtitle:  backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus ),
       title: bhrStrings[ 'WalletBackup' ],
       // screenName: 'WalletBackup',
       screenName: 'BackupMethods',
@@ -191,6 +190,20 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
   useEffect( () => {
+    async function fetchWalletDays() {
+      const walletBackupDate = await AsyncStorage.getItem( 'walletBackupDate' )
+      if( walletBackupDate && walletBackupDate != null ){
+        const backedupDate = moment( JSON.parse( walletBackupDate ) )
+        // const currentDate = moment( '2023-04-10T11:27:25.000Z' )
+        const currentDate = moment( Date() )
+        setDays( currentDate.diff( backedupDate, 'days' ) )
+      }
+    }
+
+    fetchWalletDays()
+  }, [] )
+
+  useEffect( () => {
     if ( navigationObj.selectedKeeper && onKeeperButtonClick ) {
       setSelectedKeeper( navigationObj.selectedKeeper )
       const navigationParams = {
@@ -209,7 +222,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       menuOption.onOptionPressed()
     } else if ( menuOption.screenName !== undefined ) {
       // if( menuOption.screenName == 'WalletBackup' ) {
-      if( menuOption.screenName == 'BackupMethods' ) {
+      /* if( menuOption.screenName == 'BackupMethods' ) {
         // console.log( 'skk leveldata===>' + JSON.stringify( levelData ) )
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
         levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup Phrase' ){
@@ -234,7 +247,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             setOnKeeperButtonClick( true )
           }
         } else navigation.navigate( menuOption.screenName )
-      } else navigation.navigate( menuOption.screenName )
+      } else */ navigation.navigate( menuOption.screenName )
     }
   }
 
