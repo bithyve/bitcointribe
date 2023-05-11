@@ -1220,6 +1220,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       const { giftRequest } = this.state
       let decryptionKey: string
       try{
+        console.log( 'skk decryptionKey'+ JSON.stringify( key ) )
+
         switch( giftRequest.encryptionType ){
             case DeepLinkEncryptionType.DEFAULT:
               decryptionKey = giftRequest.encryptedChannelKeys
@@ -1228,10 +1230,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             case DeepLinkEncryptionType.OTP:
             case DeepLinkEncryptionType.LONG_OTP:
             case DeepLinkEncryptionType.SECRET_PHRASE:
+              console.log( 'skk key 222'+ JSON.stringify( key ) )
+              console.log( 'skk giftRequest'+ JSON.stringify( giftRequest ) )
               decryptionKey = TrustedContactsOperations.decryptViaPsuedoKey( giftRequest.encryptedChannelKeys, key )
+              console.log( 'skk decryptionKey'+ JSON.stringify( decryptionKey ) )
               break
         }
       } catch( err ){
+        console.log( 'skk err'+ JSON.stringify( err ) )
+
         Toast( 'Invalid key' )
         return
       }

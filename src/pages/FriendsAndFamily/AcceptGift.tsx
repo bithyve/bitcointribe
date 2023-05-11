@@ -206,6 +206,8 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   }
 
   const getInputBox = () => {
+    {console.log( 'test' )
+    }
     if ( inputType == DeepLinkEncryptionType.EMAIL ) {
       return (
         <View style={styles.textboxView}>
@@ -498,6 +500,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       <TouchableOpacity
         disabled={!buttonIsDisabled ? buttonIsDisabled : isDisabled}
         onPress={() => {
+          console.log( 'log here 111' )
 
           if ( text === 'Add to Account' ) {
             setGiftAcceptedModel( false )
@@ -524,6 +527,8 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                   case DeepLinkEncryptionType.SECRET_PHRASE:
                     key = passcode
                     break
+                  case DeepLinkEncryptionType.DEFAULT:
+                    setIsDisabled( false )
 
                   default:
                     break
@@ -534,7 +539,10 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               }, 2 )
               onPressAccept( key )
             } else {
-              onGiftRequestAccepted( passcode )
+              console.log( 'skk log here', passcodeArray.toString() )
+              if( inputType === DeepLinkEncryptionType.OTP ){
+                onGiftRequestAccepted( passcodeArray.toString().replaceAll( ',', '' ) )
+              } else onGiftRequestAccepted( passcode )
             }
             // setAcceptGiftModal( false )
             // setGiftAcceptedModel( true )
@@ -716,11 +724,13 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             marginLeft: wp( 6 ),
           }}>
             <Text style={styles.modalTitleText}>Accept Gift Sats</Text>
-            {inputType !== DeepLinkEncryptionType.DEFAULT?
+            {inputType !== DeepLinkEncryptionType.DEFAULT ?
               <Text style={{
                 ...styles.modalInfoText,
               }}>{`The gift is encrypted with ${inputType == DeepLinkEncryptionType.EMAIL ? 'an email' : inputType == DeepLinkEncryptionType.NUMBER ? 'number' : 'an OTP'}`}</Text>
               : null}
+            {console.log( 'log heree 2222' )
+            }
           </View>
           <DashedLargeContainer
             titleText={'Gift Card'}
@@ -855,6 +865,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           </TouchableOpacity> */}
 
         </View>
+        {/* {inputType === DeepLinkEncryptionType.DEFAULT ?  setIsDisabled( false ) : null} */}
         {inputType === DeepLinkEncryptionType.SECRET_PHRASE && hint &&
           <Text style={{
             color: Colors.gray4,
@@ -902,7 +913,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ),
           marginTop: hp( 5 )
         }}>
-          {renderButton( 'Accept', true )}
+          {renderButton( 'Accept', inputType == DeepLinkEncryptionType.DEFAULT ? false : true )}
           <TouchableOpacity
             onPress={() => {
               if ( isGiftWithFnF ) {
