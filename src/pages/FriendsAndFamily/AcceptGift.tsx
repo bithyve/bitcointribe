@@ -206,8 +206,6 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   }
 
   const getInputBox = () => {
-    {console.log( 'test' )
-    }
     if ( inputType == DeepLinkEncryptionType.EMAIL ) {
       return (
         <View style={styles.textboxView}>
@@ -402,9 +400,6 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               maxLength={i === 0 ? NUMBER_OF_INPUTS : 1}
               onChange={( event ) => {
                 const { text } = event.nativeEvent
-                // console.log('skk text', text)
-                // console.log('skk event.nativeEvent', event.nativeEvent)
-
                 // only continue one if we see a text of length 1 or 6
                 // if (text.length === 0 || text.length === 1 || text.length === 6) {
                 if ( text.length > 1 ) {
@@ -444,9 +439,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 if ( event.nativeEvent.key === 'Backspace' ) {
                   // going backward:
                   if ( i !== 0 ) {
-                    console.log( 'skk on key press i', i )
                     const previousInput = itemsRef.current[ i - 1 ]
-                    console.log( 'skk on key press previous input', previousInput )
                     if ( previousInput ) {
                       previousInput.focus()
                       return
@@ -500,8 +493,6 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       <TouchableOpacity
         disabled={!buttonIsDisabled ? buttonIsDisabled : isDisabled}
         onPress={() => {
-          console.log( 'log here 111' )
-
           if ( text === 'Add to Account' ) {
             setGiftAcceptedModel( false )
             // setShowAccounts( true )
@@ -539,7 +530,6 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               }, 2 )
               onPressAccept( key )
             } else {
-              console.log( 'skk log here', passcodeArray.toString() )
               if( inputType === DeepLinkEncryptionType.OTP ){
                 onGiftRequestAccepted( passcodeArray.toString().replaceAll( ',', '' ) )
               } else onGiftRequestAccepted( passcode )
@@ -729,8 +719,6 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 ...styles.modalInfoText,
               }}>{`The gift is encrypted with ${inputType == DeepLinkEncryptionType.EMAIL ? 'an email' : inputType == DeepLinkEncryptionType.NUMBER ? 'number' : 'an OTP'}`}</Text>
               : null}
-            {console.log( 'log heree 2222' )
-            }
           </View>
           <DashedLargeContainer
             titleText={'Gift Card'}

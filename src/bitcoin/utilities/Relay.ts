@@ -417,8 +417,6 @@ export default class Relay {
 
       let res: AxiosResponse
       try {
-        console.log( 'skk API url ===>' +`${RELAY}fetchGiftChannel` )
-
         res = await BH_AXIOS.post( `${RELAY}fetchGiftChannel`, {
           HEXA_ID,
           channelAddress,

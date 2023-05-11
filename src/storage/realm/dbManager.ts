@@ -297,7 +297,6 @@ const updateBHR = async ( data ) => {
 }
 
 const createGifts = async ( gifts ) => {
-  console.log( 'skk create gift ===>' + JSON.stringify( gifts ) )
   try {
     gifts.forEach( gift => {
       createGift( gift )

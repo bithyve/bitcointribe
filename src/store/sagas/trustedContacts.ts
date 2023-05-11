@@ -191,11 +191,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
   let gift: Gift, giftMetaData :GiftMetaData
   try{
     const res = yield call( Relay.fetchGiftChannel, channelAddress, payload.decryptionKey )
-    console.log( 'skk gift res===> ' + JSON.stringify( res ) )
-
     gift = res.gift
-    console.log( 'skk gift ===> ' + JSON.stringify( gift ) )
-
     giftMetaData = res.metaData
 
     if( !gift ){
