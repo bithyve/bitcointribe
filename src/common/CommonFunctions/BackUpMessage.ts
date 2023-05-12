@@ -3,9 +3,6 @@ import CreateWithKeeperState from '../data/enums/CreateWithKeeperState'
 
 export function backUpMessage( days, levelData, createWithKeeperStatus,
   backupWithKeeperStatus ): string {
-  console.log( 'SKK LEVEL DATA   ' + JSON.stringify( levelData ) )
-  console.log( 'SKK LEVEL createWithKeeperStatus   ' + JSON.stringify( createWithKeeperStatus ) )
-  console.log( 'SKK LEVEL backupWithKeeperStatus   ' + JSON.stringify( backupWithKeeperStatus ) )
 
   if( days > 180 )
     return 'Wallet backup phrase is expired'
