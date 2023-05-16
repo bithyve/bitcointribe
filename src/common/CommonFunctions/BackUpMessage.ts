@@ -15,7 +15,7 @@ export function backUpMessage( days, levelData, createWithKeeperStatus,
       backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP ) &&
       levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed' &&
     levelData[ 0 ].keeper1.status != 'notSetup' )
-    return 'Your wallet is backup with keeper & backup Phrase confirmed'
+    return 'Your wallet is backed up with Keeper and the Backup Phrase'
   if( createWithKeeperStatus == CreateWithKeeperState.BACKEDUP ||
     backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP )
     return 'Your wallet is backed up with Keeper'

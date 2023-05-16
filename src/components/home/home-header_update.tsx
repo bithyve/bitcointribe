@@ -529,6 +529,7 @@ const styles = StyleSheet.create( {
     marginTop: hp( '3.6%' ),
     marginLeft: wp( 3 ),
     marginRight: wp( 3 ),
+    paddingBottom: 10
   },
   headerTitleText: {
     color: Colors.white,

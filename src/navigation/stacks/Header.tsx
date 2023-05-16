@@ -1735,7 +1735,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // >
       <View
         style={{
-          height: heightPercentageToDP( Platform.OS == 'ios' ? '21.9%' : '20.3%' ),
+          // height: heightPercentageToDP( Platform.OS == 'ios' ? '21.9%' : '20.3%' ),
           backgroundColor: Colors.blue,
           paddingTop:
                 Platform.OS == 'ios' && DeviceInfo.hasNotch

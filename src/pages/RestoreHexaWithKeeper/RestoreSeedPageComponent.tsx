@@ -5,7 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  TextInput, FlatList, Animated, Dimensions, Alert, Platform, KeyboardAvoidingView
+  TextInput, FlatList, Animated, Dimensions, Alert, Platform, KeyboardAvoidingView, Keyboard
 } from 'react-native'
 import Fonts from '../../common/Fonts'
 import {
@@ -84,6 +84,7 @@ const RestoreSeedPageComponent = ( props ) => {
     inputRange,
     outputRange: [ 0, partialSeedData.length * width ],
   } )
+  const inputRef = useRef( [] )
 
   useEffect( () => {
     setPartialSeedDataFun( seedData )
@@ -149,6 +150,7 @@ const RestoreSeedPageComponent = ( props ) => {
       if ( !seed ) seed = name
       else seed = seed + ' ' + name
     } )
+    console.log( 'skk sed data', JSON.stringify( seedData ) )
     if ( showValidation ) {
       setShowAlertModal( true )
     } else {
@@ -175,35 +177,40 @@ const RestoreSeedPageComponent = ( props ) => {
   }
 
   const getIndex = ( index, seedIndex ) => {
-    let newIndex = index + 1 + ( seedIndex * 6 )
-    let isAdd = false
-    if ( index % 2 == 0 ) isAdd = true
+    const newIndex = index + 1 + ( seedIndex * 6 )
+    // let isAdd = false
+    // if ( index % 2 == 0 ) isAdd = true
 
-    let tempNumber = 0
-    if ( index == 0 || index == 5 ) tempNumber = 0
-    else if ( index == 1 || index == 4 ) tempNumber = 2
-    else tempNumber = 1
+    // let tempNumber = 0
+    // if ( index == 0 || index == 5 ) tempNumber = 0
+    // else if ( index == 1 || index == 4 ) tempNumber = 2
+    // else tempNumber = 1
 
-    if ( isAdd )
-      newIndex -= tempNumber
-    else newIndex += tempNumber
+    // if ( isAdd )
+    //   newIndex -= tempNumber
+    // else newIndex += tempNumber
 
     return newIndex
   }
 
+  const getFocusIndex = ( index, seedIndex ) => {
+    const newIndex = index + 2 + ( seedIndex * 6 )
+    return newIndex
+  }
+
   const getTextIndex = ( index ) => {
-    let newIndex = index
-    let isAdd = false
-    if ( index % 2 == 0 ) isAdd = true
+    const newIndex = index
+    // let isAdd = false
+    // if ( index % 2 == 0 ) isAdd = true
 
-    let tempNumber = 0
-    if ( index == 0 || index == 5 ) tempNumber = 0
-    else if ( index == 1 || index == 4 ) tempNumber = 2
-    else tempNumber = 1
+    // let tempNumber = 0
+    // if ( index == 0 || index == 5 ) tempNumber = 0
+    // else if ( index == 1 || index == 4 ) tempNumber = 2
+    // else tempNumber = 1
 
-    if ( isAdd )
-      newIndex -= tempNumber
-    else newIndex += tempNumber
+    // if ( isAdd )
+    //   newIndex -= tempNumber
+    // else newIndex += tempNumber
 
     return newIndex
   }
@@ -303,6 +310,7 @@ const RestoreSeedPageComponent = ( props ) => {
                       >
                         <Text style={styles.numberText}>{getFormattedNumber( getIndex( index, seedIndex ) )}</Text>
                         <TextInput
+                          ref={el => inputRef.current[ getIndex( index, seedIndex ) ] = el }
                           style={[ styles.modalInputBox,
                             partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name.length > 0 ? styles.selectedInput : null,
                           // value?.name.length > 0 ? styles.selectedInput : null,
@@ -314,17 +322,25 @@ const RestoreSeedPageComponent = ( props ) => {
                           // autoCompleteType="off"
                           keyboardType='ascii-capable'
                           textContentType="none"
-                          returnKeyType="next"
+                          returnKeyType={( getIndex( index, seedIndex ) == 6
+                            ||getIndex( index, seedIndex ) == 12
+                            ||getIndex( index, seedIndex ) == 18
+                            ||getIndex( index, seedIndex ) == 24 )
+                            ?'done':'next'}
                           autoCorrect={false}
                           // editable={isEditable}
                           autoCapitalize="none"
                           onSubmitEditing={() => {
                             setSuggestedWords( [] )
+                            const doneIndex = getIndex( index, seedIndex )
+                            if( doneIndex == 6 || doneIndex == 12|| doneIndex == 18|| doneIndex == 24 )
+                              Keyboard.dismiss()
                           }}
                           onFocus={() => {
                             setSuggestedWords( [] )
                             setOnChangeIndex( index )
                           }}
+                          blurOnSubmit={false}
                           onChangeText={( text ) => {
                             const data = [ ...partialSeedData ]
                             data[ currentPosition ][ getTextIndex( index ) ].name = text.trim()
@@ -382,6 +398,10 @@ const RestoreSeedPageComponent = ( props ) => {
                             console.log( 'skk seed data', JSON.stringify( data ) )
                             setPartialSeedData( data )
                             setSuggestedWords( [] )
+                            console.log( 'skk index', getFocusIndex( onChangeIndex, seedIndex ) )
+                            const focusIndex = getFocusIndex( onChangeIndex, seedIndex )
+                            if( focusIndex != 7 && focusIndex != 13&& focusIndex != 19&& focusIndex != 25 )
+                              inputRef.current[ focusIndex ].focus()
                           }}>
                             <Text style={{
                               color: Colors.white
@@ -592,7 +612,8 @@ const styles = StyleSheet.create( {
     color: Colors.numberFont,
     fontSize: RFValue( 20 ),
     fontFamily: Fonts.Regular,
-    marginEnd: 10
+    marginEnd: 10,
+    width: 35
   },
   nameText: {
     color: Colors.greyTextColor,
