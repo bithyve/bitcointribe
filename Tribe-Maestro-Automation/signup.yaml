@@ -1,0 +1,17 @@
+# signup.yaml
+
+# First time login
+
+appId: io.hexawallet.hexa2
+---
+- launchApp
+- tapOn: "1"
+- tapOn: "2"
+- tapOn: "3"
+- tapOn: "4"
+- tapOn: "Proceed"
+# - tapOn: Using Backup phrase 
+# - tapOn: Start with a new Tribe Wallet wallet 
+# - tapOn: Start with a new Tribe Wallet wallet 
+# - inputText: "TestWallet"
+# - tapOn: Proceed

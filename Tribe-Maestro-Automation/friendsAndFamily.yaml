@@ -1,0 +1,43 @@
+# friendsAndFamily.yaml
+
+# Add friends and Family to your list to be able to send SATS easily
+
+appId: io.hexawallet.hexa2
+---
+- launchApp
+- tapOn: "1"
+- tapOn: "2"
+- tapOn: "3"
+- tapOn: "4"
+- tapOn: "Proceed"
+- tapOn: Freiend, tab, 2 of 4
+- tapOn: + Add New
+- tapOn: Anna Haro
+- tapOn: Confirm & Proceed
+
+- tapOn:
+    point: "45%,72%"
+- tapOn:
+    point: 50%,76%
+
+- tapOn: Close
+- tapOn: 
+
+- tapOn: + Add New
+- tapOn: David Taylor
+- tapOn: Confirm & Proceed
+
+- tapOn:
+    point: "45%,85%"
+
+- tapOn: Enter amount in sats
+- tapOn: "1"
+- tapOn: "0"
+- tapOn: "0"
+- tapOn: "0"
+- tapOn:
+    text: "0"
+    index: 0
+
+- tapOn: Use SATSCARD™ to gift sats
+- tapOn: Create Gifts
