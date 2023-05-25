@@ -1,0 +1,36 @@
+# home.yaml
+
+# HoDashboardme Screen
+
+appId: io.hexawallet.hexa.development
+---
+- runFlow: "login.yaml"
+
+# Add Lightning Wallet
+
+- tapOn: 
+    id: "AddLightningWalletButton"
+- tapOn: 
+    id: "EnterManuallyButton"
+- tapOn: 
+    id: "HostInput"
+- inputText: "Sample Host"
+- tapOn: 
+    id: "PortInput"
+- inputText: "Sample Port"
+- tapOn: 
+    id: "MacaroonHexInput"
+- inputText: "Sample Macaroon Hex"
+- tapOn: 
+    id: "NodeConnectButton"
+- tapOn: 
+- tapOn: 
+
+# Buy BTC
+
+- tapOn: 
+    id: "BuyBTCButton"
+- tapOn: 
+    id: "BuybitCoinButton"
+- tapOn: "Close"
+- tapOn: "Close"

@@ -150,7 +150,7 @@ export default function ScanNodeConfig( { navigation } ) {
             marginBottom: 16
           }}
         />
-        <TouchableOpacity
+        <TouchableOpacity testID='EnterManuallyButton'
           style={styles.buttonView}
           activeOpacity={0.6}
           onPress={() => {

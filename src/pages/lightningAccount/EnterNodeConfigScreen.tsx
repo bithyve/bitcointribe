@@ -906,7 +906,7 @@ render() {
           {( implementation === 'lnd' ||
                         implementation === 'c-lightning-REST' ) && (
             <>
-              <Input
+              <Input testID='HostInput'
                 placeholder={'Enter host'}
                 value={host}
                 onChangeText={( text: string ) =>
@@ -923,7 +923,7 @@ render() {
               />
 
 
-              <Input
+              <Input testID='PortInput'
                 keyboardType="numeric"
                 placeholder={'Port'}
                 value={port}
@@ -939,7 +939,7 @@ render() {
                 numberOfLines={1}
                 editable={!loading}
               />
-              <Input
+              <Input testID='MacaroonHexInput'
                 placeholder={'Macaroon Hex'}
                 value={macaroonHex}
                 onChangeText={( text: string ) =>
@@ -1013,7 +1013,7 @@ render() {
           )} */}
         </View>
 
-        <TouchableOpacity
+        <TouchableOpacity testID='NodeConnectButton'
           activeOpacity={0.6}
           onPress={() => {
             this.saveNodeConfiguration()

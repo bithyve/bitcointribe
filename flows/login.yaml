@@ -9,6 +9,5 @@ appId: io.hexawallet.hexa.development
 - tapOn: "2"
 - tapOn: "3"
 - tapOn: "4"
-# - tapOn: 
-#     id: "Proceed"
-- tapOn: "Proceed"
+- tapOn: 
+    id: "ProceedButton"

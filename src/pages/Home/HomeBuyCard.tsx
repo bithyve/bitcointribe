@@ -155,7 +155,7 @@ const HomeBuyCard = ( {
           // },
           // elevation: 15
         }}>
-        <TouchableOpacity
+        <TouchableOpacity testID='BuyBTCButton'
         // icon={
         //   <Image
         //     source={require( '../../assets/images/icons/recurring_buy.png' )}
