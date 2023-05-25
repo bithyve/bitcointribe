@@ -2,16 +2,12 @@
 
 # Add friends and Family to your list to be able to send SATS easily
 
-appId: io.hexawallet.hexa2
+appId: io.hexawallet.hexa.development
 ---
-- launchApp
-- tapOn: "1"
-- tapOn: "2"
-- tapOn: "3"
-- tapOn: "4"
-- tapOn: "Proceed"
+- runFlow: "login.yaml"
 - tapOn: Freiend, tab, 2 of 4
-- tapOn: + Add New
+- tapOn:
+    id: "+AddNewContact"
 - tapOn: Anna Haro
 - tapOn: Confirm & Proceed
 
