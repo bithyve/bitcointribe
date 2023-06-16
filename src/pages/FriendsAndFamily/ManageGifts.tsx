@@ -330,7 +330,7 @@ const ManageGifts = ( props ) => {
           />
         } */}
         { active === GiftStatus.CREATED &&
-        <TouchableOpacity
+        <TouchableOpacity testID='createNewButtonButton2'
           onPress={() => navigation.navigate( 'CreateGift', {
             setActiveTab: buttonPress
           } )}
