@@ -510,7 +510,7 @@ export default function AddContactSendRequest( props ) {
           }}
         />
         {!giftId &&
-        <TouchableOpacity
+        <TouchableOpacity testID='secureWithContactsPhoneNumber'
           onPress={() => setSecure2FAModal( true )}
           style={{
             flex: 1

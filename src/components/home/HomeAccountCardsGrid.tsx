@@ -206,7 +206,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
       data={columnData}
       keyExtractor={keyExtractor}
       renderItem={( { item, index }: RenderItemProps ) => {
-        return <AccountCardColumn
+        return <AccountCardColumn 
           key={index}
           index={index}
           cardData={item}

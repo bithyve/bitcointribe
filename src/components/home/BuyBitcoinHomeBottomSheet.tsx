@@ -152,7 +152,6 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ({
           </ListItem.Content>
 
           <TouchableOpacity
-            testID="BuyBitcoinButton"
             onPress={() => {
               onMenuItemSelected(menuItem);
             }}

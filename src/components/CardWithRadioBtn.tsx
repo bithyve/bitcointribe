@@ -97,7 +97,7 @@ export default function CardWithRadioBtn( {
               alignItems: 'center',
             }}
           >
-            <View
+            <View testID='confirmPhoneNumber'
               style={
                 {
                   // // flex: 1,
@@ -116,6 +116,7 @@ export default function CardWithRadioBtn( {
                   {`${mainText} `}
                 </Text>
               </Text>
+              
             </View>
             {tag !== '' && (
               <View
