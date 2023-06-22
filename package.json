@@ -176,7 +176,7 @@
     "rn-secure-storage": "^2.0.6",
     "rn-tooltip": "^3.0.2",
     "secrets.js-grempe": "^2.0.0",
-    "semver": "^7.3.2",
+    "semver": "^7.5.2",
     "stacktrace-js": "^2.0.2",
     "stream-browserify": "^1.0.0",
     "string_decoder": "^0.10.31",
