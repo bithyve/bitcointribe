@@ -43,6 +43,7 @@ export enum BottomSheetKind {
   SWAN_STATUS_INFO,
   WYRE_STATUS_INFO,
   RAMP_STATUS_INFO,
+  ADD_A_WALLET_INFO
 }
 interface HomeStateTypes {
   currencyCode?: string;
@@ -99,9 +100,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
   navigateToAddNewAccountScreen = () => {
     // this.props.navigation.navigate( 'AddNewAccount' )
-    this.props.navigation.navigate( 'ScanNodeConfig', {
-      currentSubAccount: null,
-    } )
+    // this.props.navigation.navigate( 'ScanNodeConfig', {
+    //   currentSubAccount: null,
+    // } )
+    this.props.openBottomSheet( BottomSheetKind.ADD_A_WALLET_INFO )
   };
 
   handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
