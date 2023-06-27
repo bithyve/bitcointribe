@@ -1,4 +1,4 @@
-import { Account, AccountType, DonationAccount, MultiSigAccount, NetworkType, LNNode } from '../Interface'
+import { Account, AccountType, DonationAccount, MultiSigAccount, NetworkType, LNNode, RGBConfig } from '../Interface'
 import crypto from 'crypto'
 import AccountUtilities from './AccountUtilities'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
@@ -13,7 +13,8 @@ export function generateAccount(
     primarySeed,
     derivationPath,
     networkType,
-    node
+    node,
+    rgbConfig
   }: {
     walletId: string,
     type: AccountType,
@@ -23,7 +24,8 @@ export function generateAccount(
     primarySeed: string,
     derivationPath: string,
     networkType: NetworkType,
-    node?: LNNode
+    node?: LNNode,
+    rgbConfig?: RGBConfig
   }
 ): Account {
 
@@ -72,8 +74,9 @@ export function generateAccount(
   }
   if( type === AccountType.LIGHTNING_ACCOUNT ) {
     account.node = node
+  } else if( type === AccountType.RGB_ACCOUNT ) {
+    account.rgbConfig = rgbConfig
   }
-
   return account
 }
 

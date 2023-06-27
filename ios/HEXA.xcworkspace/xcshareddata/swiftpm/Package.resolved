@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "bdk-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/bitcoindevkit/bdk-swift",
+      "state" : {
+        "branch" : "master",
+        "revision" : "9c69d6255c251ba606e7aad94969c8d24b0ea344"
+      }
+    },
+    {
+      "identity" : "rgb-lib-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/RGB-Tools/rgb-lib-swift",
+      "state" : {
+        "branch" : "master",
+        "revision" : "05d1d1169fa52e2827d43c5cd2f53d2e6c862ddd"
+      }
+    }
+  ],
+  "version" : 2
+}

@@ -31,6 +31,7 @@ import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import WyreIntegrationScreen from '../../../pages/WyreIntegration/WyreIntegrationScreen'
 import Launch from '../../../pages/Launch'
 import EnterNodeConfig from '../../../pages/lightningAccount/EnterNodeConfigScreen'
+import NewRGBWallet from '../../../pages/rgb/NewRGBWallet'
 import ScanNodeConfig from '../../../pages/lightningAccount/ScanNodeConfigScreen'
 import RestoreWithICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import RestoreWithoutICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithoutICloud'
@@ -112,6 +113,12 @@ const HomeStack = createStackNavigator(
     },
     EnterNodeConfig: {
       screen: EnterNodeConfig,
+      navigationOptions: {
+        header: null
+      }
+    },
+    NewRGBWallet: {
+      screen: NewRGBWallet,
       navigationOptions: {
         header: null
       }

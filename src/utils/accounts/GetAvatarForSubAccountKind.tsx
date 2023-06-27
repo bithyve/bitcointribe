@@ -1,5 +1,5 @@
 import React from 'react'
-import { ImageSourcePropType } from 'react-native'
+import { ImageSourcePropType, Text } from 'react-native'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
@@ -68,6 +68,8 @@ const getAvatarForSubAccount = (
         return <Wallet />
       case SubAccountKind.LIGHTNING_ACCOUNT:
         return isHome ? <LightningHexa/> : <Lightning />
+      case SubAccountKind.RGB_ACCOUNT:
+        return isHome ? <Text>RGB</Text> : <Lightning />
       case SubAccountKind.SERVICE:
         return getAvatarForServiceAccountKind( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind, isHome, isAccount )
       default:

@@ -31,7 +31,6 @@ import FriendsAndFamily from './stacks/F&F/F&FStack'
 import Colors from '../common/Colors'
 import Intermediate from '../pages/Intermediate'
 import CreateKeeperScreen from '../pages/CreateKeeperScreen'
-import NewRGBWallet from '../pages/Home/NewRGBWallet'
 // import RGBWalletDetail from '../pages/Home/RGBWalletDetail'
 // import RGBReceive from '../pages/Home/RGBReceive'
 // import RGBTxDetail from '../pages/Home/RGBTxDetail'
@@ -87,7 +86,6 @@ const SetupNavigator = createStackNavigator(
     },
     PasscodeConfirm,
     NewWalletName,
-    NewRGBWallet,
     // RGBWalletDetail,
     // RGBReceive,
     // RGBTxDetail,
