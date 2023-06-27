@@ -31,10 +31,6 @@ import FriendsAndFamily from './stacks/F&F/F&FStack'
 import Colors from '../common/Colors'
 import Intermediate from '../pages/Intermediate'
 import CreateKeeperScreen from '../pages/CreateKeeperScreen'
-// import RGBWalletDetail from '../pages/Home/RGBWalletDetail'
-// import RGBReceive from '../pages/Home/RGBReceive'
-// import RGBTxDetail from '../pages/Home/RGBTxDetail'
-
 import RestoreWithICloud from '../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
 import { BottomTabBar, createBottomTabNavigator } from 'react-navigation-tabs'
@@ -86,9 +82,6 @@ const SetupNavigator = createStackNavigator(
     },
     PasscodeConfirm,
     NewWalletName,
-    // RGBWalletDetail,
-    // RGBReceive,
-    // RGBTxDetail,
     CreateKeeperScreen,
     AccountSelection,
     NewWalletQuestion,

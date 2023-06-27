@@ -32,6 +32,9 @@ import WyreIntegrationScreen from '../../../pages/WyreIntegration/WyreIntegratio
 import Launch from '../../../pages/Launch'
 import EnterNodeConfig from '../../../pages/lightningAccount/EnterNodeConfigScreen'
 import NewRGBWallet from '../../../pages/rgb/NewRGBWallet'
+import RGBWalletDetail from '../../../pages/rgb/RGBWalletDetail'
+import RGBReceive from '../../../pages/rgb/RGBReceive'
+import RGBTxDetail from '../../../pages/rgb/RGBTxDetail'
 import ScanNodeConfig from '../../../pages/lightningAccount/ScanNodeConfigScreen'
 import RestoreWithICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import RestoreWithoutICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithoutICloud'
@@ -119,6 +122,24 @@ const HomeStack = createStackNavigator(
     },
     NewRGBWallet: {
       screen: NewRGBWallet,
+      navigationOptions: {
+        header: null
+      }
+    },
+    RGBWalletDetail: {
+      screen: RGBWalletDetail,
+      navigationOptions: {
+        header: null
+      }
+    },
+    RGBReceive: {
+      screen: RGBReceive,
+      navigationOptions: {
+        header: null
+      }
+    },
+    RGBTxDetail: {
+      screen: RGBTxDetail,
       navigationOptions: {
         header: null
       }
