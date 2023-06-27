@@ -25,7 +25,7 @@ import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
 import { setShowAllAccount, markAccountChecked } from '../../store/actions/accounts'
 import { SwanIntegrationState } from '../../store/reducers/SwanIntegration'
-import Fonts from './../../common/Fonts'
+import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { ScrollView } from 'react-native-gesture-handler'
 import ToggleContainer from './ToggleContainer'
@@ -107,14 +107,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
-    // if (
-    //   this.props.startRegistration &&
-    //   selectedAccount.primarySubAccount.kind === SubAccountKind.SERVICE &&
-    // ( selectedAccount.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
-    // ) {
-    //   this.props.openBottomSheet( 6, null, true )
-
-    // } else {
     if( selectedAccount.primarySubAccount.hasNewTxn ) {
       this.props.markAccountChecked( selectedAccount.id )
     }
@@ -124,7 +116,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         swanDeepLinkContent: this.props.swanDeepLinkContent,
         node: selectedAccount.primarySubAccount.node
       } )
-    } else {
+    }
+    if( selectedAccount.primarySubAccount.type === AccountType.RGB_ACCOUNT ) {
+      this.props.navigation.navigate( 'RGBWalletDetail', {
+        accountShellID: selectedAccount.id,
+        rgbConfig: selectedAccount.primarySubAccount.rgbConfig
+      } )
+    }
+    else {
       this.props.navigation.navigate( 'AccountDetails', {
         accountShellID: selectedAccount.id,
         swanDeepLinkContent: this.props.swanDeepLinkContent

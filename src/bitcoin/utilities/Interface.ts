@@ -894,6 +894,14 @@ export interface LNNode {
   enableTor?: boolean
 }
 
+export interface RGBConfig {
+  mnemonic: string,
+  xpub: string,
+  xpubFingerprint: string,
+  bdkDir: string,
+  rgbDir: string
+}
+
 export interface Account {
   id: string,                           // account identifier(derived from xpub)
   isUsable: boolean,                    // true if account is usable
@@ -941,6 +949,7 @@ export interface Account {
     type: string;
   }[]
   node?: LNNode
+  rgbConfig?: RGBConfig
 }
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled
@@ -984,7 +993,8 @@ export enum AccountType {
   WYRE_ACCOUNT = 'WYRE_ACCOUNT',
   EXCHANGE_ACCOUNT = 'EXCHANGE_ACCOUNT',
   FNF_ACCOUNT = 'FNF_ACCOUNT',
-  LIGHTNING_ACCOUNT = 'LIGHTNING_ACCOUNT'
+  LIGHTNING_ACCOUNT = 'LIGHTNING_ACCOUNT',
+  RGB_ACCOUNT = 'RGB_ACCOUNT'
 }
 
 export interface Accounts {

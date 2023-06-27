@@ -76,7 +76,8 @@ import {
   Trusted_Contacts,
   UnecryptedStreamData,
   Wallet,
-  LNNode
+  LNNode,
+  RGBConfig
 } from '../../bitcoin/utilities/Interface'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -112,6 +113,8 @@ import { generateDeepLink } from '../../common/CommonFunctions'
 import Toast from '../../components/Toast'
 import RESTUtils from '../../utils/ln/RESTUtils'
 import { Alert } from 'react-native'
+import RGBServices from '../../services/RGBServices'
+import RgbSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/RgbSubAccountInfo'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -855,6 +858,17 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
           node: account.node
         } )
         break
+      case AccountType.RGB_ACCOUNT:
+        primarySubAccount = new RgbSubAccountInfo( {
+          id: account.id,
+          xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          isUsable: account.isUsable,
+          instanceNumber: account.instanceNum,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+          rgbConfig: account.rgbConfig
+        } )
+        break
   }
 
   let accountShell: AccountShell
@@ -1004,6 +1018,23 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           node
         } )
         return lnAccount
+
+      case AccountType.RGB_ACCOUNT:
+        const rgbAccountCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ accountType ] )?.length | 0
+        const rgbConfig = yield call( RGBServices.generateKeys )
+        const rgbAccount: Account = yield call( generateAccount, {
+          walletId,
+          type: accountType,
+          instanceNum: rgbAccountCount,
+          accountName: accountName? accountName: defaultAccountName,
+          accountDescription: accountDescription? accountDescription: defaultAccountDescription,
+          primarySeed,
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, rgbAccountCount ),
+          networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+          node: null,
+          rgbConfig
+        } )
+        return rgbAccount
   }
 }
 export interface newAccountDetails {
@@ -1011,8 +1042,8 @@ export interface newAccountDetails {
   description?: string,
   is2FAEnabled?: boolean,
   doneeName?: string,
-  youtubeURL: string,
-  imageURL: any,
+  youtubeURL?: string,
+  imageURL?: any,
   node?: LNNode
 }
 export interface newAccountsInfo {

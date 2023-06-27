@@ -1,21 +1,17 @@
-import React, { useContext, useState, createRef, useEffect, useCallback, useMemo } from 'react'
+import React, { useContext, useState } from 'react'
 import {
   StyleSheet,
   View,
   SafeAreaView,
   TouchableOpacity,
-  ScrollView,
   StatusBar,
   Text,
-  Image,
   KeyboardAvoidingView,
   Platform,
   TextInput,
-  InteractionManager,
   Keyboard,
 } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import Fonts from '../../common/Fonts'
 import Colors from '../../common/Colors'
 import CommonStyles from '../../common/Styles/Styles'
@@ -26,24 +22,14 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize'
 import DeviceInfo from 'react-native-device-info'
 import HeaderTitle1 from '../../components/HeaderTitle1'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import Entypo from 'react-native-vector-icons/Entypo'
-import { updateCloudPermission } from '../../store/actions/BHR'
-import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
-import BottomSheet from '@gorhom/bottom-sheet'
-import { BottomSheetView } from '@gorhom/bottom-sheet'
-import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
-import { Easing } from 'react-native-reanimated'
-import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
-import ModalContainer from '../../components/home/ModalContainer'
 import { LocalizationContext } from '../../common/content/LocContext'
-import { useDispatch, useSelector } from 'react-redux'
-import { setupWallet, walletSetupCompletion } from '../../store/actions/setupAndAuth'
-import { setVersion } from '../../store/actions/versionHistory'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { initNewBHRFlow } from '../../store/actions/BHR'
-import LoaderModal from '../../components/LoaderModal'
+import { useDispatch } from 'react-redux'
 import LinearGradient from 'react-native-linear-gradient'
+import { addNewAccountShells } from '../../store/actions/accounts'
+import { newAccountsInfo } from '../../store/sagas/accounts'
+import { AccountType } from '../../bitcoin/utilities/Interface'
+import { goHomeAction } from '../../navigation/actions/NavigationActions'
+import Toast from '../../components/Toast'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -55,22 +41,26 @@ export enum BottomSheetState {
 }
 
 export default function NewRGBWallet( props ) {
-  // const [ timerArray, setTimerArray ] = useState( [ 1, 1, 1 ] )
-  // const [ timeLeft, setTimeLeft ] = useState( null )
-  // const [ intervalRef, setIntervalRef ] = useState( null )
-  const accountShellID = useMemo( () => {
-    return props.navigation.getParam( 'accountShellID' )
-  }, [ props.navigation ] )
   const [ walletName, setWalletName ] = useState( '' )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
-  const [ note, showNote ] = useState( true )
   const dispatch = useDispatch()
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
-  const common = translations[ 'common' ]
-  const walletSetupCompleted = useSelector( ( state ) => state.setupAndAuth.walletSetupCompleted )
   const [ loaderModal, setLoaderModal ] = useState( false )
-  // const mnemonic = props.navigation.getParam( 'mnemonic' ) || null
+
+  const createNewRgbAccount = () => {
+    const accountsInfo: newAccountsInfo = {
+      accountType: AccountType.RGB_ACCOUNT,
+      accountDetails: {
+        name: walletName,
+        description: 'RGB Account',
+      }
+    }
+    dispatch( addNewAccountShells( [ accountsInfo ] ) )
+    Toast( 'RGB account created' )
+    props.navigation.dispatch( goHomeAction() )
+
+  }
 
   return (
     <SafeAreaView style={{
@@ -130,7 +120,6 @@ export default function NewRGBWallet( props ) {
               }}
               onFocus={() => {
                 setInputStyle( styles.inputBoxFocused )
-                showNote( false )
               }}
               onBlur={() => {
                 setInputStyle( styles.inputBox )
@@ -160,9 +149,7 @@ export default function NewRGBWallet( props ) {
                 onPress={() => {
                   setLoaderModal( true )
                   Keyboard.dismiss()
-                  props.navigation.navigate( 'RGBWalletDetail', {
-                    accountShellID: accountShellID
-                  } )
+                  createNewRgbAccount()
                 }}
               >
                 <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}

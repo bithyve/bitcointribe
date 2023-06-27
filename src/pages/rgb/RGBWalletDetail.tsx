@@ -61,7 +61,7 @@ import DonationWebPageBottomSheet from '../../components/bottom-sheets/DonationW
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
-import LabeledBalanceDisplay from '../../../src/components/LabeledBalanceDisplay'
+import LabeledBalanceDisplay from '../../components/LabeledBalanceDisplay'
 import BitcoinUnit, { displayNameForBitcoinUnit } from '../../common/data/enums/BitcoinUnit'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { AccountType } from '../../bitcoin/utilities/Interface'
