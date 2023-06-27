@@ -32,9 +32,9 @@ import Colors from '../common/Colors'
 import Intermediate from '../pages/Intermediate'
 import CreateKeeperScreen from '../pages/CreateKeeperScreen'
 import NewRGBWallet from '../pages/Home/NewRGBWallet'
-// import RGBWalletDetail from '../pages/Home/RGBWalletDetail'
-// import RGBReceive from '../pages/Home/RGBReceive'
-// import RGBTxDetail from '../pages/Home/RGBTxDetail'
+import RGBWalletDetail from '../pages/Home/RGBWalletDetail'
+import RGBReceive from '../pages/Home/RGBReceive'
+import RGBTxDetail from '../pages/Home/RGBTxDetail'
 
 import RestoreWithICloud from '../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
@@ -88,9 +88,9 @@ const SetupNavigator = createStackNavigator(
     PasscodeConfirm,
     NewWalletName,
     NewRGBWallet,
-    // RGBWalletDetail,
-    // RGBReceive,
-    // RGBTxDetail,
+    RGBWalletDetail,
+    RGBReceive,
+    RGBTxDetail,
     CreateKeeperScreen,
     AccountSelection,
     NewWalletQuestion,
