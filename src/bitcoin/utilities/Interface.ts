@@ -949,7 +949,12 @@ export interface Account {
     type: string;
   }[]
   node?: LNNode
-  rgbConfig?: RGBConfig
+  rgbConfig?: RGBConfig,
+  rgb?:{
+    bitcoinAssets?:any [],
+    rgb20Assets?:any [],
+    rgb121Assets?:any []
+  }
 }
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled

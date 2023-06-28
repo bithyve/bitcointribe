@@ -1,17 +1,11 @@
-import React, { createRef, PureComponent } from 'react'
+import React, { PureComponent } from 'react'
 import {
   Text,
   View,
-  StyleSheet,
   ViewStyle,
   StyleProp,
-  Image,
   Platform
 } from 'react-native'
-import {
-  heightPercentageToDP,
-  widthPercentageToDP,
-} from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
 import {
   widthPercentageToDP as wp,
@@ -24,15 +18,9 @@ import { withNavigationFocus } from 'react-navigation'
 import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
 import { setShowAllAccount, markAccountChecked } from '../../store/actions/accounts'
-import { SwanIntegrationState } from '../../store/reducers/SwanIntegration'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { ScrollView } from 'react-native-gesture-handler'
 import ToggleContainer from './ToggleContainer'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
-import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import HomeBuyCard from './HomeBuyCard'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { AccountType } from '../../bitcoin/utilities/Interface'
@@ -106,7 +94,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.props.openBottomSheet( BottomSheetKind.ADD_A_WALLET_INFO )
   };
 
-  handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
+  handleAccountCardSelection =async ( selectedAccount: AccountShell ) => {
     if( selectedAccount.primarySubAccount.hasNewTxn ) {
       this.props.markAccountChecked( selectedAccount.id )
     }

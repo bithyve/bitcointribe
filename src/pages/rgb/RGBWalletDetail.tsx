@@ -1,51 +1,25 @@
-import React, { useContext, useState, createRef, useEffect, useCallback, useMemo } from 'react'
+import React, { useContext, useState, useEffect, useMemo } from 'react'
 import {
   StyleSheet,
   View,
   SafeAreaView,
   TouchableOpacity,
-  ScrollView,
   StatusBar,
   Text,
   Image,
-  KeyboardAvoidingView,
-  Platform,
-  TextInput,
-  InteractionManager,
-  Keyboard,
-  SectionList,
   FlatList,
 } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import Fonts from '../../common/Fonts'
 import Colors from '../../common/Colors'
 import CommonStyles from '../../common/Styles/Styles'
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
-import DeviceInfo from 'react-native-device-info'
-import HeaderTitle1 from '../../components/HeaderTitle1'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import Entypo from 'react-native-vector-icons/Entypo'
-import { updateCloudPermission } from '../../store/actions/BHR'
-import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
-import BottomSheet from '@gorhom/bottom-sheet'
-import { BottomSheetView } from '@gorhom/bottom-sheet'
-import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
-import { Easing } from 'react-native-reanimated'
-import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
 import ModalContainer from '../../components/home/ModalContainer'
 import { LocalizationContext } from '../../common/content/LocContext'
-import { useDispatch, useSelector } from 'react-redux'
-import { setupWallet, walletSetupCompletion } from '../../store/actions/setupAndAuth'
-import { setVersion } from '../../store/actions/versionHistory'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { initNewBHRFlow } from '../../store/actions/BHR'
-import LoaderModal from '../../components/LoaderModal'
-import LinearGradient from 'react-native-linear-gradient'
+import { useDispatch } from 'react-redux'
 import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import config from '../../bitcoin/HexaConfig'
@@ -59,12 +33,8 @@ import ButtonBlue from '../../components/ButtonBlue'
 import { RootSiblingParent } from 'react-native-root-siblings'
 import DonationWebPageBottomSheet from '../../components/bottom-sheets/DonationWebPageBottomSheet'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import { NavigationScreenConfig } from 'react-navigation'
-import { NavigationStackOptions } from 'react-navigation-stack'
-import LabeledBalanceDisplay from '../../components/LabeledBalanceDisplay'
 import BitcoinUnit, { displayNameForBitcoinUnit } from '../../common/data/enums/BitcoinUnit'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
-import { AccountType } from '../../bitcoin/utilities/Interface'
 import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../components/MaterialCurrencyCodeIcon'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
@@ -74,18 +44,10 @@ import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitT
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions'
 
-enum SectionKind {
-  TOP_TABS,
-  TRANSACTIONS_LIST_PREVIEW,
-  SEND_AND_RECEIVE_FOOTER,
-}
-const sectionListItemKeyExtractor = ( index ) => String( index )
 
 export default function RGBWalletDetail( props ) {
   const dispatch = useDispatch()
   const { translations } = useContext( LocalizationContext )
-  const strings = translations[ 'login' ]
-  const common = translations[ 'common' ]
   const accountShellID = useMemo( () => {
     return props.navigation.getParam( 'accountShellID' )
   }, [ props.navigation ] )
@@ -252,6 +214,18 @@ export default function RGBWalletDetail( props ) {
             } ]}>COLLECTIBLE</Text>
           </View>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.fungibleContainer} onPress={()=>{
+          if( !isFungible )
+            setFungible( true )
+        }} activeOpacity={1}>
+          <View style={[ styles.fungibleInnerContainer, {
+            backgroundColor:isFungible? Colors.CLOSE_ICON_COLOR:null,
+          } ]}>
+            <Text style={[ styles.fungibleText, {
+              color: isFungible ?  Colors.white : Colors.CLOSE_ICON_COLOR,
+            } ]}>BITCOIN</Text>
+          </View>
+        </TouchableOpacity>
       </View>
     )
   }
@@ -292,7 +266,7 @@ export default function RGBWalletDetail( props ) {
     } )
   }
 
-  const renderItem = ( { item, index } ) => {
+  const renderItem = ( { item } ) => {
 
     return(
       isFungible ?
@@ -403,8 +377,8 @@ const styles = StyleSheet.create( {
     borderRadius: 8, paddingHorizontal: 15, paddingVertical: 5
   },
   fungibleText:{
-    fontFamily: Fonts.Medium,
-    fontSize: RFValue( 14 )
+    fontFamily: Fonts.Regular,
+    fontSize: 12
   },
   amountTextStyle: {
     fontFamily: Fonts.Regular,

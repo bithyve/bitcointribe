@@ -78,6 +78,9 @@
 		F4AC220F2A4AB1E0008F73A9 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AC220E2A4AB1E0008F73A9 /* Utility.swift */; };
 		F4AC22102A4AB1E0008F73A9 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AC220E2A4AB1E0008F73A9 /* Utility.swift */; };
 		F4AC22112A4AB1E0008F73A9 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AC220E2A4AB1E0008F73A9 /* Utility.swift */; };
+		F4AC22132A4AC4E2008F73A9 /* BDKHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AC22122A4AC4E2008F73A9 /* BDKHelper.swift */; };
+		F4AC22142A4AC4E2008F73A9 /* BDKHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AC22122A4AC4E2008F73A9 /* BDKHelper.swift */; };
+		F4AC22152A4AC4E2008F73A9 /* BDKHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AC22122A4AC4E2008F73A9 /* BDKHelper.swift */; };
 		F4E16A492A49F01900AE6802 /* RgbLib in Frameworks */ = {isa = PBXBuildFile; productRef = F4E16A482A49F01900AE6802 /* RgbLib */; };
 		F4E16A4B2A49F08B00AE6802 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F4E16A4A2A49F08B00AE6802 /* libc++.tbd */; };
 		F4E16A4F2A49FA0300AE6802 /* RGBModule.m in Sources */ = {isa = PBXBuildFile; fileRef = F4E16A4E2A49FA0300AE6802 /* RGBModule.m */; };
@@ -176,6 +179,7 @@
 		F49AA80C26A0284D0097D815 /* BackgroundViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BackgroundViewController.xib; sourceTree = "<group>"; };
 		F4AC220A2A4AADB9008F73A9 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		F4AC220E2A4AB1E0008F73A9 /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
+		F4AC22122A4AC4E2008F73A9 /* BDKHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BDKHelper.swift; sourceTree = "<group>"; };
 		F4E16A4A2A49F08B00AE6802 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		F4E16A4D2A49F9DA00AE6802 /* RGBModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RGBModule.h; sourceTree = "<group>"; };
 		F4E16A4E2A49FA0300AE6802 /* RGBModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RGBModule.m; sourceTree = "<group>"; };
@@ -395,6 +399,7 @@
 				F4E16A522A49FA1400AE6802 /* RGBHelper.swift */,
 				F4AC220A2A4AADB9008F73A9 /* Constants.swift */,
 				F4AC220E2A4AB1E0008F73A9 /* Utility.swift */,
+				F4AC22122A4AC4E2008F73A9 /* BDKHelper.swift */,
 			);
 			path = rgb;
 			sourceTree = "<group>";
@@ -1086,6 +1091,7 @@
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				CCF1689025FB8FC50038E126 /* iCloudHelper.swift in Sources */,
 				F4E16A4F2A49FA0300AE6802 /* RGBModule.m in Sources */,
+				F4AC22132A4AC4E2008F73A9 /* BDKHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1104,6 +1110,7 @@
 				6182F778250B23D7005B6ECE /* PdfGenerate.swift in Sources */,
 				6182F779250B23D7005B6ECE /* main.m in Sources */,
 				F4E16A502A49FA0300AE6802 /* RGBModule.m in Sources */,
+				F4AC22142A4AC4E2008F73A9 /* BDKHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1122,6 +1129,7 @@
 				6182F7A4250B2742005B6ECE /* PdfGenerate.swift in Sources */,
 				6182F7A5250B2742005B6ECE /* main.m in Sources */,
 				F4E16A512A49FA0300AE6802 /* RGBModule.m in Sources */,
+				F4AC22152A4AC4E2008F73A9 /* BDKHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

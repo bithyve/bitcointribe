@@ -635,6 +635,34 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
   if( activeAddressesWithNewTxsMap && Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
 }
 
+
+function* refreshRgbShellsWorker( { payload }: { payload: {
+  shells: AccountShell[],
+}} ){
+  const accountShells: AccountShell[] = payload.shells
+  const accountState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const accounts: Accounts = accountState.accounts
+  yield put( accountShellRefreshStarted( accountShells ) )
+  const accountsToSync: Accounts = {
+  }
+  for( const accountShell of accountShells ){
+    accountsToSync[ accountShell.primarySubAccount.id ] = accounts[ accountShell.primarySubAccount.id ]
+  }
+  const { synchedAccounts } = yield call( syncRgbAccountsWorker, {
+    payload: {
+      accounts: accountsToSync,
+    }
+  } )
+  yield put( updateAccountShells( {
+    accounts: synchedAccounts
+  } ) )
+  yield put( accountShellRefreshCompleted( accountShells ) )
+
+}
+
+
 function* refreshLNShellsWorker( { payload }: { payload: {
   shells: AccountShell[],
 }} ){
@@ -659,6 +687,25 @@ function* refreshLNShellsWorker( { payload }: { payload: {
   } ) )
   yield put( recomputeNetBalance() )
   yield put( accountShellRefreshCompleted( accountShells ) )
+}
+
+function* syncRgbAccountsWorker( { payload }: {payload: {
+  accounts: Accounts }} ) {
+  const { accounts } = payload
+  for( const account of Object.values( accounts ) ){
+    const { mnemonic, xpub } = account.rgbConfig
+    const sync = yield call( RGBServices.sync, mnemonic )
+    const balances = yield call( RGBServices.getBalance, mnemonic )
+    const transactions = yield call( RGBServices.getTransactions, mnemonic )
+    account.balances.confirmed = Number( balances.confirmed )
+    account.balances.unconfirmed = Number( balances.trustedPending )
+    account.rgb = {
+      bitcoinAssets: transactions
+    }
+  }
+  return {
+    synchedAccounts: accounts
+  }
 }
 
 function* syncLnAccountsWorker( { payload }: {payload: {
@@ -687,11 +734,11 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
   const shells: AccountShell[] = yield select(
     ( state ) => state.accounts.accountShells
   )
-
   const shellsToSync: AccountShell[] = []
   const testShellsToSync: AccountShell[] = [] // Note: should be synched separately due to network difference(testnet)
   const donationShellsToSync: AccountShell[] = []
   const lnShellsToSync: AccountShell[] = []
+  const rgbShellsToSync: AccountShell[] = []
   for ( const shell of shells ) {
     if( syncAll || shell.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
       if( !shell.primarySubAccount.isUsable ) continue
@@ -708,13 +755,19 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
           case AccountType.LIGHTNING_ACCOUNT:
             lnShellsToSync.push( shell )
             break
-
+          case AccountType.RGB_ACCOUNT:
+            rgbShellsToSync.push( shell )
+            break
           default:
             shellsToSync.push( shell )
       }
     }
   }
-
+  if( rgbShellsToSync.length ) yield call( refreshRgbShellsWorker, {
+    payload: {
+      shells: rgbShellsToSync,
+    }
+  } )
   if( shellsToSync.length ) yield call( refreshAccountShellsWorker, {
     payload: {
       shells: shellsToSync,
@@ -738,6 +791,9 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
       shells: lnShellsToSync,
     }
   } )
+
+
+
 }
 
 export const autoSyncShellsWatcher = createWatcher(

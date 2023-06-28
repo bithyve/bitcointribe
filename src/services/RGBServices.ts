@@ -11,4 +11,55 @@ export default class RGBServices{
     )
     return JSON.parse( keys )
   }
+
+  static getAddress = async ( mnemonic: string ): Promise<string> => {
+    const address = await RGB.getAddress(
+      mnemonic,
+      NETWORK
+    )
+    return address
+  }
+
+  static getBalance = async ( mnemonic: string ): Promise<string> => {
+    const balance = await RGB.getBalance(
+      mnemonic,
+      NETWORK
+    )
+    return JSON.parse( balance )
+  }
+
+  static getTransactions = async ( mnemonic: string ): Promise<[]> => {
+    const txns = await RGB.getTransactions(
+      mnemonic,
+      NETWORK
+    )
+    return JSON.parse( txns )
+  }
+
+  static sync = async ( mnemonic: string ): Promise<string> => {
+    const isSynched = await RGB.sync(
+      mnemonic,
+      NETWORK
+    )
+    return isSynched
+  }
+
+  static sendBtc = async ( mnemonic: string, address: string, amount: Number ): Promise<string> => {
+    const txid = await RGB.sendBtc(
+      mnemonic,
+      NETWORK,
+      address,
+      `${amount}`
+    )
+    return txid
+  }
+
+  static receiveAsset = async ( mnemonic: string, pubKey: string ): Promise<string> => {
+    const balance = await RGB.receiveAsset(
+      mnemonic,
+      pubKey,
+      NETWORK
+    )
+    return balance
+  }
 }
