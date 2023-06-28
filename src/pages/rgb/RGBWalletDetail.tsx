@@ -4,17 +4,13 @@ import {
   View,
   SafeAreaView,
   TouchableOpacity,
-  ScrollView,
   StatusBar,
   Text,
   Image,
-  KeyboardAvoidingView,
-  Platform,
-  TextInput,
-  InteractionManager,
-  Keyboard,
-  SectionList,
   FlatList,
+  sections,
+  SectionList,
+  RefreshControl,
 } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -26,45 +22,21 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
-import DeviceInfo from 'react-native-device-info'
-import HeaderTitle1 from '../../components/HeaderTitle1'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import Entypo from 'react-native-vector-icons/Entypo'
-import { updateCloudPermission } from '../../store/actions/BHR'
-import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
-import BottomSheet from '@gorhom/bottom-sheet'
-import { BottomSheetView } from '@gorhom/bottom-sheet'
-import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
-import { Easing } from 'react-native-reanimated'
-import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
-import ModalContainer from '../../components/home/ModalContainer'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { useDispatch, useSelector } from 'react-redux'
-import { setupWallet, walletSetupCompletion } from '../../store/actions/setupAndAuth'
-import { setVersion } from '../../store/actions/versionHistory'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { initNewBHRFlow } from '../../store/actions/BHR'
-import LoaderModal from '../../components/LoaderModal'
-import LinearGradient from 'react-native-linear-gradient'
 import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import config from '../../bitcoin/HexaConfig'
 import NetworkKind from '../../common/data/enums/NetworkKind'
 import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
-import { fetchExchangeRates, fetchFeeRates } from '../../store/actions/accounts'
+import { fetchExchangeRates, fetchFeeRates, refreshAccountShells } from '../../store/actions/accounts'
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useAccountShellFromNavigation from '../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import ButtonBlue from '../../components/ButtonBlue'
-import { RootSiblingParent } from 'react-native-root-siblings'
-import DonationWebPageBottomSheet from '../../components/bottom-sheets/DonationWebPageBottomSheet'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import { NavigationScreenConfig } from 'react-navigation'
-import { NavigationStackOptions } from 'react-navigation-stack'
-import LabeledBalanceDisplay from '../../components/LabeledBalanceDisplay'
 import BitcoinUnit, { displayNameForBitcoinUnit } from '../../common/data/enums/BitcoinUnit'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
-import { AccountType } from '../../bitcoin/utilities/Interface'
 import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../components/MaterialCurrencyCodeIcon'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
@@ -73,9 +45,14 @@ import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmo
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions'
+import TransactionsPreviewSection from '../Accounts/Details/TransactionsPreviewSection'
+import AccountDetailsCard from '../../components/account-details/AccountDetailsCard'
+import AccountShell from '../../common/data/models/AccountShell'
+import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 
 enum SectionKind {
   TOP_TABS,
+  ACCOUNT_CARD,
   TRANSACTIONS_LIST_PREVIEW,
   SEND_AND_RECEIVE_FOOTER,
 }
@@ -83,12 +60,16 @@ const sectionListItemKeyExtractor = ( index ) => String( index )
 
 export default function RGBWalletDetail( props ) {
   const dispatch = useDispatch()
+  const swanDeepLinkContent = props.navigation.getParam( 'swanDeepLinkContent' )
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
   const common = translations[ 'common' ]
   const accountShellID = useMemo( () => {
     return props.navigation.getParam( 'accountShellID' )
   }, [ props.navigation ] )
+  const isRefreshing = useMemo( () => {
+    return ( accountShell.syncStatus===SyncStatus.IN_PROGRESS )
+  }, [ accountShell.syncStatus ] )
 
   const accountsState = useAccountsState()
   const { averageTxFees, exchangeRates } = accountsState
@@ -97,7 +78,7 @@ export default function RGBWalletDetail( props ) {
   const [ webView, showWebView ] = useState( false )
   const account = useAccountByAccountShell( accountShell )
 
-  const [ isFungible, setFungible ] = useState( true )
+  const [ selectedTab, setSelectedTab ] = useState( 'fungible' )
   const [ fungibleData, setFungibleData ] =useState( [ {
     'a':'a'
   }, {
@@ -106,10 +87,7 @@ export default function RGBWalletDetail( props ) {
     'a':'a'
   } ] )
   const [ collectibleData, setCollectibleData ] =useState( [] )
-
-  const isShowingDonationButton = useMemo( () => {
-    return primarySubAccount?.kind === SubAccountKind.DONATION_ACCOUNT
-  }, [ primarySubAccount?.kind ] )
+  const [ showMore, setShowMore ] = useState( false )
 
   const isTestAccount = false
   const currencyKind = useCurrencyKind()
@@ -165,25 +143,6 @@ export default function RGBWalletDetail( props ) {
     }
   }, [] )
 
-  function navigateToDonationAccountWebViewSettings( donationAccount ) {
-    props.navigation.navigate( 'DonationAccountWebViewSettings', {
-      account: donationAccount,
-    } )
-  }
-
-  const showDonationWebViewSheet = () => {
-    return(
-      <DonationWebPageBottomSheet
-        account={account}
-        onClickSetting={() => {
-          showWebView( false )
-          navigateToDonationAccountWebViewSettings( account )
-        }}
-        closeModal={() => showWebView( false )}
-      />
-    )
-  }
-
   const renderFooter = () => {
     return(
       <View style={styles.viewSectionContainer}>
@@ -206,55 +165,56 @@ export default function RGBWalletDetail( props ) {
             }
             isTestAccount={primarySubAccount?.sourceKind === SourceAccountKind.TEST_ACCOUNT}
           />
-
-          {isShowingDonationButton && (
-            <View style={{
-              alignItems: 'center',
-              marginTop: 36,
-            }}>
-              <ButtonBlue
-                buttonText={'Donation Webpage'}
-                handleButtonPress={()=>showWebView( true )}
-              />
-            </View>
-          )}
         </View>
 
       </View>
     )
   }
-
   const renderTabs = () => {
     return(
       <View style={styles.tabContainer}>
         <TouchableOpacity style={styles.fungibleContainer} onPress={()=>{
-          if( !isFungible )
-            setFungible( true )
-        }} activeOpacity={1}>
+          // if( selectedTab == 'f' )
+          setSelectedTab( 'fungible' )
+        }
+        } activeOpacity={1}>
           <View style={[ styles.fungibleInnerContainer, {
-            backgroundColor:isFungible? Colors.CLOSE_ICON_COLOR:null,
+            backgroundColor: selectedTab == 'fungible'? Colors.CLOSE_ICON_COLOR:null,
           } ]}>
             <Text style={[ styles.fungibleText, {
-              color: isFungible ?  Colors.white : Colors.CLOSE_ICON_COLOR,
+              color: selectedTab == 'fungible' ?  Colors.white : Colors.CLOSE_ICON_COLOR,
             } ]}>FUNGIBLE</Text>
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.fungibleContainer} onPress={()=>{
-          if( isFungible )
-            setFungible( false )
+          // if( selectedTab )
+          setSelectedTab( 'collectible' )
         }} activeOpacity={1}>
           <View style={[ styles.fungibleInnerContainer, {
-            backgroundColor:!isFungible? Colors.CLOSE_ICON_COLOR:null,
+            backgroundColor:selectedTab == 'collectible'? Colors.CLOSE_ICON_COLOR:null,
           } ]}>
             <Text style={[ styles.fungibleText, {
-              color: !isFungible ?  Colors.white : Colors.CLOSE_ICON_COLOR,
+              color: selectedTab == 'collectible' ?  Colors.white : Colors.CLOSE_ICON_COLOR,
             } ]}>COLLECTIBLE</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.fungibleContainer} onPress={()=>{
+          // if( selectedTab )
+          setSelectedTab( 'Bitcoin' )
+        }} activeOpacity={1}>
+          <View style={[ styles.fungibleInnerContainer, {
+            backgroundColor: selectedTab == 'Bitcoin' ? Colors.CLOSE_ICON_COLOR:null,
+          } ]}>
+            <Text style={[ styles.fungibleText, {
+              color: selectedTab == 'Bitcoin' ?  Colors.white : Colors.CLOSE_ICON_COLOR,
+            } ]}>BITCOIN</Text>
           </View>
         </TouchableOpacity>
       </View>
     )
   }
+
 
   const BalanceCurrencyIcon = () => {
     if ( prefersBitcoin || isTestAccount ) {
@@ -285,17 +245,82 @@ export default function RGBWalletDetail( props ) {
       )
     }
   }
+  function navigateToTransactionsList() {
+    props.navigation.navigate( 'TransactionsList', {
+      accountShellID,
+    } )
+  }
+  function handleTransactionSelection( transaction: TransactionDescribing ) {
+    props.navigation.navigate( 'TransactionDetails', {
+      transaction,
+      accountShellID: accountShell.id,
+    } )
+  }
+  function navigateToAccountSettings() {
+    props.navigation.navigate( 'SubAccountSettings', {
+      accountShellID,
+    } )
+  }
+  function performRefreshOnPullDown() {
+    dispatch( refreshAccountShells( [ accountShell ], {
+      hardRefresh: true,
+    } ) )
+  }
 
   const onItemClick = () => {
     props.navigation.navigate( 'RGBTxDetail', {
       accountShellID
     } )
   }
+  const sections = useMemo( () => {
+    return [
+      {
+        kind: SectionKind.ACCOUNT_CARD,
+        data: [ null ],
+        renderItem: () => {
+          return (
+            <View style={ {
+              paddingHorizontal: 20,
+            }}>
+              <AccountDetailsCard
+                accountShell={accountShell}
+                onKnowMorePressed={() => setShowMore( true )}
+                onSettingsPressed={navigateToAccountSettings}
+                swanDeepLinkContent={swanDeepLinkContent}
+              />
+            </View>
+          )
+        },
+      },
+      {
+        kind: SectionKind.TRANSACTIONS_LIST_PREVIEW,
+        data: [ null ],
+        renderItem: () => {
+
+          return (
+            <View style={styles.viewSectionContainer}>
+              <TransactionsPreviewSection
+                transactions={AccountShell.getAllTransactions( accountShell ) }
+                // transactions={AccountShell.getAllTransactions( accountShell ).slice( 0, 3 )}
+                availableBalance={AccountShell.getSpendableBalance( accountShell )}
+                bitcoinUnit={accountShell.unit}
+                isTestAccount={primarySubAccount.kind === SubAccountKind.TEST_ACCOUNT}
+                onViewMorePressed={navigateToTransactionsList}
+                onTransactionItemSelected={handleTransactionSelection}
+                accountShellId={accountShell.id}
+                kind={primarySubAccount.kind}
+              />
+            </View>
+          )
+        },
+      },
+    ]
+  }, [ accountShell ] )
 
   const renderItem = ( { item, index } ) => {
 
     return(
-      isFungible ?
+      selectedTab == 'fungible' ?
         <TouchableOpacity style={styles.itemContainer} onPress={() =>onItemClick()}>
           <Image style={styles.itemImage} source={item?.image}/>
           <View style={styles.textContainer}>
@@ -321,13 +346,14 @@ export default function RGBWalletDetail( props ) {
             } ]}>{`${formattedUnitText}`}</Text>
           </View>
         </TouchableOpacity>
-        :
-        <TouchableOpacity style={styles.itemContainer} onPress={() =>onItemClick()}>
-          <Image style={{
-            height: '50%', width: '50%'
-          }} source={''}>
-          </Image>
-        </TouchableOpacity>
+        : selectedTab == 'collectible' ?
+          <TouchableOpacity style={styles.itemContainer} onPress={() =>onItemClick()}>
+            <Image style={{
+              height: '50%', width: '50%'
+            }} source={''}>
+            </Image>
+          </TouchableOpacity>
+          : null
     )
   }
 
@@ -354,20 +380,34 @@ export default function RGBWalletDetail( props ) {
         flex: 1,
       }}>
         {renderTabs()}
-        <FlatList
+        { selectedTab != 'bitcoin' ?
+          <FlatList
           // contentContainerStyle={{
           //   flex:1, backgroundColor:'red'
           // }}
-          data={ isFungible ? fungibleData : collectibleData}
-          renderItem={renderItem}
-          keyExtractor={( item, index ) => index.toString()}
-        />
+            data={ selectedTab == 'fungible' ? fungibleData : collectibleData}
+            renderItem={renderItem}
+            keyExtractor={( item, index ) => index.toString()}
+          /> :
+          <SectionList
+            contentContainerStyle={styles.scrollViewContainer}
+            showsVerticalScrollIndicator={false}
+            nestedScrollEnabled
+            refreshControl={
+              <RefreshControl
+                onRefresh={performRefreshOnPullDown}
+                refreshing={isRefreshing}
+                style={{
+                  backgroundColor: Colors.backgroundColor,
+                }}
+              />
+            }
+            sections={sections}
+            stickySectionHeadersEnabled={false}
+            keyExtractor={sectionListItemKeyExtractor}
+          />
+        }
         {renderFooter()}
-        <ModalContainer onBackground={()=>showWebView( false )} visible={webView} closeBottomSheet={() => { showWebView( false ) }} >
-          <RootSiblingParent>
-            {showDonationWebViewSheet()}
-          </RootSiblingParent>
-        </ModalContainer>
       </View>
     </SafeAreaView>
   )
@@ -400,11 +440,11 @@ const styles = StyleSheet.create( {
     flex:1, justifyContent:'center', alignItems:'center'
   },
   fungibleInnerContainer:{
-    borderRadius: 8, paddingHorizontal: 15, paddingVertical: 5
+    borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5
   },
   fungibleText:{
     fontFamily: Fonts.Medium,
-    fontSize: RFValue( 14 )
+    fontSize: RFValue( 12 )
   },
   amountTextStyle: {
     fontFamily: Fonts.Regular,
