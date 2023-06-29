@@ -1145,7 +1145,7 @@
 				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 568;
+				CURRENT_PROJECT_VERSION = 569;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -1161,7 +1161,7 @@
 					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
 				);
-				MARKETING_VERSION = 2.1.7;
+				MARKETING_VERSION = 2.1.8;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1187,7 +1187,7 @@
 				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 568;
+				CURRENT_PROJECT_VERSION = 569;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Y5TCB759QL;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = Y5TCB759QL;
@@ -1203,7 +1203,7 @@
 					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
 				);
-				MARKETING_VERSION = 2.1.7;
+				MARKETING_VERSION = 2.1.8;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1229,7 +1229,7 @@
 				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 568;
+				CURRENT_PROJECT_VERSION = 569;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Y5TCB759QL;
 				ENABLE_BITCODE = NO;
@@ -1249,7 +1249,7 @@
 					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
 				);
-				MARKETING_VERSION = 2.1.7;
+				MARKETING_VERSION = 2.1.8;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1275,7 +1275,7 @@
 				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 568;
+				CURRENT_PROJECT_VERSION = 569;
 				DEVELOPMENT_TEAM = Y5TCB759QL;
 				INFOPLIST_FILE = "HEXA/HEXA.Dev-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe dev";
@@ -1289,7 +1289,7 @@
 					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
 				);
-				MARKETING_VERSION = 2.1.7;
+				MARKETING_VERSION = 2.1.8;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1314,7 +1314,7 @@
 				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 568;
+				CURRENT_PROJECT_VERSION = 569;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Y5TCB759QL;
 				ENABLE_BITCODE = NO;
@@ -1330,7 +1330,7 @@
 					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
 				);
-				MARKETING_VERSION = 2.1.7;
+				MARKETING_VERSION = 2.1.8;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1356,7 +1356,7 @@
 				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 568;
+				CURRENT_PROJECT_VERSION = 569;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Y5TCB759QL;
 				INFOPLIST_FILE = "HEXA/HEXA.Stage-Info.plist";
@@ -1371,7 +1371,7 @@
 					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
 				);
-				MARKETING_VERSION = 2.1.7;
+				MARKETING_VERSION = 2.1.8;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
