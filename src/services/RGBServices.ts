@@ -44,6 +44,15 @@ export default class RGBServices{
     return isSynched
   }
 
+  static syncRgbAssets = async ( mnemonic: string, pubKey: string ): Promise<string> => {
+    const assets = await RGB.syncRgbAsset(
+      mnemonic,
+      pubKey,
+      NETWORK
+    )
+    return JSON.parse( assets )
+  }
+
   static sendBtc = async ( mnemonic: string, address: string, amount: Number ): Promise<string> => {
     const txid = await RGB.sendBtc(
       mnemonic,
@@ -55,11 +64,31 @@ export default class RGBServices{
   }
 
   static receiveAsset = async ( mnemonic: string, pubKey: string ): Promise<string> => {
-    const balance = await RGB.receiveAsset(
+    const data = await RGB.receiveAsset(
       mnemonic,
       pubKey,
       NETWORK
     )
-    return balance
+    return JSON.parse( data )
+  }
+
+  static getRgbAssetMetaData = async ( mnemonic: string, pubKey: string, assetId: string ): Promise<{}> => {
+    const data = await RGB.getRgbAssetMetaData(
+      mnemonic,
+      pubKey,
+      assetId,
+      NETWORK
+    )
+    return JSON.parse( data )
+  }
+
+  static getRgbAssetTransactions = async ( mnemonic: string, pubKey: string, assetId: string ): Promise<{}> => {
+    const data = await RGB.getRgbAssetTransactions(
+      mnemonic,
+      pubKey,
+      assetId,
+      NETWORK
+    )
+    return JSON.parse( data )
   }
 }

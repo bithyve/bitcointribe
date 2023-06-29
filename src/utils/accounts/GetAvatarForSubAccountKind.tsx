@@ -1,5 +1,5 @@
 import React from 'react'
-import { ImageSourcePropType, Text } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
@@ -24,6 +24,25 @@ import Wallet from '../../assets/images/accIcons/icon_wallet.svg'
 import Watch from '../../assets/images/accIcons/view.svg'
 import Lightning from '../../assets/images/accIcons/lightning.svg'
 import LightningHexa from '../../assets/images/accIcons/icon_ln.svg'
+import Fonts from '../../common/Fonts'
+
+const styles = StyleSheet.create( {
+  container: {
+    height: 37, width: 37, backgroundColor: '#ae76db', borderRadius: 30, justifyContent: 'center', alignItems: 'center'
+  },
+  text:{
+    color: 'white',
+    fontFamily: Fonts.Regular,
+    fontSize: 11
+  }
+} )
+
+
+function RgbAccountIcon() {
+  return (
+    <View style={styles.container}><Text style={styles.text}>RGB</Text></View>
+  )
+}
 
 const getAvatarForSubAccount = (
   subAccount: SubAccountDescribing,
@@ -31,26 +50,6 @@ const getAvatarForSubAccount = (
   isHome?: boolean,
   isAccount?: boolean
 ) => {
-  // switch ( subAccount.kind ) {
-  //     case SubAccountKind.TEST_ACCOUNT:
-  //       return require( '../../assets/images/icons/icon_test.png' )
-  //     case SubAccountKind.REGULAR_ACCOUNT:
-  //       return require( '../../assets/images/icons/icon_regular.png' )
-  //     case SubAccountKind.SECURE_ACCOUNT:
-  //       return require( '../../assets/images/icons/icon_secureaccount.png' )
-  //     case SubAccountKind.TRUSTED_CONTACTS:
-  //       return require( '../../assets/images/icons/icon_qr_logo.png' )
-  //     case SubAccountKind.DONATION_ACCOUNT:
-  //       return require( '../../assets/images/icons/icon_donation_hexa.png' )
-  //     case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
-  //       return require( '../../assets/images/icons/icon_import_watch_only_wallet.png' )
-  //     case SubAccountKind.FULLY_IMPORTED_WALLET:
-  //       return require( '../../assets/images/icons/icon_wallet.png' )
-  //     case SubAccountKind.SERVICE:
-  //       return getAvatarForServiceAccountKind( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind )
-  //     default:
-  //       return require( '../../assets/images/icons/icon_qr_logo.png' )
-  // }
   switch ( subAccount.kind ) {
       case SubAccountKind.TEST_ACCOUNT:
         return isAccount ? <AccountTest /> : isHome ? <AccountTestHome /> : active ? <AccountTestActive /> : <AccountTestInactive />
@@ -69,7 +68,7 @@ const getAvatarForSubAccount = (
       case SubAccountKind.LIGHTNING_ACCOUNT:
         return isHome ? <LightningHexa/> : <Lightning />
       case SubAccountKind.RGB_ACCOUNT:
-        return isHome ? <Text>RGB</Text> : <Lightning />
+        return isHome ? <RgbAccountIcon/> : <Lightning />
       case SubAccountKind.SERVICE:
         return getAvatarForServiceAccountKind( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind, isHome, isAccount )
       default:

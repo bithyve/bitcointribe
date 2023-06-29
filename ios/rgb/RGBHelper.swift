@@ -37,15 +37,114 @@ import BitcoinDevKit
     }
   }
   
+  func getRgbAssetMetaData(wallet: RgbLib.Wallet, assetId: String)->String{
+    do{
+      let online = try wallet.goOnline(skipConsistencyCheck: true, electrumUrl: Constants.testnetElectrumUrl)
+      let metaData = try wallet.getAssetMetadata(online: online, assetId: assetId)
+      var jsonObject = [String: Any]()
+      jsonObject["assetId"] = assetId
+      jsonObject["precision"] = metaData.precision
+      jsonObject["name"] = metaData.name
+      jsonObject["ticker"] = metaData.ticker
+      jsonObject["description"] = metaData.description
+      jsonObject["timestamp"] = metaData.timestamp
+      jsonObject["assetType"] = "\(metaData.assetType)"
+      jsonObject["parentId"] = metaData.parentId
+      jsonObject["issuedSupply"] = metaData.issuedSupply
+
+      let jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted)
+      let jsonString = String(data: jsonData, encoding: .utf8)!
+      return jsonString
+    }catch{
+      print(error)
+      return "{}"
+    }
+  }
+  
+  func getRgbAssetTransfers(wallet: RgbLib.Wallet, assetId: String)->String{
+    do{
+      let online = try wallet.goOnline(skipConsistencyCheck: true, electrumUrl: Constants.testnetElectrumUrl)
+      let refresh = try wallet.refresh(online: online, assetId: assetId, filter: [RgbLib.RefreshFilter(status: RefreshTransferStatus.waitingCounterparty, incoming: true), RgbLib.RefreshFilter(status: RefreshTransferStatus.waitingCounterparty, incoming: false)])
+      let transfers = try wallet.listTransfers(assetId: assetId)
+      var jsonArray = [[String: Any]]()
+      for transfer in transfers {
+        var jsonObject = [String: Any]()
+        jsonObject["txid"] = transfer.txid
+        jsonObject["amount"] = transfer.amount
+        jsonObject["createdAt"] = transfer.createdAt
+        jsonObject["updatedAt"] = transfer.updatedAt
+        jsonObject["status"] = "\(transfer.status)"
+        jsonObject["kind"] = "\(transfer.kind)"
+        jsonObject["expiration"] = transfer.expiration
+        jsonObject["blindingSecret"] = transfer.blindingSecret
+        jsonObject["blindedUtxo"] = transfer.blindedUtxo
+        jsonObject["changeUtxo"] = transfer.changeUtxo
+        jsonObject["consignmentEndpoints"] =
+          transfer.consignmentEndpoints.map{ endpoint in
+            return [
+              "endpoint": endpoint.endpoint,
+              "used": endpoint.used,
+              "protocol": "\(endpoint.protocol)"
+              ]
+          }
+          
+        var unblindedUtxo = [String: Any]()
+        unblindedUtxo["txid"] = transfer.unblindedUtxo?.txid
+        unblindedUtxo["vout"] = transfer.unblindedUtxo?.vout
+        jsonObject["unblindedUtxo"] = unblindedUtxo
+        
+        var changeUtxo = [String: Any]()
+        changeUtxo["txid"] = transfer.changeUtxo?.txid
+        changeUtxo["vout"] = transfer.changeUtxo?.vout
+        
+        jsonObject["changeUtxo"] = changeUtxo
+
+        jsonArray.append(jsonObject)
+      }
+      let jsonData = try JSONSerialization.data(withJSONObject: jsonArray, options: .prettyPrinted)
+      let jsonString = String(data: jsonData, encoding: .utf8)!
+      return jsonString
+    }catch{
+      print(error)
+      return "{}"
+    }
+  }
+  
+  func getRgbAssets(wallet: RgbLib.Wallet, mnemonic: String, btcNetwotk: String)->String{
+    do{
+      let online = try wallet.goOnline(skipConsistencyCheck: true, electrumUrl: Constants.testnetElectrumUrl)
+      let refresh = try wallet.refresh(online: online, assetId: nil, filter: [RgbLib.RefreshFilter(status: RefreshTransferStatus.waitingCounterparty, incoming: true), RgbLib.RefreshFilter(status: RefreshTransferStatus.waitingCounterparty, incoming: false)])
+      
+      let assets = try wallet.listAssets(filterAssetTypes: [])
+      var jsonArray = [[String: Any]]()
+      for asset in assets.rgb20! {
+        var jsonObject = [String: Any]()
+        jsonObject["assetId"] = asset.assetId
+        jsonObject["futureBalance"] = asset.balance.future
+        jsonObject["settledBalance"] = asset.balance.settled
+        jsonObject["spendableBalance"] = asset.balance.spendable
+        jsonObject["ticker"] = asset.ticker
+        jsonObject["name"] = asset.name
+        jsonObject["precision"] = asset.precision
+        
+        jsonArray.append(jsonObject)
+      }
+      let jsonData = try JSONSerialization.data(withJSONObject: jsonArray, options: .prettyPrinted)
+
+      let data: [String: Any] = [
+        "rgb20": jsonArray
+      ]
+      let json = Utility.convertToJSONString(params: data)
+      return json
+    }catch{
+      return ""
+    }
+  }
+  
   func genReceiveData(wallet: RgbLib.Wallet, mnemonic: String, btcNetwotk: String)->String{
     do{
       let online = try wallet.goOnline(skipConsistencyCheck: true, electrumUrl: Constants.testnetElectrumUrl)
-      print("online: \(online)")
       let refresh = try wallet.refresh(online: online, assetId: nil, filter: [RgbLib.RefreshFilter(status: RefreshTransferStatus.waitingCounterparty, incoming: true), RgbLib.RefreshFilter(status: RefreshTransferStatus.waitingCounterparty, incoming: false)])
-      let assets = try wallet.listAssets(filterAssetTypes: [])
-
-      print("REFRESH: \(refresh)")
-      print("assets: \(assets)")
 
       let bindData = try wallet.blind(assetId: nil, amount: nil, durationSeconds: 86400, consignmentEndpoints: [Constants.proxyConsignmentEndpoint])
       let data: [String: Any] = [
@@ -61,7 +160,7 @@ import BitcoinDevKit
       print("Type of error")
       print(type(of: error))
       print("ERROR: \(error)")
-    /* let address = wallet.getAddress()
+    let address = wallet.getAddress()
       let bdkWallet = BDKHelper.getWallet(mnemonic: mnemonic, network: btcNetwotk)
       BDKHelper.sync(wallet: bdkWallet!)
       let txid = BDKHelper.sendToAddress(address: address, amount: 9000, fee: 3.0, wallet: bdkWallet!)
@@ -77,7 +176,7 @@ import BitcoinDevKit
         return txid
       }catch{
         print(error)
-      }*/
+      }
       return "\(error)"
 
     }
@@ -151,7 +250,6 @@ import BitcoinDevKit
   @objc func sendBtc(btcNetwotk: String, mnemonic: String, address: String, amount: String, callback: @escaping ((String) -> Void)) {
     do{
       let wallet = try BDKHelper.getWallet(mnemonic: mnemonic, network: btcNetwotk)
-      print("WALLET GENERATED")
       let txid = BDKHelper.sendToAddress(address: address, amount: UInt64(amount)!, fee: 3.0, wallet: wallet!)
       callback("{txid: \(txid)")
     } catch {
@@ -166,6 +264,34 @@ import BitcoinDevKit
       callback(genReceiveData(wallet: wallet, mnemonic: mnemonic, btcNetwotk: btcNetwotk))
     }catch{
       callback("{}")
+    }
+  }
+  
+  @objc func syncRgb(btcNetwotk: String, mnemonic: String,pubkey: String,callback: @escaping ((String) -> Void)){
+    do {
+      let wallet = (try getRgbWallet(bitcoinNetwork: btcNetwotk, pubkey: pubkey, mnemonic: mnemonic))!
+      callback(getRgbAssets(wallet: wallet, mnemonic: mnemonic, btcNetwotk: btcNetwotk))
+    }catch{
+      callback("{}")
+    }
+  }
+  
+  @objc func getRgbAssetMetaData(btcNetwotk: String, mnemonic: String, pubkey: String, assetId:String, callback: @escaping ((String) -> Void)){
+    do {
+      let wallet = (try getRgbWallet(bitcoinNetwork: btcNetwotk, pubkey: pubkey, mnemonic: mnemonic))!
+      callback(getRgbAssetMetaData(wallet: wallet, assetId: assetId))
+    }catch{
+      callback("{}")
+    }
+  }
+  
+  @objc func getRgbAssetTransactions(btcNetwotk: String, mnemonic: String, pubkey: String, assetId:String, callback: @escaping ((String) -> Void)){
+    do {
+      let wallet = (try getRgbWallet(bitcoinNetwork: btcNetwotk, pubkey: pubkey, mnemonic: mnemonic))!
+      callback(getRgbAssetTransfers(wallet: wallet, assetId: assetId))
+    }catch{
+      print(error)
+      callback("[]")
     }
   }
 }

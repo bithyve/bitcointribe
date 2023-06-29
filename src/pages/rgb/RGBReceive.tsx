@@ -1,20 +1,17 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useState, useEffect } from 'react'
 import {
   View,
-  Image,
   TouchableOpacity,
   Text,
   StyleSheet,
-  TextInput,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
   SafeAreaView,
-  StatusBar
+  StatusBar,
+  ActivityIndicator
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { RFValue } from 'react-native-responsive-fontsize'
 import NavStyles from '../../common/Styles/NavStyles'
 import {
@@ -26,215 +23,52 @@ import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import BottomSheet from 'reanimated-bottom-sheet'
 
-import {
-  setReceiveHelper,
-  setSavingWarning,
-} from '../../store/actions/preferences'
-import KnowMoreButton from '../../components/KnowMoreButton'
 import QRCode from '../../components/QRCode'
 import CopyThisText from '../../components/CopyThisText'
-import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
-import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
-import { useBottomSheetModal } from '@gorhom/bottom-sheet'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
-import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents'
-import idx from 'idx'
-import DeviceInfo from 'react-native-device-info'
 import AccountShell from '../../common/data/models/AccountShell'
-import { Account, AccountType, LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import ModalContainer from '../../components/home/ModalContainer'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { getNextFreeAddress } from '../../store/sagas/accounts'
 import { translations } from '../../common/content/LocContext'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import { onPressKeeper } from '../../store/actions/BHR'
-import { getAccountIconByShell, getAccountTitleByShell } from '../Accounts/Send/utils'
-import TwoFASetupWarningModal from '../Accounts/TwoFASetupWarningModal'
-import HeaderTitle1 from '../../components/HeaderTitle1'
+import { getAccountTitleByShell } from '../Accounts/Send/utils'
+import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
+import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import { useDispatch } from 'react-redux'
+import { receiveRgbAsset } from '../../store/actions/accounts'
 
 export default function RGBReceive( props ) {
-  const dispatch = useDispatch()
-  const [ receiveHelper, showReceiveHelper ] = useState( false )
-  const [ receiveModal, setReceiveModal ] = useState( false )
-  const [ backupReminder, setBackupReminder ] = useState( false )
-  const [ isReceiveHelperDone, setIsReceiveHelperDone ] = useState( true )
-  const isReceiveHelperDoneValue = useSelector( ( state ) =>
-    idx( state, ( _ ) => _.preferences.isReceiveHelperDoneValue ),
-  )
-  const savingWarning = useSelector( ( state ) =>
-    idx( state, ( _ ) => _.preferences.savingWarning ),
-  )
   const strings = translations[ 'accounts' ]
   const common = translations[ 'common' ]
-  const [ SecureReceiveWarningBottomSheet ] = useState( React.createRef() )
-  const [ amount, setAmount ] = useState( '' )
   const accountShell: AccountShell = props.navigation.getParam( 'accountShell' )
-  const account: Account = useAccountByAccountShell( accountShell )
+  const assetType: RGB_ASSET_TYPE = props.navigation.getParam( 'assetType' ) || RGB_ASSET_TYPE.BITCOIN
+  const dispatch = useDispatch()
   const [ receivingAddress, setReceivingAddress ] = useState( null )
   const [ paymentURI, setPaymentURI ] = useState( null )
-  const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
-  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
-  const navigationObj: any = useSelector( ( state ) => state.bhr.navigationObj )
-  const [ onKeeperButtonClick, setOnKeeperButtonClick ] = useState( false )
+  const account = useAccountByAccountShell( accountShell )
+  const [ loading, setLoading ] = useState( false )
 
-  const defaultKeeperObj: {
-    shareType: string
-    updatedAt: number;
-    status: string
-    shareId: string
-    reshareVersion: number;
-    name?: string
-    data?: any;
-    channelKey?: string
-  } = {
-    shareType: '',
-    updatedAt: 0,
-    status: 'notAccessible',
-    shareId: '',
-    reshareVersion: 0,
-    name: '',
-    data: {
-    },
-    channelKey: ''
-  }
-  const [ selectedKeeper, setSelectedKeeper ]: [{
-    shareType: string;
-    updatedAt: number;
-    status: string;
-    shareId: string;
-    reshareVersion: number;
-    name?: string;
-    data?: any;
-    channelKey?: string;
-  }, any] = useState( defaultKeeperObj )
+
 
   useEffect( () => {
-    if ( navigationObj.selectedKeeper && onKeeperButtonClick ) {
-      setSelectedKeeper( navigationObj.selectedKeeper )
-      const navigationParams = {
-        selectedTitle: navigationObj.selectedKeeper.name,
-        SelectedRecoveryKeyNumber: 1,
-        selectedKeeper: navigationObj.selectedKeeper,
-        selectedLevelId: levelData[ 0 ].id
-      }
-      props.navigation.navigate( 'SeedBackupHistory', navigationParams )
-    }
-  }, [ navigationObj ] )
-
-  const {
-    present: presentBottomSheet,
-    dismiss: dismissBottomSheet,
-  } = useBottomSheetModal()
-
-  const onPressTouchableWrapper = () => {
-    showReceiveHelper( false )
-  }
-
-  const onPressBack = () => {
-    props.navigation.goBack()
-  }
-
-  const onPressKnowMore = () => {
-    dispatch( setReceiveHelper( true ) )
-    showReceiveHelper( true )
-  }
-
-  const checkNShowHelperModal = async () => {
-    const isReceiveHelperDone1 = isReceiveHelperDoneValue
-    if ( !isReceiveHelperDone1 ) {
-      await AsyncStorage.getItem( 'isReceiveHelperDone' )
-    }
-    if ( !isReceiveHelperDone1 && accountShell.primarySubAccount.type == AccountType.TEST_ACCOUNT ) {
-      dispatch( setReceiveHelper( true ) )
-      //await AsyncStorage.setItem('isReceiveHelperDone', 'true');
-      setTimeout( () => {
-        setIsReceiveHelperDone( true )
-      }, 10 )
-      setTimeout( () => {
-        showReceiveHelper( true )
-      }, 1000 )
+    if( assetType == RGB_ASSET_TYPE.BITCOIN ) {
+      setReceivingAddress( account.rgb.nextUnusedAddress )
     } else {
-      setTimeout( () => {
-        setIsReceiveHelperDone( false )
-      }, 10 )
+      setReceivingAddress( account.rgb?.receiveAssets?.data.invoice )
+      // dispatch( receiveRgbAsset( {
+      //   accountShell
+      // } ) )
     }
-  }
+  }, [] )
 
   useEffect( () => {
-    checkNShowHelperModal()
-    //(async () => {
-    if ( accountShell.primarySubAccount.type == AccountType.SAVINGS_ACCOUNT ) {
-      if ( !savingWarning ) {
-        //await AsyncStorage.getItem('savingsWarning')
-        // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
-        if ( SecureReceiveWarningBottomSheet.current )
-          ( SecureReceiveWarningBottomSheet as any ).current.snapTo( 1 )
-        dispatch( setSavingWarning( true ) )
-        //await AsyncStorage.setItem('savingsWarning', 'true');
+    if( assetType === RGB_ASSET_TYPE.RGB20 ) {
+      if( account.rgb?.receiveAssets?.refreshing ){
+        setLoading( false )
+      } else{
+        setLoading( false )
+        setReceivingAddress( account.rgb.receiveAssets.data.invoice )
       }
     }
+  }, [ account.rgb?.receiveAssets?.refreshing ] )
 
-    if ( ( levelData[ 0 ].keeper1.status === 'notSetup' ) ||
-      ( levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' &&
-        levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'Write down Backup Phrase' ) ) {
-      setTimeout( () => {
-        setBackupReminder( true )
-      }, 500 )
-    }
-    //})();
-  }, [] )
-
-  const onPressOkOf2FASetupWarning = () => {
-    if ( SecureReceiveWarningBottomSheet.current )
-      ( SecureReceiveWarningBottomSheet as any ).current.snapTo( 0 )
-  }
-
-  useEffect( () => {
-    return () => {
-      dismissBottomSheet()
-    }
-  }, [ props.navigation ] )
-
-  const showReceiveAmountBottomSheet = useCallback( () => {
-    return (
-
-      <ReceiveAmountContent
-        title={strings.Receivesats}
-        message={strings.Receivesatsinto}
-        onPressConfirm={( amount ) => {
-          setAmount( amount )
-          setReceiveModal( false )
-        }}
-        selectedAmount={amount}
-        onPressBack={() => {
-          setReceiveModal( false )
-        }
-        }
-      />
-    )
-  }, [ amount ] )
-
-
-  useEffect( () => {
-    const receivingAddress = getNextFreeAddress( dispatch, account )
-    setReceivingAddress( receivingAddress )
-  }, [] )
-
-  useEffect( () => {
-    if ( amount ) {
-      const newPaymentURI = AccountUtilities.generatePaymentURI( receivingAddress, {
-        amount: parseInt( amount ) / SATOSHIS_IN_BTC,
-      } ).paymentURI
-      setPaymentURI( newPaymentURI )
-    } else if ( paymentURI ) setPaymentURI( null )
-  }, [ amount ] )
 
   return (
     <View style={{
@@ -244,7 +78,7 @@ export default function RGBReceive( props ) {
         flex: 0
       }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <TouchableWithoutFeedback onPress={() => onPressTouchableWrapper()}>
+      <TouchableWithoutFeedback onPress={() => {}}>
         <KeyboardAvoidingView
           style={{
             flex: 1
@@ -270,41 +104,21 @@ export default function RGBReceive( props ) {
               </TouchableOpacity>
             </View>
             <Text style={styles.headerTitleText}>Receive</Text>
-            <Text style={styles.headerInfoText}>Make sure you keep them safe</Text>
 
-            <ScrollView>
-              <View style={styles.QRView}>
-                <QRCode title={getAccountTitleByShell( accountShell ) === 'Test Account' ? 'Testnet address' : 'Bitcoin address'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp( '27%' )} />
-              </View>
+            {
+              loading ? <ActivityIndicator />:
+                <ScrollView>
+                  <View style={styles.QRView}>
+                    <QRCode title={assetType === RGB_ASSET_TYPE.BITCOIN ? 'Bitcoin address': 'Invoice'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp( '27%' )} />
+                  </View>
 
-              <CopyThisText
-                backgroundColor={Colors.white}
-                text={paymentURI ? paymentURI : receivingAddress}
-              />
-
-              {/* <AppBottomSheetTouchableWrapper
-                onPress={() => { setReceiveModal( true ) }}
-                style={styles.selectedView}
-              >
-                <View
-                  style={styles.text}
-                >
-                  <Text style={styles.titleText}>{amount ? amount : strings.Enteramount}</Text>
-                </View>
-
-                <View style={{
-                  marginLeft: 'auto'
-                }}>
-                  <Ionicons
-                    name="chevron-forward"
-                    color={Colors.textColorGrey}
-                    size={15}
-                    style={styles.forwardIcon}
+                  <CopyThisText
+                    backgroundColor={Colors.white}
+                    text={paymentURI ? paymentURI : receivingAddress}
                   />
-                </View>
-              </AppBottomSheetTouchableWrapper> */}
 
-            </ScrollView>
+                </ScrollView>
+            }
             <View style={{
               marginBottom: hp( '2.5%' )
             }}>
@@ -318,80 +132,6 @@ export default function RGBReceive( props ) {
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
 
-      <ModalContainer onBackground={() => showReceiveHelper( false )} visible={receiveHelper} closeBottomSheet={() => { showReceiveHelper( false ) }} >
-        <ReceiveHelpContents
-          titleClicked={() => {
-            showReceiveHelper( false )
-          }}
-        />
-      </ModalContainer>
-      <ModalContainer onBackground={() => setReceiveModal( false )} visible={receiveModal} closeBottomSheet={() => { setReceiveModal( false ) }} >
-        {showReceiveAmountBottomSheet()}
-      </ModalContainer>
-      <BottomSheet
-        enabledInnerScrolling={true}
-        enabledGestureInteraction={false}
-        ref={SecureReceiveWarningBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
-        ]}
-        renderContent={() => (
-          <TwoFASetupWarningModal
-            onPressOk={() => onPressOkOf2FASetupWarning()}
-          //onPressManageBackup={() => props.navigation.replace('ManageBackup')}
-          />
-        )}
-        renderHeader={() => (
-          <SmallHeaderModal
-            borderColor={Colors.borderColor}
-            backgroundColor={Colors.white}
-          // onPressHeader={() => {
-          //   if (SecureReceiveWarningBottomSheet.current)
-          //     (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
-          // }}
-          />
-        )}
-      />
-      {/* <ModalContainer onBackground={() => setBackupReminder( false )} visible={backupReminder} closeBottomSheet={() => setBackupReminder( false )}>
-        <ErrorModalContents
-          title={'Wallet is not Backed-up'}
-          info={'Backup your wallet to ensure security and easy wallet retrieval'}
-          // note={errorMsg}
-          onPressProceed={() => {
-            setBackupReminder( false )
-            // props.navigation.navigate( 'WalletBackupAlert' )
-            if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
-              levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup Phrase' ){
-              if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
-                const navigationParams = {
-                  selectedTitle: navigationObj?.selectedKeeper?.name,
-                  SelectedRecoveryKeyNumber: 1,
-                  selectedKeeper: navigationObj?.selectedKeeper,
-                  selectedLevelId: levelData[ 0 ].id
-                }
-                props.navigation.navigate( 'SeedBackupHistory', navigationParams )
-              } else {
-                setSelectedKeeper( levelData[ 0 ].keeper1 )
-                dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
-                setOnKeeperButtonClick( true )
-              }
-            } else props.navigation.navigate( 'WalletBackupAlert' )
-          }}
-          onPressIgnore={() => setTimeout( () => { setBackupReminder( false ) }, 500 )}
-          proceedButtonText={'Backup now'}
-          cancelButtonText={'Later'}
-          isIgnoreButton={true}
-          isBottomImage={false}
-          isBottomImageStyle={{
-            width: wp( '35%' ),
-            height: wp( '27%' ),
-            marginLeft: 'auto',
-            resizeMode: 'stretch',
-            marginBottom: hp( '-3%' ),
-          }}
-        />
-      </ModalContainer> */}
     </View>
   )
 }
@@ -479,7 +219,7 @@ const styles = StyleSheet.create( {
   headerInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
-    marginLeft: 40,
+    marginLeft: 20,
     fontFamily: Fonts.Regular,
   },
 } )

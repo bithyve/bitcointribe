@@ -69,6 +69,8 @@ import { translations } from '../../../common/content/LocContext'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
+import AssetMetaData from '../../../pages/rgb/AssetMetaData'
+import AssetTransferDetails from '../../../pages/rgb/AssetTransferDetails'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -140,6 +142,18 @@ const HomeStack = createStackNavigator(
     },
     RGBTxDetail: {
       screen: RGBTxDetail,
+      navigationOptions: {
+        header: null
+      }
+    },
+    AssetMetaData: {
+      screen: AssetMetaData,
+      navigationOptions: {
+        header: null
+      }
+    },
+    AssetTransferDetails: {
+      screen: AssetTransferDetails,
       navigationOptions: {
         header: null
       }

@@ -1,50 +1,25 @@
-import React, { useContext, useState, createRef, useEffect, useCallback, useMemo } from 'react'
+import React, { useContext, useState, useEffect, useMemo } from 'react'
 import {
   StyleSheet,
   View,
   SafeAreaView,
   TouchableOpacity,
-  ScrollView,
   StatusBar,
   Text,
   Image,
-  KeyboardAvoidingView,
-  Platform,
-  TextInput,
-  InteractionManager,
-  Keyboard,
-  SectionList,
   FlatList,
+  ActivityIndicator
 } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import Fonts from '../../common/Fonts'
 import Colors from '../../common/Colors'
 import CommonStyles from '../../common/Styles/Styles'
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
-import DeviceInfo from 'react-native-device-info'
-import HeaderTitle1 from '../../components/HeaderTitle1'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import Entypo from 'react-native-vector-icons/Entypo'
-import { updateCloudPermission } from '../../store/actions/BHR'
-import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
-import BottomSheet from '@gorhom/bottom-sheet'
-import { BottomSheetView } from '@gorhom/bottom-sheet'
-import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
-import { Easing } from 'react-native-reanimated'
-import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
-import ModalContainer from '../../components/home/ModalContainer'
 import { LocalizationContext } from '../../common/content/LocContext'
-import { useDispatch, useSelector } from 'react-redux'
-import { setupWallet, walletSetupCompletion } from '../../store/actions/setupAndAuth'
-import { setVersion } from '../../store/actions/versionHistory'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { initNewBHRFlow } from '../../store/actions/BHR'
-import LoaderModal from '../../components/LoaderModal'
+import { useDispatch } from 'react-redux'
 import LinearGradient from 'react-native-linear-gradient'
 import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
@@ -56,15 +31,9 @@ import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePri
 import useAccountShellFromNavigation from '../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import ButtonBlue from '../../components/ButtonBlue'
-import { RootSiblingParent } from 'react-native-root-siblings'
-import DonationWebPageBottomSheet from '../../components/bottom-sheets/DonationWebPageBottomSheet'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import { NavigationScreenConfig } from 'react-navigation'
-import { NavigationStackOptions } from 'react-navigation-stack'
-import LabeledBalanceDisplay from '../../components/LabeledBalanceDisplay'
 import BitcoinUnit, { displayNameForBitcoinUnit } from '../../common/data/enums/BitcoinUnit'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
-import { AccountType } from '../../bitcoin/utilities/Interface'
 import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../components/MaterialCurrencyCodeIcon'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
@@ -74,40 +43,43 @@ import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitT
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions'
 import CopyThisText from '../../components/CopyThisText'
-
-enum SectionKind {
-  TOP_TABS,
-  TRANSACTIONS_LIST_PREVIEW,
-  SEND_AND_RECEIVE_FOOTER,
-}
-const sectionListItemKeyExtractor = ( index ) => String( index )
+import RGBServices from '../../services/RGBServices'
+import moment from 'moment'
 
 export default function RGBTxDetail( props ) {
   const dispatch = useDispatch()
   const { translations } = useContext( LocalizationContext )
-  const strings = translations[ 'login' ]
-  const common = translations[ 'common' ]
-  const accountStr  = translations[ 'accounts' ]
-  const accountShellID = useMemo( () => {
-    return props.navigation.getParam( 'accountShellID' )
-  }, [ props.navigation ] )
-
+  const accountStr = translations[ 'accounts' ]
+  const asset = props.navigation.getParam( 'asset' )
   const accountsState = useAccountsState()
   const { averageTxFees, exchangeRates } = accountsState
   const accountShell = useAccountShellFromNavigation( props.navigation )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-  const [ webView, showWebView ] = useState( false )
   const account = useAccountByAccountShell( accountShell )
+  const { rgbConfig } = account
+  const [ loading, setLoading ] = useState( true )
+  const [ transactionData, setTransactionData ] = useState( [ ] )
 
-  const [ transactionData, setTransactionData ] =useState( [ {
-    'a':'a'
-  }, {
-    'a':'a'
-  }, {
-    'a':'a'
-  } ] )
-  const [ paymentURI, setPaymentURI ] = useState( null )
-  const [ receivingAddress, setReceivingAddress ] = useState( null )
+  useEffect( () => {
+    getTransfers()
+  }, [] )
+
+  const getTransfers = async () => {
+    try {
+      const txns = await RGBServices.getRgbAssetTransactions( rgbConfig.mnemonic, rgbConfig.xpub, asset.assetId )
+      if ( txns ) {
+        setTransactionData( txns )
+        setLoading( false )
+      } else {
+        props.navigation.goBack()
+      }
+    } catch ( error ) {
+      console.log( error )
+      props.navigation.goBack()
+    }
+  }
+
+
 
   const isShowingDonationButton = useMemo( () => {
     return primarySubAccount?.kind === SubAccountKind.DONATION_ACCOUNT
@@ -117,7 +89,7 @@ export default function RGBTxDetail( props ) {
   const currencyKind = useCurrencyKind()
   const bitcoinUnit = BitcoinUnit.SATS
   const balance = 5000
-  const  bitcoinIconColor = 'gray'
+  const bitcoinIconColor = 'gray'
   const fiatCurrencyCode = useCurrencyCode()
   const textColor = Colors.currencyGray
 
@@ -161,33 +133,14 @@ export default function RGBTxDetail( props ) {
       !Object.keys( averageTxFees ).length ||
       !exchangeRates ||
       !Object.keys( exchangeRates ).length
-    ){
+    ) {
       dispatch( fetchFeeRates() )
       dispatch( fetchExchangeRates() )
     }
   }, [] )
 
-  function navigateToDonationAccountWebViewSettings( donationAccount ) {
-    props.navigation.navigate( 'DonationAccountWebViewSettings', {
-      account: donationAccount,
-    } )
-  }
-
-  const showDonationWebViewSheet = () => {
-    return(
-      <DonationWebPageBottomSheet
-        account={account}
-        onClickSetting={() => {
-          showWebView( false )
-          navigateToDonationAccountWebViewSettings( account )
-        }}
-        closeModal={() => showWebView( false )}
-      />
-    )
-  }
-
   const renderFooter = () => {
-    return(
+    return (
       <View style={styles.viewSectionContainer}>
         <View style={styles.footerSection}>
           <SendAndReceiveButtonsFooter
@@ -202,7 +155,7 @@ export default function RGBTxDetail( props ) {
             averageTxFees={averageTxFees}
             network={
               config.APP_STAGE === 'dev' ||
-                      primarySubAccount?.sourceKind === SourceAccountKind.TEST_ACCOUNT
+                primarySubAccount?.sourceKind === SourceAccountKind.TEST_ACCOUNT
                 ? NetworkKind.TESTNET
                 : NetworkKind.MAINNET
             }
@@ -216,82 +169,56 @@ export default function RGBTxDetail( props ) {
             }}>
               <ButtonBlue
                 buttonText={'Donation Webpage'}
-                handleButtonPress={()=>showWebView( true )}
+                handleButtonPress={() => showWebView( true )}
               />
             </View>
           )}
         </View>
-
       </View>
     )
   }
 
-  const BalanceCurrencyIcon = () => {
-    if ( prefersBitcoin || isTestAccount ) {
-      return <Image style={[
-        styles.currencyImage, {
-          marginLeft: wp( 1 )
-        }
-      ]} source={bitcoinIconSource} />
-    }
-
-    if ( materialIconCurrencyCodes.includes( fiatCurrencyCode ) ) {
-      return (
-        <MaterialCurrencyCodeIcon
-          currencyCode={fiatCurrencyCode}
-          color={textColor}
-          size={RFValue( 16 )}
-          style={{
-          }}
-        />
-      )
-    }
-    else {
-      return (
-        <Image
-          style={styles.currencyImage}
-          source={getCurrencyImageByRegion( fiatCurrencyCode, bitcoinIconColor )}
-        />
-      )
-    }
-  }
-
-  const onItemClick = () => {
-
+  const onItemClick = ( item ) => {
+    props.navigation.navigate( 'AssetTransferDetails', {
+      item, asset
+    } )
   }
 
   const renderAmountCurrency = ( balance ) => {
-    return(
+    return (
       <View style={styles.currencyContainer}>
         <View style={{
           marginRight: 4,
-          marginLeft: ( prefersBitcoin || isTestAccount ) ? -wp( 1 ) : [ 'SEK', 'BRL', 'DKK', 'ISK', 'KRW', 'PLN', 'SEK' ].includes( fiatCurrencyCode  ) ? 0 : -wp( 1 )
+          marginLeft: ( prefersBitcoin || isTestAccount ) ? -wp( 1 ) : [ 'SEK', 'BRL', 'DKK', 'ISK', 'KRW', 'PLN', 'SEK' ].includes( fiatCurrencyCode ) ? 0 : -wp( 1 )
         }}>
-          <BalanceCurrencyIcon />
         </View>
-
         <Text
           numberOfLines={1}
           style={styles.amountText}
         >
           {balance}
         </Text>
-        <Text style={[ styles.unitTextStyles, {
-          // textAlignVertical: verticalAlignUnit
-        } ]}>{`${formattedUnitText}`}</Text>
       </View>
     )
   }
 
-  const renderItem = ( { item, index } ) => {
-    return(
-      <TouchableOpacity style={styles.itemContainer} onPress={() =>onItemClick()}>
-        <Image style={styles.itemImage} source={item?.image}/>
+  const renderItem = ( { item } ) => {
+    return (
+      <TouchableOpacity style={styles.itemContainer} onPress={() => onItemClick( item )}>
         <View style={styles.textContainer}>
-          <Text style={styles.itemTitle}>SAGA</Text>
-          <Text style={styles.itemDesc}>Lorem Ipsum</Text>
+          <Text style={styles.itemTitle}>{item.status}</Text>
+          <Text style={styles.itemDesc}>{moment.unix( item.createdAt ).format( 'DD/MM/YY • hh:MMa' )}</Text>
         </View>
-        {renderAmountCurrency( formattedBalanceText )}
+        <View style={styles.currencyContainer}>
+          <Text
+            numberOfLines={1}
+            style={[ styles.amountText, {
+              color: item.kind === 'receive' ? 'green' : 'tomato'
+            } ]}
+          >
+            {item.amount}
+          </Text>
+        </View>
       </TouchableOpacity>
     )
   }
@@ -321,25 +248,30 @@ export default function RGBTxDetail( props ) {
           </View>
         </TouchableOpacity>
       </View>
-      <Text style={styles.headerTitleText}>Celebrimbore Test</Text>
+      <TouchableOpacity onPress={() => props.navigation.navigate( 'AssetMetaData', {
+        accountShell,
+        asset
+      } )}>
+        <Text style={styles.headerTitleText}>{asset.name}</Text>
+        <Text style={styles.headerSubtitle}>{asset.ticker}</Text>
+      </TouchableOpacity>
       <View style={{
         flex: 1,
       }}>
         <Text style={styles.balanceText}>Total Balance</Text>
         <View style={{
-          alignSelf:'center', marginTop: 5
+          alignSelf: 'center', marginTop: 5
         }}>
-          {renderAmountCurrency( '8000' )}
+          {renderAmountCurrency( asset.futureBalance )}
         </View>
-        <Text style={styles.assetText}>Asset id</Text>
+        <Text style={styles.assetText}>Asset ID</Text>
         <CopyThisText
           backgroundColor={Colors.white}
-          text={paymentURI ? paymentURI : receivingAddress}
+          text={asset.assetId}
         />
 
         <View style={styles.viewMoreLinkRow}>
           <Text style={styles.headerDateText}>{accountStr.RecentTransactions}</Text>
-
           <TouchableOpacity
             onPress={onViewMorePressed}
           >
@@ -358,20 +290,18 @@ export default function RGBTxDetail( props ) {
             </LinearGradient>
           </TouchableOpacity>
         </View>
-        <FlatList
-          // contentContainerStyle={{
-          //   flex:1, backgroundColor:'red'
-          // }}
-          data={ transactionData}
-          renderItem={renderItem}
-          keyExtractor={( item, index ) => index.toString()}
-        />
+        {
+          loading ? <ActivityIndicator style={{
+            height: '40%'
+          }} /> :
+            <FlatList
+              data={transactionData}
+              renderItem={renderItem}
+              keyExtractor={( item, index ) => index.toString()}
+            />
+        }
         {renderFooter()}
-        <ModalContainer onBackground={()=>showWebView( false )} visible={webView} closeBottomSheet={() => { showWebView( false ) }} >
-          <RootSiblingParent>
-            {showDonationWebViewSheet()}
-          </RootSiblingParent>
-        </ModalContainer>
+
       </View>
     </SafeAreaView>
   )
@@ -381,9 +311,14 @@ const styles = StyleSheet.create( {
   headerTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 20 ),
-    marginLeft: 20,
-    // marginTop: hp( '10%' ),
     fontFamily: Fonts.Regular,
+    textAlign: 'center'
+  },
+  headerSubtitle: {
+    color: 'gray',
+    fontSize: RFValue( 14 ),
+    fontFamily: Fonts.Regular,
+    textAlign: 'center'
   },
   viewSectionContainer: {
     marginBottom: 10,
@@ -391,36 +326,10 @@ const styles = StyleSheet.create( {
   footerSection: {
     paddingVertical: 15,
   },
-  scrollViewContainer: {
-    paddingTop: 10,
-    // height: '100%',
-    paddingHorizontal: 0,
-    backgroundColor: Colors.backgroundColor,
-    // backgroundColor: 'red',
-  },
-  tabContainer:{
-    height: 50, borderRadius: 8, backgroundColor:Colors.white,
-    flexDirection:'row', marginHorizontal:20,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 2, height: 2
-    },
-  },
-  fungibleContainer:{
-    flex:1, justifyContent:'center', alignItems:'center'
-  },
-  fungibleInnerContainer:{
-    borderRadius: 8, paddingHorizontal: 15, paddingVertical: 5
-  },
-  fungibleText:{
-    fontFamily: Fonts.Medium,
-    fontSize: RFValue( 14 )
-  },
   amountTextStyle: {
     fontFamily: Fonts.Regular,
     fontSize: RFValue( 17 ),
-    color:'gray'
+    color: 'gray'
   },
   amountText: {
     fontFamily: Fonts.Regular,
@@ -449,45 +358,38 @@ const styles = StyleSheet.create( {
   },
   currencyContainer: {
     flexDirection: 'row',
-    // alignItems: 'baseline',
     alignItems: 'center',
   },
   itemContainer: {
-    // shadowColor: Colors.shadowBlue,
-    // shadowOpacity: 1,
-    // shadowOffset: {
-    //   width: 2, height: 2
-    // },
-    // backgroundColor: Colors.white,
-    // borderRadius: 8,
     marginHorizontal: 20,
-    // paddingHorizontal: 8,
     paddingVertical: 10,
     marginTop: 20,
-    flexDirection:'row'
+    flexDirection: 'row'
   },
-  itemImage:{
-    width: 35, height: 35, borderRadius: 20, backgroundColor:'gray'
+  itemImage: {
+    width: 35, height: 35, borderRadius: 20, backgroundColor: 'gray'
   },
-  textContainer:{
-    flex:1, marginStart: 10
+  textContainer: {
+    flex: 1, marginStart: 10
   },
-  itemTitle:{
-    color: Colors.black, fontFamily:Fonts.Medium, fontSize: RFValue( 13 )
+  itemTitle: {
+    fontFamily: Fonts.Regular, fontSize: RFValue( 13 ), textTransform: 'capitalize'
   },
-  itemDesc:{
-    color: Colors.textColorGrey, fontFamily:Fonts.Regular,
+  itemDesc: {
+    color: Colors.textColorGrey, fontFamily: Fonts.Regular,
     fontSize: RFValue( 10 ), marginTop: 2
   },
-  balanceText:{
+  balanceText: {
     fontSize: 18, fontFamily: Fonts.Medium,
     color: Colors.textColorGrey, marginTop: 40,
-    alignSelf:'center'
+    alignSelf: 'center'
   },
-  assetText:{
+  assetText: {
     fontSize: 14, fontFamily: Fonts.Regular,
-    color: Colors.textColorGrey, marginTop: 40,
+    color: Colors.textColorGrey,
+    marginTop: 20,
     marginStart: 40,
+    marginBottom: -20
   },
   viewMoreLinkRow: {
     justifyContent: 'space-between',

@@ -50,6 +50,7 @@ import {
   updateAccountSettings,
   FETCH_FEE_RATES,
   FETCH_EXCHANGE_RATES,
+  RECEIVE_RGB_ASSET,
 } from '../actions/accounts'
 import {
   setAllowSecureAccount,
@@ -694,13 +695,17 @@ function* syncRgbAccountsWorker( { payload }: {payload: {
   const { accounts } = payload
   for( const account of Object.values( accounts ) ){
     const { mnemonic, xpub } = account.rgbConfig
+    const address = yield call( RGBServices.getAddress, mnemonic )
     const sync = yield call( RGBServices.sync, mnemonic )
     const balances = yield call( RGBServices.getBalance, mnemonic )
     const transactions = yield call( RGBServices.getTransactions, mnemonic )
+    const assets = yield call( RGBServices.syncRgbAssets, mnemonic, xpub )
     account.balances.confirmed = Number( balances.confirmed )
     account.balances.unconfirmed = Number( balances.trustedPending )
     account.rgb = {
-      bitcoinAssets: transactions
+      bitcoinAssets: transactions,
+      rgb20Assets: assets.rgb20,
+      nextUnusedAddress: address
     }
   }
   return {
@@ -1434,4 +1439,58 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
 export const generateGiftsWatcher = createWatcher(
   generateGiftstWorker,
   GENERATE_GIFTS,
+)
+
+function* receiveRgbAssettWorker( { payload }: {
+  payload: {
+    accountShell: AccountShell,
+}} ) {
+  const { accountShell } = payload
+  try {
+
+    const accountState: AccountsState = yield select(
+      ( state ) => state.accounts
+    )
+    const accounts: Accounts = accountState.accounts
+
+
+    const account = accounts[ accountShell.primarySubAccount.id ]
+
+    const { mnemonic, xpub } = account.rgbConfig
+    account.rgb = {
+      ...account.rgb,
+      receiveAssets: {
+        refreshing: true,
+        message: '',
+      }
+    }
+    yield put( updateAccountShells( {
+      accounts: {
+        [ account.id ]: account
+      }
+    } ) )
+    const receiveData = yield call( RGBServices.receiveAsset, mnemonic, xpub )
+    console.log( 'receiveData', receiveData )
+    account.rgb = {
+      ...account.rgb,
+      receiveAssets: {
+        refreshing: false,
+        message: '',
+        data: receiveData
+      }
+    }
+    yield put( updateAccountShells( {
+      accounts: {
+        [ account.id ]: account
+      }
+    } ) )
+  } catch ( error ) {
+    console.log( error )
+  }
+
+}
+
+export const starReceivingRgbAssetsWatcher = createWatcher(
+  receiveRgbAssettWorker,
+  RECEIVE_RGB_ASSET,
 )

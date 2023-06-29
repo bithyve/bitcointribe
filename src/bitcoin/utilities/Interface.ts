@@ -953,7 +953,18 @@ export interface Account {
   rgb?:{
     bitcoinAssets?:any [],
     rgb20Assets?:any [],
-    rgb121Assets?:any []
+    rgb121Assets?:any [],
+    nextUnusedAddress?: string,
+    receiveAssets?: {
+      refreshing: boolean,
+      message: string,
+      data?:{
+        invoice: string,
+        blindedUtxo: string,
+        expirationTimestamp: string,
+        blindingSecret:string,
+      }
+    }
   }
 }
 export interface MultiSigAccount extends Account {
@@ -1015,6 +1026,11 @@ export enum DeepLinkKind {
   GIFT = 'GIFT',
   CONTACT_GIFT = 'CONTACT_GIFT',
   CAMPAIGN = 'CAMPAIGN'
+}
+
+export enum RGB_ASSET_TYPE {
+  BITCOIN = 'BITCOIN',
+  RGB20 = 'RGB20'
 }
 
 export enum ShortLinkDomain {
