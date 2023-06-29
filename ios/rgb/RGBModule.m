@@ -85,6 +85,47 @@ RCT_EXPORT_METHOD(receiveAsset:(NSString*)mnemonic
    ];
 }
 
+RCT_EXPORT_METHOD(syncRgbAsset:(NSString*)mnemonic
+                  pubKey:(NSString *)pubKey
+                  network:(NSString *)network
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+  RGBHelper *helper = [[RGBHelper alloc]init];
+  [
+    helper syncRgbWithBtcNetwotk:network mnemonic:mnemonic pubkey:pubKey callback:^(NSString * _Nonnull response) {
+      resolve(response);
+    }
+   ];
+}
+
+RCT_EXPORT_METHOD(getRgbAssetMetaData:(NSString*)mnemonic
+                  pubKey:(NSString *)pubKey
+                  assetId:(NSString *)assetId
+                  network:(NSString *)network
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+  RGBHelper *helper = [[RGBHelper alloc]init];
+  [
+    helper getRgbAssetMetaDataWithBtcNetwotk:network mnemonic:mnemonic pubkey:pubKey assetId:assetId callback:^(NSString * _Nonnull response) {
+      resolve(response);
+    }
+   ];
+}
+
+RCT_EXPORT_METHOD(getRgbAssetTransactions:(NSString*)mnemonic
+                  pubKey:(NSString *)pubKey
+                  assetId:(NSString *)assetId
+                  network:(NSString *)network
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+  RGBHelper *helper = [[RGBHelper alloc]init];
+  [
+    helper getRgbAssetTransactionsWithBtcNetwotk:network mnemonic:mnemonic pubkey:pubKey assetId:assetId callback:^(NSString * _Nonnull response) {
+      resolve(response);
+    }
+   ];
+}
+
 RCT_EXPORT_METHOD(sendBtc:(NSString*)mnemonic
                   network:(NSString *)network
                   address:(NSString *)address
