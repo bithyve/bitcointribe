@@ -48,7 +48,7 @@ const AddNewAccountCard: React.FC<Props> = ( {
               fontFamily: Fonts.SemiBold
             }}
           >
-            Add Wallet
+            Add account
           </Text>
         </View>
       </View>

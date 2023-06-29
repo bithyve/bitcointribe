@@ -520,7 +520,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BottomSheetKind.ADD_A_WALLET_INFO:
           return (
             <>
-              <BottomSheetWalletHeader title="Add a wallet" onPress={this.closeBottomSheet} />
+              <BottomSheetWalletHeader title="Add a account" onPress={this.closeBottomSheet} />
               <BottomSheetAddWalletInfo
                 onRGBWalletClick={() => {
                   this.closeBottomSheet()

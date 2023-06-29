@@ -187,7 +187,7 @@ export default function RGBWalletDetail( props ) {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.fungibleContainer} onPress={()=>{
+        {/* <TouchableOpacity style={styles.fungibleContainer} onPress={()=>{
           // if( selectedTab )
           setSelectedTab( 'collectible' )
         }} activeOpacity={1}>
@@ -198,7 +198,7 @@ export default function RGBWalletDetail( props ) {
               color: selectedTab == 'collectible' ?  Colors.white : Colors.CLOSE_ICON_COLOR,
             } ]}>COLLECTIBLE</Text>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity style={styles.fungibleContainer} onPress={()=>{
           // if( selectedTab )
           setSelectedTab( 'Bitcoin' )
