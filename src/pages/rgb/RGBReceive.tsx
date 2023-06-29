@@ -26,8 +26,6 @@ import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import BottomSheet from 'reanimated-bottom-sheet'
 
 import {
@@ -50,14 +48,9 @@ import { Account, AccountType, LevelData, LevelHealthInterface } from '../../bit
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import ModalContainer from '../../components/home/ModalContainer'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { getNextFreeAddress } from '../../store/sagas/accounts'
 import { translations } from '../../common/content/LocContext'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import { onPressKeeper } from '../../store/actions/BHR'
-import { getAccountIconByShell, getAccountTitleByShell } from '../Accounts/Send/utils'
 import TwoFASetupWarningModal from '../Accounts/TwoFASetupWarningModal'
-import HeaderTitle1 from '../../components/HeaderTitle1'
 
 export default function RGBReceive( props ) {
   const dispatch = useDispatch()
@@ -353,45 +346,6 @@ export default function RGBReceive( props ) {
           />
         )}
       />
-      {/* <ModalContainer onBackground={() => setBackupReminder( false )} visible={backupReminder} closeBottomSheet={() => setBackupReminder( false )}>
-        <ErrorModalContents
-          title={'Wallet is not Backed-up'}
-          info={'Backup your wallet to ensure security and easy wallet retrieval'}
-          // note={errorMsg}
-          onPressProceed={() => {
-            setBackupReminder( false )
-            // props.navigation.navigate( 'WalletBackupAlert' )
-            if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
-              levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup Phrase' ){
-              if ( ( levelHealth.length == 0 ) || ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
-                const navigationParams = {
-                  selectedTitle: navigationObj?.selectedKeeper?.name,
-                  SelectedRecoveryKeyNumber: 1,
-                  selectedKeeper: navigationObj?.selectedKeeper,
-                  selectedLevelId: levelData[ 0 ].id
-                }
-                props.navigation.navigate( 'SeedBackupHistory', navigationParams )
-              } else {
-                setSelectedKeeper( levelData[ 0 ].keeper1 )
-                dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
-                setOnKeeperButtonClick( true )
-              }
-            } else props.navigation.navigate( 'WalletBackupAlert' )
-          }}
-          onPressIgnore={() => setTimeout( () => { setBackupReminder( false ) }, 500 )}
-          proceedButtonText={'Backup now'}
-          cancelButtonText={'Later'}
-          isIgnoreButton={true}
-          isBottomImage={false}
-          isBottomImageStyle={{
-            width: wp( '35%' ),
-            height: wp( '27%' ),
-            marginLeft: 'auto',
-            resizeMode: 'stretch',
-            marginBottom: hp( '-3%' ),
-          }}
-        />
-      </ModalContainer> */}
     </View>
   )
 }

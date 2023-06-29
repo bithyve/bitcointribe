@@ -4,20 +4,12 @@ import {
   View,
   SafeAreaView,
   TouchableOpacity,
-  ScrollView,
   StatusBar,
   Text,
   Image,
-  KeyboardAvoidingView,
-  Platform,
-  TextInput,
-  InteractionManager,
-  Keyboard,
-  SectionList,
   FlatList,
 } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import Fonts from '../../common/Fonts'
 import Colors from '../../common/Colors'
 import CommonStyles from '../../common/Styles/Styles'
@@ -26,25 +18,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
-import DeviceInfo from 'react-native-device-info'
-import HeaderTitle1 from '../../components/HeaderTitle1'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import Entypo from 'react-native-vector-icons/Entypo'
-import { updateCloudPermission } from '../../store/actions/BHR'
-import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
-import BottomSheet from '@gorhom/bottom-sheet'
-import { BottomSheetView } from '@gorhom/bottom-sheet'
-import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
-import { Easing } from 'react-native-reanimated'
-import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
-import ModalContainer from '../../components/home/ModalContainer'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { useDispatch, useSelector } from 'react-redux'
-import { setupWallet, walletSetupCompletion } from '../../store/actions/setupAndAuth'
-import { setVersion } from '../../store/actions/versionHistory'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { initNewBHRFlow } from '../../store/actions/BHR'
-import LoaderModal from '../../components/LoaderModal'
 import LinearGradient from 'react-native-linear-gradient'
 import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
@@ -54,17 +29,9 @@ import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAcco
 import { fetchExchangeRates, fetchFeeRates } from '../../store/actions/accounts'
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useAccountShellFromNavigation from '../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import ButtonBlue from '../../components/ButtonBlue'
-import { RootSiblingParent } from 'react-native-root-siblings'
-import DonationWebPageBottomSheet from '../../components/bottom-sheets/DonationWebPageBottomSheet'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import { NavigationScreenConfig } from 'react-navigation'
-import { NavigationStackOptions } from 'react-navigation-stack'
-import LabeledBalanceDisplay from '../../components/LabeledBalanceDisplay'
 import BitcoinUnit, { displayNameForBitcoinUnit } from '../../common/data/enums/BitcoinUnit'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
-import { AccountType } from '../../bitcoin/utilities/Interface'
 import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../components/MaterialCurrencyCodeIcon'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
@@ -74,13 +41,6 @@ import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitT
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions'
 import CopyThisText from '../../components/CopyThisText'
-
-enum SectionKind {
-  TOP_TABS,
-  TRANSACTIONS_LIST_PREVIEW,
-  SEND_AND_RECEIVE_FOOTER,
-}
-const sectionListItemKeyExtractor = ( index ) => String( index )
 
 export default function RGBTxDetail( props ) {
   const dispatch = useDispatch()
@@ -108,11 +68,6 @@ export default function RGBTxDetail( props ) {
   } ] )
   const [ paymentURI, setPaymentURI ] = useState( null )
   const [ receivingAddress, setReceivingAddress ] = useState( null )
-
-  const isShowingDonationButton = useMemo( () => {
-    return primarySubAccount?.kind === SubAccountKind.DONATION_ACCOUNT
-  }, [ primarySubAccount?.kind ] )
-
   const isTestAccount = false
   const currencyKind = useCurrencyKind()
   const bitcoinUnit = BitcoinUnit.SATS
@@ -167,25 +122,6 @@ export default function RGBTxDetail( props ) {
     }
   }, [] )
 
-  function navigateToDonationAccountWebViewSettings( donationAccount ) {
-    props.navigation.navigate( 'DonationAccountWebViewSettings', {
-      account: donationAccount,
-    } )
-  }
-
-  const showDonationWebViewSheet = () => {
-    return(
-      <DonationWebPageBottomSheet
-        account={account}
-        onClickSetting={() => {
-          showWebView( false )
-          navigateToDonationAccountWebViewSettings( account )
-        }}
-        closeModal={() => showWebView( false )}
-      />
-    )
-  }
-
   const renderFooter = () => {
     return(
       <View style={styles.viewSectionContainer}>
@@ -208,18 +144,6 @@ export default function RGBTxDetail( props ) {
             }
             isTestAccount={primarySubAccount?.sourceKind === SourceAccountKind.TEST_ACCOUNT}
           />
-
-          {isShowingDonationButton && (
-            <View style={{
-              alignItems: 'center',
-              marginTop: 36,
-            }}>
-              <ButtonBlue
-                buttonText={'Donation Webpage'}
-                handleButtonPress={()=>showWebView( true )}
-              />
-            </View>
-          )}
         </View>
 
       </View>
@@ -277,7 +201,6 @@ export default function RGBTxDetail( props ) {
           {balance}
         </Text>
         <Text style={[ styles.unitTextStyles, {
-          // textAlignVertical: verticalAlignUnit
         } ]}>{`${formattedUnitText}`}</Text>
       </View>
     )
@@ -367,11 +290,6 @@ export default function RGBTxDetail( props ) {
           keyExtractor={( item, index ) => index.toString()}
         />
         {renderFooter()}
-        <ModalContainer onBackground={()=>showWebView( false )} visible={webView} closeBottomSheet={() => { showWebView( false ) }} >
-          <RootSiblingParent>
-            {showDonationWebViewSheet()}
-          </RootSiblingParent>
-        </ModalContainer>
       </View>
     </SafeAreaView>
   )
