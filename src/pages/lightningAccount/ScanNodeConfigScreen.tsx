@@ -13,19 +13,19 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP,
   heightPercentageToDP,
-} from 'react-native-responsive-screen';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import CommonStyles from '../../common/Styles/Styles';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { LocalizationContext } from '../../common/content/LocContext';
-import HeaderTitle1 from '../../components/HeaderTitle1';
-import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner';
-import BottomInfoBox from '../../components/BottomInfoBox';
-import LndConnectUtils from '../../utils/ln/LndConnectUtils';
-import Toast from '../../components/Toast';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+} from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { LocalizationContext } from '../../common/content/LocContext'
+import HeaderTitle1 from '../../components/HeaderTitle1'
+import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import LndConnectUtils from '../../utils/ln/LndConnectUtils'
+import Toast from '../../components/Toast'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 const styles = StyleSheet.create({
   viewContainer: {
@@ -53,50 +53,50 @@ const styles = StyleSheet.create({
     marginVertical: hp('2%'),
   },
   icArrow: {
-    marginLeft: wp('3%'),
-    marginRight: wp('3%'),
+    marginLeft: wp( '3%' ),
+    marginRight: wp( '3%' ),
     alignSelf: 'center',
   },
   textValue: {
     fontFamily: Fonts.Regular,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     color: Colors.THEAM_INFO_TEXT_COLOR,
-    marginLeft: wp('3%'),
+    marginLeft: wp( '3%' ),
   },
   textHelpUs: {
     fontFamily: Fonts.SemiBold,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     color: Colors.THEAM_TEXT_COLOR,
-    marginLeft: wp('3%'),
+    marginLeft: wp( '3%' ),
   },
   textHelpUsSub: {
     fontFamily: Fonts.Regular,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     color: Colors.THEAM_INFO_TEXT_COLOR,
-    marginLeft: wp('3%'),
-    marginTop: wp('1%'),
+    marginLeft: wp( '3%' ),
+    marginTop: wp( '1%' ),
   },
   addModalView: {
     backgroundColor: Colors.gray7,
     paddingVertical: 25,
-    paddingHorizontal: widthPercentageToDP(1),
+    paddingHorizontal: widthPercentageToDP( 1 ),
     flexDirection: 'row',
     display: 'flex',
     justifyContent: 'space-between',
-    marginTop: heightPercentageToDP('5'),
+    marginTop: heightPercentageToDP( '5' ),
     alignSelf: 'center',
-    borderRadius: widthPercentageToDP('2'),
-    marginBottom: heightPercentageToDP('1.2'),
+    borderRadius: widthPercentageToDP( '2' ),
+    marginBottom: heightPercentageToDP( '1.2' ),
     shadowOpacity: 0.05,
     // shadowColor: Colors.shadowColor,
     shadowOffset: {
-      width: 10,
-      height: 10,
+      width: 10, height: 10
     },
     shadowRadius: 6,
     elevation: 6,
   },
-});
+} )
+
 
 export default function ScanNodeConfig({ navigation }) {
   const { translations } = useContext(LocalizationContext);
@@ -202,7 +202,7 @@ export default function ScanNodeConfig({ navigation }) {
             marginBottom: 16,
           }}
         />
-        {/* <TouchableOpacity testID='EnterManuallyButton'
+        {/* <TouchableOpacity
           style={styles.buttonView}
           activeOpacity={0.6}
           onPress={() => {
@@ -211,21 +211,28 @@ export default function ScanNodeConfig({ navigation }) {
         >
           <Text style={styles.buttonText}>{strings.Entermanually}</Text>
         </TouchableOpacity> */}
-
         <TouchableOpacity
           onPress={() => {
             navigation.navigate('EnterNodeConfig');
           }}
           activeOpacity={0.6}
-          style={styles.addModalView}
+          style={styles.addModalView
+          }
         >
-          <View
-            style={{
-              flex: 0.9,
-            }}
-          >
-            <Text style={styles.textHelpUs}>{strings.Entermanually}</Text>
-            <Text style={styles.textHelpUsSub}>{'Customize your set up'}</Text>
+          <View style={{
+            flex: 0.9,
+          }
+          }>
+            <Text
+              style={styles.textHelpUs}
+            >
+              {strings.Entermanually}
+            </Text>
+            <Text
+              style={styles.textHelpUsSub}
+            >
+              {'Customize your set up'}
+            </Text>
           </View>
           <Ionicons
             name={'chevron-forward'}
