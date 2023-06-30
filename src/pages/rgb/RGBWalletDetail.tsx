@@ -78,7 +78,7 @@ export default function RGBWalletDetail( props ) {
   const  bitcoinIconColor = 'gray'
   const fiatCurrencyCode = useCurrencyCode()
   const textColor = Colors.currencyGray
-  const [ fungibleData, setFungibleData ] =useState(  account.rgb.rgb20Assets  )
+  const [ fungibleData, setFungibleData ] =useState(  account.rgb?.rgb20Assets || [] )
 
   const [ collectibleData, setCollectibleData ] =useState( [] )
   const prefersBitcoin = useMemo( () => {
@@ -273,7 +273,7 @@ export default function RGBWalletDetail( props ) {
           return (
             <View style={styles.viewSectionContainer}>
               <FlatList
-                data={ account.rgb.bitcoinAssets}
+                data={ account?.rgb?.bitcoinAssets || []}
                 renderItem={( { item } ) =>
                   <TouchableOpacity style={styles.itemContainer} onPress={() =>{}}>
                     <View style={styles.textContainer}>

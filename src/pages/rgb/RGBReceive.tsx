@@ -33,6 +33,8 @@ import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import { useDispatch } from 'react-redux'
 import { receiveRgbAsset } from '../../store/actions/accounts'
+import RGBServices from '../../services/RGBServices'
+import Toast from '../../components/Toast'
 
 export default function RGBReceive( props ) {
   const strings = translations[ 'accounts' ]
@@ -43,31 +45,37 @@ export default function RGBReceive( props ) {
   const [ receivingAddress, setReceivingAddress ] = useState( null )
   const [ paymentURI, setPaymentURI ] = useState( null )
   const account = useAccountByAccountShell( accountShell )
+  const { rgbConfig } = account
   const [ loading, setLoading ] = useState( false )
-
-
 
   useEffect( () => {
     if( assetType == RGB_ASSET_TYPE.BITCOIN ) {
-      setReceivingAddress( account.rgb.nextUnusedAddress )
+      setReceivingAddress( account?.rgb?.nextUnusedAddress )
     } else {
-      setReceivingAddress( account.rgb?.receiveAssets?.data.invoice )
       // dispatch( receiveRgbAsset( {
       //   accountShell
       // } ) )
+
+      getInvoice()
     }
   }, [] )
 
-  useEffect( () => {
-    if( assetType === RGB_ASSET_TYPE.RGB20 ) {
-      if( account.rgb?.receiveAssets?.refreshing ){
-        setLoading( false )
-      } else{
-        setLoading( false )
-        setReceivingAddress( account.rgb.receiveAssets.data.invoice )
+
+  const getInvoice = async () =>{
+    try {
+      setLoading( true )
+      const invoiceData = await RGBServices.receiveAsset( rgbConfig.mnemonic, rgbConfig.xpub )
+      if( invoiceData.error ) {
+        Toast( invoiceData.error )
+        props.navigation.goBack()
+      } else {
+        setReceivingAddress( invoiceData.invoice )
       }
+      setLoading( false )
+    } catch ( error ) {
+      console.log( error )
     }
-  }, [ account.rgb?.receiveAssets?.refreshing ] )
+  }
 
 
   return (
@@ -106,7 +114,9 @@ export default function RGBReceive( props ) {
             <Text style={styles.headerTitleText}>Receive</Text>
 
             {
-              loading ? <ActivityIndicator />:
+              loading ? <ActivityIndicator style={{
+                height: '70%'
+              }} size="large" />:
                 <ScrollView>
                   <View style={styles.QRView}>
                     <QRCode title={assetType === RGB_ASSET_TYPE.BITCOIN ? 'Bitcoin address': 'Invoice'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp( '27%' )} />

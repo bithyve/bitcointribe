@@ -104,7 +104,6 @@ struct BDKHelper{
    }
      
      if let jsonString = Utility.convertToJSONString(jsonTxns) {
-         print(jsonString)
        return jsonString
      } else {
          print("Failed to convert the struct array to JSON.")

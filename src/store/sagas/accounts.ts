@@ -1457,11 +1457,12 @@ function* receiveRgbAssettWorker( { payload }: {
     const account = accounts[ accountShell.primarySubAccount.id ]
 
     const { mnemonic, xpub } = account.rgbConfig
+    account.refreshing = true
     account.rgb = {
       ...account.rgb,
       receiveAssets: {
-        refreshing: true,
         message: '',
+        ...account.rgb.receiveAssets
       }
     }
     yield put( updateAccountShells( {
@@ -1470,15 +1471,24 @@ function* receiveRgbAssettWorker( { payload }: {
       }
     } ) )
     const receiveData = yield call( RGBServices.receiveAsset, mnemonic, xpub )
-    console.log( 'receiveData', receiveData )
-    account.rgb = {
-      ...account.rgb,
-      receiveAssets: {
-        refreshing: false,
-        message: '',
-        data: receiveData
+    account.refreshing = false
+    if( receiveData.error ) {
+      account.rgb = {
+        ...account.rgb,
+        receiveAssets: {
+          message: receiveData.error,
+        }
+      }
+    } else {
+      account.rgb = {
+        ...account.rgb,
+        receiveAssets: {
+          message: '',
+          data: receiveData
+        }
       }
     }
+
     yield put( updateAccountShells( {
       accounts: {
         [ account.id ]: account

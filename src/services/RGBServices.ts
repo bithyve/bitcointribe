@@ -64,12 +64,16 @@ export default class RGBServices{
   }
 
   static receiveAsset = async ( mnemonic: string, pubKey: string ): Promise<string> => {
-    const data = await RGB.receiveAsset(
-      mnemonic,
-      pubKey,
-      NETWORK
-    )
-    return JSON.parse( data )
+    try {
+      const data = await RGB.receiveAsset(
+        mnemonic,
+        pubKey,
+        NETWORK
+      )
+      return JSON.parse( data )
+    } catch ( error ) {
+      return `${error}`
+    }
   }
 
   static getRgbAssetMetaData = async ( mnemonic: string, pubKey: string, assetId: string ): Promise<{}> => {

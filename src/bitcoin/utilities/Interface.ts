@@ -950,13 +950,13 @@ export interface Account {
   }[]
   node?: LNNode
   rgbConfig?: RGBConfig,
+  refreshing?: boolean,
   rgb?:{
     bitcoinAssets?:any [],
     rgb20Assets?:any [],
     rgb121Assets?:any [],
     nextUnusedAddress?: string,
     receiveAssets?: {
-      refreshing: boolean,
       message: string,
       data?:{
         invoice: string,

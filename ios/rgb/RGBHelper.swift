@@ -163,17 +163,33 @@ import BitcoinDevKit
     let address = wallet.getAddress()
       let bdkWallet = BDKHelper.getWallet(mnemonic: mnemonic, network: btcNetwotk)
       BDKHelper.sync(wallet: bdkWallet!)
-      let txid = BDKHelper.sendToAddress(address: address, amount: 9000, fee: 3.0, wallet: bdkWallet!)
       do{
-        let online = try  wallet.goOnline(skipConsistencyCheck: true, electrumUrl: Constants.testnetElectrumUrl)
-        var newUTXOs = UInt8(0)
-        var attempts = 3
-        while(newUTXOs == UInt8(0) && attempts > 0) {
-          newUTXOs = try wallet.createUtxos(online: online, upTo: false, num: nil, size: nil, feeRate: 3.0)
-          print("new utxo \(newUTXOs)")
-          attempts-=1
+        let txid = BDKHelper.sendToAddress(address: address, amount: 9000, fee: 3.0, wallet: bdkWallet!)
+
+        if(txid != "") {
+          let online = try  wallet.goOnline(skipConsistencyCheck: true, electrumUrl: Constants.testnetElectrumUrl)
+          var newUTXOs = UInt8(0)
+          var attempts = 3
+          while(newUTXOs == UInt8(0) && attempts > 0) {
+            newUTXOs = try wallet.createUtxos(online: online, upTo: false, num: nil, size: nil, feeRate: 3.0)
+            print("new utxo \(newUTXOs)")
+            attempts-=1
+          }
+          if(newUTXOs != UInt8(0)) {
+            return genReceiveData(wallet: wallet, mnemonic: mnemonic, btcNetwotk: btcNetwotk)
+          }
+          let data: [String: Any] = [
+            "error": "Insufficient funds"
+          ]
+          let json = Utility.convertToJSONString(params: data)
+          return json
         }
-        return txid
+        let data: [String: Any] = [
+          "error": "Insufficient funds"
+        ]
+        let json = Utility.convertToJSONString(params: data)
+        return json
+
       }catch{
         print(error)
       }
