@@ -1,10 +1,16 @@
 # home.yaml
 
-# HoDashboardme Screen
+# Home Screen
 
 appId: io.hexawallet.hexa.development
 ---
 - runFlow: "login.yaml"
+
+# Test Account
+
+- tapOn: 
+    id: "HomeAccountCard"
+    index: 0
 
 # Add Lightning Wallet
 
@@ -31,6 +37,6 @@ appId: io.hexawallet.hexa.development
 - tapOn: 
     id: "BuyBTCButton"
 - tapOn: 
-    id: "BuybitCoinButton"
+    id: "BuyBitcoinButton"
 - tapOn: "Close"
 - tapOn: "Close"

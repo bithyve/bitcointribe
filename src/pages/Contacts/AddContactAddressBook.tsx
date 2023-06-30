@@ -705,15 +705,15 @@ export default function AddContactAddressBook(props) {
           {/* {selectedContacts.length >= 1 && ( */}
           <View
             style={{
-              position: "absolute",
-              bottom: 0,
+              position: 'absolute',
+              bottom: hp( -4 ),
               // left: hp(1),
-              width: wp("95%"),
+              width: wp( '100%' ),
               // alignSelf: 'center',
-              flexDirection: "row-reverse",
-              // justifyContent: 'flex-end',
-              alignItems: "flex-end",
-              // backgroundColor: 'red'
+              flexDirection: 'row-reverse',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              backgroundColor: Colors.backgroundColor
             }}
           >
             {filterContactData.length > 0 && (
@@ -753,10 +753,10 @@ export default function AddContactAddressBook(props) {
                 onPress={() => onSkipContinue()}
                 style={{
                   // height: wp( '8%' ),
-                  marginTop: hp(1.8),
-                  width: wp("25%"),
-                  alignSelf: "flex-start",
-                  paddingLeft: wp("8%"),
+                  marginTop: hp( 1.8 ),
+                  width: wp( '28%' ),
+                  alignSelf: 'flex-start',
+                  paddingLeft: wp( '9%' ),
                 }}
               >
                 <Text
@@ -906,9 +906,9 @@ const styles = StyleSheet.create({
     width: wp("40%"),
     backgroundColor: Colors.blue,
     borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    elevation: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // elevation: 10,
     marginBottom: 20,
     marginLeft: wp(9),
   },
