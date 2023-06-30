@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
   StyleSheet,
@@ -7,25 +7,25 @@ import {
   Text,
   StatusBar,
   ScrollView,
-} from "react-native";
+} from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
   widthPercentageToDP,
   heightPercentageToDP,
-} from "react-native-responsive-screen";
-import Colors from "../../common/Colors";
-import Fonts from "../../common/Fonts";
-import CommonStyles from "../../common/Styles/Styles";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { RFValue } from "react-native-responsive-fontsize";
-import { LocalizationContext } from "../../common/content/LocContext";
-import HeaderTitle1 from "../../components/HeaderTitle1";
-import CoveredQRCodeScanner from "../../components/qr-code-scanning/CoveredQRCodeScanner";
-import BottomInfoBox from "../../components/BottomInfoBox";
-import LndConnectUtils from "../../utils/ln/LndConnectUtils";
-import Toast from "../../components/Toast";
-import Ionicons from "react-native-vector-icons/Ionicons";
+} from 'react-native-responsive-screen';
+import Colors from '../../common/Colors';
+import Fonts from '../../common/Fonts';
+import CommonStyles from '../../common/Styles/Styles';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { LocalizationContext } from '../../common/content/LocContext';
+import HeaderTitle1 from '../../components/HeaderTitle1';
+import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner';
+import BottomInfoBox from '../../components/BottomInfoBox';
+import LndConnectUtils from '../../utils/ln/LndConnectUtils';
+import Toast from '../../components/Toast';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const styles = StyleSheet.create({
   viewContainer: {
@@ -38,10 +38,10 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.Medium,
   },
   buttonView: {
-    height: wp("12%"),
+    height: wp('12%'),
     paddingHorizontal: wp(2),
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 8,
     // shadowColor: Colors.shadowBlue,
     // shadowOpacity: 1,
@@ -50,43 +50,43 @@ const styles = StyleSheet.create({
     // },
     backgroundColor: Colors.blue,
     marginHorizontal: wp(4),
-    marginVertical: hp("2%"),
+    marginVertical: hp('2%'),
   },
   icArrow: {
-    marginLeft: wp("3%"),
-    marginRight: wp("3%"),
-    alignSelf: "center",
+    marginLeft: wp('3%'),
+    marginRight: wp('3%'),
+    alignSelf: 'center',
   },
   textValue: {
     fontFamily: Fonts.Regular,
     fontSize: RFValue(13),
     color: Colors.THEAM_INFO_TEXT_COLOR,
-    marginLeft: wp("3%"),
+    marginLeft: wp('3%'),
   },
   textHelpUs: {
     fontFamily: Fonts.SemiBold,
     fontSize: RFValue(12),
     color: Colors.THEAM_TEXT_COLOR,
-    marginLeft: wp("3%"),
+    marginLeft: wp('3%'),
   },
   textHelpUsSub: {
     fontFamily: Fonts.Regular,
     fontSize: RFValue(12),
     color: Colors.THEAM_INFO_TEXT_COLOR,
-    marginLeft: wp("3%"),
-    marginTop: wp("1%"),
+    marginLeft: wp('3%'),
+    marginTop: wp('1%'),
   },
   addModalView: {
     backgroundColor: Colors.gray7,
     paddingVertical: 25,
     paddingHorizontal: widthPercentageToDP(1),
-    flexDirection: "row",
-    display: "flex",
-    justifyContent: "space-between",
-    marginTop: heightPercentageToDP("5"),
-    alignSelf: "center",
-    borderRadius: widthPercentageToDP("2"),
-    marginBottom: heightPercentageToDP("1.2"),
+    flexDirection: 'row',
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginTop: heightPercentageToDP('5'),
+    alignSelf: 'center',
+    borderRadius: widthPercentageToDP('2'),
+    marginBottom: heightPercentageToDP('1.2'),
     shadowOpacity: 0.05,
     // shadowColor: Colors.shadowColor,
     shadowOffset: {
@@ -100,8 +100,8 @@ const styles = StyleSheet.create({
 
 export default function ScanNodeConfig({ navigation }) {
   const { translations } = useContext(LocalizationContext);
-  const strings = translations["lightningAccount"];
-  const common = translations["common"];
+  const strings = translations['lightningAccount'];
+  const common = translations['common'];
   const [knowMore, setKnowMore] = useState(true);
 
   async function handleBarcodeRecognized({
@@ -109,14 +109,14 @@ export default function ScanNodeConfig({ navigation }) {
   }: {
     data: string;
   }) {
-    if (scannedData.includes("config")) {
-      const url = scannedData.split("config=")[1];
+    if (scannedData.includes('config')) {
+      const url = scannedData.split('config=')[1];
       LndConnectUtils.procesBtcPayConfig(url)
         .then((res) => {
           console.log(res);
           const { uri, macaroon, chainType, port } = res.configurations[0];
           if (uri && macaroon) {
-            navigation.navigate("EnterNodeConfig", {
+            navigation.navigate('EnterNodeConfig', {
               node: {
                 host: uri,
                 port,
@@ -124,18 +124,18 @@ export default function ScanNodeConfig({ navigation }) {
               },
             });
           } else {
-            Toast("Error fetching config");
+            Toast('Error fetching config');
           }
         })
         .catch((e) => {
           console.log(e);
-          Toast("Error fetching config");
+          Toast('Error fetching config');
         });
     } else {
       const { host, port, macaroonHex } =
         LndConnectUtils.processLndConnectUrl(scannedData);
       if (host && macaroonHex) {
-        navigation.navigate("EnterNodeConfig", {
+        navigation.navigate('EnterNodeConfig', {
           node: {
             host: host,
             port: port,
@@ -143,7 +143,7 @@ export default function ScanNodeConfig({ navigation }) {
           },
         });
       } else {
-        Toast("Invalid QR");
+        Toast('Invalid QR');
       }
     }
   }
@@ -152,7 +152,7 @@ export default function ScanNodeConfig({ navigation }) {
     <SafeAreaView style={styles.viewContainer}>
       <StatusBar
         backgroundColor={Colors.backgroundColor}
-        barStyle="dark-content"
+        barStyle='dark-content'
       />
       <View
         style={[
@@ -171,7 +171,7 @@ export default function ScanNodeConfig({ navigation }) {
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
             <FontAwesome
-              name="long-arrow-left"
+              name='long-arrow-left'
               color={Colors.homepageButtonColor}
               size={17}
             />
@@ -179,21 +179,21 @@ export default function ScanNodeConfig({ navigation }) {
         </TouchableOpacity>
       </View>
       <ScrollView
-        overScrollMode="never"
+        overScrollMode='never'
         bounces={false}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           flexGrow: 1,
         }}
-        keyboardShouldPersistTaps="handled"
+        keyboardShouldPersistTaps='handled'
       >
         <HeaderTitle1
-          firstLineTitle={"Set up Lighting Account"}
+          firstLineTitle={'Set up Lighting Account'}
           secondLineTitle={strings.Connectyournode}
-          infoTextNormal={""}
-          infoTextBold={""}
-          infoTextNormal1={""}
-          step={""}
+          infoTextNormal={''}
+          infoTextBold={''}
+          infoTextNormal1={''}
+          step={''}
         />
 
         <CoveredQRCodeScanner
@@ -214,7 +214,7 @@ export default function ScanNodeConfig({ navigation }) {
 
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("EnterNodeConfig");
+            navigation.navigate('EnterNodeConfig');
           }}
           activeOpacity={0.6}
           style={styles.addModalView}
@@ -225,10 +225,10 @@ export default function ScanNodeConfig({ navigation }) {
             }}
           >
             <Text style={styles.textHelpUs}>{strings.Entermanually}</Text>
-            <Text style={styles.textHelpUsSub}>{"Customize your set up"}</Text>
+            <Text style={styles.textHelpUsSub}>{'Customize your set up'}</Text>
           </View>
           <Ionicons
-            name={"chevron-forward"}
+            name={'chevron-forward'}
             color={Colors.textColorGrey}
             size={22}
             style={styles.icArrow}
