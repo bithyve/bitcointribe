@@ -145,7 +145,7 @@ export default function RGBTxDetail( props ) {
         <View style={styles.footerSection}>
           <SendAndReceiveButtonsFooter
             onSendPressed={() => {
-              // onSendBittonPress()
+              props.navigation.navigate( 'RGBSend')
             }}
             onReceivePressed={() => {
               props.navigation.navigate( 'RGBReceive', {

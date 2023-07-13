@@ -71,6 +71,7 @@ import defaultStackScreenNavigationOptions from '../../options/DefaultStackScree
 import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
 import AssetMetaData from '../../../pages/rgb/AssetMetaData'
 import AssetTransferDetails from '../../../pages/rgb/AssetTransferDetails'
+import RGBSend from '../../../pages/rgb/RGBSend'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -136,6 +137,12 @@ const HomeStack = createStackNavigator(
     },
     RGBReceive: {
       screen: RGBReceive,
+      navigationOptions: {
+        header: null
+      }
+    },
+    RGBSend: {
+      screen: RGBSend,
       navigationOptions: {
         header: null
       }

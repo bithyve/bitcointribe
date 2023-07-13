@@ -132,7 +132,7 @@ export default function RGBWalletDetail( props ) {
         <View style={styles.footerSection}>
           <SendAndReceiveButtonsFooter
             onSendPressed={() => {
-              // onSendBittonPress()
+              props.navigation.navigate( 'RGBSend')
             }}
             onReceivePressed={() => {
               props.navigation.navigate( 'RGBReceive', {
