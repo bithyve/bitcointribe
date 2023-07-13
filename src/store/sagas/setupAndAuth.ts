@@ -214,10 +214,6 @@ function* credentialsAuthWorker( { payload } ) {
     const storedVersion = wallet.version
     const currentVersion = DeviceInfo.getVersion()
     if( currentVersion !== storedVersion ) yield put( updateApplication( currentVersion, storedVersion ) )
-
-    // initialize configuration file
-    const { activePersonalNode } = yield select( state => state.nodeSettings )
-    if( activePersonalNode ) config.connectToPersonalNode( activePersonalNode )
   }
 }
 

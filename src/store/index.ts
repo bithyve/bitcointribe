@@ -124,7 +124,7 @@ import {
   updateAvailableKeeperDataWatcher,
 } from './sagas/upgradeToNewBhr'
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
-import { connectToBitHyveNodeWatcher, restorePersonalNodeConfigurationWatcher, savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
+import { connectToBitHyveNodeWatcher, connectToNodeWatcher, restorePersonalNodeConfigurationWatcher, savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
 import { createMigrate, persistReducer, persistStore } from 'redux-persist'
 import {
   fetchNotificationsWatcher,
@@ -224,6 +224,7 @@ const rootSaga = function* () {
     savePersonalNodeConfigurationWatcher,
     connectToBitHyveNodeWatcher,
     restorePersonalNodeConfigurationWatcher,
+    connectToNodeWatcher,
 
     // Notifications
     updateFCMTokensWatcher,
