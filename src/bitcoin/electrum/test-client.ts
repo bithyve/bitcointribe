@@ -6,7 +6,8 @@ import { ElectrumTransaction, ElectrumUTXO } from './interface'
 
 const TEST_ELECTRUM_CLIENT_CONFIG = {
   predefinedTestnetPeers: [ {
-    host: '13.42.121.212', ssl: '50002'
+    host: 'testnet.qtornado.com',
+    ssl: '51002',
   } ],
   maxConnectionAttempt: 5,
   reconnectDelay: 1000, // 1 second
