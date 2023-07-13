@@ -1,11 +1,19 @@
 import PersonalNode from '../../common/data/models/PersonalNode'
-import { CONNECT_TO_PERSONAL_NODE, PERSONAL_NODE_CONNECTING_FAILED, PERSONAL_NODE_CONNECTING_SUCCEEDED, PERSONAL_NODE_PREFERENCE_TOGGLED, PERSONAL_NODE_CONFIGURATION_SET, PERSONAL_NODE_CONNECTING_COMPLETED, BIT_HYVE_NODE_CONNECTING_SUCCEEDED, BIT_HYVE_NODE_CONNECTING_COMPLETED, SET_ALL_NODES, IS_CONNECTION_ACTIVE } from '../actions/nodeSettings'
+import { CONNECT_TO_PERSONAL_NODE, PERSONAL_NODE_CONNECTING_FAILED, PERSONAL_NODE_CONNECTING_SUCCEEDED, PERSONAL_NODE_PREFERENCE_TOGGLED, PERSONAL_NODE_CONFIGURATION_SET, PERSONAL_NODE_CONNECTING_COMPLETED, BIT_HYVE_NODE_CONNECTING_SUCCEEDED, BIT_HYVE_NODE_CONNECTING_COMPLETED, IS_CONNECTION_ACTIVE, SET_PERSONAL_NODES, SET_DEFAULT_NODES, SET_DEFAULT_NODES_SAVED,  } from '../actions/nodeSettings'
+
+export enum NodeStateOperations {
+  ADD= 'ADD',
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE'
+}
 
 export type NodeSettingsState = {
   isConnectionActive: boolean;
   prefersPersonalNodeConnection: boolean;
 
   activePersonalNode: PersonalNode | null;
+  defaultNodesSaved: boolean;
+  defaultNodes: PersonalNode[],
   personalNodes: PersonalNode[];
 
   isConnectionInProgress: boolean;
@@ -24,6 +32,8 @@ const INITIAL_STATE: NodeSettingsState = {
   prefersPersonalNodeConnection: false,
 
   activePersonalNode: null,
+  defaultNodesSaved: false,
+  defaultNodes: [],
   personalNodes: [],
 
   isConnectionInProgress: false,
@@ -52,10 +62,70 @@ const nodeSettingsReducer = ( state: NodeSettingsState = INITIAL_STATE, action )
           activePersonalNode: action.payload,
         }
 
-      case SET_ALL_NODES:
+      case SET_PERSONAL_NODES:
+        const { node: selectedPersonalNode, operation: personalNodesOperation } = action.payload
+        let updatedPersonalNodes = [ ...state.personalNodes ]
+
+        switch( personalNodesOperation ){
+            case NodeStateOperations.ADD:
+            case NodeStateOperations.UPDATE:
+              let toAdd = true
+              for( let idx = 0; idx < updatedPersonalNodes.length; idx++ ){
+                if( updatedPersonalNodes[ idx ].id === selectedPersonalNode.id ) {
+                  updatedPersonalNodes[ idx ] = selectedPersonalNode
+                  toAdd = false
+                  break
+                }
+              }
+              if( toAdd ) updatedPersonalNodes.push( selectedPersonalNode )
+              break
+
+            case NodeStateOperations.DELETE:
+              updatedPersonalNodes = updatedPersonalNodes.filter( ( item ) => item.id !== selectedPersonalNode.id )
+              break
+        }
+
         return {
           ...state,
-          personalNodes: action.payload
+          personalNodes: updatedPersonalNodes
+        }
+
+
+      case SET_DEFAULT_NODES:
+        const { node: selectedDefaultNode, operation: defaultNodesOperation } = action.payload
+        let updatedDefaultNodes = {
+          ...state.defaultNodes
+        }
+
+        switch( defaultNodesOperation ){
+            case NodeStateOperations.ADD:
+            case NodeStateOperations.UPDATE:
+              let toAdd = true
+              for( let idx = 0; idx < updatedDefaultNodes.length; idx++ ){
+                if( updatedDefaultNodes[ idx ].id === selectedDefaultNode.id ) {
+                  updatedDefaultNodes[ idx ] = selectedDefaultNode
+                  toAdd = false
+                  break
+                }
+              }
+              if( toAdd ) updatedDefaultNodes.push( selectedDefaultNode )
+
+              break
+
+            case NodeStateOperations.DELETE:
+              updatedDefaultNodes = updatedDefaultNodes.filter( ( item ) => item.id !== selectedDefaultNode.id )
+              break
+        }
+
+        return {
+          ...state,
+          defaultNodes: updatedDefaultNodes
+        }
+
+      case SET_DEFAULT_NODES_SAVED:
+        return {
+          ...state,
+          defaultNodesSaved: action.payload
         }
 
       case IS_CONNECTION_ACTIVE:
