@@ -173,24 +173,6 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
         />
       </View>
 
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => setuseKeeperNode( !useKeeperNode )}
-        style={styles.useFallbackTouchable}
-      >
-        <Text style={styles.useFallbackText}>
-          {strings.fallback}
-        </Text>
-        <View style={styles.useFallbackCheckView}>
-          {useKeeperNode && (
-            <Entypo
-              name="check"
-              size={RFValue( 17 )}
-              color={Colors.green}
-            />
-          )}
-        </View>
-      </TouchableOpacity>
 
       <View style={styles.footerSection}>
         <TouchableOpacity disabled={canProceed === false} onPress={handleProceedButtonPress}>
