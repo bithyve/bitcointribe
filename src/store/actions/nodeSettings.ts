@@ -12,6 +12,8 @@ export const SET_PERSONAL_NODES = 'SET_PERSONAL_NODES'
 export const SET_DEFAULT_NODES = 'SET_DEFAULT_NODES'
 export const SET_DEFAULT_NODES_SAVED = 'SET_DEFAULT_NODES_SAVED'
 export const CONNECT_TO_NODE = 'CONNECT_TO_NODE'
+export const SET_ELECTRUM_CLIENT_NOT_CONNECTED_ERR = 'SET_ELECTRUM_CLIENT_NOT_CONNECTED'
+export const RESET_ELECTRUM_CLIENT_NOT_CONNECTED_ERR = 'RESET_ELECTRUM_CLIENT_NOT_CONNECTED'
 export const IS_CONNECTION_ACTIVE = 'IS_CONNECTION_ACTIVE'
 export const CONNECT_TO_PERSONAL_NODE = 'CONNECT_TO_PERSONAL_NODE'
 export const PERSONAL_NODE_CONNECTING_FAILED = 'PERSONAL_NODE_CONNECTING_FAILED'
@@ -118,6 +120,19 @@ export const setPersonalNodes = (
 export const connectToNode = () => {
   return {
     type: CONNECT_TO_NODE
+  }
+}
+
+export const setElectrumNotConnectedErr = ( err ) => {
+  return {
+    type: SET_ELECTRUM_CLIENT_NOT_CONNECTED_ERR,
+    payload: err
+  }
+}
+
+export const resetElectrumNotConnectedErr = () => {
+  return {
+    type: RESET_ELECTRUM_CLIENT_NOT_CONNECTED_ERR
   }
 }
 

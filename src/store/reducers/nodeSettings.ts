@@ -1,5 +1,5 @@
 import PersonalNode from '../../common/data/models/PersonalNode'
-import { CONNECT_TO_PERSONAL_NODE, PERSONAL_NODE_CONNECTING_FAILED, PERSONAL_NODE_CONNECTING_SUCCEEDED, PERSONAL_NODE_PREFERENCE_TOGGLED, PERSONAL_NODE_CONFIGURATION_SET, PERSONAL_NODE_CONNECTING_COMPLETED, BIT_HYVE_NODE_CONNECTING_SUCCEEDED, BIT_HYVE_NODE_CONNECTING_COMPLETED, IS_CONNECTION_ACTIVE, SET_PERSONAL_NODES, SET_DEFAULT_NODES, SET_DEFAULT_NODES_SAVED,  } from '../actions/nodeSettings'
+import { CONNECT_TO_PERSONAL_NODE, PERSONAL_NODE_CONNECTING_FAILED, PERSONAL_NODE_CONNECTING_SUCCEEDED, PERSONAL_NODE_PREFERENCE_TOGGLED, PERSONAL_NODE_CONFIGURATION_SET, PERSONAL_NODE_CONNECTING_COMPLETED, BIT_HYVE_NODE_CONNECTING_SUCCEEDED, BIT_HYVE_NODE_CONNECTING_COMPLETED, IS_CONNECTION_ACTIVE, SET_PERSONAL_NODES, SET_DEFAULT_NODES, SET_DEFAULT_NODES_SAVED, SET_ELECTRUM_CLIENT_NOT_CONNECTED_ERR, RESET_ELECTRUM_CLIENT_NOT_CONNECTED_ERR,  } from '../actions/nodeSettings'
 
 export enum NodeStateOperations {
   ADD= 'ADD',
@@ -15,6 +15,15 @@ export type NodeSettingsState = {
   defaultNodesSaved: boolean;
   defaultNodes: PersonalNode[],
   personalNodes: PersonalNode[];
+
+  electrumClientConnectionStatus: {
+    inProgress: boolean;
+    success: boolean;
+    connectedTo: string;
+    failed: boolean;
+    error: string;
+    setElectrumNotConnectedErr: string;
+  };
 
   isConnectionInProgress: boolean;
 
@@ -35,6 +44,15 @@ const INITIAL_STATE: NodeSettingsState = {
   defaultNodesSaved: false,
   defaultNodes: [],
   personalNodes: [],
+
+  electrumClientConnectionStatus: {
+    inProgress: false,
+    success: false,
+    connectedTo: null,
+    failed: false,
+    error: null,
+    setElectrumNotConnectedErr: '',
+  },
 
   isConnectionInProgress: false,
 
@@ -124,6 +142,24 @@ const nodeSettingsReducer = ( state: NodeSettingsState = INITIAL_STATE, action )
         return {
           ...state,
           defaultNodesSaved: action.payload
+        }
+
+      case SET_ELECTRUM_CLIENT_NOT_CONNECTED_ERR:
+        return {
+          ...state,
+          electrumClientConnectionStatus: {
+            ...state.electrumClientConnectionStatus,
+            setElectrumNotConnectedErr: action.payload
+          }
+        }
+
+      case RESET_ELECTRUM_CLIENT_NOT_CONNECTED_ERR:
+        return {
+          ...state,
+          electrumClientConnectionStatus: {
+            ...state.electrumClientConnectionStatus,
+            setElectrumNotConnectedErr: ''
+          }
         }
 
       case IS_CONNECTION_ACTIVE:

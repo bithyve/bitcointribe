@@ -128,7 +128,7 @@ export default class AccountOperations {
     network: bitcoinJS.Network
   ) => {
 
-    const client = network === bitcoinJS.networks.bitcoin? ElectrumClient: TestElectrumClient
+    const client = account.type === AccountType.TEST_ACCOUNT?  TestElectrumClient: ElectrumClient
     const { historyByAddress, txids, txidToAddress } = await client.syncHistoryByAddress(
       addresses,
       network
@@ -491,7 +491,7 @@ export default class AccountOperations {
         addresses.push( address )
       }
 
-      const client = network === bitcoinJS.networks.bitcoin? ElectrumClient: TestElectrumClient
+      const client = account.type === AccountType.TEST_ACCOUNT?  TestElectrumClient: ElectrumClient
       // sync utxos & balances
       const utxosByAddress = await client.syncUTXOByAddress( addresses, network )
 
@@ -1219,7 +1219,7 @@ export default class AccountOperations {
       txHex = signedTxb.build().toHex()
     }
 
-    const client = network === bitcoinJS.networks.bitcoin? ElectrumClient: TestElectrumClient
+    const client = account.type === AccountType.TEST_ACCOUNT?  TestElectrumClient: ElectrumClient
     const txid = await client.broadcast( txHex )
     if ( !txid ) throw new Error( 'Failed to broadcast transaction, txid missing' )
 
