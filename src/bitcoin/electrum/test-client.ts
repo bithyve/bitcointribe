@@ -41,7 +41,7 @@ export default class TestElectrumClient {
         console.log( 'Error: Close the connection' )
       }
 
-      console.log( 'Initiate electrum server' )
+      console.log( 'Initiate electrum server for test account' )
       const ver = await TEST_ELECTRUM_CLIENT.electrumClient.initElectrum( {
         client: 'bitcoin-keeper',
         version: '1.4',
@@ -62,7 +62,7 @@ export default class TestElectrumClient {
   }
 
   public static async reconnect() {
-    console.log( 'Trying to reconnect' )
+    console.log( 'Trying to reconnect electrum for test account' )
     TEST_ELECTRUM_CLIENT.connectionAttempt += 1
 
     // close the connection before attempting again

@@ -30,13 +30,13 @@ import { AccountType, ContactInfo, LevelData, KeeperInfoInterface, MetaShare, Tr
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
-import { autoSyncShells, newAccountShellCreationCompleted } from '../actions/accounts'
+import {  newAccountShellCreationCompleted } from '../actions/accounts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
 import semverLte from 'semver/functions/lte'
 import { applyUpgradeSequence } from './upgrades'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
-import ElectrumClient from '../../bitcoin/electrum/client'
+import { connectToNode } from '../actions/nodeSettings'
 
 
 function* setupWalletWorker( { payload } ) {
@@ -132,7 +132,7 @@ function* credentialsStorageWorker( { payload } ) {
   yield put( credsStored() )
 
   // connect electrum-client
-
+  yield put( connectToNode() )
 }
 
 export const credentialStorageWatcher = createWatcher(
@@ -204,10 +204,11 @@ function* credentialsAuthWorker( { payload } ) {
     yield put( switchReLogin( true ) )
   } else {
     yield put( credsAuthenticated( true ) )
+    yield put( connectToNode() )
+
     // t.stop()
     yield put( keyFetched( key ) )
-    yield put( autoSyncShells() )
-
+    // yield put( autoSyncShells() ) // have to synchronize w/ connectToNode saga in order for this to work
 
     // check if the app has been upgraded
     const wallet: Wallet = yield select( state => state.storage.wallet )

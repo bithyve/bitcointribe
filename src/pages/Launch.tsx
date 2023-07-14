@@ -26,7 +26,6 @@ import {
 } from '../store/actions/notifications'
 import { LocalizationContext } from '../common/content/LocContext'
 import TestElectrumClient from '../bitcoin/electrum/test-client'
-import { connectToNode } from '../store/actions/nodeSettings'
 // import RestClient from '../services/rest/RestClient'
 
 type LaunchScreenProps = {
@@ -37,7 +36,6 @@ type LaunchScreenProps = {
   walletId: any;
   walletExists: Boolean,
   torEnabled: boolean,
-  connectToNode: any,
 }
 
 type LaunchScreenState = { }
@@ -55,8 +53,6 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
 
 
   componentDidMount = async() => {
-    this.props.connectToNode()
-
     TestElectrumClient.connect()
     AppState.addEventListener( 'change', this.handleAppStateChange )
     Linking.addEventListener( 'url', this.handleDeepLinkEvent )
@@ -95,7 +91,6 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
 
   postSplashScreenActions = async () => {
     try {
-      console.log( 'walletId', this.props.walletId )
       if( this.props.walletId ){
         this.props.getMessages()
       }
@@ -226,5 +221,4 @@ const mapStateToProps = ( state ) => {
 
 export default connect( mapStateToProps, {
   getMessages,
-  connectToNode
 } )( Launch )

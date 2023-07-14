@@ -93,9 +93,7 @@ const nodeSettingsReducer = ( state: NodeSettingsState = INITIAL_STATE, action )
 
       case SET_DEFAULT_NODES:
         const { node: selectedDefaultNode, operation: defaultNodesOperation } = action.payload
-        let updatedDefaultNodes = {
-          ...state.defaultNodes
-        }
+        let updatedDefaultNodes = [ ...state.defaultNodes ]
 
         switch( defaultNodesOperation ){
             case NodeStateOperations.ADD:
