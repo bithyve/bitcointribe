@@ -21,36 +21,29 @@ import LinearGradient from 'react-native-linear-gradient'
 type Props = {
   onRGBWalletClick: ()=>any;
   onLighteningWalletClick: ()=>any;
+  title1: string;
+title2:string;
 }
 
-const BottomSheetAddWalletInfo: React.FC<Props> = ( { onRGBWalletClick, onLighteningWalletClick }: Props ) => {
+const BottomSheetAddWalletInfo: React.FC<Props> = ( { onRGBWalletClick, onLighteningWalletClick, title1, title2 }: Props ) => {
   const dispatch = useDispatch()
   const common  = translations[ 'common' ]
   const strings  = translations[ 'accounts' ]
-  // const { swanAccountCreationStatus, hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, swanAccountDetails, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated  } = useSwanIntegrationState()
-  // const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   const [ isConfirm, setIsConfirm ] = useState( false )
   const swanMessage = strings.swanMessage
   const swanTitle = strings.StackSats
 
-  // const onRGBWalletClick=()=> {
-  //   console.log( 'Hello RGB' )
-  // }
-
-  // const onLighteningWalletClick=()=> {
-  //   console.log( 'Hello LW' )
-  // }
 
   const renderWallet =( onPress, title, desc ) => {
     return(
       <TouchableOpacity style={styles.container} onPress={onPress}>
-        <Image
+        {/* <Image
           style={styles.addIcon}
           source={require( '../../../assets/images/icons/icon_add.png' )}
-        />
+        /> */}
         <View style={styles.innerContainer}>
           <Text style={styles.titleText}>{title}</Text>
-          <Text style={styles.descText}>{desc}</Text>
+          <Text numberOfLines={2} style={styles.descText}>{desc}</Text>
         </View>
         <Image source={require( '../../../assets/images/icons/icon_arrow.png' )}
           style={{
@@ -68,8 +61,8 @@ const BottomSheetAddWalletInfo: React.FC<Props> = ( { onRGBWalletClick, onLighte
   return ( <View style={{
     ...styles.modalContentContainer
   }}>
-    {renderWallet( onRGBWalletClick, 'RGB Wallet', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry' )}
-    {renderWallet( onLighteningWalletClick, 'Lightening Wallet', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry' )}
+    {renderWallet( onRGBWalletClick, title1, 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry' )}
+    {renderWallet( onLighteningWalletClick, title2, 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry' )}
   </View>
   )
 }
@@ -100,12 +93,12 @@ const styles = StyleSheet.create( {
     paddingBottom: hp( 5 )
   },
   titleText: {
-    color: Colors.black,
+    color: Colors.THEAM_TEXT_COLOR,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.Medium
+    fontFamily: Fonts.Medium,
   },
   descText: {
-    color: Colors.black,
+    color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.Regular,
     marginTop: 10

@@ -72,6 +72,7 @@ import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
 import AssetMetaData from '../../../pages/rgb/AssetMetaData'
 import AssetTransferDetails from '../../../pages/rgb/AssetTransferDetails'
 import RGBSend from '../../../pages/rgb/RGBSend'
+import IssueScreen from '../../../pages/rgb/IssueScreen'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -143,6 +144,12 @@ const HomeStack = createStackNavigator(
     },
     RGBSend: {
       screen: RGBSend,
+      navigationOptions: {
+        header: null
+      }
+    },
+    IssueScreen: {
+      screen: IssueScreen,
       navigationOptions: {
         header: null
       }

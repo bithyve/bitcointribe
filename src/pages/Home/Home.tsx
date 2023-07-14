@@ -535,6 +535,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     currentSubAccount: null,
                   } )
                 }}
+                title1='RGB Wallet'
+                title2='Lightening Wallet'
               />
             </>
           )

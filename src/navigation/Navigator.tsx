@@ -43,12 +43,16 @@ import {
 import Svg, { G, Path, Defs } from 'react-native-svg'
 import HomeSVG from '../assets/images/tabs/home.svg'
 import HomeInactiveSVG from '../assets/images/tabs/home_inactive.svg'
+import Wallet_InactiveSVG from '../assets/images/tabs/wallet_inactive.svg'
+import Wallet_activeSVG from '../assets/images/tabs/wallet_active.svg'
 import SecurityInactive from '../assets/images/tabs/security.svg'
 import Security from '../assets/images/tabs/security_active.svg'
 import SettingsInactive from '../assets/images/tabs/settings.svg'
 import Settings from '../assets/images/tabs/settings_active.svg'
 import FnFInactive from '../assets/images/tabs/f&f.svg'
 import FnF from '../assets/images/tabs/fnf_active.svg'
+import RGBInactive from '../assets/images/tabs/rgb_inactive.svg'
+import RGBActive from '../assets/images/tabs/rgb_active.svg'
 import MoreOptionsStack from './stacks/more-options/MoreOptionsStack'
 import SecurityStack from './stacks/security/Security&Privacy'
 import BuyStack from './stacks/buy/BuyStack'
@@ -61,6 +65,7 @@ import GiftStack from './stacks/gift/GiftStack'
 import Filled_gift_tab from '../assets/images/satCards/filled_gift_tab.svg'
 import Gift_tab from '../assets/images/satCards/gift_tab.svg'
 import LinearGradient from 'react-native-linear-gradient'
+import AssetsStack from './stacks/assets/AssetsStack'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -176,9 +181,9 @@ const Bottomtab = createBottomTabNavigator(
               marginTop: hp( '1.3%' )
             }}>
               {focused ?
-                <HomeSVG/>
+                <Wallet_activeSVG/>
                 :
-                <HomeInactiveSVG/>
+                <Wallet_InactiveSVG/>
               }
 
               {focused ?
@@ -195,6 +200,27 @@ const Bottomtab = createBottomTabNavigator(
           )
         }
       }
+    },
+    Assets: {
+      screen: AssetsStack,
+      navigationOptions: {
+        tabBarIcon: ( { focused } ) => {
+          return (
+            <View style={{
+              marginTop: hp( '1.3%' )
+            }}>
+              {focused ?
+                <RGBActive /> : <RGBInactive />
+              }
+              {focused ?
+                <View style={styles.activeStyle}/>
+                :
+                <View style={styles.inactiveStyle}/>
+              }
+            </View>
+          )
+        }
+      },
     },
     Freiend: {
       screen: FriendsAndFamily,
