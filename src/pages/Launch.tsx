@@ -25,9 +25,8 @@ import {
   getMessages,
 } from '../store/actions/notifications'
 import { LocalizationContext } from '../common/content/LocContext'
-import ElectrumClient from '../bitcoin/electrum/client'
-import PersonalNode from '../common/data/models/PersonalNode'
 import TestElectrumClient from '../bitcoin/electrum/test-client'
+import { connectToNode } from '../store/actions/nodeSettings'
 // import RestClient from '../services/rest/RestClient'
 
 type LaunchScreenProps = {
@@ -38,7 +37,7 @@ type LaunchScreenProps = {
   walletId: any;
   walletExists: Boolean,
   torEnabled: boolean,
-  personalNodes: PersonalNode[],
+  connectToNode: any,
 }
 
 type LaunchScreenState = { }
@@ -54,9 +53,10 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
     // console.log( ':LAUNCH' )
   }
 
+
   componentDidMount = async() => {
-    ElectrumClient.setActivePeer( this.props.personalNodes )
-    ElectrumClient.connect()
+    this.props.connectToNode()
+
     TestElectrumClient.connect()
     AppState.addEventListener( 'change', this.handleAppStateChange )
     Linking.addEventListener( 'url', this.handleDeepLinkEvent )
@@ -221,10 +221,10 @@ const mapStateToProps = ( state ) => {
     walletId: idx( state, ( _ ) => _.preferences.walletId ),
     walletExists: idx( state, ( _ ) => _.storage.walletExists ),
     torEnabled: idx( state, ( _ ) => _.preferences.torEnabled ),
-    personalNodes: idx( state, ( _ ) => _.nodeSettings.personalNodes )
   }
 }
 
 export default connect( mapStateToProps, {
-  getMessages
+  getMessages,
+  connectToNode
 } )( Launch )
