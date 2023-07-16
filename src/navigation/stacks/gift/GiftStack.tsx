@@ -52,7 +52,7 @@ import ClaimSatsScreen from '../../../pages/Gift/ClaimSatsScreen'
 
 const GiftStack = createStackNavigator(
   {
-    Home: {
+    GiftScreen: {
       screen: GiftScreen,
       navigationOptions: {
         header: null,
@@ -146,13 +146,13 @@ const GiftStack = createStackNavigator(
   },
   {
     // mode: 'modal',
-    initialRouteName: 'Home',
+    initialRouteName: 'GiftScreen',
     defaultNavigationOptions: {
       header: null
     },
     navigationOptions: ( { navigation } ) => {
       let tabBarVisible = false
-      if ( ( navigation.state.index === 0  && navigation.state.routes[ 0 ].routeName === 'Home' || navigation.state.index === 1 && navigation.state.routes[ 1 ]?.routeName === 'Home' ) ) {
+      if ( ( navigation.state.index === 0  && navigation.state.routes[ 0 ].routeName === 'GiftScreen' || navigation.state.index === 1 && navigation.state.routes[ 1 ]?.routeName === 'GiftScreen' ) ) {
         tabBarVisible = true
       }
 

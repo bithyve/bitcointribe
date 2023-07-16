@@ -309,23 +309,23 @@ const Bottomtab = createBottomTabNavigator(
     //     }
     //   },
     // },
-    Securiy: {
-      screen: GiftStack,
-      navigationOptions: {
-        tabBarIcon: ( { focused } ) => {
-          return (
-            <View style={{
-              marginTop: hp( '0.85%' )
-            }}>
-              {/* <IconWithBadge focused={focused} /> */}
-              {focused ?
-                <Filled_gift_tab /> : <Gift_tab />
-              }
-            </View>
-          )
-        }
-      },
-    },
+    // Securiy: {
+    //   screen: GiftStack,
+    //   navigationOptions: {
+    //     tabBarIcon: ( { focused } ) => {
+    //       return (
+    //         <View style={{
+    //           marginTop: hp( '0.85%' )
+    //         }}>
+    //           {/* <IconWithBadge focused={focused} /> */}
+    //           {focused ?
+    //             <Filled_gift_tab /> : <Gift_tab />
+    //           }
+    //         </View>
+    //       )
+    //     }
+    //   },
+    // },
 
     Setting: {
       screen: MoreOptionsStack,

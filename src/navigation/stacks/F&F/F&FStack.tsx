@@ -34,6 +34,7 @@ import SendGift from '../../../pages/FriendsAndFamily/SendGift'
 import GiftDetails from '../../../pages/FriendsAndFamily/GiftDetails'
 import EnterGiftDetails from '../../../pages/FriendsAndFamily/EnterGiftDetails'
 import SendViaLinkAndQR from '../../../pages/FriendsAndFamily/SendViaLinkAndQR'
+import GiftStack from '../gift/GiftStack'
 const strings  = translations[ 'stackTitle' ]
 
 const MODAL_ROUTES = [
@@ -112,7 +113,8 @@ const FriendsAndFamily = createStackNavigator(
         header: null,
       },
     },
-    RequestKeyFromContact
+    RequestKeyFromContact,
+    GiftStack
   },
   {
     // mode: 'modal',
@@ -122,9 +124,14 @@ const FriendsAndFamily = createStackNavigator(
     },
     navigationOptions: ( { navigation } ) => {
       let tabBarVisible = false
-      if ( ( navigation.state.index === 0  && navigation.state.routes[ 0 ].routeName === 'Home' || navigation.state.index === 1 && navigation.state.routes[ 1 ]?.routeName === 'Home' ) ) {
+      if ( ( navigation.state.index === 0  && 
+        navigation.state.routes[ 0 ].routeName === 'Home' || navigation.state.index === 1 && 
+        navigation.state.routes[ 1 ]?.routeName === 'Home' ) ) {
         tabBarVisible = true
       }
+      console.log('skk routes', JSON.stringify(navigation.state))
+      if (navigation.state.index === 1  && navigation.state.routes[1]?.routeName == 'GiftStack')
+      tabBarVisible= true
 
       return {
         tabBarVisible,

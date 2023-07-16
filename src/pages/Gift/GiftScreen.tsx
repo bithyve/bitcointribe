@@ -1,10 +1,12 @@
 import {
   ActivityIndicator,
   Alert,
+  Dimensions,
   Image,
   ImageBackground,
   Platform,
   RefreshControl,
+  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -73,6 +75,9 @@ import { connect } from 'react-redux'
 import defaultStackScreenNavigationOptions from '../../navigation/options/DefaultStackScreenNavigationOptions'
 import idx from 'idx'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import CommonStyles from '../../common/Styles/Styles'
+
+const { height } = Dimensions.get( 'window' )
 
 interface GiftPropTypes {
   navigation: any;
@@ -667,8 +672,8 @@ class GiftScreen extends React.Component<
       showIndicator
     } = this.state
     return (
-      <View style={{
-        backgroundColor: Colors.darkBlue
+      <SafeAreaView style={{
+        backgroundColor: Colors.darkBlue, flex:1
       }}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         <View style={styles.accountCardsSectionContainer}>
@@ -698,6 +703,31 @@ class GiftScreen extends React.Component<
               </Text>
               <ToggleContainer />
             </View> */}
+            <View
+              style={[
+                CommonStyles.headerContainer,
+                {
+                  backgroundColor: Colors.backgroundColor1,
+                  marginRight: wp( 4 ),
+                  marginVertical: height < 720 ? wp( 0 ) : 'auto',
+                },
+              ]}
+            >
+              <TouchableOpacity
+                style={CommonStyles.headerLeftIconContainer}
+                onPress={() => {
+                  navigation.pop()
+                }}
+              >
+                <View style={CommonStyles.headerLeftIconInnerContainer}>
+                  <FontAwesome
+                  name="long-arrow-left"
+                  color={Colors.homepageButtonColor}
+                    size={17}
+                  />
+                </View>
+              </TouchableOpacity>
+          </View>
           <View style={{
             flexDirection: 'row', marginHorizontal: 30, marginTop: 15, alignItems: 'flex-end'
           }}>
@@ -840,7 +870,7 @@ class GiftScreen extends React.Component<
             bottomImage={require( '../../assets/images/icons/errorImage.png' )}
           />
         </ModalContainer>
-      </View>
+      </SafeAreaView>
       /* feature/2.0 */
     )
   }
@@ -956,19 +986,20 @@ const styles = StyleSheet.create( {
     marginHorizontal: wp( 1 )
   },
   accountCardsSectionContainer: {
-    height: hp( '71.46%' ),
+    // height: hp( '71.46%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor1,
-    opacity: 1,
-    borderTopLeftRadius: 25,
-    shadowColor: 'black',
-    shadowOpacity: 0.4,
-    shadowOffset: {
-      width: 2,
-      height: -1,
-    },
-    flexDirection: 'column',
-    justifyContent: 'space-around',
+    flex:1
+    // opacity: 1,
+    // borderTopLeftRadius: 25,
+    // shadowColor: 'black',
+    // shadowOpacity: 0.4,
+    // shadowOffset: {
+      // width: 2,
+      // height: -1,
+    // },
+    // flexDirection: 'column',
+    // justifyContent: 'space-around',
   },
   contactText: {
     // marginLeft: 10,

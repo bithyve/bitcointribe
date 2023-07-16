@@ -29,6 +29,7 @@ import BottomSheetWalletHeader from '../Accounts/BottomSheetWalletHeader'
 import BottomSheetAddWalletInfo from '../../components/bottom-sheets/add-wallet/BottomSheetAddWalletInfo'
 import BottomSheet from 'reanimated-bottom-sheet'
 import BottomSheetCoinsHeader from './BottomSheetCoinsHeader'
+import StaggeredList from '@mindinventory/react-native-stagger-view';
 
 const keyExtractor = ( item: any ) => item.toString()
 
@@ -85,7 +86,7 @@ export default function AssetsScreen( props ) {
       }
 
     const renderCoinItems = ({item, index})=> {
-    return(
+        return(    
         <TouchableOpacity style={styles.coinItemContainer} activeOpacity={1} 
         // onPress= {() =>
         //     props.navigation.navigate( 'RGBWalletDetail', {
@@ -96,13 +97,33 @@ export default function AssetsScreen( props ) {
         >
             <View style={[styles.labelContainer, {backgroundColor:item.color}]}>
                 <Text style={styles.labelText}>{item.label}</Text>
-            </View>
+            </View>            
             <Text style={styles.nameText}>{item.name}</Text>
             <Text style={styles.labelOuterText}>{item.label}</Text>
             <Text style={styles.amountText}>{item.amount}</Text>
         </TouchableOpacity>
     )
+    
     }
+    const renderCollectibleItems = (item, index)=> {
+        return(    
+            <TouchableOpacity style={index == 7 ? 
+                styles.collectibleRandomItemContainer : 
+                styles.collectibleItemContainer} activeOpacity={1} 
+            onPress= {() =>
+                props.navigation.navigate( 'AssetsDetailScreen')
+            }
+            >
+                <View style={index == 7 ? styles.randomImageContainer :styles.imageContainer}>
+                    <Image style={styles.image} 
+                    source={require('../../assets/images/BottomSheetMessages/success-stars.png')}
+                    />
+                </View>
+                <Text style={styles.collectibleOuterText}>{item.label}</Text>
+                <Text style={styles.collectibleAmountText}>{item.amount}</Text>
+            </TouchableOpacity>
+        )
+        }
 
     const closeBottomSheet = () => {
         setBottomSheetState(BottomSheetState.Closed)
@@ -164,7 +185,32 @@ export default function AssetsScreen( props ) {
                 </View>
                 {renderTabs()}
                 {selectedTab == 0?
-                <View></View>
+                <ScrollView 
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    directionalLockEnabled={true}
+                    alwaysBounceVertical={false}
+                >
+                    {/* <FlatList
+                        data={coinsData}
+                        contentContainerStyle={styles.flatListStyle}
+                        keyExtractor={keyExtractor}
+                        renderItem={renderCollectibleItems}
+                        numColumns={Math.ceil(coinsData.length/3)}
+                        showsVerticalScrollIndicator={false}
+                        showsHorizontalScrollIndicator={false}
+                        scrollEnabled={false}
+                    /> */}
+                    <StaggeredList
+                        numColumns={Math.ceil(coinsData.length/3)}
+                        showsVerticalScrollIndicator={false}
+                        showsHorizontalScrollIndicator={false}
+                        data={coinsData}
+                        animationType={'FADE_IN_FAST'}
+                        contentContainerStyle={styles.flatListStyle}
+                        renderItem={({item, i})=>renderCollectibleItems(item, i)}
+                    />
+                </ScrollView>
                 : 
                 <ScrollView 
                     horizontal
@@ -267,7 +313,25 @@ headerContainer:{
   coinItemContainer: {
     width: 110,
     borderRadius: 10,
-    backgroundColor: Colors.white,
+    backgroundColor:Colors.white,
+    marginTop: 20,
+    marginEnd: 20,
+    padding: 10
+  },
+  collectibleItemContainer: {
+    width: 110,
+    height: 110,
+    borderRadius: 10,
+    backgroundColor: 'transparent',
+    marginTop: 20,
+    marginEnd: 20,
+    padding: 10
+  },
+  collectibleRandomItemContainer: {
+    width: 240,
+    height: 240,
+    borderRadius: 10,
+    backgroundColor: 'transparent',
     marginTop: 20,
     marginEnd: 20,
     padding: 10
@@ -280,6 +344,28 @@ headerContainer:{
     justifyContent:'center',
     alignItems:'center'
   },
+  imageContainer: {
+    backgroundColor: Colors.THEAM_TEXT_COLOR,
+    borderRadius: 10,
+    height: 90,
+    width: 90,
+    justifyContent:'center',
+    alignItems:'center'
+  },
+  randomImageContainer: {
+    backgroundColor: Colors.THEAM_TEXT_COLOR,
+    borderRadius: 10,
+    height: 240,
+    width: 240,
+    justifyContent:'center',
+    alignItems:'center'
+  },
+  image: {
+    height: '100%',
+    width: '100%',
+    borderRadius:4
+  },
+ 
   labelText:{
     fontSize: RFValue(9),
     fontFamily: Fonts.SemiBold,
@@ -296,13 +382,27 @@ headerContainer:{
     marginTop: 12
   },
   labelOuterText:{
-    fontSize: RFValue(7),
+    fontSize: 9,
     fontFamily: Fonts.SemiBold,
     color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
     marginTop: 5
   },
   amountText:{
-    fontSize: RFValue(10),
+    fontSize: 11,
+    fontFamily: Fonts.Regular,
+    color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
+  },
+  collectibleOuterText:{
+    fontSize: 9,
+    fontFamily: Fonts.SemiBold,
+    color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
+    marginTop: 5,
+    textAlign: 'center',
+
+  },
+  collectibleAmountText:{
+    fontSize: 11,
+    textAlign: 'center',
     fontFamily: Fonts.Regular,
     color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
   },

@@ -73,6 +73,7 @@ import AssetMetaData from '../../../pages/rgb/AssetMetaData'
 import AssetTransferDetails from '../../../pages/rgb/AssetTransferDetails'
 import RGBSend from '../../../pages/rgb/RGBSend'
 import IssueScreen from '../../../pages/rgb/IssueScreen'
+import AssetsDetailScreen from '../../../pages/Assets/AssetsDetailScreen'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -168,6 +169,12 @@ const HomeStack = createStackNavigator(
     },
     AssetTransferDetails: {
       screen: AssetTransferDetails,
+      navigationOptions: {
+        header: null
+      }
+    },
+    AssetsDetailScreen: {
+      screen: AssetsDetailScreen,
       navigationOptions: {
         header: null
       }
