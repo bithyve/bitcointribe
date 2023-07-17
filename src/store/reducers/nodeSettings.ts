@@ -36,7 +36,7 @@ export type NodeSettingsState = {
   bitHyveNodeConnectionErrorMessage: string | null;
 };
 
-const INITIAL_STATE: NodeSettingsState = {
+export const INITIAL_STATE: NodeSettingsState = {
   isConnectionActive: false,
   prefersPersonalNodeConnection: false,
 

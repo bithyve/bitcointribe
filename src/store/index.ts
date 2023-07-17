@@ -175,7 +175,7 @@ import doNotStoreReducer from './reducers/doNotStore'
 
 const config = {
   key: 'root', // key is required
-  // version: 0, // redux persist migration version code(initiate to a version once the corresponding migration state is implemented)
+  version: 0, // redux persist migration version code(initiate to a version once the corresponding migration state is implemented)
   storage: AsyncStorage, // storage is now required
   blacklist: [ 'setupAndAuth', 'loaders', 'doNotStore' ],
   migrate: createMigrate( reduxPersistMigrations, {
