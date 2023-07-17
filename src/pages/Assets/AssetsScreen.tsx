@@ -88,12 +88,9 @@ export default function AssetsScreen( props ) {
     const renderCoinItems = ({item, index})=> {
         return(    
         <TouchableOpacity style={styles.coinItemContainer} activeOpacity={1} 
-        // onPress= {() =>
-        //     props.navigation.navigate( 'RGBWalletDetail', {
-        //         accountShellID: selectedAccount.id,
-        //         rgbConfig: selectedAccount.primarySubAccount.rgbConfig
-        //       } )
-        // }
+        onPress= {() =>
+            props.navigation.navigate( 'CollectibleDetailScreen')
+        }
         >
             <View style={[styles.labelContainer, {backgroundColor:item.color}]}>
                 <Text style={styles.labelText}>{item.label}</Text>
@@ -111,7 +108,7 @@ export default function AssetsScreen( props ) {
                 styles.collectibleRandomItemContainer : 
                 styles.collectibleItemContainer} activeOpacity={1} 
             onPress= {() =>
-                props.navigation.navigate( 'AssetsDetailScreen')
+                props.navigation.navigate( 'CollectibleDetailScreen')
             }
             >
                 <View style={index == 7 ? styles.randomImageContainer :styles.imageContainer}>
