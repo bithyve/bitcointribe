@@ -19,6 +19,8 @@ import { updateAccountShells } from '../actions/accounts'
 import dbManager from '../../storage/realm/dbManager'
 import Relay from '../../bitcoin/utilities/Relay'
 import { getNextFreeAddressWorker } from './accounts'
+import { ELECTRUM_NOT_CONNECTED_ERR } from '../../bitcoin/electrum/client'
+import { setElectrumNotConnectedErr } from '../actions/nodeSettings'
 
 function* processRecipients( accountShell: AccountShell ){
   const accountsState: AccountsState = yield select(
@@ -202,6 +204,9 @@ function* executeSendStage2( { payload }: {payload: {
         err: 'Send failed: unable to generate txid'
       } ) )
   } catch( err ){
+    if ( [ ELECTRUM_NOT_CONNECTED_ERR ].includes( err?.message ) )
+      yield put( setElectrumNotConnectedErr( err?.message ) )
+
     yield put( sendStage2Executed( {
       successful: false,
       err: 'Send failed: ' + err.message

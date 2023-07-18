@@ -30,7 +30,7 @@ import { AccountType, ContactInfo, LevelData, KeeperInfoInterface, MetaShare, Tr
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
-import { autoSyncShells, newAccountShellCreationCompleted } from '../actions/accounts'
+import {  newAccountShellCreationCompleted } from '../actions/accounts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
 import semverLte from 'semver/functions/lte'
@@ -39,6 +39,7 @@ import BHROperations from '../../bitcoin/utilities/BHROperations'
 import ElectrumClient from '../../bitcoin/electrum/client'
 import RGBServices from '../../services/RGBServices'
 import { setRgbConfig, syncRgb } from '../actions/rgb'
+import { connectToNode } from '../actions/nodeSettings'
 
 
 function* setupWalletWorker( { payload } ) {
@@ -139,7 +140,7 @@ function* credentialsStorageWorker( { payload } ) {
   yield put( credsStored() )
 
   // connect electrum-client
-
+  yield put( connectToNode() )
 }
 
 export const credentialStorageWatcher = createWatcher(
@@ -213,11 +214,12 @@ function* credentialsAuthWorker( { payload } ) {
     yield put( switchReLogin( true ) )
   } else {
     yield put( credsAuthenticated( true ) )
+    yield put( connectToNode() )
+
     // t.stop()
     yield put( keyFetched( key ) )
-    yield put( autoSyncShells() )
+    // yield put( autoSyncShells() )
     const rgbConfig: RGBConfig = yield select( state => state.rgb.config )
-    console.log( 'rgbConfig', rgbConfig )
     if( !rgbConfig || rgbConfig.mnemonic ==='' ) {
       const config = yield call( RGBServices.generateKeys )
       yield put( setRgbConfig( config ) )
@@ -228,16 +230,13 @@ function* credentialsAuthWorker( { payload } ) {
       if( isRgbInit ) yield put( syncRgb() )
 
     }
+    // yield put( autoSyncShells() ) // have to synchronize w/ connectToNode saga in order for this to work
 
     // check if the app has been upgraded
     const wallet: Wallet = yield select( state => state.storage.wallet )
     const storedVersion = wallet.version
     const currentVersion = DeviceInfo.getVersion()
     if( currentVersion !== storedVersion ) yield put( updateApplication( currentVersion, storedVersion ) )
-
-    // initialize configuration file
-    const { activePersonalNode } = yield select( state => state.nodeSettings )
-    if( activePersonalNode ) config.connectToPersonalNode( activePersonalNode )
   }
 }
 

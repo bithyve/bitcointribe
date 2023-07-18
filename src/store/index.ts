@@ -124,7 +124,7 @@ import {
   updateAvailableKeeperDataWatcher,
 } from './sagas/upgradeToNewBhr'
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
-import { connectToBitHyveNodeWatcher, restorePersonalNodeConfigurationWatcher, savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
+import { connectToBitHyveNodeWatcher, connectToNodeWatcher, restorePersonalNodeConfigurationWatcher, savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
 import { createMigrate, persistReducer, persistStore } from 'redux-persist'
 import {
   fetchNotificationsWatcher,
@@ -180,7 +180,7 @@ import rgbReducer from './reducers/rgb'
 
 const config = {
   key: 'root', // key is required
-  // version: 0, // redux persist migration version code(initiate to a version once the corresponding migration state is implemented)
+  version: 0, // redux persist migration version code(initiate to a version once the corresponding migration state is implemented)
   storage: AsyncStorage, // storage is now required
   blacklist: [ 'setupAndAuth', 'loaders', 'doNotStore' ],
   migrate: createMigrate( reduxPersistMigrations, {
@@ -228,6 +228,7 @@ const rootSaga = function* () {
     savePersonalNodeConfigurationWatcher,
     connectToBitHyveNodeWatcher,
     restorePersonalNodeConfigurationWatcher,
+    connectToNodeWatcher,
 
     // Notifications
     updateFCMTokensWatcher,
