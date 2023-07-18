@@ -23,19 +23,19 @@ import { useDispatch } from 'react-redux'
 import LinearGradient from 'react-native-linear-gradient'
 import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
 import NetworkKind from '../../common/data/enums/NetworkKind'
-import moment from 'moment'
 import ArrowRight from '../../assets/images/svgs/icon_arrow_right.svg'
 import IconSent from '../../assets/images/icons/icon_sent.svg'
 import RgbAccountDetailsCard from '../../components/rgbAccountDetail/RgbAccountDetailsCard'
+import RgbTransactionCard from '../../components/rgbAccountDetail/RgbTransactionCard'
 
 
 
 export default function CollectibleDetailScreen( props ) {
   const dispatch = useDispatch()
   const { translations } = useContext( LocalizationContext )
-  const accountStr = translations[ 'accounts' ] 
+  const accountStr = translations[ 'accounts' ]
   const [ loading, setLoading ] = useState( true )
-  const [ transactionData, setTransactionData ] = useState( ['1', '2' ] )
+  const [ transactionData, setTransactionData ] = useState( [ '1', '2' ] )
 
   const renderFooter = () => {
     return (
@@ -43,10 +43,10 @@ export default function CollectibleDetailScreen( props ) {
         <View style={styles.footerSection}>
           <SendAndReceiveButtonsFooter
             onSendPressed={() => {
-              props.navigation.navigate( 'RGBSend')
+              props.navigation.navigate( 'RGBSend' )
             }}
             onReceivePressed={() => {
-             
+
             }}
             averageTxFees={''}
             network={ NetworkKind.TESTNET}
@@ -56,31 +56,20 @@ export default function CollectibleDetailScreen( props ) {
       </View>
     )
   }
-  const onItemClick = ( item ) => {
+  const onItemClick = () => {
     props.navigation.navigate( 'AssetsDetailScreen' )
   }
   const renderItem = ( { item } ) => {
     return (
-      <TouchableOpacity style={styles.itemContainer} onPress={() => onItemClick( item )}>
-        <View style={styles.textContainer}>
-          <IconSent/>
-          <Text style={styles.itemDesc}>{
-            '02/02/23 - 08:00am'
-          // moment.unix( item.createdAt ).format( 'DD/MM/YY • hh:MMa' )
-          }</Text>
-        </View>
-        <View style={styles.currencyContainer}>
-          <Text
-            numberOfLines={1}
-            style={[ styles.amountText, {
-              color: item.kind === 'receive' ? 'green' : 'tomato'
-            } ]}
-          >{'34,000'}
-            {/* {item.amount} */}
-          </Text>
-          <ArrowRight />
-        </View>
-      </TouchableOpacity>
+      <RgbTransactionCard
+        title={'02/02/23 - 08:00am'}
+        ammount={'34,000'}
+        image={null}
+        onItemPress={()=>{
+          onItemClick()
+        }}
+        txType={'send'}
+      />
     )
   }
 
@@ -109,22 +98,22 @@ export default function CollectibleDetailScreen( props ) {
           </View>
         </TouchableOpacity>
       </View>
-      
+
       <View style={{
         flex: 1,
       }}>
-            <RgbAccountDetailsCard
-            currency={null}
-            assetId={null}
-            name={'Eye of the Beholder'}
-            ammount={'2,000,000'}
-            image={null}
-            description={'rud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'}
-            onViewDetailPress={()=>{}}
-            viewDetails={'View Details'}
-            labelBg={'#A29DD3'}
-            containerBg={'#B7B7B7'}
-              />
+        <RgbAccountDetailsCard
+          currency={null}
+          assetId={null}
+          name={'Eye of the Beholder'}
+          ammount={'2,000,000'}
+          image={null}
+          description={'rud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'}
+          onViewDetailPress={()=>{}}
+          viewDetails={'View Details'}
+          labelBg={'#A29DD3'}
+          containerBg={'#B7B7B7'}
+        />
 
         <View style={styles.viewMoreLinkRow}>
           <Text style={styles.headerDateText}>{accountStr.RecentTransactions}</Text>
@@ -137,10 +126,10 @@ export default function CollectibleDetailScreen( props ) {
               }} end={{
                 x: 1, y: 0
               }}
-              colors={[ 
-                Colors.skyBlue, 
+              colors={[
+                Colors.skyBlue,
                 Colors.skyBlue
-               ]}
+              ]}
               style={styles.viewMoreWrapper}
             >
               <Text style={styles.headerTouchableText}>
@@ -149,11 +138,11 @@ export default function CollectibleDetailScreen( props ) {
             </LinearGradient>
           </TouchableOpacity>
         </View>
-            <FlatList
-              data={transactionData}
-              renderItem={renderItem}
-              keyExtractor={( item, index ) => index.toString()}
-            />
+        <FlatList
+          data={transactionData}
+          renderItem={renderItem}
+          keyExtractor={( item, index ) => index.toString()}
+        />
         {renderFooter()}
       </View>
     </SafeAreaView>
@@ -191,13 +180,15 @@ const styles = StyleSheet.create( {
   },
   itemContainer: {
     marginHorizontal: 15,
-    paddingVertical: 10,
-    flexDirection: 'row'
+    paddingVertical: 15,
+    flexDirection: 'row',
+    borderBottomWidth: 0.5,
+    borderColor: Colors.gray1
   },
   textContainer: {
-    flex: 1, 
-    marginStart: 10, 
-    flexDirection: 'row', 
+    flex: 1,
+    marginStart: 10,
+    flexDirection: 'row',
     alignItems :'center'
   },
   itemDesc: {

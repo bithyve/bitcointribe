@@ -13,6 +13,7 @@ import { withNavigation } from 'react-navigation'
 import { translations } from '../../common/content/LocContext'
 import { hp } from '../../common/data/responsiveness/responsive'
 
+
 export type Props = {
   currency: string | null;
   assetId: string | null;
@@ -42,31 +43,41 @@ const RgbAccountDetailsCard: React.FC<Props> = ( {
   const common  = translations[ 'common' ]
 
   return(
-    <View style={[styles.bitcoinContainer, {backgroundColor: containerBg}]}>
+    <View style={[ styles.bitcoinContainer, {
+      backgroundColor: containerBg
+    } ]}>
       <View style={styles.btcTopContainer}>
-        <View style={[styles.labelContainer, {backgroundColor:labelBg}]}>
+        <View style={[ styles.labelContainer, {
+          backgroundColor:labelBg
+        } ]}>
           {
             currency ?
               <Text style={styles.labelText}>{currency}</Text>
-            : <Image style={styles.imageContainer} source={{uri: image}} />
+              : <Image style={styles.imageContainer} source={{
+                uri: image
+              }} />
           }
-          </View>
+        </View>
         {
           assetId ?
-          <View style={styles.assetContainer}>
-            <Text style={styles.assetIdTitle}>{'ASSET ID'}</Text>
-            <Text style={styles.assetIDText} numberOfLines={1}>{assetId}</Text>
-          </View>
-        :
-        <>
-          <View style={{flex:1}} />
-          <TouchableOpacity style={styles.viewDetailContainer} onPress={onViewDetailPress}>
-            <Text style={styles.viewDetailText}>{viewDetails}</Text>
-          </TouchableOpacity>
-        </>
-      }
+            <View style={styles.assetContainer}>
+              <Text style={styles.assetIdTitle}>{'ASSET ID'}</Text>
+              <Text style={styles.assetIDText} numberOfLines={1}>{assetId}</Text>
+            </View>
+            :
+            <>
+              <View style={{
+                flex:1
+              }} />
+              <TouchableOpacity style={styles.viewDetailContainer} onPress={onViewDetailPress}>
+                <Text style={styles.viewDetailText}>{viewDetails}</Text>
+              </TouchableOpacity>
+            </>
+        }
       </View>
-      <View style={{flex:1}}/>
+      <View style={{
+        flex:1
+      }}/>
       <Text style={styles.nameText}>{name}</Text>
       {
         description &&
@@ -86,7 +97,7 @@ const styles = StyleSheet.create( {
   rootContainer: {
     width: '100%',
     maxWidth: 440,
-    maxHeight: hp(250),
+    maxHeight: hp( 250 ),
     borderRadius: 15,
     elevation: 5,
     shadowOpacity: 0.62,
@@ -110,7 +121,7 @@ const styles = StyleSheet.create( {
     width: 48,
   },
   labelText:{
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     fontFamily: Fonts.SemiBold,
     color: Colors.backgroundColor1,
   },
@@ -119,56 +130,56 @@ const styles = StyleSheet.create( {
     flex:1
   },
   assetIdTitle:{
-    fontSize: RFValue(7),
+    fontSize: RFValue( 7 ),
     fontFamily: Fonts.SemiBold,
     color: Colors.backgroundColor1,
   },
   assetIDText:{
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.Regular,
     color: Colors.backgroundColor1,
     marginTop: 3
   },
   viewDetailContainer:{
-    padding:5, 
-    borderColor: Colors.white, 
-    borderWidth:1, 
+    padding:5,
+    borderColor: Colors.white,
+    borderWidth:1,
     borderRadius: 5
   },
   viewDetailText:{
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.Regular,
     color: Colors.backgroundColor1,
   },
   nameText:{
-    fontSize: RFValue(14),
+    fontSize: RFValue( 14 ),
     fontFamily: Fonts.Regular,
     color: Colors.backgroundColor1,
   },
   currencyText:{
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.SemiBold,
     color: Colors.backgroundColor1,
     marginBottom: 3,
     marginEnd: 5
   },
   labelOuterText:{
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.Regular,
     color: Colors.backgroundColor1,
     marginTop: 1
   },
   amountText:{
-    fontSize: RFValue(20),
+    fontSize: RFValue( 20 ),
     fontFamily: Fonts.Regular,
     color: Colors.backgroundColor1,
   },
   btcBottomContainer: {
-    flexDirection: 'row', 
+    flexDirection: 'row',
     alignItems: 'flex-end'
   },
   bitcoinContainer : {
-    height: 175, 
+    height: 175,
     marginHorizontal: 15,
     backgroundColor:'#A36363',
     borderRadius: 15,
@@ -178,7 +189,7 @@ const styles = StyleSheet.create( {
   btcTopContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    alignItems: 'center', 
+    alignItems: 'center',
     paddingHorizontal: 3,
   }
 } )
