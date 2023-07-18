@@ -7,39 +7,54 @@ import {
   StatusBar,
   Text,
   ActivityIndicator,
-  ScrollView
+  ScrollView,
+  Image
 } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
 import CommonStyles from '../../common/Styles/Styles'
 import { RFValue } from 'react-native-responsive-fontsize'
-import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import RGBServices from '../../services/RGBServices'
 import moment from 'moment'
 import HeaderTitle from '../../components/HeaderTitle'
-import ListStyles from '../../common/Styles/ListStyles'
+import Fonts from '../../common/Fonts'
 
 const styles = StyleSheet.create( {
   lineItem: {
-    marginBottom: RFValue( 16 ),
-    backgroundColor: 'white',
-    padding: 10,
+    marginBottom: RFValue( 2 ),
+    padding: 2,
     paddingHorizontal: 10,
-    elevation: 4,
-    borderRadius: 8,
+    flexDirection: 'row'
   },
+  textTitle: {
+    flex: 2.5,
+    fontSize: RFValue( 13 ),
+    color: '#6C7074',
+    fontFamily: Fonts.Medium
+  },
+  title: {
+    fontSize: RFValue( 15 ),
+    color: '#A36363',
+    fontFamily: Fonts.Medium,
+    marginVertical: 10
+  },
+  textValue: {
+    flex: 4,
+    fontSize: RFValue( 14 ),
+    color: '#2C3E50',
+    fontFamily: Fonts.Regular
+  }
 } )
 
 export const DetailsItem = ( { name, value } ) => {
   return(
     <View style={styles.lineItem}>
-      <Text style={ListStyles.listItemTitleTransaction}>{name}</Text>
+      <Text style={styles.textTitle}>{name}</Text>
       <Text
         selectable
-        style={{
-          ...ListStyles.listItemSubtitle,
-          marginBottom: 3,
-        }}
+        numberOfLines={1}
+        ellipsizeMode="middle"
+        style={styles.textValue}
       >
         {value}
       </Text>
@@ -50,9 +65,6 @@ export const DetailsItem = ( { name, value } ) => {
 const AssetMetaData = ( props ) => {
   const [ loading, setLoading ] = useState( true )
   const asset = props.navigation.getParam( 'asset' )
-  const accountShell = props.navigation.getParam( 'accountShell' )
-  const account = useAccountByAccountShell( accountShell )
-  const { rgbConfig } = account
   const [ metaData, setMetaData ] = useState( {
   } )
 
@@ -62,7 +74,7 @@ const AssetMetaData = ( props ) => {
 
   const getMetaData = async () => {
     try {
-      const data = await RGBServices.getRgbAssetMetaData( rgbConfig.mnemonic, rgbConfig.xpub, asset.assetId )
+      const data = await RGBServices.getRgbAssetMetaData( asset.assetId )
       if ( data ) {
         setMetaData( data )
         setLoading( false )
@@ -99,8 +111,8 @@ const AssetMetaData = ( props ) => {
         </TouchableOpacity>
       </View>
       <HeaderTitle
-        firstLineTitle={asset.name}
-        secondLineTitle={asset.ticker}
+        firstLineTitle={'Asset Details'}
+        secondLineTitle={asset.name}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}
@@ -114,7 +126,23 @@ const AssetMetaData = ( props ) => {
           <ScrollView contentContainerStyle={{
             padding: 20
           }}>
+            {
+              asset.dataPaths && (
+                <View>
+                  <Image
+                    style={{
+                      height: '100%'
+                    }}
+                    resizeMode="contain"
+                    source={{
+                      uri: asset.dataPaths[ 0 ].filePath
+                    }}
+                  />
 
+                </View>
+              )
+            }
+            <Text style={styles.title}>Asset Meta Data</Text>
             <DetailsItem
               name="Asset ID"
               value={metaData.assetId}
@@ -122,7 +150,7 @@ const AssetMetaData = ( props ) => {
 
             <DetailsItem
               name="Issued Supply"
-              value={metaData.issuedSupply}
+              value={metaData.issuedSupply.toLocaleString()}
             />
 
             <DetailsItem

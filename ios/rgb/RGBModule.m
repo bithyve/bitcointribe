@@ -39,6 +39,18 @@ RCT_EXPORT_METHOD(getAddress:(NSString*)mnemonic
    ];
 }
 
+RCT_EXPORT_METHOD(initiate:(NSString*)network
+                  mnemonic:(NSString *)mnemonic
+                  pubKey:(NSString *)pubKey
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+  RGBHelper *helper = [[RGBHelper alloc]init];
+  [helper initiateWithBtcNetwotk:network mnemonic:mnemonic pubkey:pubKey callback:^(NSString * _Nonnull response) {
+    resolve(response);
+  }
+   ];
+}
+
 RCT_EXPORT_METHOD(sync:(NSString*)mnemonic
                   network:(NSString *)network
                   resolver:(RCTPromiseResolveBlock)resolve
@@ -72,19 +84,6 @@ RCT_EXPORT_METHOD(getTransactions:(NSString*)mnemonic
    ];
 }
 
-RCT_EXPORT_METHOD(receiveAsset:(NSString*)mnemonic
-                  pubKey:(NSString *)pubKey
-                  network:(NSString *)network
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject){
-  RGBHelper *helper = [[RGBHelper alloc]init];
-  [
-    helper receiveAssetWithBtcNetwotk:network mnemonic:mnemonic pubkey:pubKey callback:^(NSString * _Nonnull response) {
-      resolve(response);
-    }
-   ];
-}
-
 RCT_EXPORT_METHOD(syncRgbAsset:(NSString*)mnemonic
                   pubKey:(NSString *)pubKey
                   network:(NSString *)network
@@ -92,37 +91,44 @@ RCT_EXPORT_METHOD(syncRgbAsset:(NSString*)mnemonic
                   rejecter:(RCTPromiseRejectBlock)reject){
   RGBHelper *helper = [[RGBHelper alloc]init];
   [
-    helper syncRgbWithBtcNetwotk:network mnemonic:mnemonic pubkey:pubKey callback:^(NSString * _Nonnull response) {
+    helper syncRgbWithCallback:^(NSString * _Nonnull response) {
       resolve(response);
     }
    ];
 }
 
-RCT_EXPORT_METHOD(getRgbAssetMetaData:(NSString*)mnemonic
-                  pubKey:(NSString *)pubKey
-                  assetId:(NSString *)assetId
+RCT_EXPORT_METHOD(receiveAsset:(NSString*)mnemonic
                   network:(NSString *)network
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject){
   RGBHelper *helper = [[RGBHelper alloc]init];
   [
-    helper getRgbAssetMetaDataWithBtcNetwotk:network mnemonic:mnemonic pubkey:pubKey assetId:assetId callback:^(NSString * _Nonnull response) {
+    helper receiveAssetWithBtcNetwotk:network mnemonic:mnemonic callback:^(NSString * _Nonnull response) {
       resolve(response);
     }
    ];
 }
 
-RCT_EXPORT_METHOD(getRgbAssetTransactions:(NSString*)mnemonic
-                  pubKey:(NSString *)pubKey
-                  assetId:(NSString *)assetId
-                  network:(NSString *)network
+
+RCT_EXPORT_METHOD(getRgbAssetMetaData:(NSString*)assetId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject){
   RGBHelper *helper = [[RGBHelper alloc]init];
   [
-    helper getRgbAssetTransactionsWithBtcNetwotk:network mnemonic:mnemonic pubkey:pubKey assetId:assetId callback:^(NSString * _Nonnull response) {
+    helper getRgbAssetMetaDataWithAssetId:assetId callback:^(NSString * _Nonnull response) {
       resolve(response);
     }
+   ];
+}
+
+
+RCT_EXPORT_METHOD(getRgbAssetTransactions:(NSString*)assetId
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+  RGBHelper *helper = [[RGBHelper alloc]init];
+  [helper getRgbAssetTransactionsWithAssetId:assetId callback:^(NSString * _Nonnull response) {
+    resolve(response);
+  }
    ];
 }
 
@@ -140,5 +146,30 @@ RCT_EXPORT_METHOD(sendBtc:(NSString*)mnemonic
    ];
 }
 
+RCT_EXPORT_METHOD(issueRgb20Asset:(NSString*)ticker
+                  name:(NSString *)name
+                  supply:(NSString *)supply
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+  RGBHelper *helper = [[RGBHelper alloc]init];
+
+  [helper issueRgb20AssetWithTicker:ticker name:name supply:supply callback:^(NSString * _Nonnull response) {
+    resolve(response);
+  }];
+}
+
+RCT_EXPORT_METHOD(issueRgb121Asset:(NSString*)description
+                  name:(NSString *)name
+                  supply:(NSString *)supply
+                  filePath:(NSString *)filePath
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+  RGBHelper *helper = [[RGBHelper alloc]init];
+  
+  [helper issueRgb121AssetWithName:name description:description supply:supply filePath:filePath callback:^(NSString * _Nonnull response) {
+    resolve(response);
+  }
+   ];
+}
 
 @end

@@ -26,56 +26,63 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 
 import QRCode from '../../components/QRCode'
 import CopyThisText from '../../components/CopyThisText'
-import AccountShell from '../../common/data/models/AccountShell'
 import { translations } from '../../common/content/LocContext'
-import { getAccountTitleByShell } from '../Accounts/Send/utils'
 import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
-import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import { useDispatch } from 'react-redux'
-import { receiveRgbAsset } from '../../store/actions/accounts'
-import RGBServices from '../../services/RGBServices'
+import { useDispatch, useSelector } from 'react-redux'
 import Toast from '../../components/Toast'
+import { receiveRgbAsset } from '../../store/actions/rgb'
 
 export default function RGBReceive( props ) {
   const strings = translations[ 'accounts' ]
   const common = translations[ 'common' ]
-  const accountShell: AccountShell = props.navigation.getParam( 'accountShell' )
   const assetType: RGB_ASSET_TYPE = props.navigation.getParam( 'assetType' ) || RGB_ASSET_TYPE.BITCOIN
   const dispatch = useDispatch()
   const [ receivingAddress, setReceivingAddress ] = useState( null )
   const [ paymentURI, setPaymentURI ] = useState( null )
-  const account = useAccountByAccountShell( accountShell )
-  const { rgbConfig } = account
-  const [ loading, setLoading ] = useState( false )
+  const { nextFreeAddress } = useSelector( state => state.rgb )
+  const { loading, isError, message, data } = useSelector( state => state.rgb.receiveAssets )
+  const [ requesting, setRequesting ] = useState( false )
 
   useEffect( () => {
-    if( assetType == RGB_ASSET_TYPE.BITCOIN ) {
-      setReceivingAddress( account?.rgb?.nextUnusedAddress )
+    if ( assetType == RGB_ASSET_TYPE.BITCOIN ) {
+      setReceivingAddress( nextFreeAddress )
     } else {
-      // dispatch( receiveRgbAsset( {
-      //   accountShell
-      // } ) )
-
-      getInvoice()
+      if ( data ) {
+        if ( data.expirationTimestamp ) {
+          const now = Date.now() / 1000
+          const exp = Number( data.expirationTimestamp )
+          if ( exp - now > 100 ) {
+            setReceivingAddress( data.invoice )
+            setRequesting( false )
+          } else {
+            dispatch( receiveRgbAsset() )
+          }
+        } else {
+          dispatch( receiveRgbAsset() )
+        }
+      } else {
+        dispatch( receiveRgbAsset() )
+      }
     }
   }, [] )
 
-
-  const getInvoice = async () =>{
-    try {
-      setLoading( true )
-      const invoiceData = await RGBServices.receiveAsset( rgbConfig.mnemonic, rgbConfig.xpub )
-      if( invoiceData.error ) {
-        Toast( invoiceData.error )
-        props.navigation.goBack()
-      } else {
-        setReceivingAddress( invoiceData.invoice )
+  useEffect( () => {
+    if ( assetType == RGB_ASSET_TYPE.RGB20 ) {
+      if ( loading ) {
+        setRequesting( true )
       }
-      setLoading( false )
-    } catch ( error ) {
-      console.log( error )
+      if ( !loading && isError ) {
+        Toast( message )
+        props.navigation.goBack()
+      }
+      if ( !loading && !isError ) {
+        setReceivingAddress( data.invoice )
+        setRequesting( false )
+      }
+
     }
-  }
+  }, [ isError, loading ] )
+
 
 
   return (
@@ -86,7 +93,7 @@ export default function RGBReceive( props ) {
         flex: 0
       }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <TouchableWithoutFeedback onPress={() => {}}>
+      <TouchableWithoutFeedback onPress={() => { }}>
         <KeyboardAvoidingView
           style={{
             flex: 1
@@ -114,12 +121,12 @@ export default function RGBReceive( props ) {
             <Text style={styles.headerTitleText}>Receive</Text>
 
             {
-              loading ? <ActivityIndicator style={{
+              requesting ? <ActivityIndicator style={{
                 height: '70%'
-              }} size="large" />:
+              }} size="large" /> :
                 <ScrollView>
                   <View style={styles.QRView}>
-                    <QRCode title={assetType === RGB_ASSET_TYPE.BITCOIN ? 'Bitcoin address': 'Invoice'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp( '27%' )} />
+                    <QRCode title={assetType === RGB_ASSET_TYPE.BITCOIN ? 'Bitcoin address' : 'Invoice'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp( '27%' )} />
                   </View>
 
                   <CopyThisText

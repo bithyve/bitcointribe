@@ -26,7 +26,7 @@ import { initializeHealthSetup, updateWalletImageHealth, resetLevelsAfterPasswor
 import { updateCloudBackupWorker } from '../sagas/cloud'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { AccountType, ContactInfo, LevelData, KeeperInfoInterface, MetaShare, Trusted_Contacts, UnecryptedStreamData, Wallet, WalletDB } from '../../bitcoin/utilities/Interface'
+import { AccountType, ContactInfo, LevelData, KeeperInfoInterface, MetaShare, Trusted_Contacts, UnecryptedStreamData, Wallet, WalletDB, RGBConfig } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
@@ -37,6 +37,8 @@ import semverLte from 'semver/functions/lte'
 import { applyUpgradeSequence } from './upgrades'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import ElectrumClient from '../../bitcoin/electrum/client'
+import RGBServices from '../../services/RGBServices'
+import { setRgbConfig, syncRgb } from '../actions/rgb'
 
 
 function* setupWalletWorker( { payload } ) {
@@ -106,6 +108,11 @@ function* setupWalletWorker( { payload } ) {
   yield put( newAccountShellCreationCompleted() )
   if( security ) yield put( initializeHealthSetup() )  // initialize health-check schema on relay
   yield put( completedWalletSetup( ) )
+  const config = yield call( RGBServices.generateKeys )
+  yield put( setRgbConfig( config ) )
+  const isRgbInit = yield call( RGBServices.initiate, config.mnemonic, config.xpub  )
+  if( isRgbInit ) yield put( syncRgb() )
+  console.log( 'isRgbInit', isRgbInit )
 }
 
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
@@ -183,6 +190,8 @@ function* resetPasswordWorker( { payload } ) {
 
 function* credentialsAuthWorker( { payload } ) {
   // let t = timer('credentialsAuthWorker')
+  console.log( 'credentialsAuthWorker', )
+
   yield put( switchSetupLoader( 'authenticating' ) )
   let key
   try {
@@ -207,7 +216,18 @@ function* credentialsAuthWorker( { payload } ) {
     // t.stop()
     yield put( keyFetched( key ) )
     yield put( autoSyncShells() )
+    const rgbConfig: RGBConfig = yield select( state => state.rgb.config )
+    console.log( 'rgbConfig', rgbConfig )
+    if( !rgbConfig || rgbConfig.mnemonic ==='' ) {
+      const config = yield call( RGBServices.generateKeys )
+      yield put( setRgbConfig( config ) )
+      const isRgbInit = yield call( RGBServices.initiate, rgbConfig.mnemonic, rgbConfig.xpub  )
+      if( isRgbInit ) yield put( syncRgb() )
+    } else {
+      const isRgbInit = yield call( RGBServices.initiate, rgbConfig.mnemonic, rgbConfig.xpub  )
+      if( isRgbInit ) yield put( syncRgb() )
 
+    }
 
     // check if the app has been upgraded
     const wallet: Wallet = yield select( state => state.storage.wallet )

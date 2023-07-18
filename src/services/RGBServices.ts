@@ -20,6 +20,20 @@ export default class RGBServices{
     return address
   }
 
+  static initiate = async ( mnemonic: string, pubKey: string ): Promise<string> => {
+    try {
+      const data = await RGB.initiate(
+        NETWORK,
+        mnemonic,
+        pubKey,
+      )
+      console.log( 'initiate', data )
+      return JSON.parse( data )
+    } catch ( error ) {
+      return `${error}`
+    }
+  }
+
   static getBalance = async ( mnemonic: string ): Promise<string> => {
     const balance = await RGB.getBalance(
       mnemonic,
@@ -63,11 +77,10 @@ export default class RGBServices{
     return txid
   }
 
-  static receiveAsset = async ( mnemonic: string, pubKey: string ): Promise<string> => {
+  static receiveAsset = async ( mnemonic: string ): Promise<string> => {
     try {
       const data = await RGB.receiveAsset(
         mnemonic,
-        pubKey,
         NETWORK
       )
       return JSON.parse( data )
@@ -76,23 +89,32 @@ export default class RGBServices{
     }
   }
 
-  static getRgbAssetMetaData = async ( mnemonic: string, pubKey: string, assetId: string ): Promise<{}> => {
+  static getRgbAssetMetaData = async ( assetId: string ): Promise<{}> => {
     const data = await RGB.getRgbAssetMetaData(
-      mnemonic,
-      pubKey,
       assetId,
-      NETWORK
     )
     return JSON.parse( data )
   }
 
-  static getRgbAssetTransactions = async ( mnemonic: string, pubKey: string, assetId: string ): Promise<{}> => {
+  static getRgbAssetTransactions = async ( assetId: string ): Promise<{}> => {
     const data = await RGB.getRgbAssetTransactions(
-      mnemonic,
-      pubKey,
       assetId,
-      NETWORK
     )
+    return JSON.parse( data )
+  }
+
+  static issueRgb20Asset = async ( ticker: string, name: string, supply: string ): Promise<{}> => {
+    const data = await RGB.issueRgb20Asset(
+      ticker, name, supply
+    )
+    return JSON.parse( data )
+  }
+
+  static issueRgb121Asset = async ( name: string, description: string, supply: string, filePath: string ): Promise<{}> => {
+    const data = await RGB.issueRgb121Asset(
+      description, name, supply, filePath
+    )
+    console.log( data )
     return JSON.parse( data )
   }
 }

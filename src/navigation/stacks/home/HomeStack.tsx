@@ -35,6 +35,7 @@ import NewRGBWallet from '../../../pages/rgb/NewRGBWallet'
 import RGBWalletDetail from '../../../pages/rgb/RGBWalletDetail'
 import RGBReceive from '../../../pages/rgb/RGBReceive'
 import RGBTxDetail from '../../../pages/rgb/RGBTxDetail'
+import RGB121TxDetail from '../../../pages/rgb/RGB121TxDetail'
 import ScanNodeConfig from '../../../pages/lightningAccount/ScanNodeConfigScreen'
 import RestoreWithICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import RestoreWithoutICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithoutICloud'
@@ -151,6 +152,12 @@ const HomeStack = createStackNavigator(
     },
     IssueScreen: {
       screen: IssueScreen,
+      navigationOptions: {
+        header: null
+      }
+    },
+    RGB121TxDetail: {
+      screen: RGB121TxDetail,
       navigationOptions: {
         header: null
       }

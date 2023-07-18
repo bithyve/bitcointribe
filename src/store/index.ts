@@ -76,7 +76,6 @@ import {
   updateAccountSettingsWatcher,
   updateDonationPreferencesWatcher,
   validateTwoFAWatcher,
-  starReceivingRgbAssetsWatcher
 } from './sagas/accounts'
 import {
   accountSyncWatcher,
@@ -136,6 +135,10 @@ import {
   updateMessageStatusWatcher
 } from './sagas/notifications'
 import { recreateMissingAccountsWatcher, sweepMissingAccountsWatcher, syncMissingAccountsWatcher } from './sagas/upgrades'
+import {
+  rgbSyncWatcher,
+  receiveRgbAssetWatcher
+} from './sagas/rgb'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import VersionHistoryReducer from './reducers/versionHistory'
@@ -173,6 +176,7 @@ import wyreIntegrationReducer from './reducers/WyreIntegration'
 import { satCardAcountWatcher } from './sagas/satCardAccount'
 import misc from './reducers/misc'
 import doNotStoreReducer from './reducers/doNotStore'
+import rgbReducer from './reducers/rgb'
 
 const config = {
   key: 'root', // key is required
@@ -214,8 +218,6 @@ const rootSaga = function* () {
     createSmNResetTFAOrXPrivWatcher,
     updateAccountSettingsWatcher,
     generateGiftsWatcher,
-    starReceivingRgbAssetsWatcher,
-
     //fBTC
     accountSyncWatcher,
     getQuoteWatcher,
@@ -347,7 +349,10 @@ const rootSaga = function* () {
     sweepMissingAccountsWatcher,
 
     // sat card account
-    satCardAcountWatcher
+    satCardAcountWatcher,
+    // rgb
+    rgbSyncWatcher,
+    receiveRgbAssetWatcher
   ]
 
   yield all(
@@ -386,7 +391,8 @@ const rootReducer = combineReducers( {
   upgradeToNewBhr: upgradeToNewBhr,
   upgrades: upgrades,
   misc: misc,
-  doNotStore: doNotStoreReducer
+  doNotStore: doNotStoreReducer,
+  rgb: rgbReducer,
 } )
 
 export default function makeStore() {
