@@ -56,6 +56,7 @@ const PersonalNodeSettingsHeader: React.FC<Props> = ( {
         </ListItem.Content>
 
         <Switch
+          testID='ConnectToMyNodeSwitch'
           value={isConnectionEnabled}
           onValueChange={onToggle}
           thumbColor={isConnectionEnabled ? Colors.white : Colors.white}

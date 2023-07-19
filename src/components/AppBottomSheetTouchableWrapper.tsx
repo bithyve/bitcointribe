@@ -11,7 +11,7 @@ import React, { ReactNode } from 'react'
  * `@gorhom/bottom-sheet` across the app.
  */
 export const AppBottomSheetTouchableWrapper = (
-  props: { children: ReactNode } & Pick<TouchableOpacityProps, 'onPress' | 'style' | 'activeOpacity' | 'disabled' | 'hitSlop' | 'delayPressIn'>,
+  props: { children: ReactNode } & Pick<TouchableOpacityProps, 'onPress' | 'testID' | 'style' | 'activeOpacity' | 'disabled' | 'hitSlop' | 'delayPressIn'>,
 ) =>
   Platform.select( {
     android: <TouchableOpacity {...props} />,

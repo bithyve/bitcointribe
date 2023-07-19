@@ -425,6 +425,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             // )}
             renderItem={( { item: menuOption }: { item: MenuOption } ) => {
               return <AppBottomSheetTouchableWrapper
+                testID='SettingsButton'
                 onPress={() => handleOptionSelection( menuOption )}
                 style={[ styles.addModalView,
                   ( ( levelData[ 0 ].keeper1.status == 'notSetup' ||
@@ -493,7 +494,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               </AppBottomSheetTouchableWrapper>
             }}
           />
-          <TouchableOpacity
+          <TouchableOpacity testID='faqButton'
             onPress={() => {
               Linking.openURL( 'https://bitcointribe.app/faq/' )
                 .then( ( _data ) => { } )
@@ -525,7 +526,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               }}
             />
           </TouchableOpacity>
-          <TouchableOpacity
+          <TouchableOpacity testID='btTelegram'
             onPress={() => {
               Linking.openURL( 'https://t.me/bitcoinTribe_' )
                 .then( ( _data ) => { } )

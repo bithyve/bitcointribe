@@ -1,0 +1,100 @@
+# settings.yaml
+
+appId: io.hexawallet.hexa.development
+---
+- runFlow: "login.yaml"
+- tapOn: Setting, tab, 4 of 4
+
+# ------------ Wallet Backup --------------
+
+- tapOn:
+    id: SettingsButton
+    index: 0
+- tapOn:
+    point: "24%,87%"
+- tapOn: 01 ********
+- tapOn: 02 ********
+- tapOn: 03 ********
+- tapOn: 04 ********
+- tapOn: Back
+- tapOn:
+    point: 7%,11%
+
+# ------------ Account Management --------------
+
+- tapOn:
+    id: SettingsButton
+    index: 1
+- tapOn:
+    point: "7%,11%"
+
+# ------------ Node Settings --------------
+
+- tapOn:
+    id: SettingsButton
+    index: 2
+- tapOn:
+    id: SetupPersonalNodeAddButton
+- tapOn:
+    id: RNE__Input__text-input
+    index: 0
+- inputText: "Sample Node Address"
+- tapOn:
+    id: RNE__Input__text-input
+    index: 1
+- inputText: "Sample Port Number"
+- tapOn:
+    id: UseSSLNodeSwitch
+- tapOn:
+    id: CloseSetupPersonalNodeButton
+- extendedWaitUntil:
+    visible:
+      id: SetupPersonalNodeAddButton # or any other selector
+    timeout: 400000      # Timeout in milliseconds
+- tapOn: 
+
+# ------------ Wallet Settings --------------
+
+- tapOn:
+    id: SettingsButton
+    index: 3
+- tapOn:
+    id: WalletSettingsOptions
+    index: 1
+- tapOn: $ USD 
+- tapOn: ₹ INR
+- tapOn: 
+- tapOn:
+    id: WalletSettingsOptions
+    index: 0
+- tapOn: "1"
+- tapOn: "2"
+- tapOn: "3"
+- tapOn: "4"
+- tapOn: Proceed
+- tapOn: "1"
+- tapOn: "2"
+- tapOn: "3"
+- tapOn: "4"
+- tapOn: "1"
+- tapOn: "2"
+- tapOn: "3"
+- tapOn: "4"
+- tapOn: Proceed
+- tapOn: View Settings
+
+# ------------ App Info --------------
+
+- tapOn:
+    id: SettingsButton
+    index: 4
+- tapOn: 
+
+# # ------------ FAQ --------------
+# - tapOn:
+#     id: faqButton
+
+# # ------------ TG Group --------------
+
+# - tapOn:
+#     id: btTelegram
