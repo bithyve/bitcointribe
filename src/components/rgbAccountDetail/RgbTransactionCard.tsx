@@ -14,6 +14,8 @@ import { translations } from '../../common/content/LocContext'
 import { hp, wp } from '../../common/data/responsiveness/responsive'
 import ArrowRight from '../../assets/images/svgs/icon_arrow_right.svg'
 import IconSent from '../../assets/images/icons/icon_sent.svg'
+import IconReceive from '../../assets/images/icons/icon_recieve.svg'
+
 
 export type Props = {
   title: string | null;
@@ -36,7 +38,7 @@ const RgbTransactionCard: React.FC<Props> = ( {
   return(
     <TouchableOpacity style={styles.itemContainer} onPress={onItemPress}>
       <View style={styles.textContainer}>
-        {txType === 'receive' ? <IconSent/> : <IconSent/> }
+        {txType === 'receive' ? <IconReceive/> : <IconSent/> }
         <Text style={styles.itemDesc}>{title}</Text>
       </View>
       <View style={styles.currencyContainer}>
