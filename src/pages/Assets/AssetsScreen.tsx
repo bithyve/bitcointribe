@@ -149,7 +149,9 @@ export default function AssetsScreen( props ) {
   const renderBottomSheetContent = () => {
     return (
       <>
-        <BottomSheetCoinsHeader title={'Add ' + ( selectedTab == 0 ? 'Collectibles' : 'Coins' )} onPress={closeBottomSheet} />
+        <BottomSheetCoinsHeader title={'Add Assets'
+          // 'Add ' + ( selectedTab == 0 ? 'Collectibles' : 'Coins' )
+        } onPress={closeBottomSheet} />
         {/* <Text numberOfLines={2} style={styles.descText}>{'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'}</Text> */}
 
         <BottomSheetAddWalletInfo
@@ -168,7 +170,9 @@ export default function AssetsScreen( props ) {
             } )
           }}
           title1='Issue'
+          subtitle1={'Issue new coins or collectibles on RGB. Set limit and send it around your tribe'}
           title2='Recieve'
+          subtitle2={'You can also add an asset to your Tribe wallet by receiving it from someone'}
         />
       </>
     )

@@ -91,6 +91,11 @@
             "heading": "Tribe agora suportado pelo Keeper",
             "text": "Crie uma nova carteira ou faça backup de uma já existente com o Bitcoin Keeper",
             "subText": ""
+        },
+        {
+            "heading": "Apresentando ativos RGB",
+            "text": "Agora emita, receba, envie e sincronize ativos com sua tribo",
+            "subText": ""
         }
       ],
       "Hello": "Olá!",

@@ -109,7 +109,12 @@
       "heading": "Tribe now supported by Keeper",
       "text": "Create a new wallet or backup an existing one with Bitcoin Keeper",
       "subText": ""
-  }
+  },
+  {
+    "heading": "Introducing RGB assets",
+    "text": "Now Issue, receive, send and sync assets with your tribe",
+    "subText": ""
+}
     ],
     "Hello": "Hello!",
     "create": "Create a login",

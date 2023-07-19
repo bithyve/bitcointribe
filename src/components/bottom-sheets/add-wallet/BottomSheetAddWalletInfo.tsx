@@ -23,9 +23,11 @@ type Props = {
   onLighteningWalletClick: ()=>any;
   title1: string;
 title2:string;
+subtitle1:string;
+subtitle2: string
 }
 
-const BottomSheetAddWalletInfo: React.FC<Props> = ( { onRGBWalletClick, onLighteningWalletClick, title1, title2 }: Props ) => {
+const BottomSheetAddWalletInfo: React.FC<Props> = ( { onRGBWalletClick, onLighteningWalletClick, title1, title2, subtitle1, subtitle2 }: Props ) => {
   const dispatch = useDispatch()
   const common  = translations[ 'common' ]
   const strings  = translations[ 'accounts' ]
@@ -61,8 +63,8 @@ const BottomSheetAddWalletInfo: React.FC<Props> = ( { onRGBWalletClick, onLighte
   return ( <View style={{
     ...styles.modalContentContainer
   }}>
-    {renderWallet( onRGBWalletClick, title1, 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry' )}
-    {renderWallet( onLighteningWalletClick, title2, 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry' )}
+    {renderWallet( onRGBWalletClick, title1, subtitle1 )}
+    {renderWallet( onLighteningWalletClick, title2, subtitle2 )}
   </View>
   )
 }

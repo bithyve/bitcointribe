@@ -104,7 +104,7 @@ export default function IssueScreen( props ) {
         </TouchableOpacity>
       </View>
       <Text style={styles.headerTitleText}>{'Issue ' + issueType}</Text>
-      <Text style={styles.headerSubTitleText}>{'Lorem ipsum dolor sit amet, consec tetur'}</Text>
+      <Text style={styles.headerSubTitleText}>{'Issue new coins or collectibles on RGB. Set limit and send it around your tribe'}</Text>
 
       <View style={styles.bodySection}>
         <Input

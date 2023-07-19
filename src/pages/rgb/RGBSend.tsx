@@ -23,12 +23,12 @@ export default function RGBSend ( props ) {
   const [ payTo, setPayTo ] = useState( '' )
   const [ amount, setamount ] = useState( '' )
   const [ fee, setfee ] = useState( '' )
-  
+
   function SendButtonClick() {
 
   }
   return (
-<View style={{
+    <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
       <SafeAreaView style={{
@@ -36,31 +36,34 @@ export default function RGBSend ( props ) {
       }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={CommonStyles.headerContainer}>
-              <TouchableOpacity
-                style={CommonStyles.headerLeftIconContainer}
-                onPress={() => {
-                  props.navigation.goBack()
-                }}
-              >
-                <View style={CommonStyles.headerLeftIconInnerContainer}>
-                  <FontAwesome
-                    name="long-arrow-left"
-                    color={Colors.homepageButtonColor}
-                    size={17}
-                  />
-                </View>
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.headerTitleText}>{common.send}</Text>
-            <Text style={styles.headerSubTitleText}>{'Lorem ipsum dolor sit amet, consec tetur'}</Text>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.headerTitleText}>{common.send}</Text>
+      <Text style={styles.headerSubTitleText}>{'You can also add an asset to your Tribe wallet by receiving it from someone'}</Text>
 
-      <View style={[ListStyles.infoHeaderSection, {height: '20%',flexDirection: 'row'
-            }]}>
-      <Text style={[styles.infoHeaderText, {color: Colors.THEAM_INFO_TEXT_COLOR, paddingTop: 15}]}>{'Sending From:'}</Text>
+      <View style={[ ListStyles.infoHeaderSection, {
+        height: '20%', flexDirection: 'row'
+      } ]}>
+        <Text style={[ styles.infoHeaderText, {
+          color: Colors.THEAM_INFO_TEXT_COLOR, paddingTop: 15
+        } ]}>{'Sending From:'}</Text>
         <View style={{
-            height: '20%',
-            justifyContent: 'space-between',
-            paddingHorizontal:hp(4),
+          height: '20%',
+          justifyContent: 'space-between',
+          paddingHorizontal:hp( 4 ),
         }}>
           <Text style={ListStyles.infoHeaderTitleText}>{'Savings Account'}</Text>
           <Text numberOfLines={2} style={styles.infoHeaderText}>{'Available to spend 5,000 sats'}</Text>
@@ -101,7 +104,7 @@ export default function RGBSend ( props ) {
           keyboardType="number-pad"
           numberOfLines={1}
         />
-         <Input
+        <Input
           inputContainerStyle={[
             FormStyles.textInputContainer,
             styles.textInputContainer,
@@ -117,21 +120,21 @@ export default function RGBSend ( props ) {
           keyboardType="number-pad"
           numberOfLines={1}
         />
-         <View style={styles.footerSection}>
-        <TouchableOpacity onPress={SendButtonClick}>
-          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-            start={{
-              x: 0, y: 0
-            }} end={{
-              x: 1, y: 0
-            }}
-            locations={[ 0.2, 1 ]}
-            style={styles.sendBtnWrapper}
-          >
-            <Text style={styles.sendBtnText}>{common.send}</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.footerSection}>
+          <TouchableOpacity onPress={SendButtonClick}>
+            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+              start={{
+                x: 0, y: 0
+              }} end={{
+                x: 1, y: 0
+              }}
+              locations={[ 0.2, 1 ]}
+              style={styles.sendBtnWrapper}
+            >
+              <Text style={styles.sendBtnText}>{common.send}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   )
@@ -182,5 +185,5 @@ const styles = StyleSheet.create( {
     color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
     fontFamily: Fonts.Regular,
   },
-  
+
 } )

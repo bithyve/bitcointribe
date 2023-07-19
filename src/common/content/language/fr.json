@@ -91,6 +91,11 @@
             "heading": "La Tribe est désormais prise en charge par Keeper",
             "text": "Créez un nouveau portefeuille ou sauvegardez-en un existant avec Bitcoin Keeper",
             "subText": ""
+        },
+        {
+            "heading": "Présentation des ressources RGB",
+            "text": "Maintenant, émettez, recevez, envoyez et synchronisez des actifs avec votre tribu",
+            "subText": ""
         }
       ],
       "Hello": "Bonjour !",
