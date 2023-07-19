@@ -805,7 +805,7 @@ const styles = StyleSheet.create( {
   },
   proceedButtonText: {
     color: Colors.blue,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.Medium
   },
   modalContentContainer: {
@@ -840,11 +840,12 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontFamily: Fonts.Medium,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 12 ),
+    paddingHorizontal:5
   },
   bottomButtonView: {
     height: hp( '6%' ),
-    width: wp( '40%' ),
+    width: wp( '43%' ),
     backgroundColor: Colors.blue,
     borderRadius: 10,
     justifyContent: 'center',

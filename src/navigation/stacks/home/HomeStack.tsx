@@ -75,6 +75,7 @@ import AssetTransferDetails from '../../../pages/rgb/AssetTransferDetails'
 import RGBSend from '../../../pages/rgb/RGBSend'
 import IssueScreen from '../../../pages/rgb/IssueScreen'
 import AssetsDetailScreen from '../../../pages/Assets/AssetsDetailScreen'
+import CollectibleDetailScreen from '../../../pages/rgb/CollectibleDetailScreen'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -182,6 +183,12 @@ const HomeStack = createStackNavigator(
     },
     AssetsDetailScreen: {
       screen: AssetsDetailScreen,
+      navigationOptions: {
+        header: null
+      }
+    },
+    CollectibleDetailScreen: {
+      screen: CollectibleDetailScreen,
       navigationOptions: {
         header: null
       }

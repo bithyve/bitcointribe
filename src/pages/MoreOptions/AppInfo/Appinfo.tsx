@@ -241,6 +241,9 @@ const AppInfo = ( props ) => {
         infoTextNormal1={''}
         step={''}
       />
+      <View style={{
+        height:20
+      }}/>
       <FlatList
         data={menuOptions}
         keyExtractor={listItemKeyExtractor}
@@ -300,7 +303,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 16 ),
     // marginBottom: wp( '1%' ),
     alignSelf: 'center',
-    marginHorizontal: wp( 2 ),
+    marginHorizontal: wp( 5 ),
     letterSpacing: 0.48
   },
   addModalView: {
@@ -312,7 +315,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-between',
     width: '90%',
     alignSelf: 'center',
-    borderRadius: wp( '2' ),
+    borderRadius: wp( '3' ),
     marginBottom: hp( '1' ),
     shadowOpacity: 0.16,
     shadowColor: Colors.shadowColor,

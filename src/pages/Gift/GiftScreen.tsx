@@ -76,6 +76,7 @@ import defaultStackScreenNavigationOptions from '../../navigation/options/Defaul
 import idx from 'idx'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import CommonStyles from '../../common/Styles/Styles'
+import ArrowRight from '../../assets/images/svgs/icon_arrow_right.svg'
 
 const { height } = Dimensions.get( 'window' )
 
@@ -673,9 +674,9 @@ class GiftScreen extends React.Component<
     } = this.state
     return (
       <SafeAreaView style={{
-        backgroundColor: Colors.darkBlue, flex:1
+        flex:1
       }}>
-        <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
+        <StatusBar backgroundColor={Colors.blue} barStyle='dark-content' />
         <View style={styles.accountCardsSectionContainer}>
           {showIndicator &&
             <ModalContainer onBackground={() => this.setState( {
@@ -703,30 +704,30 @@ class GiftScreen extends React.Component<
               </Text>
               <ToggleContainer />
             </View> */}
-            <View
-              style={[
-                CommonStyles.headerContainer,
-                {
-                  backgroundColor: Colors.backgroundColor1,
-                  marginRight: wp( 4 ),
-                  marginVertical: height < 720 ? wp( 0 ) : 'auto',
-                },
-              ]}
+          <View
+            style={[
+              CommonStyles.headerContainer,
+              {
+                backgroundColor: Colors.backgroundColor1,
+                marginRight: wp( 4 ),
+                marginVertical: height < 720 ? wp( 0 ) : 'auto',
+              },
+            ]}
+          >
+            <TouchableOpacity
+              style={CommonStyles.headerLeftIconContainer}
+              onPress={() => {
+                navigation.pop()
+              }}
             >
-              <TouchableOpacity
-                style={CommonStyles.headerLeftIconContainer}
-                onPress={() => {
-                  navigation.pop()
-                }}
-              >
-                <View style={CommonStyles.headerLeftIconInnerContainer}>
-                  <FontAwesome
+              <View style={CommonStyles.headerLeftIconInnerContainer}>
+                <FontAwesome
                   name="long-arrow-left"
                   color={Colors.homepageButtonColor}
-                    size={17}
-                  />
-                </View>
-              </TouchableOpacity>
+                  size={17}
+                />
+              </View>
+            </TouchableOpacity>
           </View>
           <View style={{
             flexDirection: 'row', marginHorizontal: 30, marginTop: 15, alignItems: 'flex-end'
@@ -737,7 +738,7 @@ class GiftScreen extends React.Component<
               marginStart: 10,
               marginBottom: 5,
             } ]}>
-              {this.strings[ 'giftsats' ]}
+              {this.strings[ 'gift' ]}
             </Text>
             {/* <View style={{marginTop: 10, justifyContent: 'center', alignSelf: 'flex-end'}}> */}
 
@@ -761,29 +762,32 @@ class GiftScreen extends React.Component<
             // }
             contentContainerStyle={{
               // flex: 1,
-              paddingHorizontal: 38, paddingBottom: 20
+              paddingHorizontal: 21, paddingBottom: 20
             }}
           >
             <GiftBoxComponent
-              titleText={'Create New Gift'}
-              subTitleText={this.strings[ 'giftSubTextF&F' ]}
+              titleText={'Create a new gift'}
+              subTitleText={'Create gifts and send to your family and friends'}
               onPress={() => {
 
                 this.props.navigation.navigate( 'CreateGift', {
                 // setActiveTab: buttonPress
                 } )}}
               image={<Add />}
+              rightArrow={<ArrowRight/>}
             />
             <GiftBoxComponent
-              titleText={'Available Gifts'}
-              subTitleText={'All the gifts you have created, not sent, \nand gifts you have received are shown here'}
+              titleText={'All Gifts'}
+              subTitleText={'All the gifts you have created, not sent, and gifts you have received'}
               onPress={() => this.props.navigation.navigate( 'ManageGifts', {
                 giftType : '0'
               } )}
               image={<Gifts />}
+              rightArrow={<ArrowRight/>}
+
             />
             <GiftBoxComponent
-              titleText={'Claim SATSCARD'}
+              titleText={'Claim your Satscard'}
               scTitleText={'TM'}
               subTitleText={'Move sats from your SATSCARD™'}
               scSubText={'TM'}
@@ -791,6 +795,7 @@ class GiftScreen extends React.Component<
               onPress={() => this.setState( {
                 showVerification:true
               } )}
+              rightArrow={<ArrowRight/>}
               image={<Sat_card/>}
             />
           </ScrollView>
@@ -995,8 +1000,8 @@ const styles = StyleSheet.create( {
     // shadowColor: 'black',
     // shadowOpacity: 0.4,
     // shadowOffset: {
-      // width: 2,
-      // height: -1,
+    // width: 2,
+    // height: -1,
     // },
     // flexDirection: 'column',
     // justifyContent: 'space-around',

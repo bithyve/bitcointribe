@@ -592,7 +592,7 @@ class FriendsAndFamilyScreen extends React.Component<
                 } )
               }}
             >
-              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+              <LinearGradient colors={[ Colors.blue, Colors.blue ]}
                 start={{
                   x: 0, y: 0
                 }} end={{
@@ -604,7 +604,7 @@ class FriendsAndFamilyScreen extends React.Component<
                 }}
               >
                 <Text style={[ styles.contactText, {
-                  fontSize: RFValue( 24 ), lineHeight:30
+                  fontSize: RFValue( 18 ), lineHeight:30
                 } ]}>+</Text>
                 <Text style={styles.contactText}>{this.strings[ 'AddNew' ]}</Text>
               </LinearGradient>
@@ -865,7 +865,7 @@ const styles = StyleSheet.create( {
   contactText: {
     // marginLeft: 10,
     // marginHorizontal: wp ( 1 ),
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.Regular,
     color: Colors.white,
     // padding: wp( 2 )
