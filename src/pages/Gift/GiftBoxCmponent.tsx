@@ -8,7 +8,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 
-const {height} = Dimensions.get('window');
+const { height } = Dimensions.get( 'window' )
 
 const GiftBoxComponent = ( props ) => {
 
@@ -17,47 +17,60 @@ const GiftBoxComponent = ( props ) => {
       {/* <Gift /> */}
       <View
         style={{
-          height: RFValue(26),
-          width: RFValue(26),
+          height: RFValue( 26 ),
+          width: RFValue( 26 ),
+          
         }}
       >
         {props.image}
         {/* <CheckingAcc /> */}
       </View>
-      <View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "flex-start",
-            marginTop: height > 720 ? 6 : wp(2),
-          }}
-        >
-          <Text style={[styles.pageTitle]}>{props.titleText}</Text>
-          {props.scTitleText 
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around'
+      }}>
+        <View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              marginTop: height > 720 ? 6 : wp( 2 ),
+            }}
+          >
+            <Text style={[ styles.pageTitle ]}>{props.titleText}</Text>
+            {props.scTitleText
           && (
             <Text style={styles.extraSubText}>{props.scTitleText}</Text>
           )
-          }
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "flex-start",
-          }}
-        >
-          <Text numberOfLines={3} style={styles.subText}>
-            {props.subTitleText} {props.pendingSubText}
-          </Text>
-          {/* {props.scSubText && (
+            }
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+            }}
+          >
+            <Text numberOfLines={3} style={styles.subText}>
+              {props.subTitleText} {props.pendingSubText}
+            </Text>
+            {/* {props.scSubText && (
             <Text style={styles.scSubText}>{props.scSubText}</Text>
           )} */}
-          {/* {props.pendingSubText && (
+            {/* {props.pendingSubText && (
             <Text style={styles.subText}>{props.pendingSubText}</Text>
           )} */}
+
+          </View>
+        </View>
+        <View style={{
+          paddingHorizontal: 10,
+        }}>
+          {props.rightArrow && props.rightArrow}
         </View>
       </View>
     </TouchableOpacity>
-  );
+  )
 }
 
 export default GiftBoxComponent
@@ -66,7 +79,7 @@ export default GiftBoxComponent
 const styles = StyleSheet.create( {
   container:{
     width: '100%',
-    height: hp( 15 ),
+    height: hp( 18 ),
     backgroundColor: Colors.gray7,
     shadowOpacity: 0.06,
     shadowOffset: {
@@ -78,7 +91,7 @@ const styles = StyleSheet.create( {
     borderRadius: wp( 2 ),
     marginTop: hp( 3 ),
     paddingHorizontal: wp( 5 ),
-    paddingVertical: wp(2.5),
+    paddingVertical: wp( 2.5 ),
     justifyContent:'center',
   },
   pageTitle: {
@@ -86,7 +99,8 @@ const styles = StyleSheet.create( {
     letterSpacing: 0.7,
     fontFamily: Fonts.Medium,
     alignItems: 'center',
-    fontSize: RFValue( 13 )
+    fontSize: RFValue( 13 ),
+    paddingBottom:8
   },
   subText:{
     color: Colors.THEAM_INFO_TEXT_COLOR,
@@ -94,7 +108,8 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Regular,
     // marginTop: RFValue( 4 ),
     letterSpacing: .75,
-    lineHeight: RFValue(11)
+    lineHeight: RFValue( 11 ),
+    paddingBottom:15
   },
   scSubText:{
     color: Colors.textColorGrey,

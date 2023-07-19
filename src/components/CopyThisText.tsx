@@ -69,7 +69,7 @@ export default function CopyThisText( props ) {
             numberOfLines={1}
             style={{
               fontSize: RFValue( 13 ),
-              color: props.title ? Colors.CLOSE_ICON_COLOR : Colors.lightBlue,
+              color: props.title ? Colors.CLOSE_ICON_COLOR : Colors.CLOSE_ICON_COLOR,
               fontFamily: Fonts.Regular
             }}
           >

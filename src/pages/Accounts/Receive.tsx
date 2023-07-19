@@ -241,7 +241,7 @@ export default function Receive( props ) {
       <SafeAreaView style={{
         flex: 0
       }} />
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.LIGHT_BACKGROUND} barStyle="dark-content" />
       <TouchableWithoutFeedback onPress={() => onPressTouchableWrapper()}>
         <KeyboardAvoidingView
           style={{
