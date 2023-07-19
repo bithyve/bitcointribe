@@ -4,14 +4,45 @@ import {
   View,
   SafeAreaView,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  Text
 } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
 import CommonStyles from '../../common/Styles/Styles'
+import ListStyles from '../../common/Styles/ListStyles'
 import moment from 'moment'
 import HeaderTitle from '../../components/HeaderTitle'
-import { DetailsItem } from './AssetMetaData'
+import { RFValue } from 'react-native-responsive-fontsize'
+
+const styles = StyleSheet.create( {
+  lineItem: {
+    marginBottom: RFValue( 2 ),
+    padding: 10,
+    paddingHorizontal: 10,
+    backgroundColor: 'white',
+    marginVertical: 10,
+    borderRadius: 5
+  },
+} )
+
+const DetailsItem = ( { name, value } ) => {
+  return(
+    <View style={styles.lineItem}>
+      <Text style={ListStyles.listItemTitleTransaction}>{name}</Text>
+      <Text
+        selectable
+        numberOfLines={1}
+        ellipsizeMode="middle"
+        style={[ ListStyles.listItemSubtitle, {
+          marginBottom: 3
+        } ]}
+      >
+        {value}
+      </Text>
+    </View>
+  )
+}
 
 const AssetTransferDetails = ( props ) => {
   const asset = props.navigation.getParam( 'asset' )

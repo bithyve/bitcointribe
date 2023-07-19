@@ -116,6 +116,8 @@ import RESTUtils from '../../utils/ln/RESTUtils'
 import { Alert } from 'react-native'
 import RGBServices from '../../services/RGBServices'
 import RgbSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/RgbSubAccountInfo'
+import { ELECTRUM_NOT_CONNECTED_ERR } from '../../bitcoin/electrum/client'
+import { setElectrumNotConnectedErr } from '../actions/nodeSettings'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -591,49 +593,55 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
 }} ) {
   const accountShells: AccountShell[] = payload.shells
   const options: { hardRefresh?: boolean } = payload.options
-  yield put( accountShellRefreshStarted( accountShells ) )
-  const accountState: AccountsState = yield select(
-    ( state ) => state.accounts
-  )
-  const accountIds = []
-  const accounts: Accounts = accountState.accounts
-  const accountsToSync: Accounts = {
-  }
-  for( const accountShell of accountShells ){
-    accountsToSync[ accountShell.primarySubAccount.id ] = accounts[ accountShell.primarySubAccount.id ]
-  }
-
-  const { synchedAccounts, activeAddressesWithNewTxsMap } = yield call( syncAccountsWorker, {
-    payload: {
-      accounts: accountsToSync,
-      options,
+  try {
+    yield put( accountShellRefreshStarted( accountShells ) )
+    const accountState: AccountsState = yield select(
+      ( state ) => state.accounts
+    )
+    const accountIds = []
+    const accounts: Accounts = accountState.accounts
+    const accountsToSync: Accounts = {
     }
-  } )
-
-  yield put( updateAccountShells( {
-    accounts: synchedAccounts
-  } ) )
-  yield put( accountShellRefreshCompleted( accountShells ) )
-
-  let computeNetBalance = false
-  for ( const [ key, synchedAcc ] of Object.entries( synchedAccounts ) ) {
-    yield call( dbManager.updateAccount, ( synchedAcc as Account ).id, synchedAcc )
-    if( ( synchedAcc as Account ).hasNewTxn ) {
-      accountIds.push( ( synchedAcc as Account ).id )
-      computeNetBalance = true
+    for( const accountShell of accountShells ){
+      accountsToSync[ accountShell.primarySubAccount.id ] = accounts[ accountShell.primarySubAccount.id ]
     }
-  }
-  if( accountIds.length > 0 ) {
-    yield put( updateWalletImageHealth( {
-      updateAccounts: true,
-      accountIds: accountIds
+
+    const { synchedAccounts, activeAddressesWithNewTxsMap } = yield call( syncAccountsWorker, {
+      payload: {
+        accounts: accountsToSync,
+        options,
+      }
+    } )
+
+    yield put( updateAccountShells( {
+      accounts: synchedAccounts
     } ) )
+
+    let computeNetBalance = false
+    for ( const [ key, synchedAcc ] of Object.entries( synchedAccounts ) ) {
+      yield call( dbManager.updateAccount, ( synchedAcc as Account ).id, synchedAcc )
+      if( ( synchedAcc as Account ).hasNewTxn ) {
+        accountIds.push( ( synchedAcc as Account ).id )
+        computeNetBalance = true
+      }
+    }
+    if( accountIds.length > 0 ) {
+      yield put( updateWalletImageHealth( {
+        updateAccounts: true,
+        accountIds: accountIds
+      } ) )
+    }
+
+    if( computeNetBalance ) yield put( recomputeNetBalance() )
+
+    // update F&F channels if any new txs found on an assigned address
+    if( activeAddressesWithNewTxsMap && Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
+  } catch( err ){
+    if ( [ ELECTRUM_NOT_CONNECTED_ERR ].includes( err?.message ) )
+      yield put( setElectrumNotConnectedErr( err?.message ) )
+  } finally {
+    yield put( accountShellRefreshCompleted( accountShells ) )
   }
-
-  if( computeNetBalance ) yield put( recomputeNetBalance() )
-
-  // update F&F channels if any new txs found on an assigned address
-  if( activeAddressesWithNewTxsMap && Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
 }
 
 
@@ -1439,68 +1447,4 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
 export const generateGiftsWatcher = createWatcher(
   generateGiftstWorker,
   GENERATE_GIFTS,
-)
-
-function* receiveRgbAssettWorker( { payload }: {
-  payload: {
-    accountShell: AccountShell,
-}} ) {
-  const { accountShell } = payload
-  try {
-
-    const accountState: AccountsState = yield select(
-      ( state ) => state.accounts
-    )
-    const accounts: Accounts = accountState.accounts
-
-
-    const account = accounts[ accountShell.primarySubAccount.id ]
-
-    const { mnemonic, xpub } = account.rgbConfig
-    account.refreshing = true
-    account.rgb = {
-      ...account.rgb,
-      receiveAssets: {
-        message: '',
-        ...account.rgb.receiveAssets
-      }
-    }
-    yield put( updateAccountShells( {
-      accounts: {
-        [ account.id ]: account
-      }
-    } ) )
-    const receiveData = yield call( RGBServices.receiveAsset, mnemonic, xpub )
-    account.refreshing = false
-    if( receiveData.error ) {
-      account.rgb = {
-        ...account.rgb,
-        receiveAssets: {
-          message: receiveData.error,
-        }
-      }
-    } else {
-      account.rgb = {
-        ...account.rgb,
-        receiveAssets: {
-          message: '',
-          data: receiveData
-        }
-      }
-    }
-
-    yield put( updateAccountShells( {
-      accounts: {
-        [ account.id ]: account
-      }
-    } ) )
-  } catch ( error ) {
-    console.log( error )
-  }
-
-}
-
-export const starReceivingRgbAssetsWatcher = createWatcher(
-  receiveRgbAssettWorker,
-  RECEIVE_RGB_ASSET,
 )

@@ -66,8 +66,6 @@ export const RESET_ACCOUNT_UPDATE_FLAG = 'RESET_ACCOUNT_UPDATE_FLAG'
 export const RESET_TWO_FA_LOADER = 'RESET_TWO_FA_LOADER'
 
 export const GENERATE_GIFTS = 'GENERATE_GIFTS'
-export const RECEIVE_RGB_ASSET = 'RECEIVE_RGB_ASSET'
-export const SET_RGB_RECEIVE_STATE = 'SET_RGB_RECEIVE_STATE'
 
 export const getAllAccountsData = () => {
   return {
@@ -84,14 +82,6 @@ export const setAllAccountsData = ( accounts ) => {
   }
 }
 
-export const receiveRgbAsset = (
-  accountShell: AccountShell
-) => {
-  return {
-    type: RECEIVE_RGB_ASSET,
-    payload: accountShell,
-  }
-}
 
 export const accountChecked = ( accountShells: AccountShell [], accounts: Accounts ) => {
   return {

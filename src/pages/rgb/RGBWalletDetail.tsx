@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import {
   StyleSheet,
   View,
@@ -19,30 +19,20 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { LocalizationContext } from '../../common/content/LocContext'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import config from '../../bitcoin/HexaConfig'
 import NetworkKind from '../../common/data/enums/NetworkKind'
-import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
-import { fetchExchangeRates, fetchFeeRates, refreshAccountShells } from '../../store/actions/accounts'
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import useAccountShellFromNavigation from '../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
-import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import BitcoinUnit, { displayNameForBitcoinUnit } from '../../common/data/enums/BitcoinUnit'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../components/MaterialCurrencyCodeIcon'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import { UsNumberFormat } from '../../common/utilities'
-import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText'
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions'
-import AccountDetailsCard from '../../components/account-details/AccountDetailsCard'
-import SyncStatus from '../../common/data/enums/SyncStatus'
 import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
+import DetailsCard from './DetailsCard'
+import AccountChecking from '../../assets/images/accIcons/acc_checking.svg'
+import { syncRgb } from '../../store/actions/rgb'
 
 enum SectionKind {
   TOP_TABS,
@@ -54,46 +44,21 @@ const sectionListItemKeyExtractor = ( index ) => String( index )
 
 export default function RGBWalletDetail( props ) {
   const dispatch = useDispatch()
-  const swanDeepLinkContent = props.navigation.getParam( 'swanDeepLinkContent' )
-  const { translations } = useContext( LocalizationContext )
-  const accountShellID = props.navigation.getParam( 'accountShellID' )
-  const accountShell = useAccountShellFromNavigation( props.navigation )
+  const { syncing, balances, transactions } = useSelector( state=> state.rgb )
 
-  const isRefreshing = useMemo( () => {
-    return ( accountShell.syncStatus===SyncStatus.IN_PROGRESS )
-  }, [ accountShell.syncStatus ] )
+  const [ selectedTab, setSelectedTab ] = useState( 'Bitcoin' )
 
-  const accountsState = useAccountsState()
-  const { averageTxFees, exchangeRates } = accountsState
-  const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-  const account = useAccountByAccountShell( accountShell )
-  const [ selectedTab, setSelectedTab ] = useState( 'fungible' )
-
-  const [ showMore, setShowMore ] = useState( false )
 
   const isTestAccount = false
   const currencyKind = useCurrencyKind()
   const bitcoinUnit = BitcoinUnit.SATS
-  const balance = 5000
   const  bitcoinIconColor = 'gray'
   const fiatCurrencyCode = useCurrencyCode()
   const textColor = Colors.currencyGray
-  const [ fungibleData, setFungibleData ] =useState(  account.rgb?.rgb20Assets || [] )
 
-  const [ collectibleData, setCollectibleData ] =useState( [] )
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
-
-  const amountToDisplay = useMemo( () => {
-    const divisor = [ BitcoinUnit.SATS, BitcoinUnit.TSATS ].includes( bitcoinUnit ) ? 1 : SATOSHIS_IN_BTC
-
-    return balance / divisor
-  }, [ balance, bitcoinUnit ] )
-
-  const formattedBalanceText = isTestAccount ?
-    UsNumberFormat( amountToDisplay )
-    : useFormattedAmountText( amountToDisplay )
 
   const formattedUnitText = isTestAccount ?
     displayNameForBitcoinUnit( BitcoinUnit.TSATS )
@@ -113,91 +78,29 @@ export default function RGBWalletDetail( props ) {
     }
   }, [ bitcoinIconColor ] )
 
-  useEffect( () => {
-    // missing fee & exchange rates patch(restore & upgrade)
-    if (
-      !averageTxFees ||
-      !Object.keys( averageTxFees ).length ||
-      !exchangeRates ||
-      !Object.keys( exchangeRates ).length
-    ){
-      dispatch( fetchFeeRates() )
-      dispatch( fetchExchangeRates() )
-    }
-  }, [] )
-
   const renderFooter = ( assetType: RGB_ASSET_TYPE ) => {
     return(
       <View style={styles.viewSectionContainer}>
         <View style={styles.footerSection}>
           <SendAndReceiveButtonsFooter
             onSendPressed={() => {
-              props.navigation.navigate( 'RGBSend')
+              props.navigation.navigate( 'RGBSend' )
             }}
             onReceivePressed={() => {
               props.navigation.navigate( 'RGBReceive', {
-                accountShell,
                 assetType
               } )
             }}
-            averageTxFees={averageTxFees}
-            network={
-              config.APP_STAGE === 'dev' ||
-                      primarySubAccount?.sourceKind === SourceAccountKind.TEST_ACCOUNT
-                ? NetworkKind.TESTNET
-                : NetworkKind.MAINNET
+            averageTxFees={null}
+            network={ NetworkKind.MAINNET
             }
-            isTestAccount={primarySubAccount?.sourceKind === SourceAccountKind.TEST_ACCOUNT}
+            isTestAccount={false}
           />
         </View>
 
       </View>
     )
   }
-  const renderTabs = () => {
-    return(
-      <View style={styles.tabContainer}>
-        <TouchableOpacity style={styles.fungibleContainer} onPress={()=>{
-          setSelectedTab( 'fungible' )
-        }
-        } activeOpacity={1}>
-          <View style={[ styles.fungibleInnerContainer, {
-            backgroundColor: selectedTab == 'fungible'? Colors.THEAM_TEXT_COLOR:null,
-          } ]}>
-            <Text style={[ styles.fungibleText, {
-              color: selectedTab == 'fungible' ?  Colors.white : Colors.THEAM_TEXT_COLOR,
-            } ]}>FUNGIBLE</Text>
-          </View>
-        </TouchableOpacity>
-
-        {/* <TouchableOpacity style={styles.fungibleContainer} onPress={()=>{
-          // if( selectedTab )
-          setSelectedTab( 'collectible' )
-        }} activeOpacity={1}>
-          <View style={[ styles.fungibleInnerContainer, {
-            backgroundColor:selectedTab == 'collectible'? Colors.THEAM_TEXT_COLOR:null,
-          } ]}>
-            <Text style={[ styles.fungibleText, {
-              color: selectedTab == 'collectible' ?  Colors.white : Colors.THEAM_TEXT_COLOR,
-            } ]}>COLLECTIBLE</Text>
-          </View>
-        </TouchableOpacity> */}
-        <TouchableOpacity style={styles.fungibleContainer} onPress={()=>{
-          // if( selectedTab )
-          setSelectedTab( 'Bitcoin' )
-        }} activeOpacity={1}>
-          <View style={[ styles.fungibleInnerContainer, {
-            backgroundColor: selectedTab == 'Bitcoin' ? Colors.THEAM_TEXT_COLOR:null,
-          } ]}>
-            <Text style={[ styles.fungibleText, {
-              color: selectedTab == 'Bitcoin' ?  Colors.white : Colors.THEAM_TEXT_COLOR,
-            } ]}>BITCOIN</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    )
-  }
-
 
   const BalanceCurrencyIcon = () => {
     if ( prefersBitcoin || isTestAccount ) {
@@ -228,20 +131,9 @@ export default function RGBWalletDetail( props ) {
       )
     }
   }
-  function navigateToAccountSettings() {
-    props.navigation.navigate( 'SubAccountSettings', {
-      accountShellID,
-    } )
-  }
-  function performRefreshOnPullDown() {
-    dispatch( refreshAccountShells( [ accountShell ], {
-      hardRefresh: true,
-    } ) )
-  }
 
   const onItemClick = ( item ) => {
     props.navigation.navigate( 'RGBTxDetail', {
-      accountShellID,
       asset: item
     } )
   }
@@ -256,11 +148,15 @@ export default function RGBWalletDetail( props ) {
             <View style={ {
               paddingHorizontal: 20,
             }}>
-              <AccountDetailsCard
-                accountShell={accountShell}
-                onKnowMorePressed={() => setShowMore( true )}
-                onSettingsPressed={navigateToAccountSettings}
-                swanDeepLinkContent={swanDeepLinkContent}
+              <DetailsCard
+                onKnowMorePressed={() => {}}
+                onSettingsPressed={()=>{}}
+                balance={balances.confirmed}
+                cardColor='#88B283'
+                title='Bitcoin Wallet'
+                description=''
+                renderIcon={()=><AccountChecking/>}
+                isBitcoin={true}
               />
             </View>
           )
@@ -273,7 +169,7 @@ export default function RGBWalletDetail( props ) {
           return (
             <View style={styles.viewSectionContainer}>
               <FlatList
-                data={ account?.rgb?.bitcoinAssets || []}
+                data={transactions}
                 renderItem={( { item } ) =>
                   <TouchableOpacity style={styles.itemContainer} onPress={() =>{}}>
                     <View style={styles.textContainer}>
@@ -306,7 +202,7 @@ export default function RGBWalletDetail( props ) {
         },
       },
     ]
-  }, [ accountShell ] )
+  }, [  ] )
 
   const renderItem = ( { item } ) => {
     return(
@@ -369,35 +265,26 @@ export default function RGBWalletDetail( props ) {
       <View style={{
         flex: 1,
       }}>
-        {renderTabs()}
-        { selectedTab != 'Bitcoin' ?
-          <FlatList
-          // contentContainerStyle={{
-          //   flex:1, backgroundColor:'red'
-          // }}
-            data={ selectedTab == 'fungible' ? fungibleData : collectibleData}
-            renderItem={renderItem}
-            keyExtractor={( item, index ) => index.toString()}
-          /> :
-          <SectionList
-            contentContainerStyle={styles.scrollViewContainer}
-            showsVerticalScrollIndicator={false}
-            nestedScrollEnabled
-            refreshControl={
-              <RefreshControl
-                onRefresh={performRefreshOnPullDown}
-                refreshing={isRefreshing}
-                style={{
-                  backgroundColor: Colors.backgroundColor,
-                }}
-              />
-            }
-            sections={sections}
-            stickySectionHeadersEnabled={false}
-            keyExtractor={sectionListItemKeyExtractor}
-          />
-        }
-        {renderFooter( selectedTab === 'Bitcoin' ? RGB_ASSET_TYPE.BITCOIN : RGB_ASSET_TYPE.RGB20 )}
+        <SectionList
+          contentContainerStyle={styles.scrollViewContainer}
+          showsVerticalScrollIndicator={false}
+          nestedScrollEnabled
+          refreshControl={
+            <RefreshControl
+              onRefresh={() => {
+                dispatch( syncRgb() )
+              }}
+              refreshing={syncing}
+              style={{
+                backgroundColor: Colors.backgroundColor,
+              }}
+            />
+          }
+          sections={sections}
+          stickySectionHeadersEnabled={false}
+          keyExtractor={sectionListItemKeyExtractor}
+        />
+        {renderFooter( RGB_ASSET_TYPE.BITCOIN )}
       </View>
     </SafeAreaView>
   )
@@ -494,7 +381,7 @@ const styles = StyleSheet.create( {
     marginStart: 10
   },
   itemTitle:{
-    color: Colors.black, fontFamily:Fonts.Medium, fontSize: RFValue( 13 )
+    color: '#2C3E50', fontFamily:Fonts.Regular, fontSize: RFValue( 12 )
   },
   itemDesc:{
     color: Colors.textColorGrey, fontFamily:Fonts.Regular,

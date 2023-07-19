@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { View, Text, StyleSheet, SafeAreaView, StatusBar } from 'react-native'
 import FormStyles from '../../common/Styles/FormStyles'
 import { Input } from 'react-native-elements'
@@ -9,27 +9,78 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 import Fonts from '../../common/Fonts'
-import { translations } from '../../common/content/LocContext'
 import LinearGradient from 'react-native-linear-gradient'
 import CommonStyles from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import RGBServices from '../../services/RGBServices'
+import { useDispatch } from 'react-redux'
+import { syncRgb } from '../../store/actions/rgb'
+import Toast from '../../components/Toast'
+import { launchImageLibrary } from 'react-native-image-picker'
 
-export default function IssueScreen ( props ) {
-  const strings  = translations[ 'settings' ]
-  const common  = translations[ 'common' ]
+export default function IssueScreen( props ) {
+
   const issueType = props.navigation.getParam( 'issueType' )
-
+  const dispatch = useDispatch()
   const [ name, setName ] = useState( '' )
   const [ description, setDescription ] = useState( '' )
   const [ totalAmount, setTotalAmount ] = useState( '' )
   const [ ticker, setTicker ] = useState( '' )
-  const [attachedfile, setAttachedFile] = useState('Attach File')
-  
-  function IssueAssetClick() {
+  const [ attachedfile, setAttachedFile ] = useState( 'Attach File' )
+  const [ requesting, setRequesting ] = useState( false )
 
+  async function IssueAssetClick() {
+    try {
+      if( issueType === 'collectible' ) {
+        setRequesting( true )
+        const newAsset = await RGBServices.issueRgb121Asset( name, description, totalAmount, attachedfile )
+        setRequesting( false )
+        if( newAsset.assetId ) {
+          props.navigation.goBack()
+          dispatch( syncRgb() )
+          Toast( 'Asset created' )
+        } else {
+          Toast( `Failed ${newAsset.error}` )
+        }
+      } else {
+        setRequesting( true )
+        const newAsset = await RGBServices.issueRgb20Asset( ticker, name, totalAmount )
+        setRequesting( false )
+        if( newAsset.assetId ) {
+          props.navigation.goBack()
+          dispatch( syncRgb() )
+          Toast( 'Asset created' )
+        } else {
+          Toast( `Failed ${newAsset.error}` )
+        }
+      }
+    } catch ( error ) {
+      setRequesting( false )
+      Toast( `Failed ${error}` )
+      console.log( 'error', error )
+    }
   }
+
+  const pickFile = ()=> {
+    launchImageLibrary(
+      {
+        title: 'Select a file',
+        mediaType: 'photo',
+        takePhotoButtonTitle: null,
+        selectionLimit: 1,
+      },
+      response => {
+        console.log( response )
+        if( response.assets ) {
+          setAttachedFile( response.assets[ 0 ].uri.replace( 'file://', '' ) )
+
+        }
+      },
+    )
+  }
+
   return (
-<View style={{
+    <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
       <SafeAreaView style={{
@@ -37,23 +88,23 @@ export default function IssueScreen ( props ) {
       }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={CommonStyles.headerContainer}>
-              <TouchableOpacity
-                style={CommonStyles.headerLeftIconContainer}
-                onPress={() => {
-                  props.navigation.goBack()
-                }}
-              >
-                <View style={CommonStyles.headerLeftIconInnerContainer}>
-                  <FontAwesome
-                    name="long-arrow-left"
-                    color={Colors.homepageButtonColor}
-                    size={17}
-                  />
-                </View>
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.headerTitleText}>{'Issue ' + issueType }</Text>
-            <Text style={styles.headerSubTitleText}>{'Lorem ipsum dolor sit amet, consec tetur'}</Text>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.headerTitleText}>{'Issue ' + issueType}</Text>
+      <Text style={styles.headerSubTitleText}>{'Lorem ipsum dolor sit amet, consec tetur'}</Text>
 
       <View style={styles.bodySection}>
         <Input
@@ -70,41 +121,44 @@ export default function IssueScreen ( props ) {
             setName( text )
           }}
           numberOfLines={1}
+          editable={!requesting}
         />
         {issueType != 'coin' &&
-      <Input
-          inputContainerStyle={[
-            FormStyles.textInputContainer,
-            styles.textInputContainer,
-          ]}
-          inputStyle={FormStyles.inputText}
-          placeholder={'Asset Description'}
-          placeholderTextColor={FormStyles.placeholderText.color}
-          underlineColorAndroid={'transparent'}
-          value={description}
-          onChangeText={( text ) => {
-            setDescription( text )
-          }}
-          numberOfLines={1}
-        />
-}
-{issueType == 'coin' &&
-        <Input
-          inputContainerStyle={[
-            FormStyles.textInputContainer,
-            styles.textInputContainer,
-          ]}
-          inputStyle={FormStyles.inputText}
-          placeholder={'Asset Ticker'}
-          placeholderTextColor={FormStyles.placeholderText.color}
-          underlineColorAndroid={'transparent'}
-          value={ticker}
-          onChangeText={( text ) => {
-            setTicker( text )
-          }}
-          numberOfLines={1}
-        />
-}
+          <Input
+            inputContainerStyle={[
+              FormStyles.textInputContainer,
+              styles.textInputContainer,
+            ]}
+            inputStyle={FormStyles.inputText}
+            placeholder={'Asset Description'}
+            placeholderTextColor={FormStyles.placeholderText.color}
+            underlineColorAndroid={'transparent'}
+            value={description}
+            onChangeText={( text ) => {
+              setDescription( text )
+            }}
+            editable={!requesting}
+            numberOfLines={1}
+          />
+        }
+        {issueType == 'coin' &&
+          <Input
+            inputContainerStyle={[
+              FormStyles.textInputContainer,
+              styles.textInputContainer,
+            ]}
+            inputStyle={FormStyles.inputText}
+            placeholder={'Asset Ticker'}
+            placeholderTextColor={FormStyles.placeholderText.color}
+            underlineColorAndroid={'transparent'}
+            value={ticker}
+            onChangeText={( text ) => {
+              setTicker( text )
+            }}
+            numberOfLines={1}
+            editable={!requesting}
+          />
+        }
         <Input
           inputContainerStyle={[
             FormStyles.textInputContainer,
@@ -116,31 +170,34 @@ export default function IssueScreen ( props ) {
           underlineColorAndroid={'transparent'}
           value={totalAmount}
           onChangeText={( text ) => {
-            setTotalAmount( text )
+            setTotalAmount( text.replace( /[^0-9]/g, '' ), )
           }}
           keyboardType="number-pad"
           numberOfLines={1}
+          editable={!requesting}
         />
-      {issueType != 'coin' &&
-         <TouchableOpacity style={[FormStyles.textInputContainer, {marginHorizontal:12, alignItems: 'center'}]}>
-              <Text style={ attachedfile == 'Attach File' ? styles.attachPlaceholderText : styles.attachText}>{attachedfile}</Text>
-         </TouchableOpacity>
-}
-         <View style={styles.footerSection}>
-        <TouchableOpacity onPress={IssueAssetClick}>
-          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-            start={{
-              x: 0, y: 0
-            }} end={{
-              x: 1, y: 0
-            }}
-            locations={[ 0.2, 1 ]}
-            style={styles.IssueAssetWrapper}
-          >
-            <Text style={styles.IssueAssetText}>{'Issue Asset'}</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+        {issueType != 'coin' &&
+          <TouchableOpacity onPress={pickFile} activeOpacity={0.6} disabled={requesting} style={[ FormStyles.textInputContainer, {
+            marginHorizontal: 12, alignItems: 'center', backgroundColor: 'white'
+          } ]}>
+            <Text style={attachedfile == 'Attach File' ? styles.attachPlaceholderText : styles.attachText}>{attachedfile}</Text>
+          </TouchableOpacity>
+        }
+        <View style={styles.footerSection}>
+          <TouchableOpacity disabled={requesting} activeOpacity={0.6} onPress={IssueAssetClick}>
+            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+              start={{
+                x: 0, y: 0
+              }} end={{
+                x: 1, y: 0
+              }}
+              locations={[ 0.2, 1 ]}
+              style={styles.IssueAssetWrapper}
+            >
+              <Text style={styles.IssueAssetText}>{'Issue Asset'}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   )
@@ -155,7 +212,8 @@ const styles = StyleSheet.create( {
   },
 
   textInputContainer: {
-
+    backgroundColor: 'white',
+    elevation: 1
   },
 
   footerSection: {
@@ -169,6 +227,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     borderRadius: 8,
     alignItems: 'center',
+    marginTop: 30
   },
   IssueAssetText: {
     color: Colors.white,
@@ -186,7 +245,7 @@ const styles = StyleSheet.create( {
     color: Colors.THEAM_INFO_TEXT_COLOR,
     fontFamily: Fonts.Regular,
     marginLeft: 20,
-    marginTop:6,
+    marginTop: 6,
     marginBottom: 20
   },
   attachPlaceholderText: {
@@ -205,5 +264,5 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     textAlign: 'left',
   }
-  
+
 } )

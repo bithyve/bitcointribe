@@ -7,7 +7,8 @@ import {
   StatusBar,
   Text,
   FlatList,
-  ActivityIndicator
+  ActivityIndicator,
+  Image
 } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Fonts from '../../common/Fonts'
@@ -28,7 +29,7 @@ import RGBServices from '../../services/RGBServices'
 import moment from 'moment'
 import DetailsCard from './DetailsCard'
 
-export default function RGBTxDetail( props ) {
+export default function RGB121TxDetail( props ) {
   const dispatch = useDispatch()
   const { translations } = useContext( LocalizationContext )
   const accountStr = translations[ 'accounts' ]
@@ -159,14 +160,18 @@ export default function RGBTxDetail( props ) {
           showKnowMore
           onSettingsPressed={() => { }}
           balance={asset.futureBalance}
-          cardColor={'#A29DD3'}
+          cardColor={'#B7B7B7'}
           title={asset.name}
-          description={asset.ticker}
+          description={asset.description}
           assetId={asset.assetId}
           renderIcon={() => <View style={[ styles.labelContainer, {
-            backgroundColor: '#7e7aac'
+            backgroundColor: '#B7B7B7'
           } ]}>
-            <Text style={styles.labelText}>{asset.ticker.substring( 0, 3 )}</Text>
+            <Image style={{
+              height: 50, width: 50, borderRadius: 30
+            }} source={{
+              uri: asset.dataPaths[ 0 ].filePath
+            }}/>
           </View>}
           isBitcoin={false}
         />
