@@ -21,6 +21,7 @@ vectorstore = create_vectorstore(urls, OPENAI_API_KEY)
 
 chat_history = []
 
+
 @bot.message_handler(commands=['info'])
 def info(message):
     bot.reply_to(message, "Hey there! I'm Bitcoin Keeper's Customer Support bot available for you 24/7 ;)")
@@ -55,13 +56,18 @@ def respond_query(message):
     llm = ChatOpenAI(temperature=0.7, model_name='gpt-3.5-turbo')
     # chain = RetrievalQA.from_llm(llm=llm, retriever=vectorstore.as_retriever())
     chain = ConversationalRetrievalChain.from_llm(llm=llm, retriever=vectorstore.as_retriever())
-    response = chain({"question": f"{message}", "chat_history": chat_history}, return_only_outputs=True)
-    print(response)
-    bot.reply_to(message, response["answer"])
-    if len(chat_history) > 4:
-        chat_history.pop(0)
-    chat_history.append((message.text, response["answer"]))
-    print(chat_history)
+    try:
+        response = chain({"question": f"{message}", "chat_history": chat_history}, return_only_outputs=True)
+        print(response)
+        bot.reply_to(message, response["answer"])
+        if len(chat_history) > 4:
+            chat_history.pop(0)
+        chat_history.append((message.text, response["answer"]))
+        print(chat_history)
+
+    except:
+        print("Oops! I'm having a brain meltdown. Maybe try again?")
+        bot.reply_to(message, "Oops! I'm having a brain meltdown. Maybe try again?")
 
 
 if __name__ == "__main__":
