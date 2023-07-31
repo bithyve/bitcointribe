@@ -5,4 +5,3 @@ tiktoken
 unstructured
 pyTelegramBotAPI
 python-dotenv
-libmagic
