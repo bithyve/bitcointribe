@@ -44,6 +44,7 @@ def greet(message):
     bot.reply_to(message, "Howdy, how are you doing?")
 
 
+
 @bot.message_handler(commands=['clear'])
 def clear_chat_history(message):
     chat_history.clear()
