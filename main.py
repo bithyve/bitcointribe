@@ -14,10 +14,10 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 bot = telebot.TeleBot(BOT_TOKEN)
 
-vectorstore = create_vectorstore(urls, OPENAI_API_KEY)
+# vectorstore = create_vectorstore(urls, OPENAI_API_KEY)
 
-# with open("keeper_kb.pkl", "rb") as file:
-#     vectorstore = pickle.load(file)
+with open("keeper_kb.pkl", "rb") as file:
+    vectorstore = pickle.load(file)
 
 chat_history = []
 
@@ -65,8 +65,8 @@ def respond_query(message):
         chat_history.append((message.text, response["answer"]))
         print(chat_history)
 
-    except:
-        print("Oops! I'm having a brain meltdown. Maybe try again?")
+    except Exception as e:
+        print(e)
         bot.reply_to(message, "Oops! I'm having a brain meltdown. Maybe try again?")
 
 
