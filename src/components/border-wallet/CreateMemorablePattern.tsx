@@ -116,13 +116,6 @@ const styles = StyleSheet.create( {
     marginBottom: hp( '1%' ),
     textAlign: 'center'
   },
-  headerSeparator: {
-    backgroundColor: Colors.homepageButtonColor,
-    height: 1,
-    marginLeft: wp( '5%' ),
-    marginRight: wp( '5%' ),
-    marginBottom: hp( '1%' ),
-  },
   infoText: {
     textAlign: 'center',
     color: Colors.backgroundColor1,
@@ -131,48 +124,9 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Regular,
     marginHorizontal: wp( '10%' ),
   },
-  clickHereText: {
-    color: Colors.backgroundColor1,
-    fontSize: RFValue( 13 ),
-    fontFamily: Fonts.Regular,
-    textDecorationLine: 'underline',
-    textAlign: 'center',
-  },
-  toKnowMoreText: {
-    color: Colors.backgroundColor1,
-    fontSize: RFValue( 13 ),
-    fontFamily: Fonts.Regular,
-  },
-  linkView: {
-    flexDirection: 'row',
-    marginLeft: wp( '10%' ),
-    marginRight: wp( '10%' ),
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-  },
   ElementView: {
     height: hp( '60%' ),
     justifyContent: 'space-between',
-  },
-  separatorView: {
-    width: wp( '70%' ),
-    height: 0,
-    alignSelf: 'center',
-    marginBottom: wp( '1%' ),
-    borderStyle: 'dotted',
-    borderWidth: 1,
-    borderRadius: 1,
-    borderColor: Colors.white,
-  },
-  helperImage: {
-    width: wp( '80%' ),
-    height: wp( '60%' ),
-    resizeMode: 'contain',
-  },
-  bottomLinkView: {
-    marginLeft: wp( '10%' ),
-    marginRight: wp( '10%' ),
-    marginBottom: wp( '15%' ),
   },
   boldText:{
     fontWeight: 'bold'
