@@ -28,6 +28,7 @@ const RestoreSeedHeaderComponent = ( props ) => {
           }}
         />
       </TouchableOpacity>
+      <Text style={styles.infoText}>{props.info1}</Text>
       <Text style={styles.titleText}>{props.selectedTitle}</Text>
       <Text style={styles.infoText}>{props.info}</Text>
     </View>
