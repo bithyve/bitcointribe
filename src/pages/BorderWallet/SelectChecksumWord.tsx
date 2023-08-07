@@ -116,7 +116,7 @@ const SelectChecksumWord = ( props ) => {
           <TouchableOpacity
             onPress={() => {
             //   setGenerateEntropyGrid( true )
-              props.navigation.navigate( 'SelectChecksumWord' )
+              props.navigation.navigate( 'CreatePassPhrase' )
             }}
           >
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
@@ -177,6 +177,7 @@ const styles = StyleSheet.create( {
     borderRadius: 10,
     backgroundColor: Colors.blue,
     right: 15,
+    width: 120
   },
   buttonText: {
     color: Colors.white,
