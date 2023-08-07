@@ -14,6 +14,8 @@ import RestoreSelectedContactsList from '../pages/Recovery/RestoreSelectedContac
 import NewWalletName from '../pages/NewWalletName'
 import CreateWithBorderWallet from '../pages/BorderWallet/CreateWithBorderWallet'
 import SelectChecksumWord from '../pages/BorderWallet/SelectChecksumWord'
+import CreatePassPhrase from '../pages/BorderWallet/CreatePassPhrase'
+import ConfirmDownload from '../pages/BorderWallet/ConfirmDownload'
 import AccountSelection from '../pages/AccountSelection'
 import NewWalletQuestion from '../pages/NewWalletQuestion'
 import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice'
@@ -88,6 +90,8 @@ const SetupNavigator = createStackNavigator(
     CreateKeeperScreen,
     CreateWithBorderWallet,
     SelectChecksumWord,
+    CreatePassPhrase,
+    ConfirmDownload,
     AccountSelection,
     NewWalletQuestion,
     WalletInitialization: WalletInitializationScreen,
