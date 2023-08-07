@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, createRef } from 'react'
+import React, { useState } from 'react'
 import {
   View,
   SafeAreaView,
@@ -9,23 +9,13 @@ import {
   TouchableOpacity,
 } from 'react-native'
 import Colors from '../../common/Colors'
-import _ from 'underscore'
 import { RFValue } from 'react-native-responsive-fontsize'
 
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
-import SeedPageComponent from '../NewBHR/SeedPageComponent'
-import { useDispatch } from 'react-redux'
-import { setSeedBackupHistory, updateSeedHealth } from '../../store/actions/BHR'
-import AlertModalContents from '../../components/AlertModalContents'
-import RNPreventScreenshot from 'react-native-screenshot-prevent'
-import dbManager from '../../storage/realm/dbManager'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import moment from 'moment'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
-import { hp, wp } from '../../common/data/responsiveness/responsive'
+import { hp } from '../../common/data/responsiveness/responsive'
 import ModalContainer from '../../components/home/ModalContainer'
 import CreateMemorablePattern from '../../components/border-wallet/CreateMemorablePattern'
 
@@ -102,9 +92,7 @@ const CreateWithBorderWallet = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <SeedHeaderComponent
         onPressBack={() => {
-          // RNPreventScreenshot.enabled( false )
           props.navigation.goBack()
-          // props.navigation.navigate( 'Home' )
         }}
         info1={'Step 1 of Creating a Border Wallet'}
         info={'Note down these 12 word Regeneration Mnemonic'}
@@ -126,7 +114,8 @@ const CreateWithBorderWallet = ( props ) => {
         <View>
           <TouchableOpacity
             onPress={() => {
-              setGenerateEntropyGrid( true )
+            //   setGenerateEntropyGrid( true )
+              props.navigation.navigate( 'SelectChecksumWord' )
             }}
           >
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
