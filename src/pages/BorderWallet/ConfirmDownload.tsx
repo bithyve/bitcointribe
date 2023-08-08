@@ -81,7 +81,7 @@ const ConfirmDownload = ( props ) => {
       <View style={[ styles.indexWrapper ]}>
         <Text style={styles.gridItemIndex}>{id}</Text>
       </View>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.title}>{title.toLocaleUpperCase()}</Text>
     </View>
   )
 
@@ -187,14 +187,14 @@ const ConfirmDownload = ( props ) => {
 const styles = StyleSheet.create( {
   item: {
     flexDirection: 'row',
-    width: '38%',
+    width: '42%',
     backgroundColor: '#FAFAFA',
-    padding: 15,
+    padding: 10,
     margin: 2,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   indexWrapper: {
-    width: '30%'
+    width: '28%',
   },
   title: {
     fontSize: 12,
