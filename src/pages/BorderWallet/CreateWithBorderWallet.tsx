@@ -10,7 +10,7 @@ import {
 } from 'react-native'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
-
+import * as bip39 from 'bip39'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import LinearGradient from 'react-native-linear-gradient'
@@ -22,56 +22,8 @@ import CreateMemorablePattern from '../../components/border-wallet/CreateMemorab
 const CreateWithBorderWallet = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'Generate New Entropy Grid' )
   const [ generateEntropyGrid, setGenerateEntropyGrid ] = useState( false )
-  const DATA = [
-    {
-      id: '01',
-      title: 'soup',
-    },
-    {
-      id: '02',
-      title: 'example',
-    },
-    {
-      id: '03',
-      title: 'crater',
-    },
-    {
-      id: '04',
-      title: 'canyon',
-    },
-    {
-      id: '05',
-      title: 'air',
-    },
-    {
-      id: '06',
-      title: 'tiger',
-    },
-    {
-      id: '07',
-      title: 'either',
-    },
-    {
-      id: '08',
-      title: 'repair',
-    },
-    {
-      id: '09',
-      title: 'warfare',
-    },
-    {
-      id: '10',
-      title: 'blind',
-    },
-    {
-      id: '11',
-      title: 'permit',
-    },
-    {
-      id: '12',
-      title: 'art',
-    }
-  ]
+  const mnemonic =  bip39.generateMnemonic()
+
   type ItemProps = {title: string, id: string};
 
   const Item = ( { title, id }: ItemProps ) => (
@@ -100,9 +52,9 @@ const CreateWithBorderWallet = ( props ) => {
       />
 
       <FlatList
-        data={DATA}
-        renderItem={( { item } ) => <Item title={item.title} id={item.id} />}
-        keyExtractor={item => item.id}
+        data={mnemonic.split(' ')}
+        renderItem={( { item, index } ) => <Item title={item} id={`${index+1}`} />}
+        keyExtractor={item => item}
         numColumns={2}
       />
       <BottomInfoBox
@@ -115,7 +67,7 @@ const CreateWithBorderWallet = ( props ) => {
           <TouchableOpacity
             onPress={() => {
             //   setGenerateEntropyGrid( true )
-              props.navigation.navigate( 'BorderWalletGridScreen' )
+              props.navigation.navigate( 'BorderWalletGridScreen', {mnemonic} )
             }}
           >
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
