@@ -85,6 +85,7 @@ const styles = StyleSheet.create( {
   },
   text: {
     fontSize: 12,
+    color: '#BEBBBB'
   },
   textSeq: {
     textAlign: 'left',
@@ -127,6 +128,9 @@ const styles = StyleSheet.create( {
     width: 15,
     borderRadius: 15,
     marginLeft: 5
+  },
+  ceilText: {
+    color: '#BEBBBB'
   }
 } )
 
@@ -140,8 +144,8 @@ const Ceil = ( { onPress, text, index, selected } ) => {
     >
       {isSelected && <Text style={styles.textSeq}>{sequence} &nbsp;</Text>}
       <Text style={[ styles.text, {
-        color: isSelected && '#F8F8F8'
-      } ]}>{text}</Text>
+        color: isSelected ? '#F8F8F8' : '#BEBBBB'
+      } ]}>{text.toLocaleUpperCase()}</Text>
     </TouchableOpacity>
   )
 }
@@ -153,7 +157,6 @@ const BorderWalletGridScreen = ( { navigation } ) => {
   const columnHeaderRef = useRef()
   const rowHeaderRef = useRef()
   const [ loading, setLoading ] = useState( true )
-  const [ headerTitle, setHeaderTitle ]=useState( 'Step 2: Create a Pattern' )
 
   const rnd11Bit = ( limit = 2048 ) => {
     let small = limit
@@ -289,7 +292,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
             showsHorizontalScrollIndicator={false}
             renderItem={( { item } ) => (
               <View style={styles.cell}>
-                <Text>{item}</Text>
+                <Text style={styles.ceilText}>{item}</Text>
               </View>
             )}
             keyExtractor={( item ) => item}
@@ -317,7 +320,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
               showsHorizontalScrollIndicator={false}
               renderItem={( { item } ) => (
                 <View style={styles.cell}>
-                  <Text>{( '000' + ( item + 1 ) ).substr( -3 )}</Text>
+                  <Text style={styles.ceilText}>{( '000' + ( item + 1 ) ).substr( -3 )}</Text>
                 </View>
               )}
               keyExtractor={( item ) => item.toString()}
