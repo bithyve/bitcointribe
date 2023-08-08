@@ -47,7 +47,7 @@ export default function GenerateEntropyGridModal( props ) {
           activeOpacity={10}
           onPress={() => props.titleClicked && props.titleClicked()}
         >
-          <Text style={styles.headerText}>Generate & Download New Entropy Grid</Text>
+          <Text style={styles.headerText}>Step 1: Generate New Entropy Grid</Text>
 
         </AppBottomSheetTouchableWrapper>
         <ScrollView
