@@ -181,6 +181,16 @@ const BorderWalletGridScreen = ( { navigation } ) => {
     }
   }
 
+  const onPressNext = () => {
+    const words = [ ...wordlists ]
+    shuffle( words, mnemonic )
+    const selectedWords = []
+    selected.forEach(s => {
+      selectedWords.push(words[s])
+    });
+    navigation.navigate( 'SelectChecksumWord', {words: selectedWords.toString().replace( /,/g, ' ' )} )
+  }
+
   return (
     <SafeAreaView style={styles.viewContainer}>
       <StatusBar
@@ -198,7 +208,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
           zIndex: 10,
           borderRadius: 10
         }}
-        onPress={()=> navigation.navigate( 'SelectChecksumWord' )}
+        onPress={onPressNext}
       >
         <Text>{`${selected.length} of 11`}</Text>
       </TouchableOpacity>
