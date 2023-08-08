@@ -12,6 +12,13 @@ import PasscodeConfirm from '../pages/PasscodeConfirm'
 import WalletInitializationScreen from '../pages/WalletInitializationScreen'
 import RestoreSelectedContactsList from '../pages/Recovery/RestoreSelectedContactsList'
 import NewWalletName from '../pages/NewWalletName'
+import CreateWithBorderWallet from '../pages/BorderWallet/CreateWithBorderWallet'
+import BorderWalletGridScreen from '../pages/BorderWallet/BorderWalletGridScreen'
+import SelectChecksumWord from '../pages/BorderWallet/SelectChecksumWord'
+import CreatePassPhrase from '../pages/BorderWallet/CreatePassPhrase'
+import ConfirmDownload from '../pages/BorderWallet/ConfirmDownload'
+import RecoverBorderWallet from '../pages/BorderWalletRecover/RecoverBorderWallet'
+import RegenerateEntropyGrid from '../pages/BorderWalletRecover/RegenerateEntropyGrid'
 import AccountSelection from '../pages/AccountSelection'
 import NewWalletQuestion from '../pages/NewWalletQuestion'
 import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice'
@@ -84,6 +91,13 @@ const SetupNavigator = createStackNavigator(
     PasscodeConfirm,
     NewWalletName,
     CreateKeeperScreen,
+    CreateWithBorderWallet,
+    BorderWalletGridScreen,
+    SelectChecksumWord,
+    CreatePassPhrase,
+    ConfirmDownload,
+    RecoverBorderWallet,
+    RegenerateEntropyGrid,
     AccountSelection,
     NewWalletQuestion,
     WalletInitialization: WalletInitializationScreen,
@@ -146,19 +160,25 @@ const styles= StyleSheet.create( {
 
 const GradientTab = props => {
   return (
-      <View style={{ backgroundColor: 'transparent' }}>
-           <LinearGradient
-        colors={[Colors.darkBlue,Colors.darkBlue]}
-        start={{x:0, y:0}}
-        end={{x:0.01, y:0.1}}
+    <View style={{
+      backgroundColor: 'transparent'
+    }}>
+      <LinearGradient
+        colors={[ Colors.darkBlue, Colors.darkBlue ]}
+        start={{
+          x:0, y:0
+        }}
+        end={{
+          x:0.01, y:0.1
+        }}
         // locations={[0.2, 1]}
         // style={{flex: 1}}
       >
-              <BottomTabBar {...props} />
-          </LinearGradient>
-      </View >
+        <BottomTabBar {...props} />
+      </LinearGradient>
+    </View >
   )
-};
+}
 
 const Bottomtab = createBottomTabNavigator(
   {

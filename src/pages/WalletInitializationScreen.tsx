@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import {
   StyleSheet,
   View,
@@ -8,6 +8,7 @@ import {
   StatusBar,
   Text,
   Linking,
+  ScrollView,
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -23,154 +24,212 @@ import { useDispatch } from 'react-redux'
 import { setCloudDataRecovery, setIsFileReading } from '../store/actions/cloud'
 import { setDownloadedBackupData } from '../store/actions/BHR'
 import { hp } from '../common/data/responsiveness/responsive'
+import BorderWallet from '../assets/images/svgs/borderWallet.svg'
+import ModalContainer from '../components/home/ModalContainer'
+import GenerateEntropyGridModal from '../components/border-wallet/GenerateEntropyGridModal'
 
 const WalletInitializationScreen = props => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
   const dispatch = useDispatch()
+  const [ generateEntropyGrid, setGenerateEntropyGrid ] = useState( false )
   return (
     <SafeAreaView style={{
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={{
-        marginBottom: wp( '5%' )
-      }}>
-        <View style={styles.titleView}>
-          <Text style={styles.headerTitleText}>{`${strings.new} Wallet`}</Text>
-          <Text style={styles.headerInfoText}>
-            {strings.appcreates}
-          </Text>
-        </View>
-        <TouchableOpacity
-          onPress={() => props.navigation.navigate( 'NewWalletName' )}
-          style={styles.NewWalletTouchableView}
-        >
-          <Image
-            style={{
-              ...styles.iconImage, width: wp( 7 ),
-              height: wp( 7 ), marginBottom: wp( 2 )
-            }}
-            source={require( '../assets/images/icons/icon_newwallet.png' )}
-          />
-          <View style={styles.textView}>
-            <Text style={styles.touchableText}>
-              {
-                'Start with a new Tribe Wallet'
-              }
-            </Text>
-          </View>
-          <View style={styles.arrowIconView}>
-            <MaterialIcons
-              name="arrow-forward-ios"
-              color={Colors.borderColor}
-              size={15}
-              style={{
-                alignSelf: 'center'
-              }}
-            />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => props.navigation.navigate( 'CreateKeeperScreen' )}
-          style={[ styles.NewWalletTouchableView, {
-            marginTop: hp( 20 )
-          } ]}
-        >
-          <Image
-            style={{
-              ...styles.iconImage, width: wp( 7 ),
-              height: wp( 7 ), marginBottom: wp( 2 )
-            }}
-            source={require( '../assets/images/icons/icon_createwk.png' )}
-          />
-          <View style={styles.textView}>
-            <Text style={styles.touchableText}>
-              {
-                'Create with Bitcoin Keeper'
-              }
-            </Text>
-          </View>
-          <View style={styles.arrowIconView}>
-            <MaterialIcons
-              name="arrow-forward-ios"
-              color={Colors.borderColor}
-              size={15}
-              style={{
-                alignSelf: 'center'
-              }}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
-      <View style={{
-        flex: 1,
-      }}>
+      <ScrollView>
         <View style={{
-          ...styles.titleView, marginTop: wp( '2%' )
+          marginBottom: wp( '5%' ),
         }}>
-          <Text style={styles.headerTitleText}>{`${strings.Existing} Wallet`}</Text>
-          <Text style={styles.headerInfoText}>
-            {/* {strings.previously} */}
-            {'Use Backup Phrase if you have 12/24 word Backup Phrase. Recovery Keys are for legacy users'}
-          </Text>
+          <View style={styles.titleView}>
+            <Text style={styles.headerTitleText}>{`${strings.new} Wallet`}</Text>
+            <Text style={styles.headerInfoText}>
+              {strings.appcreates}
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={() => props.navigation.navigate( 'NewWalletName' )}
+            style={styles.NewWalletTouchableView}
+          >
+            <Image
+              style={{
+                ...styles.iconImage, width: wp( 7 ),
+                height: wp( 7 ), marginBottom: wp( 2 )
+              }}
+              source={require( '../assets/images/icons/icon_newwallet.png' )}
+            />
+            <View style={styles.textView}>
+              <Text style={styles.touchableText}>
+                {
+                  'Start with a new Tribe Wallet'
+                }
+              </Text>
+            </View>
+            <View style={styles.arrowIconView}>
+              <MaterialIcons
+                name="arrow-forward-ios"
+                color={Colors.borderColor}
+                size={15}
+                style={{
+                  alignSelf: 'center'
+                }}
+              />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => props.navigation.navigate( 'CreateKeeperScreen' )}
+            style={[ styles.NewWalletTouchableView, {
+              marginTop: hp( 20 )
+            } ]}
+          >
+            <Image
+              style={{
+                ...styles.iconImage, width: wp( 7 ),
+                height: wp( 7 ), marginBottom: wp( 2 )
+              }}
+              source={require( '../assets/images/icons/icon_createwk.png' )}
+            />
+            <View style={styles.textView}>
+              <Text style={styles.touchableText}>
+                {
+                  'Create with Bitcoin Keeper'
+                }
+              </Text>
+            </View>
+            <View style={styles.arrowIconView}>
+              <MaterialIcons
+                name="arrow-forward-ios"
+                color={Colors.borderColor}
+                size={15}
+                style={{
+                  alignSelf: 'center'
+                }}
+              />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              props.navigation.navigate( 'CreateWithBorderWallet' )
+              // setGenerateEntropyGrid( true )
+            }}
+            style={[ styles.NewWalletTouchableView, {
+              marginTop: hp( 20 ), alignItems: 'center'
+            } ]}
+          >
+            <BorderWallet/>
+            <View style={styles.textView}>
+              <Text style={styles.touchableText}>
+                {
+                  'Create a Border Wallet'
+                }
+              </Text>
+            </View>
+            <View style={styles.arrowIconView}>
+              <MaterialIcons
+                name="arrow-forward-ios"
+                color={Colors.borderColor}
+                size={15}
+                style={{
+                  alignSelf: 'center'
+                }}
+              />
+            </View>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          onPress={async () => {
-            props.navigation.navigate( 'RestoreSeedWordsContent' )
-          }}
-          style={{
-            ...styles.NewWalletTouchableView, marginBottom: wp( '7%' )
-          }}
-        >
-          <Image
-            style={styles.iconImage}
-            source={require( '../assets/images/icons/seedwords.png' )}
-          />
-          <View style={styles.textView}>
-            <Text style={styles.touchableText}>Using Backup Phrase</Text>
+        <View style={{
+          flex: 1,
+        }}>
+          <View style={{
+            ...styles.titleView, marginTop: wp( '2%' )
+          }}>
+            <Text style={styles.headerTitleText}>{`${strings.Existing} Wallet`}</Text>
+            <Text style={styles.headerInfoText}>
+              {/* {strings.previously} */}
+              {'Use Backup Phrase if you have 12/24 word Backup Phrase. Recovery Keys are for legacy users'}
+            </Text>
           </View>
-          <View style={styles.arrowIconView}>
-            <MaterialIcons
-              name="arrow-forward-ios"
-              color={Colors.borderColor}
-              size={15}
-              style={{
-                alignSelf: 'center'
-              }}
+          <TouchableOpacity
+            onPress={async () => {
+              props.navigation.navigate( 'RestoreSeedWordsContent' )
+            }}
+            style={{
+              ...styles.NewWalletTouchableView, marginBottom: wp( '7%' )
+            }}
+          >
+            <Image
+              style={styles.iconImage}
+              source={require( '../assets/images/icons/seedwords.png' )}
             />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={async () => {
-            dispatch( setDownloadedBackupData( [] ) )
-            dispatch( setCloudDataRecovery( null ) )
-            dispatch( setIsFileReading( false ) )
-            props.navigation.navigate( 'RestoreWithICloud' )
-          }}
-          style={{
-            ...styles.NewWalletTouchableView, marginBottom: wp( '7%' )
-          }}
-        >
-          <Image
-            style={styles.iconImage}
-            source={require( '../assets/images/icons/icon_secrets.png' )}
-          />
-          <View style={styles.textView}>
-            <Text style={styles.touchableText}>Using Recovery Keys</Text>
-          </View>
-          <View style={styles.arrowIconView}>
-            <MaterialIcons
-              name="arrow-forward-ios"
-              color={Colors.borderColor}
-              size={15}
-              style={{
-                alignSelf: 'center'
-              }}
+            <View style={styles.textView}>
+              <Text style={styles.touchableText}>Using Backup Phrase</Text>
+            </View>
+            <View style={styles.arrowIconView}>
+              <MaterialIcons
+                name="arrow-forward-ios"
+                color={Colors.borderColor}
+                size={15}
+                style={{
+                  alignSelf: 'center'
+                }}
+              />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={async () => {
+              dispatch( setDownloadedBackupData( [] ) )
+              dispatch( setCloudDataRecovery( null ) )
+              dispatch( setIsFileReading( false ) )
+              props.navigation.navigate( 'RestoreWithICloud' )
+            }}
+            style={{
+              ...styles.NewWalletTouchableView, marginBottom: wp( '7%' )
+            }}
+          >
+            <Image
+              style={styles.iconImage}
+              source={require( '../assets/images/icons/icon_secrets.png' )}
             />
-          </View>
-        </TouchableOpacity>
-        {/* <View style={{
+            <View style={styles.textView}>
+              <Text style={styles.touchableText}>Using Recovery Keys</Text>
+            </View>
+            <View style={styles.arrowIconView}>
+              <MaterialIcons
+                name="arrow-forward-ios"
+                color={Colors.borderColor}
+                size={15}
+                style={{
+                  alignSelf: 'center'
+                }}
+              />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => props.navigation.navigate( 'RegenerateEntropyGrid' )}
+            style={[ styles.NewWalletTouchableView, {
+              alignItems: 'center'
+            } ]}
+          >
+            <BorderWallet/>
+            <View style={styles.textView}>
+              <Text style={styles.touchableText}>
+                {
+                  'Using a Border Wallet'
+                }
+              </Text>
+            </View>
+            <View style={styles.arrowIconView}>
+              <MaterialIcons
+                name="arrow-forward-ios"
+                color={Colors.borderColor}
+                size={15}
+                style={{
+                  alignSelf: 'center'
+                }}
+              />
+            </View>
+          </TouchableOpacity>
+          {/* <View style={{
           marginLeft: wp( '3%' ), marginRight: wp( '3%' )
         }}>
           <Text
@@ -183,7 +242,7 @@ const WalletInitializationScreen = props => {
               , textDecorationLine:'underline'
             }}>{'\nhttps://hexawallet.io/faq/'}</Text></Text>
         </View> */}
-        {/* <TouchableOpacity
+          {/* <TouchableOpacity
           onPress={async () => {
             // props.navigation.navigate( 'RestoreWithICloud' )
           }}
@@ -214,24 +273,31 @@ const WalletInitializationScreen = props => {
           </View>
         </TouchableOpacity> */}
 
-        <View style={{
-          flex: 1,
-        }}>
-          <View style={{
-            marginTop: 'auto'
+          {/* <View style={{
+            flex: 1,
           }}>
-            <BottomInfoBox
-              backgroundColor={Colors.white}
-              title={strings.TermsService}
-              infoText={
-                `${strings.proceeding} `
-              }
-              linkText={strings.TermsService}
-              onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
-            />
-          </View>
+            <View style={{
+              marginTop: 'auto'
+            }}>
+
+            </View>
+          </View> */}
         </View>
-      </View>
+      </ScrollView>
+      <BottomInfoBox
+        backgroundColor={Colors.white}
+        title={strings.TermsService}
+        infoText={
+          `${strings.proceeding} `
+        }
+        linkText={strings.TermsService}
+        onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
+      />
+      <ModalContainer onBackground={() =>setGenerateEntropyGrid( false )}
+        visible={generateEntropyGrid}
+        closeBottomSheet={() => { }}>
+        <GenerateEntropyGridModal closeModal={() => setGenerateEntropyGrid( false )}/>
+      </ModalContainer>
     </SafeAreaView>
   )
 }

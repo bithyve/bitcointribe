@@ -340,7 +340,7 @@ const RestoreSeedPageComponent = ( props ) => {
                       </TouchableOpacity>
                     )
                   }}
-                  ListFooterComponent={() => seedIndex == 1 &&
+                  ListFooterComponent={() => seedIndex == 1 && props.isTwelveCheckbox &&
                   <TouchableOpacity onPress={() => onCheckPressed()} style={{
                     flexDirection: 'row', alignItems: 'center'
                   }}>
