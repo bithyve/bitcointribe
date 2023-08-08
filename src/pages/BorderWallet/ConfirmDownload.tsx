@@ -109,14 +109,16 @@ const ConfirmDownload = ( props ) => {
         </View>
         <View style={styles.mnemonicWrapper}>
           <Text style={styles.previewTitle}>Regeneration Mnemonic</Text>
-          <FlatList
-            data={DATA}
-            renderItem={( { item } ) => <Item title={item.title} id={item.id} />}
-            keyExtractor={item => item.id}
-            numColumns={2}
-          />
+          <View>
+            <FlatList
+              data={DATA}
+              renderItem={( { item } ) => <Item title={item.title} id={item.id} />}
+              keyExtractor={item => item.id}
+              numColumns={2}
+            />
+          </View>
           <Text style={[ styles.previewTitle, {
-            marginLeft: 5
+            marginLeft: 5, marginTop: 15
           } ]}>Checksum Word</Text>
           <View style={[ styles.item, {
             marginLeft: 8
@@ -128,7 +130,7 @@ const ConfirmDownload = ( props ) => {
           </View>
           <View>
             <Text style={[ styles.previewTitle, {
-              marginLeft: 5
+              marginLeft: 5, marginTop: 10
             } ]}>Passphrase</Text>
             <View style={styles.passPhraseWrapper}>
               <Text>Do not go gentle into that good night, Old age should burn and rave at close of day</Text>
@@ -217,7 +219,7 @@ const styles = StyleSheet.create( {
     width: '40%'
   },
   mnemonicWrapper: {
-    width: '60%'
+    width: '60%',
   },
   previewTitle: {
     color: Colors.blue,
@@ -227,7 +229,7 @@ const styles = StyleSheet.create( {
   },
   patternPreviewWrapper: {
     backgroundColor: '#CBCBCB',
-    height: '65%',
+    height: '60%',
     width: '90%',
     marginTop: 20
   },
@@ -265,6 +267,7 @@ const styles = StyleSheet.create( {
     marginLeft: 5
   },
   previewPatternButton :{
+    width:'90%',
     backgroundColor: '#69A2B0',
     borderRadius: 5,
     paddingVertical: 5,
