@@ -50,7 +50,10 @@ const RegenerateEntropyGrid = ( props ) => {
         </View>
         <View style={styles.iconWrapper}>
           <TouchableOpacity style={styles.uploadBtnWraper}>
-            <Text style={styles.uploadBtnText}>Upload</Text>
+            <View style={styles.iconUpWrapper}>
+              {/* <IconUp/> */}
+            </View>
+            <Text style={styles.uploadBtnText}>&nbsp;Upload</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -74,6 +77,15 @@ const styles = StyleSheet.create( {
     width: '20%',
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  iconUpWrapper: {
+    backgroundColor: '#F8F8F8',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 15,
+    width: 15,
+    borderRadius: 15,
+    marginLeft: 5
   },
   titleText: {
     fontSize: RFValue( 16 ),
