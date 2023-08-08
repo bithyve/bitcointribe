@@ -147,7 +147,7 @@ const Ceil = ( { onPress, text, index, selected } ) => {
 }
 
 const BorderWalletGridScreen = ( { navigation } ) => {
-  const mnemonic = navigation.getParam('mnemonic')
+  const mnemonic = navigation.getParam( 'mnemonic' )
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
   const columnHeaderRef = useRef()
@@ -213,6 +213,18 @@ const BorderWalletGridScreen = ( { navigation } ) => {
       selected.push( index )
       setSelected( [ ...selected ] )
     }
+  }
+
+  const onPressNext = () => {
+    const words = [ ...wordlists ]
+    shuffle( words, mnemonic )
+    const selectedWords = []
+    selected.forEach( s => {
+      selectedWords.push( words[ s ] )
+    } )
+    navigation.navigate( 'SelectChecksumWord', {
+      words: selectedWords.toString().replace( /,/g, ' ' )
+    } )
   }
 
   return (
