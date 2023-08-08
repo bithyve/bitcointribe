@@ -22,7 +22,7 @@ import CreateMemorablePattern from '../../components/border-wallet/CreateMemorab
 const CreateWithBorderWallet = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'Generate New Entropy Grid' )
   const [ generateEntropyGrid, setGenerateEntropyGrid ] = useState( false )
-  const seed =  bip39.generateMnemonic()
+  const mnemonic =  bip39.generateMnemonic()
 
   type ItemProps = {title: string, id: string};
 
@@ -52,7 +52,7 @@ const CreateWithBorderWallet = ( props ) => {
       />
 
       <FlatList
-        data={seed.split(' ')}
+        data={mnemonic.split(' ')}
         renderItem={( { item, index } ) => <Item title={item} id={`${index+1}`} />}
         keyExtractor={item => item}
         numColumns={2}
@@ -67,7 +67,7 @@ const CreateWithBorderWallet = ( props ) => {
           <TouchableOpacity
             onPress={() => {
             //   setGenerateEntropyGrid( true )
-              props.navigation.navigate( 'BorderWalletGridScreen', {seed} )
+              props.navigation.navigate( 'BorderWalletGridScreen', {mnemonic} )
             }}
           >
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
