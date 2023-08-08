@@ -74,7 +74,10 @@ const SelectChecksumWord = ( props ) => {
   type ItemProps = {title: string, id: string};
 
   const Item = ( { title, id }: ItemProps ) => (
-    <TouchableOpacity style={styles.item} onPress={()=> setChecksumWord( `${id} ${title}` ) }>
+    <TouchableOpacity style={styles.item} onPress={()=> {
+      setShowDropdown( false ),
+      setChecksumWord( `${id} ${title}` )
+    } }>
       <View style={[ styles.indexWrapper ]}>
         <Text style={styles.gridItemIndex}>{id}</Text>
       </View>
