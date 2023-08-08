@@ -7,7 +7,6 @@ import {
   FlatList,
   Text,
   TouchableOpacity,
-  TextInput,
 } from 'react-native'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -16,10 +15,11 @@ import Fonts from '../../common/Fonts'
 import { hp, wp } from '../../common/data/responsiveness/responsive'
 import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
+import ModalContainer from '../../components/home/ModalContainer'
 
 const ConfirmDownload = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'Memorise/Download' )
-  const [ checksumWord, setChecksumWord ] = useState( '' )
+  const [ successModal, setSuccessModal ] = useState( false )
   const DATA = [
     {
       id: '01',
@@ -137,7 +137,8 @@ const ConfirmDownload = ( props ) => {
           <TouchableOpacity
             onPress={() => {
             //   setGenerateEntropyGrid( true )
-              props.navigation.navigate( 'SelectChecksumWord' )
+              setSuccessModal( true )
+              // props.navigation.navigate( 'SelectChecksumWord' )
             }}
           >
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
@@ -154,6 +155,13 @@ const ConfirmDownload = ( props ) => {
           </TouchableOpacity>
         </View>
       </View>
+      {/* <ModalContainer
+        onBackground={()=> setSuccessModal( false )}
+        visible={successModal}
+        closeBottomSheet={()=> setSuccessModal( false )}
+      >
+
+      </ModalContainer> */}
     </SafeAreaView>
   )
 }

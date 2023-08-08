@@ -115,7 +115,7 @@ const CreateWithBorderWallet = ( props ) => {
           <TouchableOpacity
             onPress={() => {
             //   setGenerateEntropyGrid( true )
-              props.navigation.navigate( 'SelectChecksumWord' )
+              props.navigation.navigate( 'BorderWalletGridScreen' )
             }}
           >
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
