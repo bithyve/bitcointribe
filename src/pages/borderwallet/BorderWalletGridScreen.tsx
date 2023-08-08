@@ -147,6 +147,7 @@ const Ceil = ( { onPress, text, index, selected } ) => {
 }
 
 const BorderWalletGridScreen = ( { navigation } ) => {
+  const mnemonic = navigation.getParam('mnemonic')
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
   const columnHeaderRef = useRef()
@@ -186,10 +187,8 @@ const BorderWalletGridScreen = ( { navigation } ) => {
     let listener
     InteractionManager.runAfterInteractions( () => {
       listener = setTimeout( () => {
-        const entropy =
-          'soup example crater canyon air art tiger either repair warfare blind permit'
         const words = [ ...wordlists ]
-        shuffle( words, entropy )
+        shuffle( words, mnemonic )
         const cells = words.map( ( word ) => getCellValue( word ) )
         const g = []
         Array.from( {
