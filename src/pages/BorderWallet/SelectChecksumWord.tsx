@@ -74,14 +74,20 @@ const SelectChecksumWord = ( props ) => {
   type ItemProps = {title: string, id: string};
 
   const Item = ( { title, id }: ItemProps ) => (
-    <TouchableOpacity style={styles.item} onPress={()=> {
+    <TouchableOpacity style={[ styles.item, {
+      backgroundColor: checksumWord===`${id} ${title}` ? '#69A2B0' : '#FAFAFA'
+    } ]} onPress={()=> {
       setShowDropdown( false ),
       setChecksumWord( `${id} ${title}` )
     } }>
-      <View style={[ styles.indexWrapper ]}>
-        <Text style={styles.gridItemIndex}>{id}</Text>
+      <View style={styles.indexWrapper}>
+        <Text style={[ styles.gridItemIndex, {
+          color: checksumWord===`${id} ${title}` ? '#FAFAFA' : Colors.blue
+        } ]}>{id}</Text>
       </View>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[ styles.title, {
+        color: checksumWord===`${id} ${title}` ? '#FAFAFA' : '#717171'
+      } ]}>{title}</Text>
     </TouchableOpacity>
   )
   return (
@@ -154,12 +160,12 @@ const styles = StyleSheet.create( {
   item: {
     flexDirection: 'row',
     width: '87%',
-    backgroundColor: '#FAFAFA',
     padding: 15,
     borderBottomColor: '#BABABA',
     borderBottomWidth: 0.3,
     marginHorizontal:  wp( 25 ),
-    alignItems: 'center'
+    alignItems: 'center',
+    borderRadius: 10
   },
   indexWrapper: {
     width: '10%'
@@ -167,13 +173,11 @@ const styles = StyleSheet.create( {
   gridItemIndex: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: Colors.blue,
     opacity: 0.6
   },
   title: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#717171',
     opacity: 0.6
   },
   buttonView: {
