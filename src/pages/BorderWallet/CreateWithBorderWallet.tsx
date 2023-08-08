@@ -31,7 +31,7 @@ const CreateWithBorderWallet = ( props ) => {
       <View style={[ styles.indexWrapper ]}>
         <Text style={styles.gridItemIndex}>{id}</Text>
       </View>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.title}>{title.toLocaleUpperCase()}</Text>
     </View>
   )
 
@@ -52,13 +52,12 @@ const CreateWithBorderWallet = ( props ) => {
       />
 
       <FlatList
-        data={mnemonic.split(' ')}
+        data={mnemonic.split( ' ' )}
         renderItem={( { item, index } ) => <Item title={item} id={`${index+1}`} />}
         keyExtractor={item => item}
         numColumns={2}
       />
       <BottomInfoBox
-        backgroundColor={Colors.white}
         title={'Note'}
         infoText={'Treat these words & grid with the same degree of security that you would a Bitcoin seed phrase'}
       />
@@ -67,7 +66,9 @@ const CreateWithBorderWallet = ( props ) => {
           <TouchableOpacity
             onPress={() => {
             //   setGenerateEntropyGrid( true )
-              props.navigation.navigate( 'BorderWalletGridScreen', {mnemonic} )
+              props.navigation.navigate( 'BorderWalletGridScreen', {
+                mnemonic
+              } )
             }}
           >
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
