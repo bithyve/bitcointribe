@@ -7,7 +7,6 @@ import {
   FlatList,
   Text,
   TouchableOpacity,
-  TextInput,
 } from 'react-native'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -16,6 +15,7 @@ import Fonts from '../../common/Fonts'
 import { hp, wp } from '../../common/data/responsiveness/responsive'
 import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
+import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 
 const SelectChecksumWord = ( props ) => {
   const DATA = [
@@ -69,7 +69,8 @@ const SelectChecksumWord = ( props ) => {
     }
   ]
   const [ headerTitle, setHeaderTitle ]=useState( 'Select Checksum Word' )
-  const [ checksumWord, setChecksumWord ] = useState( '' )
+  const [ checksumWord, setChecksumWord ] = useState( 'Select checksum word' )
+  const [ showDropdown, setShowDropdown ] = useState( false )
   type ItemProps = {title: string, id: string};
 
   const Item = ( { title, id }: ItemProps ) => (
@@ -95,22 +96,18 @@ const SelectChecksumWord = ( props ) => {
         info={'This is the final step of creating your Border Wallet'}
         selectedTitle={headerTitle}
       />
-      <View>
-        <TextInput
-          style={
-            styles.textBox
-          }
-          placeholder={'Select checksum word'}
-          placeholderTextColor={Colors.textColorGrey}
-          value={checksumWord}
-          onChangeText={text => setChecksumWord( text )}
-        />
-      </View>
-      <FlatList
+      <TouchableOpacity style={styles.dropdownBox} onPress={()=> setShowDropdown( !showDropdown )}>
+        <Text style={styles.dropdownText}>{checksumWord}</Text>
+        <IconArrowDown/>
+      </TouchableOpacity>
+      {showDropdown && <FlatList
+        contentContainerStyle={{
+          height: '55%'
+        }}
         data={DATA}
         renderItem={( { item } ) => <Item title={item.title} id={item.id} />}
         keyExtractor={item => item.id}
-      />
+      />}
       <View style={styles.bottomButtonView}>
         <View>
           <TouchableOpacity
@@ -137,21 +134,27 @@ const SelectChecksumWord = ( props ) => {
   )
 }
 const styles = StyleSheet.create( {
-  textBox: {
+  dropdownBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginHorizontal: wp( 25 ),
     padding: 15,
     borderRadius: 10,
+    backgroundColor: '#FAFAFA'
+  },
+  dropdownText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.Medium,
     fontSize: RFValue( 13 ),
-    backgroundColor: '#FAFAFA'
   },
   item: {
     flexDirection: 'row',
     width: '87%',
     backgroundColor: '#FAFAFA',
     padding: 15,
-    marginVertical: 8,
+    borderBottomColor: '#BABABA',
+    borderBottomWidth: 0.3,
     marginHorizontal:  wp( 25 ),
     alignItems: 'center'
   },
@@ -185,10 +188,12 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Medium,
   },
   bottomButtonView: {
-    flexDirection: 'row',
-    paddingHorizontal: hp( 6 ),
+    flex: 1,
+    // flexDirection: 'row',
+    // paddingHorizontal: hp( 6 ),
     paddingBottom: deviceInfoModule.hasNotch() ? hp( 4 ) : hp( 3 ),
     justifyContent: 'flex-end',
+    alignItems: 'flex-end'
   },
 } )
 export default SelectChecksumWord
