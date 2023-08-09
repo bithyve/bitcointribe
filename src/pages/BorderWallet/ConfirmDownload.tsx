@@ -229,9 +229,9 @@ const styles = StyleSheet.create( {
   },
   patternPreviewWrapper: {
     backgroundColor: '#CBCBCB',
-    height: '60%',
+    height: '88%',
     width: '90%',
-    marginTop: 20
+    marginVertical: 20
   },
   buttonView: {
     padding: 15,
