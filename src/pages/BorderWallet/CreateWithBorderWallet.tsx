@@ -147,14 +147,14 @@ const styles = StyleSheet.create( {
     alignItems: 'center'
   },
   statusIndicatorActiveView: {
-    height: 8,
-    width: 8,
+    height: 10,
+    width: 10,
     backgroundColor: Colors.CLOSE_ICON_COLOR,
     borderRadius: 10,
   },
   statusIndicatorInactiveView: {
-    height: 8,
-    width: 8,
+    height: 7,
+    width: 7,
     backgroundColor: Colors.THEAM_TEXT_COLOR,
     borderRadius: 10,
     marginLeft: 5,
