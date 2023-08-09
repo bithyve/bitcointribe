@@ -20,6 +20,7 @@ import {
 import * as bip39 from 'bip39'
 import uheprng from '../../utils/uheprng'
 import { RFValue } from 'react-native-responsive-fontsize'
+import IconRight from '../../assets/images/svgs/icon_right.svg'
 
 const wordlists = bip39.wordlists.english
 const columns = [
@@ -83,10 +84,15 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
   },
   text: {
+    fontSize: 12,
+    color: '#BEBBBB'
   },
   textSeq: {
     textAlign: 'left',
     fontSize: 9,
+    color: '#F8F8F8',
+    top: -6,
+    left: -10
   },
   headerWrapper: {
     flexDirection: 'row',
@@ -95,6 +101,36 @@ const styles = StyleSheet.create( {
   headerText:{
     color: Colors.blue,
     fontSize: RFValue( 17 )
+  },
+  selectedPatternText: {
+    fontSize: 12,
+    color: '#F8F8F8'
+  },
+  selectionNextBtn:{
+    padding: 20,
+    backgroundColor: '#69A2B0',
+    position: 'absolute',
+    bottom: 35,
+    right: 35,
+    zIndex: 10,
+    borderRadius: 10,
+    flexDirection: 'row'
+  },
+  nextBtnWrapper: {
+    marginLeft: 30,
+    flexDirection: 'row'
+  },
+  iconRightWrapper: {
+    backgroundColor: '#F8F8F8',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 15,
+    width: 15,
+    borderRadius: 15,
+    marginLeft: 5
+  },
+  ceilText: {
+    color: '#BEBBBB'
   }
 } )
 
@@ -106,20 +142,21 @@ const Ceil = ( { onPress, text, index, selected } ) => {
       onPress={() => onPress( index )}
       style={isSelected ? styles.cellSelected : styles.cell}
     >
-      {isSelected && <Text style={styles.textSeq}>{sequence}</Text>}
-      <Text style={styles.text}>{text}</Text>
+      {isSelected && <Text style={styles.textSeq}>{sequence} &nbsp;</Text>}
+      <Text style={[ styles.text, {
+        color: isSelected ? '#F8F8F8' : '#BEBBBB'
+      } ]}>{text}</Text>
     </TouchableOpacity>
   )
 }
 
 const BorderWalletGridScreen = ( { navigation } ) => {
-  const mnemonic = navigation.getParam('mnemonic')
+  const mnemonic = navigation.getParam( 'mnemonic' )
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
   const columnHeaderRef = useRef()
   const rowHeaderRef = useRef()
   const [ loading, setLoading ] = useState( true )
-  const [ headerTitle, setHeaderTitle ]=useState( 'Step 2: Create a Pattern' )
 
   const rnd11Bit = ( limit = 2048 ) => {
     let small = limit
@@ -185,10 +222,12 @@ const BorderWalletGridScreen = ( { navigation } ) => {
     const words = [ ...wordlists ]
     shuffle( words, mnemonic )
     const selectedWords = []
-    selected.forEach(s => {
-      selectedWords.push(words[s])
-    });
-    navigation.navigate( 'SelectChecksumWord', {words: selectedWords.toString().replace( /,/g, ' ' )} )
+    selected.forEach( s => {
+      selectedWords.push( words[ s ] )
+    } )
+    navigation.navigate( 'SelectChecksumWord', {
+      words: selectedWords.toString().replace( /,/g, ' ' )
+    } )
   }
 
   return (
@@ -199,18 +238,16 @@ const BorderWalletGridScreen = ( { navigation } ) => {
       />
       <TouchableOpacity
         disabled={selected.length !== 11}
-        style={{
-          padding: 20,
-          backgroundColor: '#69A2B0',
-          position: 'absolute',
-          bottom: 35,
-          right: 35,
-          zIndex: 10,
-          borderRadius: 10
-        }}
-        onPress={onPressNext}
+        style={styles.selectionNextBtn}
+        onPress={()=> navigation.navigate( 'SelectChecksumWord' )}
       >
-        <Text>{`${selected.length} of 11`}</Text>
+        <Text style={styles.selectedPatternText}>{`${selected.length} of 11`}</Text>
+        {selected.length=== 11 && <View style={styles.nextBtnWrapper}>
+          <Text style={styles.selectedPatternText}>Next</Text>
+          <View style={styles.iconRightWrapper}>
+            <IconRight/>
+          </View>
+        </View>}
       </TouchableOpacity>
       <View
         style={[
@@ -255,7 +292,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
             showsHorizontalScrollIndicator={false}
             renderItem={( { item } ) => (
               <View style={styles.cell}>
-                <Text>{item}</Text>
+                <Text style={styles.ceilText}>{item}</Text>
               </View>
             )}
             keyExtractor={( item ) => item}
@@ -283,7 +320,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
               showsHorizontalScrollIndicator={false}
               renderItem={( { item } ) => (
                 <View style={styles.cell}>
-                  <Text>{( '000' + ( item + 1 ) ).substr( -3 )}</Text>
+                  <Text style={styles.ceilText}>{( '000' + ( item + 1 ) ).substr( -3 )}</Text>
                 </View>
               )}
               keyExtractor={( item ) => item.toString()}
@@ -350,5 +387,4 @@ const BorderWalletGridScreen = ( { navigation } ) => {
     </SafeAreaView>
   )
 }
-
 export default BorderWalletGridScreen

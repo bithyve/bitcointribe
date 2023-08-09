@@ -15,7 +15,7 @@ import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
-import { hp } from '../../common/data/responsiveness/responsive'
+import { hp, wp } from '../../common/data/responsiveness/responsive'
 import ModalContainer from '../../components/home/ModalContainer'
 import CreateMemorablePattern from '../../components/border-wallet/CreateMemorablePattern'
 
@@ -52,22 +52,30 @@ const CreateWithBorderWallet = ( props ) => {
       />
 
       <FlatList
-        data={mnemonic.split(' ')}
+        data={mnemonic.split( ' ' )}
         renderItem={( { item, index } ) => <Item title={item} id={`${index+1}`} />}
         keyExtractor={item => item}
         numColumns={2}
       />
       <BottomInfoBox
-        backgroundColor={Colors.white}
         title={'Note'}
         infoText={'Treat these words & grid with the same degree of security that you would a Bitcoin seed phrase'}
       />
       <View style={styles.bottomButtonView}>
+        <View style={styles.statusIndicatorView}>
+          <View style={styles.statusIndicatorActiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+        </View>
         <View>
           <TouchableOpacity
             onPress={() => {
             //   setGenerateEntropyGrid( true )
-              props.navigation.navigate( 'BorderWalletGridScreen', {mnemonic} )
+              props.navigation.navigate( 'BorderWalletGridScreen', {
+                mnemonic
+              } )
             }}
           >
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
@@ -130,9 +138,26 @@ const styles = StyleSheet.create( {
   },
   bottomButtonView: {
     flexDirection: 'row',
-    paddingHorizontal: hp( 6 ),
+    justifyContent: 'space-between',
+    paddingHorizontal: wp( 30 ),
     paddingBottom: deviceInfoModule.hasNotch() ? hp( 4 ) : hp( 3 ),
-    justifyContent: 'flex-end'
+  },
+  statusIndicatorView: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  statusIndicatorActiveView: {
+    height: 10,
+    width: 10,
+    backgroundColor: Colors.CLOSE_ICON_COLOR,
+    borderRadius: 10,
+  },
+  statusIndicatorInactiveView: {
+    height: 7,
+    width: 7,
+    backgroundColor: Colors.THEAM_TEXT_COLOR,
+    borderRadius: 10,
+    marginLeft: 5,
   },
 } )
 export default CreateWithBorderWallet

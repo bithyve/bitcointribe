@@ -74,11 +74,20 @@ const SelectChecksumWord = ( props ) => {
   type ItemProps = {title: string, id: string};
 
   const Item = ( { title, id }: ItemProps ) => (
-    <TouchableOpacity style={styles.item} onPress={()=> setChecksumWord( `${id} ${title}` ) }>
-      <View style={[ styles.indexWrapper ]}>
-        <Text style={styles.gridItemIndex}>{id}</Text>
+    <TouchableOpacity style={[ styles.item, {
+      backgroundColor: checksumWord===`${id} ${title}` ? '#69A2B0' : '#FAFAFA'
+    } ]} onPress={()=> {
+      setShowDropdown( false ),
+      setChecksumWord( `${id} ${title}` )
+    } }>
+      <View style={styles.indexWrapper}>
+        <Text style={[ styles.gridItemIndex, {
+          color: checksumWord===`${id} ${title}` ? '#FAFAFA' : Colors.blue
+        } ]}>{id}</Text>
       </View>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[ styles.title, {
+        color: checksumWord===`${id} ${title}` ? '#FAFAFA' : '#717171'
+      } ]}>{title}</Text>
     </TouchableOpacity>
   )
   return (
@@ -100,35 +109,41 @@ const SelectChecksumWord = ( props ) => {
         <Text style={styles.dropdownText}>{checksumWord}</Text>
         <IconArrowDown/>
       </TouchableOpacity>
-      {showDropdown && <FlatList
-        contentContainerStyle={{
-          height: '55%'
-        }}
-        data={DATA}
-        renderItem={( { item } ) => <Item title={item.title} id={item.id} />}
-        keyExtractor={item => item.id}
-      />}
+      <View style={{
+        height: '60%'
+      }}>
+        {showDropdown && <FlatList
+          data={DATA}
+          renderItem={( { item } ) => <Item title={item.title} id={item.id} />}
+          keyExtractor={item => item.id}
+        />}
+      </View>
       <View style={styles.bottomButtonView}>
-        <View>
-          <TouchableOpacity
-            onPress={() => {
-            //   setGenerateEntropyGrid( true )
-              props.navigation.navigate( 'CreatePassPhrase' )
-            }}
-          >
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
-              style={styles.buttonView}
-            >
-              <Text style={styles.buttonText}>Next</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+        <View style={styles.statusIndicatorView}>
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorActiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
         </View>
+        <TouchableOpacity
+          onPress={() => {
+          //   setGenerateEntropyGrid( true )
+            props.navigation.navigate( 'CreatePassPhrase' )
+          }}
+        >
+          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+            start={{
+              x: 0, y: 0
+            }} end={{
+              x: 1, y: 0
+            }}
+            locations={[ 0.2, 1 ]}
+            style={styles.buttonView}
+          >
+            <Text style={styles.buttonText}>Next</Text>
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   )
@@ -151,12 +166,12 @@ const styles = StyleSheet.create( {
   item: {
     flexDirection: 'row',
     width: '87%',
-    backgroundColor: '#FAFAFA',
     padding: 15,
     borderBottomColor: '#BABABA',
     borderBottomWidth: 0.3,
     marginHorizontal:  wp( 25 ),
-    alignItems: 'center'
+    alignItems: 'center',
+    borderRadius: 10
   },
   indexWrapper: {
     width: '10%'
@@ -164,13 +179,11 @@ const styles = StyleSheet.create( {
   gridItemIndex: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: Colors.blue,
     opacity: 0.6
   },
   title: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#717171',
     opacity: 0.6
   },
   buttonView: {
@@ -179,7 +192,6 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 10,
     backgroundColor: Colors.blue,
-    right: 15,
     width: 120
   },
   buttonText: {
@@ -189,11 +201,29 @@ const styles = StyleSheet.create( {
   },
   bottomButtonView: {
     flex: 1,
-    // flexDirection: 'row',
-    // paddingHorizontal: hp( 6 ),
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    paddingHorizontal: wp( 30 ),
     paddingBottom: deviceInfoModule.hasNotch() ? hp( 4 ) : hp( 3 ),
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end'
+  },
+  statusIndicatorView: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  statusIndicatorActiveView: {
+    height: 10,
+    width: 10,
+    backgroundColor: Colors.CLOSE_ICON_COLOR,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
+  statusIndicatorInactiveView: {
+    height: 7,
+    width: 7,
+    backgroundColor: Colors.THEAM_TEXT_COLOR,
+    borderRadius: 10,
+    marginLeft: 5,
   },
 } )
 export default SelectChecksumWord

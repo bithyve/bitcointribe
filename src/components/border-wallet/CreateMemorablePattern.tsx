@@ -11,7 +11,7 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { ScrollView } from 'react-native-gesture-handler'
 import { translations } from '../../common/content/LocContext'
-import EntropyGridIllustration from '../../assets/images/svgs/generateGridEntropyIllustration.svg'
+import MemoriableIllustration from '../../assets/images/svgs/MemoriableIllustration.svg'
 
 export default function CreateMemorablePattern( props ) {
   const scrollViewRef = useRef<ScrollView>()
@@ -47,7 +47,7 @@ export default function CreateMemorablePattern( props ) {
           activeOpacity={10}
           onPress={() => props.titleClicked && props.titleClicked()}
         >
-          <Text style={styles.headerText}>Create a Memorable Pattern</Text>
+          <Text style={styles.headerText}>Step 2: Create a Memorable Pattern</Text>
 
         </AppBottomSheetTouchableWrapper>
         <ScrollView
@@ -71,7 +71,7 @@ export default function CreateMemorablePattern( props ) {
             <View style={{
               justifyContent: 'center', alignItems: 'center'
             }}>
-              <EntropyGridIllustration />
+              <MemoriableIllustration />
             </View>
             <Text
               style={{

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import {
   View,
   SafeAreaView,
@@ -16,8 +16,12 @@ import { hp, wp } from '../../common/data/responsiveness/responsive'
 import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
 import ModalContainer from '../../components/home/ModalContainer'
+import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
+import { LocalizationContext } from '../../common/content/LocContext'
 
 const ConfirmDownload = ( props ) => {
+  const { translations } = useContext( LocalizationContext )
+  const common = translations[ 'common' ]
   const [ headerTitle, setHeaderTitle ]=useState( 'Memorise/Download' )
   const [ successModal, setSuccessModal ] = useState( false )
   const DATA = [
@@ -105,14 +109,16 @@ const ConfirmDownload = ( props ) => {
         </View>
         <View style={styles.mnemonicWrapper}>
           <Text style={styles.previewTitle}>Regeneration Mnemonic</Text>
-          <FlatList
-            data={DATA}
-            renderItem={( { item } ) => <Item title={item.title} id={item.id} />}
-            keyExtractor={item => item.id}
-            numColumns={2}
-          />
+          <View>
+            <FlatList
+              data={DATA}
+              renderItem={( { item } ) => <Item title={item.title} id={item.id} />}
+              keyExtractor={item => item.id}
+              numColumns={2}
+            />
+          </View>
           <Text style={[ styles.previewTitle, {
-            marginLeft: 5
+            marginLeft: 5, marginTop: 15
           } ]}>Checksum Word</Text>
           <View style={[ styles.item, {
             marginLeft: 8
@@ -124,7 +130,7 @@ const ConfirmDownload = ( props ) => {
           </View>
           <View>
             <Text style={[ styles.previewTitle, {
-              marginLeft: 5
+              marginLeft: 5, marginTop: 10
             } ]}>Passphrase</Text>
             <View style={styles.passPhraseWrapper}>
               <Text>Do not go gentle into that good night, Old age should burn and rave at close of day</Text>
@@ -155,27 +161,42 @@ const ConfirmDownload = ( props ) => {
           </TouchableOpacity>
         </View>
       </View>
-      {/* <ModalContainer
+      <ModalContainer
         onBackground={()=> setSuccessModal( false )}
         visible={successModal}
         closeBottomSheet={()=> setSuccessModal( false )}
       >
+        <BorderWalletSuccessModal
+          title={'Border Wallet creation success!'}
+          info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit,'}
+          otherText={'Your Border Wallet has been added and is now ready for you to start using.'}
+          proceedButtonText={common.continue}
+          isIgnoreButton={false}
+          closeModal={()=> setSuccessModal( false )}
+          onPressProceed={() => {
+            setSuccessModal( false )
+          }}
+          onPressIgnore={() => {
 
-      </ModalContainer> */}
+          }}
+          isBottomImage={true}
+          bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
+        />
+      </ModalContainer>
     </SafeAreaView>
   )
 }
 const styles = StyleSheet.create( {
   item: {
     flexDirection: 'row',
-    width: '38%',
+    width: '42%',
     backgroundColor: '#FAFAFA',
-    padding: 15,
+    padding: 10,
     margin: 2,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   indexWrapper: {
-    width: '30%'
+    width: '28%',
   },
   title: {
     fontSize: 12,
@@ -198,7 +219,7 @@ const styles = StyleSheet.create( {
     width: '40%'
   },
   mnemonicWrapper: {
-    width: '60%'
+    width: '60%',
   },
   previewTitle: {
     color: Colors.blue,
@@ -208,9 +229,9 @@ const styles = StyleSheet.create( {
   },
   patternPreviewWrapper: {
     backgroundColor: '#CBCBCB',
-    height: '65%',
+    height: '88%',
     width: '90%',
-    marginTop: 20
+    marginVertical: 20
   },
   buttonView: {
     padding: 15,
@@ -246,6 +267,7 @@ const styles = StyleSheet.create( {
     marginLeft: 5
   },
   previewPatternButton :{
+    width:'90%',
     backgroundColor: '#69A2B0',
     borderRadius: 5,
     paddingVertical: 5,
