@@ -60,8 +60,18 @@ const CreatePassPhrase = ( props ) => {
         </View>
       </View>
       <View style={styles.bottomButtonView}>
-        <Text style={styles.skipText}>Skip</Text>
-        <View>
+        <View style={styles.statusIndicatorView}>
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorActiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+        </View>
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center'
+        }}>
+          <Text style={styles.skipText}>Skip</Text>
           <TouchableOpacity
             onPress={() => {
             //   setGenerateEntropyGrid( true )
@@ -139,18 +149,34 @@ const styles = StyleSheet.create( {
   },
   bottomButtonView: {
     flexDirection: 'row',
-    width: '100%',
-    paddingHorizontal: hp( 6 ),
+    paddingHorizontal: hp( 30 ),
     paddingBottom: deviceInfoModule.hasNotch() ? hp( 4 ) : hp( 3 ),
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    right: 20
   },
   skipText :{
     color: Colors.blue,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.Medium,
     marginRight: 15
-  }
+  },
+  statusIndicatorView: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  statusIndicatorActiveView: {
+    height: 10,
+    width: 10,
+    backgroundColor: Colors.CLOSE_ICON_COLOR,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
+  statusIndicatorInactiveView: {
+    height: 7,
+    width: 7,
+    backgroundColor: Colors.THEAM_TEXT_COLOR,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
 } )
 export default CreatePassPhrase
