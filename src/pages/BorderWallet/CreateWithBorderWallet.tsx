@@ -31,7 +31,7 @@ const CreateWithBorderWallet = ( props ) => {
       <View style={[ styles.indexWrapper ]}>
         <Text style={styles.gridItemIndex}>{id}</Text>
       </View>
-      <Text style={styles.title}>{title.toLocaleUpperCase()}</Text>
+      <Text style={styles.title}>{title}</Text>
     </View>
   )
 

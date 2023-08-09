@@ -145,7 +145,7 @@ const Ceil = ( { onPress, text, index, selected } ) => {
       {isSelected && <Text style={styles.textSeq}>{sequence} &nbsp;</Text>}
       <Text style={[ styles.text, {
         color: isSelected ? '#F8F8F8' : '#BEBBBB'
-      } ]}>{text.toLocaleUpperCase()}</Text>
+      } ]}>{text}</Text>
     </TouchableOpacity>
   )
 }
