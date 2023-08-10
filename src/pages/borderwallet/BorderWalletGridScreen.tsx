@@ -248,7 +248,8 @@ const BorderWalletGridScreen = ( { navigation } ) => {
     } )
     navigation.navigate( 'SelectChecksumWord', {
       words: selectedWords.toString().replace( /,/g, ' ' ),
-      selected
+      selected,
+      initialMnemonic: mnemonic
     } )
   }
 

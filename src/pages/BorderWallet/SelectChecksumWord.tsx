@@ -129,8 +129,11 @@ const SelectChecksumWord = ( props ) => {
           activeOpacity={0.6}
           disabled={checksumWord === 'Select checksum word'}
           onPress={() => {
-            props.navigation.navigate( 'CreatePassPhrase', {
-              selected, mnemonic: `${words} ${checksumWord.split( ' ' )[ 1 ]}`
+            props.navigation.navigate( 'ConfirmDownload', {
+              selected,
+              checksumWord,
+              mnemonic: `${words} ${checksumWord.split( ' ' )[ 1 ]}`,
+              initialMnemonic: props.navigation.getParam( 'initialMnemonic' )
             } )
           }}
         >
