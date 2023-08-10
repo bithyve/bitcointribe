@@ -247,7 +247,8 @@ const BorderWalletGridScreen = ( { navigation } ) => {
       selectedWords.push( words[ s ] )
     } )
     navigation.navigate( 'SelectChecksumWord', {
-      words: selectedWords.toString().replace( /,/g, ' ' )
+      words: selectedWords.toString().replace( /,/g, ' ' ),
+      selected
     } )
   }
 
@@ -260,7 +261,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
       <TouchableOpacity
         disabled={selected.length !== 11}
         style={styles.selectionNextBtn}
-        onPress={()=> navigation.navigate( 'SelectChecksumWord' )}
+        onPress={onPressNext}
       >
         <Text style={styles.selectedPatternText}>{`${selected.length} of 11`}</Text>
         {selected.length=== 11 && <View style={styles.nextBtnWrapper}>
