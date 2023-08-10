@@ -157,7 +157,9 @@ const PreviewPattern = ( { navigation } ) => {
               <Text style={styles.headerText}>Preview Pattern</Text>
             </View>
           </View>
-          <TouchableOpacity style={styles.doneBtnWrapper}>
+          <TouchableOpacity style={styles.doneBtnWrapper} onPress={() => {
+            navigation.goBack()
+          }}>
             <Text style={styles.doneBtnText}>Done</Text>
           </TouchableOpacity>
         </TouchableOpacity>
