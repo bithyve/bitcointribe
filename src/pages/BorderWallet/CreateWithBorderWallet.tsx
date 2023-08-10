@@ -18,6 +18,8 @@ import deviceInfoModule from 'react-native-device-info'
 import { hp, wp } from '../../common/data/responsiveness/responsive'
 import ModalContainer from '../../components/home/ModalContainer'
 import GenerateEntropyGridModal from '../../components/border-wallet/GenerateEntropyGridModal'
+import Fonts from '../../common/Fonts'
+import { getIndex } from '../../common/utilities'
 
 const CreateWithBorderWallet = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'Generate New Entropy Grid' )
@@ -25,11 +27,14 @@ const CreateWithBorderWallet = ( props ) => {
   const mnemonic =  bip39.generateMnemonic()
 
   type ItemProps = {title: string, id: string};
-
+  const getFormattedNumber = ( number ) => {
+    if ( number < 10 ) return '0' + number
+    else return number + ''
+  }
   const Item = ( { title, id }: ItemProps ) => (
     <View style={styles.item}>
       <View style={[ styles.indexWrapper ]}>
-        <Text style={styles.gridItemIndex}>{id}</Text>
+        <Text style={styles.gridItemIndex}>{getFormattedNumber( id )}</Text>
       </View>
       <Text style={styles.title}>{title}</Text>
     </View>
@@ -124,7 +129,8 @@ const styles = StyleSheet.create( {
   },
   gridItemIndex: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: Fonts.Regular,
+    fontWeight: '500',
     color: Colors.blue
   },
   buttonView: {
