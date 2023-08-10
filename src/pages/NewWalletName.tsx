@@ -217,10 +217,10 @@ export default function NewWalletName( props ) {
             flex: 1
           }} >
             <HeaderTitle1
-              firstLineTitle={`${strings.Step1}`}
+              firstLineTitle={initialMnemonic ? 'Step 5 of Create with Border Wallet' : `${strings.Step1}` }
               secondLineBoldTitle={strings.NameyourWallet}
               secondLineTitle={''}
-              infoTextNormal={''}
+              infoTextNormal={initialMnemonic ? `${strings.Step1}` : ''}
               infoTextBold={''}
               infoTextNormal1={''}
               step={''}
