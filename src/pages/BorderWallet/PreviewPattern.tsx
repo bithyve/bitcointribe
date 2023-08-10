@@ -58,7 +58,6 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
   },
   cell: {
-    backgroundColor: 'red',
     height: 35,
     paddingHorizontal: 10,
     margin: 1,
