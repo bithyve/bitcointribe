@@ -14,6 +14,7 @@ import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CommonStyles from '../../common/Styles/Styles'
 import { RFValue } from 'react-native-responsive-fontsize'
+import { windowHeight, windowWidth } from '../../common/data/responsiveness/responsive'
 
 const columns = [
   'A',
@@ -57,30 +58,21 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
   },
   cell: {
+    backgroundColor: 'red',
+    height: 35,
     paddingHorizontal: 10,
-    margin: 2,
+    margin: 1,
     borderRadius: 4,
     justifyContent: 'center',
     alignItems: 'center',
   },
   headerCell: {
     height: 15,
-    width: 15,
+    width: windowWidth/22,
     margin: 1,
     borderRadius: 4,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  cellSelected: {
-    padding: 10,
-    width: 70,
-    height: 35,
-    backgroundColor: '#69A2B0',
-    margin: 2,
-    borderRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
   },
   text: {
     fontSize: 12,
@@ -119,14 +111,14 @@ const styles = StyleSheet.create( {
     color: Colors.white
   },
   previewStyle:{
-    height: 45,
-    width: 15,
+    height: 35,
+    width: windowWidth/22,
     backgroundColor: '#B5B5B5',
     margin: 1,
   },
   patternPreviewStyle: {
-    height: 45,
-    width: 15,
+    height: 35,
+    width: windowWidth/22,
     backgroundColor: '#304E55',
     margin: 1,
   }
@@ -227,11 +219,10 @@ const PreviewPattern = ( { navigation } ) => {
               bounces={false}
               showsHorizontalScrollIndicator={false}
               scrollEventThrottle={10}
-              snapToInterval={74}
               snapToAlignment="start"
               onScroll={( e ) => {
                 columnHeaderRef.current?.scrollToIndex( {
-                  index: e.nativeEvent.contentOffset.x / 74,
+                  index: e.nativeEvent.contentOffset.x/35,
                   animated: false,
                 } )
               }}
@@ -246,7 +237,7 @@ const PreviewPattern = ( { navigation } ) => {
                 scrollEventThrottle={10}
                 onScroll={( e ) => {
                   rowHeaderRef.current?.scrollToIndex( {
-                    index: e.nativeEvent.contentOffset.y / 39,
+                    index: e.nativeEvent.contentOffset.y / 35,
                     animated: false,
                   } )
                 }}

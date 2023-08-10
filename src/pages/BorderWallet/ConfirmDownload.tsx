@@ -128,6 +128,7 @@ const ConfirmDownload = ( props ) => {
           </TouchableOpacity>
         </View>
       </View>
+
       <ModalContainer
         onBackground={()=> setSuccessModal( false )}
         visible={successModal}
@@ -179,11 +180,11 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     width: '100%',
     marginHorizontal: 20,
-    height: '73%'
+    height: '70%'
 
   },
   patternWrapper: {
-    width: '40%'
+    width: '40%',
   },
   mnemonicWrapper: {
     width: '60%',
@@ -222,10 +223,9 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     width: '100%',
     paddingHorizontal: hp( 6 ),
-    paddingBottom: deviceInfoModule.hasNotch() ? hp( 4 ) : hp( 3 ),
     justifyContent: 'flex-end',
     alignItems: 'center',
-    right: 20
+    right: 20,
   },
   passPhraseWrapper:{
     width: '80%',
