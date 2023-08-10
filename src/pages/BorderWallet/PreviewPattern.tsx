@@ -35,7 +35,6 @@ const columns = [
   'P',
 ]
 const grid = Array( 2048 ).fill( 0 )
-const pattern = [ 11, 12, 3, 5, 8, 9, 2047, 6, 7, 4, 7 ]
 
 const rows = Array.from( Array( 128 ).keys() )
 
@@ -124,6 +123,7 @@ const styles = StyleSheet.create( {
 } )
 
 const PreviewPattern = ( { navigation } ) => {
+  const pattern = navigation.getParam( 'pattern' )
   const columnHeaderRef = useRef()
   const rowHeaderRef = useRef()
   const [ loading, setLoading ] = useState( false )

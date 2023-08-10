@@ -58,19 +58,19 @@ const ConfirmDownload = ( props ) => {
       <View style={styles.previewWrapper}>
         <View style={styles.patternWrapper}>
           <Text style={styles.previewTitle}>Your Pattern</Text>
-          <View style={styles.patternPreviewWrapper}>
-            <FlatList
-              scrollEnabled={false}
-              bounces={false}
-              data={grid}
-              renderItem={( { item, index } )=>(
-                <View style={pattern.includes( index ) ?  styles.patternPreviewStyle : styles.previewStyle}/>
-              )}
-              numColumns={16}
-              keyExtractor={item => item.id}
-            />
-          </View>
-          <TouchableOpacity onPress={()=> props.navigation.navigate( 'PreviewPattern' )}>
+          <FlatList
+            scrollEnabled={false}
+            bounces={false}
+            data={grid}
+            renderItem={( { item, index } )=>(
+              <View style={pattern.includes( index ) ?  styles.patternPreviewStyle : styles.previewStyle}/>
+            )}
+            numColumns={16}
+            keyExtractor={item => item.id}
+          />
+          <TouchableOpacity onPress={()=> props.navigation.navigate( 'PreviewPattern', {
+            pattern
+          } )}>
             <View  style={styles.previewPatternButton}>
               <Text style={styles.PreviewButtonText}>Preview Pattern</Text>
             </View>
@@ -196,12 +196,6 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.Medium,
     marginBottom: 5
-  },
-  patternPreviewWrapper: {
-    // backgroundColor: '#CBCBCB',
-    // padding: 5,
-    // marginVertical: 20,
-    flexWrap: 'wrap'
   },
   buttonView: {
     padding: 15,
