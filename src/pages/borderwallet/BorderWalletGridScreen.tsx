@@ -131,7 +131,26 @@ const styles = StyleSheet.create( {
   },
   ceilText: {
     color: '#BEBBBB'
-  }
+  },
+  statusIndicatorView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: wp( 10 )
+  },
+  statusIndicatorActiveView: {
+    height: 10,
+    width: 10,
+    backgroundColor: Colors.CLOSE_ICON_COLOR,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
+  statusIndicatorInactiveView: {
+    height: 7,
+    width: 7,
+    backgroundColor: Colors.THEAM_TEXT_COLOR,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
 } )
 
 const Ceil = ( { onPress, text, index, selected } ) => {
@@ -259,7 +278,9 @@ const BorderWalletGridScreen = ( { navigation } ) => {
         ]}
       >
         <TouchableOpacity
-          style={[ CommonStyles.headerLeftIconContainer, styles.headerWrapper ]}
+          style={[ CommonStyles.headerLeftIconContainer, styles.headerWrapper, {
+
+          } ]}
           onPress={() => {
             navigation.goBack()
           }}
@@ -273,6 +294,13 @@ const BorderWalletGridScreen = ( { navigation } ) => {
           </View>
           <View>
             <Text style={styles.headerText}>Step 2: Create a Pattern</Text>
+          </View>
+          <View style={styles.statusIndicatorView}>
+            <View style={styles.statusIndicatorInactiveView} />
+            <View style={styles.statusIndicatorActiveView} />
+            <View style={styles.statusIndicatorInactiveView} />
+            <View style={styles.statusIndicatorInactiveView} />
+            <View style={styles.statusIndicatorInactiveView} />
           </View>
         </TouchableOpacity>
       </View>
