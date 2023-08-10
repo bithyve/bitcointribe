@@ -66,7 +66,6 @@ const styles = StyleSheet.create( {
     padding: 10,
     width: 70,
     height: 35,
-    backgroundColor: '#E5E5E5',
     margin: 2,
     borderRadius: 4,
     justifyContent: 'center',
@@ -159,11 +158,14 @@ const Ceil = ( { onPress, text, index, selected } ) => {
   return (
     <TouchableOpacity
       onPress={() => onPress( index )}
-      style={isSelected ? styles.cellSelected : styles.cell}
+      style={isSelected ? styles.cellSelected : [ styles.cell, {
+        backgroundColor: '#E5E5E5'
+      } ]}
     >
       {isSelected && <Text style={styles.textSeq}>{sequence} &nbsp;</Text>}
       <Text style={[ styles.text, {
-        color: isSelected ? '#F8F8F8' : '#BEBBBB'
+        color: isSelected ? '#F8F8F8' : '#BEBBBB',
+        fontWeight: isSelected ? 'bold' : '500'
       } ]}>{text}</Text>
     </TouchableOpacity>
   )
