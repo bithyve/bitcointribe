@@ -79,6 +79,7 @@ export default function NewWalletName( props ) {
   const [ message, setMessage ] = useState( strings.Creatingyourwallet )
   const [ signUpStarted, setSignUpStarted ] = useState( false )
   const mnemonic = props.navigation.getParam( 'mnemonic' ) || null
+  const initialMnemonic = props.navigation.getParam( 'initialMnemonic' ) || null
 
   useEffect( () => {
     if ( walletSetupCompleted ) {

@@ -24,58 +24,11 @@ const ConfirmDownload = ( props ) => {
   const common = translations[ 'common' ]
   const [ headerTitle, setHeaderTitle ]=useState( 'Memorise/Download' )
   const [ successModal, setSuccessModal ] = useState( false )
-  const DATA = [
-    {
-      id: '01',
-      title: 'soup',
-    },
-    {
-      id: '02',
-      title: 'example',
-    },
-    {
-      id: '03',
-      title: 'crater',
-    },
-    {
-      id: '04',
-      title: 'canyon',
-    },
-    {
-      id: '05',
-      title: 'air',
-    },
-    {
-      id: '06',
-      title: 'tiger',
-    },
-    {
-      id: '07',
-      title: 'either',
-    },
-    {
-      id: '08',
-      title: 'repair',
-    },
-    {
-      id: '09',
-      title: 'warfare',
-    },
-    {
-      id: '10',
-      title: 'blind',
-    },
-    {
-      id: '11',
-      title: 'permit',
-    },
-    {
-      id: '12',
-      title: 'art',
-    }
-  ]
+  const mnemonic = props.navigation.getParam( 'mnemonic' )
   const grid = Array( 2048 ).fill( 0 )
-  const pattern = [ 11, 12, 3, 5, 8, 9, 2047, 6, 7, 4, 7 ]
+  const pattern = props.navigation.getParam( 'selected' )
+  const checksumWord = props.navigation.getParam( 'checksumWord' )
+  const initialMnemonic = props.navigation.getParam( 'initialMnemonic' )
 
   type ItemProps = {title: string, id: string};
 
@@ -125,9 +78,9 @@ const ConfirmDownload = ( props ) => {
           <Text style={styles.previewTitle}>Regeneration Mnemonic</Text>
           <View>
             <FlatList
-              data={DATA}
-              renderItem={( { item } ) => <Item title={item.title} id={item.id} />}
-              keyExtractor={item => item.id}
+              data={mnemonic.split( ' ' )}
+              renderItem={( { item, index } ) => <Item title={item} id={index+1} />}
+              keyExtractor={item => item}
               numColumns={2}
             />
           </View>
@@ -138,27 +91,27 @@ const ConfirmDownload = ( props ) => {
             marginLeft: 8
           } ]}>
             <View style={styles.indexWrapper}>
-              <Text style={styles.gridItemIndex}>34</Text>
+              <Text style={styles.gridItemIndex}>{checksumWord.split( ' ' )[ 0 ]}</Text>
             </View>
-            <Text style={styles.title}>DOVE</Text>
+            <Text style={styles.title}>{checksumWord.split( ' ' )[ 1 ]}</Text>
           </View>
-          <View>
+          {/* <View>
             <Text style={[ styles.previewTitle, {
               marginLeft: 5, marginTop: 10
             } ]}>Passphrase</Text>
             <View style={styles.passPhraseWrapper}>
               <Text>Do not go gentle into that good night, Old age should burn and rave at close of day</Text>
             </View>
-          </View>
+          </View> */}
         </View>
       </View>
       <View style={styles.bottomButtonView}>
         <View>
           <TouchableOpacity
             onPress={() => {
-            //   setGenerateEntropyGrid( true )
-              setSuccessModal( true )
-              // props.navigation.navigate( 'SelectChecksumWord' )
+              props.navigation.navigate( 'NewWalletName', {
+                mnemonic, initialMnemonic
+              } )
             }}
           >
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
