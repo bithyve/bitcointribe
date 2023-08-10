@@ -117,7 +117,7 @@ const ConfirmDownload = ( props ) => {
               keyExtractor={item => item.id}
             />
           </View>
-          <TouchableOpacity style={styles.previewPatternButton}>
+          <TouchableOpacity style={styles.previewPatternButton} onPress={()=> props.navigation.navigate( 'PreviewPattern' )}>
             <Text style={styles.PreviewButtonText}>Preview Pattern</Text>
           </TouchableOpacity>
         </View>
