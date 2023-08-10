@@ -180,7 +180,7 @@ const styles = StyleSheet.create( {
     borderRadius: 10,
   },
   indexWrapper: {
-    width: '10%',
+    width: '15%'
   },
   gridItemIndex: {
     fontSize: 20,

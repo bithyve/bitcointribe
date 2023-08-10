@@ -66,7 +66,6 @@ const styles = StyleSheet.create( {
     padding: 10,
     width: 70,
     height: 35,
-    backgroundColor: '#E5E5E5',
     margin: 2,
     borderRadius: 4,
     justifyContent: 'center',
@@ -131,7 +130,26 @@ const styles = StyleSheet.create( {
   },
   ceilText: {
     color: '#BEBBBB'
-  }
+  },
+  statusIndicatorView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: wp( 10 )
+  },
+  statusIndicatorActiveView: {
+    height: 10,
+    width: 10,
+    backgroundColor: Colors.CLOSE_ICON_COLOR,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
+  statusIndicatorInactiveView: {
+    height: 7,
+    width: 7,
+    backgroundColor: Colors.THEAM_TEXT_COLOR,
+    borderRadius: 10,
+    marginLeft: 5,
+  },
 } )
 
 const Ceil = ( { onPress, text, index, selected } ) => {
@@ -140,11 +158,14 @@ const Ceil = ( { onPress, text, index, selected } ) => {
   return (
     <TouchableOpacity
       onPress={() => onPress( index )}
-      style={isSelected ? styles.cellSelected : styles.cell}
+      style={isSelected ? styles.cellSelected : [ styles.cell, {
+        backgroundColor: '#E5E5E5'
+      } ]}
     >
       {isSelected && <Text style={styles.textSeq}>{sequence} &nbsp;</Text>}
       <Text style={[ styles.text, {
-        color: isSelected ? '#F8F8F8' : '#BEBBBB'
+        color: isSelected ? '#F8F8F8' : '#BEBBBB',
+        fontWeight: isSelected ? 'bold' : '500'
       } ]}>{text}</Text>
     </TouchableOpacity>
   )
@@ -260,7 +281,9 @@ const BorderWalletGridScreen = ( { navigation } ) => {
         ]}
       >
         <TouchableOpacity
-          style={[ CommonStyles.headerLeftIconContainer, styles.headerWrapper ]}
+          style={[ CommonStyles.headerLeftIconContainer, styles.headerWrapper, {
+
+          } ]}
           onPress={() => {
             navigation.goBack()
           }}
@@ -274,6 +297,13 @@ const BorderWalletGridScreen = ( { navigation } ) => {
           </View>
           <View>
             <Text style={styles.headerText}>Step 2: Create a Pattern</Text>
+          </View>
+          <View style={styles.statusIndicatorView}>
+            <View style={styles.statusIndicatorInactiveView} />
+            <View style={styles.statusIndicatorActiveView} />
+            <View style={styles.statusIndicatorInactiveView} />
+            <View style={styles.statusIndicatorInactiveView} />
+            <View style={styles.statusIndicatorInactiveView} />
           </View>
         </TouchableOpacity>
       </View>
