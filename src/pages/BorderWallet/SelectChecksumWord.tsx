@@ -31,13 +31,15 @@ const SelectChecksumWord = ( props ) => {
 
   useEffect( () => {
     const validChecksums = []
+    let count = 1
     wordlists.forEach( ( word, index ) => {
       const s = `${words} ${word}`
       if ( bip39.validateMnemonic( s ) ) {
         validChecksums.push( {
-          id: `${index}`,
+          id: `${count}`,
           title: word,
         } )
+        count++
       }
     } )
     setChecksums( validChecksums )
