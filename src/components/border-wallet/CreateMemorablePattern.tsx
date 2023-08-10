@@ -122,7 +122,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     letterSpacing: 0.6,
     fontFamily: Fonts.Regular,
-    marginHorizontal: wp( '10%' ),
+    marginHorizontal: wp( '8%' ),
   },
   ElementView: {
     height: hp( '60%' ),

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   View,
   SafeAreaView,
@@ -17,7 +17,7 @@ import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
 import { hp, wp } from '../../common/data/responsiveness/responsive'
 import ModalContainer from '../../components/home/ModalContainer'
-import CreateMemorablePattern from '../../components/border-wallet/CreateMemorablePattern'
+import GenerateEntropyGridModal from '../../components/border-wallet/GenerateEntropyGridModal'
 
 const CreateWithBorderWallet = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'Generate New Entropy Grid' )
@@ -34,6 +34,10 @@ const CreateWithBorderWallet = ( props ) => {
       <Text style={styles.title}>{title}</Text>
     </View>
   )
+
+  useEffect( ()=>{
+    setGenerateEntropyGrid( true )
+  }, [] )
 
   return (
     <SafeAreaView
@@ -72,7 +76,6 @@ const CreateWithBorderWallet = ( props ) => {
         <View>
           <TouchableOpacity
             onPress={() => {
-            //   setGenerateEntropyGrid( true )
               props.navigation.navigate( 'BorderWalletGridScreen', {
                 mnemonic
               } )
@@ -95,7 +98,7 @@ const CreateWithBorderWallet = ( props ) => {
       <ModalContainer onBackground={() =>setGenerateEntropyGrid( false )}
         visible={generateEntropyGrid}
         closeBottomSheet={() => { }}>
-        <CreateMemorablePattern closeModal={() => setGenerateEntropyGrid( false )}/>
+        <GenerateEntropyGridModal closeModal={() => setGenerateEntropyGrid( false )}/>
       </ModalContainer>
     </SafeAreaView>
   )
