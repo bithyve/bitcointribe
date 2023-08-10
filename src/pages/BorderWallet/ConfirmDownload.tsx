@@ -74,6 +74,9 @@ const ConfirmDownload = ( props ) => {
       title: 'art',
     }
   ]
+  const grid = Array( 2048 ).fill( 0 )
+  const pattern = [ 11, 12, 3, 5, 8, 9, 2047, 6, 7, 4, 7 ]
+
   type ItemProps = {title: string, id: string};
 
   const Item = ( { title, id }: ItemProps ) => (
@@ -102,7 +105,18 @@ const ConfirmDownload = ( props ) => {
       <View style={styles.previewWrapper}>
         <View style={styles.patternWrapper}>
           <Text style={styles.previewTitle}>Your Pattern</Text>
-          <View style={styles.patternPreviewWrapper}></View>
+          <View style={styles.patternPreviewWrapper}>
+            <FlatList
+              scrollEnabled={false}
+              bounces={false}
+              data={grid}
+              renderItem={( { item, index } )=>(
+                <View style={pattern.includes( index ) ?  styles.patternPreviewStyle : styles.previewStyle}/>
+              )}
+              numColumns={16}
+              keyExtractor={item => item.id}
+            />
+          </View>
           <TouchableOpacity style={styles.previewPatternButton}>
             <Text style={styles.PreviewButtonText}>Preview Pattern</Text>
           </TouchableOpacity>
@@ -228,10 +242,10 @@ const styles = StyleSheet.create( {
     marginBottom: 5
   },
   patternPreviewWrapper: {
-    backgroundColor: '#CBCBCB',
-    height: '88%',
-    width: '90%',
-    marginVertical: 20
+    // backgroundColor: '#CBCBCB',
+    // padding: 5,
+    // marginVertical: 20,
+    flexWrap: 'wrap'
   },
   buttonView: {
     padding: 15,
@@ -273,6 +287,18 @@ const styles = StyleSheet.create( {
     paddingVertical: 5,
     alignItems: 'center',
     marginTop: 10
+  },
+  previewStyle:{
+    backgroundColor: '#B5B5B5',
+    height: 2,
+    width: 6,
+    margin: 1,
+  },
+  patternPreviewStyle: {
+    backgroundColor: '#304E55',
+    height: 2,
+    width: 6,
+    margin: 1,
   }
 } )
 export default ConfirmDownload
