@@ -70,8 +70,10 @@ const ConfirmDownload = ( props ) => {
               keyExtractor={item => item.id}
             />
           </View>
-          <TouchableOpacity style={styles.previewPatternButton} onPress={()=> props.navigation.navigate( 'PreviewPattern' )}>
-            <Text style={styles.PreviewButtonText}>Preview Pattern</Text>
+          <TouchableOpacity onPress={()=> props.navigation.navigate( 'PreviewPattern' )}>
+            <View  style={styles.previewPatternButton}>
+              <Text style={styles.PreviewButtonText}>Preview Pattern</Text>
+            </View>
           </TouchableOpacity>
         </View>
         <View style={styles.mnemonicWrapper}>
@@ -235,9 +237,9 @@ const styles = StyleSheet.create( {
   },
   previewPatternButton :{
     width:'90%',
-    backgroundColor: '#69A2B0',
+    backgroundColor: Colors.CLOSE_ICON_COLOR,
     borderRadius: 5,
-    paddingVertical: 5,
+    paddingVertical: 10,
     alignItems: 'center',
     marginTop: 10
   },
