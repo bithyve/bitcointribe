@@ -17,6 +17,7 @@ import { LevelData } from '../../bitcoin/utilities/Interface'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
 import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
+import BorderWalletIcon from '../../assets/images/svgs/borderWallet.svg'
 import moment from 'moment'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
@@ -187,8 +188,41 @@ export default function BackupMethods( { navigation } ) {
         </TouchableOpacity>
 
       </View>
+      <View style={styles.body}>
+
+        <TouchableOpacity
+          style={{
+            flexDirection: 'row',
+          }}
+        >
+          <View style={{
+            width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, borderColor:
+            backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP
+              ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center',
+            //   elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
+            //   width: 15, height: 15
+            // }
+          }}
+          >
+            <View style={{
+              right: 1, height: 12, width: 12, borderRadius: 6,
+              backgroundColor: backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP ? Colors.green : Colors.yellow, top: 0, justifyContent: 'center', alignItems: 'center'
+            }}>
+              <FontAwesome
+                name={backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP ? 'check' : 'exclamation' }
+                color={Colors.white} size={10} />
+            </View>
+            <BorderWalletIcon/>
+          </View>
+          <Text style={{
+            fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, color: Colors.black, margin: 10, textAlign: 'center'
+          }}>
+            Created with Border wallet
+          </Text>
+        </TouchableOpacity>
+
+      </View>
     </View>
   )
 }
-
 
