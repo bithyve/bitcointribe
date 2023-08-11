@@ -17,6 +17,7 @@ import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
 import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import * as bip39 from 'bip39'
+import BottomInfoBox from '../../components/BottomInfoBox'
 
 const wordlists = bip39.wordlists.english
 
@@ -108,7 +109,7 @@ const SelectChecksumWord = ( props ) => {
       </TouchableOpacity>
       <View
         style={{
-          height: '60%',
+          height: '43%',
         }}
       >
         {showDropdown && (
@@ -119,6 +120,10 @@ const SelectChecksumWord = ( props ) => {
           />
         )}
       </View>
+      <BottomInfoBox
+        title={'Note'}
+        infoText={'In addition to having your Entropy Grid Regeneration Mnemonic and recalling your Pattern, you will need to remember this final Checksum Word in order to recover your Border Wallet'}
+      />
       <View style={styles.bottomButtonView}>
         <View style={styles.statusIndicatorView}>
           <View style={styles.statusIndicatorInactiveView} />
