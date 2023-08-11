@@ -23,6 +23,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import IconRight from '../../assets/images/svgs/icon_right.svg'
 import ModalContainer from '../../components/home/ModalContainer'
 import CreateMemorablePattern from '../../components/border-wallet/CreateMemorablePattern'
+import Toast from '../../components/Toast'
 
 const wordlists = bip39.wordlists.english
 const columns = [
@@ -244,6 +245,8 @@ const BorderWalletGridScreen = ( { navigation } ) => {
     } else if ( selected.length < 11 ) {
       selected.push( index )
       setSelected( [ ...selected ] )
+    }else{
+      Toast( 'Pattern limits reached.' )
     }
   }
 
@@ -424,10 +427,10 @@ const BorderWalletGridScreen = ( { navigation } ) => {
           </View>
         </View>
       )}
-      <ModalContainer onBackground={() =>setCreateMemorablePattern( false )}
+      <ModalContainer onBackground={() => {setCreateMemorablePattern( false ), Toast( 'Entropy Grid Regenerated Successfully!' )}}
         visible={createMemorablePattern}
         closeBottomSheet={() => { }}>
-        <CreateMemorablePattern closeModal={() => setCreateMemorablePattern( false )}/>
+        <CreateMemorablePattern closeModal={() => {setCreateMemorablePattern( false ), Toast( 'Entropy Grid Regenerated Successfully!' )}}/>
       </ModalContainer>
     </SafeAreaView>
   )
