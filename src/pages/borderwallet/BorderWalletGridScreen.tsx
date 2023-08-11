@@ -21,6 +21,7 @@ import * as bip39 from 'bip39'
 import uheprng from '../../utils/uheprng'
 import { RFValue } from 'react-native-responsive-fontsize'
 import IconRight from '../../assets/images/svgs/icon_right.svg'
+import StartAgain from '../../assets/images/svgs/startagain.svg'
 import ModalContainer from '../../components/home/ModalContainer'
 import CreateMemorablePattern from '../../components/border-wallet/CreateMemorablePattern'
 import Toast from '../../components/Toast'
@@ -111,12 +112,9 @@ const styles = StyleSheet.create( {
     color: '#F8F8F8'
   },
   selectionNextBtn:{
+    marginLeft: 10,
     padding: 20,
     backgroundColor: '#69A2B0',
-    position: 'absolute',
-    bottom: 35,
-    right: 35,
-    zIndex: 10,
     borderRadius: 10,
     flexDirection: 'row'
   },
@@ -155,6 +153,27 @@ const styles = StyleSheet.create( {
     borderRadius: 10,
     marginLeft: 5,
   },
+  bottomViewWrapper: {
+    width: '100%',
+    backgroundColor: Colors.LIGHT_BACKGROUND,
+    position: 'absolute',
+    bottom: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingRight: 20,
+    paddingVertical: 10,
+    zIndex: 10
+  },
+  startAgainBtnWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  startAgainBtnText: {
+    fontSize: RFValue( 13 ),
+    color: Colors.CLOSE_ICON_COLOR,
+    fontWeight: 'bold'
+  }
 } )
 
 const Ceil = ( { onPress, text, index, selected } ) => {
@@ -270,19 +289,29 @@ const BorderWalletGridScreen = ( { navigation } ) => {
         backgroundColor={Colors.backgroundColor}
         barStyle="dark-content"
       />
-      <TouchableOpacity
-        disabled={selected.length !== 11}
-        style={styles.selectionNextBtn}
-        onPress={onPressNext}
-      >
-        <Text style={styles.selectedPatternText}>{`${selected.length} of 11`}</Text>
-        {selected.length=== 11 && <View style={styles.nextBtnWrapper}>
-          <Text style={styles.selectedPatternText}>Next</Text>
-          <View style={styles.iconRightWrapper}>
-            <IconRight/>
-          </View>
-        </View>}
-      </TouchableOpacity>
+      <View style={styles.bottomViewWrapper}>
+        {selected.length=== 11 &&<TouchableOpacity
+          disabled={selected.length !== 11}
+          style={styles.startAgainBtnWrapper}
+          onPress={()=> setSelected( [] )}
+        >
+          <StartAgain/>
+          <Text style={styles.startAgainBtnText}>&nbsp;Start Again</Text>
+        </TouchableOpacity>}
+        <TouchableOpacity
+          disabled={selected.length !== 11}
+          style={styles.selectionNextBtn}
+          onPress={onPressNext}
+        >
+          <Text style={styles.selectedPatternText}>{`${selected.length} of 11`}</Text>
+          {selected.length=== 11 && <View style={styles.nextBtnWrapper}>
+            <Text style={styles.selectedPatternText}>Next</Text>
+            <View style={styles.iconRightWrapper}>
+              <IconRight/>
+            </View>
+          </View>}
+        </TouchableOpacity>
+      </View>
       <View
         style={[
           CommonStyles.headerContainer,
