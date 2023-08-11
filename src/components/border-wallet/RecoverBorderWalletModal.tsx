@@ -66,7 +66,7 @@ export default function RecoverBorderWalletModal( props ) {
                 marginTop: wp( '2%' ),
               }}
             >
-             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            Recovering a border wallet involves using an Entropy Grid, user-generated patterns, and a Final Word <Text style={styles.boldText}>Number</Text>. These components reconstruct the Bitcoin seed phrases.
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
@@ -78,7 +78,7 @@ export default function RecoverBorderWalletModal( props ) {
                 ...styles.infoText,
               }}
             >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            The Entropy Grid Generator (EGG) offers secure digital storage and deterministic grid regeneration, adding extra security layers to the Border Wallet.
             </Text>
           </View>
         </ScrollView>
@@ -161,4 +161,7 @@ const styles = StyleSheet.create( {
     marginRight: wp( '10%' ),
     marginBottom: wp( '15%' ),
   },
+  boldText:{
+    fontWeight: 'bold'
+  }
 } )
