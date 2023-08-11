@@ -1,5 +1,5 @@
 
-import React from 'react'
+import React, { useState } from 'react'
 import {
   View,
   SafeAreaView,
@@ -13,8 +13,11 @@ import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 import ArrowRight from '../../assets/images/svgs/icon_arrow_right.svg'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
+import RecoverBorderWalletModal from '../../components/border-wallet/RecoverBorderWalletModal'
+import ModalContainer from '../../components/home/ModalContainer'
 
 const RegenerateEntropyGrid = ( props ) => {
+  const [ recoverBorderModal, setRecoverBorderModal ] = useState( false )
 
   return (
     <View style={{
@@ -49,7 +52,7 @@ const RegenerateEntropyGrid = ( props ) => {
           <Text style={styles.subTitleText}>Import an Entropy Grid file.</Text>
         </View>
         <View style={styles.iconWrapper}>
-          <TouchableOpacity style={styles.uploadBtnWraper}>
+          <TouchableOpacity style={styles.uploadBtnWraper} onPress={()=> setRecoverBorderModal( true )}>
             <View style={styles.iconUpWrapper}>
               {/* <IconUp/> */}
             </View>
@@ -57,6 +60,12 @@ const RegenerateEntropyGrid = ( props ) => {
           </TouchableOpacity>
         </View>
       </View>
+      {/* Modal */}
+      <ModalContainer onBackground={() =>setRecoverBorderModal( false )}
+        visible={recoverBorderModal}
+        closeBottomSheet={() => { }}>
+        <RecoverBorderWalletModal closeModal={() => setRecoverBorderModal( false )}/>
+      </ModalContainer>
     </View>
   )
 }
