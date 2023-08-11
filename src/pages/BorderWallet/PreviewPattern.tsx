@@ -97,6 +97,7 @@ const styles = StyleSheet.create( {
   },
   ceilText: {
     color: '#BEBBBB',
+    fontSize: 12,
   },
   doneBtnWrapper: {
     backgroundColor: Colors.blue,
@@ -168,7 +169,7 @@ const PreviewPattern = ( { navigation } ) => {
       </View>
       {!loading && (
         <View style={{
-          marginLeft: '15%'
+          marginLeft: '14%'
         }}>
           <FlatList
             data={columns}
