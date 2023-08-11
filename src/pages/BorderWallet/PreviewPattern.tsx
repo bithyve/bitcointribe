@@ -16,6 +16,8 @@ import CommonStyles from '../../common/Styles/Styles'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { windowHeight, windowWidth } from '../../common/data/responsiveness/responsive'
 
+const blockheight = 15
+
 const columns = [
   'A',
   'B',
@@ -57,7 +59,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
   },
   cell: {
-    height: 35,
+    height: blockheight,
     paddingHorizontal: 10,
     margin: 1,
     borderRadius: 4,
@@ -94,7 +96,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 17 )
   },
   ceilText: {
-    color: '#BEBBBB'
+    color: '#BEBBBB',
   },
   doneBtnWrapper: {
     backgroundColor: Colors.blue,
@@ -109,13 +111,13 @@ const styles = StyleSheet.create( {
     color: Colors.white
   },
   previewStyle:{
-    height: 35,
+    height: blockheight,
     width: windowWidth/22,
     backgroundColor: '#B5B5B5',
     margin: 1,
   },
   patternPreviewStyle: {
-    height: 35,
+    height: blockheight,
     width: windowWidth/22,
     backgroundColor: '#304E55',
     margin: 1,
@@ -195,9 +197,9 @@ const PreviewPattern = ( { navigation } ) => {
             <FlatList
               data={rows}
               ref={rowHeaderRef}
-              //   contentContainerStyle={{
-              //     paddingBottom: 100 + 36
-              //   }}
+              contentContainerStyle={{
+                paddingBottom: 100 + blockheight
+              }}
               overScrollMode="never"
               bounces={false}
               scrollEnabled={false}
@@ -219,26 +221,19 @@ const PreviewPattern = ( { navigation } ) => {
               overScrollMode="never"
               bounces={false}
               showsHorizontalScrollIndicator={false}
-              scrollEventThrottle={10}
               snapToAlignment="start"
-              onScroll={( e ) => {
-                columnHeaderRef.current?.scrollToIndex( {
-                  index: e.nativeEvent.contentOffset.x/35,
-                  animated: false,
-                } )
-              }}
             >
               <ScrollView
                 overScrollMode="never"
                 bounces={false}
                 contentContainerStyle={{
-                  paddingBottom: 100
+                  paddingBottom: 100 + blockheight
                 }}
                 showsVerticalScrollIndicator={false}
                 scrollEventThrottle={10}
                 onScroll={( e ) => {
                   rowHeaderRef.current?.scrollToIndex( {
-                    index: e.nativeEvent.contentOffset.y / 35,
+                    index: e.nativeEvent.contentOffset.y / ( blockheight+2 ),
                     animated: false,
                   } )
                 }}
