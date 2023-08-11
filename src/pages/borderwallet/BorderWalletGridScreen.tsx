@@ -244,7 +244,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
       selected.push( index )
       setSelected( [ ...selected ] )
     }else{
-      Toast( 'Pattern selection limit ' )
+      Toast( 'Pattern selection limit reached. You have selected 11 words ' )
     }
   }
 
