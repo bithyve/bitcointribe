@@ -17,6 +17,7 @@ import BorderWalletGridScreen from '../pages/borderWallet/BorderWalletGridScreen
 import SelectChecksumWord from '../pages/borderWallet/SelectChecksumWord'
 import CreatePassPhrase from '../pages/borderWallet/CreatePassPhrase'
 import ConfirmDownload from '../pages/borderWallet/ConfirmDownload'
+import PreviewPattern from '../pages/borderWallet/PreviewPattern'
 import RecoverBorderWallet from '../pages/BorderWalletRecover/RecoverBorderWallet'
 import RegenerateEntropyGrid from '../pages/BorderWalletRecover/RegenerateEntropyGrid'
 import AccountSelection from '../pages/AccountSelection'
@@ -96,6 +97,7 @@ const SetupNavigator = createStackNavigator(
     SelectChecksumWord,
     CreatePassPhrase,
     ConfirmDownload,
+    PreviewPattern,
     RecoverBorderWallet,
     RegenerateEntropyGrid,
     AccountSelection,

@@ -58,20 +58,22 @@ const ConfirmDownload = ( props ) => {
       <View style={styles.previewWrapper}>
         <View style={styles.patternWrapper}>
           <Text style={styles.previewTitle}>Your Pattern</Text>
-          <View style={styles.patternPreviewWrapper}>
-            <FlatList
-              scrollEnabled={false}
-              bounces={false}
-              data={grid}
-              renderItem={( { item, index } )=>(
-                <View style={pattern.includes( index ) ?  styles.patternPreviewStyle : styles.previewStyle}/>
-              )}
-              numColumns={16}
-              keyExtractor={item => item.id}
-            />
-          </View>
-          <TouchableOpacity style={styles.previewPatternButton}>
-            <Text style={styles.PreviewButtonText}>Preview Pattern</Text>
+          <FlatList
+            scrollEnabled={false}
+            bounces={false}
+            data={grid}
+            renderItem={( { item, index } )=>(
+              <View style={pattern.includes( index ) ?  styles.patternPreviewStyle : styles.previewStyle}/>
+            )}
+            numColumns={16}
+            keyExtractor={item => item.id}
+          />
+          <TouchableOpacity onPress={()=> props.navigation.navigate( 'PreviewPattern', {
+            pattern
+          } )}>
+            <View  style={styles.previewPatternButton}>
+              <Text style={styles.PreviewButtonText}>Preview Pattern</Text>
+            </View>
           </TouchableOpacity>
         </View>
         <View style={styles.mnemonicWrapper}>
@@ -128,6 +130,7 @@ const ConfirmDownload = ( props ) => {
           </TouchableOpacity>
         </View>
       </View>
+
       <ModalContainer
         onBackground={()=> setSuccessModal( false )}
         visible={successModal}
@@ -179,11 +182,11 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     width: '100%',
     marginHorizontal: 20,
-    height: '73%'
+    height: '70%'
 
   },
   patternWrapper: {
-    width: '40%'
+    width: '40%',
   },
   mnemonicWrapper: {
     width: '60%',
@@ -193,12 +196,6 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.Medium,
     marginBottom: 5
-  },
-  patternPreviewWrapper: {
-    // backgroundColor: '#CBCBCB',
-    // padding: 5,
-    // marginVertical: 20,
-    flexWrap: 'wrap'
   },
   buttonView: {
     padding: 15,
@@ -222,10 +219,9 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     width: '100%',
     paddingHorizontal: hp( 6 ),
-    paddingBottom: deviceInfoModule.hasNotch() ? hp( 4 ) : hp( 3 ),
     justifyContent: 'flex-end',
     alignItems: 'center',
-    right: 20
+    right: 20,
   },
   passPhraseWrapper:{
     width: '80%',
@@ -235,9 +231,9 @@ const styles = StyleSheet.create( {
   },
   previewPatternButton :{
     width:'90%',
-    backgroundColor: '#69A2B0',
+    backgroundColor: Colors.CLOSE_ICON_COLOR,
     borderRadius: 5,
-    paddingVertical: 5,
+    paddingVertical: 10,
     alignItems: 'center',
     marginTop: 10
   },

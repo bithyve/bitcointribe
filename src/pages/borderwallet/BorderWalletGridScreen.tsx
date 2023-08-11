@@ -21,6 +21,8 @@ import * as bip39 from 'bip39'
 import uheprng from '../../utils/uheprng'
 import { RFValue } from 'react-native-responsive-fontsize'
 import IconRight from '../../assets/images/svgs/icon_right.svg'
+import ModalContainer from '../../components/home/ModalContainer'
+import CreateMemorablePattern from '../../components/border-wallet/CreateMemorablePattern'
 
 const wordlists = bip39.wordlists.english
 const columns = [
@@ -178,7 +180,11 @@ const BorderWalletGridScreen = ( { navigation } ) => {
   const columnHeaderRef = useRef()
   const rowHeaderRef = useRef()
   const [ loading, setLoading ] = useState( true )
+  const [ createMemorablePattern, setCreateMemorablePattern ]  = useState( false )
 
+  useEffect( ()=> {
+    setCreateMemorablePattern( true )
+  }, [] )
   const rnd11Bit = ( limit = 2048 ) => {
     let small = limit
     while ( small >= limit ) {
@@ -416,6 +422,11 @@ const BorderWalletGridScreen = ( { navigation } ) => {
           </View>
         </View>
       )}
+      <ModalContainer onBackground={() =>setCreateMemorablePattern( false )}
+        visible={createMemorablePattern}
+        closeBottomSheet={() => { }}>
+        <CreateMemorablePattern closeModal={() => setCreateMemorablePattern( false )}/>
+      </ModalContainer>
     </SafeAreaView>
   )
 }

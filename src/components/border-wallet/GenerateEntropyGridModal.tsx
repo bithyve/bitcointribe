@@ -100,7 +100,8 @@ const styles = StyleSheet.create( {
     letterSpacing: 0.54,
     marginTop: hp( '1%' ),
     marginBottom: hp( '1%' ),
-    textAlign: 'center'
+    textAlign: 'center',
+    width: '90%'
   },
   headerSeparator: {
     backgroundColor: Colors.homepageButtonColor,
