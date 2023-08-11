@@ -11,6 +11,7 @@ import {
 import Colors from '../../common/Colors'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 import ArrowRight from '../../assets/images/svgs/icon_arrow_right.svg'
+import IconUp from '../../assets/images/svgs/icon_arrow_up.svg'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import RecoverBorderWalletModal from '../../components/border-wallet/RecoverBorderWalletModal'
@@ -54,7 +55,7 @@ const RegenerateEntropyGrid = ( props ) => {
         <View style={styles.iconWrapper}>
           <TouchableOpacity style={styles.uploadBtnWraper} onPress={()=> setRecoverBorderModal( true )}>
             <View style={styles.iconUpWrapper}>
-              {/* <IconUp/> */}
+              <IconUp/>
             </View>
             <Text style={styles.uploadBtnText}>&nbsp;Upload</Text>
           </TouchableOpacity>
