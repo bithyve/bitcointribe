@@ -109,7 +109,7 @@ const SelectChecksumWord = ( props ) => {
       </TouchableOpacity>
       <View
         style={{
-          height: '43%',
+          height: '40%',
         }}
       >
         {showDropdown && (
