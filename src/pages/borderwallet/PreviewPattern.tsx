@@ -14,6 +14,7 @@ import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CommonStyles from '../../common/Styles/Styles'
 import { RFValue } from 'react-native-responsive-fontsize'
+import Fonts from '../../common/Fonts'
 import { windowHeight, windowWidth } from '../../common/data/responsiveness/responsive'
 
 const blockheight = 15
@@ -93,11 +94,13 @@ const styles = StyleSheet.create( {
   },
   headerText:{
     color: Colors.blue,
-    fontSize: RFValue( 17 )
+    fontSize: RFValue( 17 ),
+    fontFamily: Fonts.Regular
   },
   ceilText: {
     color: '#BEBBBB',
     fontSize: 12,
+    fontFamily: Fonts.Regular
   },
   doneBtnWrapper: {
     backgroundColor: Colors.blue,
@@ -109,7 +112,8 @@ const styles = StyleSheet.create( {
     marginRight: 15
   },
   doneBtnText: {
-    color: Colors.white
+    color: Colors.white,
+    fontFamily: Fonts.Medium
   },
   previewStyle:{
     height: blockheight,
