@@ -19,7 +19,6 @@ import { hp, wp } from '../../common/data/responsiveness/responsive'
 import ModalContainer from '../../components/home/ModalContainer'
 import GenerateEntropyGridModal from '../../components/border-wallet/GenerateEntropyGridModal'
 import Fonts from '../../common/Fonts'
-import { getIndex } from '../../common/utilities'
 
 const CreateWithBorderWallet = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'Generate New Entropy Grid' )
@@ -125,7 +124,8 @@ const styles = StyleSheet.create( {
   title: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#717171'
+    color: '#717171',
+    fontFamily: Fonts.Regular,
   },
   gridItemIndex: {
     fontSize: 20,
@@ -143,7 +143,7 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    // fontFamily: Fonts.Medium,
+    fontFamily: Fonts.Medium,
   },
   bottomButtonView: {
     flexDirection: 'row',

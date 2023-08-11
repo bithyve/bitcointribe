@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native'
 import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CommonStyles from '../../common/Styles/Styles'
 import {
@@ -102,7 +103,8 @@ const styles = StyleSheet.create( {
   },
   headerText:{
     color: Colors.blue,
-    fontSize: RFValue( 17 )
+    fontSize: RFValue( 17 ),
+    fontFamily: Fonts.Regular,
   },
   selectedPatternText: {
     fontSize: 12,

@@ -191,11 +191,13 @@ const styles = StyleSheet.create( {
     fontSize: 20,
     fontWeight: 'bold',
     opacity: 0.6,
+    fontFamily: Fonts.Regular,
   },
   title: {
     fontSize: 12,
     fontWeight: 'bold',
     opacity: 0.6,
+    fontFamily: Fonts.Regular,
   },
   buttonView: {
     padding: 15,

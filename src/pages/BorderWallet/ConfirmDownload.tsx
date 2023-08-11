@@ -12,9 +12,8 @@ import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 import Fonts from '../../common/Fonts'
-import { hp, wp } from '../../common/data/responsiveness/responsive'
+import { hp } from '../../common/data/responsiveness/responsive'
 import LinearGradient from 'react-native-linear-gradient'
-import deviceInfoModule from 'react-native-device-info'
 import ModalContainer from '../../components/home/ModalContainer'
 import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
 import { LocalizationContext } from '../../common/content/LocContext'
@@ -171,12 +170,14 @@ const styles = StyleSheet.create( {
   title: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#717171'
+    color: '#717171',
+    fontFamily: Fonts.Regular,
   },
   gridItemIndex: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: Colors.blue
+    color: Colors.blue,
+    fontFamily: Fonts.Regular,
   },
   previewWrapper: {
     flexDirection: 'row',
