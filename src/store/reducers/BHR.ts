@@ -50,7 +50,8 @@ import {
   SEED_BACKUP_HISTORY,
   RESTORE_SEED_WORD,
   SET_BACKUP_WITH_KEEPER_STATE,
-  CREATE_WITH_KEEPER_STATE
+  CREATE_WITH_KEEPER_STATE,
+  SET_BORDER_WALLET_BACKUP
 } from '../actions/BHR'
 
 interface historyObj {
@@ -142,6 +143,10 @@ const initialState: {
   seedBackupHistory: historyObj[];
   backupWithKeeperStatus: BackupWithKeeperState
   createWithKeeperStatus: BackupWithKeeperState
+  borderWalletBackup: {
+    status: boolean,
+    timestamp: number
+  }
 } = {
   seedBackupHistory: [],
   mnemonic: '',
@@ -218,7 +223,11 @@ const initialState: {
   pdfUpgrade: false,
   passwordResetState: '',
   backupWithKeeperStatus: BackupWithKeeperState.NOT_SETUP,
-  createWithKeeperStatus: BackupWithKeeperState.NOT_SETUP
+  createWithKeeperStatus: BackupWithKeeperState.NOT_SETUP,
+  borderWalletBackup: {
+    status: false,
+    timestamp: 0
+  }
 }
 
 export default ( state = initialState, action ) => {
@@ -541,6 +550,15 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           createWithKeeperStatus: action.payload.state,
+        }
+      case SET_BORDER_WALLET_BACKUP:
+        const { status } = action.payload
+        return {
+          ...state,
+          borderWalletBackup: {
+            status: status,
+            timestamp: status ? Date.now() : 0
+          },
         }
   }
   return state

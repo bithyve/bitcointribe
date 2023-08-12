@@ -81,7 +81,7 @@ const CreateWithBorderWallet = ( props ) => {
           <TouchableOpacity
             onPress={() => {
               props.navigation.navigate( 'BorderWalletGridScreen', {
-                mnemonic
+                mnemonic, isNewWallet: true
               } )
             }}
           >

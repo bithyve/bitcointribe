@@ -18,67 +18,23 @@ import deviceInfoModule from 'react-native-device-info'
 import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import * as bip39 from 'bip39'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import Toast from '../../components/Toast'
-import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
-import { recoverWalletUsingMnemonic, restoreSeedWordFailed } from '../../store/actions/BHR'
+import dbManager from '../../storage/realm/dbManager'
 import { Wallet } from '../../bitcoin/utilities/Interface'
-import { completedWalletSetup } from '../../store/actions/setupAndAuth'
-import { setVersion } from '../../store/actions/versionHistory'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import ModalContainer from '../../components/home/ModalContainer'
-import LoaderModal from '../../components/LoaderModal'
-import { translations } from '../../common/content/LocContext'
+import Toast from '../../components/Toast'
+import { useDispatch } from 'react-redux'
+import { setBorderWalletBackup } from '../../store/actions/BHR'
 
 const wordlists = bip39.wordlists.english
 
-const SelectChecksumWord = ( props ) => {
-  const loaderMessage = {
-    heading: translations[ 'bhr' ].Importingyourwallet,
-    text: translations[ 'bhr' ].Thismaytake
-  }
-  const subPoints = [
-    translations[ 'bhr' ].Settingupmultipleaccounts,
-    translations[ 'bhr' ].Preloading,
-  ]
-  const bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
+const ValidateBorderWalletChecksum = ( props ) => {
+  const wallet: Wallet =  dbManager.getWallet()
   const words = props.navigation.getParam( 'words' )
-  const selected = props.navigation.getParam( 'selected' )
-  const isNewWallet = props.navigation.getParam( 'isNewWallet' )
   const [ checksums, setChecksums ] = useState( [] )
-  const [ headerTitle, setHeaderTitle ] = useState( 'Select Checksum Word' )
+  const [ headerTitle ] = useState( 'Select Checksum Word' )
   const [ checksumWord, setChecksumWord ] = useState( 'Select checksum word' )
   const [ showDropdown, setShowDropdown ] = useState( false )
   type ItemProps = { title: string; id: string };
-  const [ showLoader, setShowLoader ] = useState( false )
-  const [ loaderModal, setLoaderModal ] = useState( false )
-
-  const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
-  const restoreSeedData = useSelector( ( state ) => state.bhr.loading.restoreSeedData )
-
   const dispatch = useDispatch()
-
-  useEffect( () => {
-    return () => {
-      dispatch( restoreSeedWordFailed( false ) )
-    }
-  }, [] )
-
-  useEffect( () => {
-    if( restoreSeedData == 'restoreSeedDataFailed' ){
-      setLoaderModal( false )
-      Toast( 'Failed to restore' )
-    }
-  }, [ restoreSeedData ] )
-
-  useEffect( () => {
-    setLoaderModal( false )
-    if ( wallet ) {
-      dispatch( completedWalletSetup() )
-      AsyncStorage.setItem( 'walletRecovered', 'true' )
-      dispatch( setVersion( 'Restored' ) )
-      props.navigation.navigate( 'HomeNav' )
-    }
-  }, [ wallet ] )
 
   useEffect( () => {
     const validChecksums = []
@@ -135,28 +91,15 @@ const SelectChecksumWord = ( props ) => {
     </TouchableOpacity>
   )
 
-  const onPressNext = ()=> {
-    const mnemonic = `${words} ${checksumWord.split( ' ' )[ 1 ]}`
-    if( isNewWallet ) {
-      props.navigation.navigate( 'ConfirmDownload', {
-        selected,
-        checksumWord,
-        mnemonic,
-        initialMnemonic: props.navigation.getParam( 'initialMnemonic' )
-      } )
+  const onPressVerify = () => {
+    const selectedWord = checksumWord.split( ' ' )[ 1 ]
+    if( selectedWord === wallet.primaryMnemonic.split( ' ' )[ 11 ] ) {
+      Toast( 'Checksum matched' )
+      dispatch( setBorderWalletBackup( true ) )
+      props.navigation.goBack()
     } else {
-      setShowLoader( true )
-      setTimeout( () => {
-        setLoaderModal( true )
-        setTimeout( () => {
-          dispatch( recoverWalletUsingMnemonic( mnemonic, props.navigation.getParam( 'initialMnemonic' ) ) )
-        }, 500 )
-      }, 1000 )
+      Toast( 'Invalid checksum' )
     }
-  }
-
-  const onBackgroundOfLoader = () => {
-    setLoaderModal( false )
   }
 
   return (
@@ -171,8 +114,8 @@ const SelectChecksumWord = ( props ) => {
         onPressBack={() => {
           props.navigation.goBack()
         }}
-        info1={isNewWallet ? 'Step 3 of Create with Border Wallet': 'Recover with Border Wallet'}
-        info={'This is the final step of creating your Border Wallet'}
+        info1={''}
+        info={''}
         selectedTitle={headerTitle}
       />
       <TouchableOpacity
@@ -197,30 +140,18 @@ const SelectChecksumWord = ( props ) => {
           />
         )}
       </View>
-      {
-        isNewWallet && (
-          <BottomInfoBox
-            title={'Note'}
-            infoText={'In addition to having your Entropy Grid Regeneration Mnemonic and recalling your Pattern, you will need to remember this final Checksum Word in order to recover your Border Wallet'}
-          />
-        )
-      }
+      {/* <BottomInfoBox
+        title={'Note'}
+        infoText={'In addition to having your Entropy Grid Regeneration Mnemonic and recalling your Pattern, you will need to remember this final Checksum Word in order to recover your Border Wallet'}
+      /> */}
       <View style={styles.bottomButtonView}>
-        {
-          isNewWallet && (
-            <View style={styles.statusIndicatorView}>
-              <View style={styles.statusIndicatorInactiveView} />
-              <View style={styles.statusIndicatorInactiveView} />
-              <View style={styles.statusIndicatorActiveView} />
-              <View style={styles.statusIndicatorInactiveView} />
-              <View style={styles.statusIndicatorInactiveView} />
-            </View>
-          )
-        }
+        <View style={styles.statusIndicatorView}>
+
+        </View>
         <TouchableOpacity
           activeOpacity={0.6}
           disabled={checksumWord === 'Select checksum word'}
-          onPress={onPressNext}
+          onPress={onPressVerify}
         >
           <LinearGradient
             colors={[ Colors.blue, Colors.darkBlue ]}
@@ -235,18 +166,10 @@ const SelectChecksumWord = ( props ) => {
             locations={[ 0.2, 1 ]}
             style={styles.buttonView}
           >
-            <Text style={styles.buttonText}>{isNewWallet ? 'Next': 'Recover'}</Text>
+            <Text style={styles.buttonText}>Verify</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
-      <ModalContainer onBackground={onBackgroundOfLoader}  visible={loaderModal} closeBottomSheet={() => { }} >
-        <LoaderModal
-          headerText={loaderMessage.heading}
-          messageText={loaderMessage.text}
-          subPoints={subPoints}
-          bottomText={bottomTextMessage} />
-      </ModalContainer>
-
     </SafeAreaView>
   )
 }
@@ -330,4 +253,4 @@ const styles = StyleSheet.create( {
     marginLeft: 5,
   },
 } )
-export default SelectChecksumWord
+export default ValidateBorderWalletChecksum

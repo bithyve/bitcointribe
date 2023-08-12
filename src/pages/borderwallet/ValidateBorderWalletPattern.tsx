@@ -25,6 +25,8 @@ import ModalContainer from '../../components/home/ModalContainer'
 import CreateMemorablePattern from '../../components/border-wallet/CreateMemorablePattern'
 import Toast from '../../components/Toast'
 import StartAgain from '../../assets/images/svgs/startagain.svg'
+import dbManager from '../../storage/realm/dbManager'
+import { Wallet } from '../../bitcoin/utilities/Interface'
 
 const wordlists = bip39.wordlists.english
 const columns = [
@@ -199,19 +201,14 @@ export const Ceil = ( { onPress, text, index, selected } ) => {
   )
 }
 
-const BorderWalletGridScreen = ( { navigation } ) => {
-  const mnemonic = navigation.getParam( 'mnemonic' )
-  const isNewWallet = navigation.getParam( 'isNewWallet' )
+const ValidateBorderWalletPattern = ( { navigation } ) => {
+  const wallet: Wallet =  dbManager.getWallet()
+  const mnemonic = wallet.borderWalletMnemonic
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
   const columnHeaderRef = useRef()
   const rowHeaderRef = useRef()
   const [ loading, setLoading ] = useState( true )
-  const [ createMemorablePattern, setCreateMemorablePattern ]  = useState( false )
-
-  useEffect( ()=> {
-    if( isNewWallet ) setCreateMemorablePattern( true )
-  }, [] )
 
   const rnd11Bit = ( limit = 2048 ) => {
     let small = limit
@@ -275,19 +272,24 @@ const BorderWalletGridScreen = ( { navigation } ) => {
     }
   }
 
-  const onPressNext = () => {
+  const onPressVerify = () => {
     const words = [ ...wordlists ]
     shuffle( words, mnemonic )
     const selectedWords = []
     selected.forEach( s => {
       selectedWords.push( words[ s ] )
     } )
-    navigation.navigate( 'SelectChecksumWord', {
-      words: selectedWords.toString().replace( /,/g, ' ' ),
-      selected,
-      initialMnemonic: mnemonic,
-      isNewWallet
-    } )
+    const selectedPattern =  selectedWords.toString().replace( /,/g, ' ' )
+    if( selectedPattern === wallet.primaryMnemonic.split( ' ' ).splice( 0, 11 ).toString().replace( /,/g, ' ' ) ) {
+      Toast( 'Pattern matched' )
+      navigation.replace( 'ValidateBorderWalletChecksum', {
+        words: selectedPattern,
+        selected,
+        initialMnemonic: mnemonic
+      } )
+    } else {
+      Toast( 'Pattern does not match' )
+    }
   }
 
   return (
@@ -308,11 +310,11 @@ const BorderWalletGridScreen = ( { navigation } ) => {
         <TouchableOpacity
           disabled={selected.length !== 11}
           style={styles.selectionNextBtn}
-          onPress={onPressNext}
+          onPress={onPressVerify}
         >
           <Text style={styles.selectedPatternText}>{`${selected.length} of 11`}</Text>
           {selected.length=== 11 && <View style={styles.nextBtnWrapper}>
-            <Text style={styles.selectedPatternText}>Next</Text>
+            <Text style={styles.selectedPatternText}>Verify</Text>
             <View style={styles.iconRightWrapper}>
               <IconRight/>
             </View>
@@ -344,19 +346,8 @@ const BorderWalletGridScreen = ( { navigation } ) => {
             />
           </View>
           <View>
-            <Text style={styles.headerText}>{isNewWallet ? 'Step 2: Create a Pattern' : 'Select your Pattern'}</Text>
+            <Text style={styles.headerText}>Select your pattern</Text>
           </View>
-          {
-            isNewWallet && (
-              <View style={styles.statusIndicatorView}>
-                <View style={styles.statusIndicatorInactiveView} />
-                <View style={styles.statusIndicatorActiveView} />
-                <View style={styles.statusIndicatorInactiveView} />
-                <View style={styles.statusIndicatorInactiveView} />
-                <View style={styles.statusIndicatorInactiveView} />
-              </View>
-            )
-          }
         </TouchableOpacity>
       </View>
       {!loading && (
@@ -467,12 +458,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
           </View>
         </View>
       )}
-      <ModalContainer onBackground={() =>{setCreateMemorablePattern( false ); Toast( 'Entropy Grid Regenerated Successfully!' )}}
-        visible={createMemorablePattern}
-        closeBottomSheet={() => { }}>
-        <CreateMemorablePattern closeModal={() => {setCreateMemorablePattern( false ); Toast( 'Entropy Grid Regenerated Successfully!' )}}/>
-      </ModalContainer>
     </SafeAreaView>
   )
 }
-export default BorderWalletGridScreen
+export default ValidateBorderWalletPattern

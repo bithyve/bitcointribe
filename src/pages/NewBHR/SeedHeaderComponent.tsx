@@ -51,7 +51,7 @@ const styles = StyleSheet.create( {
   },
   infoText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.lightTextColor,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     marginLeft: wp( '4%' ),
     marginTop: wp( '1.5%' ),

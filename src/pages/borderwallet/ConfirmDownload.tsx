@@ -28,7 +28,6 @@ const ConfirmDownload = ( props ) => {
   const pattern = props.navigation.getParam( 'selected' )
   const checksumWord = props.navigation.getParam( 'checksumWord' )
   const initialMnemonic = props.navigation.getParam( 'initialMnemonic' )
-
   type ItemProps = {title: string, id: string};
 
   const Item = ( { title, id }: ItemProps ) => (
@@ -79,7 +78,7 @@ const ConfirmDownload = ( props ) => {
           <Text style={styles.previewTitle}>Regeneration Mnemonic</Text>
           <View>
             <FlatList
-              data={mnemonic.split( ' ' )}
+              data={initialMnemonic.split( ' ' )}
               renderItem={( { item, index } ) => <Item title={item} id={index+1} />}
               keyExtractor={item => item}
               numColumns={2}

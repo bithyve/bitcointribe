@@ -15,6 +15,7 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import RecoverBorderWalletModal from '../../components/border-wallet/RecoverBorderWalletModal'
 import ModalContainer from '../../components/home/ModalContainer'
+import IconUp from '../../assets/images/svgs/icon_arrow_up.svg'
 
 const RegenerateEntropyGrid = ( props ) => {
   const [ recoverBorderModal, setRecoverBorderModal ] = useState( false )
@@ -54,7 +55,7 @@ const RegenerateEntropyGrid = ( props ) => {
         <View style={styles.iconWrapper}>
           <TouchableOpacity style={styles.uploadBtnWraper} onPress={()=> setRecoverBorderModal( true )}>
             <View style={styles.iconUpWrapper}>
-              {/* <IconUp/> */}
+              <IconUp/>
             </View>
             <Text style={styles.uploadBtnText}>&nbsp;Upload</Text>
           </TouchableOpacity>

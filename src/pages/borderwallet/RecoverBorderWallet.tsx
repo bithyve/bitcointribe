@@ -22,6 +22,7 @@ import LoaderModal from '../../components/LoaderModal'
 import { translations } from '../../common/content/LocContext'
 import AlertModalContents from '../../components/AlertModalContents'
 import ErrorModalContents from '../../components/ErrorModalContents'
+import Toast from '../../components/Toast'
 
 const RecoverBorderWallet = ( props ) => {
   const [ showSeedError, setShowSeedError ] = useState( false )
@@ -84,22 +85,31 @@ const RecoverBorderWallet = ( props ) => {
   }
 
   const recoverWalletViaSeed = ( mnemonic: string ) => {
-    setShowLoader( true )
-    setMnemonic( mnemonic )
-    setTimeout( () => {
-      const isValidMnemonic = bip39.validateMnemonic( mnemonic )
-      if ( !isValidMnemonic ) {
-        setShowLoader( false )
-        // Alert.alert( 'Invalid mnemonic, try again!' )
-        setShowAlertModal( true )
-        return
-      }
-      setShowLoader( false )
-      setLoaderModal( true )
-      setTimeout( () => {
-        dispatch( recoverWalletUsingMnemonic( mnemonic ) )
-      }, 500 )
-    }, 1000 )
+    const isValidMnemonic = bip39.validateMnemonic( mnemonic )
+    if( isValidMnemonic ) {
+      props.navigation.navigate( 'BorderWalletGridScreen', {
+        mnemonic,
+        isNewWallet: false
+      } )
+    } else {
+      Toast( 'Invalid mnemonic' )
+    }
+    // setShowLoader( true )
+    // setMnemonic( mnemonic )
+    // setTimeout( () => {
+    //   const isValidMnemonic = bip39.validateMnemonic( mnemonic )
+    //   if ( !isValidMnemonic ) {
+    //     setShowLoader( false )
+    //     // Alert.alert( 'Invalid mnemonic, try again!' )
+    //     setShowAlertModal( true )
+    //     return
+    //   }
+    //   setShowLoader( false )
+    //   setLoaderModal( true )
+    //   setTimeout( () => {
+    //     dispatch( recoverWalletUsingMnemonic( mnemonic ) )
+    //   }, 500 )
+    // }, 1000 )
   }
   const onBackgroundOfLoader = () => {
     setLoaderModal( false )

@@ -40,7 +40,7 @@ import ElectrumClient from '../../bitcoin/electrum/client'
 
 
 function* setupWalletWorker( { payload } ) {
-  const { walletName, security, mnemonic }: { walletName: string, security: { questionId: string, question: string, answer: string }, newBie:boolean, mnemonic: string } = payload
+  const { walletName, security, mnemonic, initialMnemonic }: { walletName: string, security: { questionId: string, question: string, answer: string }, newBie:boolean, mnemonic: string, initialMnemonic: string } = payload
   let primaryMnemonic = null
   if( mnemonic && mnemonic != null )
     primaryMnemonic = mnemonic
@@ -68,7 +68,8 @@ function* setupWalletWorker( { payload } ) {
     primarySeed: primarySeed.toString( 'hex' ),
     accounts: {
     },
-    version: DeviceInfo.getVersion()
+    version: DeviceInfo.getVersion(),
+    borderWalletMnemonic: initialMnemonic
   }
   const wallet: Wallet = {
     walletId,
@@ -79,7 +80,7 @@ function* setupWalletWorker( { payload } ) {
     // primarySeed: '',
     accounts: {
     },
-    version: DeviceInfo.getVersion()
+    version: DeviceInfo.getVersion(),
   }
   yield put( updateWallet( wallet ) )
   yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
