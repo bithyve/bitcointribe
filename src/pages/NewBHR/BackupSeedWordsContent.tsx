@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useCallback, createRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   View,
   SafeAreaView,
   StatusBar,
-  Alert,
-  Platform,
 } from 'react-native'
 import Colors from '../../common/Colors'
 import _ from 'underscore'
@@ -16,23 +14,18 @@ import SeedPageComponent from './SeedPageComponent'
 import SeedBacupModalContents from './SeedBacupModalContents'
 import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
 import { useDispatch } from 'react-redux'
-import { setSeedBackupHistory, updateSeedHealth } from '../../store/actions/BHR'
+import { updateSeedHealth } from '../../store/actions/BHR'
 import AlertModalContents from '../../components/AlertModalContents'
 import RNPreventScreenshot from 'react-native-screenshot-prevent'
 import dbManager from '../../storage/realm/dbManager'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import moment from 'moment'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
 
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
   const [ showAlertModal, setShowAlertModal ] = useState( false )
-  const [ seedSecondName, setSeedSecondName ] = useState( '' )
   const [ info, setInfo ] = useState( '' )
   const [ seedRandomNumber, setSeedRandomNumber ] = useState( [] )
   const [ seedData, setSeedData ] = useState( [] )

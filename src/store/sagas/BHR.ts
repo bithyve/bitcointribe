@@ -551,11 +551,11 @@ export const recoverWalletWithoutIcloudWatcher = createWatcher(
 function* recoverWalletWithMnemonicWorker( { payload } ) {
   try {
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
-    const { primaryMnemonic }: { primaryMnemonic: string } = payload
+    const { primaryMnemonic, initialMnemonic }: { primaryMnemonic: string, initialMnemonic: string } = payload
 
     yield call( recoverWalletWorker, {
       payload: {
-        primaryMnemonic, isWithoutCloud: true
+        primaryMnemonic, isWithoutCloud: true, initialMnemonic
       }
     } )
     yield put( updateSeedHealth() )
@@ -573,7 +573,7 @@ export const recoverWalletWithMnemonicWatcher = createWatcher(
 
 function* recoverWalletWorker( { payload } ) {
   yield put( switchS3LoadingStatus( 'restoreWallet' ) )
-  let { level, answer, selectedBackup, image, primaryMnemonic, secondaryMnemonics, shares, isWithoutCloud }: { level: number, answer: string, selectedBackup: cloudDataInterface, image: NewWalletImage, primaryMnemonic?: string, secondaryMnemonics?: string, shares?: {
+  let { level, answer, selectedBackup, image, primaryMnemonic, initialMnemonic, secondaryMnemonics, shares, isWithoutCloud }: { level: number, answer: string, selectedBackup: cloudDataInterface, image: NewWalletImage, primaryMnemonic?: string, initialMnemonic?: string, secondaryMnemonics?: string, shares?: {
     primaryData?: PrimaryStreamData;
     backupData?: BackupStreamData;
     secondaryData?: SecondaryStreamData;
@@ -674,7 +674,8 @@ function* recoverWalletWorker( { payload } ) {
       primarySeed: primarySeed.toString( 'hex' ),
       secondaryXpub,
       details2FA,
-      smShare
+      smShare,
+      borderWalletMnemonic: initialMnemonic
     }
     const wallet: Wallet = {
       walletId: image.walletId,

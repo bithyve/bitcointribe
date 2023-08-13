@@ -32,14 +32,14 @@ export default function CheckingAccountKnowMoreSheetContents( props ) {
         >
           <Text style={styles.headerText}>Checking Account</Text>
           <AppBottomSheetTouchableWrapper style={{
-            width: wp(8),
-            height: wp(8),
-            borderRadius: wp(4),
+            width: wp( 8 ),
+            height: wp( 8 ),
+            borderRadius: wp( 4 ),
             backgroundColor: Colors.blue,
             justifyContent: 'center',
             alignItems: 'center',
-            marginRight: wp(2),
-            marginLeft: -wp(10)
+            marginRight: wp( 2 ),
+            marginLeft: -wp( 10 )
           }}
           onPress={() => props.titleClicked && props.titleClicked()}>
             <CrossButton />
