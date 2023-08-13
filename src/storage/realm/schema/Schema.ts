@@ -442,6 +442,9 @@ export const WalletSchema: ObjectSchema = {
     primaryMnemonic: {
       type: 'string', optional: true,
     },
+    borderWalletMnemonic: {
+      type: 'string', default: ''
+    },
     primarySeed: {
       type: 'string', optional: true,
     },

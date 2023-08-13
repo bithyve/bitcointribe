@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -11,9 +11,9 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { ScrollView } from 'react-native-gesture-handler'
 import { translations } from '../../common/content/LocContext'
-import GiftIllustration from '../../assets/images/svgs/gift_illustration.svg'
+import BWIllustration from '../../assets/images/svgs/BWIllustration.svg'
 
-export default function TestAccountKnowMoreSheetContents( props ) {
+export default function RecoverBorderWalletModal( props ) {
   const scrollViewRef = useRef<ScrollView>()
   const strings  = translations[ 'accounts' ]
 
@@ -32,22 +32,22 @@ export default function TestAccountKnowMoreSheetContents( props ) {
           style={{
             width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
             alignSelf: 'flex-end',
-            backgroundColor: Colors.CLOSE_ICON_COLOR, alignItems: 'center', justifyContent: 'center',
+            backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center',
             marginTop: wp( 3 ), marginRight: wp( 3 ), marginBottom:wp( -4 ), zIndex:999
           }}
         >
-          <FontAwesome name="close" color={Colors.white} size={19} style={{
+          <FontAwesome name="close" color={Colors.blue} size={19} style={{
           // marginTop: hp( 0.5 )
           }} />
         </TouchableOpacity>
         <AppBottomSheetTouchableWrapper
           style={{
-            justifyContent: 'center', alignItems: 'center',
+            justifyContent: 'center', alignItems: 'center', marginTop: 10
           }}
           activeOpacity={10}
           onPress={() => props.titleClicked && props.titleClicked()}
         >
-          <Text style={styles.headerText}>Gift Sats</Text>
+          <Text style={styles.headerText}>Recover with Border Wallet</Text>
 
         </AppBottomSheetTouchableWrapper>
         <ScrollView
@@ -63,24 +63,22 @@ export default function TestAccountKnowMoreSheetContents( props ) {
             <Text
               style={{
                 ...styles.infoText,
-                marginTop: wp( '5%' ),
-                marginBottom: wp( '1%' ),
+                marginTop: wp( '2%' ),
               }}
             >
-              Bitcoin Tribe creates a link or QR code that allows you to send sats as gifts to anyone using Bitcoin Tribe Wallet
+            Recovering a border wallet involves using an Entropy Grid, user-generated patterns, and a Final Word <Text style={styles.boldText}>Number</Text>. These components reconstruct the Bitcoin seed phrases.
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
             }}>
-              <GiftIllustration />
+              <BWIllustration />
             </View>
             <Text
               style={{
                 ...styles.infoText,
-                marginBottom: wp( '15%' ),
               }}
             >
-              You can manage these Gifts from here. Send them when you want to and reclaim them if not accepted. The recipient will be directed to download Bitcoin Tribe wallet if they don't have it already
+            The Entropy Grid Generator (EGG) offers secure digital storage and deterministic grid regeneration, adding extra security layers to the Border Wallet.
             </Text>
           </View>
         </ScrollView>
@@ -102,6 +100,8 @@ const styles = StyleSheet.create( {
     letterSpacing: 0.54,
     marginTop: hp( '1%' ),
     marginBottom: hp( '1%' ),
+    textAlign: 'center',
+    width: '80%'
   },
   headerSeparator: {
     backgroundColor: Colors.homepageButtonColor,
@@ -116,8 +116,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     letterSpacing: 0.6,
     fontFamily: Fonts.Regular,
-    marginLeft: wp( '10%' ),
-    marginRight: wp( '10%' ),
+    marginHorizontal: wp( '10%' ),
   },
   clickHereText: {
     color: Colors.backgroundColor1,
@@ -139,7 +138,7 @@ const styles = StyleSheet.create( {
     flexWrap: 'wrap',
   },
   ElementView: {
-    height: hp( '70%' ),
+    height: hp( '60%' ),
     justifyContent: 'space-between',
   },
   separatorView: {
@@ -162,4 +161,7 @@ const styles = StyleSheet.create( {
     marginRight: wp( '10%' ),
     marginBottom: wp( '15%' ),
   },
+  boldText:{
+    fontWeight: 'bold'
+  }
 } )

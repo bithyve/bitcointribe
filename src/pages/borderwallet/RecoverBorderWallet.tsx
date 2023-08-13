@@ -8,8 +8,8 @@ import {
 } from 'react-native'
 import Colors from '../../common/Colors'
 import ModalContainer from '../../components/home/ModalContainer'
-import RestoreSeedPageComponent from './RestoreSeedPageComponent'
-import RestoreSeedHeaderComponent from './RestoreSeedHeaderComponent'
+import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
+import RestoreSeedPageComponent from '../RestoreHexaWithKeeper/RestoreSeedPageComponent'
 import * as bip39 from 'bip39'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
 import { recoverWalletUsingMnemonic, restoreSeedWordFailed } from '../../store/actions/BHR'
@@ -17,12 +17,14 @@ import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Wallet } from '../../bitcoin/utilities/Interface'
+import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import LoaderModal from '../../components/LoaderModal'
 import { translations } from '../../common/content/LocContext'
 import AlertModalContents from '../../components/AlertModalContents'
 import ErrorModalContents from '../../components/ErrorModalContents'
+import Toast from '../../components/Toast'
 
-const RestoreSeedWordsContent = ( props ) => {
+const RecoverBorderWallet = ( props ) => {
   const [ showSeedError, setShowSeedError ] = useState( false )
   const [ showLoader, setShowLoader ] = useState( false )
   const [ loaderModal, setLoaderModal ] = useState( false )
@@ -83,22 +85,31 @@ const RestoreSeedWordsContent = ( props ) => {
   }
 
   const recoverWalletViaSeed = ( mnemonic: string ) => {
-    setShowLoader( true )
-    setMnemonic( mnemonic )
-    setTimeout( () => {
-      const isValidMnemonic = bip39.validateMnemonic( mnemonic )
-      if ( !isValidMnemonic ) {
-        setShowLoader( false )
-        // Alert.alert( 'Invalid mnemonic, try again!' )
-        setShowAlertModal( true )
-        return
-      }
-      setShowLoader( false )
-      setLoaderModal( true )
-      setTimeout( () => {
-        dispatch( recoverWalletUsingMnemonic( mnemonic ) )
-      }, 500 )
-    }, 1000 )
+    const isValidMnemonic = bip39.validateMnemonic( mnemonic )
+    if( isValidMnemonic ) {
+      props.navigation.navigate( 'BorderWalletGridScreen', {
+        mnemonic,
+        isNewWallet: false
+      } )
+    } else {
+      Toast( 'Invalid mnemonic' )
+    }
+    // setShowLoader( true )
+    // setMnemonic( mnemonic )
+    // setTimeout( () => {
+    //   const isValidMnemonic = bip39.validateMnemonic( mnemonic )
+    //   if ( !isValidMnemonic ) {
+    //     setShowLoader( false )
+    //     // Alert.alert( 'Invalid mnemonic, try again!' )
+    //     setShowAlertModal( true )
+    //     return
+    //   }
+    //   setShowLoader( false )
+    //   setLoaderModal( true )
+    //   setTimeout( () => {
+    //     dispatch( recoverWalletUsingMnemonic( mnemonic ) )
+    //   }, 500 )
+    // }, 1000 )
   }
   const onBackgroundOfLoader = () => {
     setLoaderModal( false )
@@ -133,10 +144,13 @@ const RestoreSeedWordsContent = ( props ) => {
         }}
       />
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      <RestoreSeedHeaderComponent
-        onPressBack={() => props.navigation.goBack()}
-        selectedTitle={'Enter backup phrase'}
-        moreInfo={''}
+      <SeedHeaderComponent
+        onPressBack={() => {
+          props.navigation.goBack()
+        }}
+        info1={'Step 1 of Recover a Border Wallet'}
+        selectedTitle={'Enter Entropy Grid Regeneration Mnemonic'}
+        info={'Enter 1 - 6 of 12 word Entropy Grid Regeneration Mnemonic'}
       />
       <View style={{
         flex: 1,
@@ -157,7 +171,7 @@ const RestoreSeedWordsContent = ( props ) => {
           changeButtonText={'Back'}
           previousButtonText={'Previous'}
           isChangeKeeperAllow={true}
-          isTwelveCheckbox
+          isTwelveCheckbox={false}
         />
         <ModalContainer visible={( showSeedError )} onBackground={() => setShowSeedError}>
           {renderSeedErrorModal()}
@@ -200,4 +214,4 @@ const RestoreSeedWordsContent = ( props ) => {
     </View>
   )
 }
-export default RestoreSeedWordsContent
+export default RecoverBorderWallet
