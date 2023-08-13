@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -11,9 +11,9 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { ScrollView } from 'react-native-gesture-handler'
 import { translations } from '../../common/content/LocContext'
-import GiftIllustration from '../../assets/images/svgs/gift_illustration.svg'
+import MemoriableIllustration from '../../assets/images/svgs/MemoriableIllustration.svg'
 
-export default function TestAccountKnowMoreSheetContents( props ) {
+export default function CreateMemorablePattern( props ) {
   const scrollViewRef = useRef<ScrollView>()
   const strings  = translations[ 'accounts' ]
 
@@ -32,22 +32,22 @@ export default function TestAccountKnowMoreSheetContents( props ) {
           style={{
             width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
             alignSelf: 'flex-end',
-            backgroundColor: Colors.CLOSE_ICON_COLOR, alignItems: 'center', justifyContent: 'center',
+            backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center',
             marginTop: wp( 3 ), marginRight: wp( 3 ), marginBottom:wp( -4 ), zIndex:999
           }}
         >
-          <FontAwesome name="close" color={Colors.white} size={19} style={{
+          <FontAwesome name="close" color={Colors.blue} size={19} style={{
           // marginTop: hp( 0.5 )
           }} />
         </TouchableOpacity>
         <AppBottomSheetTouchableWrapper
           style={{
-            justifyContent: 'center', alignItems: 'center',
+            justifyContent: 'center', alignItems: 'center', marginTop: 10
           }}
           activeOpacity={10}
           onPress={() => props.titleClicked && props.titleClicked()}
         >
-          <Text style={styles.headerText}>Gift Sats</Text>
+          <Text style={styles.headerText}>Step 2: Create a Memorable Pattern</Text>
 
         </AppBottomSheetTouchableWrapper>
         <ScrollView
@@ -63,24 +63,44 @@ export default function TestAccountKnowMoreSheetContents( props ) {
             <Text
               style={{
                 ...styles.infoText,
-                marginTop: wp( '5%' ),
-                marginBottom: wp( '1%' ),
+                marginTop: wp( '2%' ),
               }}
             >
-              Bitcoin Tribe creates a link or QR code that allows you to send sats as gifts to anyone using Bitcoin Tribe Wallet
+            You now need to create a <Text style={styles.boldText}>memorable pattern</Text> to apply onto your <Text style={styles.boldText}>Entropy Grid</Text> in order to generate your Border Wallet.
             </Text>
-            <View style={{
-              justifyContent: 'center', alignItems: 'center'
-            }}>
-              <GiftIllustration />
-            </View>
+            <ImageBackground source={require( '../../assets/images/illustrationbackground.png' )}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}
+              resizeMode='contain'
+            >
+              <View style={{
+                justifyContent: 'center', alignItems: 'center'
+              }}>
+                <MemoriableIllustration />
+              </View>
+            </ImageBackground>
             <Text
               style={{
                 ...styles.infoText,
-                marginBottom: wp( '15%' ),
               }}
             >
-              You can manage these Gifts from here. Send them when you want to and reclaim them if not accepted. The recipient will be directed to download Bitcoin Tribe wallet if they don't have it already
+              Your pattern must comprise <Text style={styles.boldText}>11 cells</Text>, selected in your own <Text style={styles.boldText}>preferred order</Text>
+            </Text>
+            <Text
+              style={{
+                ...styles.infoText,
+              }}
+            >
+           To recover your Border Wallet at a future date, you will need to <Text style={styles.boldText}>recall your pattern</Text> and its <Text style={styles.boldText}>position on the grid</Text>, so choose carefully.
+            </Text>
+            <Text
+              style={{
+                ...styles.infoText,
+              }}
+            >
+           The row numbers and column letters will assist you.
             </Text>
           </View>
         </ScrollView>
@@ -102,13 +122,7 @@ const styles = StyleSheet.create( {
     letterSpacing: 0.54,
     marginTop: hp( '1%' ),
     marginBottom: hp( '1%' ),
-  },
-  headerSeparator: {
-    backgroundColor: Colors.homepageButtonColor,
-    height: 1,
-    marginLeft: wp( '5%' ),
-    marginRight: wp( '5%' ),
-    marginBottom: hp( '1%' ),
+    textAlign: 'center'
   },
   infoText: {
     textAlign: 'center',
@@ -116,50 +130,13 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     letterSpacing: 0.6,
     fontFamily: Fonts.Regular,
-    marginLeft: wp( '10%' ),
-    marginRight: wp( '10%' ),
-  },
-  clickHereText: {
-    color: Colors.backgroundColor1,
-    fontSize: RFValue( 13 ),
-    fontFamily: Fonts.Regular,
-    textDecorationLine: 'underline',
-    textAlign: 'center',
-  },
-  toKnowMoreText: {
-    color: Colors.backgroundColor1,
-    fontSize: RFValue( 13 ),
-    fontFamily: Fonts.Regular,
-  },
-  linkView: {
-    flexDirection: 'row',
-    marginLeft: wp( '10%' ),
-    marginRight: wp( '10%' ),
-    justifyContent: 'center',
-    flexWrap: 'wrap',
+    marginHorizontal: wp( '8%' ),
   },
   ElementView: {
-    height: hp( '70%' ),
+    height: hp( '60%' ),
     justifyContent: 'space-between',
   },
-  separatorView: {
-    width: wp( '70%' ),
-    height: 0,
-    alignSelf: 'center',
-    marginBottom: wp( '1%' ),
-    borderStyle: 'dotted',
-    borderWidth: 1,
-    borderRadius: 1,
-    borderColor: Colors.white,
-  },
-  helperImage: {
-    width: wp( '80%' ),
-    height: wp( '60%' ),
-    resizeMode: 'contain',
-  },
-  bottomLinkView: {
-    marginLeft: wp( '10%' ),
-    marginRight: wp( '10%' ),
-    marginBottom: wp( '15%' ),
-  },
+  boldText:{
+    fontWeight: 'bold'
+  }
 } )

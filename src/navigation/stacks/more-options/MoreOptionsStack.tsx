@@ -30,6 +30,8 @@ import WalletBackupStack from './WalletBackupStack'
 import WalletOption from '../../../pages/MoreOptions/WalletOption/WalletOption'
 import BackupWithKeeper from '../../../pages/NewBHR/BackupWithKeeper'
 import BackupMethods from '../../../pages/NewBHR/BackupMethods'
+import ValidateBorderWalletPattern from '../../../pages/borderwallet/ValidateBorderWalletPattern'
+import ValidateBorderWalletChecksum from '../../../pages/borderwallet/ValidateBorderWalletChecksum'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -81,6 +83,18 @@ const MoreOptionsStack = createStackNavigator(
     },
     BackupWithKeeper: {
       screen: BackupWithKeeper,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    ValidateBorderWalletChecksum: {
+      screen: ValidateBorderWalletChecksum,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    ValidateBorderWalletPattern: {
+      screen: ValidateBorderWalletPattern,
       navigationOptions: {
         header: null,
       },
