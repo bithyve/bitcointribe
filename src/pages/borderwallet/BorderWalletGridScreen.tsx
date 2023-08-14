@@ -10,7 +10,6 @@ import {
   FlatList,
   InteractionManager,
   ActivityIndicator,
-  Platform,
 } from 'react-native'
 import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -209,7 +208,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
   const [ createMemorablePattern, setCreateMemorablePattern ]  = useState( false )
 
   useEffect( ()=> {
-    // if( isNewWallet ) setCreateMemorablePattern( true )
+    if( isNewWallet ) setCreateMemorablePattern( true )
   }, [] )
 
   const rnd11Bit = ( limit = 2048 ) => {
