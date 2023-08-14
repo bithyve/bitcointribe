@@ -12,7 +12,7 @@ import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 import Fonts from '../../common/Fonts'
-import { hp, wp } from '../../common/data/responsiveness/responsive'
+import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsive'
 import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
 import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
@@ -184,7 +184,7 @@ const SelectChecksumWord = ( props ) => {
       </TouchableOpacity>
       <View
         style={{
-          height: '40%',
+          height: windowHeight> 800? '40%' : '36%',
         }}
       >
         {showDropdown && (
