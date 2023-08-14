@@ -121,7 +121,7 @@ const WalletInitializationScreen = props => {
             <View style={styles.textView}>
               <Text style={styles.touchableText}>
                 {
-                  'Create a Border Wallet'
+                  'Create with Border Wallet'
                 }
               </Text>
             </View>
@@ -214,7 +214,7 @@ const WalletInitializationScreen = props => {
             <View style={styles.textView}>
               <Text style={styles.touchableText}>
                 {
-                  'Using a Border Wallet'
+                  'Using Border Wallet'
                 }
               </Text>
             </View>
