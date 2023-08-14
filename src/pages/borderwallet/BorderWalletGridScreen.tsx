@@ -10,6 +10,7 @@ import {
   FlatList,
   InteractionManager,
   ActivityIndicator,
+  Platform,
 } from 'react-native'
 import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -160,7 +161,7 @@ const styles = StyleSheet.create( {
     width: '100%',
     backgroundColor: Colors.LIGHT_BACKGROUND,
     position: 'absolute',
-    bottom: 15,
+    bottom: Platform.OS === 'ios' ? 15 : 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -271,7 +272,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
       selected.push( index )
       setSelected( [ ...selected ] )
     }else{
-      Toast( 'Pattern limits reached.' )
+      Toast( 'Pattern selection limit reached. You have selected 11 words' )
     }
   }
 
