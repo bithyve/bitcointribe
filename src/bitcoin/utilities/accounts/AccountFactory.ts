@@ -1,7 +1,24 @@
-import { Account, AccountType, DonationAccount, MultiSigAccount, NetworkType, LNNode } from '../Interface'
+import { Account, AccountType, DonationAccount, MultiSigAccount, NetworkType, LNNode, DerivationPurpose } from '../Interface'
 import crypto from 'crypto'
 import AccountUtilities from './AccountUtilities'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+
+export const getPurpose = (derivationPath: string): DerivationPurpose => {
+  const purpose = parseInt(derivationPath.split('/')[1], 10);
+  switch (purpose) {
+    case DerivationPurpose.BIP84:
+      return DerivationPurpose.BIP84;
+
+    case DerivationPurpose.BIP49:
+      return DerivationPurpose.BIP49;
+
+    case DerivationPurpose.BIP44:
+      return DerivationPurpose.BIP44;
+
+    default:
+      throw new Error(`Unsupported derivation type, purpose: ${purpose}`);
+  }
+};
 
 export function generateAccount(
   {
@@ -27,54 +44,59 @@ export function generateAccount(
   }
 ): Account {
 
-  const network = AccountUtilities.getNetworkByType( networkType )
-  const { xpriv, xpub } = AccountUtilities.generateExtendedKeyPairFromSeed( primarySeed, network, derivationPath )
-
-  const id = crypto.createHash( 'sha256' ).update( xpub ).digest( 'hex' )
-  const initialRecevingAddress = AccountUtilities.getAddressByIndex( xpub, false, 0, network )
-
-  const account: Account = {
-    id,
-    isUsable: true,
-    walletId,
-    type,
-    instanceNum,
-    networkType,
-    derivationPath,
-    xpub,
-    xpriv,
-    accountName,
-    accountDescription,
-    accountVisibility: AccountVisibility.DEFAULT,
-    activeAddresses: {
-      external: {
+  try {
+    const network = AccountUtilities.getNetworkByType( networkType )
+    const { xpriv, xpub } = AccountUtilities.generateExtendedKeyPairFromSeed( primarySeed, network, derivationPath )
+  
+    const id = crypto.createHash( 'sha256' ).update( xpub ).digest( 'hex' )
+    const purpose = getPurpose(derivationPath)
+    const initialRecevingAddress = AccountUtilities.getAddressByIndex( xpub, false, 0, network, purpose )
+   console.log({initialRecevingAddress})
+    const account: Account = {
+      id,
+      isUsable: true,
+      walletId,
+      type,
+      instanceNum,
+      networkType,
+      derivationPath,
+      xpub,
+      xpriv,
+      accountName,
+      accountDescription,
+      accountVisibility: AccountVisibility.DEFAULT,
+      activeAddresses: {
+        external: {
+        },
+        internal: {
+        },
       },
-      internal: {
+      receivingAddress: initialRecevingAddress,
+      nextFreeAddressIndex: 0,
+      nextFreeChangeAddressIndex: 0,
+      confirmedUTXOs: [],
+      unconfirmedUTXOs: [],
+      balances: {
+        confirmed: 0,
+        unconfirmed: 0,
       },
-    },
-    receivingAddress: initialRecevingAddress,
-    nextFreeAddressIndex: 0,
-    nextFreeChangeAddressIndex: 0,
-    confirmedUTXOs: [],
-    unconfirmedUTXOs: [],
-    balances: {
-      confirmed: 0,
-      unconfirmed: 0,
-    },
-    transactions: [],
-    lastSynched: 0,
-    txIdMap: {
-    },
-    transactionsNote: {
-    },
-    importedAddresses: {
-    },
-  }
-  if( type === AccountType.LIGHTNING_ACCOUNT ) {
-    account.node = node
+      transactions: [],
+      lastSynched: 0,
+      txIdMap: {
+      },
+      transactionsNote: {
+      },
+      importedAddresses: {
+      },
+    }
+    if( type === AccountType.LIGHTNING_ACCOUNT ) {
+      account.node = node
+    }
+    return account
+    
+  } catch (error) {
   }
 
-  return account
 }
 
 export function generateMultiSigAccount(
