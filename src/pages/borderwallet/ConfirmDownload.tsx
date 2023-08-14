@@ -12,7 +12,7 @@ import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 import Fonts from '../../common/Fonts'
-import { hp } from '../../common/data/responsiveness/responsive'
+import { hp, windowHeight } from '../../common/data/responsiveness/responsive'
 import LinearGradient from 'react-native-linear-gradient'
 import ModalContainer from '../../components/home/ModalContainer'
 import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
@@ -182,7 +182,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     width: '100%',
     marginHorizontal: 20,
-    height: '70%'
+    height: windowHeight>800? '70%' : '66%'
 
   },
   patternWrapper: {
