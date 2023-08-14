@@ -398,7 +398,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
               overScrollMode="never"
               bounces={false}
               scrollEnabled={false}
-              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
               renderItem={( { item } ) => (
                 <View style={styles.cell}>
                   <Text style={styles.ceilText}>{( '000' + ( item + 1 ) ).substr( -3 )}</Text>
