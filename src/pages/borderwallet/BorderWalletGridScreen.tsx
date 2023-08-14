@@ -114,9 +114,6 @@ const styles = StyleSheet.create( {
   selectionNextBtn:{
     padding: 20,
     backgroundColor: '#69A2B0',
-    position: 'absolute',
-    bottom: 35,
-    right: 35,
     zIndex: 10,
     borderRadius: 10,
     flexDirection: 'row'
@@ -158,9 +155,9 @@ const styles = StyleSheet.create( {
   },
   bottomViewWrapper: {
     width: '100%',
-    backgroundColor: Colors.LIGHT_BACKGROUND,
+    backgroundColor: 'rgba(242, 242, 242,0.6)',
     position: 'absolute',
-    bottom: 15,
+    bottom: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -170,7 +167,8 @@ const styles = StyleSheet.create( {
   },
   startAgainBtnWrapper: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginRight: 10
   },
   startAgainBtnText: {
     fontSize: RFValue( 13 ),
@@ -271,7 +269,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
       selected.push( index )
       setSelected( [ ...selected ] )
     }else{
-      Toast( 'Pattern limits reached.' )
+      Toast( 'Pattern selection limit reached. You have selected 11 words' )
     }
   }
 
@@ -400,7 +398,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
               overScrollMode="never"
               bounces={false}
               scrollEnabled={false}
-              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
               renderItem={( { item } ) => (
                 <View style={styles.cell}>
                   <Text style={styles.ceilText}>{( '000' + ( item + 1 ) ).substr( -3 )}</Text>

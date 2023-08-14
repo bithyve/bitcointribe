@@ -66,7 +66,7 @@ export default function RecoverBorderWalletModal( props ) {
                 marginTop: wp( '2%' ),
               }}
             >
-            Recovering a border wallet involves using an Entropy Grid, user-generated patterns, and a Final Word <Text style={styles.boldText}>Number</Text>. These components reconstruct the Bitcoin seed phrases.
+            Recovering a border wallet involves using an Entropy Grid, user-generated patterns, and a Final Word. These components reconstruct the Bitcoin seed phrases.
             </Text>
             <View style={{
               justifyContent: 'center', alignItems: 'center'
