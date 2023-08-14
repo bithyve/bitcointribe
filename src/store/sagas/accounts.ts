@@ -76,7 +76,8 @@ import {
   Trusted_Contacts,
   UnecryptedStreamData,
   Wallet,
-  LNNode
+  LNNode,
+  DerivationPurpose
 } from '../../bitcoin/utilities/Interface'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -782,7 +783,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
         } )
         break
 
-      case AccountType.CHECKING_ACCOUNT:
+      case AccountType.CHECKING_ACCOUNT :
         primarySubAccount = new CheckingSubAccountInfo( {
           id: account.id,
           xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
@@ -792,6 +793,17 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
           customDescription: account.accountDescription,
         } )
         break
+
+      case AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT :
+          primarySubAccount = new CheckingSubAccountInfo( {
+            id: account.id,
+            xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+            isUsable: account.isUsable,
+            instanceNumber: account.instanceNum,
+            customDisplayName: account.accountName,
+            customDescription: account.accountDescription,
+          } )
+          break
 
       case AccountType.SAVINGS_ACCOUNT:
         primarySubAccount = new SavingsSubAccountInfo( {
@@ -886,7 +898,6 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
   const walletObj = JSON.parse( JSON.stringify( dbWallet ) )
   const primarySeed = walletObj.primarySeed
   const { name: accountName, description: accountDescription, is2FAEnabled, doneeName } = accountDetails
-
   switch ( accountType ) {
       case AccountType.TEST_ACCOUNT:
         const testInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ AccountType.TEST_ACCOUNT ] )?.length | 0
@@ -915,6 +926,20 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
         return checkingAccount
+
+      case AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT:
+          const checkingNativeSegwitInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT ] )?.length | 0
+          const checkingAccountNativeSegwit: Account = yield call( generateAccount, {
+            walletId,
+            type: AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT,
+            instanceNum: checkingNativeSegwitInstanceCount,
+            accountName: accountName? accountName: 'Checking Account Native Segwit',
+            accountDescription: accountDescription? accountDescription: 'Bitcoin Wallet',
+            primarySeed,
+            derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT, checkingNativeSegwitInstanceCount, null, DerivationPurpose.BIP84 ),
+            networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+          } )
+          return checkingAccountNativeSegwit
 
       case AccountType.SAVINGS_ACCOUNT:
         // if( !wallet.secondaryXpub && !wallet.details2FA ) throw new Error( 'Fail to create savings account; secondary-xpub/details2FA missing' )
