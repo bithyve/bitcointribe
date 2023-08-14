@@ -115,9 +115,6 @@ const styles = StyleSheet.create( {
   selectionNextBtn:{
     padding: 20,
     backgroundColor: '#69A2B0',
-    position: 'absolute',
-    bottom: 35,
-    right: 35,
     zIndex: 10,
     borderRadius: 10,
     flexDirection: 'row'
@@ -161,7 +158,7 @@ const styles = StyleSheet.create( {
     width: '100%',
     backgroundColor: Colors.LIGHT_BACKGROUND,
     position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 15 : 0,
+    bottom: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -171,7 +168,8 @@ const styles = StyleSheet.create( {
   },
   startAgainBtnWrapper: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginRight: 10
   },
   startAgainBtnText: {
     fontSize: RFValue( 13 ),
@@ -211,7 +209,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
   const [ createMemorablePattern, setCreateMemorablePattern ]  = useState( false )
 
   useEffect( ()=> {
-    if( isNewWallet ) setCreateMemorablePattern( true )
+    // if( isNewWallet ) setCreateMemorablePattern( true )
   }, [] )
 
   const rnd11Bit = ( limit = 2048 ) => {
