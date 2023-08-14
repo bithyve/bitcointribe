@@ -223,7 +223,7 @@ const SelectChecksumWord = ( props ) => {
           onPress={onPressNext}
         >
           <LinearGradient
-            colors={[ Colors.blue, Colors.darkBlue ]}
+            colors={checksumWord !== 'Select checksum word'?[ Colors.blue, Colors.darkBlue ]: [ Colors.greyTextColor, Colors.greyTextColor ]}
             start={{
               x: 0,
               y: 0,
