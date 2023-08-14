@@ -79,13 +79,6 @@ const styles = StyleSheet.create( {
     fontSize: 12,
     color: '#BEBBBB'
   },
-  textSeq: {
-    textAlign: 'left',
-    fontSize: 9,
-    color: '#F8F8F8',
-    top: -6,
-    left: -10
-  },
   headerWrapper: {
     width: '100%',
     flexDirection: 'row',
@@ -120,12 +113,21 @@ const styles = StyleSheet.create( {
     width: windowWidth/22,
     backgroundColor: '#B5B5B5',
     margin: 1,
+    justifyContent:'center',
+    alignItems: 'center'
   },
   patternPreviewStyle: {
     height: blockheight,
     width: windowWidth/22,
     backgroundColor: '#304E55',
     margin: 1,
+    justifyContent:'center',
+    alignItems: 'center'
+  },
+  textSeq: {
+    color: 'white',
+    fontSize: 9,
+    fontFamily: Fonts.Regular
   }
 } )
 
@@ -248,9 +250,15 @@ const PreviewPattern = ( { navigation } ) => {
                   bounces={false}
                   showsVerticalScrollIndicator={false}
                   data={grid}
-                  renderItem={( { item, index } )=>(
-                    <View style={pattern.includes( index ) ?  styles.patternPreviewStyle : styles.previewStyle}/>
-                  )}
+                  renderItem={( { item, index } )=> {
+                    const isIncluded = pattern.includes( index )
+                    return (
+                      <View style={isIncluded ?  styles.patternPreviewStyle : styles.previewStyle}>
+                        {isIncluded && ( <Text style={styles.textSeq}>{pattern.indexOf( index )+1}</Text> )}
+                      </View>
+                    )
+                  }
+                  }
                   numColumns={16}
                   keyExtractor={item => item.id}
                 />
