@@ -222,7 +222,7 @@ export default function BackupMethods( { navigation } ) {
               <Text style={{
                 fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, color: Colors.black, margin: 10, textAlign: 'center'
               }}>
-              Created with Border wallet
+              Backup with Border wallet
               </Text>
             </TouchableOpacity>
 
