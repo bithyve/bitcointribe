@@ -246,6 +246,7 @@ const PreviewPattern = ( { navigation } ) => {
                 <FlatList
                   scrollEnabled={false}
                   bounces={false}
+                  showsVerticalScrollIndicator={false}
                   data={grid}
                   renderItem={( { item, index } )=>(
                     <View style={pattern.includes( index ) ?  styles.patternPreviewStyle : styles.previewStyle}/>
