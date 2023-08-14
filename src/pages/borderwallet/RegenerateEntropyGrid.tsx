@@ -34,7 +34,7 @@ const RegenerateEntropyGrid = ( props ) => {
         onPressBack={() => {
           props.navigation.goBack()
         }}
-        info1={'Step 1 of Recover a Border Wallet'}
+        info1={'Step 1 of Recover Border Wallet'}
         selectedTitle={'Regenerate Entropy Grid'}
         info={'Enter the 12 word Entropy Grid Regeneration Mnemonic'}
       />
