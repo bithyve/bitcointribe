@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
   View,
   SafeAreaView,
@@ -7,6 +7,7 @@ import {
   FlatList,
   Text,
   TouchableOpacity,
+  ActivityIndicator
 } from 'react-native'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -23,6 +24,7 @@ const ConfirmDownload = ( props ) => {
   const common = translations[ 'common' ]
   const [ headerTitle, setHeaderTitle ]=useState( 'Memorise/Download' )
   const [ successModal, setSuccessModal ] = useState( false )
+  const [ loading, setLoading ] = useState( true )
   const mnemonic = props.navigation.getParam( 'mnemonic' )
   const grid = Array( 2048 ).fill( 0 )
   const pattern = props.navigation.getParam( 'selected' )
@@ -63,6 +65,7 @@ const ConfirmDownload = ( props ) => {
             renderItem={( { item, index } )=>(
               <View style={pattern.includes( index ) ?  styles.patternPreviewStyle : styles.previewStyle}/>
             )}
+            initialNumToRender={1000}
             numColumns={16}
             keyExtractor={item => item.id}
           />
