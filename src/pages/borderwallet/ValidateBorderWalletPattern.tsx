@@ -157,7 +157,7 @@ const styles = StyleSheet.create( {
   },
   bottomViewWrapper: {
     width: '100%',
-    backgroundColor: 'rgba(142, 142, 142,0.3)',
+    backgroundColor: 'rgba(242, 242, 242,0.6)',
     position: 'absolute',
     bottom: 0,
     flexDirection: 'row',
