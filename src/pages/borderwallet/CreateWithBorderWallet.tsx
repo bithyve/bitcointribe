@@ -54,7 +54,7 @@ const CreateWithBorderWallet = ( props ) => {
         onPressBack={() => {
           props.navigation.goBack()
         }}
-        info1={'Step 1 of Creating a Border Wallet'}
+        info1={'Step 1 of Creating with Border Wallet'}
         info={'Note down these 12 word Regeneration Mnemonic'}
         selectedTitle={headerTitle}
       />
