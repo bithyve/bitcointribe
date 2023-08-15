@@ -4,9 +4,12 @@ import telebot
 from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
+from langchain import LLMChain
 from langchain.vectorstores import faiss
 from urls import urls
 from ingest import create_vectorstore
+from qa_prompt import QA_PROMPT
+from general_prompt import GENERAL_PROMPT
 
 load_dotenv()
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
@@ -48,16 +51,22 @@ def greet(message):
 
 @bot.message_handler(func=lambda msg: True)
 def respond_query(message):
-    llm = ChatOpenAI(temperature=0.7, model_name='gpt-3.5-turbo')
-    chain = RetrievalQA.from_llm(llm=llm, retriever=vectorstore.as_retriever())
+    llm = ChatOpenAI(temperature=0.5, model_name='gpt-3.5-turbo')
+    chain = RetrievalQA.from_llm(llm=llm, retriever=vectorstore.as_retriever(), prompt=QA_PROMPT)
     try:
-        response = chain({"query": f"{message}"}, return_only_outputs=True)
+        response = (chain({"query": f"{message}"}, return_only_outputs=True))
         print(response)
-        bot.reply_to(message, response["result"])
+        if response["result"] == "Sorry":
+            general_chain = LLMChain(llm=llm, prompt=GENERAL_PROMPT)
+            response = general_chain.run(human_input=message)
+            print(response)
+            bot.reply_to(message, response)
+        else:
+            bot.reply_to(message, response["result"])
 
     except Exception as e:
         print(e)
-        bot.reply_to(message, "Oops! I'm having a brain meltdown. Maybe try again?")
+        bot.reply_to(message, f"Oops! I'm having a brain meltdown. Maybe try again?\n\nError: {e}")
 
 
 if __name__ == "__main__":
