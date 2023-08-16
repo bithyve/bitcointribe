@@ -110,6 +110,7 @@ const HomeHeader = ( {
   const cloudErrorMessage: string = useSelector( ( state ) => state.cloud.cloudErrorMessage )
   const createWithKeeperStatus: CreateWithKeeperState  =useSelector( ( state ) => state.bhr.createWithKeeperStatus )
   const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
+  const borderWalletBackup: BackupWithKeeperState =useSelector( ( state ) => state.bhr.borderWalletBackup.status )
   const stringsBhr  = translations[ 'bhr' ]
   const common  = translations[ 'common' ]
   const iCloudErrors  = translations[ 'iCloudErrors' ]
@@ -246,7 +247,7 @@ const HomeHeader = ( {
           />
         </View>
         : <View style={{
-          backgroundColor: ( levelData[ 0 ].keeper1.shareType == 'seed' ? Colors.green :  backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP ? Colors.green : Colors.red ),
+          backgroundColor: ( levelData[ 0 ].keeper1.shareType == 'seed' || borderWalletBackup ? Colors.green :  backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP ? Colors.green : Colors.red ),
           // backgroundColor: isError ? currentLevel === 0 ? Colors.white : Colors.red : Colors.green,
           width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '4.7/2%' ),
           alignItems:'center',
@@ -262,7 +263,7 @@ const HomeHeader = ( {
             resizeMode={'contain'}
           /> : */}
           <Image
-            source={ levelData[ 0 ].keeper1.shareType !== 'seed' ?  backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP ? require( '../../assets/images/icons/check_white.png' ) : require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
+            source={ levelData[ 0 ].keeper1.shareType !== 'seed' ?  backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP || borderWalletBackup ? require( '../../assets/images/icons/check_white.png' ) : require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
             style={{
               width: wp( '2.7%' ), height: wp( '2.7%' ),
               // tintColor: Colors.white
@@ -278,7 +279,7 @@ const HomeHeader = ( {
 
       <Text ellipsizeMode="middle" style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, marginTop: wp( 0.8 )
-      }}>{backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus )}
+      }}>{backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus, borderWalletBackup )}
       </Text>
 
       {/* {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{
