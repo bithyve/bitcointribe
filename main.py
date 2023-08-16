@@ -51,7 +51,7 @@ def greet(message):
 
 @bot.message_handler(func=lambda msg: True)
 def respond_query(message):
-    llm = ChatOpenAI(temperature=0.5, model_name='gpt-3.5-turbo')
+    llm = ChatOpenAI(temperature=0, model_name='gpt-3.5-turbo')
     chain = RetrievalQA.from_llm(llm=llm, retriever=vectorstore.as_retriever(), prompt=QA_PROMPT)
     try:
         response = (chain({"query": f"{message}"}, return_only_outputs=True))
