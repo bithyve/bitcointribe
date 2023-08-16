@@ -32,6 +32,7 @@ import BackupWithKeeper from '../../../pages/NewBHR/BackupWithKeeper'
 import BackupMethods from '../../../pages/NewBHR/BackupMethods'
 import ValidateBorderWalletPattern from '../../../pages/borderwallet/ValidateBorderWalletPattern'
 import ValidateBorderWalletChecksum from '../../../pages/borderwallet/ValidateBorderWalletChecksum'
+import BackupGridMnemonic from '../../../pages/borderwallet/BackupGridMnemonic'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -83,6 +84,12 @@ const MoreOptionsStack = createStackNavigator(
     },
     BackupWithKeeper: {
       screen: BackupWithKeeper,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    BackupGridMnemonic: {
+      screen: BackupGridMnemonic,
       navigationOptions: {
         header: null,
       },
