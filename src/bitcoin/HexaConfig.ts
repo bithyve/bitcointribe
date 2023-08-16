@@ -135,7 +135,7 @@ class HexaConfig {
       upperBound: 10,
     },
     [ AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT ]: {
-      series: 10,
+      series: 0,
       upperBound: 10,
     },
     [ AccountType.SAVINGS_ACCOUNT ]: {
