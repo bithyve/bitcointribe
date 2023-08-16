@@ -920,9 +920,9 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           type: AccountType.CHECKING_ACCOUNT,
           instanceNum: checkingInstanceCount,
           accountName: accountName? accountName: 'Checking Account',
-          accountDescription: accountDescription? accountDescription: 'Bitcoin Wallet',
+          accountDescription: accountDescription? accountDescription: 'Bitcoin Wallet - Wrapped SegWit',
           primarySeed,
-          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, checkingInstanceCount ),
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, checkingInstanceCount, null, DerivationPurpose.BIP49 ),
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
         return checkingAccount
@@ -933,8 +933,8 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
             walletId,
             type: AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT,
             instanceNum: checkingNativeSegwitInstanceCount,
-            accountName: accountName? accountName: 'Checking Account Native Segwit',
-            accountDescription: accountDescription? accountDescription: 'Bitcoin Wallet',
+            accountName: accountName? accountName: 'Checking Account',
+            accountDescription: accountDescription? accountDescription: 'Bitcoin Wallet - Native SegWit',
             primarySeed,
             derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT, checkingNativeSegwitInstanceCount, null, DerivationPurpose.BIP84 ),
             networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
