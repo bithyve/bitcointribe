@@ -82,6 +82,20 @@ export function* hideWrappedSegwitAccount( ) {
   }
 }
 
+export function* createCheckingAccountNativeSegWitAccount( ) {
+  const accountShells: AccountShell[] = yield select(
+    ( state ) => state.accounts.accountsShells
+  )
+  const hasNativeSegWitCheckingAccount = accountShells.some(
+    shell => shell.primarySubAccount.type === AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT
+  );
+
+  if (!hasNativeSegWitCheckingAccount) {
+    const accountInfo = { accountType: AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT };
+    yield call(addNewAccountShellsWorker, { payload: [accountInfo] });
+  }
+}
+
 
 export function* restoreMultiSigTwoFAFlag( ) {
   // reintroduces the is2FA flag in the multisig accounts for the apps which are restored(<2.0.69) using the faulty backup(missing is2FA flag)
