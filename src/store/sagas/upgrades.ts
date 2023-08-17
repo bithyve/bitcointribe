@@ -26,6 +26,10 @@ export function* applyUpgradeSequence( { storedVersion, newVersion }: {storedVer
     yield call( recreateMissingAccounts )
   }
   if( semver.lt( storedVersion, '2.0.75' ) ) yield call( restoreManageBackupDataPipeline )
+  if( semver.lt( storedVersion, '2.2.2' ) ) {
+    yield call( hideWrappedSegwitAccount )
+    yield call( createCheckingAccountNativeSegWitAccount )
+  }
 }
 
 export function* testAccountEnabler( ) {
@@ -67,7 +71,7 @@ export function* accountVisibilityResetter( ) {
 
 export function* hideWrappedSegwitAccount( ) {
   const accountShells: AccountShell[] = yield select(
-    ( state ) => state.accounts.accountsShells
+    ( state ) => state.accounts.accountShells
   )
 
   for( const shell of accountShells ){
@@ -83,8 +87,9 @@ export function* hideWrappedSegwitAccount( ) {
 }
 
 export function* createCheckingAccountNativeSegWitAccount( ) {
+
   const accountShells: AccountShell[] = yield select(
-    ( state ) => state.accounts.accountsShells
+    ( state ) => state.accounts.accountShells
   )
   const hasNativeSegWitCheckingAccount = accountShells.some(
     shell => shell.primarySubAccount.type === AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT
