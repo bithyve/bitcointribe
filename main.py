@@ -5,11 +5,10 @@ from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
 from langchain import LLMChain
-from langchain.vectorstores import faiss
-from urls import urls
-from ingest import create_vectorstore
-from qa_prompt import QA_PROMPT
-from general_prompt import GENERAL_PROMPT
+from prompts.qa_prompt import QA_PROMPT
+from prompts.general_prompt import GENERAL_PROMPT
+from scripts.ingest import create_vectorstore
+from urls.urls import urls
 
 load_dotenv()
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
@@ -51,7 +50,7 @@ def greet(message):
 
 @bot.message_handler(func=lambda msg: True)
 def respond_query(message):
-    llm = ChatOpenAI(temperature=0, model_name='gpt-3.5-turbo')
+    llm = ChatOpenAI(temperature=0, model_name='gpt-4')
     chain = RetrievalQA.from_llm(llm=llm, retriever=vectorstore.as_retriever(), prompt=QA_PROMPT)
     try:
         response = (chain({"query": f"{message}"}, return_only_outputs=True))
