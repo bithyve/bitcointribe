@@ -2,8 +2,8 @@ import db from './realm'
 import schema from './schema/Schema'
 //import { Account } from '../../bitcoin/utilities/Interface'
 
-const initDb = ( key ) => {
-  db.init( key )
+const initDb = async ( key ) => {
+  await db.init( key )
 }
 
 const createWallet = async ( wallet ) => {
@@ -360,9 +360,7 @@ const getWallet = () => {
   try {
     // deprecated(to be only used by upgrade script)
     const walletsRef = db.objects( schema.Wallet )
-    // console.log( 'walletsRef', walletsRef )
     const wallets = Array.from( walletsRef )
-    // console.log( 'wallets', wallets )
     return ( wallets[ 0 ] as any )
   } catch ( error ) {
     console.log( 'err', error )
