@@ -359,11 +359,8 @@ const getSecondaryMnemonicShare = () => {
 const getWallet = () => {
   try {
     // deprecated(to be only used by upgrade script)
-    console.log({db})
     const walletsRef = db.objects( schema.Wallet )
-    console.log( 'walletsRef', walletsRef )
     const wallets = Array.from( walletsRef )
-    console.log( 'wallets', wallets )
     return ( wallets[ 0 ] as any )
   } catch ( error ) {
     console.log( 'err', error )
