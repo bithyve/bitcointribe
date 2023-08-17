@@ -65,6 +65,23 @@ export function* accountVisibilityResetter( ) {
   }
 }
 
+export function* hideWrappedSegwitAccount( ) {
+  const accountShells: AccountShell[] = yield select(
+    ( state ) => state.accounts.accountsShells
+  )
+
+  for( const shell of accountShells ){
+    if( shell.primarySubAccount.visibility !== AccountVisibility.HIDDEN && shell.primarySubAccount.type === AccountType.CHECKING_ACCOUNT ){
+      const settings = {
+        visibility: AccountVisibility.HIDDEN
+      }
+      yield put( updateAccountSettings( {
+        accountShell: shell, settings
+      } ) )
+    }
+  }
+}
+
 
 export function* restoreMultiSigTwoFAFlag( ) {
   // reintroduces the is2FA flag in the multisig accounts for the apps which are restored(<2.0.69) using the faulty backup(missing is2FA flag)
