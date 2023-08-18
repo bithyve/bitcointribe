@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useMemo } from 'react'
 import {
   View,
   Text,
@@ -213,6 +213,10 @@ const BorderWalletGridScreen = ( { navigation } ) => {
     if( isNewWallet ) setCreateMemorablePattern( true )
   }, [] )
 
+  const isNext = useMemo( () => {
+    return selected.length === 11 || selected.length === 23
+  }, [ selected ] )
+
   const rnd11Bit = ( limit = 2048 ) => {
     let small = limit
     while ( small >= limit ) {
@@ -281,11 +285,11 @@ const BorderWalletGridScreen = ( { navigation } ) => {
       const i = selected.findIndex( ( i ) => i === index )
       selected.splice( i, 1 )
       setSelected( [ ...selected ] )
-    } else if ( selected.length < 11 ) {
+    } else if ( selected.length < 23 ) {
       selected.push( index )
       setSelected( [ ...selected ] )
     }else{
-      Toast( 'Pattern selection limit reached. You have selected 11 words' )
+      Toast( 'Pattern selection limit reached. You have selected 23 words' )
     }
   }
 
@@ -311,8 +315,8 @@ const BorderWalletGridScreen = ( { navigation } ) => {
         barStyle="dark-content"
       />
       <View style={styles.bottomViewWrapper}>
-        {selected.length=== 11 &&<TouchableOpacity
-          disabled={selected.length !== 11}
+        {isNext &&<TouchableOpacity
+          disabled={!isNext}
           style={styles.startAgainBtnWrapper}
           onPress={()=> setSelected( [] )}
         >
@@ -320,12 +324,12 @@ const BorderWalletGridScreen = ( { navigation } ) => {
           <Text style={styles.startAgainBtnText}>&nbsp;Start Again</Text>
         </TouchableOpacity>}
         <TouchableOpacity
-          disabled={selected.length !== 11}
+          disabled={!isNext}
           style={styles.selectionNextBtn}
           onPress={onPressNext}
         >
-          <Text style={styles.selectedPatternText}>{`${selected.length} of 11`}</Text>
-          {selected.length=== 11 && <View style={styles.nextBtnWrapper}>
+          <Text style={styles.selectedPatternText}>{`${selected.length} of ${selected.length <= 11 ? '11' : '23'}`}</Text>
+          {isNext && <View style={styles.nextBtnWrapper}>
             <Text style={styles.selectedPatternText}>Next</Text>
             <View style={styles.iconRightWrapper}>
               <IconRight/>
