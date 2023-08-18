@@ -52,7 +52,7 @@ const WalletInitializationScreen = props => {
             }}
             source={require( '../assets/images/icons/icon_newwallet.png' )}
           />
-          <View style={styles.textView}>
+          <View testID='StartWithANewTribeWalletButton' style={styles.textView}>
             <Text style={styles.touchableText}>
               {
               //` ${strings.Createanew}
@@ -95,7 +95,7 @@ const WalletInitializationScreen = props => {
             style={styles.iconImage}
             source={require( '../assets/images/icons/seedwords.png' )}
           />
-          <View style={styles.textView}>
+          <View testID='UsingBackupPhraseButton' style={styles.textView}>
             <Text style={styles.touchableText}>Using Backup phrase</Text>
           </View>
           <View style={styles.arrowIconView}>
@@ -124,7 +124,7 @@ const WalletInitializationScreen = props => {
             style={styles.iconImage}
             source={require( '../assets/images/icons/icon_secrets.png' )}
           />
-          <View style={styles.textView}>
+          <View testID='UsingRecoveryKeysButton' style={styles.textView}>
             <Text style={styles.touchableText}>Using Recovery Keys</Text>
           </View>
           <View style={styles.arrowIconView}>
