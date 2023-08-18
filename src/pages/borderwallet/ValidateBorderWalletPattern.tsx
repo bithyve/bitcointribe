@@ -202,7 +202,7 @@ export const Ceil = ( { onPress, text, index, selected } ) => {
 const ValidateBorderWalletPattern = ( { navigation } ) => {
   const wallet: Wallet =  dbManager.getWallet()
   const mnemonic = wallet.borderWalletMnemonic
-  const gridType = navigation.getParam( 'gridType' ) || GridType.WORDS
+  const gridType = wallet.borderWalletGridType || GridType.WORDS
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
   const columnHeaderRef = useRef()
