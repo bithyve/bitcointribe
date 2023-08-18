@@ -23,7 +23,7 @@ const AddNewAccountCard: React.FC<Props> = ( {
   const lnAccount = useActiveAccountShells().filter( account => account.primarySubAccount.type === AccountType.LIGHTNING_ACCOUNT )
 
   return (
-    <TouchableOpacity activeOpacity={0.85}
+    <TouchableOpacity activeOpacity={0.85} testID='AddLightningWalletButton'
       onPress={onPress}
       style={containerStyle}
       disabled={lnAccount.length !==0}    >

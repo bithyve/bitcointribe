@@ -45,7 +45,7 @@ const AccountCardColumn: React.FC<Props> = ( {
           )
           :
           (
-            <TouchableOpacity
+            <TouchableOpacity testID='HomeAccountCard'
               key={accountShell.id}
               disabled={disabled}
               style={styles.cardContainer}

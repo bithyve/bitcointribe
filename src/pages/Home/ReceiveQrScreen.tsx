@@ -118,7 +118,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           onPress={() => { setReceiveModal( true ) }}
           style={styles.selectedView}
         >
-          <View
+          <View testID='enterAmountToReceive'
             style={styles.text}
           >
             <Text style={styles.titleText}>{amount ? amount : strings.Enteramount}</Text>

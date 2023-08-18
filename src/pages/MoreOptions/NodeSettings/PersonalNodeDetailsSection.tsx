@@ -64,7 +64,7 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
           }}>
             {strings.PersonalNodeDetails}
           </Text>
-          <TouchableOpacity onPress={onAddButtonPressed}>
+          <TouchableOpacity testID='SetupPersonalNodeAddButton' onPress={onAddButtonPressed}>
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
               start={{
                 x: 0, y: 0

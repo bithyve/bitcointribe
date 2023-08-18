@@ -128,7 +128,7 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
         </ModalContainer>
         {menuOptions.map( ( menuOption, index ) => {
           return (
-            <AppBottomSheetTouchableWrapper
+            <AppBottomSheetTouchableWrapper testID='WalletSettingsOptions'
               onPress={() => handleOptionSelection( menuOption )}
               style={styles.selectedContactsView}
               key={index}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
   StyleSheet,
@@ -7,7 +7,7 @@ import {
   Text,
   StatusBar,
   ScrollView,
-} from 'react-native'
+} from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -27,19 +27,19 @@ import LndConnectUtils from '../../utils/ln/LndConnectUtils'
 import Toast from '../../components/Toast'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
   viewContainer: {
     flex: 1,
     backgroundColor: Colors.LIGHT_BACKGROUND,
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue(13),
     fontFamily: Fonts.Medium,
   },
   buttonView: {
-    height: wp( '12%' ),
-    paddingHorizontal: wp( 2 ),
+    height: wp('12%'),
+    paddingHorizontal: wp(2),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
@@ -49,8 +49,51 @@ const styles = StyleSheet.create( {
     //   width: 15, height: 15
     // },
     backgroundColor: Colors.blue,
-    marginHorizontal: wp( 4 ),
-    marginVertical: hp( '2%' ),
+    marginHorizontal: wp(4),
+    marginVertical: hp('2%'),
+  },
+  icArrow: {
+    marginLeft: wp( '3%' ),
+    marginRight: wp( '3%' ),
+    alignSelf: 'center',
+  },
+  textValue: {
+    fontFamily: Fonts.Regular,
+    fontSize: RFValue( 13 ),
+    color: Colors.THEAM_INFO_TEXT_COLOR,
+    marginLeft: wp( '3%' ),
+  },
+  textHelpUs: {
+    fontFamily: Fonts.SemiBold,
+    fontSize: RFValue( 12 ),
+    color: Colors.THEAM_TEXT_COLOR,
+    marginLeft: wp( '3%' ),
+  },
+  textHelpUsSub: {
+    fontFamily: Fonts.Regular,
+    fontSize: RFValue( 12 ),
+    color: Colors.THEAM_INFO_TEXT_COLOR,
+    marginLeft: wp( '3%' ),
+    marginTop: wp( '1%' ),
+  },
+  addModalView: {
+    backgroundColor: Colors.gray7,
+    paddingVertical: 25,
+    paddingHorizontal: widthPercentageToDP( 1 ),
+    flexDirection: 'row',
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginTop: heightPercentageToDP( '5' ),
+    alignSelf: 'center',
+    borderRadius: widthPercentageToDP( '2' ),
+    marginBottom: heightPercentageToDP( '1.2' ),
+    shadowOpacity: 0.05,
+    // shadowColor: Colors.shadowColor,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 6,
+    elevation: 6,
   },
   icArrow: {
     marginLeft: wp( '3%' ),
@@ -98,89 +141,95 @@ const styles = StyleSheet.create( {
 } )
 
 
-export default function ScanNodeConfig( { navigation } ) {
-  const { translations } = useContext( LocalizationContext )
-  const strings = translations[ 'lightningAccount' ]
-  const common = translations[ 'common' ]
-  const [ knowMore, setKnowMore ] = useState( true )
+export default function ScanNodeConfig({ navigation }) {
+  const { translations } = useContext(LocalizationContext);
+  const strings = translations['lightningAccount'];
+  const common = translations['common'];
+  const [knowMore, setKnowMore] = useState(true);
 
-  async function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
-    if( scannedData.includes( 'config' ) ){
-      const url = scannedData.split( 'config=' )[ 1 ]
-      LndConnectUtils.procesBtcPayConfig( url ).then(
-        res=> {
-          console.log( res )
-          const {
-            uri,
-            macaroon,
-            chainType,
-            port
-          } = res.configurations[ 0 ]
-          if ( uri && macaroon ) {
-            navigation.navigate( 'EnterNodeConfig', {
+  async function handleBarcodeRecognized({
+    data: scannedData,
+  }: {
+    data: string;
+  }) {
+    if (scannedData.includes('config')) {
+      const url = scannedData.split('config=')[1];
+      LndConnectUtils.procesBtcPayConfig(url)
+        .then((res) => {
+          console.log(res);
+          const { uri, macaroon, chainType, port } = res.configurations[0];
+          if (uri && macaroon) {
+            navigation.navigate('EnterNodeConfig', {
               node: {
-                host: uri, port, macaroonHex: macaroon
+                host: uri,
+                port,
+                macaroonHex: macaroon,
               },
-            } )
+            });
           } else {
-            Toast( 'Error fetching config' )
+            Toast('Error fetching config');
           }
-        }
-      ).catch( e=> {
-        console.log( e )
-        Toast( 'Error fetching config' )
-
-      } )
+        })
+        .catch((e) => {
+          console.log(e);
+          Toast('Error fetching config');
+        });
     } else {
-      const {
-        host,
-        port,
-        macaroonHex
-      } = LndConnectUtils.processLndConnectUrl( scannedData )
-      if( host &&  macaroonHex ) {
-        navigation.navigate( 'EnterNodeConfig', {
+      const { host, port, macaroonHex } =
+        LndConnectUtils.processLndConnectUrl(scannedData);
+      if (host && macaroonHex) {
+        navigation.navigate('EnterNodeConfig', {
           node: {
-            host: host, port: port, macaroonHex: macaroonHex
+            host: host,
+            port: port,
+            macaroonHex: macaroonHex,
           },
-        } )
+        });
       } else {
-        Toast( 'Invalid QR' )
+        Toast('Invalid QR');
       }
     }
   }
 
   return (
-
     <SafeAreaView style={styles.viewContainer}>
-      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      <View style={[ CommonStyles.headerContainer, {
-        backgroundColor: Colors.backgroundColor,
-        marginRight: wp( 4 )
-      } ]}>
+      <StatusBar
+        backgroundColor={Colors.backgroundColor}
+        barStyle='dark-content'
+      />
+      <View
+        style={[
+          CommonStyles.headerContainer,
+          {
+            backgroundColor: Colors.backgroundColor,
+            marginRight: wp(4),
+          },
+        ]}
+      >
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            navigation.goBack()
+            navigation.goBack();
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
             <FontAwesome
-              name="long-arrow-left"
+              name='long-arrow-left'
               color={Colors.homepageButtonColor}
               size={17}
             />
           </View>
         </TouchableOpacity>
-
       </View>
       <ScrollView
-        overScrollMode="never"
+        overScrollMode='never'
         bounces={false}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          flexGrow: 1
+          flexGrow: 1,
         }}
-        keyboardShouldPersistTaps='handled'>
+        keyboardShouldPersistTaps='handled'
+      >
         <HeaderTitle1
           firstLineTitle={'Set up Lighting Account'}
           secondLineTitle={strings.Connectyournode}
@@ -193,7 +242,7 @@ export default function ScanNodeConfig( { navigation } ) {
         <CoveredQRCodeScanner
           onCodeScanned={handleBarcodeRecognized}
           containerStyle={{
-            marginBottom: 16
+            marginBottom: 16,
           }}
         />
         {/* <TouchableOpacity
@@ -207,7 +256,7 @@ export default function ScanNodeConfig( { navigation } ) {
         </TouchableOpacity> */}
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate( 'EnterNodeConfig' )
+            navigation.navigate('EnterNodeConfig');
           }}
           activeOpacity={0.6}
           style={styles.addModalView
@@ -236,8 +285,6 @@ export default function ScanNodeConfig( { navigation } ) {
           />
         </TouchableOpacity>
       </ScrollView>
-
-
     </SafeAreaView>
-  )
+  );
 }

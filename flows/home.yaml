@@ -1,0 +1,100 @@
+# home.yaml
+
+# Home Screen
+
+appId: io.hexawallet.hexa.development
+---
+- runFlow: "login.yaml"
+
+# Test Account
+
+- tapOn: 
+    id: "HomeAccountCard"
+    index: 0
+
+# Add Lightning Wallet
+
+- tapOn: 
+    id: "AddLightningWalletButton"
+- tapOn: 
+    id: "EnterManuallyButton"
+- tapOn: 
+    id: "HostInput"
+- inputText: "Sample Host"
+- tapOn: 
+    id: "PortInput"
+- inputText: "Sample Port"
+- tapOn: 
+    id: "MacaroonHexInput"
+- inputText: "Sample Macaroon Hex"
+- tapOn: 
+    id: "NodeConnectButton"
+- tapOn: 
+- tapOn: 
+
+# Buy BTC
+
+- tapOn: 
+    id: "BuyBTCButton"
+- tapOn: 
+    id: "BuyBitcoinButton"
+- tapOn: "Close"
+- tapOn: "Close"
+
+- tapOn:
+    id: notificationButton
+- tapOn:
+    point: "91%,34%"
+
+- tapOn:
+    id: navigateToQRScreen
+- tapOn:
+    id: RNE__Input__text-input
+- inputText: "1hsmMidMUjZt29p1eZik9Z83kMPos315Y"
+- tapOn: Send Max
+- inputText: "1"
+- tapOn: Confirm & Proceed
+- tapOn: Confirm & Send
+- tapOn:
+    point: "63%,89%"
+- tapOn: 
+
+- tapOn:
+    id: navigateToQRScreen
+- tapOn:
+    id: receiveBitcoinButton
+- tapOn:
+    id: enterAmountToReceive
+- tapOn:
+    point: "26%,77%"
+- inputText: 10
+- tapOn:
+    id: notificationButton
+- tapOn:
+    point: "91%,34%"
+
+- tapOn:
+    id: navigateToQRScreen
+- tapOn:
+    id: RNE__Input__text-input
+- inputText: "1hsmMidMUjZt29p1eZik9Z83kMPos315Y"
+- tapOn: Send Max
+- inputText: "1"
+- tapOn: Confirm & Proceed
+- tapOn: Confirm & Send
+- tapOn:
+    point: "63%,89%"
+- tapOn: 
+
+- tapOn:
+    id: navigateToQRScreen
+- tapOn:
+    id: receiveBitcoinButton
+# - tapOn:
+#     id: enterAmountToReceive
+# - tapOn:
+#     point: "26%,77%"
+# - inputText: 10
+# - tapOn:
+#     point: "26%,59%"
+

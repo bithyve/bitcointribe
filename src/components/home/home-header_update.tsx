@@ -431,7 +431,7 @@ const HomeHeader = ( {
             </View>
           </View>
         </View>
-        <TouchableOpacity
+        <TouchableOpacity testID='navigateToQRScreen'
           onPress={navigateToQRScreen}
           style={{
             height: wp( '9%' ),
@@ -460,7 +460,7 @@ const HomeHeader = ( {
             ) : null}
           </ImageBackground>
         </TouchableOpacity>
-        <TouchableOpacity
+        <TouchableOpacity testID='notificationButton'
           onPress={onPressNotifications}
           style={{
             height: wp( '9%' ),

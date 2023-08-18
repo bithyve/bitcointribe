@@ -187,7 +187,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
               <Text style={styles.textImport}>Import From Gallery</Text>
             </TouchableOpacity> */}
 
-            <Button
+            <Button testID='receiveBitcoinButton'
               raised
               title={strings.Receivebitcoin}
               icon={

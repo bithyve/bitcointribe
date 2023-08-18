@@ -734,7 +734,7 @@ class GiftScreen extends React.Component<
               paddingHorizontal: 38, paddingBottom: 20
             }}
           >
-            <GiftBoxComponent
+            <GiftBoxComponent testID='createNewGiftButton'
               titleText={'Create New Gift'}
               subTitleText={this.strings[ 'giftSubTextF&F' ]}
               onPress={() => {
@@ -744,7 +744,7 @@ class GiftScreen extends React.Component<
                 } )}}
               image={<Add />}
             />
-            <GiftBoxComponent
+            <GiftBoxComponent testID='availableGiftsButton'
               titleText={'Available Gifts'}
               subTitleText={'All the gifts you have created, not sent, \nand gifts you have received are shown here'}
               onPress={() => this.props.navigation.navigate( 'ManageGifts', {
@@ -752,7 +752,7 @@ class GiftScreen extends React.Component<
               } )}
               image={<Gifts />}
             />
-            <GiftBoxComponent
+            <GiftBoxComponent testID='claimSatscardButton'
               titleText={'Claim SATSCARD'}
               scTitleText={'TM'}
               subTitleText={'Move sats from your SATSCARD™'}

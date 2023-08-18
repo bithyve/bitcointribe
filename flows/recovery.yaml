@@ -1,0 +1,94 @@
+# signup.yaml
+
+# First time login
+
+appId: io.hexawallet.hexa.development
+---
+- launchApp
+- tapOn: "1"
+- tapOn: "2"
+- tapOn: "3"
+- tapOn: "4"
+
+- tapOn: "1"
+- tapOn: "2"
+- tapOn: "3"
+- tapOn: "4"
+
+- tapOn: Proceed
+
+
+# --------- Recovery Using BackUp Phrase -----------
+
+- tapOn:
+    id: UsingBackupPhraseButton
+
+- tapOn: "01 Enter 1st word"
+- inputText: "muffin"
+- pressKey: Enter
+
+- tapOn: 02 Enter 2nd word
+- inputText: "jeans"
+- pressKey: Enter
+
+- tapOn: 03 Enter 3rd word
+- inputText: "other"
+- pressKey: Enter
+
+- tapOn: 04 Enter 4th word
+- inputText: "year"
+- pressKey: Enter
+
+- tapOn: 05 Enter 5th word
+- inputText: "rare"
+- pressKey: Enter
+
+- tapOn: 06 Enter 6th word
+- inputText: "prevent"
+- pressKey: Enter
+
+- tapOn: Next
+
+- tapOn: "07 Enter 7th word"
+- inputText: "message"
+- pressKey: Enter
+
+- tapOn: 08 Enter 8th word
+- inputText: "symbol"
+- pressKey: Enter
+
+- tapOn: 09 Enter 9th word
+- inputText: "pulse"
+- pressKey: Enter
+
+- tapOn: 10 Enter 10th word
+- inputText: "fine"
+- pressKey: Enter
+
+- tapOn: 11 Enter 11th word
+- inputText: "midnight"
+- pressKey: Enter
+
+- tapOn: 12 Enter 12th word
+- inputText: "solar"
+- pressKey: Enter
+
+- tapOn: Proceed
+
+# --------- Recovery Using Recovery Keys -----------
+
+- tapOn:
+    id: UsingRecoveryKeysButton
+- tapOn:
+    point: "50%,85%"
+
+# --------- Start witha new Tribe Wallet -----------
+
+- tapOn:
+    id: StartWithANewTribeWalletButton
+
+- tapOn:
+    point: 50%,28%
+- inputText: "Test"
+- pressKey: Enter
+- tapOn: Proceed

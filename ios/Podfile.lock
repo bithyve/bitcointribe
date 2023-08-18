@@ -21,7 +21,7 @@ PODS:
   - EXPermissions (9.0.1):
     - UMCore
     - UMPermissionsInterface
-  - EXSecureStore (9.3.0):
+  - EXSecureStore (9.2.0):
     - UMCore
   - FBLazyVector (0.63.3)
   - FBReactNativeSpec (0.63.3):
@@ -200,24 +200,24 @@ PODS:
     - GoogleUtilities/Environment (~> 7.7)
     - nanopb (< 2.30910.0, >= 2.30908.0)
     - PromisesObjC (< 3.0, >= 1.2)
-  - GoogleUtilities/AppDelegateSwizzler (7.8.0):
+  - GoogleUtilities/AppDelegateSwizzler (7.7.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
     - GoogleUtilities/Network
-  - GoogleUtilities/Environment (7.8.0):
+  - GoogleUtilities/Environment (7.7.0):
     - PromisesObjC (< 3.0, >= 1.2)
-  - GoogleUtilities/Logger (7.8.0):
+  - GoogleUtilities/Logger (7.7.0):
     - GoogleUtilities/Environment
-  - GoogleUtilities/MethodSwizzler (7.8.0):
+  - GoogleUtilities/MethodSwizzler (7.7.0):
     - GoogleUtilities/Logger
-  - GoogleUtilities/Network (7.8.0):
+  - GoogleUtilities/Network (7.7.0):
     - GoogleUtilities/Logger
     - "GoogleUtilities/NSData+zlib"
     - GoogleUtilities/Reachability
-  - "GoogleUtilities/NSData+zlib (7.8.0)"
-  - GoogleUtilities/Reachability (7.8.0):
+  - "GoogleUtilities/NSData+zlib (7.7.0)"
+  - GoogleUtilities/Reachability (7.7.0):
     - GoogleUtilities/Logger
-  - GoogleUtilities/UserDefaults (7.8.0):
+  - GoogleUtilities/UserDefaults (7.7.0):
     - GoogleUtilities/Logger
   - GTMSessionFetcher/Core (1.7.2)
   - jail-monkey (2.6.0):
@@ -432,7 +432,7 @@ PODS:
     - React-Core
   - react-native-nfc-manager (3.14.0):
     - React-Core
-  - react-native-pager-view (6.0.0-rc.2):
+  - react-native-pager-view (6.0.0-rc.1):
     - React-Core
   - react-native-print (0.6.0):
     - React
@@ -442,6 +442,9 @@ PODS:
     - React-Core
   - react-native-screen-corner-radius (0.1.1):
     - React
+  - react-native-tcp-socket (5.6.2):
+    - CocoaAsyncSocket
+    - React-Core
   - react-native-udp (4.1.5):
     - CocoaAsyncSocket
     - React-Core
@@ -512,7 +515,7 @@ PODS:
     - React-Core (= 0.63.3)
     - React-cxxreact (= 0.63.3)
     - React-jsi (= 0.63.3)
-  - RealmJS (10.16.0):
+  - RealmJS (10.5.0):
     - GCDWebServer
     - React
   - rn-fetch-blob (0.12.0):
@@ -567,16 +570,13 @@ PODS:
     - React
   - RNSecureStorage (1.0.82):
     - React
-  - RNShare (3.8.5):
+  - RNShare (8.2.1):
     - React-Core
   - RNSVG (12.3.0):
     - React-Core
   - RNVectorIcons (7.1.0):
     - React
   - SocketRocket (0.6.0)
-  - TcpSockets (4.0.0):
-    - CocoaAsyncSocket
-    - React
   - UMAppLoader (1.2.0)
   - UMBarCodeScannerInterface (5.2.1)
   - UMCameraInterface (5.2.1)
@@ -665,6 +665,7 @@ DEPENDENCIES:
   - react-native-randombytes (from `../node_modules/react-native-randombytes`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-screen-corner-radius (from `../node_modules/react-native-screen-corner-radius`)
+  - react-native-tcp-socket (from `../node_modules/react-native-tcp-socket`)
   - react-native-udp (from `../node_modules/react-native-udp`)
   - react-native-video (from `../node_modules/react-native-video`)
   - react-native-view-shot (from `../node_modules/react-native-view-shot`)
@@ -702,7 +703,6 @@ DEPENDENCIES:
   - RNShare (from `../node_modules/react-native-share`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
-  - TcpSockets (from `../node_modules/react-native-tcp`)
   - UMAppLoader (from `../node_modules/unimodules-app-loader/ios`)
   - UMBarCodeScannerInterface (from `../node_modules/unimodules-barcode-scanner-interface/ios`)
   - UMCameraInterface (from `../node_modules/unimodules-camera-interface/ios`)
@@ -837,6 +837,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-screen-corner-radius:
     :path: "../node_modules/react-native-screen-corner-radius"
+  react-native-tcp-socket:
+    :path: "../node_modules/react-native-tcp-socket"
   react-native-udp:
     :path: "../node_modules/react-native-udp"
   react-native-video:
@@ -911,8 +913,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-svg"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
-  TcpSockets:
-    :path: "../node_modules/react-native-tcp"
   UMAppLoader:
     :path: "../node_modules/unimodules-app-loader/ios"
   UMBarCodeScannerInterface:
@@ -952,7 +952,7 @@ SPEC CHECKSUMS:
   EXFileSystem: 76875135b61708b9afa7e6a89b72a60ba0fdfa20
   EXImageLoader: 02ca02c9cd5cc8a97b423207a73a791e0a86bea5
   EXPermissions: 80ac3acbdb145930079810fe5b08c022b3428aa8
-  EXSecureStore: 1b571851e6068b30b8ec097be848a04603c03bae
+  EXSecureStore: 579cbccd9cd093e6f4336aba073b059008bd78e0
   FBLazyVector: 878b59e31113e289e275165efbe4b54fa614d43d
   FBReactNativeSpec: 7da9338acfb98d4ef9e5536805a0704572d33c2f
   Firebase: 5f8193dff4b5b7c5d5ef72ae54bb76c08e2b841d
@@ -978,7 +978,7 @@ SPEC CHECKSUMS:
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
   GoogleAppMeasurement: 4c19f031220c72464d460c9daa1fb5d1acce958e
   GoogleDataTransport: 1c8145da7117bd68bbbed00cf304edb6a24de00f
-  GoogleUtilities: 1d20a6ad97ef46f67bbdec158ce00563a671ebb7
+  GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
   GTMSessionFetcher: 5595ec75acf5be50814f81e9189490412bad82ba
   jail-monkey: 07b83767601a373db876e939b8dbf3f5eb15f073
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
@@ -1010,11 +1010,12 @@ SPEC CHECKSUMS:
   react-native-mail: 8fdcd3aef007c33a6877a18eb4cf7447a1d4ce4a
   react-native-netinfo: 30fb89fa913c342be82a887b56e96be6d71201dd
   react-native-nfc-manager: 449c2c400a4f0ab3b8c084a713f41762a26b3307
-  react-native-pager-view: c9171e3b9f212fe6a4a529818745d8cd21fe82a0
+  react-native-pager-view: 06738ffe86f82c53d59a2387f889679fe210acf1
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
   react-native-randombytes: 421f1c7d48c0af8dbcd471b0324393ebf8fe7846
   react-native-safe-area-context: 9e40fb181dac02619414ba1294d6c2a807056ab9
   react-native-screen-corner-radius: 57b6dea3c024035bff8377618df6e5056e6c6f27
+  react-native-tcp-socket: c1b7297619616b4c9caae6889bcb0aba78086989
   react-native-udp: 8864b1211857e9d8224ae5cbaf8580970fb99de1
   react-native-video: eee541262ada11bc7ffe8ec5508e6a877937c462
   react-native-view-shot: 4475fde003fe8a210053d1f98fb9e06c1d834e1c
@@ -1028,7 +1029,7 @@ SPEC CHECKSUMS:
   React-RCTText: 65a6de06a7389098ce24340d1d3556015c38f746
   React-RCTVibration: 8e9fb25724a0805107fc1acc9075e26f814df454
   ReactCommon: 4167844018c9ed375cc01a843e9ee564399e53c3
-  RealmJS: 8a3478957315c29cdc0b3f958f2e370d22330b2d
+  RealmJS: 3442dc29909254448c28f500b8b49f976a3b22a8
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
   RNCAsyncStorage: 005c0e2f09575360f142d0d1f1f15e4ec575b1af
   RNCClipboard: cc054ad1e8a33d2a74cd13e565588b4ca928d8fd
@@ -1049,11 +1050,10 @@ SPEC CHECKSUMS:
   RNScreens: f7ad633b2e0190b77b6a7aab7f914fad6f198d8d
   RNScreenshotPrevent: ec7d8304fd054b8cc17206ec8c7925400ed676b5
   RNSecureStorage: 8b2b07278d80c48b3a881c56e604ab147372f243
-  RNShare: 7e22ba3bf66294ff7c122a1f2da8a8ec642091a0
+  RNShare: eaee3dd5a06dad397c7d3b14762007035c5de405
   RNSVG: 302bfc9905bd8122f08966dc2ce2d07b7b52b9f8
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
-  TcpSockets: a8eb6b5867fe643e6cfed5db2e4de62f4d1e8fd0
   UMAppLoader: 61049c8d55590b74e9ae1d5429bf68d96b4a2528
   UMBarCodeScannerInterface: e5e4c87797d3d01214e25cd1618866caf5d4f17f
   UMCameraInterface: 415ac060034edecacdbbaa739c223e3f276e0056

@@ -645,7 +645,7 @@ export default function Login( props ) {
                 </TouchableOpacity>
               )
             }
-            <TouchableOpacity
+            <TouchableOpacity testID='ProceedButton'
               disabled={passcode.length !==4}
               activeOpacity={0.7}
               onPress={() => {

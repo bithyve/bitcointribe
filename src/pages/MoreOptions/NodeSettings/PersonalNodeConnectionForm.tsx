@@ -92,7 +92,7 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
         }}>
           <Text style={ListStyles.infoHeaderTitleText}>{strings.SetupPersonal}</Text>
 
-          <TouchableOpacity onPress={onCloseClick}>
+          <TouchableOpacity onPress={onCloseClick} testID='CloseSetupPersonalNodeButton'>
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
               start={{
                 x: 0, y: 0
@@ -164,6 +164,7 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
         </Text>
         <Switch
           value={useSSL}
+          testID='UseSSLNodeSwitch'
           onValueChange={onToggle}
           thumbColor={useSSL ? Colors.white : Colors.white}
           trackColor={{
@@ -193,7 +194,7 @@ const PersonalNodeConnectionForm: React.FC<Props> = ( { params, onSubmit, onClos
       </TouchableOpacity>
 
       <View style={styles.footerSection}>
-        <TouchableOpacity disabled={canProceed === false} onPress={handleProceedButtonPress}>
+        <TouchableOpacity testID='SetupPersonalNodeProceedButton' disabled={canProceed === false} onPress={handleProceedButtonPress}>
           <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
             start={{
               x: 0, y: 0

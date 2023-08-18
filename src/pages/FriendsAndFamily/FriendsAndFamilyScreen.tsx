@@ -566,7 +566,7 @@ class FriendsAndFamilyScreen extends React.Component<
             >
               {this.strings[ 'f&f' ]}
             </Text>
-            <TouchableOpacity
+            <TouchableOpacity testID='+AddNewContact'
               onPress={() => {
                 this.setState( {
                   isLoadContacts: true,

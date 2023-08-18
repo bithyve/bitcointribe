@@ -59,14 +59,14 @@ const CreateFNFInvite = (props: Props) => {
             Create an F{"&"}F invite
           </Text>
         </View>
-        <TouchableOpacity
+        <TouchableOpacity testID="createInvitationLink"
           style={styles.cardBackView}
           onPress={() => props.sendRequestToContact()}
         >
-          <View style={{width: '15%'}}>
+          <View style={{ width: "15%" }}>
             <Add_gifts />
           </View>
-          <View style={{width: '85%'}}>
+          <View style={{ width: "85%" }}>
             <Text style={[styles.titleText, { fontSize: RFValue(12) }]}>
               Create Invitation link
             </Text>
@@ -77,13 +77,14 @@ const CreateFNFInvite = (props: Props) => {
           </View>
         </TouchableOpacity>
         <TouchableOpacity
+          testID="createInvitationLinkWithGift"
           style={styles.cardBackView}
           onPress={() => props.createGifts()}
         >
-          <View style={{width: '15%'}}>
+          <View style={{ width: "15%" }}>
             <Gifts />
           </View>
-          <View style={{width: '85%'}}>
+          <View style={{ width: "85%" }}>
             <Text style={[styles.titleText, { fontSize: RFValue(12) }]}>
               Create Invitation link with gift
             </Text>
@@ -110,11 +111,11 @@ const styles = StyleSheet.create({
   paragraphTitleText: {
     fontSize: 12,
     color: Colors.gray3,
-    textAlign: 'left',
-    flexWrap: 'wrap'
+    textAlign: "left",
+    flexWrap: "wrap",
   },
   cardBackView: {
-    alignItems: 'center',
+    alignItems: "center",
     flexDirection: "row",
     width: "100%",
     backgroundColor: Colors.numberBg,

@@ -13,7 +13,7 @@ const {height} = Dimensions.get('window');
 const GiftBoxComponent = ( props ) => {
 
   return (
-    <TouchableOpacity onPress={props.onPress} style={styles.container}>
+    <TouchableOpacity testID={props.testID} onPress={props.onPress} style={styles.container}>
       {/* <Gift /> */}
       <View
         style={{

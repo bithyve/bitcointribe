@@ -1,0 +1,67 @@
+# giftSats.yaml
+
+appId: io.hexawallet.hexa.development
+---
+- runFlow: "login.yaml"
+- tapOn: Securiy, tab, 3 of 4
+
+#------------------------------------------------------------
+# Create New Gift
+#------------------------------------------------------------
+
+- tapOn:
+    id: "createNewGiftButton" 
+- tapOn:
+    point: "45%,85%"
+
+- tapOn: Enter amount in sats
+- tapOn: 1
+- tapOn: 0
+- tapOn: 0
+- tapOn: 0
+- tapOn:
+    text: 0
+    index: 0
+- tapOn:
+    id: "UseSatcardToGiftSats"
+- tapOn: Create Gift
+- tapOn: 
+
+#------------------------------------------------------------
+# Available Gifts
+#------------------------------------------------------------
+
+- tapOn:
+    id: "availableGiftsButton" 
+- tapOn: Sent
+- tapOn: Expired
+- tapOn: Available
+- tapOn:
+    id: "createNewButtonButton2"
+- tapOn:
+    point: "45%,85%"
+
+- tapOn: Enter amount in sats
+- tapOn: 1
+- tapOn: 0
+- tapOn: 0
+- tapOn: 0
+- tapOn:
+    text: 0
+    index: 0
+- tapOn:
+    id: "UseSatcardToGiftSats"
+- tapOn: Create Gift
+- tapOn: 
+- tapOn: 
+
+#------------------------------------------------------------
+# Claim SATSCARD
+#------------------------------------------------------------
+
+- tapOn:
+    id: "claimSatscardButton" 
+- tapOn:
+    point: "67%,86%"
+- tapOn:
+    point: "22%,88%"
