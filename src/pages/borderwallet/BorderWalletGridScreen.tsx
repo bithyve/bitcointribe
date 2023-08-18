@@ -25,6 +25,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import CreateMemorablePattern from '../../components/border-wallet/CreateMemorablePattern'
 import Toast from '../../components/Toast'
 import StartAgain from '../../assets/images/svgs/startagain.svg'
+import { GridType } from '../../bitcoin/utilities/Interface'
 
 const wordlists = bip39.wordlists.english
 const columns = [
@@ -200,6 +201,7 @@ export const Ceil = ( { onPress, text, index, selected } ) => {
 const BorderWalletGridScreen = ( { navigation } ) => {
   const mnemonic = navigation.getParam( 'mnemonic' )
   const isNewWallet = navigation.getParam( 'isNewWallet' )
+  const gridType = navigation.getParam( 'gridType' ) || GridType.WORDS
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
   const columnHeaderRef = useRef()
@@ -237,27 +239,41 @@ const BorderWalletGridScreen = ( { navigation } ) => {
     prng.done()
   }
 
-  const getCellValue = ( word ) => word.slice( 0, 4 )
 
   useEffect( () => {
     let listener
     InteractionManager.runAfterInteractions( () => {
       listener = setTimeout( () => {
-        const words = [ ...wordlists ]
-        shuffle( words, mnemonic )
-        const cells = words.map( ( word ) => getCellValue( word ) )
-        const g = []
-        Array.from( {
-          length: 128
-        }, ( _, rowIndex ) => {
-          g.push( cells.slice( rowIndex * 16, ( rowIndex + 1 ) * 16 ) )
-        } )
-        setGrid( g )
-        setLoading( false )
+        generateGrid()
       }, 500 )
     } )
     return () => clearTimeout( listener )
-  }, [] )
+  }, [ gridType ] )
+
+  const generateGrid = ()=>{
+    const words = [ ...wordlists ]
+    shuffle( words, mnemonic )
+    const cells = words.map( ( word ) => {
+      switch ( gridType ) {
+          case GridType.WORDS:
+            return word.slice( 0, 4 )
+          case GridType.HEXADECIMAL:
+            return ' ' + ( wordlists.indexOf( word ) + 1 ).toString( 16 ).padStart( 3, '0' )
+          case GridType.NUMBERS:
+            return ( wordlists.indexOf( word ) + 1 ).toString().padStart( 4, '0' )
+          default:
+            return ' '
+      }
+    } )
+    const g = []
+    Array.from( {
+      length: 128
+    }, ( _, rowIndex ) => {
+      g.push( cells.slice( rowIndex * 16, ( rowIndex + 1 ) * 16 ) )
+    } )
+    setGrid( g )
+    setLoading( false )
+  }
 
   const onCeilPress = ( index ) => {
     const isSelected = selected.includes( index )
