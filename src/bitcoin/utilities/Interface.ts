@@ -877,7 +877,8 @@ export interface Wallet {
     [accountType: string]: string[] // array of accountIds
   },
   version: string,
-  borderWalletMnemonic?: string
+  borderWalletMnemonic?: string,
+  borderWalletGridType?: string
 }
 
 export interface LNNode {

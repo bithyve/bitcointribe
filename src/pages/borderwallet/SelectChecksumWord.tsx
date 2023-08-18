@@ -142,7 +142,8 @@ const SelectChecksumWord = ( props ) => {
         selected,
         checksumWord,
         mnemonic,
-        initialMnemonic: props.navigation.getParam( 'initialMnemonic' )
+        initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
+        gridType: props.navigation.getParam( 'gridType' )
       } )
     } else {
       setShowLoader( true )
