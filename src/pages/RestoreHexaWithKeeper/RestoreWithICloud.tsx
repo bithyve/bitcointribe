@@ -934,8 +934,8 @@ class RestoreWithICloud extends Component<
               style={styles.headerBackArrowView}
             >
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </TouchableOpacity>
@@ -1082,11 +1082,11 @@ class RestoreWithICloud extends Component<
             marginBottom: hp( '4%' ),
             justifyContent: 'space-evenly',
             alignItems: 'center',
-            shadowColor: Colors.shadowBlue,
-            shadowOpacity: 1,
-            shadowOffset: {
-              width: 15, height: 15
-            },
+            // shadowColor: Colors.shadowBlue,
+            // shadowOpacity: 1,
+            // shadowOffset: {
+            //   width: 15, height: 15
+            // },
             width: wp( '40%' )
           }}
         >

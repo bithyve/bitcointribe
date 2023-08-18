@@ -84,6 +84,8 @@ export const RESET_LEVEL_AFTER_PASSWORD_CHANGE = 'RESET_LEVEL_AFTER_PASSWORD_CHA
 export const SEED_BACKUP_HISTORY = 'SEED_BACKUP_HISTORY'
 export const RESTORE_SEED_WORD = 'RESTORE_SEED_WORD'
 export const SET_BACKUP_WITH_KEEPER_STATE = 'SET_BACKUP_WITH_KEEPER_STATE'
+export const CREATE_WITH_KEEPER_STATE = 'CREATE_WITH_KEEPER_STATE'
+export const SET_BORDER_WALLET_BACKUP = 'SET_BORDER_WALLET_BACKUP'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -811,11 +813,11 @@ export const restoreWithoutUsingIcloud = ( backupData, answer ) => {
   }
 }
 
-export const recoverWalletUsingMnemonic = ( primaryMnemonic: string ) => {
+export const recoverWalletUsingMnemonic = ( primaryMnemonic: string, initialMnemonic = '' ) => {
   return {
     type: RECOVER_WALLET_WITH_MNEMONIC,
     payload: {
-      primaryMnemonic
+      primaryMnemonic, initialMnemonic
     }
   }
 }
@@ -844,6 +846,22 @@ export const setBackupWithKeeperState = ( state ) => {
   return {
     type: SET_BACKUP_WITH_KEEPER_STATE, payload: {
       state
+    }
+  }
+}
+
+export const createWithKeeperState = ( state ) => {
+  return {
+    type: CREATE_WITH_KEEPER_STATE, payload: {
+      state
+    }
+  }
+}
+
+export const setBorderWalletBackup = ( status ) => {
+  return {
+    type: SET_BORDER_WALLET_BACKUP, payload: {
+      status
     }
   }
 }

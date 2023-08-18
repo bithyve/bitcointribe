@@ -95,6 +95,49 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 6,
   },
+  icArrow: {
+    marginLeft: wp( '3%' ),
+    marginRight: wp( '3%' ),
+    alignSelf: 'center',
+  },
+  textValue: {
+    fontFamily: Fonts.Regular,
+    fontSize: RFValue( 13 ),
+    color: Colors.THEAM_INFO_TEXT_COLOR,
+    marginLeft: wp( '3%' ),
+  },
+  textHelpUs: {
+    fontFamily: Fonts.SemiBold,
+    fontSize: RFValue( 12 ),
+    color: Colors.THEAM_TEXT_COLOR,
+    marginLeft: wp( '3%' ),
+  },
+  textHelpUsSub: {
+    fontFamily: Fonts.Regular,
+    fontSize: RFValue( 12 ),
+    color: Colors.THEAM_INFO_TEXT_COLOR,
+    marginLeft: wp( '3%' ),
+    marginTop: wp( '1%' ),
+  },
+  addModalView: {
+    backgroundColor: Colors.gray7,
+    paddingVertical: 25,
+    paddingHorizontal: widthPercentageToDP( 1 ),
+    flexDirection: 'row',
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginTop: heightPercentageToDP( '5' ),
+    alignSelf: 'center',
+    borderRadius: widthPercentageToDP( '2' ),
+    marginBottom: heightPercentageToDP( '1.2' ),
+    shadowOpacity: 0.05,
+    // shadowColor: Colors.shadowColor,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 6,
+    elevation: 6,
+  },
 } )
 
 

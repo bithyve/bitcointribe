@@ -190,6 +190,7 @@ const WalletInitializationScreen = props => {
               style={styles.iconImage}
               source={require( '../assets/images/icons/icon_secrets.png' )}
             />
+
             <View testID='UsingRecoveryKeysButton' style={styles.textView}>
               <Text style={styles.touchableText}>Using Recovery Keys</Text>
             </View>

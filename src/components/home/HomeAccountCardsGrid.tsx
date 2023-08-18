@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { FlatList } from 'react-native'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -198,9 +198,15 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
   //   return columns
   // }, [ accountShells, showAllAccount ] )
 
+  const [ scrollEnabled, setScrollEnabled ]=useState( true )
   return (
     <FlatList
       horizontal
+      scrollEnabled={scrollEnabled}
+      onTouchStart={event=> {
+        if ( event.nativeEvent.locationY < 600 )setScrollEnabled( false )
+      }}
+      onTouchEnd={event=>setScrollEnabled( true )}
       contentContainerStyle={contentContainerStyle}
       showsHorizontalScrollIndicator={false}
       data={columnData}

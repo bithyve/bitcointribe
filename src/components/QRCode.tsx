@@ -18,7 +18,7 @@ export type Props = {
 
 const QRCode: React.FC<Props> = ( {
   value = '',
-  size = hp( '27%' ),
+  size = hp( '30%' ),
   title = '',
 }: Props ) => {
 
@@ -26,10 +26,10 @@ const QRCode: React.FC<Props> = ( {
     <View style={styles.containerQrCode}>
       <QR
         logo={require( '../assets/images/icons/icon_qr_logo.png' )}
-        logoSize={50}
-        logoMargin={2}
+        logoSize={45}
+        logoMargin={1}
         logoBackgroundColor="white"
-        logoBorderRadius={50}
+        logoBorderRadius={45}
         value={value}
         size={size} />
       {

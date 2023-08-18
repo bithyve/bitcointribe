@@ -877,6 +877,7 @@ export interface Wallet {
     [accountType: string]: string[] // array of accountIds
   },
   version: string,
+  borderWalletMnemonic?: string
 }
 
 export interface LNNode {
@@ -1004,9 +1005,9 @@ export enum DeepLinkKind {
 
 export enum ShortLinkDomain {
   DEFAULT = 'https://app.hexawallet.io',
-  CONTACT = 'https://request.hexawallet.io',
-  GIFT = 'https://gift.hexawallet.io',
-  DONATION = 'https://donation.hexawallet.io',
+  CONTACT = 'https://request.bitcointribe.app',
+  GIFT = 'https://gift.bitcointribe.app',
+  DONATION = 'https://donation.bitcointribe.app',
 }
 
 export enum DeepLinkEncryptionType {

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Image, Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
@@ -13,9 +13,14 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import HeaderTitle from '../../components/HeaderTitle'
 import { translations } from '../../common/content/LocContext'
 import { useDispatch, useSelector } from 'react-redux'
-import { LevelData } from '../../bitcoin/utilities/Interface'
+import { LevelData, Wallet } from '../../bitcoin/utilities/Interface'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
-import { setBackupWithKeeperState } from '../../store/actions/BHR'
+import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
+import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
+import BorderWalletIcon from '../../assets/images/svgs/borderWallet.svg'
+import moment from 'moment'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import dbManager from '../../storage/realm/dbManager'
 
 const styles = StyleSheet.create( {
   body: {
@@ -43,17 +48,36 @@ export default function BackupMethods( { navigation } ) {
   const strings  = translations[ 'bhr' ]
   const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
   const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
+  const createWithKeeperStatus: CreateWithKeeperState  = useSelector( ( state ) => state.bhr.createWithKeeperStatus )
+  const borderWalletBackup  = useSelector( ( state ) => state.bhr.borderWalletBackup )
+
+  const [ days, setDays ] = useState( 0 )
+  const wallet: Wallet =  dbManager.getWallet()
   const dispatch = useDispatch()
+
+  useEffect( () => {
+    async function fetchWalletDays() {
+      const walletBackupDate = await AsyncStorage.getItem( 'walletBackupDate' )
+      if( walletBackupDate && walletBackupDate != null ){
+        const backedupDate = moment( JSON.parse( walletBackupDate ) )
+        // const currentDate = moment( '2023-04-10T11:27:25.000Z' )
+        const currentDate = moment( Date() )
+        setDays( currentDate.diff( backedupDate, 'days' ) )
+      }
+    }
+
+    fetchWalletDays()
+  }, [] )
 
   function onKeeperButtonPress () {
     navigation.navigate( 'SeedBackupHistory' )
   }
 
   function onPressBackupWithKeeper() {
-    if( backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP ) {
-      navigation.navigate( 'BackupWithKeeper' )
-      dispatch( setBackupWithKeeperState( BackupWithKeeperState.INITIATED ) )
-    }
+    // if( backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP ) {
+    navigation.navigate( 'BackupWithKeeper' )
+    // dispatch( setBackupWithKeeperState( BackupWithKeeperState.INITIATED ) )
+    // }
   }
 
   return (
@@ -66,7 +90,9 @@ export default function BackupMethods( { navigation } ) {
         marginTop: hp( 5 )
       } ]}>
         <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
+          style={[ CommonStyles.headerLeftIconContainer, {
+            marginTop: 20
+          } ]}
           onPress={() => {
             navigation.goBack()
           }}
@@ -83,7 +109,7 @@ export default function BackupMethods( { navigation } ) {
       </View>
       <HeaderTitle
         firstLineTitle={strings.WalletBackup}
-        secondLineTitle={strings.WalletBackupInfo1}
+        secondLineTitle={ backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus )}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}
@@ -101,9 +127,10 @@ export default function BackupMethods( { navigation } ) {
           <View style={{
             width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, borderColor:
           levelData[ 0 ].keeper1.status == 'accessible'
-            ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center', elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
-              width: 15, height: 15
-            }
+            ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center'
+            // , elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
+            //   width: 15, height: 15
+            // }
           }}
           >
             <View style={{
@@ -135,10 +162,11 @@ export default function BackupMethods( { navigation } ) {
         >
           <View style={{
             width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, borderColor:
-            backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP
-              ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center', elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
-              width: 15, height: 15
-            }
+            backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP
+              ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center',
+            //   elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
+            //   width: 15, height: 15
+            // }
           }}
           >
             <View style={{
@@ -150,20 +178,58 @@ export default function BackupMethods( { navigation } ) {
                 color={Colors.white} size={10} />
             </View>
             <Image style={{
-              height: 20, width: 20, tintColor: Colors.blue
-            }} resizeMode={'contain'} source={require( '../../assets/images/icons/seedwords.png' )} />
+              height: 20, width: 20
+              // , tintColor: Colors.blue
+            }} resizeMode={'contain'} source={require( '../../assets/images/icons/keeper.png' )} />
 
           </View>
           <Text style={{
             fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, color: Colors.black, margin: 10, textAlign: 'center'
           }}>
-            Backup width Keeper
+            Backup with Keeper
           </Text>
         </TouchableOpacity>
 
       </View>
+      {
+        wallet.borderWalletMnemonic !=='' && (
+          <View style={styles.body}>
+            <TouchableOpacity
+              onPress={()=> navigation.navigate( 'ValidateBorderWalletPattern' )}
+              style={{
+                flexDirection: 'row',
+              }}
+            >
+              <View style={{
+                width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, borderColor:
+                borderWalletBackup && borderWalletBackup.status
+                  ? Colors.white : Colors.yellow, borderWidth: 1, justifyContent: 'center', alignItems: 'center',
+              //   elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
+              //   width: 15, height: 15
+              // }
+              }}
+              >
+                <View style={{
+                  right: 1, height: 12, width: 12, borderRadius: 6,
+                  backgroundColor: borderWalletBackup && borderWalletBackup.status ? Colors.green : Colors.yellow, top: 0, justifyContent: 'center', alignItems: 'center'
+                }}>
+                  <FontAwesome
+                    name={borderWalletBackup && borderWalletBackup.status ? 'check' : 'exclamation' }
+                    color={Colors.white} size={10} />
+                </View>
+                <BorderWalletIcon/>
+              </View>
+              <Text style={{
+                fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, color: Colors.black, margin: 10, textAlign: 'center'
+              }}>
+              Backup with Border wallet
+              </Text>
+            </TouchableOpacity>
+
+          </View>
+        )
+      }
     </View>
   )
 }
-
 

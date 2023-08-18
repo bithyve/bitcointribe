@@ -28,6 +28,7 @@ const RestoreSeedHeaderComponent = ( props ) => {
           }}
         />
       </TouchableOpacity>
+      <Text style={styles.infoText}>{props.info1}</Text>
       <Text style={styles.titleText}>{props.selectedTitle}</Text>
       <Text style={styles.infoText}>{props.info}</Text>
     </View>
@@ -50,7 +51,7 @@ const styles = StyleSheet.create( {
   },
   infoText: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.lightTextColor,
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 11 ),
     marginLeft: wp( '4%' ),
     marginTop: wp( '1.5%' ),

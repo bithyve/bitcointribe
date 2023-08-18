@@ -1,19 +1,13 @@
 
-import React, { useState, useEffect, useCallback, createRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   View,
   SafeAreaView,
   StatusBar,
-  Alert,
   ActivityIndicator,
 } from 'react-native'
 import Colors from '../../common/Colors'
-import _ from 'underscore'
 import ModalContainer from '../../components/home/ModalContainer'
-import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
-import SeedPageComponent from '../NewBHR/SeedPageComponent'
-import SeedBacupModalContents from '../NewBHR/SeedBacupModalContents'
-import ConfirmSeedWordsModal from '../NewBHR/ConfirmSeedWordsModal'
 import RestoreSeedPageComponent from './RestoreSeedPageComponent'
 import RestoreSeedHeaderComponent from './RestoreSeedHeaderComponent'
 import * as bip39 from 'bip39'
@@ -23,16 +17,12 @@ import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Wallet } from '../../bitcoin/utilities/Interface'
-import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import LoaderModal from '../../components/LoaderModal'
 import { translations } from '../../common/content/LocContext'
 import AlertModalContents from '../../components/AlertModalContents'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import { NavigationContext } from 'react-navigation'
 
 const RestoreSeedWordsContent = ( props ) => {
-  const [ seedWordModal, setSeedWordModal ] = useState( false )
-  const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
   const [ showSeedError, setShowSeedError ] = useState( false )
   const [ showLoader, setShowLoader ] = useState( false )
   const [ loaderModal, setLoaderModal ] = useState( false )
@@ -167,6 +157,7 @@ const RestoreSeedWordsContent = ( props ) => {
           changeButtonText={'Back'}
           previousButtonText={'Previous'}
           isChangeKeeperAllow={true}
+          isTwelveCheckbox
         />
         <ModalContainer visible={( showSeedError )} onBackground={() => setShowSeedError}>
           {renderSeedErrorModal()}

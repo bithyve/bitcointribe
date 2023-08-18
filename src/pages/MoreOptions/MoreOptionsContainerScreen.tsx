@@ -20,6 +20,11 @@ import ModalContainer from '../../components/home/ModalContainer'
 import CrossButton from '../../assets/images/svgs/icons_close.svg'
 import { toggleClipboardAccess } from '../../store/actions/misc'
 import { onPressKeeper } from '../../store/actions/BHR'
+import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
+import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
+import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import moment from 'moment'
 
 export type Props = {
   navigation: any;
@@ -46,6 +51,10 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   // currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
   const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
+  const createWithKeeperStatus: CreateWithKeeperState  = useSelector( ( state ) => state.bhr.createWithKeeperStatus )
+  const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
+  const [ days, setDays ] = useState( 0 )
+
   const navigationObj: any = useSelector( ( state ) => state.bhr.navigationObj )
   const [ isEnabled, setIsEnabled ] = useState( false )
   const toggleSwitch = () => setIsEnabled( previousState => !previousState )
@@ -72,13 +81,10 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     // },
     {
       imageSource: require( '../../assets/images/icons/icon_info.png' ),
-      subtitle: levelData[ 0 ].keeper1.status == 'notSetup'
-        ? 'Confirm backup phrase'
-        : levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'
-          ? 'Wallet backup confirmed'
-          :'Confirm backup phrase',
+      subtitle:  backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus ),
       title: bhrStrings[ 'WalletBackup' ],
-      screenName: 'WalletBackup',
+      // screenName: 'WalletBackup',
+      screenName: 'BackupMethods',
     },
     {
       title: strings.accountManagement,
@@ -184,6 +190,20 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
   useEffect( () => {
+    async function fetchWalletDays() {
+      const walletBackupDate = await AsyncStorage.getItem( 'walletBackupDate' )
+      if( walletBackupDate && walletBackupDate != null ){
+        const backedupDate = moment( JSON.parse( walletBackupDate ) )
+        // const currentDate = moment( '2023-04-10T11:27:25.000Z' )
+        const currentDate = moment( Date() )
+        setDays( currentDate.diff( backedupDate, 'days' ) )
+      }
+    }
+
+    fetchWalletDays()
+  }, [] )
+
+  useEffect( () => {
     if ( navigationObj.selectedKeeper && onKeeperButtonClick ) {
       setSelectedKeeper( navigationObj.selectedKeeper )
       const navigationParams = {
@@ -201,9 +221,11 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     if ( typeof menuOption.onOptionPressed === 'function' ) {
       menuOption.onOptionPressed()
     } else if ( menuOption.screenName !== undefined ) {
-      if( menuOption.screenName == 'WalletBackup' ) {
+      // if( menuOption.screenName == 'WalletBackup' ) {
+      /* if( menuOption.screenName == 'BackupMethods' ) {
+        // console.log( 'skk leveldata===>' + JSON.stringify( levelData ) )
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
-        levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'write down seed-words' ){
+        levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup Phrase' ){
           if ( ( levelHealth.length == 0 ) ||
           ( levelHealth.length && levelHealth[ 0 ].levelInfo.length &&
             levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ||
@@ -217,14 +239,15 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               selectedKeeper: navigationObj?.selectedKeeper,
               selectedLevelId: levelData[ 0 ].id
             }
-            navigation.navigate( 'WalletBackup', navigationParams )
+            // navigation.navigate( 'WalletBackup', navigationParams )
+            navigation.navigate( 'BackupMethods', navigationParams )
           } else {
             setSelectedKeeper( levelData[ 0 ].keeper1 )
             dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
             setOnKeeperButtonClick( true )
           }
         } else navigation.navigate( menuOption.screenName )
-      } else navigation.navigate( menuOption.screenName )
+      } else */ navigation.navigate( menuOption.screenName )
     }
   }
 

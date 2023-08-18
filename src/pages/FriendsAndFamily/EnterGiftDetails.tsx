@@ -649,7 +649,7 @@ const GiftDetails = ({ navigation }) => {
     <ScrollView
       contentContainerStyle={{
         flexGrow: 1,
-        height: '100%',
+        // height: '100%',
       }}
       keyboardShouldPersistTaps="handled"
       style={{
@@ -693,7 +693,7 @@ const GiftDetails = ({ navigation }) => {
                 justifyContent: 'space-around',
                 alignItems: 'center',
                 borderRadius: 8,
-                backgroundColor: Colors.lightBlue
+                backgroundColor: Colors.blue
               }}
             >
               <View style={styles.settingIcon}>
@@ -1107,7 +1107,7 @@ const styles = StyleSheet.create({
   statusIndicatorInactiveView: {
     height: 5,
     width: 5,
-    backgroundColor: Colors.lightBlue,
+    backgroundColor: Colors.blue,
     borderRadius: 10,
     marginLeft: 5,
   },
@@ -1250,11 +1250,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
+    // shadowColor: Colors.shadowBlue,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 15, height: 15
+    // },
     backgroundColor: Colors.blue,
     marginLeft: wp(5)
   },
@@ -1265,11 +1265,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
+    // shadowColor: Colors.shadowBlue,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 15, height: 15
+    // },
     backgroundColor: Colors.lightBlue,
     marginLeft: wp(5)
   },

@@ -942,7 +942,7 @@ export default function ManageBackup( props ) {
         <ModalContainer onBackground={() => setSeedBackupModal( false )} visible={seedBackupModal}
           closeBottomSheet={() => setSeedBackupModal( false )}>
           <SeedBacupModalContents
-            title={'Backup using \nSeed Words'}
+            title={'Backup using \nBackup Phrase'}
             info={'You will be shown 12 English words that you need to write down privately\n\nMake sure you keep them safe'}
             proceedButtonText={'Proceed'}
             cancelButtonText={'Back'}

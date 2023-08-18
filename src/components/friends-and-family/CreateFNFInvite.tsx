@@ -30,7 +30,7 @@ const CreateFNFInvite = (props: Props) => {
           height: wp(7),
           borderRadius: wp(7 / 2),
           alignSelf: "flex-end",
-          backgroundColor: Colors.lightBlue,
+          backgroundColor: Colors.CLOSE_ICON_COLOR,
           alignItems: "center",
           justifyContent: "center",
           marginTop: wp(3),

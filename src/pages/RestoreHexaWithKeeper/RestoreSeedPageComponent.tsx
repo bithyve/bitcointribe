@@ -150,7 +150,6 @@ const RestoreSeedPageComponent = ( props ) => {
       else seed = seed + ' ' + name
     } )
     if ( showValidation ) {
-      // Alert.alert( 'Please fill all seed words' )
       setShowAlertModal( true )
     } else {
       props.onPressConfirm( seed )
@@ -308,7 +307,7 @@ const RestoreSeedPageComponent = ( props ) => {
                             partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name.length > 0 ? styles.selectedInput : null,
                           // value?.name.length > 0 ? styles.selectedInput : null,
                           ]}
-                          placeholder={`Enter ${getPlaceholder( getIndex( index, seedIndex ) )} word`}
+                          placeholder={`Enter ${getPlaceholder( getIndex( index, seedIndex ) )} Phrase`}
                           placeholderTextColor={Colors.borderColor}
                           value={partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name}
                           // value={value}
@@ -341,14 +340,14 @@ const RestoreSeedPageComponent = ( props ) => {
                       </TouchableOpacity>
                     )
                   }}
-                  ListFooterComponent={() => seedIndex == 1 &&
+                  ListFooterComponent={() => seedIndex == 1 && props.isTwelveCheckbox &&
                   <TouchableOpacity onPress={() => onCheckPressed()} style={{
                     flexDirection: 'row', alignItems: 'center'
                   }}>
                     <Icon name={extraSeeds ? 'checkbox-marked' : 'checkbox-blank-outline'} size={24} color={Colors.blue} />
                     <Text style={{
                       color: Colors.blue, marginStart: 10
-                    }}>{'I have 24 seed words'}</Text>
+                    }}>{'I have 24 Backup Phrase'}</Text>
                   </TouchableOpacity>}
                 />
                 {
@@ -481,7 +480,7 @@ const RestoreSeedPageComponent = ( props ) => {
         <AlertModalContents
           // modalRef={this.ErrorBottomSheet}
           // title={''}
-          info={'Please fill all seed words'}
+          info={'Please fill all Backup Phrase'}
           proceedButtonText={'Okay'}
           onPressProceed={() => {
             setShowAlertModal( false )
@@ -533,6 +532,7 @@ const styles = StyleSheet.create( {
   },
   historyCard: {
     marginEnd: 15,
+    backgroundColor: Colors.backgroundColor1,
     // backgroundColor: Colors.gray7,
     borderRadius: 10,
     flex: 1 / 2,
@@ -590,10 +590,11 @@ const styles = StyleSheet.create( {
     alignItems: 'center'
   },
   numberText: {
-    color: Colors.numberFont,
+    color: Colors.blue,
     fontSize: RFValue( 20 ),
     fontFamily: Fonts.Regular,
-    marginEnd: 10
+    marginEnd: 5,
+    paddingStart: 2
   },
   nameText: {
     color: Colors.greyTextColor,
@@ -604,14 +605,13 @@ const styles = StyleSheet.create( {
   modalInputBox: {
     flex: 1,
     height: 50,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 12 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.Regular,
     paddingLeft: 15,
     borderRadius: 10,
     // borderColor: '#E3E3E3',
     // borderWidth: 1
-    backgroundColor: Colors.backgroundColor1
   },
   selectedInput: {
     backgroundColor: Colors.white,
@@ -635,7 +635,7 @@ const styles = StyleSheet.create( {
     width: 6,
     height: 5,
     borderRadius: 5,
-    backgroundColor: Colors.THEAM_ERROR_RED_TEXT_COLOR,
+    backgroundColor: Colors.blue,
     marginEnd: 5
   }
 } )
