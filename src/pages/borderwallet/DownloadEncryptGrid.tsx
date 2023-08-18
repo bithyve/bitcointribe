@@ -20,7 +20,7 @@ const DownloadEncryptGrid = ( props ) => {
   const mnemonic = props.navigation.getParam( 'mnemonic' )
   const gridType = props.navigation.getParam( 'gridType' ) || GridType.WORDS
 
-  const [ headerTitle ] = useState( 'Download & encrypt grid' )
+  const [ headerTitle ] = useState( 'Download grid (Optional)' )
   useEffect( ()=>{
     Toast( 'Entropy Grid Regenerated Successfully!' )
   }, [] )
@@ -42,7 +42,7 @@ const DownloadEncryptGrid = ( props ) => {
           props.navigation.goBack()
         }}
         info1={'Step 3 of Creating Border Wallet'}
-        info={'Optional Step'}
+        info={'The Regeneration Mnemonic for the entropy grid will hep you create back the grid, but you can optionally also download the grid'}
         selectedTitle={headerTitle}
       />
       <View style={{
