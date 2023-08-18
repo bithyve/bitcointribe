@@ -80,6 +80,7 @@ export default function NewWalletName( props ) {
   const [ signUpStarted, setSignUpStarted ] = useState( false )
   const mnemonic = props.navigation.getParam( 'mnemonic' ) || null
   const initialMnemonic = props.navigation.getParam( 'initialMnemonic' ) || ''
+  const gridType = props.navigation.getParam( 'gridType' ) || ''
 
   useEffect( () => {
     if ( walletSetupCompleted ) {
@@ -284,7 +285,7 @@ export default function NewWalletName( props ) {
                     setTimeout( () => {
                       setSignUpStarted( true )
                       dispatch( updateCloudPermission( false ) )
-                      dispatch( setupWallet( walletName, null, mnemonic, initialMnemonic ) )
+                      dispatch( setupWallet( walletName, null, mnemonic, initialMnemonic, gridType ) )
                       dispatch( initNewBHRFlow( true ) )
                       dispatch( setVersion( 'Current' ) )
                       const current = Date.now()

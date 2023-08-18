@@ -11,7 +11,8 @@ const createWallet = async ( wallet ) => {
     walletId: wallet.walletId,
     walletName: wallet.walletName,
     primaryMnemonic: wallet.primaryMnemonic,
-    borderWalletMnemonic: wallet.borderWalletMnemonic
+    borderWalletMnemonic: wallet.borderWalletMnemonic,
+    borderWalletGridType: wallet.borderWalletGridType
   }
   if( Object.entries( wallet.accounts ).length > 0 ) {
     let accountIds = []

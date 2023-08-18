@@ -30,6 +30,7 @@ const ConfirmDownload = ( props ) => {
   const pattern = props.navigation.getParam( 'selected' )
   const checksumWord = props.navigation.getParam( 'checksumWord' )
   const initialMnemonic = props.navigation.getParam( 'initialMnemonic' )
+  const gridType = props.navigation.getParam( 'gridType' )
   type ItemProps = {title: string, id: string};
 
   const Item = ( { title, id }: ItemProps ) => (
@@ -113,7 +114,7 @@ const ConfirmDownload = ( props ) => {
           <TouchableOpacity
             onPress={() => {
               props.navigation.navigate( 'NewWalletName', {
-                mnemonic, initialMnemonic
+                mnemonic, initialMnemonic, gridType
               } )
             }}
           >

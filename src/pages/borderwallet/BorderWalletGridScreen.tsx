@@ -304,7 +304,8 @@ const BorderWalletGridScreen = ( { navigation } ) => {
       words: selectedWords.toString().replace( /,/g, ' ' ),
       selected,
       initialMnemonic: mnemonic,
-      isNewWallet
+      isNewWallet,
+      gridType
     } )
   }
 
