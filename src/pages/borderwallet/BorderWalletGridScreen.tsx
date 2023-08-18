@@ -362,14 +362,15 @@ const BorderWalletGridScreen = ( { navigation } ) => {
             />
           </View>
           <View>
-            <Text style={styles.headerText}>{isNewWallet ? 'Step 2: Create a Pattern' : 'Select your Pattern'}</Text>
+            <Text style={styles.headerText}>{isNewWallet ? 'Step 4: Create a Pattern' : 'Select your Pattern'}</Text>
           </View>
           {
             isNewWallet && (
               <View style={styles.statusIndicatorView}>
                 <View style={styles.statusIndicatorInactiveView} />
-                <View style={styles.statusIndicatorActiveView} />
                 <View style={styles.statusIndicatorInactiveView} />
+                <View style={styles.statusIndicatorInactiveView} />
+                <View style={styles.statusIndicatorActiveView} />
                 <View style={styles.statusIndicatorInactiveView} />
                 <View style={styles.statusIndicatorInactiveView} />
               </View>
@@ -485,10 +486,10 @@ const BorderWalletGridScreen = ( { navigation } ) => {
           </View>
         </View>
       )}
-      <ModalContainer onBackground={() =>{setCreateMemorablePattern( false ); Toast( 'Entropy Grid Regenerated Successfully!' )}}
+      <ModalContainer onBackground={() =>{setCreateMemorablePattern( false )}}
         visible={createMemorablePattern}
         closeBottomSheet={() => { }}>
-        <CreateMemorablePattern closeModal={() => {setCreateMemorablePattern( false ); Toast( 'Entropy Grid Regenerated Successfully!' )}}/>
+        <CreateMemorablePattern closeModal={() => {setCreateMemorablePattern( false )}}/>
       </ModalContainer>
     </SafeAreaView>
   )
