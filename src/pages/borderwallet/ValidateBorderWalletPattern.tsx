@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useMemo } from 'react'
 import {
   View,
   Text,
@@ -26,7 +26,7 @@ import CreateMemorablePattern from '../../components/border-wallet/CreateMemorab
 import Toast from '../../components/Toast'
 import StartAgain from '../../assets/images/svgs/startagain.svg'
 import dbManager from '../../storage/realm/dbManager'
-import { Wallet } from '../../bitcoin/utilities/Interface'
+import { GridType, Wallet } from '../../bitcoin/utilities/Interface'
 
 const wordlists = bip39.wordlists.english
 const columns = [
@@ -202,6 +202,7 @@ export const Ceil = ( { onPress, text, index, selected } ) => {
 const ValidateBorderWalletPattern = ( { navigation } ) => {
   const wallet: Wallet =  dbManager.getWallet()
   const mnemonic = wallet.borderWalletMnemonic
+  const gridType = navigation.getParam( 'gridType' ) || GridType.WORDS
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
   const columnHeaderRef = useRef()
@@ -235,27 +236,44 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
     prng.done()
   }
 
-  const getCellValue = ( word ) => word.slice( 0, 4 )
-
   useEffect( () => {
     let listener
     InteractionManager.runAfterInteractions( () => {
       listener = setTimeout( () => {
-        const words = [ ...wordlists ]
-        shuffle( words, mnemonic )
-        const cells = words.map( ( word ) => getCellValue( word ) )
-        const g = []
-        Array.from( {
-          length: 128
-        }, ( _, rowIndex ) => {
-          g.push( cells.slice( rowIndex * 16, ( rowIndex + 1 ) * 16 ) )
-        } )
-        setGrid( g )
-        setLoading( false )
+        generateGrid()
       }, 500 )
     } )
     return () => clearTimeout( listener )
-  }, [] )
+  }, [ gridType ] )
+
+  const isNext = useMemo( () => {
+    return selected.length === 11 || selected.length === 23
+  }, [ selected ] )
+
+  const generateGrid = ()=>{
+    const words = [ ...wordlists ]
+    shuffle( words, mnemonic )
+    const cells = words.map( ( word ) => {
+      switch ( gridType ) {
+          case GridType.WORDS:
+            return word.slice( 0, 4 )
+          case GridType.HEXADECIMAL:
+            return ' ' + ( wordlists.indexOf( word ) + 1 ).toString( 16 ).padStart( 3, '0' )
+          case GridType.NUMBERS:
+            return ( wordlists.indexOf( word ) + 1 ).toString().padStart( 4, '0' )
+          default:
+            return ' '
+      }
+    } )
+    const g = []
+    Array.from( {
+      length: 128
+    }, ( _, rowIndex ) => {
+      g.push( cells.slice( rowIndex * 16, ( rowIndex + 1 ) * 16 ) )
+    } )
+    setGrid( g )
+    setLoading( false )
+  }
 
   const onCeilPress = ( index ) => {
     const isSelected = selected.includes( index )
@@ -263,11 +281,11 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
       const i = selected.findIndex( ( i ) => i === index )
       selected.splice( i, 1 )
       setSelected( [ ...selected ] )
-    } else if ( selected.length < 11 ) {
+    } else if ( selected.length < 23 ) {
       selected.push( index )
       setSelected( [ ...selected ] )
     }else{
-      Toast( 'Pattern selection limit reached. You have selected 11 words' )
+      Toast( 'Pattern selection limit reached. You have selected 23 words' )
     }
   }
   const onPressForgot = () => {
@@ -303,8 +321,8 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
         barStyle="dark-content"
       />
       <View style={styles.bottomViewWrapper}>
-        {selected.length=== 11 &&<TouchableOpacity
-          disabled={selected.length !== 11}
+        {isNext &&<TouchableOpacity
+          disabled={!isNext}
           style={styles.startAgainBtnWrapper}
           onPress={()=> setSelected( [] )}
         >
@@ -312,7 +330,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
           <Text style={styles.startAgainBtnText}>&nbsp;Start Again</Text>
         </TouchableOpacity>}
         <TouchableOpacity
-          disabled={selected.length !== 11}
+          disabled={!isNext}
           style={styles.selectionNextBtn}
           onPress={attempts===3 ? onPressForgot : onPressVerify}
         >

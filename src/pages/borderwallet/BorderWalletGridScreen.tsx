@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useMemo } from 'react'
 import {
   View,
   Text,
@@ -25,6 +25,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import CreateMemorablePattern from '../../components/border-wallet/CreateMemorablePattern'
 import Toast from '../../components/Toast'
 import StartAgain from '../../assets/images/svgs/startagain.svg'
+import { GridType } from '../../bitcoin/utilities/Interface'
 
 const wordlists = bip39.wordlists.english
 const columns = [
@@ -200,6 +201,7 @@ export const Ceil = ( { onPress, text, index, selected } ) => {
 const BorderWalletGridScreen = ( { navigation } ) => {
   const mnemonic = navigation.getParam( 'mnemonic' )
   const isNewWallet = navigation.getParam( 'isNewWallet' )
+  const gridType = navigation.getParam( 'gridType' ) || GridType.WORDS
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
   const columnHeaderRef = useRef()
@@ -210,6 +212,10 @@ const BorderWalletGridScreen = ( { navigation } ) => {
   useEffect( ()=> {
     if( isNewWallet ) setCreateMemorablePattern( true )
   }, [] )
+
+  const isNext = useMemo( () => {
+    return selected.length === 11 || selected.length === 23
+  }, [ selected ] )
 
   const rnd11Bit = ( limit = 2048 ) => {
     let small = limit
@@ -237,27 +243,41 @@ const BorderWalletGridScreen = ( { navigation } ) => {
     prng.done()
   }
 
-  const getCellValue = ( word ) => word.slice( 0, 4 )
 
   useEffect( () => {
     let listener
     InteractionManager.runAfterInteractions( () => {
       listener = setTimeout( () => {
-        const words = [ ...wordlists ]
-        shuffle( words, mnemonic )
-        const cells = words.map( ( word ) => getCellValue( word ) )
-        const g = []
-        Array.from( {
-          length: 128
-        }, ( _, rowIndex ) => {
-          g.push( cells.slice( rowIndex * 16, ( rowIndex + 1 ) * 16 ) )
-        } )
-        setGrid( g )
-        setLoading( false )
+        generateGrid()
       }, 500 )
     } )
     return () => clearTimeout( listener )
-  }, [] )
+  }, [ gridType ] )
+
+  const generateGrid = ()=>{
+    const words = [ ...wordlists ]
+    shuffle( words, mnemonic )
+    const cells = words.map( ( word ) => {
+      switch ( gridType ) {
+          case GridType.WORDS:
+            return word.slice( 0, 4 )
+          case GridType.HEXADECIMAL:
+            return ' ' + ( wordlists.indexOf( word ) + 1 ).toString( 16 ).padStart( 3, '0' )
+          case GridType.NUMBERS:
+            return ( wordlists.indexOf( word ) + 1 ).toString().padStart( 4, '0' )
+          default:
+            return ' '
+      }
+    } )
+    const g = []
+    Array.from( {
+      length: 128
+    }, ( _, rowIndex ) => {
+      g.push( cells.slice( rowIndex * 16, ( rowIndex + 1 ) * 16 ) )
+    } )
+    setGrid( g )
+    setLoading( false )
+  }
 
   const onCeilPress = ( index ) => {
     const isSelected = selected.includes( index )
@@ -265,11 +285,11 @@ const BorderWalletGridScreen = ( { navigation } ) => {
       const i = selected.findIndex( ( i ) => i === index )
       selected.splice( i, 1 )
       setSelected( [ ...selected ] )
-    } else if ( selected.length < 11 ) {
+    } else if ( selected.length < 23 ) {
       selected.push( index )
       setSelected( [ ...selected ] )
     }else{
-      Toast( 'Pattern selection limit reached. You have selected 11 words' )
+      Toast( 'Pattern selection limit reached. You have selected 23 words' )
     }
   }
 
@@ -295,8 +315,8 @@ const BorderWalletGridScreen = ( { navigation } ) => {
         barStyle="dark-content"
       />
       <View style={styles.bottomViewWrapper}>
-        {selected.length=== 11 &&<TouchableOpacity
-          disabled={selected.length !== 11}
+        {isNext &&<TouchableOpacity
+          disabled={!isNext}
           style={styles.startAgainBtnWrapper}
           onPress={()=> setSelected( [] )}
         >
@@ -304,12 +324,12 @@ const BorderWalletGridScreen = ( { navigation } ) => {
           <Text style={styles.startAgainBtnText}>&nbsp;Start Again</Text>
         </TouchableOpacity>}
         <TouchableOpacity
-          disabled={selected.length !== 11}
+          disabled={!isNext}
           style={styles.selectionNextBtn}
           onPress={onPressNext}
         >
-          <Text style={styles.selectedPatternText}>{`${selected.length} of 11`}</Text>
-          {selected.length=== 11 && <View style={styles.nextBtnWrapper}>
+          <Text style={styles.selectedPatternText}>{`${selected.length} of ${selected.length <= 11 ? '11' : '23'}`}</Text>
+          {isNext && <View style={styles.nextBtnWrapper}>
             <Text style={styles.selectedPatternText}>Next</Text>
             <View style={styles.iconRightWrapper}>
               <IconRight/>
