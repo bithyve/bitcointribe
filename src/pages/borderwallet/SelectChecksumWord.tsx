@@ -172,7 +172,7 @@ const SelectChecksumWord = ( props ) => {
         onPressBack={() => {
           props.navigation.goBack()
         }}
-        info1={isNewWallet ? 'Step 3 of Create with Border Wallet': 'Recover with Border Wallet'}
+        info1={isNewWallet ? 'Step 5 of Create with Border Wallet': 'Recover with Border Wallet'}
         info={'This is the final step of creating your Border Wallet'}
         selectedTitle={headerTitle}
       />
@@ -212,8 +212,9 @@ const SelectChecksumWord = ( props ) => {
             <View style={styles.statusIndicatorView}>
               <View style={styles.statusIndicatorInactiveView} />
               <View style={styles.statusIndicatorInactiveView} />
-              <View style={styles.statusIndicatorActiveView} />
               <View style={styles.statusIndicatorInactiveView} />
+              <View style={styles.statusIndicatorInactiveView} />
+              <View style={styles.statusIndicatorActiveView} />
               <View style={styles.statusIndicatorInactiveView} />
             </View>
           )

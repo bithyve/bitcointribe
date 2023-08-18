@@ -76,12 +76,13 @@ const CreateWithBorderWallet = ( props ) => {
           <View style={styles.statusIndicatorInactiveView} />
           <View style={styles.statusIndicatorInactiveView} />
           <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
         </View>
         <View>
           <TouchableOpacity
             onPress={() => {
-              props.navigation.navigate( 'BorderWalletGridScreen', {
-                mnemonic, isNewWallet: true
+              props.navigation.navigate( 'SelectEntropyGridType', {
+                mnemonic
               } )
             }}
           >
@@ -94,7 +95,7 @@ const CreateWithBorderWallet = ( props ) => {
               locations={[ 0.2, 1 ]}
               style={styles.buttonView}
             >
-              <Text style={styles.buttonText}>Generate Grid</Text>
+              <Text style={styles.buttonText}>Next</Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
@@ -135,6 +136,7 @@ const styles = StyleSheet.create( {
   },
   buttonView: {
     padding: 15,
+    width: 120,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,

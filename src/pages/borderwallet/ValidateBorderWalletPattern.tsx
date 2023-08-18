@@ -208,6 +208,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
   const columnHeaderRef = useRef()
   const rowHeaderRef = useRef()
   const [ loading, setLoading ] = useState( true )
+  const [ attempts, setAttempts ] = useState( 0 )
 
   const rnd11Bit = ( limit = 2048 ) => {
     let small = limit
@@ -287,7 +288,11 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
       Toast( 'Pattern selection limit reached. You have selected 23 words' )
     }
   }
-
+  const onPressForgot = () => {
+    navigation.navigate( 'CheckPasscode', {
+      backupType: 'borderWallet'
+    } )
+  }
   const onPressVerify = () => {
     const words = [ ...wordlists ]
     shuffle( words, mnemonic )
@@ -305,6 +310,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
       } )
     } else {
       Toast( 'Pattern does not match' )
+      setAttempts( attempts + 1 )
     }
   }
 
@@ -326,14 +332,19 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
         <TouchableOpacity
           disabled={!isNext}
           style={styles.selectionNextBtn}
-          onPress={onPressVerify}
+          onPress={attempts===3 ? onPressForgot : onPressVerify}
         >
-          <Text style={styles.selectedPatternText}>{`${selected.length} of ${selected.length <= 11 ? '11' : '23'}`}</Text>
-          {isNext && <View style={styles.nextBtnWrapper}>
-            <Text style={styles.selectedPatternText}>Verify</Text>
-            <View style={styles.iconRightWrapper}>
-              <IconRight/>
-            </View>
+          <Text style={styles.selectedPatternText}>{`${selected.length} of 11`}</Text>
+          {selected.length=== 11 && <View style={styles.nextBtnWrapper}>
+            {attempts===3?
+              <Text style={styles.selectedPatternText}>Forgot</Text>
+              :
+              <>
+                <Text style={styles.selectedPatternText}>Verify</Text>
+                <View style={styles.iconRightWrapper}>
+                  <IconRight/>
+                </View>
+              </>}
           </View>}
         </TouchableOpacity>
       </View>
