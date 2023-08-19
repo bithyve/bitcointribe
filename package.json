@@ -123,6 +123,7 @@
     "react-native-fs": "^2.16.6",
     "react-native-gesture-handler": "1.7.0",
     "react-native-get-random-values": "^1.4.0",
+    "react-native-html-to-pdf": "^0.12.0",
     "react-native-image-picker": "^4.1.1",
     "react-native-in-app-utils": "^6.0.2",
     "react-native-keyboard-aware-scroll-view": "^0.9.3",
