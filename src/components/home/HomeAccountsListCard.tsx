@@ -36,6 +36,7 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
     ( state ) => state.bhr.AllowSecureAccount,
   )
 
+  const isBorderWallet = primarySubAccount.type === AccountType.BORDER_WALLET
   const secondarySubAccountBadgeIcons: ImageSourcePropType[] = useMemo( () => {
     return secondarySubAccounts
       .map( subAccount => getAvatarForSubAccount( subAccount, false ) )
@@ -50,7 +51,7 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
         source={getAccountSyncIcon( accountShell.syncStatus )}
       />
       <View style={styles.headerAccountImage} >
-        {getAvatarForSubAccount( primarySubAccount, false, true )}
+        {getAvatarForSubAccount( primarySubAccount, false, true, null , isBorderWallet  )}
       </View>
       {
         accountShell.primarySubAccount.hasNewTxn || ( primarySubAccount.type === AccountType.SWAN_ACCOUNT && !isVisited && !primarySubAccount.isUsable )  && (
