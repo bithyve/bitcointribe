@@ -29,7 +29,7 @@ import StartAgain from '../../assets/images/svgs/startagain.svg'
 import { GridType } from '../../bitcoin/utilities/Interface'
 
 const wordlists = bip39.wordlists.english
-const columns = [
+export const columns = [
   'A',
   'B',
   'C',

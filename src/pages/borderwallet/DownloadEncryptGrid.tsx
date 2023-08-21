@@ -8,27 +8,53 @@ import {
   TouchableOpacity,
 } from 'react-native'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 import Fonts from '../../common/Fonts'
 import { GridType } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
+import RNHTMLtoPDF from 'react-native-html-to-pdf'
+import RNFetchBlob from 'rn-fetch-blob'
+import { generateGridHtmlString } from './gridToHtml'
+import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
 
 const DownloadEncryptGrid = ( props ) => {
   const mnemonic = props.navigation.getParam( 'mnemonic' )
   const gridType = props.navigation.getParam( 'gridType' ) || GridType.WORDS
 
-  const [ headerTitle ] = useState( 'Download grid (Optional)' )
-  useEffect( ()=>{
+  const [ headerTitle ] = useState( 'Download & encrypt grid' )
+
+  useEffect( () => {
     Toast( 'Entropy Grid Regenerated Successfully!' )
   }, [] )
+
   const onPressNext = () => {
     props.navigation.navigate( 'BorderWalletGridScreen', {
-      mnemonic, isNewWallet: true, gridType
+      mnemonic,
+      isNewWallet: true,
+      gridType,
     } )
   }
+
+  const downloadPdf = async () => {
+    try {
+      const options = {
+        html: generateGridHtmlString( generateBorderWalletGrid( mnemonic, gridType ), mnemonic ),
+        fileName: 'BorderWalletGrid',
+        directory: 'Documents',
+        height: 842,
+        width: 595,
+        padding: 10
+        //base64: true
+      }
+      const file = await RNHTMLtoPDF.convert( options )
+      RNFetchBlob.ios.openDocument( file.filePath )
+    } catch ( error ) {
+      console.log( error )
+    }
+  }
+
   return (
     <SafeAreaView
       style={{
@@ -45,13 +71,21 @@ const DownloadEncryptGrid = ( props ) => {
         info={'The Regeneration Mnemonic for the entropy grid will hep you create back the grid, but you can optionally also download the grid'}
         selectedTitle={headerTitle}
       />
-      <View style={{
-        height:'45%'
-      }}>
-        <TouchableOpacity style={styles.menuWrapper} onPress={()=>onPressNext()}>
+      <View
+        style={{
+          height: '45%',
+        }}
+      >
+        <TouchableOpacity
+          style={styles.menuWrapper}
+          onPress={() => onPressNext()}
+        >
           <View style={styles.titleWrapper}>
             <Text style={styles.titleText}>Encrypt & Download</Text>
-            <Text style={styles.subTitleText}>Download with encryption Provide an encryption passphrase in the next step</Text>
+            <Text style={styles.subTitleText}>
+              Download with encryption Provide an encryption passphrase in the
+              next step
+            </Text>
           </View>
           <View style={styles.arrowIconView}>
             <MaterialIcons
@@ -59,15 +93,17 @@ const DownloadEncryptGrid = ( props ) => {
               color={Colors.borderColor}
               size={15}
               style={{
-                alignSelf: 'center'
+                alignSelf: 'center',
               }}
             />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuWrapper}  onPress={()=>onPressNext()}>
+        <TouchableOpacity style={styles.menuWrapper} onPress={downloadPdf}>
           <View style={styles.titleWrapper}>
             <Text style={styles.titleText}>Download without Encryption</Text>
-            <Text style={styles.subTitleText}>Download without encryption Store a PDF file with the grid</Text>
+            <Text style={styles.subTitleText}>
+              Download without encryption Store a PDF file with the grid
+            </Text>
           </View>
           <View style={styles.arrowIconView}>
             <MaterialIcons
@@ -75,17 +111,22 @@ const DownloadEncryptGrid = ( props ) => {
               color={Colors.borderColor}
               size={15}
               style={{
-                alignSelf: 'center'
+                alignSelf: 'center',
               }}
             />
           </View>
         </TouchableOpacity>
       </View>
       <View>
-        <TouchableOpacity style={styles.menuWrapper}  onPress={()=>onPressNext()}>
+        <TouchableOpacity
+          style={styles.menuWrapper}
+          onPress={() => onPressNext()}
+        >
           <View style={styles.titleWrapper}>
             <Text style={styles.titleText}>Proceed without downloading</Text>
-            <Text style={styles.subTitleText}>If you have already noted down the 12-word Regeneration Mnemonic</Text>
+            <Text style={styles.subTitleText}>
+              If you have already noted down the 12-word Regeneration Mnemonic
+            </Text>
           </View>
           <View style={styles.arrowIconView}>
             <MaterialIcons
@@ -93,7 +134,7 @@ const DownloadEncryptGrid = ( props ) => {
               color={Colors.borderColor}
               size={15}
               style={{
-                alignSelf: 'center'
+                alignSelf: 'center',
               }}
             />
           </View>
@@ -125,7 +166,7 @@ const styles = StyleSheet.create( {
     elevation: 6,
   },
   titleWrapper: {
-    width: '90%'
+    width: '90%',
   },
   titleText: {
     color: Colors.THEAM_TEXT_COLOR,
@@ -146,7 +187,7 @@ const styles = StyleSheet.create( {
     flex: 1,
     position: 'absolute',
     bottom: 25,
-    marginLeft: 25
+    marginLeft: 25,
   },
   statusIndicatorView: {
     flexDirection: 'row',
