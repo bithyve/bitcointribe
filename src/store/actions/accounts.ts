@@ -1,5 +1,5 @@
 import { Action } from 'redux'
-import { Account, Accounts, ContactInfo, DonationAccount, Gift } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts, ContactInfo, DonationAccount, Gift, GridType } from '../../bitcoin/utilities/Interface'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
@@ -74,9 +74,14 @@ export const getAllAccountsData = () => {
   }
 }
 
-export const createBorderWallet  = () => {
+export const createBorderWallet  = (primaryMnemonic: string, gridMnemonic: string,  gridType: GridType) => {
   return {
     type: CREATE_BORDER_WALLET,
+    payload: {
+      primaryMnemonic,
+      gridMnemonic,
+      gridType,
+    }
   }
 }
 

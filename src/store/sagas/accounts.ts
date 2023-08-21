@@ -78,7 +78,8 @@ import {
   UnecryptedStreamData,
   Wallet,
   LNNode,
-  DerivationPurpose
+  DerivationPurpose,
+  GridType
 } from '../../bitcoin/utilities/Interface'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -114,6 +115,7 @@ import { generateDeepLink } from '../../common/CommonFunctions'
 import Toast from '../../components/Toast'
 import RESTUtils from '../../utils/ln/RESTUtils'
 import { Alert } from 'react-native'
+import BorderWalletSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/BorderWalletSubAccount'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -807,7 +809,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
           break
       
           case AccountType.BORDER_WALLET :
-          primarySubAccount = new CheckingSubAccountInfo( {
+          primarySubAccount = new BorderWalletSubAccountInfo( {
             id: account.id,
             xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
             isUsable: account.isUsable,
@@ -903,7 +905,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
   return accountShell
 }
 
-export function* addNewAccount( accountType: AccountType, accountDetails: newAccountDetails, recreationInstanceNumber?: number, generatedPrimarySeed?: string ) {
+export function* addNewAccount( accountType: AccountType, accountDetails: newAccountDetails, recreationInstanceNumber?: number, borderWalletAccountInfo?: borderWalletAccountInfo ) {
   const wallet: Wallet = yield select( state => state.storage.wallet )
   const { walletId, accounts } = wallet
   const dbWallet =  dbManager.getWallet()
@@ -955,15 +957,17 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
       
       case AccountType.BORDER_WALLET:
             const borderWalletInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ AccountType.BORDER_WALLET ] )?.length | 0
+            const {generatedSeed} = borderWalletAccountInfo
             const borderWalletAccount: Account = yield call( generateAccount, {
               walletId,
               type: AccountType.BORDER_WALLET,
               instanceNum: borderWalletInstanceCount,
-              accountName: accountName? accountName: `Border Wallet ${borderWalletInstanceCount}`,
+              accountName: accountName? accountName: `Border Wallet ${borderWalletInstanceCount + 1}`,
               accountDescription: accountDescription? accountDescription: 'Border Wallet - Native SegWit',
-              primarySeed: generatedPrimarySeed.toString('hex') ,
+              primarySeed: generatedSeed.toString('hex') ,
               derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT, borderWalletInstanceCount, null, DerivationPurpose.BIP84 ),
               networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+              borderWalletAccountInfo,
             } )
             return borderWalletAccount
 
@@ -1066,11 +1070,17 @@ export interface newAccountDetails {
   imageURL: any,
   node?: LNNode
 }
+
+export interface borderWalletAccountInfo {
+  generatedSeed: any,
+  memonic: string;
+  gridType: GridType;
+}
 export interface newAccountsInfo {
   accountType: AccountType,
   accountDetails?: newAccountDetails,
   recreationInstanceNumber?: number,
-  primarySeed?: any,
+  borderWalletAccountInfo?: borderWalletAccountInfo
 }
 
 export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {payload: newAccountsInfo[], } ) {
@@ -1080,14 +1090,14 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
   const accountIds = []
   let testcoinsToAccount
 
-  for ( const { accountType, accountDetails, recreationInstanceNumber, primarySeed } of newAccountsInfo ){
+  for ( const { accountType, accountDetails, recreationInstanceNumber, borderWalletAccountInfo } of newAccountsInfo ){
     const account: Account | MultiSigAccount = yield call(
       addNewAccount,
       accountType,
       accountDetails || {
       },
       recreationInstanceNumber,
-      primarySeed,
+      borderWalletAccountInfo,
     )
     accountIds.push( account.id )
     const accountShell = yield call( generateShellFromAccount, account )
@@ -1286,10 +1296,15 @@ export const createSmNResetTFAOrXPrivWatcher = createWatcher(
   CREATE_SM_N_RESETTFA_OR_XPRIV
 )
 
-export function* createBorderWalletWorker (){
-  const primaryMnemonic = bip39.generateMnemonic()
+export function* createBorderWalletWorker ({payload}){
+  const {primaryMnemonic, gridMnemonic, gridType} = payload
   const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
-  const accountInfo: newAccountsInfo = { accountType: AccountType.BORDER_WALLET, primarySeed }
+  const borderWalletAccountInfo: borderWalletAccountInfo = {
+    generatedSeed: primarySeed,
+    memonic: gridMnemonic,
+    gridType,
+  }
+  const accountInfo: newAccountsInfo = { accountType: AccountType.BORDER_WALLET, borderWalletAccountInfo }
   yield call(addNewAccountShellsWorker, { payload: [accountInfo] });
 }
 
