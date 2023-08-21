@@ -98,10 +98,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }, 2000 )
   }
   navigateToAddNewAccountScreen = () => {
-    // this.props.navigation.navigate( 'AddNewAccount' )
-    this.props.navigation.navigate( 'ScanNodeConfig', {
-      currentSubAccount: null,
+    //BW-TO-DO
+    this.props.navigation.push( 'CreateWithBorderWallet', {
+      isAccountCreation: true
     } )
+    // dispatch( storeCreds( passcode ) )
+    // this.props.navigation.navigate( 'ScanNodeConfig', {
+    //   currentSubAccount: null,
+    // } )
   };
 
   handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
