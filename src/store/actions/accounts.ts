@@ -64,12 +64,19 @@ export const CREATE_SM_N_RESETTFA_OR_XPRIV = 'CREATE_SM_N_RESETTFA_OR_XPRIV'
 export const SET_SHOW_ALL_ACCOUNT = 'SET_SHOW_ALL_ACCOUNT'
 export const RESET_ACCOUNT_UPDATE_FLAG = 'RESET_ACCOUNT_UPDATE_FLAG'
 export const RESET_TWO_FA_LOADER = 'RESET_TWO_FA_LOADER'
+export const CREATE_BORDER_WALLET = 'CREATE_BORDER_WALLET'
 
 export const GENERATE_GIFTS = 'GENERATE_GIFTS'
 
 export const getAllAccountsData = () => {
   return {
     type: GET_ALL_ACCOUNTS_DATA
+  }
+}
+
+export const createBorderWallet  = () => {
+  return {
+    type: CREATE_BORDER_WALLET,
   }
 }
 
