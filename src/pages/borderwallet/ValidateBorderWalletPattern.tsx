@@ -289,8 +289,8 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
     }
   }
   const onPressForgot = () => {
-    navigation.navigate( 'CheckPasscode', {
-      backupType: 'borderWallet'
+    navigation.navigate( 'PreviewPattern', {
+      pattern: 'saddle hospital yard autumn side ticket feed gaze hair electric husband'
     } )
   }
   const onPressVerify = () => {

@@ -14,6 +14,7 @@ import {
 import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CommonStyles from '../../common/Styles/Styles'
+import Fonts from '../../common/Fonts'
 import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
@@ -91,11 +92,13 @@ const styles = StyleSheet.create( {
   },
   text: {
     fontSize: 12,
-    color: '#BEBBBB'
+    color: '#BEBBBB',
+    fontFamily: Fonts.Light,
   },
   textSeq: {
     textAlign: 'left',
     fontSize: 9,
+    fontFamily: Fonts.Medium,
     color: '#F8F8F8',
     top: -5,
     left: -7
@@ -106,11 +109,13 @@ const styles = StyleSheet.create( {
   },
   headerText:{
     color: Colors.blue,
-    fontSize: RFValue( 17 )
+    fontSize: RFValue( 17 ),
+    fontFamily: Fonts.Medium,
   },
   selectedPatternText: {
     fontSize: 12,
-    color: '#F8F8F8'
+    color: '#F8F8F8',
+    fontFamily: Fonts.Medium,
   },
   selectionNextBtn:{
     padding: 20,
@@ -138,7 +143,7 @@ const styles = StyleSheet.create( {
   statusIndicatorView: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: wp( 10 )
+    marginLeft: wp( 2 )
   },
   statusIndicatorActiveView: {
     height: 10,
