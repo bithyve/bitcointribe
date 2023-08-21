@@ -143,7 +143,7 @@ const styles = StyleSheet.create( {
   statusIndicatorView: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: wp( 10 )
+    marginLeft: wp( 2 )
   },
   statusIndicatorActiveView: {
     height: 10,
