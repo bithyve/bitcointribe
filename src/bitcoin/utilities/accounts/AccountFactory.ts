@@ -2,6 +2,7 @@ import { Account, AccountType, DonationAccount, MultiSigAccount, NetworkType, LN
 import crypto from 'crypto'
 import AccountUtilities from './AccountUtilities'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+import { borderWalletAccountInfo } from '../../../store/sagas/accounts';
 
 export const getPurpose = (derivationPath: string): DerivationPurpose => {
   const purpose = parseInt(derivationPath.split('/')[1], 10);
@@ -30,7 +31,8 @@ export function generateAccount(
     primarySeed,
     derivationPath,
     networkType,
-    node
+    node,
+    borderWalletAccountInfo,
   }: {
     walletId: string,
     type: AccountType,
@@ -41,6 +43,7 @@ export function generateAccount(
     derivationPath: string,
     networkType: NetworkType,
     node?: LNNode
+    borderWalletAccountInfo?: borderWalletAccountInfo
   }
 ): Account {
 
@@ -51,7 +54,6 @@ export function generateAccount(
     const id = crypto.createHash( 'sha256' ).update( xpub ).digest( 'hex' )
     const purpose = getPurpose(derivationPath)
     const initialRecevingAddress = AccountUtilities.getAddressByIndex( xpub, false, 0, network, purpose )
-   console.log({initialRecevingAddress})
     const account: Account = {
       id,
       isUsable: true,
@@ -91,6 +93,10 @@ export function generateAccount(
     }
     if( type === AccountType.LIGHTNING_ACCOUNT ) {
       account.node = node
+    }
+    if(type === AccountType.BORDER_WALLET){
+      account.borderWalletMnemonic = borderWalletAccountInfo.memonic
+      account.borderWalletGridType = borderWalletAccountInfo.gridType
     }
     return account
     
