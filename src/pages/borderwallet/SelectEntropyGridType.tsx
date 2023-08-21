@@ -25,6 +25,7 @@ import { GridType } from '../../bitcoin/utilities/Interface'
 
 const SelectEntropyGridType = ( props ) => {
   const mnemonic = props.navigation.getParam( 'mnemonic' )
+  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
   const loaderMessage = {
     heading: translations[ 'bhr' ].Importingyourwallet,
     text: translations[ 'bhr' ].Thismaytake
@@ -69,7 +70,7 @@ const SelectEntropyGridType = ( props ) => {
 
   const onPressNext = ()=> {
     props.navigation.navigate( 'DownloadEncryptGrid', {
-      mnemonic, isNewWallet: true, gridType
+      mnemonic, isNewWallet: true, gridType, isAccountCreation
     } )
   }
 

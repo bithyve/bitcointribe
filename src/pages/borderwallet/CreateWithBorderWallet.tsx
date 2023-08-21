@@ -23,6 +23,8 @@ import Fonts from '../../common/Fonts'
 const CreateWithBorderWallet = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'Generate New Entropy Grid' )
   const [ generateEntropyGrid, setGenerateEntropyGrid ] = useState( false )
+  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
+
   const mnemonic =  bip39.generateMnemonic()
 
   type ItemProps = {title: string, id: string};
@@ -82,7 +84,8 @@ const CreateWithBorderWallet = ( props ) => {
           <TouchableOpacity
             onPress={() => {
               props.navigation.navigate( 'SelectEntropyGridType', {
-                mnemonic
+                mnemonic,
+                isAccountCreation,
               } )
             }}
           >

@@ -18,6 +18,7 @@ import Toast from '../../components/Toast'
 
 const DownloadEncryptGrid = ( props ) => {
   const mnemonic = props.navigation.getParam( 'mnemonic' )
+  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
   const gridType = props.navigation.getParam( 'gridType' ) || GridType.WORDS
 
   const [ headerTitle ] = useState( 'Download & encrypt grid' )
@@ -26,7 +27,7 @@ const DownloadEncryptGrid = ( props ) => {
   }, [] )
   const onPressNext = () => {
     props.navigation.navigate( 'BorderWalletGridScreen', {
-      mnemonic, isNewWallet: true, gridType
+      mnemonic, isNewWallet: true, gridType, isAccountCreation
     } )
   }
   return (
