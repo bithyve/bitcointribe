@@ -943,6 +943,9 @@ export interface Account {
     type: string;
   }[]
   node?: LNNode
+    
+  borderWalletMnemonic?: string;  //only for account type border wallet
+  borderWalletGridType?: GridType;//only for account type border walle
 }
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled
