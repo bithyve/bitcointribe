@@ -50,6 +50,7 @@ import {
   updateAccountSettings,
   FETCH_FEE_RATES,
   FETCH_EXCHANGE_RATES,
+  CREATE_BORDER_WALLET,
 } from '../actions/accounts'
 import {
   setAllowSecureAccount,
@@ -804,6 +805,17 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
             customDescription: account.accountDescription,
           } )
           break
+      
+          case AccountType.BORDER_WALLET :
+          primarySubAccount = new CheckingSubAccountInfo( {
+            id: account.id,
+            xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+            isUsable: account.isUsable,
+            instanceNumber: account.instanceNum,
+            customDisplayName: account.accountName,
+            customDescription: account.accountDescription,
+          } )
+          break
 
       case AccountType.SAVINGS_ACCOUNT:
         primarySubAccount = new SavingsSubAccountInfo( {
@@ -891,7 +903,7 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
   return accountShell
 }
 
-export function* addNewAccount( accountType: AccountType, accountDetails: newAccountDetails, recreationInstanceNumber?: number ) {
+export function* addNewAccount( accountType: AccountType, accountDetails: newAccountDetails, recreationInstanceNumber?: number, generatedPrimarySeed?: string ) {
   const wallet: Wallet = yield select( state => state.storage.wallet )
   const { walletId, accounts } = wallet
   const dbWallet =  dbManager.getWallet()
@@ -940,6 +952,20 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
             networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
           } )
           return checkingAccountNativeSegwit
+      
+      case AccountType.BORDER_WALLET:
+            const borderWalletInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ AccountType.BORDER_WALLET ] )?.length | 0
+            const borderWalletAccount: Account = yield call( generateAccount, {
+              walletId,
+              type: AccountType.BORDER_WALLET,
+              instanceNum: borderWalletInstanceCount,
+              accountName: accountName? accountName: `Border Wallet ${borderWalletInstanceCount}`,
+              accountDescription: accountDescription? accountDescription: 'Border Wallet - Native SegWit',
+              primarySeed: generatedPrimarySeed.toString('hex') ,
+              derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT, borderWalletInstanceCount, null, DerivationPurpose.BIP84 ),
+              networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+            } )
+            return borderWalletAccount
 
       case AccountType.SAVINGS_ACCOUNT:
         // if( !wallet.secondaryXpub && !wallet.details2FA ) throw new Error( 'Fail to create savings account; secondary-xpub/details2FA missing' )
@@ -1044,6 +1070,7 @@ export interface newAccountsInfo {
   accountType: AccountType,
   accountDetails?: newAccountDetails,
   recreationInstanceNumber?: number,
+  primarySeed?: any,
 }
 
 export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {payload: newAccountsInfo[], } ) {
@@ -1053,13 +1080,14 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
   const accountIds = []
   let testcoinsToAccount
 
-  for ( const { accountType, accountDetails, recreationInstanceNumber } of newAccountsInfo ){
+  for ( const { accountType, accountDetails, recreationInstanceNumber, primarySeed } of newAccountsInfo ){
     const account: Account | MultiSigAccount = yield call(
       addNewAccount,
       accountType,
       accountDetails || {
       },
-      recreationInstanceNumber
+      recreationInstanceNumber,
+      primarySeed,
     )
     accountIds.push( account.id )
     const accountShell = yield call( generateShellFromAccount, account )
@@ -1257,6 +1285,15 @@ export const createSmNResetTFAOrXPrivWatcher = createWatcher(
   createSmNResetTFAOrXPrivWorker,
   CREATE_SM_N_RESETTFA_OR_XPRIV
 )
+
+export function* createBorderWalletWorker (){
+  const primaryMnemonic = bip39.generateMnemonic()
+  const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
+  const accountInfo: newAccountsInfo = { accountType: AccountType.BORDER_WALLET, primarySeed }
+  yield call(addNewAccountShellsWorker, { payload: [accountInfo] });
+}
+
+export const createBorderWalletWatcher = createWatcher(createBorderWalletWorker, CREATE_BORDER_WALLET)
 
 export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { payload: Account[] } ) {
   const newAccountShells: AccountShell[] = []
