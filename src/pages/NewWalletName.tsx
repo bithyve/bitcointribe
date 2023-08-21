@@ -85,21 +85,13 @@ export default function NewWalletName( props ) {
   const gridType = props.navigation.getParam( 'gridType' ) || ''
 
   useEffect( () => {
-    if ( walletSetupCompleted && initialMnemonic === '' ) {
+    if ( walletSetupCompleted ) {
       setLoaderModal( false )
       props.navigation.navigate( 'HomeNav', {
         walletName,
       } )
-    }else if( walletSetupCompleted && initialMnemonic !== '' ){
-      setSuccessModal( true )
     }
   }, [ walletSetupCompleted, cloudBackupStatus ] )
-
-  const navigateToHome = () => {
-    props.navigation.navigate( 'HomeNav', {
-      walletName,
-    } )
-  }
 
   const renderLoaderModalContent = useCallback( () => {
     return <LoaderModal
