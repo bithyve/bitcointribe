@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Alert,
 } from 'react-native'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Colors from '../../common/Colors'
@@ -18,6 +19,8 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf'
 import RNFetchBlob from 'rn-fetch-blob'
 import { generateGridHtmlString } from './gridToHtml'
 import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
+import RNFS from 'react-native-fs'
+
 
 const DownloadEncryptGrid = ( props ) => {
   const mnemonic = props.navigation.getParam( 'mnemonic' )
@@ -40,7 +43,7 @@ const DownloadEncryptGrid = ( props ) => {
     try {
       const options = {
         html: generateGridHtmlString( generateBorderWalletGrid( mnemonic, gridType ), mnemonic ),
-        fileName: 'BorderWalletGrid',
+        fileName: 'BorderWalletEntropyGrid',
         directory: 'Documents',
         height: 842,
         width: 595,
@@ -48,9 +51,19 @@ const DownloadEncryptGrid = ( props ) => {
         //base64: true
       }
       const file = await RNHTMLtoPDF.convert( options )
-      console.log( file.filePath )
+      // const downloadsDir = `${RNFS.DocumentDirectoryPath}/Tribe/`
+      // await RNFS.moveFile( file.filePath, downloadsDir )
+      Alert.alert( 'File saved', `BorderWalletEntropyGrid.pdf save to ${file.filePath}`, [
+        {
+          text: 'Next',
+          onPress: () => onPressNext(),
+          style: 'default',
+        },
+      ], {
+        cancelable: false
+      } )
 
-      RNFetchBlob.ios.openDocument( file.filePath )
+      //RNFetchBlob.ios.openDocument( file.filePath )
     } catch ( error ) {
       console.log( error )
     }
