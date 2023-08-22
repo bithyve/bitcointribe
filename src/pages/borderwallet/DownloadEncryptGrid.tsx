@@ -24,7 +24,7 @@ const DownloadEncryptGrid = ( props ) => {
   const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
   const gridType = props.navigation.getParam( 'gridType' ) || GridType.WORDS
 
-  const [ headerTitle ] = useState( 'Download & encrypt grid' )
+  const [ headerTitle ] = useState( 'Download grid (optional)' )
 
   useEffect( () => {
     Toast( 'Entropy Grid Regenerated Successfully!' )
@@ -48,6 +48,8 @@ const DownloadEncryptGrid = ( props ) => {
         //base64: true
       }
       const file = await RNHTMLtoPDF.convert( options )
+      console.log( file.filePath )
+
       RNFetchBlob.ios.openDocument( file.filePath )
     } catch ( error ) {
       console.log( error )
@@ -67,7 +69,7 @@ const DownloadEncryptGrid = ( props ) => {
           props.navigation.goBack()
         }}
         info1={'Step 3 of Creating Border Wallet'}
-        info={'The Regeneration Mnemonic for the entropy grid will hep you create back the grid, but you can optionally also download the grid'}
+        info={'The Regeneration Mnemonic for the entropy grid will help you create back the grid, but you can optionally also download the grid'}
         selectedTitle={headerTitle}
       />
       <View
@@ -80,10 +82,9 @@ const DownloadEncryptGrid = ( props ) => {
           onPress={() => onPressNext()}
         >
           <View style={styles.titleWrapper}>
-            <Text style={styles.titleText}>Encrypt & Download</Text>
+            <Text style={styles.titleText}>Download with Encryption</Text>
             <Text style={styles.subTitleText}>
-              Download with encryption Provide an encryption passphrase in the
-              next step
+              Provide an encryption password in the next step
             </Text>
           </View>
           <View style={styles.arrowIconView}>
@@ -101,7 +102,7 @@ const DownloadEncryptGrid = ( props ) => {
           <View style={styles.titleWrapper}>
             <Text style={styles.titleText}>Download without Encryption</Text>
             <Text style={styles.subTitleText}>
-              Download without encryption Store a PDF file with the grid
+              Store a PDF file with grid
             </Text>
           </View>
           <View style={styles.arrowIconView}>
