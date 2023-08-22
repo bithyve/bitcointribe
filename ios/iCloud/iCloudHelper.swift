@@ -16,17 +16,17 @@ import PDFKit
     super.init()
   }
   
-  @objc func pdfText(filePath: String, callback: @escaping ((String) -> Void)){
+  @objc func pdfText(filePath: String, callback: @escaping (([String]) -> Void)){
     guard let pdfURL = URL(string: filePath) else {
         return
     }
     let pdfDocument = PDFDocument(url: pdfURL)
-    var result = "{text: ["", ""]}"
+    var result: [String] = [];
     if let pageCount = pdfDocument?.pageCount {
         for pageIndex in 0..<pageCount {
             if let pdfPage = pdfDocument?.page(at: pageIndex) {
                 if let pageText = pdfPage.string {
-                  result+=pageText
+                  result.append(pageText);
                 }
             }
         }

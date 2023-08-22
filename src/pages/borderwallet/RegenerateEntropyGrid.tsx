@@ -6,7 +6,9 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  Platform,
+  NativeModules
 } from 'react-native'
 import Colors from '../../common/Colors'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
@@ -21,6 +23,7 @@ import MnemonicPDFError from '../../components/border-wallet/MnemonicPDFError'
 import * as bip39 from 'bip39'
 import { decode } from 'base-64'
 import Toast from '../../components/Toast'
+const iCloud = NativeModules.iCloud
 
 const RNFS = require( 'react-native-fs' )
 
@@ -29,22 +32,36 @@ const RegenerateEntropyGrid = ( props ) => {
   const [ recoverBorderModal, setRecoverBorderModal ] = useState( false )
   const [ mnemonicPDFErrorModal, setMnemonicPDFErrorModal ] = useState( false )
 
+  const extractMnemonic = async ( path ) => {
+    let decodedString = ''
+    if( Platform.OS === 'ios' ){
+      const pages = await iCloud.pdfText( path )
+      if( pages[ 0 ] ){
+        decodedString = pages[ 0 ]
+      }
+    }else{
+      const cosigner = await RNFS.readFile( path, 'base64' )
+      decodedString = decode( cosigner )
+    }
+    return decodedString
+  }
+
   const pickBWGrid = async () => {
     try{
       const result = await DocumentPicker.pick( {
         type: [ DocumentPicker.types.allFiles ],
       } )
       try {
-        const cosigner = await RNFS.readFile( result[ 0 ].uri, 'base64' )
-        const decodedString: string = decode( cosigner )
+        const decodedString = await extractMnemonic( result[ 0 ].uri )
         const start = decodedString.indexOf( 'Recovery' )
         if( start === -1 ){
           setMnemonicPDFErrorModal( true )
           return
         }
-        const approx = decodedString.slice( start, start + 100 )
-        const mnemonic =  approx.slice( approx.indexOf( ':' )+1, approx.indexOf( ')' ) )
-        const isValidMnemonic = bip39.validateMnemonic( mnemonic.trim() )
+        const approx = decodedString.slice( start, start + 200 )
+        const words = approx.split( ' ' )
+        const mnemonic =  words.slice( words.length - 12, words.length ).map( word=>word.trim() ).join( ' ' )
+        const isValidMnemonic = bip39.validateMnemonic( mnemonic )
         if( isValidMnemonic ) {
           props.navigation.navigate( 'BorderWalletGridScreen', {
             mnemonic,
