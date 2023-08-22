@@ -38,5 +38,15 @@ RCT_EXPORT_METHOD(downloadBackup:(RCTPromiseResolveBlock)resolve
   }];
 }
 
+RCT_EXPORT_METHOD(pdfText:(NSString*) fileUri
+                  get:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+  iCloudBackup *backup = [[iCloudBackup alloc]init];
+  [backup pdfTextWithFilePath:fileUri callback:^(NSString * _Nonnull result) {
+    resolve(result);
+  }];
+  
+}
+
 
 @end
