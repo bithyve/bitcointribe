@@ -46,17 +46,22 @@ export const generateGridHtmlString = ( array, mnemonic ) => {
 p, h4 {
 font-size: 10px;
 text-align: center;
+margin: 0;
 }
 table {
 border-collapse: collapse;
 width: 100%;
 font-size: 8.5px;
 text-align: center;
+margin: 0;
+}
+tr {
+  margin: 0;
 }
 th, td {
 border: 0.8px solid gray;
 padding: 0.1;
-nargin: 0;
+margin: 0;
 }
 th {
 background-color: #f2f2f2;
@@ -67,7 +72,7 @@ background-color: #f2f2f2;
 </style>
 </head>
 <body>
-<h4>Bitcoin Tribe Border Wallets</h4>
+<p>Bitcoin Tribe Border Wallets</p>
 ${htmlTable1}
 <p>Recovery Phrase: ${mnemonic}</p>
 <div class="pagebreak"> </div>

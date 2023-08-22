@@ -290,7 +290,8 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
   }
   const onPressForgot = () => {
     navigation.navigate( 'PreviewPattern', {
-      pattern: 'saddle hospital yard autumn side ticket feed gaze hair electric husband'
+      pattern: 'saddle hospital yard autumn side ticket feed gaze hair electric husband',
+      isValidate: true
     } )
   }
   const onPressVerify = () => {
