@@ -31,6 +31,9 @@ const DownloadEncryptGrid = ( props ) => {
   }, [] )
 
   const onPressNext = () => {
+    isAccountCreation ?  props.navigation.navigate( 'BorderWalletGridScreenAccount', {
+      mnemonic, isNewWallet: true, gridType, isAccountCreation
+    } ) : 
     props.navigation.navigate( 'BorderWalletGridScreen', {
       mnemonic, isNewWallet: true, gridType, isAccountCreation
     } )

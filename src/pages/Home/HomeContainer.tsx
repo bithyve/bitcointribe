@@ -251,7 +251,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               this.setState( {
                 visibleModal: false
               } )
-              this.props.navigation.push( 'CreateWithBorderWallet', {
+              this.props.navigation.navigate( 'CreateWithBorderWalletAccount', {
                 isAccountCreation: true
               } )}}>
               <View style={styles.iconWrapper}>
