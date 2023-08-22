@@ -114,7 +114,7 @@ export default function MnemonicPDFError( props ) {
             marginVertical: hp( 5 )
           }}
         >
-          <TouchableOpacity>
+          <TouchableOpacity onPress={props.tryAgain}>
             <Text style={{
               fontSize: 13,
               color: Colors.blue,
