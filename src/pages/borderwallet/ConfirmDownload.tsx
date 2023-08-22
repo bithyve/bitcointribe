@@ -40,17 +40,17 @@ const ConfirmDownload = ( props ) => {
 
 
   useAccountShellCreationCompletionEffect(()=>{
+    //TO-DO-CW
     //Insert Successful Modal
-    props.navigation.navigate( 'HomeNav')
+    props.navigation.navigate('Home')
   })
   
   const onPressContinue = () => {
     if(isAccountCreation){
-      console.log("create border wallet")
           dispatch(createBorderWallet(mnemonic,initialMnemonic,gridType))
     }
     else{
-      props.navigation.navigate( 'NewWalletName', {
+      props.navigation.navigate('NewWalletName', {
         mnemonic, initialMnemonic, gridType
       } ) 
     }

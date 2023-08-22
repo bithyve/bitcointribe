@@ -300,18 +300,21 @@ const BorderWalletGridScreen = ( { navigation } ) => {
   }
 
   const onPressNext = () => {
-    console.log("onPressNext")
     const words = [ ...wordlists ]
     shuffle( words, mnemonic )
     const selectedWords = []
     selected.forEach( s => {
       selectedWords.push( words[ s ] )
     } )
-    console.log({words: selectedWords.toString().replace( /,/g, ' ' ),
-    selected,
-    initialMnemonic: mnemonic,
-    isNewWallet,
-    gridType})
+
+    isAccountCreation ?  navigation.navigate( 'SelectChecksumWordAccount', {
+      words: selectedWords.toString().replace( /,/g, ' ' ),
+      selected,
+      initialMnemonic: mnemonic,
+      isNewWallet,
+      gridType,
+      isAccountCreation,
+    } ): 
     navigation.navigate( 'SelectChecksumWord', {
       words: selectedWords.toString().replace( /,/g, ' ' ),
       selected,
