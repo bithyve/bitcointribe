@@ -27,6 +27,7 @@ import Toast from '../../components/Toast'
 import StartAgain from '../../assets/images/svgs/startagain.svg'
 import dbManager from '../../storage/realm/dbManager'
 import { GridType, Wallet } from '../../bitcoin/utilities/Interface'
+import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
 
 const wordlists = bip39.wordlists.english
 const columns = [
@@ -289,8 +290,18 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
     }
   }
   const onPressForgot = () => {
+    const selected = []
+    const words = wallet.primaryMnemonic.split( ' ' )
+    words.pop()
+    const wordsGrid = generateBorderWalletGrid( mnemonic, gridType )
+    words.forEach( word => {
+      const index = wordsGrid.findIndex( g => {
+        return g === word.slice( 0, 4 )
+      } )
+      selected.push( index )
+    } )
     navigation.navigate( 'PreviewPattern', {
-      pattern: 'saddle hospital yard autumn side ticket feed gaze hair electric husband',
+      pattern: selected,
       isValidate: true
     } )
   }

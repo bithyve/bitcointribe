@@ -140,9 +140,9 @@ const PreviewPattern = ( { navigation } ) => {
 
   useEffect( ()=> {
     if( isValidate ) {
-      navigation.navigate( 'CheckPasscode', {
-        backupType: 'borderWallet'
-      } )
+      // navigation.navigate( 'CheckPasscode', {
+      //   backupType: 'borderWallet'
+      // } )
     }
   }, [] )
 
