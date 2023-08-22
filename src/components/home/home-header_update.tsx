@@ -110,7 +110,7 @@ const HomeHeader = ( {
   const cloudErrorMessage: string = useSelector( ( state ) => state.cloud.cloudErrorMessage )
   const createWithKeeperStatus: CreateWithKeeperState  =useSelector( ( state ) => state.bhr.createWithKeeperStatus )
   const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
-  const borderWalletBackup: BackupWithKeeperState =useSelector( ( state ) => state.bhr.borderWalletBackup.status )
+  const borderWalletBackup = useSelector( ( state ) => state.bhr.borderWalletBackup )
   const stringsBhr  = translations[ 'bhr' ]
   const common  = translations[ 'common' ]
   const iCloudErrors  = translations[ 'iCloudErrors' ]
@@ -247,7 +247,7 @@ const HomeHeader = ( {
           />
         </View>
         : <View style={{
-          backgroundColor: ( levelData[ 0 ].keeper1.shareType == 'seed' || borderWalletBackup ? Colors.green :  backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP ? Colors.green : Colors.red ),
+          backgroundColor: ( levelData[ 0 ].keeper1.shareType == 'seed' || borderWalletBackup && borderWalletBackup.status ? Colors.green :  backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP ? Colors.green : Colors.red ),
           // backgroundColor: isError ? currentLevel === 0 ? Colors.white : Colors.red : Colors.green,
           width: wp( '4.7%' ), height: wp( '4.7%' ), borderRadius: wp( '4.7/2%' ),
           alignItems:'center',
@@ -263,7 +263,7 @@ const HomeHeader = ( {
             resizeMode={'contain'}
           /> : */}
           <Image
-            source={ levelData[ 0 ].keeper1.shareType !== 'seed' ?  backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP || borderWalletBackup ? require( '../../assets/images/icons/check_white.png' ) : require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
+            source={ levelData[ 0 ].keeper1.shareType !== 'seed' ?  backupWithKeeperStatus == BackupWithKeeperState.BACKEDUP || borderWalletBackup && borderWalletBackup.status ? require( '../../assets/images/icons/check_white.png' ) : require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
             style={{
               width: wp( '2.7%' ), height: wp( '2.7%' ),
               // tintColor: Colors.white

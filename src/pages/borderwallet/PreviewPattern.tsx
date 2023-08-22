@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   View,
   Text,
@@ -136,6 +136,12 @@ const PreviewPattern = ( { navigation } ) => {
   const columnHeaderRef = useRef()
   const rowHeaderRef = useRef()
   const [ loading, setLoading ] = useState( false )
+
+  useEffect( ()=> {
+    navigation.navigate( 'CheckPasscode', {
+      backupType: 'borderWallet'
+    } )
+  }, [] )
 
   return (
     <SafeAreaView style={styles.viewContainer}>

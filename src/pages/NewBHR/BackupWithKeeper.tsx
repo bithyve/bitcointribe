@@ -99,7 +99,7 @@ export default function BackupWithKeeper( { navigation } ) {
   const dispatch = useDispatch()
   const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
   const accounts: Accounts = useSelector( state => state.accounts.accounts )
-  const checkingAccount = Object.values( accounts ).filter( acc => acc.type === AccountType.CHECKING_ACCOUNT )
+  const checkingAccount = Object.values( accounts ).filter( acc => acc.type === AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT  )
   useEffect(  () => {
     init()
   }, [] )
@@ -225,7 +225,7 @@ export default function BackupWithKeeper( { navigation } ) {
             fontFamily: Fonts.Regular
           }}
         >
-          {'P2SH-P2WPKH: Wrapped segwit'}
+          {'P2WPKH: Native SegWit'}
         </Text>
       </View>
       {/* <Text onPress={copyPath} style={{

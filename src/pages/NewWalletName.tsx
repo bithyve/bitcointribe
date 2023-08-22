@@ -44,6 +44,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { initNewBHRFlow } from '../store/actions/BHR'
 import LoaderModal from '../components/LoaderModal'
 import LinearGradient from 'react-native-linear-gradient'
+import BorderWalletSuccessModal from '../components/border-wallet/BorderWalletSuccessModal'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -61,6 +62,7 @@ export default function NewWalletName( props ) {
   const [ walletName, setWalletName ] = useState( '' )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ note, showNote ] = useState( true )
+  const [ successModal, setSuccessModal ] = useState( false )
   const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
   const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
@@ -336,6 +338,29 @@ export default function NewWalletName( props ) {
       /> */}
       <ModalContainer onBackground={()=>setCurrentBottomSheetKind( null )} visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
         {renderBottomSheetContent()}
+      </ModalContainer>
+      <ModalContainer
+        onBackground={()=> setSuccessModal( false )}
+        visible={successModal}
+        closeBottomSheet={()=> setSuccessModal( false )}
+      >
+        <BorderWalletSuccessModal
+          title={'Border Wallet creation success!'}
+          info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit,'}
+          otherText={'Your Border Wallet has been added and is now ready for you to start using.'}
+          proceedButtonText={common.continue}
+          isIgnoreButton={false}
+          closeModal={()=> setSuccessModal( false )}
+          onPressProceed={() => {
+            setSuccessModal( false )
+            navigateToHome()
+          }}
+          onPressIgnore={() => {
+
+          }}
+          isBottomImage={true}
+          bottomImage={require( '../assets/images/icons/contactPermission.png' )}
+        />
       </ModalContainer>
     </SafeAreaView>
   )

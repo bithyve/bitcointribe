@@ -96,7 +96,7 @@ const ValidateBorderWalletChecksum = ( props ) => {
     if( selectedWord === wallet.primaryMnemonic.split( ' ' )[ 11 ] ) {
       Toast( 'Checksum matched' )
       dispatch( setBorderWalletBackup( true ) )
-      props.navigation.goBack()
+      props.navigation.navigate( 'BackupMethods' )
     } else {
       Toast( 'Invalid checksum' )
     }
