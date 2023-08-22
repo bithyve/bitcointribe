@@ -19,9 +19,9 @@ export const generateGridHtmlString = ( array, mnemonic ) => {
   for ( let i = 0; i < table1.length; i++ ) {
     if ( i % 16 === 0 ) {
       if ( i !== 0 ) {
-        htmlTable1 += `<th>${i / 16}</th></tr>`
+        htmlTable1 += `<th>${( '000' + ( i / 16 ) ).substr( -3 )}</th></tr>`
       }
-      htmlTable1 += `<tr><th>${i / 16 + 1}</th>`
+      htmlTable1 += `<tr><th>${( '000' + ( ( i / 16 )+1 ) ).substr( -3 )}</th>`
     }
     htmlTable1 += '<td>' + table1[ i ].slice( 0, 4 ) + '</td>'
   }
@@ -29,14 +29,14 @@ export const generateGridHtmlString = ( array, mnemonic ) => {
   for ( let i = 0; i < table2.length; i++ ) {
     if ( i % 16 === 0 ) {
       if ( i !== 0 ) {
-        htmlTable2 += `<th>${i / 16 + 64}</th></tr>`
+        htmlTable2 += `<th>${( '000' + ( ( i / 16 )+ 64 ) ).substr( -3 )}</th></tr>`
       }
-      htmlTable2 += `<tr><th>${i / 16 + 65}</th>`
+      htmlTable2 += `<tr><th>${( '000' + ( ( i / 16 )+ 65 ) ).substr( -3 )}</th>`
     }
     htmlTable2 += '<td>' + table2[ i ].slice( 0, 4 ) + '</td>'
   }
 
-  htmlTable1 += `<th>64</th></tr>${tableHeader}</table>`
+  htmlTable1 += `<th>064</th></tr>${tableHeader}</table>`
   htmlTable2 += `<th>128</th></tr>${tableHeader}</table>`
   const html = `
   <!DOCTYPE html>
