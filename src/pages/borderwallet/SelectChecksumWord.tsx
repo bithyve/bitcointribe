@@ -74,7 +74,6 @@ const SelectChecksumWord = ( props ) => {
   useEffect( () => {
     setLoaderModal( false )
     if ( wallet && !isAccountCreation) {
-      console.log("here")
       dispatch( completedWalletSetup() )
       AsyncStorage.setItem( 'walletRecovered', 'true' )
       dispatch( setVersion( 'Restored' ) )
@@ -140,7 +139,14 @@ const SelectChecksumWord = ( props ) => {
   const onPressNext = ()=> {
     const mnemonic = `${words} ${checksumWord.split( ' ' )[ 1 ]}`
     if( isNewWallet ) {
-      props.navigation.navigate( 'ConfirmDownload', {
+      isAccountCreation?  props.navigation.navigate( 'ConfirmDownloadAccount', {
+        selected,
+        checksumWord,
+        mnemonic,
+        initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
+        gridType: props.navigation.getParam( 'gridType' ),
+        isAccountCreation
+      } ) : props.navigation.navigate( 'ConfirmDownload', {
         selected,
         checksumWord,
         mnemonic,

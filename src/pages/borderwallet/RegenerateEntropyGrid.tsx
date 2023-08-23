@@ -136,8 +136,8 @@ const RegenerateEntropyGrid = ( props ) => {
       >
         <MnemonicPDFError
           title={'Error reading PDF, enter Regeneration Mnemonic'}
-          info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit,'}
-          otherText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '}
+          info={'There was an error trying to import your PDF. Alternatively, please enter the 12 words written at the bottom of each page of the PDF'}
+          otherText={'The app will regenerate the PDF with the help of these words'}
           proceedButtonText={'Enter Words'}
           isIgnoreButton={false}
           closeModal={()=> setMnemonicPDFErrorModal( false )}

@@ -34,7 +34,6 @@ const getAvatarForSubAccount = (
   isAccount?: boolean,
   isBorderWallet?: boolean
 ) => {
-console.log("sdfdf",subAccount.type, isBorderWallet)
   // switch ( subAccount.kind ) {
   //     case SubAccountKind.TEST_ACCOUNT:
   //       return require( '../../assets/images/icons/icon_test.png' )

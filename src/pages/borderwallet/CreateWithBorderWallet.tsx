@@ -83,6 +83,10 @@ const CreateWithBorderWallet = ( props ) => {
         <View>
           <TouchableOpacity
             onPress={() => {
+              isAccountCreation ? props.navigation.navigate( 'SelectEntropyGridTypeAccount', {
+                mnemonic,
+                isAccountCreation,
+              } ):
               props.navigation.navigate( 'SelectEntropyGridType', {
                 mnemonic,
                 isAccountCreation,

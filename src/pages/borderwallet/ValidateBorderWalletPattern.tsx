@@ -27,6 +27,7 @@ import Toast from '../../components/Toast'
 import StartAgain from '../../assets/images/svgs/startagain.svg'
 import dbManager from '../../storage/realm/dbManager'
 import { GridType, Wallet } from '../../bitcoin/utilities/Interface'
+import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
 
 const wordlists = bip39.wordlists.english
 const columns = [
@@ -289,9 +290,21 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
     }
   }
   const onPressForgot = () => {
-    navigation.navigate( 'PreviewPattern', {
-      pattern: 'saddle hospital yard autumn side ticket feed gaze hair electric husband'
+    const selected = []
+    const words = wallet.primaryMnemonic.split( ' ' )
+    words.pop()
+    const wordsGrid = generateBorderWalletGrid( mnemonic, gridType )
+    words.forEach( word => {
+      const index = wordsGrid.findIndex( g => {
+        return g === word.slice( 0, 4 )
+      } )
+      selected.push( index )
     } )
+    navigation.navigate( 'PreviewPattern', {
+      pattern: selected,
+      isValidate: true
+    } )
+    clearSelection()
   }
   const onPressVerify = () => {
     const words = [ ...wordlists ]
@@ -314,6 +327,11 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
     }
   }
 
+  const clearSelection = () => {
+    setSelected( [] )
+    setAttempts( 0 )
+  }
+
   return (
     <SafeAreaView style={styles.viewContainer}>
       <StatusBar
@@ -324,7 +342,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
         {isNext &&<TouchableOpacity
           disabled={!isNext}
           style={styles.startAgainBtnWrapper}
-          onPress={()=> setSelected( [] )}
+          onPress={clearSelection}
         >
           <StartAgain/>
           <Text style={styles.startAgainBtnText}>&nbsp;Start Again</Text>
@@ -334,8 +352,8 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
           style={styles.selectionNextBtn}
           onPress={attempts===3 ? onPressForgot : onPressVerify}
         >
-          <Text style={styles.selectedPatternText}>{`${selected.length} of 11`}</Text>
-          {selected.length=== 11 && <View style={styles.nextBtnWrapper}>
+          <Text style={styles.selectedPatternText}>{`${selected.length} of ${selected.length <= 11 ? '11' : '23'}`}</Text>
+          {isNext && <View style={styles.nextBtnWrapper}>
             {attempts===3?
               <Text style={styles.selectedPatternText}>Forgot</Text>
               :
