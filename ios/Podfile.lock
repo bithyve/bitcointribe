@@ -418,7 +418,7 @@ PODS:
     - React-Core
   - react-native-contacts (5.2.8):
     - React-Core
-  - react-native-document-picker (9.0.1):
+  - react-native-document-picker (8.2.0):
     - React-Core
   - react-native-flipper (0.158.0):
     - React-Core
@@ -1013,7 +1013,7 @@ SPEC CHECKSUMS:
   react-native-camera: b8cc03e2feec0c04403d0998e37cf519d8fd4c6f
   react-native-config: f309b9ac19456dea12325699af51e0fa0217ce6a
   react-native-contacts: 7b5e16196278636030c3fbbb9505543984b01697
-  react-native-document-picker: 2b8f18667caee73a96708a82b284a4f40b30a156
+  react-native-document-picker: 495c444c0c773c6e83a5d91165890ecb1c0a399a
   react-native-flipper: bbe3c862a02dab5e0f71b639855a180b699a590a
   react-native-get-random-values: 30b3f74ca34e30e2e480de48e4add2706a40ac8f
   react-native-html-to-pdf: 4c5c6e26819fe202971061594058877aa9b25265
