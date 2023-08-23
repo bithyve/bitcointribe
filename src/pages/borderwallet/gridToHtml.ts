@@ -1,6 +1,8 @@
+import moment from 'moment'
+import { GridType } from '../../bitcoin/utilities/Interface'
 import { columns } from './BorderWalletGridScreen'
 
-export const generateGridHtmlString = ( array, mnemonic ) => {
+export const generateGridHtmlString = ( array, mnemonic, gridType = GridType.WORDS ) => {
   const data = [ ...array ]
   let htmlTable1 = '<table>'
   let htmlTable2 = '<table>'
@@ -72,11 +74,11 @@ background-color: #f2f2f2;
 </style>
 </head>
 <body>
-<p>Bitcoin Tribe Border Wallets</p>
+<h4>Bitcoin Tribe Border Wallets  Grid Type: ${gridType.toLocaleLowerCase()}  Date: ${moment().format( 'DD/MM/YY • hh:MMa' )}</h4>
 ${htmlTable1}
 <p>Recovery Phrase: ${mnemonic}</p>
 <div class="pagebreak"> </div>
-<h4>Bitcoin Tribe Border Wallets</h4>
+<h4>Bitcoin Tribe Border Wallets  Grid Type: ${gridType.toLocaleLowerCase()}  Date: ${moment().format( 'DD/MM/YY • hh:MMa' )}</h4>
 ${htmlTable2}
 <p>Recovery Phrase: ${mnemonic}</p>
 </body>

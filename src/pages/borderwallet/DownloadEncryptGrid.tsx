@@ -36,16 +36,16 @@ const DownloadEncryptGrid = ( props ) => {
   const onPressNext = () => {
     isAccountCreation ?  props.navigation.navigate( 'BorderWalletGridScreenAccount', {
       mnemonic, isNewWallet: true, gridType, isAccountCreation
-    } ) : 
-    props.navigation.navigate( 'BorderWalletGridScreen', {
-      mnemonic, isNewWallet: true, gridType, isAccountCreation
-    } )
+    } ) :
+      props.navigation.navigate( 'BorderWalletGridScreen', {
+        mnemonic, isNewWallet: true, gridType, isAccountCreation
+      } )
   }
 
   const downloadPdf = async () => {
     try {
       const options = {
-        html: generateGridHtmlString( generateBorderWalletGrid( mnemonic, gridType ), mnemonic ),
+        html: generateGridHtmlString( generateBorderWalletGrid( mnemonic, gridType ), mnemonic, gridType ),
         fileName: 'BorderWalletEntropyGrid',
         directory: 'Documents',
         height: 842,
