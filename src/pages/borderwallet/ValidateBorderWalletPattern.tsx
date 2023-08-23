@@ -304,6 +304,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
       pattern: selected,
       isValidate: true
     } )
+    clearSelection()
   }
   const onPressVerify = () => {
     const words = [ ...wordlists ]
@@ -326,6 +327,11 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
     }
   }
 
+  const clearSelection = () => {
+    setSelected( [] )
+    setAttempts( 0 )
+  }
+
   return (
     <SafeAreaView style={styles.viewContainer}>
       <StatusBar
@@ -336,7 +342,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
         {isNext &&<TouchableOpacity
           disabled={!isNext}
           style={styles.startAgainBtnWrapper}
-          onPress={()=> setSelected( [] )}
+          onPress={clearSelection}
         >
           <StartAgain/>
           <Text style={styles.startAgainBtnText}>&nbsp;Start Again</Text>
@@ -346,8 +352,8 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
           style={styles.selectionNextBtn}
           onPress={attempts===3 ? onPressForgot : onPressVerify}
         >
-          <Text style={styles.selectedPatternText}>{`${selected.length} of 11`}</Text>
-          {selected.length=== 11 && <View style={styles.nextBtnWrapper}>
+          <Text style={styles.selectedPatternText}>{`${selected.length} of ${selected.length <= 11 ? '11' : '23'}`}</Text>
+          {isNext && <View style={styles.nextBtnWrapper}>
             {attempts===3?
               <Text style={styles.selectedPatternText}>Forgot</Text>
               :
