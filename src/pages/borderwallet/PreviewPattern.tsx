@@ -133,14 +133,17 @@ const styles = StyleSheet.create( {
 
 const PreviewPattern = ( { navigation } ) => {
   const pattern = navigation.getParam( 'pattern' )
+  const isValidate = navigation.getParam( 'isValidate' ) || false
   const columnHeaderRef = useRef()
   const rowHeaderRef = useRef()
   const [ loading, setLoading ] = useState( false )
 
   useEffect( ()=> {
-    navigation.navigate( 'CheckPasscode', {
-      backupType: 'borderWallet'
-    } )
+    if( isValidate ) {
+      // navigation.navigate( 'CheckPasscode', {
+      //   backupType: 'borderWallet'
+      // } )
+    }
   }, [] )
 
   return (

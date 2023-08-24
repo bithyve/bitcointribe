@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Alert,
 } from 'react-native'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Colors from '../../common/Colors'
@@ -18,30 +19,34 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf'
 import RNFetchBlob from 'rn-fetch-blob'
 import { generateGridHtmlString } from './gridToHtml'
 import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
+import RNFS from 'react-native-fs'
+
 
 const DownloadEncryptGrid = ( props ) => {
   const mnemonic = props.navigation.getParam( 'mnemonic' )
+  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
   const gridType = props.navigation.getParam( 'gridType' ) || GridType.WORDS
 
-  const [ headerTitle ] = useState( 'Download & encrypt grid' )
+  const [ headerTitle ] = useState( 'Download grid (optional)' )
 
   useEffect( () => {
     Toast( 'Entropy Grid Regenerated Successfully!' )
   }, [] )
 
   const onPressNext = () => {
-    props.navigation.navigate( 'BorderWalletGridScreen', {
-      mnemonic,
-      isNewWallet: true,
-      gridType,
-    } )
+    isAccountCreation ?  props.navigation.navigate( 'BorderWalletGridScreenAccount', {
+      mnemonic, isNewWallet: true, gridType, isAccountCreation
+    } ) :
+      props.navigation.navigate( 'BorderWalletGridScreen', {
+        mnemonic, isNewWallet: true, gridType, isAccountCreation
+      } )
   }
 
   const downloadPdf = async () => {
     try {
       const options = {
-        html: generateGridHtmlString( generateBorderWalletGrid( mnemonic, gridType ), mnemonic ),
-        fileName: 'BorderWalletGrid',
+        html: generateGridHtmlString( generateBorderWalletGrid( mnemonic, gridType ), mnemonic, gridType ),
+        fileName: 'BorderWalletEntropyGrid',
         directory: 'Documents',
         height: 842,
         width: 595,
@@ -49,7 +54,19 @@ const DownloadEncryptGrid = ( props ) => {
         //base64: true
       }
       const file = await RNHTMLtoPDF.convert( options )
-      RNFetchBlob.ios.openDocument( file.filePath )
+      // const downloadsDir = `${RNFS.DocumentDirectoryPath}/Tribe/`
+      // await RNFS.moveFile( file.filePath, downloadsDir )
+      Alert.alert( 'File saved', `BorderWalletEntropyGrid.pdf save to ${file.filePath}`, [
+        {
+          text: 'Next',
+          onPress: () => onPressNext(),
+          style: 'default',
+        },
+      ], {
+        cancelable: false
+      } )
+
+      //RNFetchBlob.ios.openDocument( file.filePath )
     } catch ( error ) {
       console.log( error )
     }
@@ -68,7 +85,7 @@ const DownloadEncryptGrid = ( props ) => {
           props.navigation.goBack()
         }}
         info1={'Step 3 of Creating Border Wallet'}
-        info={'The Regeneration Mnemonic for the entropy grid will hep you create back the grid, but you can optionally also download the grid'}
+        info={'The Regeneration Mnemonic for the entropy grid will help you create back the grid, but you can optionally also download the grid'}
         selectedTitle={headerTitle}
       />
       <View
@@ -81,10 +98,9 @@ const DownloadEncryptGrid = ( props ) => {
           onPress={() => onPressNext()}
         >
           <View style={styles.titleWrapper}>
-            <Text style={styles.titleText}>Encrypt & Download</Text>
+            <Text style={styles.titleText}>Download with Encryption</Text>
             <Text style={styles.subTitleText}>
-              Download with encryption Provide an encryption passphrase in the
-              next step
+              Provide an encryption password in the next step
             </Text>
           </View>
           <View style={styles.arrowIconView}>
@@ -102,7 +118,7 @@ const DownloadEncryptGrid = ( props ) => {
           <View style={styles.titleWrapper}>
             <Text style={styles.titleText}>Download without Encryption</Text>
             <Text style={styles.subTitleText}>
-              Download without encryption Store a PDF file with the grid
+              Store a PDF file with grid
             </Text>
           </View>
           <View style={styles.arrowIconView}>

@@ -18,6 +18,9 @@ import LinearGradient from 'react-native-linear-gradient'
 import ModalContainer from '../../components/home/ModalContainer'
 import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
 import { LocalizationContext } from '../../common/content/LocContext'
+import { useDispatch } from 'react-redux'
+import { createBorderWallet } from '../../store/actions/accounts'
+import useAccountShellCreationCompletionEffect from '../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
 
 const ConfirmDownload = ( props ) => {
   const { translations } = useContext( LocalizationContext )
@@ -30,9 +33,29 @@ const ConfirmDownload = ( props ) => {
   const pattern = props.navigation.getParam( 'selected' )
   const checksumWord = props.navigation.getParam( 'checksumWord' )
   const initialMnemonic = props.navigation.getParam( 'initialMnemonic' )
+  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
   const gridType = props.navigation.getParam( 'gridType' )
+  const dispatch = useDispatch()
   type ItemProps = {title: string, id: string};
 
+
+  useAccountShellCreationCompletionEffect(()=>{
+    //TO-DO-CW
+    //Insert Successful Modal
+    props.navigation.navigate('Home')
+  })
+  
+  const onPressContinue = () => {
+    if(isAccountCreation){
+          dispatch(createBorderWallet(mnemonic,initialMnemonic,gridType))
+    }
+    else{
+      props.navigation.navigate('NewWalletName', {
+        mnemonic, initialMnemonic, gridType
+      } ) 
+    }
+              
+  }
   const Item = ( { title, id }: ItemProps ) => (
     <View style={styles.item}>
       <View style={[ styles.indexWrapper ]}>
@@ -112,11 +135,7 @@ const ConfirmDownload = ( props ) => {
       <View style={styles.bottomButtonView}>
         <View>
           <TouchableOpacity
-            onPress={() => {
-              props.navigation.navigate( 'NewWalletName', {
-                mnemonic, initialMnemonic, gridType
-              } )
-            }}
+            onPress={onPressContinue}
           >
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
               start={{

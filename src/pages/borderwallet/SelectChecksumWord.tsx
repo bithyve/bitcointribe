@@ -44,6 +44,7 @@ const SelectChecksumWord = ( props ) => {
   const words = props.navigation.getParam( 'words' )
   const selected = props.navigation.getParam( 'selected' )
   const isNewWallet = props.navigation.getParam( 'isNewWallet' )
+  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
   const [ checksums, setChecksums ] = useState( [] )
   const [ headerTitle, setHeaderTitle ] = useState( 'Select Checksum Word' )
   const [ checksumWord, setChecksumWord ] = useState( 'Select checksum word' )
@@ -72,13 +73,13 @@ const SelectChecksumWord = ( props ) => {
 
   useEffect( () => {
     setLoaderModal( false )
-    if ( wallet ) {
+    if ( wallet && !isAccountCreation) {
       dispatch( completedWalletSetup() )
       AsyncStorage.setItem( 'walletRecovered', 'true' )
       dispatch( setVersion( 'Restored' ) )
       props.navigation.navigate( 'HomeNav' )
     }
-  }, [ wallet ] )
+  }, [ wallet, isAccountCreation ] )
 
   useEffect( () => {
     const validChecksums = []
@@ -138,12 +139,20 @@ const SelectChecksumWord = ( props ) => {
   const onPressNext = ()=> {
     const mnemonic = `${words} ${checksumWord.split( ' ' )[ 1 ]}`
     if( isNewWallet ) {
-      props.navigation.navigate( 'ConfirmDownload', {
+      isAccountCreation?  props.navigation.navigate( 'ConfirmDownloadAccount', {
         selected,
         checksumWord,
         mnemonic,
         initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
-        gridType: props.navigation.getParam( 'gridType' )
+        gridType: props.navigation.getParam( 'gridType' ),
+        isAccountCreation
+      } ) : props.navigation.navigate( 'ConfirmDownload', {
+        selected,
+        checksumWord,
+        mnemonic,
+        initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
+        gridType: props.navigation.getParam( 'gridType' ),
+        isAccountCreation
       } )
     } else {
       setShowLoader( true )

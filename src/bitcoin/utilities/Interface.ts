@@ -943,6 +943,9 @@ export interface Account {
     type: string;
   }[]
   node?: LNNode
+    
+  borderWalletMnemonic?: string;  //only for account type border wallet
+  borderWalletGridType?: GridType;//only for account type border walle
 }
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled
@@ -987,7 +990,8 @@ export enum AccountType {
   WYRE_ACCOUNT = 'WYRE_ACCOUNT',
   EXCHANGE_ACCOUNT = 'EXCHANGE_ACCOUNT',
   FNF_ACCOUNT = 'FNF_ACCOUNT',
-  LIGHTNING_ACCOUNT = 'LIGHTNING_ACCOUNT'
+  LIGHTNING_ACCOUNT = 'LIGHTNING_ACCOUNT',
+  BORDER_WALLET = 'BORDER_WALLET',
 }
 
 export interface Accounts {

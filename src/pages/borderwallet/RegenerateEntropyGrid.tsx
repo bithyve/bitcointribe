@@ -6,7 +6,9 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  Platform,
+  NativeModules
 } from 'react-native'
 import Colors from '../../common/Colors'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
@@ -16,9 +18,65 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import RecoverBorderWalletModal from '../../components/border-wallet/RecoverBorderWalletModal'
 import ModalContainer from '../../components/home/ModalContainer'
 import IconUp from '../../assets/images/svgs/icon_arrow_up.svg'
+import DocumentPicker from 'react-native-document-picker'
+import MnemonicPDFError from '../../components/border-wallet/MnemonicPDFError'
+import * as bip39 from 'bip39'
+import { decode } from 'base-64'
+import Toast from '../../components/Toast'
+const iCloud = NativeModules.iCloud
+
+const RNFS = require( 'react-native-fs' )
+
 
 const RegenerateEntropyGrid = ( props ) => {
   const [ recoverBorderModal, setRecoverBorderModal ] = useState( false )
+  const [ mnemonicPDFErrorModal, setMnemonicPDFErrorModal ] = useState( false )
+
+  const extractMnemonic = async ( path ) => {
+    let decodedString = ''
+    if( Platform.OS === 'ios' ){
+      const pages = await iCloud.pdfText( path )
+      if( pages[ 0 ] ){
+        decodedString = pages[ 0 ]
+      }
+    }else{
+      const cosigner = await RNFS.readFile( path, 'base64' )
+      decodedString = decode( cosigner )
+    }
+    return decodedString
+  }
+
+  const pickBWGrid = async () => {
+    try{
+      const result = await DocumentPicker.pick( {
+        type: [ DocumentPicker.types.allFiles ],
+      } )
+      try {
+        const decodedString = await extractMnemonic( result[ 0 ].uri )
+        const start = decodedString.indexOf( 'Recovery' )
+        if( start === -1 ){
+          setMnemonicPDFErrorModal( true )
+          return
+        }
+        const approx = decodedString.slice( start, start + 200 )
+        const words = approx.split( ' ' )
+        const mnemonic =  words.slice( words.length - 12, words.length ).map( word=>word.trim() ).join( ' ' )
+        const isValidMnemonic = bip39.validateMnemonic( mnemonic )
+        if( isValidMnemonic ) {
+          props.navigation.navigate( 'BorderWalletGridScreen', {
+            mnemonic,
+            isNewWallet: false
+          } )
+        } else {
+          Toast( 'Invalid mnemonic' )
+        }
+      } catch ( err ) {
+        console.log( err )
+      }
+    }catch( err ){
+      console.log( err )
+    }
+  }
 
   return (
     <View style={{
@@ -53,7 +111,9 @@ const RegenerateEntropyGrid = ( props ) => {
           <Text style={styles.subTitleText}>Import an Entropy Grid file.</Text>
         </View>
         <View style={styles.iconWrapper}>
-          <TouchableOpacity style={styles.uploadBtnWraper} onPress={()=> setRecoverBorderModal( true )}>
+          <TouchableOpacity style={styles.uploadBtnWraper} onPress={()=> {
+            pickBWGrid()
+          }}>
             <View style={styles.iconUpWrapper}>
               <IconUp/>
             </View>
@@ -62,10 +122,38 @@ const RegenerateEntropyGrid = ( props ) => {
         </View>
       </View>
       {/* Modal */}
-      <ModalContainer onBackground={() =>setRecoverBorderModal( false )}
+      <ModalContainer onBackground={() =>{}}
         visible={recoverBorderModal}
         closeBottomSheet={() => { }}>
-        <RecoverBorderWalletModal closeModal={() => setRecoverBorderModal( false )}/>
+        <RecoverBorderWalletModal closeModal={() => {
+          setRecoverBorderModal( false )
+        }}/>
+      </ModalContainer>
+      <ModalContainer
+        onBackground={()=> setMnemonicPDFErrorModal( false )}
+        visible={mnemonicPDFErrorModal}
+        closeBottomSheet={()=> setMnemonicPDFErrorModal( false )}
+      >
+        <MnemonicPDFError
+          title={'Error reading PDF, enter Regeneration Mnemonic'}
+          info={'There was an error trying to import your PDF. Alternatively, please enter the 12 words written at the bottom of each page of the PDF'}
+          otherText={'The app will regenerate the PDF with the help of these words'}
+          proceedButtonText={'Enter Words'}
+          isIgnoreButton={false}
+          closeModal={()=> setMnemonicPDFErrorModal( false )}
+          onPressProceed={() => {
+            setMnemonicPDFErrorModal( false )
+            props.navigation.navigate( 'RecoverBorderWallet' )
+          }}
+          tryAgain={()=>{
+            setMnemonicPDFErrorModal( false )
+            setTimeout( ()=>{
+              pickBWGrid()
+            }, 500 )
+          }}
+          onPressIgnore={() => {
+          }}
+        />
       </ModalContainer>
     </View>
   )

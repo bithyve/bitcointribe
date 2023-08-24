@@ -11,6 +11,7 @@ import {
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 import { LocalizationContext } from '../../common/content/LocContext'
 import LinearGradient from 'react-native-linear-gradient'
+import PDFError from '../../assets/images/svgs/pdferror.svg'
 
 export default function MnemonicPDFError( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -89,14 +90,15 @@ export default function MnemonicPDFError( props ) {
             </View>
           }
         </View>
-
+        <View style={styles.successModalHeaderView}>
+          <PDFError />
+        </View>
         {props.otherText ? (
           <View style={styles.successModalAmountView}>
             <Text
               style={{
                 ...styles.modalInfoText,
                 marginBottom: hp( '1%' ),
-                marginTop: hp( '12%' ),
                 marginRight: wp( 10 )
               }}
             >
@@ -111,10 +113,10 @@ export default function MnemonicPDFError( props ) {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent:'flex-end',
-            marginVertical: hp( 5 )
+            marginVertical: hp( 3 )
           }}
         >
-          <TouchableOpacity>
+          <TouchableOpacity onPress={props.tryAgain}>
             <Text style={{
               fontSize: 13,
               color: Colors.blue,

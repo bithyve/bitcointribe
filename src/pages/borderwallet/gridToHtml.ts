@@ -1,6 +1,8 @@
+import moment from 'moment'
+import { GridType } from '../../bitcoin/utilities/Interface'
 import { columns } from './BorderWalletGridScreen'
 
-export const generateGridHtmlString = ( array, mnemonic ) => {
+export const generateGridHtmlString = ( array, mnemonic, gridType = GridType.WORDS ) => {
   const data = [ ...array ]
   let htmlTable1 = '<table>'
   let htmlTable2 = '<table>'
@@ -19,9 +21,9 @@ export const generateGridHtmlString = ( array, mnemonic ) => {
   for ( let i = 0; i < table1.length; i++ ) {
     if ( i % 16 === 0 ) {
       if ( i !== 0 ) {
-        htmlTable1 += `<th>${i / 16}</th></tr>`
+        htmlTable1 += `<th>${( '000' + ( i / 16 ) ).substr( -3 )}</th></tr>`
       }
-      htmlTable1 += `<tr><th>${i / 16 + 1}</th>`
+      htmlTable1 += `<tr><th>${( '000' + ( ( i / 16 )+1 ) ).substr( -3 )}</th>`
     }
     htmlTable1 += '<td>' + table1[ i ].slice( 0, 4 ) + '</td>'
   }
@@ -29,14 +31,14 @@ export const generateGridHtmlString = ( array, mnemonic ) => {
   for ( let i = 0; i < table2.length; i++ ) {
     if ( i % 16 === 0 ) {
       if ( i !== 0 ) {
-        htmlTable2 += `<th>${i / 16 + 64}</th></tr>`
+        htmlTable2 += `<th>${( '000' + ( ( i / 16 )+ 64 ) ).substr( -3 )}</th></tr>`
       }
-      htmlTable2 += `<tr><th>${i / 16 + 65}</th>`
+      htmlTable2 += `<tr><th>${( '000' + ( ( i / 16 )+ 65 ) ).substr( -3 )}</th>`
     }
     htmlTable2 += '<td>' + table2[ i ].slice( 0, 4 ) + '</td>'
   }
 
-  htmlTable1 += `<th>64</th></tr>${tableHeader}</table>`
+  htmlTable1 += `<th>064</th></tr>${tableHeader}</table>`
   htmlTable2 += `<th>128</th></tr>${tableHeader}</table>`
   const html = `
   <!DOCTYPE html>
@@ -46,17 +48,22 @@ export const generateGridHtmlString = ( array, mnemonic ) => {
 p, h4 {
 font-size: 10px;
 text-align: center;
+margin: 0;
 }
 table {
 border-collapse: collapse;
 width: 100%;
 font-size: 8.5px;
 text-align: center;
+margin: 0;
+}
+tr {
+  margin: 0;
 }
 th, td {
 border: 0.8px solid gray;
 padding: 0.1;
-nargin: 0;
+margin: 0;
 }
 th {
 background-color: #f2f2f2;
@@ -67,11 +74,11 @@ background-color: #f2f2f2;
 </style>
 </head>
 <body>
-<h4>Bitcoin Tribe Border Wallets</h4>
+<h4>Bitcoin Tribe Border Wallets  Grid Type: ${gridType.toLocaleLowerCase()}  Date: ${moment().format( 'DD/MM/YY • hh:MMa' )}</h4>
 ${htmlTable1}
 <p>Recovery Phrase: ${mnemonic}</p>
 <div class="pagebreak"> </div>
-<h4>Bitcoin Tribe Border Wallets</h4>
+<h4>Bitcoin Tribe Border Wallets  Grid Type: ${gridType.toLocaleLowerCase()}  Date: ${moment().format( 'DD/MM/YY • hh:MMa' )}</h4>
 ${htmlTable2}
 <p>Recovery Phrase: ${mnemonic}</p>
 </body>

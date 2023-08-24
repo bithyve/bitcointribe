@@ -206,6 +206,7 @@ export const Ceil = ( { onPress, text, index, selected } ) => {
 const BorderWalletGridScreen = ( { navigation } ) => {
   const mnemonic = navigation.getParam( 'mnemonic' )
   const isNewWallet = navigation.getParam( 'isNewWallet' )
+  const isAccountCreation = navigation.getParam( 'isAccountCreation' )
   const gridType = navigation.getParam( 'gridType' ) || GridType.WORDS
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
@@ -305,12 +306,22 @@ const BorderWalletGridScreen = ( { navigation } ) => {
     selected.forEach( s => {
       selectedWords.push( words[ s ] )
     } )
+
+    isAccountCreation ?  navigation.navigate( 'SelectChecksumWordAccount', {
+      words: selectedWords.toString().replace( /,/g, ' ' ),
+      selected,
+      initialMnemonic: mnemonic,
+      isNewWallet,
+      gridType,
+      isAccountCreation,
+    } ): 
     navigation.navigate( 'SelectChecksumWord', {
       words: selectedWords.toString().replace( /,/g, ' ' ),
       selected,
       initialMnemonic: mnemonic,
       isNewWallet,
-      gridType
+      gridType,
+      isAccountCreation,
     } )
   }
 
