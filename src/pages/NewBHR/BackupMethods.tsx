@@ -195,7 +195,7 @@ export default function BackupMethods( { navigation } ) {
         wallet.borderWalletMnemonic !=='' && (
           <View style={styles.body}>
             <TouchableOpacity
-              onPress={()=> {navigation.navigate( 'BackupGridMnemonic' ), console.log( 'log' )}}
+              onPress={()=> {navigation.navigate( 'BackupGridMnemonic' )}}
               style={{
                 flexDirection: 'row',
               }}
