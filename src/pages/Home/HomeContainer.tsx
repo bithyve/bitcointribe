@@ -41,7 +41,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import ModalContainer from '../../components/home/ModalContainer'
 import BWIcon from '../../assets/images/svgs/bw.svg'
 import IconRight from '../../assets/images/svgs/icon_arrow_right.svg'
-import LNIcon from '../../assets/images/svgs/ligntning_icon.svg'
+import LNIcon from '../../assets/images/svgs/lightningWhiteWithBack.svg'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
