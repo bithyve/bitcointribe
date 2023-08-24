@@ -33,7 +33,8 @@ const RegenerateEntropyGrid = ( props ) => {
   const dirtyGridTypePrediction =
    (  data ) => {
      let gridType = GridType.WORDS
-     const rowApprox = data.slice( data.indexOf( 'A B C D E F G H I J K L M N O P' )+32, 200 )
+     const start = data.indexOf( 'ABCDEFGHIJKLMNOP' )+16
+     const rowApprox = Platform.OS === 'android'? data.slice( data.indexOf( 'A B C D E F G H I J K L M N O P' )+32, 200 ) :data.slice( start, start+50 )
      const counts = new Map()
      for ( const ch of rowApprox ) {
        if( ch !== ' ' && ch !== '' ){
@@ -50,12 +51,12 @@ const RegenerateEntropyGrid = ( props ) => {
          numberCount += value
        }
      } )
-     if( !letterCount ){
-       gridType = GridType.NUMBERS
-     } else if( numberCount < 5 ){
-       gridType = GridType.WORDS
-     }else if( letterCount> 5 && numberCount > 5 ){
+     if( letterCount> 5 && numberCount > 5 ){
        gridType = GridType.HEXADECIMAL
+     }else if( numberCount < 5 ){
+       gridType = GridType.WORDS
+     }else if( !letterCount ){
+       gridType = GridType.NUMBERS
      }
      return gridType
    }
@@ -113,7 +114,7 @@ const RegenerateEntropyGrid = ( props ) => {
       }
     } catch ( err ) {
       console.log( err )
-      if( err.toString() === 'Error: User canceled document picker' ){
+      if( err.toString().includes( 'canceled' ) ){
         return
       }
       Toast( 'Something went wrong!' )
