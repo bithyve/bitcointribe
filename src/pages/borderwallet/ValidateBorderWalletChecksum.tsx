@@ -12,7 +12,7 @@ import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 import Fonts from '../../common/Fonts'
-import { hp, wp } from '../../common/data/responsiveness/responsive'
+import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsive'
 import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
 import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
@@ -130,7 +130,7 @@ const ValidateBorderWalletChecksum = ( props ) => {
       </TouchableOpacity>
       <View
         style={{
-          height: '40%',
+          height: windowHeight > 800? '55%' : '36%',
         }}
       >
         {showDropdown && (
@@ -177,7 +177,7 @@ const ValidateBorderWalletChecksum = ( props ) => {
         closeBottomSheet={() => setBWSuccessModal( false )}>
         <SeedBacupModalContents
           title={'Border Wallet Backup \nSuccessful'}
-          info={'You have successfully confirmed your backup\n\nMake sure you store the words in a safe place. The app will request you to confirm the words periodically to ensure you have the access'}
+          info={'You have successfully confirmed your backup\n\nMake sure you remember the pattern you have used to generate the wallet and the grid can be produced for the same'}
           proceedButtonText={'Continue'}
           onPressProceed={() => {
             setBWSuccessModal( false )
