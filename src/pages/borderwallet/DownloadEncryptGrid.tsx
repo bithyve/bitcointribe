@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Alert,
 } from 'react-native'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Colors from '../../common/Colors'
@@ -57,6 +58,10 @@ const DownloadEncryptGrid = ( props ) => {
     }
   }
 
+  const alertForDownload = () => {
+    Alert.alert("Download PDF", "You will be redirected to border wallet PDF file", [{onPress: downloadPdf, text: "Ok"}])
+  }
+
   return (
     <SafeAreaView
       style={{
@@ -100,7 +105,7 @@ const DownloadEncryptGrid = ( props ) => {
             />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuWrapper} onPress={downloadPdf}>
+        <TouchableOpacity style={styles.menuWrapper} onPress={alertForDownload}>
           <View style={styles.titleWrapper}>
             <Text style={styles.titleText}>Download without Encryption</Text>
             <Text style={styles.subTitleText}>
