@@ -245,7 +245,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             </AppBottomSheetTouchableWrapper>
             <View style={styles.modalTitleWrapper}>
               <Text style={styles.modalTitleText}>Add Account/ Wallet</Text>
-              <Text style={styles.titleText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do</Text>
+              <Text style={styles.titleText}>Adding a wallet will appear on the Home Screen as a separate tile</Text>
             </View>
             <AppBottomSheetTouchableWrapper style={styles.menuWrapper} onPress={()=> {
               this.setState( {
@@ -259,13 +259,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               </View>
               <View style={styles.titleWrapper}>
                 <Text style={styles.titleText}>Add a Border Wallet</Text>
-                <Text style={styles.subTitleText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, </Text>
+                <Text style={styles.subTitleText}>Add a Border Wallet as an account in Tribe </Text>
               </View>
               <View style={styles.iconRightWrapper}>
                 <IconRight/>
               </View>
             </AppBottomSheetTouchableWrapper>
-            <AppBottomSheetTouchableWrapper style={styles.menuWrapper} onPress={()=>
+            <AppBottomSheetTouchableWrapper style={[ styles.menuWrapper, {
+              marginBottom: hp( 5 )
+            } ]} onPress={()=>
             {
               this.setState( {
                 visibleModal: false
@@ -278,7 +280,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               </View>
               <View style={styles.titleWrapper}>
                 <Text style={styles.titleText}>Add a Lightning Wallet</Text>
-                <Text style={styles.subTitleText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, </Text>
+                <Text style={styles.subTitleText}>Add a Lightning node to enable a separate account on Tribe </Text>
               </View>
               <View style={styles.iconRightWrapper}>
                 <IconRight/>
@@ -302,11 +304,13 @@ const mapStateToProps = ( state ) => {
 const styles = StyleSheet.create( {
   modalContainer: {
     backgroundColor: Colors.white,
+    padding: 15,
   },
   menuWrapper:{
     flexDirection: 'row',
     width: '90%',
-    padding: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 15,
     margin: 15,
     alignItems: 'center',
     backgroundColor: '#F8F8F8',
