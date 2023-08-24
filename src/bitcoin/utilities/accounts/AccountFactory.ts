@@ -95,7 +95,8 @@ export function generateAccount(
       account.node = node
     }
     if(type === AccountType.BORDER_WALLET){
-      account.borderWalletMnemonic = borderWalletAccountInfo.memonic
+      account.borderWalletGridMnemonic = borderWalletAccountInfo.gridMnemonic
+      account.borderWalletMnemonic = borderWalletAccountInfo.primaryMnemonic
       account.borderWalletGridType = borderWalletAccountInfo.gridType
     }
     return account

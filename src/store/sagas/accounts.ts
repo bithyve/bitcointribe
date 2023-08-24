@@ -1073,7 +1073,8 @@ export interface newAccountDetails {
 
 export interface borderWalletAccountInfo {
   generatedSeed: any,
-  memonic: string;
+  gridMnemonic: string;
+  primaryMnemonic: string;
   gridType: GridType;
 }
 export interface newAccountsInfo {
@@ -1301,7 +1302,8 @@ export function* createBorderWalletWorker ({payload}){
   const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
   const borderWalletAccountInfo: borderWalletAccountInfo = {
     generatedSeed: primarySeed,
-    memonic: gridMnemonic,
+    gridMnemonic,
+    primaryMnemonic,
     gridType,
   }
   const accountInfo: newAccountsInfo = { accountType: AccountType.BORDER_WALLET, borderWalletAccountInfo }
