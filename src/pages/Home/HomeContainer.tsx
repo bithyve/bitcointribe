@@ -44,6 +44,7 @@ import IconRight from '../../assets/images/svgs/icon_arrow_right.svg'
 import LNIcon from '../../assets/images/svgs/lightningWhiteWithBack.svg'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
 
 export enum BottomSheetKind {
   SWAN_STATUS_INFO,
@@ -53,6 +54,9 @@ export enum BottomSheetKind {
 interface HomeStateTypes {
   currencyCode?: string;
   strings: object;
+  visibleModal: boolean;
+  visibleWalletModal:boolean;
+  // walletType: string;
 }
 
 interface HomePropsTypes {
@@ -78,7 +82,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.props.setShowAllAccount( false )
     this.state = {
       strings: this.context.translations [ 'home' ],
-      visibleModal: false
+      visibleModal: false,
+      visibleWalletModal: false,
+      // walletType: props.navigation.getParam( 'walletType' ),
     }
   }
   componentDidMount() {
@@ -103,11 +109,25 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         AsyncStorage.setItem( 'randomSeedWord', JSON.stringify( asyncSeedData ) )
       }
     }, 2000 )
+    // if( dbWallet ){
+    //   this.BorderWalletCreation( dbWallet && dbWallet )
+    // }
+
   }
+  // BorderWalletCreation= ( dbWallet )=> {
+  //   console.log( 'walletType', this.state.walletType )
+  //   console.log( 'dbWallet.borderWalletMnemonic', dbWallet.borderWalletMnemonic && dbWallet.borderWalletMnemonic )
+  //   if( dbWallet.borderWalletMnemonic && dbWallet.borderWalletMnemonic ){
+  //     this.setState( {
+  //       visibleWalletModal: true
+  //     } )
+  //   }
+
+  // }
   navigateToAddNewAccountScreen = () => {
     //BW-TO-DO
     this.setState( {
-      visibleModal: true
+      visibleModal: true,
     } )
   };
 
@@ -142,7 +162,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
-
   render() {
     const {
       currentLevel,
@@ -287,6 +306,38 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               </View>
             </AppBottomSheetTouchableWrapper>
           </View>
+        </ModalContainer>
+        <ModalContainer
+          onBackground={()=> this.setState( {
+            visibleWalletModal: false
+          } )}
+          visible={this.state.visibleWalletModal}
+          closeBottomSheet={()=> this.setState( {
+            visibleWalletModal: false
+          } )}
+        >
+          <BorderWalletSuccessModal
+            title={'Border Wallet creation success!'}
+            info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit,'}
+            otherText={'Your Border Wallet has been added and is now ready for you to start using.'}
+            proceedButtonText={'Continue'}
+            isIgnoreButton={false}
+            closeModal={()=> this.setState( {
+              visibleWalletModal: false
+            } )}
+            onPressProceed={() => {
+              this.setState( {
+                visibleWalletModal: false
+              } )
+            }}
+            onPressIgnore={() => {
+              this.setState( {
+                visibleWalletModal: false
+              } )
+            }}
+            isBottomImage={true}
+            bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
+          />
         </ModalContainer>
       </View>
     )
