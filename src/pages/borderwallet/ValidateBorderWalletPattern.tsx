@@ -202,8 +202,16 @@ export const Ceil = ( { onPress, text, index, selected } ) => {
 
 const ValidateBorderWalletPattern = ( { navigation } ) => {
   const wallet: Wallet =  dbManager.getWallet()
-  const mnemonic = wallet.borderWalletMnemonic
-  const gridType = wallet.borderWalletGridType || GridType.WORDS
+  // const mnemonic = wallet.borderWalletMnemonic
+  // const gridType = wallet.borderWalletGridType || GridType.WORDS
+  // const isAccount = navigation.getParam( 'isAccount' )
+  const gridType = navigation.getParam( 'borderWalletGridType' )
+  const mnemonic = navigation.getParam( 'borderWalletMnemonic' )
+  const gridMnemonic = navigation.getParam( 'borderWalletGridMnemonic' )
+
+
+  console.log({mnemonic})
+
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
   const columnHeaderRef = useRef()
@@ -253,7 +261,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
 
   const generateGrid = ()=>{
     const words = [ ...wordlists ]
-    shuffle( words, mnemonic )
+    shuffle( words, gridMnemonic )
     const cells = words.map( ( word ) => {
       switch ( gridType ) {
           case GridType.WORDS:
@@ -293,7 +301,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
     const selected = []
     const words = wallet.primaryMnemonic.split( ' ' )
     words.pop()
-    const wordsGrid = generateBorderWalletGrid( mnemonic, gridType )
+    const wordsGrid = generateBorderWalletGrid( gridMnemonic, gridType )
     words.forEach( word => {
       const index = wordsGrid.findIndex( g => {
         return g === word.slice( 0, 4 )
@@ -307,23 +315,25 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
   }
   const onPressVerify = () => {
     const words = [ ...wordlists ]
-    shuffle( words, mnemonic )
+    shuffle( words, gridMnemonic )
     const selectedWords = []
     selected.forEach( s => {
       selectedWords.push( words[ s ] )
     } )
     const selectedPattern =  selectedWords.toString().replace( /,/g, ' ' )
-    if( selectedPattern === wallet.primaryMnemonic.split( ' ' ).splice( 0, 11 ).toString().replace( /,/g, ' ' ) ) {
-      Toast( 'Pattern matched' )
-      navigation.replace( 'ValidateBorderWalletChecksum', {
-        words: selectedPattern,
-        selected,
-        initialMnemonic: mnemonic
-      } )
-    } else {
-      Toast( 'Pattern does not match' )
-      setAttempts( attempts + 1 )
-    }
+    console.log({selectedPattern, mnemonic})
+      if( selectedPattern === mnemonic.split( ' ' ).splice( 0, 11 ).toString().replace( /,/g, ' ' ) ) {
+        Toast( 'Pattern matched' )
+        navigation.replace( 'ValidateBorderWalletChecksum', {
+          words: selectedPattern,
+          selected,
+          mnemonic,
+          initialMnemonic: gridMnemonic
+        } )
+      } else {
+        Toast( 'Pattern does not match' )
+        setAttempts( attempts + 1 )
+      }
   }
 
   return (
