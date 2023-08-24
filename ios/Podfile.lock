@@ -558,8 +558,6 @@ PODS:
     - Firebase/Storage (= 8.15.0)
     - React-Core
     - RNFBApp
-  - RNFS (2.20.0):
-    - React-Core
   - RNGestureHandler (1.7.0):
     - React
   - RNLocalize (1.4.3):
@@ -698,7 +696,6 @@ DEPENDENCIES:
   - "RNFBDynamicLinks (from `../node_modules/@react-native-firebase/dynamic-links`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - "RNFBStorage (from `../node_modules/@react-native-firebase/storage`)"
-  - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNLocalize (from `../node_modules/react-native-localize`)
   - RNOS (from `../node_modules/react-native-os`)
@@ -901,8 +898,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/messaging"
   RNFBStorage:
     :path: "../node_modules/@react-native-firebase/storage"
-  RNFS:
-    :path: "../node_modules/react-native-fs"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNLocalize:
@@ -1054,7 +1049,6 @@ SPEC CHECKSUMS:
   RNFBDynamicLinks: 2434510762fc77614d2f4044427c0b0ea38db413
   RNFBMessaging: 3e2682ea5e15fe86da24d16d16019395a881f33c
   RNFBStorage: 814adb8c5bf4ff86a0b0641d750a64d6d48d9a75
-  RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
   RNGestureHandler: b6b359bb800ae399a9c8b27032bdbf7c18f08a08
   RNLocalize: 7c7aeda16c01db7a0918981c14875c0a53be9b79
   RNOS: 6f2f9a70895bbbfbdad7196abd952e7b01d45027
@@ -1082,6 +1076,6 @@ SPEC CHECKSUMS:
   Yoga: 7d13633d129fd179e01b8953d38d47be90db185a
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: f4298d704d0751f3b3642e94af40fc733a62e9d1
+PODFILE CHECKSUM: 1b2b3983d0d94ce45a7461fea3f69afc0514bd2f
 
 COCOAPODS: 1.12.1
