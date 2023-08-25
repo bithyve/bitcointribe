@@ -339,29 +339,6 @@ export default function NewWalletName( props ) {
       <ModalContainer onBackground={()=>setCurrentBottomSheetKind( null )} visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
         {renderBottomSheetContent()}
       </ModalContainer>
-      <ModalContainer
-        onBackground={()=> setSuccessModal( false )}
-        visible={successModal}
-        closeBottomSheet={()=> setSuccessModal( false )}
-      >
-        <BorderWalletSuccessModal
-          title={'Border Wallet creation success!'}
-          info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit,'}
-          otherText={'Your Border Wallet has been added and is now ready for you to start using.'}
-          proceedButtonText={common.continue}
-          isIgnoreButton={false}
-          closeModal={()=> setSuccessModal( false )}
-          onPressProceed={() => {
-            setSuccessModal( false )
-            navigateToHome()
-          }}
-          onPressIgnore={() => {
-
-          }}
-          isBottomImage={true}
-          bottomImage={require( '../assets/images/icons/contactPermission.png' )}
-        />
-      </ModalContainer>
     </SafeAreaView>
   )
 }

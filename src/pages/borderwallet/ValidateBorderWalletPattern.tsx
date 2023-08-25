@@ -21,8 +21,7 @@ import * as bip39 from 'bip39'
 import uheprng from '../../utils/uheprng'
 import { RFValue } from 'react-native-responsive-fontsize'
 import IconRight from '../../assets/images/svgs/icon_right.svg'
-import ModalContainer from '../../components/home/ModalContainer'
-import CreateMemorablePattern from '../../components/border-wallet/CreateMemorablePattern'
+import Fonts from '../../common/Fonts'
 import Toast from '../../components/Toast'
 import StartAgain from '../../assets/images/svgs/startagain.svg'
 import dbManager from '../../storage/realm/dbManager'
@@ -90,17 +89,19 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
+    position: 'relative'
   },
   text: {
     fontSize: 12,
     color: '#BEBBBB'
   },
   textSeq: {
-    textAlign: 'left',
+    position: 'absolute',
     fontSize: 9,
+    fontFamily: Fonts.Medium,
     color: '#F8F8F8',
-    top: -5,
-    left: -7
+    top: 1,
+    left: 3
   },
   headerWrapper: {
     flexDirection: 'row',
@@ -312,6 +313,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
       pattern: selected,
       isValidate: true
     } )
+    clearSelection()
   }
   const onPressVerify = () => {
     const words = [ ...wordlists ]
@@ -336,6 +338,11 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
       }
   }
 
+  const clearSelection = () => {
+    setSelected( [] )
+    setAttempts( 0 )
+  }
+
   return (
     <SafeAreaView style={styles.viewContainer}>
       <StatusBar
@@ -346,7 +353,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
         {isNext &&<TouchableOpacity
           disabled={!isNext}
           style={styles.startAgainBtnWrapper}
-          onPress={()=> setSelected( [] )}
+          onPress={clearSelection}
         >
           <StartAgain/>
           <Text style={styles.startAgainBtnText}>&nbsp;Start Again</Text>
@@ -356,8 +363,8 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
           style={styles.selectionNextBtn}
           onPress={attempts===3 ? onPressForgot : onPressVerify}
         >
-          <Text style={styles.selectedPatternText}>{`${selected.length} of 11`}</Text>
-          {selected.length=== 11 && <View style={styles.nextBtnWrapper}>
+          <Text style={styles.selectedPatternText}>{`${selected.length} of ${selected.length <= 11 ? '11' : '23'}`}</Text>
+          {isNext && <View style={styles.nextBtnWrapper}>
             {attempts===3?
               <Text style={styles.selectedPatternText}>Forgot</Text>
               :

@@ -16,7 +16,6 @@ def all_pods
     pod 'Firebase/Crashlytics'
     # Recommended: Add the Firebase pod for Google Analytics
     pod 'Firebase/Analytics'
-    pod 'RNFS', :path => '../node_modules/react-native-fs'
 end
 target 'HEXA' do
   all_pods

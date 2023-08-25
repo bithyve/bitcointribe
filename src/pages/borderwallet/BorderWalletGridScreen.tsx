@@ -89,6 +89,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
+    position: 'relative'
   },
   text: {
     fontSize: 12,
@@ -96,12 +97,12 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Light,
   },
   textSeq: {
-    textAlign: 'left',
+    position: 'absolute',
     fontSize: 9,
     fontFamily: Fonts.Medium,
     color: '#F8F8F8',
-    top: -5,
-    left: -7
+    top: 1,
+    left: 3
   },
   headerWrapper: {
     flexDirection: 'row',
@@ -314,15 +315,15 @@ const BorderWalletGridScreen = ( { navigation } ) => {
       isNewWallet,
       gridType,
       isAccountCreation,
-    } ): 
-    navigation.navigate( 'SelectChecksumWord', {
-      words: selectedWords.toString().replace( /,/g, ' ' ),
-      selected,
-      initialMnemonic: mnemonic,
-      isNewWallet,
-      gridType,
-      isAccountCreation,
-    } )
+    } ):
+      navigation.navigate( 'SelectChecksumWord', {
+        words: selectedWords.toString().replace( /,/g, ' ' ),
+        selected,
+        initialMnemonic: mnemonic,
+        isNewWallet,
+        gridType,
+        isAccountCreation,
+      } )
   }
 
   return (

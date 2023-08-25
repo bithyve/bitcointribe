@@ -20,7 +20,7 @@ import * as bip39 from 'bip39'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import Toast from '../../components/Toast'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
-import { recoverWalletUsingMnemonic, restoreSeedWordFailed } from '../../store/actions/BHR'
+import { recoverWalletUsingMnemonic, restoreSeedWordFailed, setBorderWalletBackup } from '../../store/actions/BHR'
 import { Wallet } from '../../bitcoin/utilities/Interface'
 import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
@@ -73,7 +73,7 @@ const SelectChecksumWord = ( props ) => {
 
   useEffect( () => {
     setLoaderModal( false )
-    if ( wallet && !isAccountCreation) {
+    if ( wallet && !isAccountCreation ) {
       dispatch( completedWalletSetup() )
       AsyncStorage.setItem( 'walletRecovered', 'true' )
       dispatch( setVersion( 'Restored' ) )
@@ -161,6 +161,7 @@ const SelectChecksumWord = ( props ) => {
         setTimeout( () => {
           dispatch( recoverWalletUsingMnemonic( mnemonic, props.navigation.getParam( 'initialMnemonic' ) ) )
         }, 500 )
+        dispatch( setBorderWalletBackup( true ) )
       }, 1000 )
     }
   }
