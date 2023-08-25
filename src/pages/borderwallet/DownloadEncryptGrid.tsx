@@ -19,7 +19,6 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf'
 import RNFetchBlob from 'rn-fetch-blob'
 import { generateGridHtmlString } from './gridToHtml'
 import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
-import RNFS from 'react-native-fs'
 
 
 const DownloadEncryptGrid = ( props ) => {

@@ -161,7 +161,6 @@ dependencies {
 
 
     implementation project(':react-native-linear-gradient')
-    implementation project(':react-native-fs')
     implementation project(':react-native-check-app-install')
     implementation project(':react-native-localize')
     implementation project(':react-native-config')
