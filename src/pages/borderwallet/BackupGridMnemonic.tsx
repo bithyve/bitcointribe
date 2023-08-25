@@ -11,12 +11,9 @@ import {
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
-import BottomInfoBox from '../../components/BottomInfoBox'
 import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
 import { hp, wp } from '../../common/data/responsiveness/responsive'
-import ModalContainer from '../../components/home/ModalContainer'
-import GenerateEntropyGridModal from '../../components/border-wallet/GenerateEntropyGridModal'
 import Fonts from '../../common/Fonts'
 import { Wallet } from '../../bitcoin/utilities/Interface'
 import dbManager from '../../storage/realm/dbManager'
@@ -24,8 +21,8 @@ import dbManager from '../../storage/realm/dbManager'
 const BackupGridMnemonic = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'Regenerate Entropy Grid' )
   const [ generateEntropyGrid, setGenerateEntropyGrid ] = useState( false )
-  const [isAccount, setIsAccount] = useState(false)
-  const borderWalletGridType = props.navigation.getParam( 'borderWalletGridType' )
+  const [ isAccount, setIsAccount ] = useState( false )
+  const [ borderWalletGridType, seBborderWalletGridType ] = useState( props.navigation.getParam( 'borderWalletGridType' ) )
   const borderWalletMnemonicAccount = props.navigation.getParam( 'borderWalletMnemonic' )
   const borderWalletGridMnemonicAccount = props.navigation.getParam( 'borderWalletGridMnemonic' )
 
@@ -33,22 +30,22 @@ const BackupGridMnemonic = ( props ) => {
   const wallet: Wallet =  dbManager.getWallet()
   const walletMnemonic=  wallet.borderWalletMnemonic
 
-  const [borderWalletGridMnemonic, setBorderWalletGridMneomnic] = useState('')
-  const [borderWalletMnemonic, setborderWalletMnemonic] = useState('')
+  const [ borderWalletGridMnemonic, setBorderWalletGridMneomnic ] = useState( '' )
+  const [ borderWalletMnemonic, setborderWalletMnemonic ] = useState( '' )
 
-  useEffect(() => {
-    if(borderWalletGridMnemonicAccount && borderWalletGridType){
-      console.log({borderWalletMnemonicAccount})
-      setBorderWalletGridMneomnic(borderWalletGridMnemonicAccount)
-      setborderWalletMnemonic(borderWalletMnemonicAccount)
-      setIsAccount(true)
+  useEffect( () => {
+    if( borderWalletGridMnemonicAccount && borderWalletGridType ){
+      setBorderWalletGridMneomnic( borderWalletGridMnemonicAccount )
+      setborderWalletMnemonic( borderWalletMnemonicAccount )
+      setIsAccount( true )
     }
     else{
-      setBorderWalletGridMneomnic(walletMnemonic)
-      setborderWalletMnemonic(walletMnemonic)
+      setBorderWalletGridMneomnic( walletMnemonic )
+      setborderWalletMnemonic( wallet.primaryMnemonic )
+      seBborderWalletGridType( wallet.borderWalletGridType )
     }
-  }, [])
-  
+  }, [] )
+
 
   type ItemProps = {title: string, id: string};
   const getFormattedNumber = ( number ) => {
@@ -63,7 +60,8 @@ const BackupGridMnemonic = ( props ) => {
       <Text style={styles.title}>{title}</Text>
     </View>
   )
-    console.log({borderWalletGridMnemonic})
+
+
   return (
     <SafeAreaView
       style={{
@@ -100,7 +98,7 @@ const BackupGridMnemonic = ( props ) => {
         <View>
           <TouchableOpacity
             onPress={()=> props.navigation.navigate( 'ValidateBorderWalletPattern', {
-                borderWalletMnemonic,borderWalletGridType, borderWalletGridMnemonic
+              borderWalletMnemonic, borderWalletGridType, borderWalletGridMnemonic
             } )}
           >
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}

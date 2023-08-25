@@ -203,15 +203,9 @@ export const Ceil = ( { onPress, text, index, selected } ) => {
 
 const ValidateBorderWalletPattern = ( { navigation } ) => {
   const wallet: Wallet =  dbManager.getWallet()
-  // const mnemonic = wallet.borderWalletMnemonic
-  // const gridType = wallet.borderWalletGridType || GridType.WORDS
-  // const isAccount = navigation.getParam( 'isAccount' )
   const gridType = navigation.getParam( 'borderWalletGridType' )
   const mnemonic = navigation.getParam( 'borderWalletMnemonic' )
   const gridMnemonic = navigation.getParam( 'borderWalletGridMnemonic' )
-
-
-  console.log({mnemonic})
 
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
@@ -323,19 +317,21 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
       selectedWords.push( words[ s ] )
     } )
     const selectedPattern =  selectedWords.toString().replace( /,/g, ' ' )
-    console.log({selectedPattern, mnemonic})
-      if( selectedPattern === mnemonic.split( ' ' ).splice( 0, 11 ).toString().replace( /,/g, ' ' ) ) {
-        Toast( 'Pattern matched' )
-        navigation.replace( 'ValidateBorderWalletChecksum', {
-          words: selectedPattern,
-          selected,
-          mnemonic,
-          initialMnemonic: gridMnemonic
-        } )
-      } else {
-        Toast( 'Pattern does not match' )
-        setAttempts( attempts + 1 )
-      }
+    console.log( {
+      selectedPattern, mnemonic
+    } )
+    if( selectedPattern === mnemonic.split( ' ' ).splice( 0, 11 ).toString().replace( /,/g, ' ' ) ) {
+      Toast( 'Pattern matched' )
+      navigation.replace( 'ValidateBorderWalletChecksum', {
+        words: selectedPattern,
+        selected,
+        mnemonic,
+        initialMnemonic: gridMnemonic
+      } )
+    } else {
+      Toast( 'Pattern does not match' )
+      setAttempts( attempts + 1 )
+    }
   }
 
   const clearSelection = () => {
