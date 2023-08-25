@@ -24,8 +24,31 @@ import dbManager from '../../storage/realm/dbManager'
 const BackupGridMnemonic = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'Regenerate Entropy Grid' )
   const [ generateEntropyGrid, setGenerateEntropyGrid ] = useState( false )
+  const [isAccount, setIsAccount] = useState(false)
+  const borderWalletGridType = props.navigation.getParam( 'borderWalletGridType' )
+  const borderWalletMnemonicAccount = props.navigation.getParam( 'borderWalletMnemonic' )
+  const borderWalletGridMnemonicAccount = props.navigation.getParam( 'borderWalletGridMnemonic' )
+
+
   const wallet: Wallet =  dbManager.getWallet()
-  const mnemonic =  wallet.borderWalletMnemonic
+  const walletMnemonic=  wallet.borderWalletMnemonic
+
+  const [borderWalletGridMnemonic, setBorderWalletGridMneomnic] = useState('')
+  const [borderWalletMnemonic, setborderWalletMnemonic] = useState('')
+
+  useEffect(() => {
+    if(borderWalletGridMnemonicAccount && borderWalletGridType){
+      console.log({borderWalletMnemonicAccount})
+      setBorderWalletGridMneomnic(borderWalletGridMnemonicAccount)
+      setborderWalletMnemonic(borderWalletMnemonicAccount)
+      setIsAccount(true)
+    }
+    else{
+      setBorderWalletGridMneomnic(walletMnemonic)
+      setborderWalletMnemonic(walletMnemonic)
+    }
+  }, [])
+  
 
   type ItemProps = {title: string, id: string};
   const getFormattedNumber = ( number ) => {
@@ -40,7 +63,7 @@ const BackupGridMnemonic = ( props ) => {
       <Text style={styles.title}>{title}</Text>
     </View>
   )
-
+    console.log({borderWalletGridMnemonic})
   return (
     <SafeAreaView
       style={{
@@ -56,9 +79,8 @@ const BackupGridMnemonic = ( props ) => {
         info={'Note down these 12 word Regeneration Mnemonic'}
         selectedTitle={headerTitle}
       />
-
       <FlatList
-        data={mnemonic.split( ' ' )}
+        data={borderWalletGridMnemonic.split( ' ' )}
         renderItem={( { item, index } ) => <Item title={item} id={`${index+1}`} />}
         keyExtractor={item => item}
         numColumns={2}
@@ -77,7 +99,9 @@ const BackupGridMnemonic = ( props ) => {
         </View> */}
         <View>
           <TouchableOpacity
-            onPress={()=> props.navigation.navigate( 'ValidateBorderWalletPattern' )}
+            onPress={()=> props.navigation.navigate( 'ValidateBorderWalletPattern', {
+                borderWalletMnemonic,borderWalletGridType, borderWalletGridMnemonic
+            } )}
           >
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
               start={{

@@ -29,8 +29,8 @@ import ModalContainer from '../../components/home/ModalContainer'
 const wordlists = bip39.wordlists.english
 
 const ValidateBorderWalletChecksum = ( props ) => {
-  const wallet: Wallet =  dbManager.getWallet()
   const words = props.navigation.getParam( 'words' )
+  const mnemonic = props.navigation.getParam( 'mnemonic' )
   const [ checksums, setChecksums ] = useState( [] )
   const [ headerTitle ] = useState( 'Select Checksum Word' )
   const [ checksumWord, setChecksumWord ] = useState( 'Select checksum word' )
@@ -96,10 +96,11 @@ const ValidateBorderWalletChecksum = ( props ) => {
 
   const onPressVerify = () => {
     const selectedWord = checksumWord.split( ' ' )[ 1 ]
-    if( selectedWord === wallet.primaryMnemonic.split( ' ' )[ 11 ] ) {
+    if( selectedWord === mnemonic.split( ' ' )[ 11 ] ) {
       Toast( 'Checksum matched' )
       dispatch( setBorderWalletBackup( true ) )
-      setBWSuccessModal( true )
+      //TO-DO-BW
+      props.navigation.navigate( 'Home' )
     } else {
       Toast( 'Invalid checksum' )
     }

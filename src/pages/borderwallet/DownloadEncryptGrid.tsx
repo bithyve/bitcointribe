@@ -72,6 +72,10 @@ const DownloadEncryptGrid = ( props ) => {
     }
   }
 
+  const alertForDownload = () => {
+    Alert.alert("Download PDF", "You will be redirected to border wallet PDF file", [{onPress: downloadPdf, text: "Ok"}])
+  }
+
   return (
     <SafeAreaView
       style={{
@@ -114,7 +118,7 @@ const DownloadEncryptGrid = ( props ) => {
             />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuWrapper} onPress={downloadPdf}>
+        <TouchableOpacity style={styles.menuWrapper} onPress={alertForDownload}>
           <View style={styles.titleWrapper}>
             <Text style={styles.titleText}>Download without Encryption</Text>
             <Text style={styles.subTitleText}>
