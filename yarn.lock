@@ -9129,11 +9129,6 @@ react-native-elements@^3.1.0:
     react-native-ratings "8.0.4"
     react-native-size-matters "^0.3.1"
 
-react-native-file-viewer@^2.1.5:
-  version "2.1.5"
-  resolved "https://registry.yarnpkg.com/react-native-file-viewer/-/react-native-file-viewer-2.1.5.tgz#cd4544f573108e79002b5c7e1ebfce4371885250"
-  integrity sha512-MGC6sx9jsqHdefhVQ6o0akdsPGpkXgiIbpygb2Sg4g4bh7v6K1cardLV1NwGB9A6u1yICOSDT/MOC//9Ez6EUg==
-
 react-native-flipper@^0.158.0:
   version "0.158.0"
   resolved "https://registry.yarnpkg.com/react-native-flipper/-/react-native-flipper-0.158.0.tgz#e043213f0256ea196fa54cfb4af6868ea86ceff1"
