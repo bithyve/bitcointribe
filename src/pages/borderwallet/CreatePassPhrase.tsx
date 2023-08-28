@@ -41,7 +41,7 @@ const CreatePassPhrase = ( props ) => {
   const isNewWallet = props.navigation.getParam( 'isNewWallet' )
   const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
   const checksumWord = props.navigation.getParam( 'checksumWord' )
-  const [ headerTitle, setHeaderTitle ]=useState( 'Create Passphrase' )
+  const [ headerTitle, setHeaderTitle ]=useState( 'Add Passphrase (optional)' )
   const [ passphrase, setpassphrase ] = useState( '' )
   const [ confirmPassphrase, setConfirmPassphrase ] = useState( '' )
   const [ showLoader, setShowLoader ] = useState( false )
@@ -131,7 +131,7 @@ const CreatePassPhrase = ( props ) => {
           props.navigation.goBack()
         }}
         info1={'Step 6 of Create with Border Wallet'}
-        info={'This is the final step of creating your Border Wallet'}
+        info={'A passphrase in your wallet is not the same as a password. If you change it later, your wallet will still work, but the addresses will be different.'}
         selectedTitle={headerTitle}
       />
       <View style={styles.textInputWrapper}>
@@ -219,7 +219,7 @@ const styles = StyleSheet.create( {
     backgroundColor: '#FAFAFA'
   },
   textInputWrapper:{
-    height: '70%'
+    height: '65%'
   },
   item: {
     flexDirection: 'row',
