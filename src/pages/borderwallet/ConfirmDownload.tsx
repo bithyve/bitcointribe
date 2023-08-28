@@ -34,27 +34,28 @@ const ConfirmDownload = ( props ) => {
   const checksumWord = props.navigation.getParam( 'checksumWord' )
   const initialMnemonic = props.navigation.getParam( 'initialMnemonic' )
   const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
+  const passphrase = props.navigation.getParam( 'passphrase' )
   const gridType = props.navigation.getParam( 'gridType' )
   const dispatch = useDispatch()
   type ItemProps = {title: string, id: string};
 
 
-  useAccountShellCreationCompletionEffect(()=>{
+  useAccountShellCreationCompletionEffect( ()=>{
     //TO-DO-CW
     //Insert Successful Modal
-    props.navigation.navigate('Home')
-  })
-  
+    props.navigation.navigate( 'Home' )
+  } )
+
   const onPressContinue = () => {
-    if(isAccountCreation){
-          dispatch(createBorderWallet(mnemonic,initialMnemonic,gridType))
+    if( isAccountCreation ){
+      dispatch( createBorderWallet( mnemonic, initialMnemonic, gridType, passphrase ) )
     }
     else{
-      props.navigation.navigate('NewWalletName', {
-        mnemonic, initialMnemonic, gridType
-      } ) 
+      props.navigation.navigate( 'NewWalletName', {
+        mnemonic, initialMnemonic, gridType, passphrase
+      } )
     }
-              
+
   }
   const Item = ( { title, id }: ItemProps ) => (
     <View style={styles.item}>
@@ -122,14 +123,18 @@ const ConfirmDownload = ( props ) => {
             </View>
             <Text style={styles.title}>{checksumWord.split( ' ' )[ 1 ]}</Text>
           </View>
-          {/* <View>
-            <Text style={[ styles.previewTitle, {
-              marginLeft: 5, marginTop: 10
-            } ]}>Passphrase</Text>
-            <View style={styles.passPhraseWrapper}>
-              <Text>Do not go gentle into that good night, Old age should burn and rave at close of day</Text>
-            </View>
-          </View> */}
+          {
+            passphrase !== '' && (
+              <View>
+                <Text style={[ styles.previewTitle, {
+                  marginLeft: 5, marginTop: 10
+                } ]}>Passphrase</Text>
+                <View style={styles.passPhraseWrapper}>
+                  <Text>{passphrase}</Text>
+                </View>
+              </View>
+            )
+          }
         </View>
       </View>
       <View style={styles.bottomButtonView}>

@@ -129,43 +129,43 @@ const HomeStack = createStackNavigator(
       navigationOptions: {
         header: null
       }
-    },  
+    },
     DownloadEncryptGridAccount: {
       screen: DownloadEncryptGrid,
       navigationOptions: {
         header: null
       }
-    },  
+    },
     BorderWalletGridScreenAccount: {
       screen: BorderWalletGridScreen,
       navigationOptions: {
         header: null
       }
-    },  
+    },
     SelectChecksumWordAccount: {
       screen: SelectChecksumWord,
       navigationOptions: {
         header: null
       }
-    },  
+    },
     CreatePassPhraseAccount: {
       screen: CreatePassPhrase,
       navigationOptions: {
         header: null
       }
-    },  
+    },
     ConfirmDownloadAccount: {
       screen: ConfirmDownload,
       navigationOptions: {
         header: null
       }
-    },  
+    },
     PreviewPatternAccount: {
       screen: PreviewPattern,
       navigationOptions: {
         header: null
       }
-    },  
+    },
     EnterNodeConfig: {
       screen: EnterNodeConfig,
       navigationOptions: {

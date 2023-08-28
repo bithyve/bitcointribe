@@ -18,29 +18,10 @@ import deviceInfoModule from 'react-native-device-info'
 import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import * as bip39 from 'bip39'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import Toast from '../../components/Toast'
-import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
-import { recoverWalletUsingMnemonic, restoreSeedWordFailed, setBorderWalletBackup } from '../../store/actions/BHR'
-import { Wallet } from '../../bitcoin/utilities/Interface'
-import { completedWalletSetup } from '../../store/actions/setupAndAuth'
-import { setVersion } from '../../store/actions/versionHistory'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import ModalContainer from '../../components/home/ModalContainer'
-import LoaderModal from '../../components/LoaderModal'
-import { translations } from '../../common/content/LocContext'
 
 const wordlists = bip39.wordlists.english
 
 const SelectChecksumWord = ( props ) => {
-  const loaderMessage = {
-    heading: translations[ 'bhr' ].Importingyourwallet,
-    text: translations[ 'bhr' ].Thismaytake
-  }
-  const subPoints = [
-    translations[ 'bhr' ].Settingupmultipleaccounts,
-    translations[ 'bhr' ].Preloading,
-  ]
-  const bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
   const words = props.navigation.getParam( 'words' )
   const selected = props.navigation.getParam( 'selected' )
   const isNewWallet = props.navigation.getParam( 'isNewWallet' )
@@ -50,36 +31,8 @@ const SelectChecksumWord = ( props ) => {
   const [ checksumWord, setChecksumWord ] = useState( 'Select checksum word' )
   const [ showDropdown, setShowDropdown ] = useState( false )
   type ItemProps = { title: string; id: string };
-  const [ showLoader, setShowLoader ] = useState( false )
-  const [ loaderModal, setLoaderModal ] = useState( false )
 
-  const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
-  const restoreSeedData = useSelector( ( state ) => state.bhr.loading.restoreSeedData )
 
-  const dispatch = useDispatch()
-
-  useEffect( () => {
-    return () => {
-      dispatch( restoreSeedWordFailed( false ) )
-    }
-  }, [] )
-
-  useEffect( () => {
-    if( restoreSeedData == 'restoreSeedDataFailed' ){
-      setLoaderModal( false )
-      Toast( 'Failed to restore' )
-    }
-  }, [ restoreSeedData ] )
-
-  useEffect( () => {
-    setLoaderModal( false )
-    if ( wallet && !isAccountCreation ) {
-      dispatch( completedWalletSetup() )
-      AsyncStorage.setItem( 'walletRecovered', 'true' )
-      dispatch( setVersion( 'Restored' ) )
-      props.navigation.navigate( 'HomeNav' )
-    }
-  }, [ wallet, isAccountCreation ] )
 
   useEffect( () => {
     const validChecksums = []
@@ -138,36 +91,23 @@ const SelectChecksumWord = ( props ) => {
 
   const onPressNext = ()=> {
     const mnemonic = `${words} ${checksumWord.split( ' ' )[ 1 ]}`
-    if( isNewWallet ) {
-      isAccountCreation?  props.navigation.navigate( 'ConfirmDownloadAccount', {
-        selected,
-        checksumWord,
-        mnemonic,
-        initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
-        gridType: props.navigation.getParam( 'gridType' ),
-        isAccountCreation
-      } ) : props.navigation.navigate( 'ConfirmDownload', {
-        selected,
-        checksumWord,
-        mnemonic,
-        initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
-        gridType: props.navigation.getParam( 'gridType' ),
-        isAccountCreation
-      } )
-    } else {
-      setShowLoader( true )
-      setTimeout( () => {
-        setLoaderModal( true )
-        setTimeout( () => {
-          dispatch( recoverWalletUsingMnemonic( mnemonic, props.navigation.getParam( 'initialMnemonic' ) ) )
-        }, 500 )
-        dispatch( setBorderWalletBackup( true ) )
-      }, 1000 )
-    }
-  }
-
-  const onBackgroundOfLoader = () => {
-    setLoaderModal( false )
+    isAccountCreation?  props.navigation.navigate( 'CreatePassPhraseAccount', {
+      selected,
+      checksumWord,
+      mnemonic,
+      initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
+      gridType: props.navigation.getParam( 'gridType' ),
+      isAccountCreation,
+      isNewWallet
+    } ) : props.navigation.navigate( 'CreatePassPhrase', {
+      selected,
+      checksumWord,
+      mnemonic,
+      initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
+      gridType: props.navigation.getParam( 'gridType' ),
+      isAccountCreation,
+      isNewWallet
+    } )
   }
 
   return (
@@ -251,13 +191,6 @@ const SelectChecksumWord = ( props ) => {
           </LinearGradient>
         </TouchableOpacity>
       </View>
-      <ModalContainer onBackground={onBackgroundOfLoader}  visible={loaderModal} closeBottomSheet={() => { }} >
-        <LoaderModal
-          headerText={loaderMessage.heading}
-          messageText={loaderMessage.text}
-          subPoints={subPoints}
-          bottomText={bottomTextMessage} />
-      </ModalContainer>
 
     </SafeAreaView>
   )
