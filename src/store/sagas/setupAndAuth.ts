@@ -40,12 +40,12 @@ import ElectrumClient from '../../bitcoin/electrum/client'
 
 
 function* setupWalletWorker( { payload } ) {
-  const { walletName, security, mnemonic, initialMnemonic, gridType }: { walletName: string, security: { questionId: string, question: string, answer: string }, newBie:boolean, mnemonic: string, initialMnemonic: string, gridType: string } = payload
+  const { walletName, security, mnemonic, initialMnemonic, gridType, passphrase }: { walletName: string, security: { questionId: string, question: string, answer: string }, newBie:boolean, mnemonic: string, initialMnemonic: string, gridType: string, passphrase: string } = payload
   let primaryMnemonic = null
   if( mnemonic && mnemonic != null )
     primaryMnemonic = mnemonic
   else primaryMnemonic = bip39.generateMnemonic( )
-  const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
+  const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic, passphrase )
   const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
 
   // const wallet: Wallet = {
