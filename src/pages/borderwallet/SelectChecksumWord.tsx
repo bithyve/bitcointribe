@@ -139,7 +139,7 @@ const SelectChecksumWord = ( props ) => {
   const onPressNext = ()=> {
     const mnemonic = `${words} ${checksumWord.split( ' ' )[ 1 ]}`
     if( isNewWallet ) {
-      isAccountCreation?  props.navigation.navigate( 'ConfirmDownloadAccount', {
+      isAccountCreation?  props.navigation.navigate( 'ConfirmDownload', {
         selected,
         checksumWord,
         mnemonic,

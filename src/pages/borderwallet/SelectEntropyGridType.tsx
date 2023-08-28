@@ -69,7 +69,7 @@ const SelectEntropyGridType = ( props ) => {
   )
 
   const onPressNext = ()=> {
-    isAccountCreation ? props.navigation.navigate( 'DownloadEncryptGridAccount', {
+    isAccountCreation ? props.navigation.navigate( 'DownloadEncryptGrid', {
       mnemonic, isNewWallet: true, gridType, isAccountCreation
     } ) :
       props.navigation.navigate( 'DownloadEncryptGrid', {
