@@ -47,7 +47,7 @@ export default function CreateMemorablePattern( props ) {
           activeOpacity={10}
           onPress={() => props.titleClicked && props.titleClicked()}
         >
-          <Text style={styles.headerText}>Step 2: Create a Memorable Pattern</Text>
+          <Text style={styles.headerText}>Step 4: Create a Memorable Pattern</Text>
 
         </AppBottomSheetTouchableWrapper>
         <ScrollView
@@ -86,7 +86,7 @@ export default function CreateMemorablePattern( props ) {
                 ...styles.infoText,
               }}
             >
-              Your pattern must comprise <Text style={styles.boldText}>11 cells</Text>, selected in your own <Text style={styles.boldText}>preferred order</Text>
+              Your pattern must comprise <Text style={styles.boldText}>11 or 23 cells</Text>, selected in your own <Text style={styles.boldText}>preferred order</Text>
             </Text>
             <Text
               style={{
