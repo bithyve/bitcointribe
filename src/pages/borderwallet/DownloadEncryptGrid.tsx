@@ -19,13 +19,16 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf'
 import RNFetchBlob from 'rn-fetch-blob'
 import { generateGridHtmlString } from './gridToHtml'
 import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
-import FileViewer from "react-native-file-viewer";
+import FileViewer from 'react-native-file-viewer'
+import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
+import ModalContainer from '../../components/home/ModalContainer'
 
 
 const DownloadEncryptGrid = ( props ) => {
   const mnemonic = props.navigation.getParam( 'mnemonic' )
   const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
   const gridType = props.navigation.getParam( 'gridType' ) || GridType.WORDS
+  const [ fileSavedModal, setFileSavedModal ] = useState( false )
 
   const [ headerTitle ] = useState( 'Download grid (optional)' )
 
@@ -68,7 +71,7 @@ const DownloadEncryptGrid = ( props ) => {
       // ], {
       //   cancelable: false
       // } )
-      const path = FileViewer.open(file.filePath) // absolute-path-to-my-local-file.
+      const path = FileViewer.open( file.filePath ) // absolute-path-to-my-local-file.
       // RNFetchBlob.ios.openDocument( file.filePath )
     } catch ( error ) {
       console.log( error )
@@ -175,6 +178,23 @@ const DownloadEncryptGrid = ( props ) => {
           <View style={styles.statusIndicatorInactiveView} />
         </View>
       </View>
+      <ModalContainer
+        onBackground={()=> setFileSavedModal( false )}
+        visible={fileSavedModal}
+        closeBottomSheet={()=> setFileSavedModal( false )}
+      >
+        <BorderWalletSuccessModal
+          title={'File Saved'}
+          info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit,'}
+          proceedButtonText={'Next'}
+          isIgnoreButton={false}
+          closeModal={()=> setFileSavedModal( false )}
+          onPressProceed={() => setFileSavedModal( false )}
+          onPressIgnore={() => setFileSavedModal( false )}
+          isBottomImage={true}
+          bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
+        />
+      </ModalContainer>
     </SafeAreaView>
   )
 }
