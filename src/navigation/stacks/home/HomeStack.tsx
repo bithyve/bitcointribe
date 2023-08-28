@@ -130,13 +130,13 @@ const HomeStack = createStackNavigator(
         header: null
       }
     },
-    DownloadEncryptGridAccount: {
+    DownloadEncryptGrid: {
       screen: DownloadEncryptGrid,
       navigationOptions: {
         header: null
       }
     },
-    BorderWalletGridScreenAccount: {
+    BorderWalletGridScreen: {
       screen: BorderWalletGridScreen,
       navigationOptions: {
         header: null
@@ -154,13 +154,13 @@ const HomeStack = createStackNavigator(
         header: null
       }
     },
-    ConfirmDownloadAccount: {
+    ConfirmDownload: {
       screen: ConfirmDownload,
       navigationOptions: {
         header: null
       }
     },
-    PreviewPatternAccount: {
+    PreviewPattern: {
       screen: PreviewPattern,
       navigationOptions: {
         header: null

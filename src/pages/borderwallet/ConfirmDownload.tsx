@@ -204,7 +204,7 @@ const styles = StyleSheet.create( {
   },
   buttonView: {
     padding: 15,
-    width: 120,
+    width: 150,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,

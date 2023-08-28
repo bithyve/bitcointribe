@@ -109,7 +109,7 @@ const SelectChecksumWord = ( props ) => {
       isNewWallet
     } )
   }
-
+  console.log( windowHeight )
   return (
     <SafeAreaView
       style={{
@@ -135,7 +135,7 @@ const SelectChecksumWord = ( props ) => {
       </TouchableOpacity>
       <View
         style={{
-          height: windowHeight> 800? '40%' : '36%',
+          height: windowHeight> 850? '40%' : '30%',
         }}
       >
         {showDropdown && (
