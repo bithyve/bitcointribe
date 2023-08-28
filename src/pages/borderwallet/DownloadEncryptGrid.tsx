@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   Alert,
+  Platform,
 } from 'react-native'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Colors from '../../common/Colors'
@@ -19,9 +20,8 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf'
 import RNFetchBlob from 'rn-fetch-blob'
 import { generateGridHtmlString } from './gridToHtml'
 import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
-import FileViewer from 'react-native-file-viewer'
-import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
 import ModalContainer from '../../components/home/ModalContainer'
+import FileSavedModal from '../../components/border-wallet/FileSavedModal'
 
 
 const DownloadEncryptGrid = ( props ) => {
@@ -56,23 +56,12 @@ const DownloadEncryptGrid = ( props ) => {
         padding: 10
         //base64: true
       }
-
-      //App-Documents -> Phone-Documents
       const file = await RNHTMLtoPDF.convert( options )
-      // const downloadsDir = `${RNFS.DocumentDirectoryPath}/Tribe/`
-      // await RNFS.moveFile( file.filePath, downloadsDir )
-
-      // Alert.alert( 'File saved', `BorderWalletEntropyGrid.pdf save to ${file.filePath}`, [
-      //   {
-      //     text: 'Next',
-      //     onPress: () => onPressNext(),
-      //     style: 'default',
-      //   },
-      // ], {
-      //   cancelable: false
-      // } )
-      const path = FileViewer.open( file.filePath ) // absolute-path-to-my-local-file.
-      // RNFetchBlob.ios.openDocument( file.filePath )
+      if( Platform.OS === 'ios' ) {
+        RNFetchBlob.ios.openDocument( file.filePath )
+      } else {
+        RNFetchBlob.android.actionViewIntent( file.filePath, 'application/pdf' )
+      }
     } catch ( error ) {
       console.log( error )
     }
@@ -126,7 +115,7 @@ const DownloadEncryptGrid = ( props ) => {
             />
           </View>
         </TouchableOpacity> */}
-        <TouchableOpacity style={styles.menuWrapper} onPress={alertForDownload}>
+        <TouchableOpacity style={styles.menuWrapper} onPress={()=>setFileSavedModal( true )}>
           <View style={styles.titleWrapper}>
             <Text style={styles.titleText}>Download</Text>
             <Text style={styles.subTitleText}>
@@ -183,16 +172,14 @@ const DownloadEncryptGrid = ( props ) => {
         visible={fileSavedModal}
         closeBottomSheet={()=> setFileSavedModal( false )}
       >
-        <BorderWalletSuccessModal
+        <FileSavedModal
           title={'File Saved'}
           info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit,'}
           proceedButtonText={'Next'}
           isIgnoreButton={false}
           closeModal={()=> setFileSavedModal( false )}
           onPressProceed={() => setFileSavedModal( false )}
-          onPressIgnore={() => setFileSavedModal( false )}
-          isBottomImage={true}
-          bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
+          onPressIgnore={() => downloadPdf}
         />
       </ModalContainer>
     </SafeAreaView>
