@@ -72,7 +72,9 @@ const DownloadEncryptGrid = ( props ) => {
   }
 
   const alertForDownload = () => {
-    Alert.alert("Download PDF", "You will be redirected to border wallet PDF file", [{onPress: downloadPdf, text: "Ok"}])
+    Alert.alert( 'Download PDF', 'You will be redirected to border wallet PDF file', [ {
+      onPress: downloadPdf, text: 'Ok'
+    } ] )
   }
 
   return (
@@ -93,10 +95,10 @@ const DownloadEncryptGrid = ( props ) => {
       />
       <View
         style={{
-          height: '45%',
+          // height: '45%',
         }}
       >
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.menuWrapper}
           onPress={() => onPressNext()}
         >
@@ -116,10 +118,10 @@ const DownloadEncryptGrid = ( props ) => {
               }}
             />
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity style={styles.menuWrapper} onPress={alertForDownload}>
           <View style={styles.titleWrapper}>
-            <Text style={styles.titleText}>Download without Encryption</Text>
+            <Text style={styles.titleText}>Download</Text>
             <Text style={styles.subTitleText}>
               Store a PDF file with grid
             </Text>
