@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
   View,
   SafeAreaView,
@@ -16,76 +16,50 @@ import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsiv
 import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
 import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
-import * as bip39 from 'bip39'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import dbManager from '../../storage/realm/dbManager'
-import { Wallet } from '../../bitcoin/utilities/Interface'
-import Toast from '../../components/Toast'
-import { useDispatch } from 'react-redux'
-import { setBorderWalletBackup } from '../../store/actions/BHR'
-import SeedBacupModalContents from '../NewBHR/SeedBacupModalContents'
 import ModalContainer from '../../components/home/ModalContainer'
+import LoaderModal from '../../components/LoaderModal'
+import { translations } from '../../common/content/LocContext'
+import { GridType } from '../../bitcoin/utilities/Interface'
 
-const wordlists = bip39.wordlists.english
 
-const ValidateBorderWalletChecksum = ( props ) => {
-  const words = props.navigation.getParam( 'words' )
+const SelectEntropyGridType = ( props ) => {
   const mnemonic = props.navigation.getParam( 'mnemonic' )
-  const [ checksums, setChecksums ] = useState( [] )
-  const [ headerTitle ] = useState( 'Select Checksum Word' )
-  const [ checksumWord, setChecksumWord ] = useState( 'Select checksum word' )
+  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
+  const loaderMessage = {
+    heading: translations[ 'bhr' ].Importingyourwallet,
+    text: translations[ 'bhr' ].Thismaytake
+  }
+  const subPoints = [
+    translations[ 'bhr' ].Settingupmultipleaccounts,
+    translations[ 'bhr' ].Preloading,
+  ]
+  const bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
+  const gridTypeArray = [ GridType.WORDS, GridType.NUMBERS, GridType.HEXADECIMAL, GridType.BLANK ]
+  const [ headerTitle ] = useState( 'Select Type of Entropy Grid' )
+  const [ gridType, setGridType ] = useState( GridType.WORDS )
   const [ showDropdown, setShowDropdown ] = useState( false )
-  const [ BWSuccessModal, setBWSuccessModal ] = useState( false )
-  type ItemProps = { title: string; id: string };
-  const dispatch = useDispatch()
+  type ItemProps = { title: string; };
+  const [ loaderModal, setLoaderModal ] = useState( false )
 
-  useEffect( () => {
-    const validChecksums = []
-    let count = 1
-    wordlists.forEach( ( word, index ) => {
-      const s = `${words} ${word}`
-      if ( bip39.validateMnemonic( s ) ) {
-        validChecksums.push( {
-          id: `${count}`,
-          title: word,
-        } )
-        count++
-      }
-    } )
-    setChecksums( validChecksums )
-  }, [] )
-
-  const Item = ( { title, id }: ItemProps ) => (
+  const Item = ( { title }: ItemProps ) => (
     <TouchableOpacity
       style={[
         styles.item,
         {
           backgroundColor:
-            checksumWord === `${id} ${title}` ? '#69A2B0' : '#FAFAFA',
+          gridType === title ? '#69A2B0' : '#FAFAFA',
         },
       ]}
       onPress={() => {
-        setShowDropdown( false ), setChecksumWord( `${id} ${title}` )
+        setShowDropdown( false ), setGridType( title )
       }}
     >
-      <View style={styles.indexWrapper}>
-        <Text
-          style={[
-            styles.gridItemIndex,
-            {
-              color:
-                checksumWord === `${id} ${title}` ? '#FAFAFA' : Colors.blue,
-            },
-          ]}
-        >
-          {id}
-        </Text>
-      </View>
       <Text
         style={[
           styles.title,
           {
-            color: checksumWord === `${id} ${title}` ? '#FAFAFA' : '#717171',
+            color: gridType === title ? '#FAFAFA' : '#717171',
           },
         ]}
       >
@@ -94,16 +68,17 @@ const ValidateBorderWalletChecksum = ( props ) => {
     </TouchableOpacity>
   )
 
-  const onPressVerify = () => {
-    const selectedWord = checksumWord.split( ' ' )[ 1 ]
-    if( selectedWord === mnemonic.split( ' ' )[ 11 ] ) {
-      Toast( 'Checksum matched' )
-      dispatch( setBorderWalletBackup( true ) )
-      //TO-DO-BW
-      props.navigation.navigate( 'Home' )
-    } else {
-      Toast( 'Invalid checksum' )
-    }
+  const onPressNext = ()=> {
+    isAccountCreation ? props.navigation.navigate( 'DownloadEncryptGridAccount', {
+      mnemonic, isNewWallet: true, gridType, isAccountCreation
+    } ) :
+    props.navigation.navigate( 'DownloadEncryptGrid', {
+      mnemonic, isNewWallet: true, gridType, isAccountCreation
+    } )
+  }
+
+  const onBackgroundOfLoader = () => {
+    setLoaderModal( false )
   }
 
   return (
@@ -118,44 +93,47 @@ const ValidateBorderWalletChecksum = ( props ) => {
         onPressBack={() => {
           props.navigation.goBack()
         }}
-        info1={''}
-        info={''}
+        info1={'Step 2 of Creating Border Wallet'}
+        info={'Different entropy grid options to select from'}
         selectedTitle={headerTitle}
       />
       <TouchableOpacity
         style={styles.dropdownBox}
         onPress={() => setShowDropdown( !showDropdown )}
       >
-        <Text style={styles.dropdownText}>{checksumWord}</Text>
+        <Text style={styles.dropdownText}>{gridType}</Text>
         <IconArrowDown />
       </TouchableOpacity>
       <View
         style={{
-          height: windowHeight > 800? '55%' : '36%',
+          height: windowHeight> 800? '45%' : '38%',
         }}
       >
         {showDropdown && (
           <FlatList
-            data={checksums}
+            data={gridTypeArray}
             overScrollMode="never"
             bounces={false}
-            renderItem={( { item } ) => <Item title={item.title} id={item.id} />}
-            keyExtractor={( item ) => item.id}
+            renderItem={( { item } ) => <Item title={item} />}
           />
         )}
       </View>
-      {/* <BottomInfoBox
+      <BottomInfoBox
         title={'Note'}
-        infoText={'In addition to having your Entropy Grid Regeneration Mnemonic and recalling your Pattern, you will need to remember this final Checksum Word in order to recover your Border Wallet'}
-      /> */}
+        infoText={'Words option for entropy grid is recommended'}
+      />
       <View style={styles.bottomButtonView}>
         <View style={styles.statusIndicatorView}>
-
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorActiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
         </View>
         <TouchableOpacity
           activeOpacity={0.6}
-          disabled={checksumWord === 'Select checksum word'}
-          onPress={onPressVerify}
+          onPress={onPressNext}
         >
           <LinearGradient
             colors={[ Colors.blue, Colors.darkBlue ]}
@@ -170,26 +148,18 @@ const ValidateBorderWalletChecksum = ( props ) => {
             locations={[ 0.2, 1 ]}
             style={styles.buttonView}
           >
-            <Text style={styles.buttonText}>Verify</Text>
+            <Text style={styles.buttonText}>Generate Grid</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
-      <ModalContainer onBackground={() => setBWSuccessModal( false )} visible={BWSuccessModal}
-        closeBottomSheet={() => setBWSuccessModal( false )}>
-        <SeedBacupModalContents
-          title={'Border Wallet Backup \nSuccessful'}
-          info={'You have successfully confirmed your backup\n\nMake sure you remember the pattern you have used to generate the wallet and the grid can be produced for the same'}
-          proceedButtonText={'Continue'}
-          onPressProceed={() => {
-            setBWSuccessModal( false )
-            props.navigation.navigate( 'BackupMethods' )
-          }}
-          onPressIgnore={() => setBWSuccessModal( false )}
-          isIgnoreButton={false}
-          isBottomImage={true}
-          bottomImage={require( '../../assets/images/icons/success.png' )}
-        />
+      <ModalContainer onBackground={onBackgroundOfLoader}  visible={loaderModal} closeBottomSheet={() => { }} >
+        <LoaderModal
+          headerText={loaderMessage.heading}
+          messageText={loaderMessage.text}
+          subPoints={subPoints}
+          bottomText={bottomTextMessage} />
       </ModalContainer>
+
     </SafeAreaView>
   )
 }
@@ -207,6 +177,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontFamily: Fonts.Medium,
     fontSize: RFValue( 13 ),
+    textTransform: 'capitalize'
   },
   item: {
     flexDirection: 'row',
@@ -232,6 +203,7 @@ const styles = StyleSheet.create( {
     fontWeight: 'bold',
     opacity: 0.6,
     fontFamily: Fonts.Regular,
+    textTransform: 'capitalize'
   },
   buttonView: {
     padding: 15,
@@ -239,7 +211,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 10,
     backgroundColor: Colors.blue,
-    width: 120,
+    width: 150,
   },
   buttonText: {
     color: Colors.white,
@@ -273,4 +245,4 @@ const styles = StyleSheet.create( {
     marginLeft: 5,
   },
 } )
-export default ValidateBorderWalletChecksum
+export default SelectEntropyGridType

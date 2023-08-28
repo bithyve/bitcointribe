@@ -12,7 +12,7 @@ import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 import Fonts from '../../common/Fonts'
-import { hp, wp } from '../../common/data/responsiveness/responsive'
+import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsive'
 import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
 import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
@@ -20,7 +20,7 @@ import * as bip39 from 'bip39'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import Toast from '../../components/Toast'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
-import { recoverWalletUsingMnemonic, restoreSeedWordFailed } from '../../store/actions/BHR'
+import { recoverWalletUsingMnemonic, restoreSeedWordFailed, setBorderWalletBackup } from '../../store/actions/BHR'
 import { Wallet } from '../../bitcoin/utilities/Interface'
 import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
@@ -44,6 +44,7 @@ const SelectChecksumWord = ( props ) => {
   const words = props.navigation.getParam( 'words' )
   const selected = props.navigation.getParam( 'selected' )
   const isNewWallet = props.navigation.getParam( 'isNewWallet' )
+  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
   const [ checksums, setChecksums ] = useState( [] )
   const [ headerTitle, setHeaderTitle ] = useState( 'Select Checksum Word' )
   const [ checksumWord, setChecksumWord ] = useState( 'Select checksum word' )
@@ -72,13 +73,13 @@ const SelectChecksumWord = ( props ) => {
 
   useEffect( () => {
     setLoaderModal( false )
-    if ( wallet ) {
+    if ( wallet && !isAccountCreation ) {
       dispatch( completedWalletSetup() )
       AsyncStorage.setItem( 'walletRecovered', 'true' )
       dispatch( setVersion( 'Restored' ) )
       props.navigation.navigate( 'HomeNav' )
     }
-  }, [ wallet ] )
+  }, [ wallet, isAccountCreation ] )
 
   useEffect( () => {
     const validChecksums = []
@@ -138,11 +139,20 @@ const SelectChecksumWord = ( props ) => {
   const onPressNext = ()=> {
     const mnemonic = `${words} ${checksumWord.split( ' ' )[ 1 ]}`
     if( isNewWallet ) {
-      props.navigation.navigate( 'ConfirmDownload', {
+      isAccountCreation?  props.navigation.navigate( 'ConfirmDownloadAccount', {
         selected,
         checksumWord,
         mnemonic,
-        initialMnemonic: props.navigation.getParam( 'initialMnemonic' )
+        initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
+        gridType: props.navigation.getParam( 'gridType' ),
+        isAccountCreation
+      } ) : props.navigation.navigate( 'ConfirmDownload', {
+        selected,
+        checksumWord,
+        mnemonic,
+        initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
+        gridType: props.navigation.getParam( 'gridType' ),
+        isAccountCreation
       } )
     } else {
       setShowLoader( true )
@@ -151,6 +161,7 @@ const SelectChecksumWord = ( props ) => {
         setTimeout( () => {
           dispatch( recoverWalletUsingMnemonic( mnemonic, props.navigation.getParam( 'initialMnemonic' ) ) )
         }, 500 )
+        dispatch( setBorderWalletBackup( true ) )
       }, 1000 )
     }
   }
@@ -171,7 +182,7 @@ const SelectChecksumWord = ( props ) => {
         onPressBack={() => {
           props.navigation.goBack()
         }}
-        info1={isNewWallet ? 'Step 3 of Create with Border Wallet': 'Recover with Border Wallet'}
+        info1={isNewWallet ? 'Step 5 of Create with Border Wallet': 'Recover with Border Wallet'}
         info={'This is the final step of creating your Border Wallet'}
         selectedTitle={headerTitle}
       />
@@ -184,7 +195,7 @@ const SelectChecksumWord = ( props ) => {
       </TouchableOpacity>
       <View
         style={{
-          height: '40%',
+          height: windowHeight> 800? '40%' : '36%',
         }}
       >
         {showDropdown && (
@@ -211,8 +222,9 @@ const SelectChecksumWord = ( props ) => {
             <View style={styles.statusIndicatorView}>
               <View style={styles.statusIndicatorInactiveView} />
               <View style={styles.statusIndicatorInactiveView} />
-              <View style={styles.statusIndicatorActiveView} />
               <View style={styles.statusIndicatorInactiveView} />
+              <View style={styles.statusIndicatorInactiveView} />
+              <View style={styles.statusIndicatorActiveView} />
               <View style={styles.statusIndicatorInactiveView} />
             </View>
           )
@@ -223,7 +235,7 @@ const SelectChecksumWord = ( props ) => {
           onPress={onPressNext}
         >
           <LinearGradient
-            colors={[ Colors.blue, Colors.darkBlue ]}
+            colors={checksumWord !== 'Select checksum word'?[ Colors.blue, Colors.darkBlue ]: [ Colors.greyTextColor, Colors.greyTextColor ]}
             start={{
               x: 0,
               y: 0,

@@ -40,7 +40,7 @@ import ElectrumClient from '../../bitcoin/electrum/client'
 
 
 function* setupWalletWorker( { payload } ) {
-  const { walletName, security, mnemonic, initialMnemonic }: { walletName: string, security: { questionId: string, question: string, answer: string }, newBie:boolean, mnemonic: string, initialMnemonic: string } = payload
+  const { walletName, security, mnemonic, initialMnemonic, gridType }: { walletName: string, security: { questionId: string, question: string, answer: string }, newBie:boolean, mnemonic: string, initialMnemonic: string, gridType: string } = payload
   let primaryMnemonic = null
   if( mnemonic && mnemonic != null )
     primaryMnemonic = mnemonic
@@ -69,7 +69,8 @@ function* setupWalletWorker( { payload } ) {
     accounts: {
     },
     version: DeviceInfo.getVersion(),
-    borderWalletMnemonic: initialMnemonic
+    borderWalletMnemonic: initialMnemonic,
+    borderWalletGridType: gridType
   }
   const wallet: Wallet = {
     walletId,
@@ -88,7 +89,7 @@ function* setupWalletWorker( { payload } ) {
   // prepare default accounts for the wallet
 
   const accountsInfo: newAccountsInfo[] = []
-  const accountArray = [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT, AccountType.SWAN_ACCOUNT,
+  const accountArray = [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT
     // Note New saving account create is off
     // AccountType.SAVINGS_ACCOUNT
   ]

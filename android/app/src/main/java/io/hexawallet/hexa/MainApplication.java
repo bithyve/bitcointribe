@@ -5,7 +5,6 @@ import android.app.Application;
 import com.facebook.react.ReactApplication;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
-import com.rnfs.RNFSPackage;
 import com.rpt.reactnativecheckpackageinstallation.CheckPackageInstallationPackage;
 import com.reactcommunity.rnlocalize.RNLocalizePackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
@@ -89,6 +88,7 @@ public class MainApplication extends Application implements ShareApplication, Re
 
             packages.add(new PdfPasswordPackage());
             packages.add(new GoogleDrivePackage());
+            packages.add(new PDFPackage());
             // Add unimodules
             List<ReactPackage> unimodules = Arrays.<ReactPackage>asList(
                     new ModuleRegistryAdapter(mModuleRegistryProvider)

@@ -121,7 +121,7 @@ const WalletInitializationScreen = props => {
             <View style={styles.textView}>
               <Text style={styles.touchableText}>
                 {
-                  'Create a Border Wallet'
+                  'Create with Border Wallet'
                 }
               </Text>
             </View>
@@ -205,7 +205,9 @@ const WalletInitializationScreen = props => {
             </View>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => props.navigation.navigate( 'RegenerateEntropyGrid' )}
+            onPress={() => props.navigation.navigate( 'RegenerateEntropyGrid', {
+              navigation: props.navigation
+            } )}
             style={[ styles.NewWalletTouchableView, {
               alignItems: 'center'
             } ]}
@@ -214,7 +216,7 @@ const WalletInitializationScreen = props => {
             <View style={styles.textView}>
               <Text style={styles.touchableText}>
                 {
-                  'Using a Border Wallet'
+                  'Using Border Wallet'
                 }
               </Text>
             </View>

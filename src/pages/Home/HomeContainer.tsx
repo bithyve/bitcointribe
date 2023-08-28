@@ -38,6 +38,13 @@ import { LocalizationContext } from '../../common/content/LocContext'
 import { AccountType } from '../../bitcoin/utilities/Interface'
 import dbManager from '../../storage/realm/dbManager'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import ModalContainer from '../../components/home/ModalContainer'
+import BWIcon from '../../assets/images/svgs/bw.svg'
+import IconRight from '../../assets/images/svgs/icon_arrow_right.svg'
+import LNIcon from '../../assets/images/svgs/lightningWhiteWithBack.svg'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
 
 export enum BottomSheetKind {
   SWAN_STATUS_INFO,
@@ -47,6 +54,9 @@ export enum BottomSheetKind {
 interface HomeStateTypes {
   currencyCode?: string;
   strings: object;
+  visibleModal: boolean;
+  visibleWalletModal:boolean;
+  // walletType: string;
 }
 
 interface HomePropsTypes {
@@ -72,6 +82,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.props.setShowAllAccount( false )
     this.state = {
       strings: this.context.translations [ 'home' ],
+      visibleModal: false,
+      visibleWalletModal: false,
+      // walletType: props.navigation.getParam( 'walletType' ),
     }
   }
   componentDidMount() {
@@ -96,11 +109,25 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         AsyncStorage.setItem( 'randomSeedWord', JSON.stringify( asyncSeedData ) )
       }
     }, 2000 )
+    // if( dbWallet ){
+    //   this.BorderWalletCreation( dbWallet && dbWallet )
+    // }
+
   }
+  // BorderWalletCreation= ( dbWallet )=> {
+  //   console.log( 'walletType', this.state.walletType )
+  //   console.log( 'dbWallet.borderWalletMnemonic', dbWallet.borderWalletMnemonic && dbWallet.borderWalletMnemonic )
+  //   if( dbWallet.borderWalletMnemonic && dbWallet.borderWalletMnemonic ){
+  //     this.setState( {
+  //       visibleWalletModal: true
+  //     } )
+  //   }
+
+  // }
   navigateToAddNewAccountScreen = () => {
-    // this.props.navigation.navigate( 'AddNewAccount' )
-    this.props.navigation.navigate( 'ScanNodeConfig', {
-      currentSubAccount: null,
+    //BW-TO-DO
+    this.setState( {
+      visibleModal: true,
     } )
   };
 
@@ -135,7 +162,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
-
   render() {
     const {
       currentLevel,
@@ -213,6 +239,106 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           </View>
         </View>
+        <ModalContainer
+          onBackground={()=>this.setState( {
+            visibleModal:false
+          } )}
+          visible={this.state.visibleModal }
+          closeBottomSheet={() => {}}
+        >
+          <View style={styles.modalContainer}>
+            <AppBottomSheetTouchableWrapper
+              onPress={() => this.setState( {
+                visibleModal:false
+              } )}
+              style={{
+                width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+                alignSelf: 'flex-end',
+                backgroundColor: Colors.CLOSE_ICON_COLOR, alignItems: 'center', justifyContent: 'center',
+                marginTop: wp( 3 ), marginRight: wp( 3 )
+              }}
+            >
+              <FontAwesome name="close" color={Colors.white} size={19} style={{
+                // marginTop: hp( 0.5 )
+              }} />
+            </AppBottomSheetTouchableWrapper>
+            <View style={styles.modalTitleWrapper}>
+              <Text style={styles.modalTitleText}>Add Account/ Wallet</Text>
+              <Text style={styles.titleText}>Adding a wallet will appear on the Home Screen as a separate tile</Text>
+            </View>
+            <AppBottomSheetTouchableWrapper style={styles.menuWrapper} onPress={()=> {
+              this.setState( {
+                visibleModal: false
+              } )
+              this.props.navigation.navigate( 'CreateWithBorderWalletAccount', {
+                isAccountCreation: true
+              } )}}>
+              <View style={styles.iconWrapper}>
+                <BWIcon/>
+              </View>
+              <View style={styles.titleWrapper}>
+                <Text style={styles.titleText}>Add a Border Wallet</Text>
+                <Text style={styles.subTitleText}>Add a Border Wallet as an account in Tribe </Text>
+              </View>
+              <View style={styles.iconRightWrapper}>
+                <IconRight/>
+              </View>
+            </AppBottomSheetTouchableWrapper>
+            <AppBottomSheetTouchableWrapper style={[ styles.menuWrapper, {
+              marginBottom: hp( 5 )
+            } ]} onPress={()=>
+            {
+              this.setState( {
+                visibleModal: false
+              } )
+              this.props.navigation.navigate( 'ScanNodeConfig', {
+                currentSubAccount: null,
+              } )}}>
+              <View style={styles.iconWrapper}>
+                <LNIcon/>
+              </View>
+              <View style={styles.titleWrapper}>
+                <Text style={styles.titleText}>Add a Lightning Wallet</Text>
+                <Text style={styles.subTitleText}>Add a Lightning node to enable a separate account on Tribe </Text>
+              </View>
+              <View style={styles.iconRightWrapper}>
+                <IconRight/>
+              </View>
+            </AppBottomSheetTouchableWrapper>
+          </View>
+        </ModalContainer>
+        <ModalContainer
+          onBackground={()=> this.setState( {
+            visibleWalletModal: false
+          } )}
+          visible={this.state.visibleWalletModal}
+          closeBottomSheet={()=> this.setState( {
+            visibleWalletModal: false
+          } )}
+        >
+          <BorderWalletSuccessModal
+            title={'Border Wallet creation success!'}
+            info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit,'}
+            otherText={'Your Border Wallet has been added and is now ready for you to start using.'}
+            proceedButtonText={'Continue'}
+            isIgnoreButton={false}
+            closeModal={()=> this.setState( {
+              visibleWalletModal: false
+            } )}
+            onPressProceed={() => {
+              this.setState( {
+                visibleWalletModal: false
+              } )
+            }}
+            onPressIgnore={() => {
+              this.setState( {
+                visibleWalletModal: false
+              } )
+            }}
+            isBottomImage={true}
+            bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
+          />
+        </ModalContainer>
       </View>
     )
   }
@@ -226,7 +352,50 @@ const mapStateToProps = ( state ) => {
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
   }
 }
-
+const styles = StyleSheet.create( {
+  modalContainer: {
+    backgroundColor: Colors.white,
+    padding: 15,
+  },
+  menuWrapper:{
+    flexDirection: 'row',
+    width: '90%',
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+    margin: 15,
+    alignItems: 'center',
+    backgroundColor: '#F8F8F8',
+    borderRadius: 10
+  },
+  iconWrapper: {
+    width: '15%'
+  },
+  titleWrapper: {
+    width: '75%'
+  },
+  iconRightWrapper: {
+    width: '8%',
+    alignItems: 'center'
+  },
+  titleText: {
+    fontSize: 14,
+    color: Colors.homepageButtonColor,
+    fontFamily: Fonts.Regular,
+  },
+  subTitleText: {
+    fontSize: 11,
+    color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
+    fontFamily: Fonts.Regular,
+  },
+  modalTitleWrapper: {
+    margin: 15
+  },
+  modalTitleText: {
+    fontSize: 18,
+    color: Colors.checkBlue,
+    fontFamily: Fonts.Medium,
+  }
+} )
 export default withNavigationFocus(
   connect( mapStateToProps, {
     setShowAllAccount,

@@ -59,8 +59,8 @@ android {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 582
-        versionName "2.2.0"
+        versionCode 591
+        versionName "2.2.2"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
         resValue "string", "build_config_package", "io.hexawallet.hexa"
@@ -161,7 +161,6 @@ dependencies {
 
 
     implementation project(':react-native-linear-gradient')
-    implementation project(':react-native-fs')
     implementation project(':react-native-check-app-install')
     implementation project(':react-native-localize')
     implementation project(':react-native-config')
@@ -211,6 +210,7 @@ dependencies {
     implementation('com.google.apis:google-api-services-drive:v3-rev136-1.25.0') {
         exclude group: 'org.apache.httpcomponents'
     }
+    implementation("com.github.librepdf:openpdf:1.3.30")
 
 }
 

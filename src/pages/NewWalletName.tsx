@@ -44,6 +44,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { initNewBHRFlow } from '../store/actions/BHR'
 import LoaderModal from '../components/LoaderModal'
 import LinearGradient from 'react-native-linear-gradient'
+import BorderWalletSuccessModal from '../components/border-wallet/BorderWalletSuccessModal'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -61,6 +62,7 @@ export default function NewWalletName( props ) {
   const [ walletName, setWalletName ] = useState( '' )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ note, showNote ] = useState( true )
+  const [ successModal, setSuccessModal ] = useState( false )
   const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
   const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
@@ -80,6 +82,7 @@ export default function NewWalletName( props ) {
   const [ signUpStarted, setSignUpStarted ] = useState( false )
   const mnemonic = props.navigation.getParam( 'mnemonic' ) || null
   const initialMnemonic = props.navigation.getParam( 'initialMnemonic' ) || ''
+  const gridType = props.navigation.getParam( 'gridType' ) || ''
 
   useEffect( () => {
     if ( walletSetupCompleted ) {
@@ -217,7 +220,7 @@ export default function NewWalletName( props ) {
             flex: 1
           }} >
             <HeaderTitle1
-              firstLineTitle={initialMnemonic ? 'Step 4 of Create with Border Wallet' : `${strings.Step1}` }
+              firstLineTitle={initialMnemonic ? 'Step 6 of Create with Border Wallet' : `${strings.Step1}` }
               secondLineBoldTitle={strings.NameyourWallet}
               secondLineTitle={''}
               infoTextNormal={initialMnemonic ? `${strings.Step1}` : ''}
@@ -284,7 +287,7 @@ export default function NewWalletName( props ) {
                     setTimeout( () => {
                       setSignUpStarted( true )
                       dispatch( updateCloudPermission( false ) )
-                      dispatch( setupWallet( walletName, null, mnemonic, initialMnemonic ) )
+                      dispatch( setupWallet( walletName, null, mnemonic, initialMnemonic, gridType ) )
                       dispatch( initNewBHRFlow( true ) )
                       dispatch( setVersion( 'Current' ) )
                       const current = Date.now()

@@ -65,6 +65,14 @@ import { translations } from '../../../common/content/LocContext'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
+import CreateWithBorderWallet from '../../../pages/borderwallet/CreateWithBorderWallet'
+import SelectEntropyGridType from '../../../pages/borderwallet/SelectEntropyGridType'
+import DownloadEncryptGrid from '../../../pages/borderwallet/DownloadEncryptGrid'
+import BorderWalletGridScreen from '../../../pages/borderwallet/BorderWalletGridScreen'
+import SelectChecksumWord from '../../../pages/borderwallet/SelectChecksumWord'
+import CreatePassPhrase from '../../../pages/borderwallet/CreatePassPhrase'
+import ConfirmDownload from '../../../pages/borderwallet/ConfirmDownload'
+import PreviewPattern from '../../../pages/borderwallet/PreviewPattern'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -110,6 +118,54 @@ const HomeStack = createStackNavigator(
         header: null
       }
     },
+    CreateWithBorderWalletAccount: {
+      screen: CreateWithBorderWallet,
+      navigationOptions: {
+        header: null
+      }
+    },
+    SelectEntropyGridTypeAccount: {
+      screen: SelectEntropyGridType,
+      navigationOptions: {
+        header: null
+      }
+    },  
+    DownloadEncryptGridAccount: {
+      screen: DownloadEncryptGrid,
+      navigationOptions: {
+        header: null
+      }
+    },  
+    BorderWalletGridScreenAccount: {
+      screen: BorderWalletGridScreen,
+      navigationOptions: {
+        header: null
+      }
+    },  
+    SelectChecksumWordAccount: {
+      screen: SelectChecksumWord,
+      navigationOptions: {
+        header: null
+      }
+    },  
+    CreatePassPhraseAccount: {
+      screen: CreatePassPhrase,
+      navigationOptions: {
+        header: null
+      }
+    },  
+    ConfirmDownloadAccount: {
+      screen: ConfirmDownload,
+      navigationOptions: {
+        header: null
+      }
+    },  
+    PreviewPatternAccount: {
+      screen: PreviewPattern,
+      navigationOptions: {
+        header: null
+      }
+    },  
     EnterNodeConfig: {
       screen: EnterNodeConfig,
       navigationOptions: {
