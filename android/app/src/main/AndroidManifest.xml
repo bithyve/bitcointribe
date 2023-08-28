@@ -168,5 +168,11 @@
             </intent-filter>
         </service>
   </application>
-
+  <queries>
+    <intent>
+     <action android:name="android.intent.action.VIEW" />
+     <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
+     <data android:mimeType="application/pdf" />
+    </intent>
+   </queries>
 </manifest>

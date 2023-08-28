@@ -19,6 +19,7 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf'
 import RNFetchBlob from 'rn-fetch-blob'
 import { generateGridHtmlString } from './gridToHtml'
 import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
+import FileViewer from "react-native-file-viewer";
 
 
 const DownloadEncryptGrid = ( props ) => {
@@ -52,20 +53,23 @@ const DownloadEncryptGrid = ( props ) => {
         padding: 10
         //base64: true
       }
+
+      //App-Documents -> Phone-Documents
       const file = await RNHTMLtoPDF.convert( options )
       // const downloadsDir = `${RNFS.DocumentDirectoryPath}/Tribe/`
       // await RNFS.moveFile( file.filePath, downloadsDir )
-      Alert.alert( 'File saved', `BorderWalletEntropyGrid.pdf save to ${file.filePath}`, [
-        {
-          text: 'Next',
-          onPress: () => onPressNext(),
-          style: 'default',
-        },
-      ], {
-        cancelable: false
-      } )
 
-      //RNFetchBlob.ios.openDocument( file.filePath )
+      // Alert.alert( 'File saved', `BorderWalletEntropyGrid.pdf save to ${file.filePath}`, [
+      //   {
+      //     text: 'Next',
+      //     onPress: () => onPressNext(),
+      //     style: 'default',
+      //   },
+      // ], {
+      //   cancelable: false
+      // } )
+      const path = FileViewer.open(file.filePath) // absolute-path-to-my-local-file.
+      // RNFetchBlob.ios.openDocument( file.filePath )
     } catch ( error ) {
       console.log( error )
     }
