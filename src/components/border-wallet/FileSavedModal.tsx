@@ -66,104 +66,42 @@ export default function FileSavedModal( props ) {
               {props.info}
             </Text>
           ) : null}
-          {props.errPoints &&
-            <View style={{
-              marginTop: hp( 3 ),
-              marginBottom: hp( 1 )
-            }}>
-              {props.errPoints.map( ( item, index ) => {
-                return(
-                  <View key={index} style={{
-                    flexDirection: 'row', paddingVertical: hp( 1 ), alignItems: 'center',
-                  }}>
-                    <View style={{
-                      height: 6, width: 6, borderRadius: 3, backgroundColor: Colors.gray4, alignSelf: 'center'
-                    }}/>
-                    <Text style={{
-                      color: Colors.textColorGrey, opacity: 1, fontSize: RFValue( 12 ), letterSpacing: 0.6, fontFamily: Fonts.Regular, marginLeft: wp( 2 )
-                    }}>
-                      {item}
-                    </Text>
-                  </View>
-                )
-              } )}
-            </View>
-          }
         </View>
-        <View style={styles.successModalAmountView}>
-          {props.note ? (
-            <Text
-              style={{
-                ...styles.modalInfoText,
-                marginBottom: hp( '1%' ),
-                marginTop: 'auto',
-                letterSpacing: 0.11,
-                fontSize: RFValue( 11 ),
-              }}
-            >
-              {props.note}
-              {props.noteNextLine ? '\n' + props.noteNextLine : null}
-            </Text>
-          ) : null}
-          {props.links &&
-            <View style={{
-              marginTop: hp( 3 ),
-              marginBottom: hp( 2 )
-            }}>
-              {props.links.map( ( item, index ) => {
-                return(
-                  <View key={index} style={{
-                    flexDirection: 'row', paddingVertical: hp( 1 ), alignItems: 'center',
-                  }}>
-                    <Image source={item.icon} style={{
-                      height: wp( 4 ), width: wp( 4 ), resizeMode: 'contain'
-                    }}/>
-                    <View style={{
-                      height: hp( 2 ), width: wp( 0.3 ), backgroundColor: Colors.gray1, marginHorizontal: wp( 4 )
-                    }} />
-                    <Text style={{
-                      color: Colors.textColorGrey, opacity: 1, fontSize: RFValue( 11 ), letterSpacing: 0.6, fontFamily: Fonts.Regular,
-                    }}>
-                      {item.link}
-                    </Text>
-                  </View>
-                )
-              } )}
-            </View>
-          }
-        </View>
-        {props.otherText ? (
-          <View style={styles.successModalAmountView}>
-            <Text
-              style={{
-                ...styles.modalInfoText,
-                marginBottom: hp( '1%' ),
-                marginTop: 'auto',
-                marginRight: wp( 10 )
-              }}
-            >
-              {props.otherText}
-            </Text>
-          </View>
-        ) : null}
+        {/* <View style={styles.filePathWrapper}>
+          <Text style={styles.filePathText}>BorderWalletEntropyGrid.pdf save to /Users/Elrond/Library/ Developer/CoreSimulator/Devices/1B593559-B55D-443C-83C4-835D847749A7/ data/Containers/Data/Application/F3E68CF5-F673-4A41-9740-E22052CD8C97/Documents/ BorderWalletEntropyGrid.pdf</Text>
+        </View> */}
         <View
           style={{
             height: hp( '15%' ),
             width: wp( '90%' ),
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent:'space-between'
+            justifyContent:'flex-end'
           }}
         >
-          <SuccessBWIllustration/>
-          {/* <Image
-            source={
-              props.bottomImage
-                ? props.bottomImage
-                : require( '../../assets/images/illustration.png' )
-            }
-            style={styles.successModalImage}
-          /> */}
+          {props.isIgnoreButton && (
+            <AppBottomSheetTouchableWrapper
+              onPress={() => props.onPressIgnore()}
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 15,
+                marginTop: 25
+              }}
+              delayPressIn={0}
+            >
+              <Text
+                style={{
+                  ...styles.proceedButtonText,
+                  color: props.buttonTextColor
+                    ? props.buttonTextColor
+                    : Colors.blue,
+                }}
+              >
+                {props.cancelButtonText ? props.cancelButtonText : common.ignore}
+              </Text>
+            </AppBottomSheetTouchableWrapper>
+          )}
           <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
             start={{
               x: 0, y: 0
@@ -201,28 +139,7 @@ export default function FileSavedModal( props ) {
             </AppBottomSheetTouchableWrapper>
           </LinearGradient>
 
-          {props.isIgnoreButton && (
-            <AppBottomSheetTouchableWrapper
-              onPress={() => props.onPressIgnore()}
-              style={{
-                height: wp( '12%' ),
-                width: wp( '27%' ),
-                alignItems: 'center',
-              }}
-              delayPressIn={0}
-            >
-              <Text
-                style={{
-                  ...styles.proceedButtonText,
-                  color: props.buttonTextColor
-                    ? props.buttonTextColor
-                    : Colors.blue,
-                }}
-              >
-                {props.cancelButtonText ? props.cancelButtonText : common.ignore}
-              </Text>
-            </AppBottomSheetTouchableWrapper>
-          )}
+
         </View>
       </View>
     </View>
@@ -272,4 +189,15 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.Medium,
   },
+  filePathWrapper: {
+    backgroundColor: Colors.offWhite,
+    padding: 15,
+    marginHorizontal: 25,
+    marginTop: 20,
+    borderRadius: 15
+  },
+  filePathText: {
+    color: Colors.homepageButtonColor,
+    fontSize: 14
+  }
 } )
