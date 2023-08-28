@@ -164,8 +164,9 @@ const CreatePassPhrase = ( props ) => {
           <View style={styles.statusIndicatorInactiveView} />
           <View style={styles.statusIndicatorInactiveView} />
           <View style={styles.statusIndicatorInactiveView} />
-          <View style={styles.statusIndicatorActiveView} />
           <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorActiveView} />
         </View>
         <View style={{
           flexDirection: 'row',
