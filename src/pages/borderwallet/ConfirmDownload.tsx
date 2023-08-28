@@ -7,7 +7,8 @@ import {
   FlatList,
   Text,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert
 } from 'react-native'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -37,17 +38,15 @@ const ConfirmDownload = ( props ) => {
   const gridType = props.navigation.getParam( 'gridType' )
   const dispatch = useDispatch()
   type ItemProps = {title: string, id: string};
-
-
-  useAccountShellCreationCompletionEffect(()=>{
-    //TO-DO-CW
-    //Insert Successful Modal
-    props.navigation.navigate('Home')
-  })
   
   const onPressContinue = () => {
     if(isAccountCreation){
-          dispatch(createBorderWallet(mnemonic,initialMnemonic,gridType))
+        dispatch(createBorderWallet(mnemonic,initialMnemonic,gridType))
+        //TO-DO- BW bind this to account creation redux state
+        Alert.alert("Wallet Created!", "Border Wallet has been succssefully created", [{text: "Ok", onPress: ()=> {  props.navigation.navigate('Home')}}] )
+        setTimeout(()=>{
+            props.navigation.navigate('Home')
+      },3000)
     }
     else{
       props.navigation.navigate('NewWalletName', {
