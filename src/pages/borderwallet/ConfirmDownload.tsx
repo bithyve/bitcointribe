@@ -39,22 +39,22 @@ const ConfirmDownload = ( props ) => {
   type ItemProps = {title: string, id: string};
 
 
-  useAccountShellCreationCompletionEffect(()=>{
+  useAccountShellCreationCompletionEffect( ()=>{
     //TO-DO-CW
     //Insert Successful Modal
-    props.navigation.navigate('Home')
-  })
-  
+    props.navigation.navigate( 'Home' )
+  } )
+
   const onPressContinue = () => {
-    if(isAccountCreation){
-          dispatch(createBorderWallet(mnemonic,initialMnemonic,gridType))
+    if( isAccountCreation ){
+      dispatch( createBorderWallet( mnemonic, initialMnemonic, gridType ) )
     }
     else{
-      props.navigation.navigate('NewWalletName', {
+      props.navigation.navigate( 'NewWalletName', {
         mnemonic, initialMnemonic, gridType
-      } ) 
+      } )
     }
-              
+
   }
   const Item = ( { title, id }: ItemProps ) => (
     <View style={styles.item}>
@@ -199,7 +199,7 @@ const styles = StyleSheet.create( {
   },
   buttonView: {
     padding: 15,
-    width: 120,
+    width: 150,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
