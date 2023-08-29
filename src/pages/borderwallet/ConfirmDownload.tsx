@@ -188,7 +188,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     width: '100%',
     marginHorizontal: 20,
-    height: windowHeight>800? '64%' : '58%'
+    height: '55%'
 
   },
   patternWrapper: {
