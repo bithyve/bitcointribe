@@ -152,7 +152,7 @@ const CreatePassPhrase = ( props ) => {
             style={
               styles.textBox
             }
-            placeholder={'Confirm passphrase'}
+            placeholder={'Confirm Passphrase'}
             placeholderTextColor={Colors.textColorGrey}
             value={confirmPassphrase}
             onChangeText={text => setConfirmPassphrase( text )}
