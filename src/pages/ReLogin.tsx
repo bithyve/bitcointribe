@@ -74,12 +74,18 @@ export default function Login( props ) {
       }}>
         <View style={{
         }}>
-          <Text style={styles.headerTitleText}>Welcome back</Text>
+          <Text style={[ styles.headerTitleText, {
+            fontSize: props.navigation.state.params.isPasscodeCheck? RFValue( 20 ) : RFValue( 25 )
+          } ]}>{ props.navigation.state.params.isPasscodeCheck? 'Confirm Passcode' : 'Welcome back'}</Text>
           <View>
-            <Text style={styles.headerInfoText}>
+            {props.navigation.state.params.isPasscodeCheck?
+              <Text style={styles.headerInfoText}>Please enter your passcode to view your pattern</Text>
+              :
+              <Text style={styles.headerInfoText}>
               Please enter your{' '}
-              <Text style={styles.boldItalicText}>passcode</Text>
-            </Text>
+                <Text style={styles.boldItalicText}>passcode</Text>
+              </Text>
+            }
             <View style={{
               alignSelf: 'baseline'
             }}>
@@ -453,11 +459,6 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
   },
   proceedButtonText: {
     color: Colors.white,
@@ -477,7 +478,6 @@ const styles = StyleSheet.create( {
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue( 25 ),
     marginLeft: 20,
     marginTop: hp( '10%' ),
     fontFamily: Fonts.Regular,

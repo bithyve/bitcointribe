@@ -110,8 +110,8 @@ const styles = StyleSheet.create( {
   },
   headerText:{
     color: Colors.blue,
-    fontSize: RFValue( 17 ),
-    fontFamily: Fonts.Medium,
+    fontSize: RFValue( 14 ),
+    fontFamily: Fonts.Light,
   },
   selectedPatternText: {
     fontSize: 12,

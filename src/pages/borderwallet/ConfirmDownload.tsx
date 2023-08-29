@@ -26,7 +26,7 @@ import useAccountShellCreationCompletionEffect from '../../utils/hooks/account-e
 const ConfirmDownload = ( props ) => {
   const { translations } = useContext( LocalizationContext )
   const common = translations[ 'common' ]
-  const [ headerTitle, setHeaderTitle ]=useState( 'Memorise/Download' )
+  const [ headerTitle, setHeaderTitle ]=useState( 'Summary for Border Wallet' )
   const [ successModal, setSuccessModal ] = useState( false )
   const [ loading, setLoading ] = useState( true )
   const mnemonic = props.navigation.getParam( 'mnemonic' )
@@ -76,7 +76,8 @@ const ConfirmDownload = ( props ) => {
         onPressBack={() => {
           props.navigation.goBack()
         }}
-        info1={'Confirm'}
+        info={'Make sure you have a way to regenerate the grid (using Regeneration Mnemonic or using PDF). Also remember the pattern, checksum word and Passphrase if used.'}
+        info1={'Final step'}
         selectedTitle={headerTitle}
       />
       <View style={styles.previewWrapper}>
@@ -186,7 +187,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     width: '100%',
     marginHorizontal: 20,
-    height: windowHeight>800? '70%' : '66%'
+    height: '55%'
 
   },
   patternWrapper: {

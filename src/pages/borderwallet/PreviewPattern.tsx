@@ -139,10 +139,10 @@ const PreviewPattern = ( { navigation } ) => {
   const [ loading, setLoading ] = useState( false )
 
   useEffect( ()=> {
-    if( isValidate ) {
-      // navigation.navigate( 'CheckPasscode', {
-      //   backupType: 'borderWallet'
-      // } )
+    if( isValidate ){
+      navigation.navigate( 'ReLogin', {
+        isPasscodeCheck: true,
+      } )
     }
   }, [] )
 
