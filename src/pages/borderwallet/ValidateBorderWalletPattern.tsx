@@ -317,10 +317,8 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
       selectedWords.push( words[ s ] )
     } )
     const selectedPattern =  selectedWords.toString().replace( /,/g, ' ' )
-    console.log( {
-      selectedPattern, mnemonic
-    } )
-    if( selectedPattern === mnemonic.split( ' ' ).splice( 0, 11 ).toString().replace( /,/g, ' ' ) ) {
+    const splitArr = mnemonic.split( ' ' )
+    if( selectedPattern === splitArr.splice( 0, splitArr.length - 1 ).toString().replace( /,/g, ' ' ) ) {
       Toast( 'Pattern matched' )
       navigation.replace( 'ValidateBorderWalletChecksum', {
         words: selectedPattern,
