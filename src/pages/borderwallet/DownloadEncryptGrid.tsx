@@ -144,7 +144,7 @@ const DownloadEncryptGrid = ( props ) => {
             />
           </View>
         </TouchableOpacity> */}
-        <TouchableOpacity style={styles.menuWrapper} onPress={()=>}>
+        <TouchableOpacity style={styles.menuWrapper} onPress={()=> downloadPdf()}>
           <View style={styles.titleWrapper}>
             <Text style={styles.titleText}>Download</Text>
             <Text style={styles.subTitleText}>
@@ -223,7 +223,7 @@ const DownloadEncryptGrid = ( props ) => {
                 color: Colors.white,
               }}
             >
-            continue
+            Continue
             </Text>
           </AppBottomSheetTouchableWrapper>
         </LinearGradient>
