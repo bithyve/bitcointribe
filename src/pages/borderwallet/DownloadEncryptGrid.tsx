@@ -59,15 +59,26 @@ const DownloadEncryptGrid = ( props ) => {
     Toast( 'Entropy Grid Regenerated Successfully!' )
   }, [] )
 
-  // useEffect( ()=>{
-  //   console.log( 'filePath', filePath )
-  //   console.log( 'isMounted', isMounted )
-  //   if( filePath !== '' && isMounted ){
-  //     setFileSavedModal( true )
-  //   }
-  // }, [ isMounted, filePath ] )
+  useEffect( ()=>{
+    console.log( 'filePath', filePath )
+    if( filePath !== '' ){
+      onPressNext()
+    }
+  }, [ filePath ] )
 
+  const showAlert = () => {
+    Alert.alert( '', 'In the next step, Save the PDF file appropriately in a secure location', [
+      {
+        text: 'OK',
+        onPress: () => downloadPdf(),
+        style: 'default',
+      },
+    ], {
+      cancelable: false
+    } )
+  }
   const onPressNext = () => {
+    setFilePath( '' )
     isAccountCreation ?  props.navigation.navigate( 'BorderWalletGridScreen', {
       mnemonic, isNewWallet: true, gridType, isAccountCreation
     } ) :
@@ -88,15 +99,12 @@ const DownloadEncryptGrid = ( props ) => {
         //base64: true
       }
       const file = await RNHTMLtoPDF.convert( options )
-      setTimeout( ()=>{
-        if( Platform.OS === 'ios' ) {
-          RNFetchBlob.ios.openDocument( file.filePath )
-        } else {
-          RNFetchBlob.android.actionViewIntent( file.filePath, 'application/pdf' )
-        }
-        setFilePath( file.filePath )
-      }, 1000 )
-      setFileSavedModal( false )
+      if( Platform.OS === 'ios' ) {
+        RNFetchBlob.ios.openDocument( file.filePath )
+      } else {
+        RNFetchBlob.android.actionViewIntent( file.filePath, 'application/pdf' )
+      }
+      setFilePath( file.filePath )
     } catch ( error ) {
       console.log( error )
     }
@@ -144,7 +152,7 @@ const DownloadEncryptGrid = ( props ) => {
             />
           </View>
         </TouchableOpacity> */}
-        <TouchableOpacity style={styles.menuWrapper} onPress={()=> downloadPdf()}>
+        <TouchableOpacity style={styles.menuWrapper} onPress={()=> showAlert()}>
           <View style={styles.titleWrapper}>
             <Text style={styles.titleText}>Download</Text>
             <Text style={styles.subTitleText}>
