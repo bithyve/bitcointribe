@@ -74,7 +74,9 @@ export default function Login( props ) {
       }}>
         <View style={{
         }}>
-          <Text style={styles.headerTitleText}>Welcome back</Text>
+          <Text style={[ styles.headerTitleText, {
+            fontSize: props.navigation.state.params.isPasscodeCheck? RFValue( 20 ) : RFValue( 25 )
+          } ]}>{ props.navigation.state.params.isPasscodeCheck? 'Confirm Your Passcode' : 'Welcome back'}</Text>
           <View>
             <Text style={styles.headerInfoText}>
               Please enter your{' '}
@@ -477,7 +479,6 @@ const styles = StyleSheet.create( {
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue( 25 ),
     marginLeft: 20,
     marginTop: hp( '10%' ),
     fontFamily: Fonts.Regular,
