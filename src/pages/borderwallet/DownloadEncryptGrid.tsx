@@ -23,6 +23,9 @@ import { generateGridHtmlString } from './gridToHtml'
 import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
 import ModalContainer from '../../components/home/ModalContainer'
 import FileSavedModal from '../../components/border-wallet/FileSavedModal'
+import LinearGradient from 'react-native-linear-gradient'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import { hp, wp } from '../../common/data/responsiveness/responsive'
 
 
 const DownloadEncryptGrid = ( props ) => {
@@ -112,7 +115,7 @@ const DownloadEncryptGrid = ( props ) => {
           props.navigation.goBack()
         }}
         info1={'Step 3 of Creating Border Wallet'}
-        info={'The Regeneration Mnemonic for the entropy grid will help you create back the grid, but you can optionally also download the grid'}
+        info={'The Regeneration Mnemonic for the entropy grid will help you create back the grid, but you can optionally also download the grid or continue without downloading'}
         selectedTitle={headerTitle}
       />
       <View
@@ -141,7 +144,7 @@ const DownloadEncryptGrid = ( props ) => {
             />
           </View>
         </TouchableOpacity> */}
-        <TouchableOpacity style={styles.menuWrapper} onPress={()=>setFileSavedModal( true )}>
+        <TouchableOpacity style={styles.menuWrapper} onPress={()=>}>
           <View style={styles.titleWrapper}>
             <Text style={styles.titleText}>Download</Text>
             <Text style={styles.subTitleText}>
@@ -160,7 +163,7 @@ const DownloadEncryptGrid = ( props ) => {
           </View>
         </TouchableOpacity>
       </View>
-      <View>
+      {/* <View>
         <TouchableOpacity
           style={styles.menuWrapper}
           onPress={() => onPressNext()}
@@ -182,7 +185,7 @@ const DownloadEncryptGrid = ( props ) => {
             />
           </View>
         </TouchableOpacity>
-      </View>
+      </View> */}
       <View style={styles.bottomButtonView}>
         <View style={styles.statusIndicatorView}>
           <View style={styles.statusIndicatorInactiveView} />
@@ -192,8 +195,40 @@ const DownloadEncryptGrid = ( props ) => {
           <View style={styles.statusIndicatorInactiveView} />
           <View style={styles.statusIndicatorInactiveView} />
         </View>
+        <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+          start={{
+            x: 0, y: 0
+          }} end={{
+            x: 1, y: 0
+          }}
+          locations={[ 0.2, 1 ]}
+          style={{
+            ...styles.proceedButtonView,
+            backgroundColor: Colors.blue,
+          }}
+        >
+          <AppBottomSheetTouchableWrapper
+            onPress={() => onPressNext()}
+            style={{
+              shadowColor: props.buttonShadowColor
+                ? props.buttonShadowColor
+                : Colors.shadowBlue,
+
+            }}
+            delayPressIn={0}
+          >
+            <Text
+              style={{
+                ...styles.proceedButtonText,
+                color: Colors.white,
+              }}
+            >
+            continue
+            </Text>
+          </AppBottomSheetTouchableWrapper>
+        </LinearGradient>
       </View>
-      <ModalContainer
+      {/* <ModalContainer
         onBackground={()=> setFileSavedModal( false )}
         visible={fileSavedModal}
         closeBottomSheet={()=> setFileSavedModal( false )}
@@ -208,7 +243,7 @@ const DownloadEncryptGrid = ( props ) => {
           onPressProceed={() => {setFileSavedModal( false ); onPressNext()}}
           onPressIgnore={() => downloadPdf()}
         />
-      </ModalContainer>
+      </ModalContainer> */}
     </SafeAreaView>
   )
 }
@@ -244,9 +279,12 @@ const styles = StyleSheet.create( {
   },
   bottomButtonView: {
     flex: 1,
+    flexDirection: 'row',
+    width: '93%',
     position: 'absolute',
     bottom: 25,
-    marginLeft: 25,
+    margin: 25,
+    justifyContent: 'space-between'
   },
   statusIndicatorView: {
     flexDirection: 'row',
@@ -265,6 +303,20 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.THEAM_TEXT_COLOR,
     borderRadius: 10,
     marginLeft: 5,
+  },
+  proceedButtonView: {
+    padding: 14,
+    paddingHorizontal: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    backgroundColor: Colors.blue,
+    margin: 25,
+  },
+  proceedButtonText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.Medium,
   },
 } )
 export default DownloadEncryptGrid
