@@ -139,9 +139,11 @@ const PreviewPattern = ( { navigation } ) => {
   const [ loading, setLoading ] = useState( false )
 
   useEffect( ()=> {
-    navigation.navigate( 'ReLogin', {
-      isPasscodeCheck: true,
-    } )
+    if( isValidate ){
+      navigation.navigate( 'ReLogin', {
+        isPasscodeCheck: true,
+      } )
+    }
   }, [] )
 
   return (
