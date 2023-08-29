@@ -220,7 +220,7 @@ const styles = StyleSheet.create( {
     backgroundColor: '#FAFAFA'
   },
   textInputWrapper:{
-    height: '65%'
+    height: '56%'
   },
   item: {
     flexDirection: 'row',
