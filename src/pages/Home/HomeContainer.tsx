@@ -207,7 +207,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             onCardSelected={this.handleAccountCardSelection}
           />
           <View style={{
-            justifyContent:'center', flexDirection:'row'
+            justifyContent:'center',
+            flexDirection:'row'
           }}>
             <HomeBuyCard
               cardContainer={{

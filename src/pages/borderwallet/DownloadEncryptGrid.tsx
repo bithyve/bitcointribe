@@ -7,6 +7,8 @@ import {
   Text,
   TouchableOpacity,
   Alert,
+  Platform,
+  AppState,
 } from 'react-native'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Colors from '../../common/Colors'
@@ -19,22 +21,51 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf'
 import RNFetchBlob from 'rn-fetch-blob'
 import { generateGridHtmlString } from './gridToHtml'
 import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
-import FileViewer from "react-native-file-viewer";
+import ModalContainer from '../../components/home/ModalContainer'
+import FileSavedModal from '../../components/border-wallet/FileSavedModal'
 
 
 const DownloadEncryptGrid = ( props ) => {
   const mnemonic = props.navigation.getParam( 'mnemonic' )
   const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
   const gridType = props.navigation.getParam( 'gridType' ) || GridType.WORDS
+  const [ fileSavedModal, setFileSavedModal ] = useState( false )
 
   const [ headerTitle ] = useState( 'Download grid (optional)' )
+  // const [ appState, setAppState ] = useState( AppState.currentState )
+  // const [ isMounted, setIsMounted ] = useState( true )
+  const [ filePath, setFilePath ] = useState( '' )
+
+
+  // const handleAppStateChange = ( nextAppState ) => {
+  //   if ( appState.match( /inactive|background/ ) && nextAppState === 'active' ) {
+  //     setIsMounted( true )
+  //   } else if ( appState === 'active' && nextAppState.match( /inactive|background/ ) ) {
+  //     setIsMounted( false )
+  //   }
+  //   setAppState( nextAppState )
+  // }
+  // useEffect( () => {
+  //   AppState.addEventListener( 'change', handleAppStateChange )
+  //   return () => {
+  //     AppState.removeEventListener( 'change', handleAppStateChange )
+  //   }
+  // }, [] )
 
   useEffect( () => {
     Toast( 'Entropy Grid Regenerated Successfully!' )
   }, [] )
 
+  // useEffect( ()=>{
+  //   console.log( 'filePath', filePath )
+  //   console.log( 'isMounted', isMounted )
+  //   if( filePath !== '' && isMounted ){
+  //     setFileSavedModal( true )
+  //   }
+  // }, [ isMounted, filePath ] )
+
   const onPressNext = () => {
-    isAccountCreation ?  props.navigation.navigate( 'BorderWalletGridScreenAccount', {
+    isAccountCreation ?  props.navigation.navigate( 'BorderWalletGridScreen', {
       mnemonic, isNewWallet: true, gridType, isAccountCreation
     } ) :
       props.navigation.navigate( 'BorderWalletGridScreen', {
@@ -53,30 +84,19 @@ const DownloadEncryptGrid = ( props ) => {
         padding: 10
         //base64: true
       }
-
-      //App-Documents -> Phone-Documents
       const file = await RNHTMLtoPDF.convert( options )
-      // const downloadsDir = `${RNFS.DocumentDirectoryPath}/Tribe/`
-      // await RNFS.moveFile( file.filePath, downloadsDir )
-
-      // Alert.alert( 'File saved', `BorderWalletEntropyGrid.pdf save to ${file.filePath}`, [
-      //   {
-      //     text: 'Next',
-      //     onPress: () => onPressNext(),
-      //     style: 'default',
-      //   },
-      // ], {
-      //   cancelable: false
-      // } )
-      const path = FileViewer.open(file.filePath) // absolute-path-to-my-local-file.
-      // RNFetchBlob.ios.openDocument( file.filePath )
+      setTimeout( ()=>{
+        if( Platform.OS === 'ios' ) {
+          RNFetchBlob.ios.openDocument( file.filePath )
+        } else {
+          RNFetchBlob.android.actionViewIntent( file.filePath, 'application/pdf' )
+        }
+        setFilePath( file.filePath )
+      }, 1000 )
+      setFileSavedModal( false )
     } catch ( error ) {
       console.log( error )
     }
-  }
-
-  const alertForDownload = () => {
-    Alert.alert("Download PDF", "You will be redirected to border wallet PDF file", [{onPress: downloadPdf, text: "Ok"}])
   }
 
   return (
@@ -97,10 +117,10 @@ const DownloadEncryptGrid = ( props ) => {
       />
       <View
         style={{
-          height: '45%',
+          // height: '45%',
         }}
       >
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.menuWrapper}
           onPress={() => onPressNext()}
         >
@@ -120,10 +140,10 @@ const DownloadEncryptGrid = ( props ) => {
               }}
             />
           </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuWrapper} onPress={alertForDownload}>
+        </TouchableOpacity> */}
+        <TouchableOpacity style={styles.menuWrapper} onPress={()=>setFileSavedModal( true )}>
           <View style={styles.titleWrapper}>
-            <Text style={styles.titleText}>Download without Encryption</Text>
+            <Text style={styles.titleText}>Download</Text>
             <Text style={styles.subTitleText}>
               Store a PDF file with grid
             </Text>
@@ -173,6 +193,22 @@ const DownloadEncryptGrid = ( props ) => {
           <View style={styles.statusIndicatorInactiveView} />
         </View>
       </View>
+      <ModalContainer
+        onBackground={()=> setFileSavedModal( false )}
+        visible={fileSavedModal}
+        closeBottomSheet={()=> setFileSavedModal( false )}
+      >
+        <FileSavedModal
+          title={'File Saved'}
+          info={'Your Border wallet PDF has been downloaded to the location below and you can also view it in your local files.'}
+          proceedButtonText={'Next'}
+          cancelButtonText={'Open File'}
+          isIgnoreButton
+          closeModal={()=> setFileSavedModal( false )}
+          onPressProceed={() => {setFileSavedModal( false ); onPressNext()}}
+          onPressIgnore={() => downloadPdf()}
+        />
+      </ModalContainer>
     </SafeAreaView>
   )
 }

@@ -69,12 +69,12 @@ const SelectEntropyGridType = ( props ) => {
   )
 
   const onPressNext = ()=> {
-    isAccountCreation ? props.navigation.navigate( 'DownloadEncryptGridAccount', {
+    isAccountCreation ? props.navigation.navigate( 'DownloadEncryptGrid', {
       mnemonic, isNewWallet: true, gridType, isAccountCreation
     } ) :
-    props.navigation.navigate( 'DownloadEncryptGrid', {
-      mnemonic, isNewWallet: true, gridType, isAccountCreation
-    } )
+      props.navigation.navigate( 'DownloadEncryptGrid', {
+        mnemonic, isNewWallet: true, gridType, isAccountCreation
+      } )
   }
 
   const onBackgroundOfLoader = () => {
@@ -106,7 +106,7 @@ const SelectEntropyGridType = ( props ) => {
       </TouchableOpacity>
       <View
         style={{
-          height: windowHeight> 800? '45%' : '38%',
+          height: windowHeight> 850? '45%' : '38%',
         }}
       >
         {showDropdown && (
@@ -211,7 +211,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 10,
     backgroundColor: Colors.blue,
-    width: 150,
+    width: 200,
   },
   buttonText: {
     color: Colors.white,

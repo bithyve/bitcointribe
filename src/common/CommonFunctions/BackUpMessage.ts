@@ -2,7 +2,7 @@ import BackupWithKeeperState from '../data/enums/BackupWithKeeperState'
 import CreateWithKeeperState from '../data/enums/CreateWithKeeperState'
 
 export function backUpMessage( days, levelData, createWithKeeperStatus,
-  backupWithKeeperStatus, borderWalletBackupStatus ): string {
+  backupWithKeeperStatus, borderWalletBackupStatus, borderWalletMnemonic ): string {
 
   if( days > 180 )
     return 'Wallet backup phrase is expired'
@@ -18,7 +18,7 @@ export function backUpMessage( days, levelData, createWithKeeperStatus,
     return 'Your wallet is backed up with Keeper'
   // if( levelData[ 0 ].keeper1.shareType == '' )
   //   return 'Confirm Backup Phrase'
-  if( borderWalletBackupStatus )
+  if( borderWalletBackupStatus && borderWalletMnemonic  )
     return 'Border Wallet backup confirmed'
   if ( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed' &&
     levelData[ 0 ].keeper1.status != 'notSetup' )

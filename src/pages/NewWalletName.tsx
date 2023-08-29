@@ -83,6 +83,7 @@ export default function NewWalletName( props ) {
   const mnemonic = props.navigation.getParam( 'mnemonic' ) || null
   const initialMnemonic = props.navigation.getParam( 'initialMnemonic' ) || ''
   const gridType = props.navigation.getParam( 'gridType' ) || ''
+  const passphrase = props.navigation.getParam( 'passphrase' ) || ''
 
   useEffect( () => {
     if ( walletSetupCompleted ) {
@@ -220,7 +221,7 @@ export default function NewWalletName( props ) {
             flex: 1
           }} >
             <HeaderTitle1
-              firstLineTitle={initialMnemonic ? 'Step 6 of Create with Border Wallet' : `${strings.Step1}` }
+              firstLineTitle={initialMnemonic ? 'Step 7 of Create with Border Wallet' : `${strings.Step1}` }
               secondLineBoldTitle={strings.NameyourWallet}
               secondLineTitle={''}
               infoTextNormal={initialMnemonic ? `${strings.Step1}` : ''}
@@ -287,7 +288,7 @@ export default function NewWalletName( props ) {
                     setTimeout( () => {
                       setSignUpStarted( true )
                       dispatch( updateCloudPermission( false ) )
-                      dispatch( setupWallet( walletName, null, mnemonic, initialMnemonic, gridType ) )
+                      dispatch( setupWallet( walletName, null, mnemonic, initialMnemonic, gridType, passphrase ) )
                       dispatch( initNewBHRFlow( true ) )
                       dispatch( setVersion( 'Current' ) )
                       const current = Date.now()

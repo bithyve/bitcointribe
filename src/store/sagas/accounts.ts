@@ -798,26 +798,26 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
         break
 
       case AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT :
-          primarySubAccount = new CheckingSubAccountInfo( {
-            id: account.id,
-            xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
-            isUsable: account.isUsable,
-            instanceNumber: account.instanceNum,
-            customDisplayName: account.accountName,
-            customDescription: account.accountDescription,
-          } )
-          break
-      
-          case AccountType.BORDER_WALLET :
-          primarySubAccount = new BorderWalletSubAccountInfo( {
-            id: account.id,
-            xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
-            isUsable: account.isUsable,
-            instanceNumber: account.instanceNum,
-            customDisplayName: account.accountName,
-            customDescription: account.accountDescription,
-          } )
-          break
+        primarySubAccount = new CheckingSubAccountInfo( {
+          id: account.id,
+          xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          isUsable: account.isUsable,
+          instanceNumber: account.instanceNum,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+        } )
+        break
+
+      case AccountType.BORDER_WALLET :
+        primarySubAccount = new BorderWalletSubAccountInfo( {
+          id: account.id,
+          xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          isUsable: account.isUsable,
+          instanceNumber: account.instanceNum,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+        } )
+        break
 
       case AccountType.SAVINGS_ACCOUNT:
         primarySubAccount = new SavingsSubAccountInfo( {
@@ -942,34 +942,34 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         return checkingAccount
 
       case AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT:
-          const checkingNativeSegwitInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT ] )?.length | 0
-          const checkingAccountNativeSegwit: Account = yield call( generateAccount, {
-            walletId,
-            type: AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT,
-            instanceNum: checkingNativeSegwitInstanceCount,
-            accountName: accountName? accountName: 'Checking Account',
-            accountDescription: accountDescription? accountDescription: 'Bitcoin Wallet - Native SegWit',
-            primarySeed,
-            derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT, checkingNativeSegwitInstanceCount, null, DerivationPurpose.BIP84 ),
-            networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
-          } )
-          return checkingAccountNativeSegwit
-      
+        const checkingNativeSegwitInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT ] )?.length | 0
+        const checkingAccountNativeSegwit: Account = yield call( generateAccount, {
+          walletId,
+          type: AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT,
+          instanceNum: checkingNativeSegwitInstanceCount,
+          accountName: accountName? accountName: 'Checking Account',
+          accountDescription: accountDescription? accountDescription: 'Bitcoin Wallet - Native SegWit',
+          primarySeed,
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT, checkingNativeSegwitInstanceCount, null, DerivationPurpose.BIP84 ),
+          networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+        } )
+        return checkingAccountNativeSegwit
+
       case AccountType.BORDER_WALLET:
-            const borderWalletInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ AccountType.BORDER_WALLET ] )?.length | 0
-            const {generatedSeed} = borderWalletAccountInfo
-            const borderWalletAccount: Account = yield call( generateAccount, {
-              walletId,
-              type: AccountType.BORDER_WALLET,
-              instanceNum: borderWalletInstanceCount,
-              accountName: accountName? accountName: `Border Wallet ${borderWalletInstanceCount + 1}`,
-              accountDescription: accountDescription? accountDescription: 'Border Wallet - Native SegWit',
-              primarySeed: generatedSeed.toString('hex') ,
-              derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT, borderWalletInstanceCount, null, DerivationPurpose.BIP84 ),
-              networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
-              borderWalletAccountInfo,
-            } )
-            return borderWalletAccount
+        const borderWalletInstanceCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ AccountType.BORDER_WALLET ] )?.length | 0
+        const { generatedSeed } = borderWalletAccountInfo
+        const borderWalletAccount: Account = yield call( generateAccount, {
+          walletId,
+          type: AccountType.BORDER_WALLET,
+          instanceNum: borderWalletInstanceCount,
+          accountName: accountName? accountName: `Border Wallet ${borderWalletInstanceCount + 1}`,
+          accountDescription: accountDescription? accountDescription: 'Border Wallet - Native SegWit',
+          primarySeed: generatedSeed.toString( 'hex' ),
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT, borderWalletInstanceCount, null, DerivationPurpose.BIP84 ),
+          networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+          borderWalletAccountInfo,
+        } )
+        return borderWalletAccount
 
       case AccountType.SAVINGS_ACCOUNT:
         // if( !wallet.secondaryXpub && !wallet.details2FA ) throw new Error( 'Fail to create savings account; secondary-xpub/details2FA missing' )
@@ -1297,20 +1297,24 @@ export const createSmNResetTFAOrXPrivWatcher = createWatcher(
   CREATE_SM_N_RESETTFA_OR_XPRIV
 )
 
-export function* createBorderWalletWorker ({payload}){
-  const {primaryMnemonic, gridMnemonic, gridType} = payload
-  const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
+export function* createBorderWalletWorker ( { payload } ){
+  const { primaryMnemonic, gridMnemonic, gridType, passphrase } = payload
+  const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic, passphrase )
   const borderWalletAccountInfo: borderWalletAccountInfo = {
     generatedSeed: primarySeed,
     gridMnemonic,
     primaryMnemonic,
     gridType,
   }
-  const accountInfo: newAccountsInfo = { accountType: AccountType.BORDER_WALLET, borderWalletAccountInfo }
-  yield call(addNewAccountShellsWorker, { payload: [accountInfo] });
+  const accountInfo: newAccountsInfo = {
+    accountType: AccountType.BORDER_WALLET, borderWalletAccountInfo
+  }
+  yield call( addNewAccountShellsWorker, {
+    payload: [ accountInfo ]
+  } )
 }
 
-export const createBorderWalletWatcher = createWatcher(createBorderWalletWorker, CREATE_BORDER_WALLET)
+export const createBorderWalletWatcher = createWatcher( createBorderWalletWorker, CREATE_BORDER_WALLET )
 
 export function* restoreAccountShellsWorker( { payload: restoredAccounts } : { payload: Account[] } ) {
   const newAccountShells: AccountShell[] = []

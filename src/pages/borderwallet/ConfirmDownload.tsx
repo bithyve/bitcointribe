@@ -35,13 +35,14 @@ const ConfirmDownload = ( props ) => {
   const checksumWord = props.navigation.getParam( 'checksumWord' )
   const initialMnemonic = props.navigation.getParam( 'initialMnemonic' )
   const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
+  const passphrase = props.navigation.getParam( 'passphrase' )
   const gridType = props.navigation.getParam( 'gridType' )
   const dispatch = useDispatch()
   type ItemProps = {title: string, id: string};
   
   const onPressContinue = () => {
     if(isAccountCreation){
-        dispatch(createBorderWallet(mnemonic,initialMnemonic,gridType))
+        dispatch(createBorderWallet(mnemonic,initialMnemonic,gridType, passphrase))
         //TO-DO- BW bind this to account creation redux state
         Alert.alert("Wallet Created!", "Border Wallet has been succssefully created", [{text: "Ok", onPress: ()=> {  props.navigation.navigate('Home')}}] )
         setTimeout(()=>{
@@ -49,11 +50,11 @@ const ConfirmDownload = ( props ) => {
       },3000)
     }
     else{
-      props.navigation.navigate('NewWalletName', {
-        mnemonic, initialMnemonic, gridType
-      } ) 
+      props.navigation.navigate( 'NewWalletName', {
+        mnemonic, initialMnemonic, gridType, passphrase
+      } )
     }
-              
+
   }
   const Item = ( { title, id }: ItemProps ) => (
     <View style={styles.item}>
@@ -121,14 +122,18 @@ const ConfirmDownload = ( props ) => {
             </View>
             <Text style={styles.title}>{checksumWord.split( ' ' )[ 1 ]}</Text>
           </View>
-          {/* <View>
-            <Text style={[ styles.previewTitle, {
-              marginLeft: 5, marginTop: 10
-            } ]}>Passphrase</Text>
-            <View style={styles.passPhraseWrapper}>
-              <Text>Do not go gentle into that good night, Old age should burn and rave at close of day</Text>
-            </View>
-          </View> */}
+          {
+            passphrase !== '' && (
+              <View>
+                <Text style={[ styles.previewTitle, {
+                  marginLeft: 5, marginTop: 10
+                } ]}>Passphrase</Text>
+                <View style={styles.passPhraseWrapper}>
+                  <Text>{passphrase}</Text>
+                </View>
+              </View>
+            )
+          }
         </View>
       </View>
       <View style={styles.bottomButtonView}>
@@ -198,7 +203,7 @@ const styles = StyleSheet.create( {
   },
   buttonView: {
     padding: 15,
-    width: 120,
+    width: 150,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
