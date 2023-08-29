@@ -154,6 +154,12 @@ const HomeStack = createStackNavigator(
         header: null
       }
     },
+    ConfirmDownloadAccount: {
+      screen: ConfirmDownload,
+      navigationOptions: {
+        header: null
+      }
+    },
     ConfirmDownload: {
       screen: ConfirmDownload,
       navigationOptions: {
