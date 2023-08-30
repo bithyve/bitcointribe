@@ -8,7 +8,8 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
-  Alert
+  Alert,
+  Platform
 } from 'react-native'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -39,15 +40,17 @@ const ConfirmDownload = ( props ) => {
   const gridType = props.navigation.getParam( 'gridType' )
   const dispatch = useDispatch()
   type ItemProps = {title: string, id: string};
-  
+
   const onPressContinue = () => {
-    if(isAccountCreation){
-        dispatch(createBorderWallet(mnemonic,initialMnemonic,gridType, passphrase))
-        //TO-DO- BW bind this to account creation redux state
-        Alert.alert("Wallet Created!", "Border Wallet has been succssefully created", [{text: "Ok", onPress: ()=> {  props.navigation.navigate('Home')}}] )
-        setTimeout(()=>{
-            props.navigation.navigate('Home')
-      },3000)
+    if( isAccountCreation ){
+      dispatch( createBorderWallet( mnemonic, initialMnemonic, gridType, passphrase ) )
+      //TO-DO- BW bind this to account creation redux state
+      Alert.alert( 'Wallet Created!', 'Border Wallet has been succssefully created', [ {
+        text: 'Ok', onPress: ()=> {  props.navigation.navigate( 'Home' )}
+      } ] )
+      setTimeout( ()=>{
+        props.navigation.navigate( 'Home' )
+      }, 3000 )
     }
     else{
       props.navigation.navigate( 'NewWalletName', {
@@ -187,7 +190,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     width: '100%',
     marginHorizontal: 20,
-    height: '55%'
+    height: Platform.OS==='android'?'55%': '64%'
 
   },
   patternWrapper: {
