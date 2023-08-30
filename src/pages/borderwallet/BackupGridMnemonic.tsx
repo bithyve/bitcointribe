@@ -10,22 +10,42 @@ import {
 } from 'react-native'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
-import * as bip39 from 'bip39'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
-import BottomInfoBox from '../../components/BottomInfoBox'
 import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
 import { hp, wp } from '../../common/data/responsiveness/responsive'
-import ModalContainer from '../../components/home/ModalContainer'
-import GenerateEntropyGridModal from '../../components/border-wallet/GenerateEntropyGridModal'
 import Fonts from '../../common/Fonts'
+import { Wallet } from '../../bitcoin/utilities/Interface'
+import dbManager from '../../storage/realm/dbManager'
 
-const CreateWithBorderWallet = ( props ) => {
-  const [ headerTitle, setHeaderTitle ]=useState( 'Generate New Entropy Grid' )
+const BackupGridMnemonic = ( props ) => {
+  const [ headerTitle, setHeaderTitle ]=useState( 'Regenerate Entropy Grid' )
   const [ generateEntropyGrid, setGenerateEntropyGrid ] = useState( false )
-  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
+  const [ isAccount, setIsAccount ] = useState( false )
+  const [ borderWalletGridType, seBborderWalletGridType ] = useState( props.navigation.getParam( 'borderWalletGridType' ) )
+  const borderWalletMnemonicAccount = props.navigation.getParam( 'borderWalletMnemonic' )
+  const borderWalletGridMnemonicAccount = props.navigation.getParam( 'borderWalletGridMnemonic' )
 
-  const mnemonic =  bip39.generateMnemonic()
+
+  const wallet: Wallet =  dbManager.getWallet()
+  const walletMnemonic=  wallet.borderWalletMnemonic
+
+  const [ borderWalletGridMnemonic, setBorderWalletGridMneomnic ] = useState( '' )
+  const [ borderWalletMnemonic, setborderWalletMnemonic ] = useState( '' )
+
+  useEffect( () => {
+    if( borderWalletGridMnemonicAccount && borderWalletGridType ){
+      setBorderWalletGridMneomnic( borderWalletGridMnemonicAccount )
+      setborderWalletMnemonic( borderWalletMnemonicAccount )
+      setIsAccount( true )
+    }
+    else{
+      setBorderWalletGridMneomnic( walletMnemonic )
+      setborderWalletMnemonic( wallet.primaryMnemonic )
+      seBborderWalletGridType( wallet.borderWalletGridType )
+    }
+  }, [] )
+
 
   type ItemProps = {title: string, id: string};
   const getFormattedNumber = ( number ) => {
@@ -41,9 +61,6 @@ const CreateWithBorderWallet = ( props ) => {
     </View>
   )
 
-  useEffect( ()=>{
-    setGenerateEntropyGrid( true )
-  }, [] )
 
   return (
     <SafeAreaView
@@ -56,42 +73,33 @@ const CreateWithBorderWallet = ( props ) => {
         onPressBack={() => {
           props.navigation.goBack()
         }}
-        info1={'Step 1 of Creating with Border Wallet'}
+        info1={'Backup with Border Wallet'}
         info={'Note down these 12 word Regeneration Mnemonic'}
         selectedTitle={headerTitle}
       />
-
       <FlatList
-        data={mnemonic.split( ' ' )}
+        data={borderWalletGridMnemonic.split( ' ' )}
         renderItem={( { item, index } ) => <Item title={item} id={`${index+1}`} />}
         keyExtractor={item => item}
         numColumns={2}
       />
-      <BottomInfoBox
+      {/* <BottomInfoBox
         title={'Note'}
         infoText={'Treat these words & grid with the same degree of security that you would a Bitcoin seed phrase'}
-      />
+      /> */}
       <View style={styles.bottomButtonView}>
-        <View style={styles.statusIndicatorView}>
+        {/* <View style={styles.statusIndicatorView}>
           <View style={styles.statusIndicatorActiveView} />
           <View style={styles.statusIndicatorInactiveView} />
           <View style={styles.statusIndicatorInactiveView} />
           <View style={styles.statusIndicatorInactiveView} />
           <View style={styles.statusIndicatorInactiveView} />
-          <View style={styles.statusIndicatorInactiveView} />
-        </View>
+        </View> */}
         <View>
           <TouchableOpacity
-            onPress={() => {
-              isAccountCreation ? props.navigation.navigate( 'SelectEntropyGridTypeAccount', {
-                mnemonic,
-                isAccountCreation,
-              } ):
-              props.navigation.navigate( 'SelectEntropyGridType', {
-                mnemonic,
-                isAccountCreation,
-              } )
-            }}
+            onPress={()=> props.navigation.navigate( 'ValidateBorderWalletPattern', {
+              borderWalletMnemonic, borderWalletGridType, borderWalletGridMnemonic
+            } )}
           >
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
               start={{
@@ -102,16 +110,16 @@ const CreateWithBorderWallet = ( props ) => {
               locations={[ 0.2, 1 ]}
               style={styles.buttonView}
             >
-              <Text style={styles.buttonText}>Next</Text>
+              <Text style={styles.buttonText}>Generate Grid</Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
       </View>
-      <ModalContainer onBackground={() =>setGenerateEntropyGrid( false )}
+      {/* <ModalContainer onBackground={() =>setGenerateEntropyGrid( false )}
         visible={generateEntropyGrid}
         closeBottomSheet={() => { }}>
         <GenerateEntropyGridModal closeModal={() => setGenerateEntropyGrid( false )}/>
-      </ModalContainer>
+      </ModalContainer> */}
     </SafeAreaView>
   )
 }
@@ -143,7 +151,6 @@ const styles = StyleSheet.create( {
   },
   buttonView: {
     padding: 15,
-    width: 120,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
@@ -156,7 +163,7 @@ const styles = StyleSheet.create( {
   },
   bottomButtonView: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     paddingHorizontal: wp( 30 ),
     paddingBottom: deviceInfoModule.hasNotch() ? hp( 4 ) : hp( 3 ),
   },
@@ -178,4 +185,4 @@ const styles = StyleSheet.create( {
     marginLeft: 5,
   },
 } )
-export default CreateWithBorderWallet
+export default BackupGridMnemonic

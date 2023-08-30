@@ -14,6 +14,8 @@ import RestoreSelectedContactsList from '../pages/Recovery/RestoreSelectedContac
 import NewWalletName from '../pages/NewWalletName'
 import CreateWithBorderWallet from '../pages/borderwallet/CreateWithBorderWallet'
 import BorderWalletGridScreen from '../pages/borderwallet/BorderWalletGridScreen'
+import SelectEntropyGridType from '../pages/borderwallet/SelectEntropyGridType'
+import DownloadEncryptGrid from '../pages/borderwallet/DownloadEncryptGrid'
 import SelectChecksumWord from '../pages/borderwallet/SelectChecksumWord'
 import CreatePassPhrase from '../pages/borderwallet/CreatePassPhrase'
 import ConfirmDownload from '../pages/borderwallet/ConfirmDownload'
@@ -83,6 +85,8 @@ const SetupNavigator = createStackNavigator(
     NewWalletName,
     CreateKeeperScreen,
     CreateWithBorderWallet,
+    SelectEntropyGridType,
+    DownloadEncryptGrid,
     BorderWalletGridScreen,
     SelectChecksumWord,
     CreatePassPhrase,
