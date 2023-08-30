@@ -48,7 +48,7 @@ export default class AccountOperations {
       bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
     }, 2, network, account.nextFreeAddressIndex, false ).address
     else {
-      const purpose = getPurpose(account.derivationPath)
+      const purpose = getPurpose( account.derivationPath )
       receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network, purpose )
     }
 
@@ -448,7 +448,7 @@ export default class AccountOperations {
   }> => {
     for ( const account of Object.values( accounts ) ) {
 
-      const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
+      const purpose = account.type === AccountType.CHECKING_ACCOUNT? DerivationPurpose.BIP49: DerivationPurpose.BIP84
       const hardGapLimit = 10 // hard refresh gap limit
       const addresses = []
 
