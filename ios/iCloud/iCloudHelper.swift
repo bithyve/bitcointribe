@@ -8,11 +8,30 @@
 
 import Foundation
 import CloudKit
+import PDFKit
 
 @objc class iCloudBackup: NSObject {
   
   override init() {
     super.init()
+  }
+  
+  @objc func pdfText(filePath: String, callback: @escaping (([String]) -> Void)){
+    guard let pdfURL = URL(string: filePath) else {
+        return
+    }
+    let pdfDocument = PDFDocument(url: pdfURL)
+    var result: [String] = [];
+    if let pageCount = pdfDocument?.pageCount {
+        for pageIndex in 0..<pageCount {
+            if let pdfPage = pdfDocument?.page(at: pageIndex) {
+                if let pageText = pdfPage.string {
+                  result.append(pageText);
+                }
+            }
+        }
+    }
+    callback(result)
   }
   
   @objc func startBackup(json: String, callback: @escaping ((String) -> Void)){

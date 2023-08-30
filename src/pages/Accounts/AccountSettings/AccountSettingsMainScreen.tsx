@@ -12,12 +12,13 @@ import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateAccountSettings } from '../../../store/actions/accounts'
 import ModalContainer from '../../../components/home/ModalContainer'
-import { AccountType } from '../../../bitcoin/utilities/Interface'
+import { Account, AccountType } from '../../../bitcoin/utilities/Interface'
 import { translations } from '../../../common/content/LocContext'
 import NameNDesc from '../../../assets/images/svgs/name_desc.svg'
 import Archive from '../../../assets/images/svgs/icon_archive.svg'
 import Xpub from '../../../assets/images/svgs/xpub.svg'
 import Visibilty from '../../../assets/images/svgs/icon_visibility.svg'
+import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.ARCHIVED,
@@ -51,8 +52,10 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   const [ showAccountArchiveModal, setShowAccountArchiveModal ] = useState( false )
   const [ checkAccountModal, setCheckAccountModal ] = useState( false )
   const accountShell = useAccountShellForID( accountShellID )
-  const primarySubAccount = usePrimarySubAccountForShell( accountShell )
+  const primarySubAccount  = usePrimarySubAccountForShell( accountShell )
+  const account = useAccountByAccountShell( accountShell )
   //  const [ accountBalance, setAccountBalance ] = useState( primarySubAccount.balances )
+
 
   useEffect( () => {
     return () => {
@@ -63,7 +66,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }, [ navigation ] )
 
   const listItems = useMemo<SettingsListItem[]>( () => {
-    return [
+    const items =  [
       ...[
         {
           title: strings.NameDescription,
@@ -136,7 +139,21 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
         imageSource: () => <Archive />,
       },
     ]
-  }, [ accountShell ] )
+    if( account.type === AccountType.BORDER_WALLET ) {
+      items.push( {
+        title: 'Backup with Border Wallet',
+        subtitle: 'Check health - grid, pattern, checksum and passphrase',
+        screenName: 'BackupGridMnemonic',
+        screenParams: {
+          borderWalletGridType: account.borderWalletGridType,
+          borderWalletMnemonic: account.borderWalletMnemonic,
+          borderWalletGridMnemonic: account.borderWalletGridMnemonic,
+        },
+        imageSource: () => <NameNDesc />,
+      } )
+    }
+    return items
+  }, [ accountShell, account ] )
 
   function handleListItemPress( listItem: SettingsListItem ) {
     if ( typeof listItem.onOptionPressed === 'function' ) {

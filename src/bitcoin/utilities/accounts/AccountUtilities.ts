@@ -13,6 +13,7 @@ import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import { BH_AXIOS, SIGNING_AXIOS } from '../../../services/api'
 import idx from 'idx'
 import { generateRandomString } from '../../../common/CommonFunctions'
+import { getPurpose } from './AccountFactory'
 
 
 const { REQUEST_TIMEOUT } = config
@@ -46,13 +47,13 @@ export default class AccountUtilities {
     else return bitcoinJS.networks.bitcoin
   }
 
-  static getDerivationPath = ( type: NetworkType, accountType: AccountType, instanceNumber: number, debug?: boolean ): string => {
+  static getDerivationPath = (type: NetworkType, accountType: AccountType, instanceNumber: number, debug?: boolean, purpose: DerivationPurpose = DerivationPurpose.BIP84): string => {
     const { series, upperBound } = config.ACCOUNT_INSTANCES[ accountType ]
     if( !debug && instanceNumber > ( upperBound - 1 ) ) throw new Error( `Cannot create new instance of type ${accountType}, instace upper bound exceeds ` )
     const accountNumber = series + instanceNumber
 
-    if( type === NetworkType.TESTNET ) return `m/49'/1'/${accountNumber}'`
-    else return `m/49'/0'/${accountNumber}'`
+    if( type === NetworkType.TESTNET ) return `m/${purpose}'/1'/${accountNumber}'`
+    else return `m/${purpose}'/0'/${accountNumber}'`
   }
 
   static getKeyPair = ( privateKey: string, network: bitcoinJS.Network ): bitcoinJS.ECPairInterface =>
@@ -181,8 +182,7 @@ export default class AccountUtilities {
   static addressToPrivateKey = ( address: string, account: Account ): string => {
     const { nextFreeAddressIndex, nextFreeChangeAddressIndex, xpub, xpriv, networkType } = account
     const network = AccountUtilities.getNetworkByType( networkType )
-
-    const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
+    const purpose = getPurpose(account.derivationPath)
     const closingExtIndex = nextFreeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT : config.GAP_LIMIT )
     for ( let itr = 0; itr <= nextFreeAddressIndex + closingExtIndex; itr++ ) {
       if ( AccountUtilities.getAddressByIndex( xpub, false, itr, network, purpose ) === address )

@@ -12,7 +12,7 @@ import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 import Fonts from '../../common/Fonts'
-import { hp, wp } from '../../common/data/responsiveness/responsive'
+import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsive'
 import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
 import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
@@ -23,16 +23,19 @@ import { Wallet } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import { useDispatch } from 'react-redux'
 import { setBorderWalletBackup } from '../../store/actions/BHR'
+import SeedBacupModalContents from '../NewBHR/SeedBacupModalContents'
+import ModalContainer from '../../components/home/ModalContainer'
 
 const wordlists = bip39.wordlists.english
 
 const ValidateBorderWalletChecksum = ( props ) => {
-  const wallet: Wallet =  dbManager.getWallet()
   const words = props.navigation.getParam( 'words' )
+  const mnemonic = props.navigation.getParam( 'mnemonic' )
   const [ checksums, setChecksums ] = useState( [] )
   const [ headerTitle ] = useState( 'Select Checksum Word' )
   const [ checksumWord, setChecksumWord ] = useState( 'Select checksum word' )
   const [ showDropdown, setShowDropdown ] = useState( false )
+  const [ BWSuccessModal, setBWSuccessModal ] = useState( false )
   type ItemProps = { title: string; id: string };
   const dispatch = useDispatch()
 
@@ -93,10 +96,12 @@ const ValidateBorderWalletChecksum = ( props ) => {
 
   const onPressVerify = () => {
     const selectedWord = checksumWord.split( ' ' )[ 1 ]
-    if( selectedWord === wallet.primaryMnemonic.split( ' ' )[ 11 ] ) {
+    const mnemonicWords = mnemonic.split( ' ' )
+    if( selectedWord === mnemonicWords[ mnemonicWords.length - 1 ] ) {
       Toast( 'Checksum matched' )
       dispatch( setBorderWalletBackup( true ) )
-      props.navigation.goBack()
+      //TO-DO-BW
+      props.navigation.navigate( 'Home' )
     } else {
       Toast( 'Invalid checksum' )
     }
@@ -127,7 +132,7 @@ const ValidateBorderWalletChecksum = ( props ) => {
       </TouchableOpacity>
       <View
         style={{
-          height: '40%',
+          height: windowHeight > 800? '55%' : '36%',
         }}
       >
         {showDropdown && (
@@ -170,6 +175,22 @@ const ValidateBorderWalletChecksum = ( props ) => {
           </LinearGradient>
         </TouchableOpacity>
       </View>
+      <ModalContainer onBackground={() => setBWSuccessModal( false )} visible={BWSuccessModal}
+        closeBottomSheet={() => setBWSuccessModal( false )}>
+        <SeedBacupModalContents
+          title={'Border Wallet Backup \nSuccessful'}
+          info={'You have successfully confirmed your backup\n\nMake sure you remember the pattern you have used to generate the wallet and the grid can be produced for the same'}
+          proceedButtonText={'Continue'}
+          onPressProceed={() => {
+            setBWSuccessModal( false )
+            props.navigation.navigate( 'BackupMethods' )
+          }}
+          onPressIgnore={() => setBWSuccessModal( false )}
+          isIgnoreButton={false}
+          isBottomImage={true}
+          bottomImage={require( '../../assets/images/icons/success.png' )}
+        />
+      </ModalContainer>
     </SafeAreaView>
   )
 }

@@ -20,6 +20,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth'
 
 export default function Login( props ) {
+  const pattern = props.navigation.getParam( 'pattern' )
+  const isValidate = props.navigation.getParam( 'isValidate' ) || false
   const [ passcode, setPasscode ] = useState( '' )
   const [ passcodeFlag, setPasscodeFlag ] = useState( true )
   const [ checkAuth, setCheckAuth ] = useState( false )
@@ -60,9 +62,16 @@ export default function Login( props ) {
     }
   }, [ authenticationFailed ] )
 
-  const hardwareBackHandler = () => {
-    return true
-  } // returning true disables the hardware back button
+  const checkReloginNext = () => {
+    props.navigation.navigate( 'PreviewPattern', {
+      pattern: pattern,
+      isValidate: isValidate
+    } )
+  }
+  const loginNext = () => {
+    setCheckAuth( false )
+    dispatch( credsAuth( passcode, true ) )
+  }
 
   return (
     <SafeAreaView style={{
@@ -74,12 +83,18 @@ export default function Login( props ) {
       }}>
         <View style={{
         }}>
-          <Text style={styles.headerTitleText}>Welcome back</Text>
+          <Text style={[ styles.headerTitleText, {
+            fontSize: isValidate? RFValue( 20 ) : RFValue( 25 )
+          } ]}>{ isValidate? 'Confirm Passcode' : 'Welcome back'}</Text>
           <View>
-            <Text style={styles.headerInfoText}>
+            {isValidate?
+              <Text style={styles.headerInfoText}>Please enter your passcode to view your pattern</Text>
+              :
+              <Text style={styles.headerInfoText}>
               Please enter your{' '}
-              <Text style={styles.boldItalicText}>passcode</Text>
-            </Text>
+                <Text style={styles.boldItalicText}>passcode</Text>
+              </Text>
+            }
             <View style={{
               alignSelf: 'baseline'
             }}>
@@ -225,14 +240,11 @@ export default function Login( props ) {
               ) : null}
             </View>
           </View>
-          {passcode.length == 4 ? (
+          { passcode.length == 4 ? (
             <View>
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
-                onPress={() => {
-                  setCheckAuth( false )
-                  dispatch( credsAuth( passcode, true ) )
-                }}
+                onPress={() => isValidate? checkReloginNext() : loginNext()}
                 style={{
                   ...styles.proceedButtonView,
                   backgroundColor:
@@ -453,11 +465,6 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
   },
   proceedButtonText: {
     color: Colors.white,
@@ -477,14 +484,13 @@ const styles = StyleSheet.create( {
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue( 25 ),
     marginLeft: 20,
     marginTop: hp( '10%' ),
     fontFamily: Fonts.Regular,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue( 11 ),
     marginLeft: 20,
     fontFamily: Fonts.Regular,
   },

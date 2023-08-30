@@ -367,7 +367,9 @@ const SeedBackupHistory = ( props ) => {
           }}
           // onPressChange={() => setKeeperTypeModal( true )}
           onPressChange={() => {
-            props.navigation.navigate( 'CheckPasscode' )
+            props.navigation.navigate( 'CheckPasscode', {
+              backupType: 'seed'
+            } )
           }}
           showButton={showButton}
           changeButtonText={'Forgot'}
