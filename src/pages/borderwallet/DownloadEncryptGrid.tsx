@@ -32,39 +32,12 @@ const DownloadEncryptGrid = ( props ) => {
   const mnemonic = props.navigation.getParam( 'mnemonic' )
   const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
   const gridType = props.navigation.getParam( 'gridType' ) || GridType.WORDS
-  const [ fileSavedModal, setFileSavedModal ] = useState( false )
-
   const [ headerTitle ] = useState( 'Download grid (optional)' )
-  // const [ appState, setAppState ] = useState( AppState.currentState )
-  // const [ isMounted, setIsMounted ] = useState( true )
-  const [ filePath, setFilePath ] = useState( '' )
-
-
-  // const handleAppStateChange = ( nextAppState ) => {
-  //   if ( appState.match( /inactive|background/ ) && nextAppState === 'active' ) {
-  //     setIsMounted( true )
-  //   } else if ( appState === 'active' && nextAppState.match( /inactive|background/ ) ) {
-  //     setIsMounted( false )
-  //   }
-  //   setAppState( nextAppState )
-  // }
-  // useEffect( () => {
-  //   AppState.addEventListener( 'change', handleAppStateChange )
-  //   return () => {
-  //     AppState.removeEventListener( 'change', handleAppStateChange )
-  //   }
-  // }, [] )
 
   useEffect( () => {
     Toast( 'Entropy Grid Regenerated Successfully!' )
   }, [] )
 
-  useEffect( ()=>{
-    console.log( 'filePath', filePath )
-    if( filePath !== '' ){
-      onPressNext()
-    }
-  }, [ filePath ] )
 
   const showAlert = () => {
     Alert.alert( '', 'In the next step, Save the PDF file appropriately in a secure location', [
@@ -77,8 +50,8 @@ const DownloadEncryptGrid = ( props ) => {
       cancelable: false
     } )
   }
+
   const onPressNext = () => {
-    setFilePath( '' )
     isAccountCreation ?  props.navigation.navigate( 'BorderWalletGridScreen', {
       mnemonic, isNewWallet: true, gridType, isAccountCreation
     } ) :
@@ -104,7 +77,6 @@ const DownloadEncryptGrid = ( props ) => {
       } else {
         RNFetchBlob.android.actionViewIntent( file.filePath, 'application/pdf' )
       }
-      setFilePath( file.filePath )
     } catch ( error ) {
       console.log( error )
     }
