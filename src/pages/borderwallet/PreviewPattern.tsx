@@ -138,13 +138,6 @@ const PreviewPattern = ( { navigation } ) => {
   const rowHeaderRef = useRef()
   const [ loading, setLoading ] = useState( false )
 
-  useEffect( ()=> {
-    if( isValidate ){
-      navigation.navigate( 'ReLogin', {
-        isPasscodeCheck: true,
-      } )
-    }
-  }, [] )
 
   return (
     <SafeAreaView style={styles.viewContainer}>
@@ -157,7 +150,7 @@ const PreviewPattern = ( { navigation } ) => {
           style={[ CommonStyles.headerLeftIconContainer, styles.headerWrapper, {
           } ]}
           onPress={() => {
-            navigation.goBack()
+            isValidate ? navigation.navigate( 'ValidateBorderWalletPattern' ) : navigation.goBack()
           }}
         >
           <View style={{
@@ -176,7 +169,7 @@ const PreviewPattern = ( { navigation } ) => {
             </View>
           </View>
           <TouchableOpacity style={styles.doneBtnWrapper} onPress={() => {
-            navigation.goBack()
+            isValidate ? navigation.navigate( 'ValidateBorderWalletPattern' ): navigation.goBack()
           }}>
             <Text style={styles.doneBtnText}>Done</Text>
           </TouchableOpacity>

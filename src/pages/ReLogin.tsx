@@ -20,6 +20,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth'
 
 export default function Login( props ) {
+  const pattern = props.navigation.getParam( 'pattern' )
+  const isValidate = props.navigation.getParam( 'isValidate' ) || false
   const [ passcode, setPasscode ] = useState( '' )
   const [ passcodeFlag, setPasscodeFlag ] = useState( true )
   const [ checkAuth, setCheckAuth ] = useState( false )
@@ -60,9 +62,16 @@ export default function Login( props ) {
     }
   }, [ authenticationFailed ] )
 
-  const hardwareBackHandler = () => {
-    return true
-  } // returning true disables the hardware back button
+  const checkReloginNext = () => {
+    props.navigation.navigate( 'PreviewPattern', {
+      pattern: pattern,
+      isValidate: isValidate
+    } )
+  }
+  const loginNext = () => {
+    setCheckAuth( false )
+    dispatch( credsAuth( passcode, true ) )
+  }
 
   return (
     <SafeAreaView style={{
@@ -75,10 +84,10 @@ export default function Login( props ) {
         <View style={{
         }}>
           <Text style={[ styles.headerTitleText, {
-            fontSize: props.navigation.state.params.isPasscodeCheck? RFValue( 20 ) : RFValue( 25 )
-          } ]}>{ props.navigation.state.params.isPasscodeCheck? 'Confirm Passcode' : 'Welcome back'}</Text>
+            fontSize: isValidate? RFValue( 20 ) : RFValue( 25 )
+          } ]}>{ isValidate? 'Confirm Passcode' : 'Welcome back'}</Text>
           <View>
-            {props.navigation.state.params.isPasscodeCheck?
+            {isValidate?
               <Text style={styles.headerInfoText}>Please enter your passcode to view your pattern</Text>
               :
               <Text style={styles.headerInfoText}>
@@ -231,14 +240,11 @@ export default function Login( props ) {
               ) : null}
             </View>
           </View>
-          {passcode.length == 4 ? (
+          { passcode.length == 4 ? (
             <View>
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
-                onPress={() => {
-                  setCheckAuth( false )
-                  dispatch( credsAuth( passcode, true ) )
-                }}
+                onPress={() => isValidate? checkReloginNext() : loginNext()}
                 style={{
                   ...styles.proceedButtonView,
                   backgroundColor:
@@ -484,7 +490,7 @@ const styles = StyleSheet.create( {
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue( 11 ),
     marginLeft: 20,
     fontFamily: Fonts.Regular,
   },

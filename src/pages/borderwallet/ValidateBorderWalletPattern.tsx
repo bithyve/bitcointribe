@@ -303,7 +303,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
       } )
       selected.push( index )
     } )
-    navigation.navigate( 'PreviewPattern', {
+    navigation.navigate( 'ReLogin', {
       pattern: selected,
       isValidate: true
     } )
