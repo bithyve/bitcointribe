@@ -205,7 +205,9 @@ const WalletInitializationScreen = props => {
             </View>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => props.navigation.navigate( 'RegenerateEntropyGrid' )}
+            onPress={() => props.navigation.navigate( 'RegenerateEntropyGrid', {
+              navigation: props.navigation
+            } )}
             style={[ styles.NewWalletTouchableView, {
               alignItems: 'center'
             } ]}

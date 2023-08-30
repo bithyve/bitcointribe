@@ -6,7 +6,9 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  Platform,
+  NativeModules
 } from 'react-native'
 import Colors from '../../common/Colors'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
@@ -16,9 +18,108 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import RecoverBorderWalletModal from '../../components/border-wallet/RecoverBorderWalletModal'
 import ModalContainer from '../../components/home/ModalContainer'
 import IconUp from '../../assets/images/svgs/icon_arrow_up.svg'
+import DocumentPicker from 'react-native-document-picker'
+import MnemonicPDFError from '../../components/border-wallet/MnemonicPDFError'
+import * as bip39 from 'bip39'
+import Toast from '../../components/Toast'
+import PDFUtils from '../../nativemodules/PDFUtils'
+import { GridType } from '../../bitcoin/utilities/Interface'
+const iCloud = NativeModules.iCloud
 
 const RegenerateEntropyGrid = ( props ) => {
   const [ recoverBorderModal, setRecoverBorderModal ] = useState( false )
+  const [ mnemonicPDFErrorModal, setMnemonicPDFErrorModal ] = useState( false )
+
+  const dirtyGridTypePrediction =
+   (  data ) => {
+     let gridType = GridType.WORDS
+     const start = data.indexOf( 'ABCDEFGHIJKLMNOP' )+16
+     const rowApprox = Platform.OS === 'android'? data.slice( data.indexOf( 'A B C D E F G H I J K L M N O P' )+32, 200 ) :data.slice( start, start+50 )
+     const counts = new Map()
+     for ( const ch of rowApprox ) {
+       if( ch !== ' ' && ch !== '' ){
+         const count = counts.get( ch ) ?? 0
+         counts.set( ch, count + 1 )
+       }
+     }
+     let letterCount = 0
+     let numberCount = 0
+     counts.forEach( ( value, key ) => {
+       if( isNaN( key ) ){
+         letterCount += value
+       }else{
+         numberCount += value
+       }
+     } )
+     if( letterCount> 5 && numberCount > 5 ){
+       gridType = GridType.HEXADECIMAL
+     }else if( numberCount < 5 ){
+       gridType = GridType.WORDS
+     }else if( !letterCount ){
+       gridType = GridType.NUMBERS
+     }
+     return gridType
+   }
+
+  const extractMnemonic = async (  ) => {
+    let decodedString = ''
+    let gridType = GridType.WORDS
+
+    if( Platform.OS === 'ios' ){
+      const result = await DocumentPicker.pick( {
+        type: [ DocumentPicker.types.allFiles ],
+      } )
+      const path = result[ 0 ].uri
+      const pages = await iCloud.pdfText( path )
+      if( pages[ 0 ] ){
+        gridType = dirtyGridTypePrediction( pages[ 0 ] )
+        decodedString = pages[ 0 ]
+      }
+    }else{
+      const result = await DocumentPicker.pickSingle( {
+        copyTo: 'cachesDirectory',
+      } )
+      const path = result.fileCopyUri?.replace( 'file://', '' )
+      const pages = await PDFUtils.pdfToText( path )
+      if( pages[ 0 ] ){
+        gridType = dirtyGridTypePrediction( pages[ 0 ] )
+        decodedString = pages[ 0 ]
+      }
+    }
+    return {
+      decodedString, gridType
+    }
+  }
+
+  const pickBWGrid = async () => {
+    try {
+      const { decodedString, gridType } = await extractMnemonic()
+      const start = decodedString.indexOf( 'Recovery' )
+      if( start === -1 ){
+        setMnemonicPDFErrorModal( true )
+        return
+      }
+      const approx = decodedString.slice( start, start + 200 )
+      const words = approx.slice( approx.indexOf( ':' ) ).split( ' ' ).filter( word=>word.length > 1 ).map( word=>word.trim() )
+      const mnemonic =  words.slice( 0, 12 ).join( ' ' )
+      const isValidMnemonic = bip39.validateMnemonic( mnemonic )
+      if( isValidMnemonic ) {
+        props.navigation.navigate( 'BorderWalletGridScreen', {
+          mnemonic,
+          isNewWallet: false,
+          gridType
+        } )
+      } else {
+        Toast( 'Invalid mnemonic' )
+      }
+    } catch ( err ) {
+      console.log( err )
+      if( err.toString().includes( 'canceled' ) ){
+        return
+      }
+      Toast( 'Something went wrong!' )
+    }
+  }
 
   return (
     <View style={{
@@ -53,7 +154,9 @@ const RegenerateEntropyGrid = ( props ) => {
           <Text style={styles.subTitleText}>Import an Entropy Grid file.</Text>
         </View>
         <View style={styles.iconWrapper}>
-          <TouchableOpacity style={styles.uploadBtnWraper} onPress={()=> setRecoverBorderModal( true )}>
+          <TouchableOpacity style={styles.uploadBtnWraper} onPress={()=> {
+            pickBWGrid()
+          }}>
             <View style={styles.iconUpWrapper}>
               <IconUp/>
             </View>
@@ -62,10 +165,38 @@ const RegenerateEntropyGrid = ( props ) => {
         </View>
       </View>
       {/* Modal */}
-      <ModalContainer onBackground={() =>setRecoverBorderModal( false )}
+      <ModalContainer onBackground={() =>{}}
         visible={recoverBorderModal}
         closeBottomSheet={() => { }}>
-        <RecoverBorderWalletModal closeModal={() => setRecoverBorderModal( false )}/>
+        <RecoverBorderWalletModal closeModal={() => {
+          setRecoverBorderModal( false )
+        }}/>
+      </ModalContainer>
+      <ModalContainer
+        onBackground={()=> setMnemonicPDFErrorModal( false )}
+        visible={mnemonicPDFErrorModal}
+        closeBottomSheet={()=> setMnemonicPDFErrorModal( false )}
+      >
+        <MnemonicPDFError
+          title={'Error reading PDF, enter Regeneration Mnemonic'}
+          info={'There was an error trying to import your PDF. Alternatively, please enter the 12 words written at the bottom of each page of the PDF'}
+          otherText={'The app will regenerate the PDF with the help of these words'}
+          proceedButtonText={'Enter Words'}
+          isIgnoreButton={false}
+          closeModal={()=> setMnemonicPDFErrorModal( false )}
+          onPressProceed={() => {
+            setMnemonicPDFErrorModal( false )
+            props.navigation.navigate( 'RecoverBorderWallet' )
+          }}
+          tryAgain={()=>{
+            setMnemonicPDFErrorModal( false )
+            setTimeout( ()=>{
+              pickBWGrid()
+            }, 500 )
+          }}
+          onPressIgnore={() => {
+          }}
+        />
       </ModalContainer>
     </View>
   )

@@ -35,6 +35,8 @@ import { setOpenToApproval } from '../../store/actions/BHR'
 import LinearGradient from 'react-native-linear-gradient'
 
 export default function CheckPasscodeComponent( props ) {
+  const backupType = props.navigation.getParam( 'backupType' )
+  console.log( 'backupType', backupType )
   const dispatch = useDispatch()
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
@@ -114,7 +116,14 @@ export default function CheckPasscodeComponent( props ) {
 
   const redirectToNextScreen=()=>{
     if( creationFlag )
-      props.navigation.replace( 'BackupSeedWordsContent' )
+      if( backupType==='borderWallet' ){
+        props.navigation.navigate( 'PreviewPattern', {
+          pattern: 'saddle hospital yard autumn side ticket feed gaze hair electric husband'
+        } )
+      }else{
+        props.navigation.replace( 'BackupSeedWordsContent' )
+      }
+
   }
 
   useEffect( () => {
@@ -172,7 +181,7 @@ export default function CheckPasscodeComponent( props ) {
             <Image
               source={require( '../../assets/images/icons/icon_back.png' )}
               style={{
-                width: wp( '5%' ), height: wp( '2%' ), 
+                width: wp( '5%' ), height: wp( '2%' ),
                 tintColor: Colors.homepageButtonColor
               }}
             />

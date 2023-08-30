@@ -877,7 +877,8 @@ export interface Wallet {
     [accountType: string]: string[] // array of accountIds
   },
   version: string,
-  borderWalletMnemonic?: string
+  borderWalletMnemonic?: string,
+  borderWalletGridType?: string
 }
 
 export interface LNNode {
@@ -942,6 +943,10 @@ export interface Account {
     type: string;
   }[]
   node?: LNNode
+
+  borderWalletGridMnemonic?: string // only for account type border wallet
+  borderWalletMnemonic?: string;  //only for account type border wallet
+  borderWalletGridType?: GridType;//only for account type border walle
 }
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled
@@ -977,6 +982,7 @@ export interface DonationAccount extends Account {
 export enum AccountType {
   TEST_ACCOUNT = 'TEST_ACCOUNT',
   CHECKING_ACCOUNT = 'CHECKING_ACCOUNT',
+  CHECKING_ACCOUNT_NATIVE_SEGWIT = 'CHECKING_ACCOUNT_NATIVE_SEGWIT',
   SAVINGS_ACCOUNT = 'SAVINGS_ACCOUNT',
   DONATION_ACCOUNT = 'DONATION_ACCOUNT',
   DEPOSIT_ACCOUNT = 'DEPOSIT_ACCOUNT',
@@ -985,7 +991,8 @@ export enum AccountType {
   WYRE_ACCOUNT = 'WYRE_ACCOUNT',
   EXCHANGE_ACCOUNT = 'EXCHANGE_ACCOUNT',
   FNF_ACCOUNT = 'FNF_ACCOUNT',
-  LIGHTNING_ACCOUNT = 'LIGHTNING_ACCOUNT'
+  LIGHTNING_ACCOUNT = 'LIGHTNING_ACCOUNT',
+  BORDER_WALLET = 'BORDER_WALLET',
 }
 
 export interface Accounts {
@@ -1126,3 +1133,9 @@ export interface cloudDataInterface {
   seed?: string;
 }
 
+export enum  GridType{
+  WORDS = 'WORDS',
+  NUMBERS = 'NUMBERS',
+  HEXADECIMAL= 'HEXADECIMAL(Base64)',
+  BLANK= 'BLANK'
+}

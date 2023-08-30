@@ -26,6 +26,10 @@ export function* applyUpgradeSequence( { storedVersion, newVersion }: {storedVer
     yield call( recreateMissingAccounts )
   }
   if( semver.lt( storedVersion, '2.0.75' ) ) yield call( restoreManageBackupDataPipeline )
+  if( semver.lt( storedVersion, '2.2.2' ) ) {
+    yield call( hideWrappedSegwitAccount )
+    yield call( createCheckingAccountNativeSegWitAccount )
+  }
 }
 
 export function* testAccountEnabler( ) {
@@ -62,6 +66,38 @@ export function* accountVisibilityResetter( ) {
         accountShell: shell, settings
       } ) )
     }
+  }
+}
+
+export function* hideWrappedSegwitAccount( ) {
+  const accountShells: AccountShell[] = yield select(
+    ( state ) => state.accounts.accountShells
+  )
+
+  for( const shell of accountShells ){
+    if( shell.primarySubAccount.visibility !== AccountVisibility.HIDDEN && shell.primarySubAccount.type === AccountType.CHECKING_ACCOUNT ){
+      const settings = {
+        visibility: AccountVisibility.HIDDEN
+      }
+      yield put( updateAccountSettings( {
+        accountShell: shell, settings
+      } ) )
+    }
+  }
+}
+
+export function* createCheckingAccountNativeSegWitAccount( ) {
+
+  const accountShells: AccountShell[] = yield select(
+    ( state ) => state.accounts.accountShells
+  )
+  const hasNativeSegWitCheckingAccount = accountShells.some(
+    shell => shell.primarySubAccount.type === AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT
+  );
+
+  if (!hasNativeSegWitCheckingAccount) {
+    const accountInfo = { accountType: AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT };
+    yield call(addNewAccountShellsWorker, { payload: [accountInfo] });
   }
 }
 

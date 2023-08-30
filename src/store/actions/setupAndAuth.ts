@@ -34,11 +34,11 @@ export const credsAuth = ( passcode, reLogin? ) => {
 }
 
 
-export const setupWallet = ( walletName: string, security: { questionId: string, question: string, answer: string }, mnemonic: string, initialMnemonic='' ) => {
+export const setupWallet = ( walletName: string, security: { questionId: string, question: string, answer: string }, mnemonic: string, initialMnemonic='', gridType= '', passphrase = '' ) => {
 
   return {
     type: SETUP_WALLET, payload: {
-      walletName, security, mnemonic, initialMnemonic
+      walletName, security, mnemonic, initialMnemonic, gridType, passphrase
     }
   }
 }
