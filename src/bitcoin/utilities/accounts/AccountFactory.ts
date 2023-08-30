@@ -2,24 +2,24 @@ import { Account, AccountType, DonationAccount, MultiSigAccount, NetworkType, LN
 import crypto from 'crypto'
 import AccountUtilities from './AccountUtilities'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
-import { borderWalletAccountInfo } from '../../../store/sagas/accounts';
+import { borderWalletAccountInfo } from '../../../store/sagas/accounts'
 
-export const getPurpose = (derivationPath: string): DerivationPurpose => {
-  const purpose = parseInt(derivationPath.split('/')[1], 10);
-  switch (purpose) {
-    case DerivationPurpose.BIP84:
-      return DerivationPurpose.BIP84;
+export const getPurpose = ( derivationPath: string ): DerivationPurpose => {
+  const purpose = parseInt( derivationPath.split( '/' )[ 1 ], 10 )
+  switch ( purpose ) {
+      case DerivationPurpose.BIP84:
+        return DerivationPurpose.BIP84
 
-    case DerivationPurpose.BIP49:
-      return DerivationPurpose.BIP49;
+      case DerivationPurpose.BIP49:
+        return DerivationPurpose.BIP49
 
-    case DerivationPurpose.BIP44:
-      return DerivationPurpose.BIP44;
+      case DerivationPurpose.BIP44:
+        return DerivationPurpose.BIP44
 
-    default:
-      throw new Error(`Unsupported derivation type, purpose: ${purpose}`);
+      default:
+        throw new Error( `Unsupported derivation type, purpose: ${purpose}` )
   }
-};
+}
 
 export function generateAccount(
   {
@@ -50,9 +50,9 @@ export function generateAccount(
   try {
     const network = AccountUtilities.getNetworkByType( networkType )
     const { xpriv, xpub } = AccountUtilities.generateExtendedKeyPairFromSeed( primarySeed, network, derivationPath )
-  
+
     const id = crypto.createHash( 'sha256' ).update( xpub ).digest( 'hex' )
-    const purpose = getPurpose(derivationPath)
+    const purpose = getPurpose( derivationPath )
     const initialRecevingAddress = AccountUtilities.getAddressByIndex( xpub, false, 0, network, purpose )
     const account: Account = {
       id,
@@ -66,7 +66,7 @@ export function generateAccount(
       xpriv,
       accountName,
       accountDescription,
-      accountVisibility: AccountVisibility.DEFAULT,
+      accountVisibility: type === AccountType.TEST_ACCOUNT ? AccountVisibility.HIDDEN : AccountVisibility.DEFAULT,
       activeAddresses: {
         external: {
         },
@@ -94,14 +94,14 @@ export function generateAccount(
     if( type === AccountType.LIGHTNING_ACCOUNT ) {
       account.node = node
     }
-    if(type === AccountType.BORDER_WALLET){
+    if( type === AccountType.BORDER_WALLET ){
       account.borderWalletGridMnemonic = borderWalletAccountInfo.gridMnemonic
       account.borderWalletMnemonic = borderWalletAccountInfo.primaryMnemonic
       account.borderWalletGridType = borderWalletAccountInfo.gridType
     }
     return account
-    
-  } catch (error) {
+
+  } catch ( error ) {
   }
 
 }
