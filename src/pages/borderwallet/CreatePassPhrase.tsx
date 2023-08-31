@@ -85,7 +85,7 @@ const CreatePassPhrase = ( props ) => {
 
   const onPressSkip = ( password = '' ) => {
     if( isNewWallet ) {
-      isAccountCreation?  props.navigation.navigate( 'ConfirmDownloadAccount', {
+      isAccountCreation?  props.navigation.replace( 'ConfirmDownloadAccount', {
         selected,
         checksumWord,
         mnemonic,
@@ -93,7 +93,7 @@ const CreatePassPhrase = ( props ) => {
         gridType: props.navigation.getParam( 'gridType' ),
         isAccountCreation,
         passphrase: password
-      } ) : props.navigation.navigate( 'ConfirmDownload', {
+      } ) : props.navigation.replace( 'ConfirmDownload', {
         selected,
         checksumWord,
         mnemonic,

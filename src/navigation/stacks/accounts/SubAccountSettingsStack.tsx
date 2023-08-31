@@ -15,6 +15,11 @@ import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transacti
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
 import XPubDetailsScreen from '../../../pages/Accounts/AccountSettings/XPubDetailsScreen'
 import { translations } from '../../../common/content/LocContext'
+import CheckPasscodeComponent from '../../../pages/NewBHR/CheckPasscodeComponent'
+import PreviewPattern from '../../../pages/borderwallet/PreviewPattern'
+import ValidateBorderWalletPattern from '../../../pages/borderwallet/ValidateBorderWalletPattern'
+import ValidateBorderWalletChecksum from '../../../pages/borderwallet/ValidateBorderWalletChecksum'
+import BackupGridMnemonic from '../../../pages/borderwallet/BackupGridMnemonic'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -94,7 +99,37 @@ const SubAccountSettingsStack = createStackNavigator(
       navigationOptions: {
         title: strings[ 'TransactionDetails' ],
       },
-    }
+    },
+    BackupGridMnemonic: {
+      screen: BackupGridMnemonic,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    ValidateBorderWalletChecksum: {
+      screen: ValidateBorderWalletChecksum,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    ValidateBorderWalletPattern: {
+      screen: ValidateBorderWalletPattern,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    PreviewPattern: {
+      screen: PreviewPattern,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    CheckPasscode:{
+      screen: CheckPasscodeComponent,
+      navigationOptions:{
+        header:null
+      }
+    },
   },
   {
     initialRouteName: 'AccountSettingsMain',
