@@ -71,6 +71,7 @@ interface HomePropsTypes {
   swanDeepLinkContent: string | null;
   markAccountChecked: any;
   exchangeRates?: any[];
+  lnAcc?: AccountShell[]
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -285,16 +286,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 <IconRight/>
               </View>
             </AppBottomSheetTouchableWrapper>
-            <AppBottomSheetTouchableWrapper style={[ styles.menuWrapper, {
-              marginBottom: hp( 5 )
-            } ]} onPress={()=>
-            {
-              this.setState( {
-                visibleModal: false
-              } )
-              this.props.navigation.navigate( 'ScanNodeConfig', {
-                currentSubAccount: null,
-              } )}}>
+
+            <AppBottomSheetTouchableWrapper
+              disabled={this.props.lnAcc.length !== 0}
+              style={[ styles.menuWrapper, {
+                marginBottom: hp( 5 )
+              } ]} onPress={()=>
+              {
+                this.setState( {
+                  visibleModal: false
+                } )
+                this.props.navigation.navigate( 'ScanNodeConfig', {
+                  currentSubAccount: null,
+                } )}}>
               <View style={styles.iconWrapper}>
                 <LNIcon/>
               </View>
