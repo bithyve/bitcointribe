@@ -40,7 +40,7 @@ const DownloadEncryptGrid = ( props ) => {
 
 
   const showAlert = () => {
-    Alert.alert( '', 'In the next step, Save the PDF file appropriately in a secure location', [
+    Alert.alert( '', 'In the next step, save the PDF file appropriately in a secure location', [
       {
         text: 'OK',
         onPress: () => downloadPdf(),
