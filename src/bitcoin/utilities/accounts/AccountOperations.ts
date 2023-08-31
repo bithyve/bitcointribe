@@ -1029,7 +1029,7 @@ export default class AccountOperations {
           redeemScript = AccountUtilities.getP2SH( keyPair, network ).redeem.output
         }
 
-        if( account.type === AccountType.SWAN_ACCOUNT ){
+        if( account.type === AccountType.SWAN_ACCOUNT || getPurpose( account.derivationPath ) === DerivationPurpose.BIP84 ){
           // native segwit
           txb.sign(
             vin,
