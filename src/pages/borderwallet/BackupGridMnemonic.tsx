@@ -15,7 +15,7 @@ import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
 import { hp, wp } from '../../common/data/responsiveness/responsive'
 import Fonts from '../../common/Fonts'
-import { Wallet } from '../../bitcoin/utilities/Interface'
+import { GridType, Wallet } from '../../bitcoin/utilities/Interface'
 import dbManager from '../../storage/realm/dbManager'
 
 const BackupGridMnemonic = ( props ) => {
@@ -42,7 +42,7 @@ const BackupGridMnemonic = ( props ) => {
     else{
       setBorderWalletGridMneomnic( walletMnemonic )
       setborderWalletMnemonic( wallet.primaryMnemonic )
-      seBborderWalletGridType( wallet.borderWalletGridType )
+      seBborderWalletGridType( wallet.borderWalletGridType || GridType.WORDS )
     }
   }, [] )
 
