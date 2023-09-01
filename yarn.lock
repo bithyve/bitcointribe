@@ -9038,11 +9038,6 @@ react-native-camera@^3.35.0:
   dependencies:
     prop-types "^15.6.2"
 
-react-native-check-app-install@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/react-native-check-app-install/-/react-native-check-app-install-0.0.5.tgz#1cd5bff09a7d294af7acc88da627984654cb1b9c"
-  integrity sha512-nKUf0HcLbRGlOgSun4w2ftKZsabcwwff4GK//WwdoxG5wstqhWK1231+SKapjJY4GjoM2pI2Xv6ClTQV6e5cog==
-
 react-native-communications@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/react-native-communications/-/react-native-communications-2.2.1.tgz#7883b56b20a002eeb790c113f8616ea8692ca795"
@@ -9187,10 +9182,10 @@ react-native-level-fs@^3.0.1:
     level-filesystem "^1.0.1"
     levelup "^0.18.2"
 
-react-native-linear-gradient@^2.5.6:
-  version "2.5.6"
-  resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.5.6.tgz#96215cbc5ec7a01247a20890888aa75b834d44a0"
-  integrity sha512-HDwEaXcQIuXXCV70O+bK1rizFong3wj+5Q/jSyifKFLg0VWF95xh8XQgfzXwtq0NggL9vNjPKXa016KuFu+VFg==
+react-native-linear-gradient@^2.8.2:
+  version "2.8.2"
+  resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.8.2.tgz#9811c91751be673ef928ef4aa3ff3a70b82935d6"
+  integrity sha512-hgmCsgzd58WNcDCyPtKrvxsaoETjb/jLGxis/dmU3Aqm2u4ICIduj4ECjbil7B7pm9OnuTkmpwXu08XV2mpg8g==
 
 react-native-localize@^1.4.1:
   version "1.4.3"
@@ -9312,10 +9307,10 @@ react-native-root-toast@^3.2.1:
     prop-types "^15.5.10"
     react-native-root-siblings "^4.0.0"
 
-react-native-safe-area-context@^3.2.0:
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-3.4.1.tgz#c967a52903d55fe010b2428e5368b42f1debc0a7"
-  integrity sha512-xfpVd0CiZR7oBhuwJ2HcZMehg5bjha1Ohu1XHpcT+9ykula0TgovH2BNU0R5Krzf/jBR1LMjR6VabxdlUjqxcA==
+react-native-safe-area-context@3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-3.2.0.tgz#06113c6b208f982d68ab5c3cebd199ca93db6941"
+  integrity sha512-k2Nty4PwSnrg9HwrYeeE+EYqViYJoOFwEy9LxL5RIRfoqxAq/uQXNGwpUg2/u4gnKpBbEPa9eRh15KKMe/VHkA==
 
 react-native-safe-area-view@^0.14.9:
   version "0.14.9"
