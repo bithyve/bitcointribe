@@ -27,6 +27,7 @@ interface IntermediateStateTypes {
 
 class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTypes> {
   url: any;
+  appStateListener: any;
   constructor( props ) {
     super( props )
     this.state = {
@@ -36,7 +37,7 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
   }
 
     componentDidMount = () => {
-      AppState.addEventListener( 'change', this.handleAppStateChange )
+      this.appStateListener = AppState.addEventListener( 'change', this.handleAppStateChange )
       Linking.addEventListener( 'url', this.handleDeepLinkEvent )
       Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {
         url
@@ -167,7 +168,7 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
 
 
     componentWillUnmount() {
-      // AppState.removeEventListener( 'change', this.handleAppStateChange )
+      this.appStateListener.remove()
     }
 
 

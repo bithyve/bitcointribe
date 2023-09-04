@@ -24,7 +24,6 @@ import idx from 'idx'
 import { v4 as uuid } from 'uuid'
 import EvilIcons from 'react-native-vector-icons/EvilIcons'
 import { setIsPermissionGiven } from '../../store/actions/preferences'
-import * as Permissions from 'expo-permissions'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as ExpoContacts from 'expo-contacts'
 import ErrorModalContents from '../../components/ErrorModalContents'
@@ -204,7 +203,7 @@ const FNFToKeeper = ( props ) => {
         getContactPermission()
       }
     } else if ( Platform.OS === 'ios' ) {
-      if( ( await Permissions.getAsync( Permissions.CONTACTS ) ).status === 'undetermined' ){
+      if( ( await ExpoContacts.requestPermissionsAsync() ).status === 'undetermined' ){
         // ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
         setPermissionsModal( true )
       }
@@ -251,7 +250,7 @@ const FNFToKeeper = ( props ) => {
         getContact()
       }
     } else if ( Platform.OS === 'ios' ) {
-      const { status } = await Permissions.getAsync( Permissions.CONTACTS )
+      const { status } = await ExpoContacts.requestPermissionsAsync()
       if ( status === 'denied' ) {
         setContactPermissionIOS( false )
         setErrorMessage( strings.cannotSelect )
