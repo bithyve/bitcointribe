@@ -45,9 +45,10 @@ const ConfirmDownload = ( props ) => {
     if( isAccountCreation ){
       dispatch( createBorderWallet( mnemonic, initialMnemonic, gridType, passphrase ) )
       //TO-DO- BW bind this to account creation redux state
-      Alert.alert( 'Wallet Created!', 'Border Wallet has been succssefully created', [ {
-        text: 'Ok', onPress: ()=> {  props.navigation.navigate( 'Home' )}
-      } ] )
+      // Alert.alert( 'Wallet Created!', 'Border Wallet has been succssefully created', [ {
+      //   text: 'Ok', onPress: ()=> {  props.navigation.navigate( 'Home' )}
+      // } ] )
+      setSuccessModal( true )
       setTimeout( ()=>{
         props.navigation.navigate( 'Home' )
       }, 3000 )
@@ -159,6 +160,26 @@ const ConfirmDownload = ( props ) => {
           </TouchableOpacity>
         </View>
       </View>
+      <ModalContainer
+        onBackground={()=> setSuccessModal( false )}
+        visible={successModal}
+        closeBottomSheet={()=> setSuccessModal( false )}
+      >
+        <BorderWalletSuccessModal
+          title={'Border Wallet creation success!'}
+          info={''}
+          otherText={'Your Border Wallet has been added and is now ready for you to start using.'}
+          proceedButtonText={'Continue'}
+          isIgnoreButton={false}
+          closeModal={()=> setSuccessModal( false )}
+          onPressProceed={() => {setSuccessModal( false )}}
+          onPressIgnore={() => {
+            setSuccessModal( false )
+          }}
+          isBottomImage={true}
+          bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
+        />
+      </ModalContainer>
     </SafeAreaView>
   )
 }
