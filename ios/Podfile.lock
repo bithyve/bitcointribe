@@ -4,6 +4,24 @@ PODS:
     - React-Core
   - CocoaAsyncSocket (7.6.5)
   - DoubleConversion (1.1.6)
+  - EXApplication (5.1.1):
+    - ExpoModulesCore
+  - EXConstants (14.2.1):
+    - ExpoModulesCore
+  - EXContacts (12.2.0):
+    - ExpoModulesCore
+  - EXFileSystem (15.2.2):
+    - ExpoModulesCore
+  - EXFont (11.1.1):
+    - ExpoModulesCore
+  - Expo (48.0.20):
+    - ExpoModulesCore
+  - ExpoKeepAwake (12.0.1):
+    - ExpoModulesCore
+  - ExpoModulesCore (1.2.7):
+    - React-Core
+    - React-RCTAppDelegate
+    - ReactCommon/turbomodule/core
   - FBLazyVector (0.71.13)
   - FBReactNativeSpec (0.71.13):
     - RCT-Folly (= 2021.07.22.00)
@@ -406,8 +424,8 @@ PODS:
     - glog
   - react-native-background-timer (2.4.1):
     - React-Core
-  - react-native-blur (0.8.0):
-    - React
+  - react-native-blur (4.3.2):
+    - React-Core
   - react-native-camera (3.44.3):
     - React-Core
     - react-native-camera/RCT (= 3.44.3)
@@ -448,19 +466,14 @@ PODS:
     - React-Core
   - react-native-safe-area-context (4.7.2):
     - React-Core
-  - react-native-screen-corner-radius (0.1.1):
-    - React
   - react-native-tcp-socket (5.6.2):
     - CocoaAsyncSocket
     - React-Core
-  - react-native-udp (4.1.7):
-    - CocoaAsyncSocket
+  - react-native-video (5.2.1):
     - React-Core
-  - react-native-video (4.4.5):
-    - React
-    - react-native-video/Video (= 4.4.5)
-  - react-native-video/Video (4.4.5):
-    - React
+    - react-native-video/Video (= 5.2.1)
+  - react-native-video/Video (5.2.1):
+    - React-Core
   - react-native-view-shot (3.7.0):
     - React-Core
   - React-perflogger (0.71.13)
@@ -559,19 +572,19 @@ PODS:
     - React-Core
   - RNDeviceInfo (5.6.5):
     - React
-  - RNFBApp (14.12.0):
+  - RNFBApp (14.11.1):
     - Firebase/CoreOnly (= 8.15.0)
     - React-Core
-  - RNFBDynamicLinks (14.12.0):
+  - RNFBDynamicLinks (14.11.1):
     - Firebase/DynamicLinks (= 8.15.0)
     - GoogleUtilities/AppDelegateSwizzler
     - React-Core
     - RNFBApp
-  - RNFBMessaging (14.12.0):
+  - RNFBMessaging (14.11.1):
     - Firebase/Messaging (= 8.15.0)
     - React-Core
     - RNFBApp
-  - RNFBStorage (14.12.0):
+  - RNFBStorage (14.11.1):
     - Firebase/Storage (= 8.15.0)
     - React-Core
     - RNFBApp
@@ -579,8 +592,6 @@ PODS:
     - React-Core
   - RNLocalize (1.4.3):
     - React-Core
-  - RNOS (1.2.6):
-    - React
   - RNReanimated (2.17.0):
     - DoubleConversion
     - FBLazyVector
@@ -627,6 +638,14 @@ DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - BVLinearGradient (from `../node_modules/react-native-linear-gradient`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
+  - EXApplication (from `../node_modules/expo-application/ios`)
+  - EXConstants (from `../node_modules/expo-constants/ios`)
+  - EXContacts (from `../node_modules/expo-contacts/ios`)
+  - EXFileSystem (from `../node_modules/expo-file-system/ios`)
+  - EXFont (from `../node_modules/expo-font/ios`)
+  - Expo (from `../node_modules/expo`)
+  - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
+  - ExpoModulesCore (from `../node_modules/expo-modules-core`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/React/FBReactNativeSpec`)
   - Flipper (= 0.125.0)
@@ -692,9 +711,7 @@ DEPENDENCIES:
   - react-native-print (from `../node_modules/react-native-print`)
   - react-native-randombytes (from `../node_modules/react-native-randombytes`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
-  - react-native-screen-corner-radius (from `../node_modules/react-native-screen-corner-radius`)
   - react-native-tcp-socket (from `../node_modules/react-native-tcp-socket`)
-  - react-native-udp (from `../node_modules/react-native-udp`)
   - react-native-video (from `../node_modules/react-native-video`)
   - react-native-view-shot (from `../node_modules/react-native-view-shot`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -722,7 +739,6 @@ DEPENDENCIES:
   - "RNFBStorage (from `../node_modules/@react-native-firebase/storage`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNLocalize (from `../node_modules/react-native-localize`)
-  - RNOS (from `../node_modules/react-native-os`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNScreenshotPrevent (from `../node_modules/react-native-screenshot-prevent`)
@@ -770,6 +786,22 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-linear-gradient"
   DoubleConversion:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
+  EXApplication:
+    :path: "../node_modules/expo-application/ios"
+  EXConstants:
+    :path: "../node_modules/expo-constants/ios"
+  EXContacts:
+    :path: "../node_modules/expo-contacts/ios"
+  EXFileSystem:
+    :path: "../node_modules/expo-file-system/ios"
+  EXFont:
+    :path: "../node_modules/expo-font/ios"
+  Expo:
+    :path: "../node_modules/expo"
+  ExpoKeepAwake:
+    :path: "../node_modules/expo-keep-awake/ios"
+  ExpoModulesCore:
+    :path: "../node_modules/expo-modules-core"
   FBLazyVector:
     :path: "../node_modules/react-native/Libraries/FBLazyVector"
   FBReactNativeSpec:
@@ -846,12 +878,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-randombytes"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
-  react-native-screen-corner-radius:
-    :path: "../node_modules/react-native-screen-corner-radius"
   react-native-tcp-socket:
     :path: "../node_modules/react-native-tcp-socket"
-  react-native-udp:
-    :path: "../node_modules/react-native-udp"
   react-native-video:
     :path: "../node_modules/react-native-video"
   react-native-view-shot:
@@ -906,8 +934,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNLocalize:
     :path: "../node_modules/react-native-localize"
-  RNOS:
-    :path: "../node_modules/react-native-os"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -927,7 +953,15 @@ SPEC CHECKSUMS:
   boost: 57d2868c099736d80fcd648bf211b4431e51a558
   BVLinearGradient: 916632041121a658c704df89d99f04acb038de0f
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
-  DoubleConversion: cde416483dac037923206447da6e1454df403714
+  DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
+  EXApplication: d8f53a7eee90a870a75656280e8d4b85726ea903
+  EXConstants: f348da07e21b23d2b085e270d7b74f282df1a7d9
+  EXContacts: 9e8626eefc90c428af3d61a9e2869ac413d2569b
+  EXFileSystem: 844e86ca9b5375486ecc4ef06d3838d5597d895d
+  EXFont: 6ea3800df746be7233208d80fe379b8ed74f4272
+  Expo: b7d2843b0a0027d0ce76121a63085764355a16ed
+  ExpoKeepAwake: 69f5f627670d62318410392d03e0b5db0f85759a
+  ExpoModulesCore: 653958063a301098b541ae4dfed1ac0b98db607b
   FBLazyVector: 24e08bf294faea0abc0278abb2fcad7f3e446f6f
   FBReactNativeSpec: c949e4b726d8cf9e19b73be60ecfa26355deceb3
   Firebase: 5f8193dff4b5b7c5d5ef72ae54bb76c08e2b841d
@@ -947,7 +981,7 @@ SPEC CHECKSUMS:
   Flipper-RSocket: d9d9ade67cbecf6ac10730304bf5607266dd2541
   FlipperKit: cbdee19bdd4e7f05472a66ce290f1b729ba3cb86
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
-  glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
+  glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   GoogleDataTransport: f0308f5905a745f94fb91fea9c6cbaf3831cb1bd
   GoogleUtilities: c63691989bf362ba0505507da00eeb326192e83e
   GTMSessionFetcher: 5595ec75acf5be50814f81e9189490412bad82ba
@@ -975,7 +1009,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 7e58fe86c7cc442fd11da0c9d8bef12a8d63f771
   React-logger: a3f6ca0d018749852a2a6f07c154bfc6fcd4195a
   react-native-background-timer: 17ea5e06803401a379ebf1f20505b793ac44d0fe
-  react-native-blur: cad4d93b364f91e7b7931b3fa935455487e5c33c
+  react-native-blur: cfdad7b3c01d725ab62a8a729f42ea463998afa2
   react-native-camera: b8cc03e2feec0c04403d0998e37cf519d8fd4c6f
   react-native-config: f309b9ac19456dea12325699af51e0fa0217ce6a
   react-native-contacts: 7b5e16196278636030c3fbbb9505543984b01697
@@ -992,10 +1026,8 @@ SPEC CHECKSUMS:
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
   react-native-randombytes: 421f1c7d48c0af8dbcd471b0324393ebf8fe7846
   react-native-safe-area-context: 7aa8e6d9d0f3100a820efb1a98af68aa747f9284
-  react-native-screen-corner-radius: 57b6dea3c024035bff8377618df6e5056e6c6f27
   react-native-tcp-socket: c1b7297619616b4c9caae6889bcb0aba78086989
-  react-native-udp: df79c3cb72c4e71240cd3ce4687bfb8a137140d5
-  react-native-video: eee541262ada11bc7ffe8ec5508e6a877937c462
+  react-native-video: c26780b224543c62d5e1b2a7244a5cd1b50e8253
   react-native-view-shot: f5507655f122e6b104888a11130f267a427f0d57
   React-perflogger: 431a655960a02f01257d631b2a9bfbb02fd21064
   React-RCTActionSheet: 38c8d496d0faa63013d16f709e10a3acf6b5f100
@@ -1016,13 +1048,12 @@ SPEC CHECKSUMS:
   RNCClipboard: 3f0451a8100393908bea5c5c5b16f96d45f30bfc
   RNCPushNotificationIOS: 64218f3c776c03d7408284a819b2abfda1834bc8
   RNDeviceInfo: c5f8f3a456adcbba405ace475254b08febc4c095
-  RNFBApp: e4439717c23252458da2b41b81b4b475c86f90c4
-  RNFBDynamicLinks: 538840f6e3f58511f857d15df1bc25ed655dc283
-  RNFBMessaging: 40dac204b4197a2661dec5be964780c6ec39bf65
-  RNFBStorage: b5254c0728f704e90b0171769dfffdf4665afab7
+  RNFBApp: 9646e09d041ea159b84584865212e4cf33acd179
+  RNFBDynamicLinks: 2434510762fc77614d2f4044427c0b0ea38db413
+  RNFBMessaging: 3e2682ea5e15fe86da24d16d16019395a881f33c
+  RNFBStorage: 814adb8c5bf4ff86a0b0641d750a64d6d48d9a75
   RNGestureHandler: c0d04458598fcb26052494ae23dda8f8f5162b13
   RNLocalize: 7c7aeda16c01db7a0918981c14875c0a53be9b79
-  RNOS: 6f2f9a70895bbbfbdad7196abd952e7b01d45027
   RNReanimated: f186e85d9f28c9383d05ca39e11dd194f59093ec
   RNScreens: f7ad633b2e0190b77b6a7aab7f914fad6f198d8d
   RNScreenshotPrevent: 4ce6044ecdb37694f68a0d7cbe81ccdc39c1bca3
@@ -1033,6 +1064,6 @@ SPEC CHECKSUMS:
   Yoga: 135109c9b8c5d1a8af3a58d21cd4c7aa7f3bf555
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 6c25bb8d85a3ac581b2fd0586d88f84866553f49
+PODFILE CHECKSUM: b5dce8795692cce781195f9250f78471c4403ef0
 
 COCOAPODS: 1.12.1

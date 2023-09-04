@@ -1,4 +1,7 @@
 package io.hexawallet.hexa;
+import android.content.res.Configuration;
+import expo.modules.ApplicationLifecycleDispatcher;
+import expo.modules.ReactNativeHostWrapper;
 
 import android.app.Application;
 
@@ -10,24 +13,6 @@ import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 
-import io.hexawallet.hexa.generated.BasePackageList;
-
-import org.unimodules.adapters.react.ReactAdapterPackage;
-import org.unimodules.adapters.react.ModuleRegistryAdapter;
-import org.unimodules.adapters.react.ReactModuleRegistryProvider;
-import org.unimodules.core.interfaces.Package;
-import org.unimodules.core.interfaces.SingletonModule;
-import expo.modules.constants.ConstantsPackage;
-import expo.modules.permissions.PermissionsPackage;
-import expo.modules.filesystem.FileSystemPackage;
-
-// unimodule changes
-import io.hexawallet.hexa.generated.BasePackageList;
-import java.util.Arrays;
-import org.unimodules.adapters.react.ModuleRegistryAdapter;
-import org.unimodules.adapters.react.ReactModuleRegistryProvider;
-import org.unimodules.core.interfaces.SingletonModule;
-
 import java.util.List;
 
 import io.hexawallet.hexa.PdfPasswordPackage;
@@ -37,9 +22,7 @@ import com.facebook.react.PackageList;
 
 public class MainApplication extends Application implements ReactApplication {
 
-    private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(new BasePackageList().getPackageList(), null);
-
-    private final ReactNativeHost mReactNativeHost = new DefaultReactNativeHost(this) {
+    private final ReactNativeHost mReactNativeHost = new ReactNativeHostWrapper(this, new DefaultReactNativeHost(this) {
         @Override
         public boolean getUseDeveloperSupport() {
             return BuildConfig.DEBUG;
@@ -53,11 +36,6 @@ public class MainApplication extends Application implements ReactApplication {
             packages.add(new PdfPasswordPackage());
             packages.add(new GoogleDrivePackage());
             packages.add(new PDFPackage());
-            // Add unimodules
-            List<ReactPackage> unimodules = Arrays.<ReactPackage>asList(
-                    new ModuleRegistryAdapter(mModuleRegistryProvider)
-            );
-            packages.addAll(unimodules);
             return packages;
         }
 
@@ -74,7 +52,7 @@ public class MainApplication extends Application implements ReactApplication {
         protected Boolean isHermesEnabled() {
           return BuildConfig.IS_HERMES_ENABLED;
         }
-    };
+    });
 
     @Override
     public ReactNativeHost getReactNativeHost() {
@@ -90,5 +68,12 @@ public class MainApplication extends Application implements ReactApplication {
         DefaultNewArchitectureEntryPoint.load();
         }
         ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
-    }
+      ApplicationLifecycleDispatcher.onApplicationCreate(this);
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    ApplicationLifecycleDispatcher.onConfigurationChanged(this, newConfig);
+  }
 }

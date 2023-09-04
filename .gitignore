@@ -73,4 +73,3 @@ ios/Podfile.lock
 # VSCode
 .vscode/.react
 .vscode/settings.json
-android/app/src/main/java/io/hexawallet/hexa/generated/BasePackageList.java

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0DF76F60FB9FB773D6F11699 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F336309BA1AAAEB9081B313A /* ExpoModulesProvider.swift */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		1FD7ACE44B524CC0B1241553 /* Montserrat-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 95620CD1F8B44203A87BE6F7 /* Montserrat-SemiBold.ttf */; };
@@ -153,6 +154,7 @@
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		ED5CA33679351410597FFE38 /* libPods-HEXA Stage.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA Stage.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE6F36351DD345FAB2CDA5DE /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
+		F336309BA1AAAEB9081B313A /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-HEXA/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		F49AA80A26A0284D0097D815 /* BackgroundViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BackgroundViewController.h; sourceTree = "<group>"; };
 		F49AA80B26A0284D0097D815 /* BackgroundViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BackgroundViewController.m; sourceTree = "<group>"; };
 		F49AA80C26A0284D0097D815 /* BackgroundViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BackgroundViewController.xib; sourceTree = "<group>"; };
@@ -244,6 +246,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		43BA45D82EFBC88DE0F1F643 /* HEXA */ = {
+			isa = PBXGroup;
+			children = (
+				F336309BA1AAAEB9081B313A /* ExpoModulesProvider.swift */,
+			);
+			name = HEXA;
+			sourceTree = "<group>";
+		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -268,6 +278,7 @@
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				9FD0418BDBDF3D36477ED773 /* Pods */,
 				ED5E1CB499D246C4A53D8164 /* Resources */,
+				BD7FDE3E4639DD613FA3168F /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -295,6 +306,14 @@
 				DBD776D50B4B4FBD08A02435 /* Pods-HEXA Stage.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		BD7FDE3E4639DD613FA3168F /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				43BA45D82EFBC88DE0F1F643 /* HEXA */,
+			);
+			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		CCF1688E25FB8F990038E126 /* iCloud */ = {
@@ -604,6 +623,7 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-HEXA/Pods-HEXA-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/EXConstants/EXConstants.bundle",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
@@ -624,6 +644,7 @@
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EXConstants.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
@@ -995,6 +1016,7 @@
 				F49AA80D26A0284D0097D815 /* BackgroundViewController.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				CCF1689025FB8FC50038E126 /* iCloudHelper.swift in Sources */,
+				0DF76F60FB9FB773D6F11699 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1045,7 +1067,7 @@
 				INFOPLIST_FILE = HEXA/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
@@ -1057,6 +1079,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa2;
 				PRODUCT_NAME = "Bitcoin Tribe";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1084,7 +1107,7 @@
 				INFOPLIST_FILE = HEXA/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
@@ -1096,6 +1119,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa2;
 				PRODUCT_NAME = "Bitcoin Tribe";
 				PROVISIONING_PROFILE_SPECIFIER = "Hexa Production Dist";
@@ -1127,7 +1151,7 @@
 				INFOPLIST_FILE = "HEXA/HEXA.Dev-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe dev";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
@@ -1139,6 +1163,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.development;
 				PRODUCT_NAME = "Bitcoin Tribe Dev";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1164,7 +1189,7 @@
 				INFOPLIST_FILE = "HEXA/HEXA.Dev-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe dev";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
@@ -1176,6 +1201,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.development;
 				PRODUCT_NAME = "Bitcoin Tribe Dev";
 				PROVISIONING_PROFILE_SPECIFIER = "Hexa Development Dev";
@@ -1202,7 +1228,7 @@
 				INFOPLIST_FILE = "HEXA/HEXA.Stage-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe stag";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
@@ -1214,6 +1240,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.staging;
 				PRODUCT_NAME = "Bitcoin Tribe Stag";
 				PROVISIONING_PROFILE_SPECIFIER = "Hexa Staging Dev";
@@ -1240,7 +1267,7 @@
 				INFOPLIST_FILE = "HEXA/HEXA.Stage-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe stag";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
@@ -1252,6 +1279,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.staging;
 				PRODUCT_NAME = "Bitcoin Tribe Stag";
 				PROVISIONING_PROFILE_SPECIFIER = "Hexa Staging Dev";
@@ -1311,7 +1339,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
@@ -1367,7 +1395,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
