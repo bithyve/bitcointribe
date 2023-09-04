@@ -25,11 +25,10 @@ import { FlatList } from 'react-native-gesture-handler'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CommonStyles from '../../common/Styles/Styles'
 import RadioButton from '../../components/RadioButton'
-import * as ExpoContacts from 'expo-contacts'
+import  ExpoContacts from 'expo-contacts'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-import * as Permissions from 'expo-permissions'
 import { setIsPermissionGiven, setContactPermissionAsked } from '../../store/actions/preferences'
 import ModalContainer from '../../components/home/ModalContainer'
 import { Trusted_Contacts } from '../../bitcoin/utilities/Interface'
@@ -135,9 +134,7 @@ export default function AddContactAddressBook( props ) {
         getContact()
       }
     } else if ( Platform.OS === 'ios' ) {
-      const { status, expires, permissions } = await Permissions.askAsync(
-        Permissions.CONTACTS,
-      )
+      const { status } = await ExpoContacts.requestPermissionsAsync()
       if ( status === 'denied' ) {
         setContactPermissionIOS( false )
         setErrorMessage( strings.cannotSelect )
@@ -160,7 +157,7 @@ export default function AddContactAddressBook( props ) {
         getContactPermission()
       }
     } else if ( Platform.OS === 'ios' ) {
-      if ( ( await Permissions.getAsync( Permissions.CONTACTS ) ).status === 'undetermined' ) {
+      if ( ( await ExpoContacts.requestPermissionsAsync() ).status === 'undetermined' ) {
         setModal( true )
       }
       else {

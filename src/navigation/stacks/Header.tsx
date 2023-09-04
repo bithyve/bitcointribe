@@ -284,6 +284,7 @@ interface HomePropsTypes {
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   focusListener: any;
   appStateListener: any;
+  linkStateListener: any;
   firebaseNotificationListener: any;
   notificationOpenedListener: any;
   currentNotificationId: string;
@@ -829,7 +830,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setUpFocusListener()
       //this.getNewTransactionNotifications()
 
-      Linking.addEventListener( 'url', this.handleDeepLinkEvent )
+      this.linkStateListener = Linking.addEventListener( 'url', this.handleDeepLinkEvent )
       Linking.getInitialURL().then( this.handleDeepLinking )
 
       // call this once deeplink is detected aswell
@@ -998,10 +999,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     if ( typeof this.appStateListener === 'function' ) {
-      AppState.removeEventListener( 'change', this.appStateListener )
+      this.appStateListener.remove()
     }
 
-    Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
+    this.linkStateListener.remove()
     clearTimeout( this.openBottomSheetOnLaunchTimeout )
     if ( this.firebaseNotificationListener ) {
       this.firebaseNotificationListener()

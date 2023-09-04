@@ -6,11 +6,11 @@ import Color from '../../common/Colors'
 const Loader = ( { backgroundColor, indicatorColor, isLoading } ) => {
   const [ visibility, setVisibility ] = useState( true )
   useEffect( () => {
-    AppState.addEventListener(
+    const subscription = AppState.addEventListener(
       'change',
       onAppStateChange
     )
-    return () => AppState.removeEventListener( 'change', onAppStateChange )
+    return () => subscription.remove()
   }, [] )
 
   const  onAppStateChange = ( state ) => {
