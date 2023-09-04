@@ -208,7 +208,7 @@ function* credentialsAuthWorker( { payload } ) {
     yield put( credsAuthenticated( true ) )
     // t.stop()
     yield put( keyFetched( key ) )
-    yield put( autoSyncShells() )
+    // yield put( autoSyncShells() )
 
 
     // check if the app has been upgraded
