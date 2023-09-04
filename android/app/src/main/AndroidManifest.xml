@@ -1,6 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="io.hexawallet.hexa">
+    xmlns:tools="http://schemas.android.com/tools">
 
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
@@ -43,9 +42,9 @@
         android:exported="true"
         android:theme="@style/SplashTheme"
       android:label="@string/app_name"
-      android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
       android:screenOrientation="portrait"
       android:windowSoftInputMode="adjustResize"
+      android:exported="true"
     >
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -130,10 +129,6 @@
         <data android:scheme="@string/deeplinkScheme" />
       </intent-filter>
     </activity>
-    <activity android:exported="true" android:name="com.facebook.react.devsupport.DevSettingsActivity" />
-     <!-- <meta-data
-      android:name="com.google.firebase.messaging.default_notification_channel_id"
-      android:value="@string/default_notification_channel_id" /> -->
       <meta-data
       android:name="com.dieam.reactnativepushnotification.default_notification_channel_id"
       android:value="@string/default_notification_channel_id" />
