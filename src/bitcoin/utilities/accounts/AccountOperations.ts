@@ -450,7 +450,7 @@ export default class AccountOperations {
   }> => {
     for ( const account of Object.values( accounts ) ) {
 
-      const purpose = account.type === AccountType.CHECKING_ACCOUNT? DerivationPurpose.BIP49: DerivationPurpose.BIP84
+      const purpose = getPurpose( account.derivationPath )
       const hardGapLimit = 10 // hard refresh gap limit
       const addresses = []
 
