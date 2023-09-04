@@ -93,7 +93,7 @@ const CreatePassPhrase = ( props ) => {
         initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
         gridType: props.navigation.getParam( 'gridType' ),
         isAccountCreation,
-        passphrase: password.charAt( 0 ).toUpperCase() + password.slice( 1 )
+        passphrase: password
       } ) : props.navigation.replace( 'ConfirmDownload', {
         selected,
         checksumWord,
@@ -101,7 +101,7 @@ const CreatePassPhrase = ( props ) => {
         initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
         gridType: props.navigation.getParam( 'gridType' ),
         isAccountCreation,
-        passphrase: password.charAt( 0 ).toUpperCase() + password.slice( 1 )
+        passphrase: password
       } )
     } else {
       setShowLoader( true )
