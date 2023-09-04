@@ -4,7 +4,6 @@
 #import <RNCPushNotificationIOS.h>
 #import "HEXA-Swift.h"
 #import <React/RCTBundleURLProvider.h>
-#import "BackgroundViewController.h"
 
 @implementation AppDelegate
 
