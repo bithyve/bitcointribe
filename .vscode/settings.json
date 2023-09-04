@@ -2,17 +2,7 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
-  "eslint.validate": [
-    "javascript",
-    "typescript",
-    "typescriptreact",
-    "jsx"
-  ],
-  "java.configuration.updateBuildConfiguration": "automatic",
-  "cSpell.words": [
-    "Hexa",
-    "mergeable",
-    "uuidv"
-  ],
-  "typescript.tsdk": "${workspaceFolder}/node_modules/typescript/lib"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  // "editor.formatOnSave": true,
+  "eslint.validate": ["javascript", "typescript", "typescriptreact", "jsx"]
 }
