@@ -111,11 +111,11 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const common  = translations[ 'common' ]
 
   useEffect( () => {
-    AppState.addEventListener(
+    const subscription = AppState.addEventListener(
       'change',
       onAppStateChange
     )
-    return () => AppState.removeEventListener( 'change', onAppStateChange )
+    return () => subscription.remove()
   }, [] )
 
   const  onAppStateChange = ( state ) => {

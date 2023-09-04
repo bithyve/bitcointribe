@@ -20,12 +20,10 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize'
 import RadioButton from '../components/RadioButton'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-import * as ExpoContacts from 'expo-contacts'
+import ExpoContacts from 'expo-contacts'
 import EvilIcons from 'react-native-vector-icons/EvilIcons'
-import Contacts from 'react-native-contacts'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import { FlatList } from 'react-native-gesture-handler'
-import * as Permissions from 'expo-permissions'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../components/ErrorModalContents'
@@ -153,7 +151,7 @@ export default function ContactList( props ) {
         getContact()
       }
     } else if ( Platform.OS === 'ios' ) {
-      const { status } = await Permissions.getAsync( Permissions.CONTACTS )
+      const { status } = await ExpoContacts.requestPermissionsAsync()
       if ( status === 'denied' ) {
         setContactPermissionIOS( false )
         setErrorMessage( strings.cannotSelect )
@@ -178,7 +176,7 @@ export default function ContactList( props ) {
         getContactPermission()
       }
     } else if ( Platform.OS === 'ios' ) {
-      if( ( await Permissions.getAsync( Permissions.CONTACTS ) ).status === 'undetermined' ){
+      if( ( await ExpoContacts.requestPermissionsAsync() ).status === 'undetermined' ){
         // ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
         setPermissionsModal( true )
       }
