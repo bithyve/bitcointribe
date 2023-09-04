@@ -149,7 +149,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
     }
   }, [ primarySubAccount ] )
 
-
+  const isBorderWallet = primarySubAccount.type === AccountType.BORDER_WALLET
   const AccountKindDetailsSection: React.FC = () => {
     return (
       <View style={styles.accountKindDetailsSection}>
@@ -159,7 +159,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           // marginBottom: 4,
         }}>
           <View style={styles.accountKindBadgeImage} >
-            {getAvatarForSubAccount( primarySubAccount, false, false, true )}
+            {getAvatarForSubAccount( primarySubAccount, false, false, true, isBorderWallet )}
           </View>
           <View style={{
             marginLeft: 'auto'

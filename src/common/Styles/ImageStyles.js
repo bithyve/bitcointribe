@@ -22,6 +22,8 @@ const ListStyles = StyleSheet.create( {
   thumbnailImageLarge: {
     width: wp( 14 ),
     height: wp( 14 ),
+    alignItems: 'center',
+    justifyContent: 'center'
   },
 
   thumbnailImageXLarge: {

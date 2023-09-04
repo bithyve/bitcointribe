@@ -54,8 +54,8 @@ const getAvatarForSubAccount = (
   //     default:
   //       return require( '../../assets/images/icons/icon_qr_logo.png' )
   // }
-
-  if(isBorderWallet){
+  console.log( 'isBorderWallet', isBorderWallet )
+  if( isBorderWallet ){
     return <BorderWalletIcon/>
   }
   switch ( subAccount.kind ) {
@@ -76,7 +76,7 @@ const getAvatarForSubAccount = (
       case SubAccountKind.LIGHTNING_ACCOUNT:
         return isHome ? <LightningHexa/> : <Lightning />
       case SubAccountKind.BORDER_WALLET:
-          return isHome ? <LightningHexa/> : <Lightning />
+        return isHome ? <LightningHexa/> : <Lightning />
       case SubAccountKind.SERVICE:
         return getAvatarForServiceAccountKind( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind, isHome, isAccount )
       default:

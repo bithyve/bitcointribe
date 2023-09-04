@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
+  Platform,
 } from 'react-native'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -92,7 +93,7 @@ const CreatePassPhrase = ( props ) => {
         initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
         gridType: props.navigation.getParam( 'gridType' ),
         isAccountCreation,
-        passphrase: password
+        passphrase: password.charAt( 0 ).toUpperCase() + password.slice( 1 )
       } ) : props.navigation.replace( 'ConfirmDownload', {
         selected,
         checksumWord,
@@ -100,7 +101,7 @@ const CreatePassPhrase = ( props ) => {
         initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
         gridType: props.navigation.getParam( 'gridType' ),
         isAccountCreation,
-        passphrase: password
+        passphrase: password.charAt( 0 ).toUpperCase() + password.slice( 1 )
       } )
     } else {
       setShowLoader( true )
@@ -143,6 +144,7 @@ const CreatePassPhrase = ( props ) => {
             placeholder={'Passphrase'}
             placeholderTextColor={Colors.textColorGrey}
             value={passphrase}
+            autoCapitalize='none'
             secureTextEntry
             onChangeText={text => setpassphrase( text )}
           />
@@ -155,6 +157,7 @@ const CreatePassPhrase = ( props ) => {
             placeholder={'Confirm Passphrase'}
             placeholderTextColor={Colors.textColorGrey}
             value={confirmPassphrase}
+            autoCapitalize='none'
             onChangeText={text => setConfirmPassphrase( text )}
           />
         </View>
@@ -220,7 +223,7 @@ const styles = StyleSheet.create( {
     backgroundColor: '#FAFAFA'
   },
   textInputWrapper:{
-    height: '56%'
+    height: Platform.OS==='ios' ? '64%' : '56%'
   },
   item: {
     flexDirection: 'row',
