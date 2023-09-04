@@ -47,7 +47,7 @@ export default class AccountUtilities {
     else return bitcoinJS.networks.bitcoin
   }
 
-  static getDerivationPath = (type: NetworkType, accountType: AccountType, instanceNumber: number, debug?: boolean, purpose: DerivationPurpose = DerivationPurpose.BIP84): string => {
+  static getDerivationPath = ( type: NetworkType, accountType: AccountType, instanceNumber: number, debug?: boolean, purpose: DerivationPurpose = DerivationPurpose.BIP84 ): string => {
     const { series, upperBound } = config.ACCOUNT_INSTANCES[ accountType ]
     if( !debug && instanceNumber > ( upperBound - 1 ) ) throw new Error( `Cannot create new instance of type ${accountType}, instace upper bound exceeds ` )
     const accountNumber = series + instanceNumber
@@ -182,7 +182,7 @@ export default class AccountUtilities {
   static addressToPrivateKey = ( address: string, account: Account ): string => {
     const { nextFreeAddressIndex, nextFreeChangeAddressIndex, xpub, xpriv, networkType } = account
     const network = AccountUtilities.getNetworkByType( networkType )
-    const purpose = getPurpose(account.derivationPath)
+    const purpose = getPurpose( account.derivationPath )
     const closingExtIndex = nextFreeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT : config.GAP_LIMIT )
     for ( let itr = 0; itr <= nextFreeAddressIndex + closingExtIndex; itr++ ) {
       if ( AccountUtilities.getAddressByIndex( xpub, false, itr, network, purpose ) === address )
@@ -361,8 +361,7 @@ export default class AccountUtilities {
       value: number;
     }>
   > => {
-
-    const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
+    const purpose = getPurpose( account.derivationPath )
     for ( const output of outputs ) {
       if ( !output.address ) {
         let changeAddress: string
