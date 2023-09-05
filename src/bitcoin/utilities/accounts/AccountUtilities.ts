@@ -62,7 +62,7 @@ export default class AccountUtilities {
   static deriveAddressFromKeyPair = (
     keyPair: bip32.BIP32Interface | bitcoinJS.ECPairInterface,
     network: bitcoinJS.Network,
-    purpose: DerivationPurpose = DerivationPurpose.BIP49,
+    purpose: DerivationPurpose = DerivationPurpose.BIP84,
   ): string => {
     if ( purpose === DerivationPurpose.BIP44 ) {
       return bitcoinJS.payments.p2pkh( {
