@@ -104,6 +104,7 @@ const HomeStack = createStackNavigator(
       screen: ReLogin,
       navigationOptions: {
         gesturesEnabled: false,
+        header: null,
       },
     },
     Login,
