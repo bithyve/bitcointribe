@@ -79,6 +79,8 @@ function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): s
         return Colors.green
       case SubAccountKind.DONATION_ACCOUNT:
         return Colors.kashmirBlue
+      case SubAccountKind.BORDER_WALLET:
+        return Colors.mango
       case SubAccountKind.SERVICE:
         switch( ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind ){
             case ( ServiceAccountKind.WYRE ):
@@ -208,7 +210,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           textColor={Colors.white}
           isTestAccount={isTestAccount}
         />
-        { accountShell.primarySubAccount.type !== AccountType.SWAN_ACCOUNT &&
+        { accountShell.primarySubAccount.type !== AccountType.SWAN_ACCOUNT && !isBorderWallet &&
         <KnowMoreButton />
         }
       </View>

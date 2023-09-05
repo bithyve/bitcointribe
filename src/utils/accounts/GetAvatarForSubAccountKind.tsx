@@ -54,7 +54,6 @@ const getAvatarForSubAccount = (
   //     default:
   //       return require( '../../assets/images/icons/icon_qr_logo.png' )
   // }
-  console.log( 'isBorderWallet', isBorderWallet )
   if( isBorderWallet ){
     return <BorderWalletIcon/>
   }
