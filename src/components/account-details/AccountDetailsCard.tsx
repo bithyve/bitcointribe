@@ -70,7 +70,6 @@ function backgroundImageForAccountKind(
 }
 
 function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): string {
-  console.log( 'primarySubAccount', primarySubAccount.kind )
   switch ( primarySubAccount.kind ) {
       case SubAccountKind.TEST_ACCOUNT:
         return Colors.testAccCard
@@ -103,9 +102,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
   swanDeepLinkContent,
   navigation
 }: Props ) => {
-  console.log( 'accountShell', accountShell )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-  console.log( 'primarySubAccount', primarySubAccount )
   const [ swanModal, showSwanModal ] = useState( false )
   const dispatch = useDispatch()
   const isVisited = useSelector( ( state ) => state.swanIntegration.isVisited )
