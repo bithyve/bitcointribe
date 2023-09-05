@@ -269,12 +269,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               <Text style={styles.titleText}>Adding a wallet will appear on the Home Screen as a separate tile</Text>
             </View>
             <AppBottomSheetTouchableWrapper style={styles.menuWrapper} onPress={()=> {
+              console.log( 'log' )
               this.setState( {
                 visibleModal: false
               } )
-              this.props.navigation.navigate( 'CreateWithBorderWalletAccount', {
-                isAccountCreation: true
-              } )}}>
+              // this.props.navigation.navigate( 'CreateWithBorderWalletAccount', {
+              //   isAccountCreation: true
+              // })
+              this.props.navigation.navigate( 'ImportBorderWallet' )
+            }}
+            >
               <View style={styles.iconWrapper}>
                 <BWIcon/>
               </View>
