@@ -265,8 +265,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }} />
             </AppBottomSheetTouchableWrapper>
             <View style={styles.modalTitleWrapper}>
-              <Text style={styles.modalTitleText}>Add Account/ Wallet</Text>
-              <Text style={styles.titleText}>Adding a wallet will appear on the Home Screen as a separate tile</Text>
+              <Text style={styles.modalTitleText}>Add or Import Account / Wallet</Text>
+              <Text style={styles.titleText}>Adding or Importing a wallet will appear on the Home Screen as a separate tile</Text>
             </View>
             <AppBottomSheetTouchableWrapper style={styles.menuWrapper} onPress={()=> {
               console.log( 'log' )
@@ -283,8 +283,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 <BWIcon/>
               </View>
               <View style={styles.titleWrapper}>
-                <Text style={styles.titleText}>Add a Border Wallet</Text>
-                <Text style={styles.subTitleText}>Add a Border Wallet as an account in Tribe </Text>
+                <Text style={styles.titleText}>Add or Import a Border Wallet</Text>
+                <Text style={styles.subTitleText}>Add or Import a Border Wallet as an account in Tribe </Text>
               </View>
               <View style={styles.iconRightWrapper}>
                 <IconRight/>

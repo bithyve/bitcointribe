@@ -135,9 +135,9 @@ const ImportBorderWallet = ( props ) => {
         onPressBack={() => {
           props.navigation.goBack()
         }}
-        info1={'Border Wallet'}
-        selectedTitle={'Import Border Wallet'}
-        info={''}
+        info1={''}
+        selectedTitle={'Create / Import a Border Wallet'}
+        info={'Add or Import a Border Wallet as an account in Tribe'}
       />
       <TouchableOpacity style={styles.EntropyGridTabWrapper} onPress={()=>
         props.navigation.navigate( 'CreateWithBorderWalletAccount', {
@@ -146,7 +146,7 @@ const ImportBorderWallet = ( props ) => {
       }>
         <View style={styles.titleTextWrapper}>
           <Text style={styles.titleText}>Create New Border Wallet</Text>
-          <Text style={styles.subTitleText}></Text>
+          <Text style={styles.subTitleText}>Create a Border Wallet as an account in Tribe</Text>
         </View>
         <View style={styles.iconWrapper}>
           <ArrowRight/>
