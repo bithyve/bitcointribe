@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   TextInput,
   Platform,
+  Alert
 } from 'react-native'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -60,7 +61,18 @@ const CreatePassPhrase = ( props ) => {
   useEffect( () => {
     if( restoreSeedData == 'restoreSeedDataFailed' ){
       setLoaderModal( false )
-      Toast( 'Failed to restore' )
+      setTimeout( () => {
+        Alert.alert( 'No wallet found', 'Do you want to continue creating new wallet?', [
+          {
+            text: 'Cancel',
+            onPress: () => {},
+            style: 'cancel',
+          },
+          {
+            text: 'OK', onPress: () => continueToNextStep( '' )
+          },
+        ] )
+      }, 500 )
     }
   }, [ restoreSeedData ] )
 
@@ -84,25 +96,29 @@ const CreatePassPhrase = ( props ) => {
     }
   }
 
+  const continueToNextStep = ( password = '' ) => {
+    isAccountCreation?  props.navigation.replace( 'ConfirmDownloadAccount', {
+      selected,
+      checksumWord,
+      mnemonic,
+      initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
+      gridType: props.navigation.getParam( 'gridType' ),
+      isAccountCreation,
+      passphrase: password
+    } ) : props.navigation.replace( 'ConfirmDownload', {
+      selected,
+      checksumWord,
+      mnemonic,
+      initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
+      gridType: props.navigation.getParam( 'gridType' ),
+      isAccountCreation,
+      passphrase: password
+    } )
+  }
+
   const onPressSkip = ( password = '' ) => {
     if( isNewWallet ) {
-      isAccountCreation?  props.navigation.replace( 'ConfirmDownloadAccount', {
-        selected,
-        checksumWord,
-        mnemonic,
-        initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
-        gridType: props.navigation.getParam( 'gridType' ),
-        isAccountCreation,
-        passphrase: password
-      } ) : props.navigation.replace( 'ConfirmDownload', {
-        selected,
-        checksumWord,
-        mnemonic,
-        initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
-        gridType: props.navigation.getParam( 'gridType' ),
-        isAccountCreation,
-        passphrase: password
-      } )
+      continueToNextStep( password )
     } else {
       setShowLoader( true )
       setTimeout( () => {
