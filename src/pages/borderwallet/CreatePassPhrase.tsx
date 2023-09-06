@@ -64,12 +64,12 @@ const CreatePassPhrase = ( props ) => {
       setTimeout( () => {
         Alert.alert( 'No wallet found', 'Do you want to continue creating new wallet?', [
           {
-            text: 'Cancel',
+            text: 'No',
             onPress: () => {},
             style: 'cancel',
           },
           {
-            text: 'OK', onPress: () => continueToNextStep( '' )
+            text: 'Yes', onPress: () => continueToNextStep( '' )
           },
         ] )
       }, 500 )
