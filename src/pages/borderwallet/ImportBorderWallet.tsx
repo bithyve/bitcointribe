@@ -106,8 +106,9 @@ const ImportBorderWallet = ( props ) => {
       if( isValidMnemonic ) {
         props.navigation.navigate( 'BorderWalletGridScreen', {
           mnemonic,
-          isNewWallet: false,
-          gridType
+          isNewWallet: true,
+          gridType,
+          isAccountCreation: true
         } )
       } else {
         Toast( 'Invalid mnemonic' )
