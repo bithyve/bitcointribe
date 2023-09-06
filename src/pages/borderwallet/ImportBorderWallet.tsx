@@ -153,7 +153,7 @@ const ImportBorderWallet = ( props ) => {
           <ArrowRight/>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.EntropyGridTabWrapper} onPress={()=> props.navigation.navigate( 'RecoverBorderWallet' )}>
+      <TouchableOpacity style={styles.EntropyGridTabWrapper} onPress={()=> props.navigation.navigate( 'ImportBWGrid' )}>
         <View style={styles.titleTextWrapper}>
           <Text style={styles.titleText}>Enter Entropy Grid Regeneration Mnemonic</Text>
           <Text style={styles.subTitleText}>Enter the 12 word Entropy Grid Regeneration Mnemonic</Text>
