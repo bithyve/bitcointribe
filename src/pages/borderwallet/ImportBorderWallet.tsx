@@ -111,14 +111,14 @@ const ImportBorderWallet = ( props ) => {
           isAccountCreation: true
         } )
       } else {
-        Toast( 'Invalid mnemonic' )
+        setMnemonicPDFErrorModal( true )
       }
     } catch ( err ) {
       console.log( err )
       if( err.toString().includes( 'canceled' ) ){
         return
       }
-      Toast( 'Something went wrong!' )
+      setMnemonicPDFErrorModal( true )
     }
   }
 
