@@ -5,7 +5,7 @@ import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import CopyThisText from '../../../components/CopyThisText'
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
-import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
 import { Account,  AccountType,  MultiSigAccount, NetworkType, Wallet } from '../../../bitcoin/utilities/Interface'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
@@ -25,11 +25,12 @@ enum XpubTypes {
 }
 
 export type Props = {
+  route: any;
   navigation: any;
 };
 
-const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
-  const accountShell = useAccountShellFromNavigation( navigation )
+const XPubDetailsScreen: React.FC<Props> = ( { route, navigation }: Props ) => {
+  const accountShell = useAccountShellFromRoute( route )
   const account: Account | MultiSigAccount = useAccountByAccountShell( accountShell )
   const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
   const [ xpubs, setXpubs ] = useState( [] )

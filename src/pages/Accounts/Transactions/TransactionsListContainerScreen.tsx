@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces'
 import AccountDetailsTransactionsList from '../../../components/account-details/AccountDetailsTransactionsList'
-import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import useTransactionsForAccountShell from '../../../utils/hooks/state-selectors/accounts/UseTransactionsForAccountShell'
 import Colors from '../../../common/Colors'
 export type Props = {
@@ -11,7 +11,7 @@ export type Props = {
 
 
 const TransactionsListContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-  const accountShell = useAccountShellFromNavigation( navigation )
+  const accountShell = useAccountShellFromRoute( navigation )
   const transactions = useTransactionsForAccountShell( accountShell )
 
   function handleTransactionSelection( transaction: TransactionDescribing ) {

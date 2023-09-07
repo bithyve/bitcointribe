@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import { useDispatch } from 'react-redux'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import ListStyles from '../../../common/Styles/ListStyles'
@@ -23,6 +23,7 @@ const SELECTABLE_VISIBILITY_OPTIONS = [
 ]
 
 export type Props = {
+  route: any;
   navigation: any;
 };
 
@@ -34,9 +35,9 @@ const HeaderSection: React.FC = ( { title } ) => {
   )
 }
 
-const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { route, navigation }: Props ) => {
   const dispatch = useDispatch()
-  const accountShell = useAccountShellFromNavigation( navigation )
+  const accountShell = useAccountShellFromRoute( route )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const [ selectedVisibility, setSelectedVisibility ] = useState( primarySubAccount.visibility )
   const common  = translations[ 'common' ]
