@@ -73,6 +73,9 @@ import SelectChecksumWord from '../../../pages/borderwallet/SelectChecksumWord'
 import CreatePassPhrase from '../../../pages/borderwallet/CreatePassPhrase'
 import ConfirmDownload from '../../../pages/borderwallet/ConfirmDownload'
 import PreviewPattern from '../../../pages/borderwallet/PreviewPattern'
+import ImportBorderWallet from '../../../pages/borderwallet/ImportBorderWallet'
+import RecoverBorderWallet from '../../../pages/borderwallet/RecoverBorderWallet'
+import ImportBWGrid from '../../../pages/borderwallet/ImportBWGrid'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -102,6 +105,7 @@ const HomeStack = createStackNavigator(
       screen: ReLogin,
       navigationOptions: {
         gesturesEnabled: false,
+        header: null,
       },
     },
     Login,
@@ -114,6 +118,12 @@ const HomeStack = createStackNavigator(
     },
     ScanNodeConfig: {
       screen: ScanNodeConfig,
+      navigationOptions: {
+        header: null
+      }
+    },
+    ImportBorderWallet: {
+      screen: ImportBorderWallet,
       navigationOptions: {
         header: null
       }
@@ -168,6 +178,18 @@ const HomeStack = createStackNavigator(
     },
     PreviewPattern: {
       screen: PreviewPattern,
+      navigationOptions: {
+        header: null
+      }
+    },
+    RecoverBorderWallet:{
+      screen: RecoverBorderWallet,
+      navigationOptions: {
+        header: null
+      }
+    },
+    ImportBWGrid: {
+      screen: ImportBWGrid,
       navigationOptions: {
         header: null
       }

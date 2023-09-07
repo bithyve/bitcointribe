@@ -190,7 +190,7 @@ const PreviewPattern = ( { navigation } ) => {
                 <Text style={styles.ceilText}>{item}</Text>
               </View>
             )}
-            keyExtractor={( item ) => item}
+            // keyExtractor={( item ) => item}
           />
         </View>
       )}
@@ -218,7 +218,7 @@ const PreviewPattern = ( { navigation } ) => {
                   <Text style={styles.ceilText}>{( '000' + ( item + 1 ) ).substr( -3 )}</Text>
                 </View>
               )}
-              keyExtractor={( item ) => item.toString()}
+              // keyExtractor={( item ) => item.toString()}
             />
           </View>
 
@@ -262,7 +262,7 @@ const PreviewPattern = ( { navigation } ) => {
                   }
                   }
                   numColumns={16}
-                  keyExtractor={item => item.id}
+                  // keyExtractor={item => item.id}
                 />
               </ScrollView>
             </ScrollView>

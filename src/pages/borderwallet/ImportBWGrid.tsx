@@ -12,19 +12,18 @@ import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 import RestoreSeedPageComponent from '../RestoreHexaWithKeeper/RestoreSeedPageComponent'
 import * as bip39 from 'bip39'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
-import { recoverWalletUsingMnemonic, restoreSeedWordFailed } from '../../store/actions/BHR'
+import { restoreSeedWordFailed } from '../../store/actions/BHR'
 import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Wallet } from '../../bitcoin/utilities/Interface'
-import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import LoaderModal from '../../components/LoaderModal'
 import { translations } from '../../common/content/LocContext'
 import AlertModalContents from '../../components/AlertModalContents'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import Toast from '../../components/Toast'
 
-const RecoverBorderWallet = ( props ) => {
+const ImportBWGrid = ( props ) => {
   const [ showSeedError, setShowSeedError ] = useState( false )
   const [ showLoader, setShowLoader ] = useState( false )
   const [ loaderModal, setLoaderModal ] = useState( false )
@@ -63,15 +62,6 @@ const RecoverBorderWallet = ( props ) => {
     }
   }, [ wallet ] )
 
-  useEffect( () => {
-    if( restoreSeedData == 'restoreSeedDataFailed' ){
-      setLoaderModal( false )
-      props.navigation.navigate( 'NewWalletName', {
-        mnemonic,
-      } )
-    }
-  }, [ restoreSeedData ] )
-
   const renderSeedErrorModal = () => {
     return (
       <ErrorModalContents
@@ -88,27 +78,12 @@ const RecoverBorderWallet = ( props ) => {
     if( isValidMnemonic ) {
       props.navigation.navigate( 'BorderWalletGridScreen', {
         mnemonic,
-        isNewWallet: false
+        isNewWallet: true,
+        isAccountCreation: true
       } )
     } else {
       Toast( 'Invalid mnemonic' )
     }
-    // setShowLoader( true )
-    // setMnemonic( mnemonic )
-    // setTimeout( () => {
-    //   const isValidMnemonic = bip39.validateMnemonic( mnemonic )
-    //   if ( !isValidMnemonic ) {
-    //     setShowLoader( false )
-    //     // Alert.alert( 'Invalid mnemonic, try again!' )
-    //     setShowAlertModal( true )
-    //     return
-    //   }
-    //   setShowLoader( false )
-    //   setLoaderModal( true )
-    //   setTimeout( () => {
-    //     dispatch( recoverWalletUsingMnemonic( mnemonic ) )
-    //   }, 500 )
-    // }, 1000 )
   }
   const onBackgroundOfLoader = () => {
     setLoaderModal( false )
@@ -213,4 +188,4 @@ const RecoverBorderWallet = ( props ) => {
     </View>
   )
 }
-export default RecoverBorderWallet
+export default ImportBWGrid

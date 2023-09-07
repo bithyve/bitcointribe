@@ -28,7 +28,11 @@ import { LocalizationContext } from '../common/content/LocContext'
 import ElectrumClient from '../bitcoin/electrum/client'
 import PersonalNode from '../common/data/models/PersonalNode'
 import TestElectrumClient from '../bitcoin/electrum/test-client'
+import { predefinedMainnetNodes, predefinedTestnetNodes } from '../bitcoin/electrum/predefinedNodes'
+import TestnetElectrumClient from '../bitcoin/electrum/test-client'
+import { NetworkType } from '../bitcoin/utilities/Interface'
 // import RestClient from '../services/rest/RestClient'
+import config from '../bitcoin/HexaConfig'
 
 type LaunchScreenProps = {
   navigation: any;
@@ -55,9 +59,7 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
   }
 
   componentDidMount = async() => {
-    ElectrumClient.setActivePeer( this.props.personalNodes )
-    ElectrumClient.connect()
-    TestElectrumClient.connect()
+    this.setupElectrumClients()
     AppState.addEventListener( 'change', this.handleAppStateChange )
     Linking.addEventListener( 'url', this.handleDeepLinkEvent )
     Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {
@@ -148,62 +150,75 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
     }
   };
 
-  render() {
-    return (
-      <View style={styles.container}>
-        <Video
-          source={require( './../assets/video/splash_animation.mp4' )}
-          style={{
-            flex: 1,
-          }}
-          muted={true}
-          repeat={false}
-          resizeMode={'cover'}
-          rate={1.0}
-          ignoreSilentSwitch={'obey'}
+   setupElectrumClients = () => {
+     const defaultNodes = config.NETWORK_TYPE === NetworkType.TESTNET
+       ? predefinedTestnetNodes
+       : predefinedMainnetNodes
 
-        />
-        <StatusBar
-          backgroundColor={'white'}
-          hidden={true}
-          barStyle="dark-content"
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={this.errorBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '35%' )
-              : hp( '40%' ),
-          ]}
-          renderContent={() => (
-            <ErrorModalContents
-              title={'Login error'}
-              info={'Error while loging in, please try again'}
-              proceedButtonText={'Open Setting'}
-              isIgnoreButton={true}
-              onPressProceed={() => {
-                ( this.errorBottomSheet as any ).current.snapTo( 0 )
-              }}
-              onPressIgnore={() => {
-                ( this.errorBottomSheet as any ).current.snapTo( 0 )
-              }}
-              isBottomImage={true}
-              bottomImage={require( '../assets/images/icons/errorImage.png' )}
-            />
-          )}
-          renderHeader={() => (
-            <ModalHeader
-              onPressHeader={() => {
-                ( this.errorBottomSheet as any ).current.snapTo( 0 )
-              }}
-            />
-          )}
-        />
-      </View>
-    )
-  }
+     ElectrumClient.setActivePeer( defaultNodes, this.props.personalNodes )
+     ElectrumClient.connect()
+
+     // simultaneous instance for test account
+     TestnetElectrumClient.setActivePeer( predefinedTestnetNodes, this.props.personalNodes )
+     TestElectrumClient.connect()
+   }
+
+   render() {
+     return (
+       <View style={styles.container}>
+         <Video
+           source={require( './../assets/video/splash_animation.mp4' )}
+           style={{
+             flex: 1,
+           }}
+           muted={true}
+           repeat={false}
+           resizeMode={'cover'}
+           rate={1.0}
+           ignoreSilentSwitch={'obey'}
+
+         />
+         <StatusBar
+           backgroundColor={'white'}
+           hidden={true}
+           barStyle="dark-content"
+         />
+         <BottomSheet
+           enabledInnerScrolling={true}
+           ref={this.errorBottomSheet as any}
+           snapPoints={[
+             -50,
+             Platform.OS == 'ios' && DeviceInfo.hasNotch()
+               ? hp( '35%' )
+               : hp( '40%' ),
+           ]}
+           renderContent={() => (
+             <ErrorModalContents
+               title={'Login error'}
+               info={'Error while loging in, please try again'}
+               proceedButtonText={'Open Setting'}
+               isIgnoreButton={true}
+               onPressProceed={() => {
+                 ( this.errorBottomSheet as any ).current.snapTo( 0 )
+               }}
+               onPressIgnore={() => {
+                 ( this.errorBottomSheet as any ).current.snapTo( 0 )
+               }}
+               isBottomImage={true}
+               bottomImage={require( '../assets/images/icons/errorImage.png' )}
+             />
+           )}
+           renderHeader={() => (
+             <ModalHeader
+               onPressHeader={() => {
+                 ( this.errorBottomSheet as any ).current.snapTo( 0 )
+               }}
+             />
+           )}
+         />
+       </View>
+     )
+   }
 }
 
 const styles = StyleSheet.create( {
