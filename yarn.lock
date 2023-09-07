@@ -9987,6 +9987,11 @@ react-native-elements@^3.1.0:
     react-native-ratings "8.0.4"
     react-native-size-matters "^0.3.1"
 
+react-native-encrypted-storage@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/react-native-encrypted-storage/-/react-native-encrypted-storage-4.0.3.tgz#2a4d65459870511e8f4ccd22f02433dab7fa5e91"
+  integrity sha512-0pJA4Aj2S1PIJEbU7pN/Qvf7JIJx3hFywx+i+bLHtgK0/6Zryf1V2xVsWcrD50dfiu3jY1eN2gesQ5osGxE7jA==
+
 react-native-flipper@^0.158.0:
   version "0.158.0"
   resolved "https://registry.yarnpkg.com/react-native-flipper/-/react-native-flipper-0.158.0.tgz#e043213f0256ea196fa54cfb4af6868ea86ceff1"
@@ -10850,11 +10855,6 @@ rn-fetch-blob@^0.12.0:
     run-parallel "^1.1.2"
     semver "^5.0.1"
     xtend "^4.0.0"
-
-rn-secure-storage@2.0.8:
-  version "2.0.8"
-  resolved "https://registry.yarnpkg.com/rn-secure-storage/-/rn-secure-storage-2.0.8.tgz#ccdb0aa3e69239b77fecc3a3dee88ddfa46371e3"
-  integrity sha512-byk51qL+4GNfaBxs30TZsv3l1vXRry8Pck3q2xzwNUYfSyEdTn8NnCW2l8hOog0XEGCJdfbeFy5+EgCVnMsRAQ==
 
 rn-tooltip@^3.0.2:
   version "3.0.3"
