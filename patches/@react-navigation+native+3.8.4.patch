@@ -1,0 +1,13 @@
+diff --git a/node_modules/@react-navigation/native/lib/module/withOrientation.js b/node_modules/@react-navigation/native/lib/module/withOrientation.js
+index fbc1c0b..fdbcae0 100644
+--- a/node_modules/@react-navigation/native/lib/module/withOrientation.js
++++ b/node_modules/@react-navigation/native/lib/module/withOrientation.js
+@@ -35,7 +35,7 @@ export default function (WrappedComponent) {
+     }
+ 
+     componentWillUnmount() {
+-      Dimensions.removeEventListener('change', this.handleOrientationChange);
++      // Dimensions.removeEventListener('change', this.handleOrientationChange);
+     }
+ 
+     render() {
