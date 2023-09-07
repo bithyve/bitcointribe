@@ -294,9 +294,9 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
   }
   const onPressForgot = () => {
     const selected = []
-    const words = wallet.primaryMnemonic.split( ' ' )
+    const words = mnemonic.split( ' ' )
     words.pop()
-    const wordsGrid = generateBorderWalletGrid( gridMnemonic, gridType )
+    const wordsGrid = generateBorderWalletGrid( gridMnemonic, GridType.WORDS )
     words.forEach( word => {
       const index = wordsGrid.findIndex( g => {
         return g === word.slice( 0, 4 )
@@ -419,7 +419,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
                 <Text style={styles.ceilText}>{item}</Text>
               </View>
             )}
-            keyExtractor={( item ) => item}
+            // keyExtractor={( item ) => item}
           />
         </View>
       )}
@@ -447,7 +447,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
                   <Text style={styles.ceilText}>{( '000' + ( item + 1 ) ).substr( -3 )}</Text>
                 </View>
               )}
-              keyExtractor={( item ) => item.toString()}
+              // keyExtractor={( item ) => item.toString()}
             />
           </View>
 
@@ -500,7 +500,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
                         selected={selected}
                       />
                     )}
-                    keyExtractor={( item ) => item}
+                    // keyExtractor={( item ) => item}
                   />
                 ) )}
               </ScrollView>

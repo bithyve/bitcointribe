@@ -23,7 +23,7 @@ implements HexaSubAccountDescribing {
   accountShellID: string | null;
   instanceNumber: number;
 
-  kind: SubAccountKind = SubAccountKind.REGULAR_ACCOUNT;
+  kind: SubAccountKind = SubAccountKind.BORDER_WALLET;
   sourceKind: SourceAccountKind = SourceAccountKind.REGULAR_ACCOUNT;
   type: AccountType = AccountType.BORDER_WALLET
 

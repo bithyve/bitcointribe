@@ -8,6 +8,7 @@ import ListStyles from '../../../common/Styles/ListStyles'
 import ImageStyles from '../../../common/Styles/ImageStyles'
 import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
 import { RFValue } from 'react-native-responsive-fontsize'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
 export type Props = {
   accountShell: AccountShell;
   isActive: boolean;
@@ -24,7 +25,8 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
   setNumberOfTabs
 }: Props ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-
+  console.log( 'primarySubAccount.type0', primarySubAccount.type==AccountType.BORDER_WALLET )
+  const isBorderWallet = primarySubAccount.type === AccountType.BORDER_WALLET
   return (
     <ListItem
       activeOpacity={1}
@@ -41,7 +43,7 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
       }}
     >
       <View style={ImageStyles.thumbnailImageLarge} >
-        {getAvatarForSubAccount( primarySubAccount, false, true )}
+        {getAvatarForSubAccount( primarySubAccount, false, true, false, isBorderWallet )}
       </View>
       <ListItem.Content>
         <ListItem.Title

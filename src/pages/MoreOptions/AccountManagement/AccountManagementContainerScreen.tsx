@@ -526,8 +526,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
             >
               <View style={CommonStyles.headerLeftIconInnerContainer}>
                 <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                  name="long-arrow-left"
+                  color={Colors.homepageButtonColor}
                   size={17}
                 />
               </View>
@@ -541,7 +541,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
             alignItems: 'flex-start'
           }}>
             <HeaderTitle
-              firstLineTitle={strings[ 'AccountManagement' ]}
+              firstLineTitlse={strings[ 'AccountManagement' ]}
               secondLineTitle={strings.Rearrange}
               infoTextNormal={''}
               infoTextBold={''}

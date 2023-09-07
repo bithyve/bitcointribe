@@ -29,7 +29,11 @@ import ModalContainer from '../home/ModalContainer'
 import BottomSheetSwanInfo from '../bottom-sheets/swan/BottomSheetSwanInfo'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 import { useDispatch } from 'react-redux'
-import { clearSwanCache, isSwanVisited, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import {
+  clearSwanCache,
+  isSwanVisited,
+  updateSwanStatus,
+} from '../../store/actions/SwanIntegration'
 import { withNavigation } from 'react-navigation'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { translations } from '../../common/content/LocContext'
@@ -40,11 +44,11 @@ export type Props = {
   onKnowMorePressed: () => void;
   onSettingsPressed: () => void;
   swanDeepLinkContent: string | null;
-  navigation: any
+  navigation: any;
 };
 
 function backgroundImageForAccountKind(
-  primarySubAccount: SubAccountDescribing,
+  primarySubAccount: SubAccountDescribing
 ): ImageSourcePropType {
   switch ( primarySubAccount.kind ) {
       case SubAccountKind.TEST_ACCOUNT:
@@ -56,12 +60,14 @@ function backgroundImageForAccountKind(
       case SubAccountKind.DONATION_ACCOUNT:
         return require( '../../assets/images/carouselImages/donation_account_background.png' )
       case SubAccountKind.SERVICE:
-        switch( ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind ) {
+        switch (
+          ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind
+        ) {
             case ServiceAccountKind.WYRE:
               return require( '../../assets/images/carouselImages/wyre_account_background.png' )
-            case( ServiceAccountKind.RAMP ):
+            case ServiceAccountKind.RAMP:
               return require( '../../assets/images/carouselImages/ramp_account_background.png' )
-            case( ServiceAccountKind.SWAN ):
+            case ServiceAccountKind.SWAN:
               return require( '../../assets/images/carouselImages/swan_account_background.png' )
         }
       default:
@@ -69,7 +75,9 @@ function backgroundImageForAccountKind(
   }
 }
 
-function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): string {
+function shadowColorForAccountKind(
+  primarySubAccount: SubAccountDescribing
+): string {
   switch ( primarySubAccount.kind ) {
       case SubAccountKind.TEST_ACCOUNT:
         return Colors.testAccCard
@@ -79,13 +87,17 @@ function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): s
         return Colors.green
       case SubAccountKind.DONATION_ACCOUNT:
         return Colors.kashmirBlue
+      case SubAccountKind.BORDER_WALLET:
+        return Colors.mango
       case SubAccountKind.SERVICE:
-        switch( ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind ){
-            case ( ServiceAccountKind.WYRE ):
+        switch (
+          ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind
+        ) {
+            case ServiceAccountKind.WYRE:
               return Colors.danube
-            case ( ServiceAccountKind.RAMP ):
+            case ServiceAccountKind.RAMP:
               return Colors.riptide
-            case ( ServiceAccountKind.SWAN ):
+            case ServiceAccountKind.SWAN:
               return Colors.kashmirBlue
         }
       default:
@@ -98,7 +110,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
   onKnowMorePressed,
   onSettingsPressed,
   swanDeepLinkContent,
-  navigation
+  navigation,
 }: Props ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const [ swanModal, showSwanModal ] = useState( false )
@@ -107,19 +119,20 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const isTestAccount = useMemo( () => {
     return accountShell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT
   }, [ accountShell.primarySubAccount.kind ] )
-  const strings  = translations[ 'accounts' ]
-  const common  = translations[ 'common' ]
+  const strings = translations[ 'accounts' ]
+  const common = translations[ 'common' ]
 
   useEffect( () => {
-    AppState.addEventListener(
-      'change',
-      onAppStateChange
-    )
+    AppState.addEventListener( 'change', onAppStateChange )
     return () => AppState.removeEventListener( 'change', onAppStateChange )
   }, [] )
 
-  const  onAppStateChange = ( state ) => {
-    if( state === 'active' && ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN ) {
+  const onAppStateChange = ( state ) => {
+    if (
+      state === 'active' &&
+      ( primarySubAccount as ExternalServiceSubAccountInfo )
+        .serviceAccountKind === ServiceAccountKind.SWAN
+    ) {
       navigation.pop()
       // showSwanModal( false )
     }
@@ -127,8 +140,9 @@ const AccountDetailsCard: React.FC<Props> = ( {
   useEffect( () => {
     if (
       !primarySubAccount.isUsable &&
-        primarySubAccount.kind === SubAccountKind.SERVICE &&
-      ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
+      primarySubAccount.kind === SubAccountKind.SERVICE &&
+      ( primarySubAccount as ExternalServiceSubAccountInfo )
+        .serviceAccountKind === ServiceAccountKind.SWAN
     ) {
       dispatch( clearSwanCache() )
       dispatch( updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED ) )
@@ -138,42 +152,53 @@ const AccountDetailsCard: React.FC<Props> = ( {
       setTimeout( () => {
         showSwanModal( true )
       }, 600 )
-
     }
   }, [] )
 
   const rootContainerStyle = useMemo( () => {
     return {
       ...styles.rootContainer,
-      shadowColor: shadowColorForAccountKind( primarySubAccount ),
+      shadowColor: primarySubAccount.type === AccountType.BORDER_WALLET ? Colors.mango: shadowColorForAccountKind( primarySubAccount ),
     }
   }, [ primarySubAccount ] )
 
-
+  const isBorderWallet = primarySubAccount.type === AccountType.BORDER_WALLET
   const AccountKindDetailsSection: React.FC = () => {
     return (
       <View style={styles.accountKindDetailsSection}>
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          // marginBottom: 4,
-        }}>
-          <View style={styles.accountKindBadgeImage} >
-            {getAvatarForSubAccount( primarySubAccount, false, false, true )}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            // marginBottom: 4,
+          }}
+        >
+          <View style={styles.accountKindBadgeImage}>
+            {getAvatarForSubAccount(
+              primarySubAccount,
+              false,
+              false,
+              true,
+              isBorderWallet
+            )}
           </View>
-          <View style={{
-            marginLeft: 'auto'
-          }}>
+          <View
+            style={{
+              marginLeft: 'auto',
+            }}
+          >
             <SettingsButton />
           </View>
         </View>
 
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          marginBottom: 4,
-        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            marginBottom: 4,
+          }}
+        >
           <Text style={styles.title1Text}>
             {primarySubAccount.customDisplayName ||
               primarySubAccount.defaultTitle}
@@ -189,7 +214,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           ellipsizeMode={'tail'}
         >
           {primarySubAccount.customDescription ||
-              primarySubAccount.defaultDescription}
+            primarySubAccount.defaultDescription}
         </Text>
       </View>
     )
@@ -208,9 +233,8 @@ const AccountDetailsCard: React.FC<Props> = ( {
           textColor={Colors.white}
           isTestAccount={isTestAccount}
         />
-        { accountShell.primarySubAccount.type !== AccountType.SWAN_ACCOUNT &&
-        <KnowMoreButton />
-        }
+        {accountShell.primarySubAccount.type !== AccountType.SWAN_ACCOUNT &&
+          !isBorderWallet && <KnowMoreButton />}
       </View>
     )
   }
@@ -243,42 +267,55 @@ const AccountDetailsCard: React.FC<Props> = ( {
       >
         <Image
           source={require( '../../assets/images/icons/icon_settings.png' )}
-          style={[ styles.settingsButtonImage, {
-            tintColor: Colors.white
-          } ]}
+          style={[
+            styles.settingsButtonImage,
+            {
+              tintColor: Colors.white,
+            },
+          ]}
         />
       </TouchableOpacity>
     )
   }
 
-
   return (
     <View style={rootContainerStyle}>
-      {swanModal &&
-      <ModalContainer onBackground={()=>{showSwanModal( false )
-        setTimeout( () => {
-          showSwanModal( true )
-        }, 200 )}} visible={swanModal} closeBottomSheet={() => {}} >
-        <BottomSheetSwanInfo
-          swanDeepLinkContent={swanDeepLinkContent}
-          onClickSetting={() => {
+      {swanModal && (
+        <ModalContainer
+          onBackground={() => {
             showSwanModal( false )
+            setTimeout( () => {
+              showSwanModal( true )
+            }, 200 )
           }}
-          onPress={() => {
-            if ( !isVisited ) {
-              dispatch( isSwanVisited() )
-            }
-            showSwanModal( false )
-            navigation.pop()
-          }}
-        />
-      </ModalContainer>
-      }
-      <View style={{
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: shadowColorForAccountKind( primarySubAccount ),
-        borderRadius: 15
-      }}></View>
+          visible={swanModal}
+          closeBottomSheet={() => {}}
+        >
+          <BottomSheetSwanInfo
+            swanDeepLinkContent={swanDeepLinkContent}
+            onClickSetting={() => {
+              showSwanModal( false )
+            }}
+            onPress={() => {
+              if ( !isVisited ) {
+                dispatch( isSwanVisited() )
+              }
+              showSwanModal( false )
+              navigation.pop()
+            }}
+          />
+        </ModalContainer>
+      )}
+      <View
+        style={{
+          ...StyleSheet.absoluteFillObject,
+          backgroundColor:
+            accountShell.primarySubAccount.type === AccountType.BORDER_WALLET
+              ? Colors.mango
+              : shadowColorForAccountKind( primarySubAccount ),
+          borderRadius: 15,
+        }}
+      ></View>
       <View style={styles.mainContentContainer}>
         <AccountKindDetailsSection />
         <FooterSection />
@@ -300,7 +337,8 @@ const styles = StyleSheet.create( {
     shadowOpacity: 0.62,
     shadowRadius: 14,
     shadowOffset: {
-      width: 0, height: 10
+      width: 0,
+      height: 10,
     },
     position: 'relative',
   },
@@ -337,7 +375,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Regular,
     fontSize: RFValue( 15 ),
     color: Colors.white,
-    letterSpacing: 0.01
+    letterSpacing: 0.01,
   },
 
   title2Text: {
@@ -385,6 +423,4 @@ const styles = StyleSheet.create( {
 
 export default withNavigation( AccountDetailsCard )
 
-export {
-  shadowColorForAccountKind
-}
+export { shadowColorForAccountKind }
