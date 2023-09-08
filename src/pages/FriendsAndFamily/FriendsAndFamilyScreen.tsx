@@ -6,8 +6,6 @@ import {
   TouchableOpacity,
   ScrollView,
   RefreshControl,
-  Platform,
-  ImageBackground,
   StatusBar,
   ActivityIndicator,
   Image
@@ -25,20 +23,12 @@ import {
   syncPermanentChannels,
   PermanentChannelsSyncKind,
 } from '../../store/actions/trustedContacts'
-import {
-  REGULAR_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
 import { KeeperInfoInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import BottomSheet from 'reanimated-bottom-sheet'
-import DeviceInfo from 'react-native-device-info'
 import ModalHeader from '../../components/ModalHeader'
-import KnowMoreButton from '../../components/KnowMoreButton'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
-import { NavigationScreenConfig } from 'react-navigation'
-import { NavigationStackOptions } from 'react-navigation-stack'
-import defaultStackScreenNavigationOptions from '../../navigation/options/DefaultStackScreenNavigationOptions'
 import { ListItem } from 'react-native-elements'
 import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
 import {
@@ -49,13 +39,9 @@ import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Loader from '../../components/loader'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import RecipientAvatar from '../../components/RecipientAvatar'
-import Header from '../../navigation/stacks/Header'
 import ModalContainer from '../../components/home/ModalContainer'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { LocalizationContext } from '../../common/content/LocContext'
-import Gift from '../../assets/images/svgs/icon_gift.svg'
-import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
-import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
 import LinearGradient from 'react-native-linear-gradient'
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -86,7 +72,6 @@ class FriendsAndFamilyScreen extends React.Component<
   FriendsAndFamilyPropTypes,
   FriendsAndFamilyStateTypes
 > {
-  // static navigationOptions = makeNavigationOptions;
   static contextType = LocalizationContext
 
   addContactAddressBookBottomSheetRef: React.RefObject<BottomSheet>;
@@ -320,7 +305,6 @@ class FriendsAndFamilyScreen extends React.Component<
           style={styles.closeButton}
         >
           <FontAwesome name="close" color={Colors.white} size={19} style={{
-            // marginTop: hp( 0.5 )
           }} />
         </TouchableOpacity>
         <Text style={styles.title}>Add Friends & Family</Text>
@@ -337,13 +321,10 @@ class FriendsAndFamilyScreen extends React.Component<
               width: 18,
               height: 18,
               borderRadius: 9,
-              // borderWidth: 0.3,
-              // borderColor: Colors.borderColor,
               backgroundColor: Colors.white,
               justifyContent: 'center',
               alignItems: 'center',
               elevation: 10,
-              // shadowColor: Colors.gray,
               shadowOpacity: 0.1,
               shadowOffset: {
                 width: 1, height: 1
@@ -371,7 +352,6 @@ class FriendsAndFamilyScreen extends React.Component<
             }
 
             <View style={{
-              // width: '70%',
               flex: 1,
             }} >
               <Text style={{
@@ -386,10 +366,6 @@ class FriendsAndFamilyScreen extends React.Component<
               </Text>
             </View>
           </View>
-          {/* {isSelected && ( */}
-
-
-          {/* )} */}
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => this.setState( {
@@ -415,7 +391,6 @@ class FriendsAndFamilyScreen extends React.Component<
               source={require( '../../assets/images/icons/icon_f&F_white.png' )}
             />
             <View style={{
-              // width: '70%',
               flex: 1
             }} >
 
@@ -442,11 +417,9 @@ class FriendsAndFamilyScreen extends React.Component<
             width: '95%',  height: hp( '12%' ),
             alignSelf: 'center', justifyContent: 'center',
             borderRadius: wp( '4' ),
-            // marginVertical: hp( '3%' )
           }}>
           <View style={{
             flexDirection:'row',
-            // alignItems: 'center',
             alignItems: 'center',
             justifyContent: 'center',
             marginHorizontal: wp( '5%' ),
@@ -470,10 +443,6 @@ class FriendsAndFamilyScreen extends React.Component<
                     Gift Sats when sending invite Gift Sats when sending invite Gift Sats when sending invite
             </Text>
           </View>
-          {/* {isSelected && ( */}
-
-
-          {/* )} */}
         </TouchableOpacity>
         {this.setButtonVisible()}
       </View>
@@ -499,11 +468,7 @@ class FriendsAndFamilyScreen extends React.Component<
           ...styles.buttonView, elevation: 5
         }}
       >
-        {/* {!loading.initializing ? ( */}
         <Text style={styles.buttonText}>Proceed</Text>
-        {/* ) : (
-          <ActivityIndicator size="small" />
-        )} */}
       </TouchableOpacity>
     )
   }
@@ -523,12 +488,6 @@ class FriendsAndFamilyScreen extends React.Component<
         backgroundColor: Colors.darkBlue
       }}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        {/* <Header fromScreen={'F&F'} /> */}
-        {/* {addFnF && */}
-        {/* <ModalContainer visible={addFnF} closeBottomSheet={() => {}}>
-          {this.renderAddFnFModal()}
-        </ModalContainer> */}
-        {/* } */}
         <View style={styles.accountCardsSectionContainer}>
           {showIndicator &&
             <ModalContainer onBackground={()=>this.setState( {
@@ -537,25 +496,6 @@ class FriendsAndFamilyScreen extends React.Component<
               <ActivityIndicator color={Colors.white} size='large'/>
             </ModalContainer>
           }
-
-          {/* <View style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              paddingVertical: wp( 4 ),
-              paddingHorizontal: wp( 4 ),
-              alignItems: 'center'
-            }}>
-              <Text style={{
-                color: Colors.blue,
-                fontSize: RFValue( 16 ),
-                marginLeft: 2,
-                fontFamily: Fonts.Medium,
-
-              }}>
-              My Accounts
-              </Text>
-              <ToggleContainer />
-            </View> */}
           <View style={{
             flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: hp( 3.5 ), marginRight: wp( 6 )
           }}>
@@ -612,53 +552,6 @@ class FriendsAndFamilyScreen extends React.Component<
               flex: 1,
             }}
           >
-            {/* <TouchableOpacity
-              onPress={() => this.props.navigation.navigate( 'ManageGifts' )}
-              style={{
-                width: '90%',
-                // height: '54%',
-                backgroundColor: Colors.gray7,
-                shadowOpacity: 0.06,
-                shadowOffset: {
-                  width: 10, height: 10
-                },
-                shadowRadius: 10,
-                elevation: 2,
-                alignSelf: 'center',
-                borderRadius: wp( 2 ),
-                marginTop: hp( 3 ),
-                marginBottom: hp( 1 ),
-                paddingVertical: hp( 4 ),
-                paddingHorizontal: wp( 4.5 )
-              }}>
-              <View style={[ styles.subInfo, {
-              } ]}>
-                <CheckingAcc />
-                <View style={{
-                  flex: 1, marginHorizontal: wp( 2 )
-                }}>
-                  <Text style={[ styles.pageTitle, {
-                    fontSize: RFValue( 11 ),
-                    marginHorizontal: wp ( 0 ),
-                  } ]}>
-                    {this.strings[
-                      'giftsats'
-                    ]}
-                  </Text>
-                  <Text style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.Regular,
-                    marginTop: 3,
-                    width: '85%',
-                  }}>
-                    {this.strings[ 'giftSubTextF&F' ]}
-                  </Text>
-
-                </View>
-                <RightArrow />
-              </View>
-            </TouchableOpacity> */}
             <View style={{
               marginTop: wp( '5%' )
             }}>
@@ -704,7 +597,6 @@ class FriendsAndFamilyScreen extends React.Component<
               keepers.length == 0 &&
             keeping.length == 0 &&
             otherContacts.length == 0 && (
-                // feature/2.0
                 <BottomInfoBox
                   backgroundColor={Colors.white}
                   title={'Note'}
@@ -713,7 +605,6 @@ class FriendsAndFamilyScreen extends React.Component<
                   }
                 />
               )}
-            {/* </View> */}
 
           </ScrollView>
         </View>
@@ -751,13 +642,10 @@ const styles = StyleSheet.create( {
     width: 18,
     height: 18,
     borderRadius: 9,
-    // borderWidth: 0.3,
-    // borderColor: Colors.borderColor,
     backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 10,
-    // shadowColor: Colors.gray,
     shadowOpacity: 0.1,
     shadowOffset: {
       width: 1, height: 1
@@ -835,7 +723,6 @@ const styles = StyleSheet.create( {
   },
   accountCardsSectionContainer: {
     height: hp( '71.46%' ),
-    // marginTop: 30,
     backgroundColor: Colors.backgroundColor1,
     opacity: 1,
     borderTopLeftRadius: 25,
@@ -849,12 +736,9 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-around'
   },
   contactText: {
-    // marginLeft: 10,
-    // marginHorizontal: wp ( 1 ),
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.Regular,
-    color: Colors.white,
-    // padding: wp( 2 )
+    color: Colors.white
   },
   phoneText: {
     marginTop: 3,
@@ -864,21 +748,11 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
   },
   selectedContactsView: {
-    // marginLeft: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    // marginRight: 20,
-    // marginTop: 5,
-    // paddingBottom: 15,
-    // paddingTop: 15,
-    // borderBottomWidth: 1,
-    // borderColor: Colors.borderColor,
     backgroundColor: Colors.blue,
     borderRadius: wp ( 2 ),
-    // width: wp( 22 )
-    // padding: wp( 1 ),
-    //width: wp( 24 ),
     height: hp( 4 ),
     paddingHorizontal: wp( 2 )
   },
@@ -886,7 +760,6 @@ const styles = StyleSheet.create( {
     color: Colors.THEAM_TEXT_COLOR,
     fontSize: RFValue( 16 ),
     letterSpacing: 0.54,
-    // fontFamily: Fonts.Regular,
     fontFamily: Fonts.SemiBold,
     alignItems: 'center',
     marginHorizontal: wp ( 4 ),
@@ -902,7 +775,6 @@ const styles = StyleSheet.create( {
   cardTitle: {
     color: Colors.blue,
     fontSize: RFValue( 12 ),
-    // fontFamily: Fonts.Regular,
     fontFamily: Fonts.Medium,
     marginVertical: wp( 2 ),
     marginHorizontal: wp( 4 )
@@ -957,17 +829,3 @@ const styles = StyleSheet.create( {
     height: wp( '10%' ),
   }
 } )
-
-function makeNavigationOptions( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> {
-  return {
-    ...defaultStackScreenNavigationOptions,
-
-    title: 'Friends & Family',
-
-    headerRight: () => {
-      return (
-        <KnowMoreButton onpress={navigation.getParam( 'toggleKnowMoreSheet' )} />
-      )
-    },
-  }
-}

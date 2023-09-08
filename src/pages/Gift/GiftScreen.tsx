@@ -2,9 +2,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
-  ImageBackground,
   Platform,
-  RefreshControl,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -22,12 +20,10 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 
-import Add_gifts from '../../assets/images/satCards/Add_gifts.svg'
 import Add from '../../assets/images/svgs/add.svg'
 
 import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
 import AlertModalContents from '../../components/AlertModalContents'
-import BottomInfoBox from '../../components/BottomInfoBox'
 import BottomSheet from 'reanimated-bottom-sheet'
 import { CKTapCard } from 'cktap-protocol-react-native'
 import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
@@ -45,32 +41,22 @@ import Gift from '../../assets/images/svgs/icon_gift.svg'
 import GiftBoxComponent from './GiftBoxCmponent'
 import GiftUnwrappedComponent from './GiftUnwrappedComponent'
 import Gifts from '../../assets/images/satCards/gifts.svg'
-import Header from '../../navigation/stacks/Header'
 import ImageStyles from '../../common/Styles/ImageStyles'
-import KnowMoreButton from '../../components/KnowMoreButton'
 import { ListItem } from 'react-native-elements'
 import Loader from '../../components/loader'
 import { LocalizationContext } from '../../common/content/LocContext'
 import ModalContainer from '../../components/home/ModalContainer'
 import ModalHeader from '../../components/ModalHeader'
-import { NavigationScreenConfig } from 'react-navigation'
-import { NavigationStackOptions } from 'react-navigation-stack'
 import NfcPrompt from './NfcPromptAndroid'
-import {
-  REGULAR_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
 import { RFValue } from 'react-native-responsive-fontsize'
 import React from 'react'
 import RecipientAvatar from '../../components/RecipientAvatar'
-import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
 import Sat_card from '../../assets/images/satCards/sats_card.svg'
-import SeedBacupModalContents from '../NewBHR/SeedBacupModalContents'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import ToggleContainer from '../FriendsAndFamily/CurrencyToggle'
 import VerifySatModalContents from './VerifySatModalContents'
 import axios from 'axios'
 import { connect } from 'react-redux'
-import defaultStackScreenNavigationOptions from '../../navigation/options/DefaultStackScreenNavigationOptions'
 import idx from 'idx'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 
@@ -112,7 +98,6 @@ class GiftScreen extends React.Component<
   GiftPropTypes,
   GiftStateTypes
 > {
-  // static navigationOptions = makeNavigationOptions;
   static contextType = LocalizationContext
 
   addContactAddressBookBottomSheetRef: React.RefObject<BottomSheet>;
@@ -121,7 +106,6 @@ class GiftScreen extends React.Component<
   card: CKTapCard;
   strings: object;
 
-  // card = useRef( new CKTapCard() ).current
   constructor( props, context ) {
     super( props, context )
 
@@ -718,17 +702,6 @@ class GiftScreen extends React.Component<
             marginHorizontal: 39, fontSize: RFValue( 11 ), color: Colors.THEAM_INFO_TEXT_COLOR, fontFamily: Fonts.Ragular, marginTop: 18
           }}>{'Give sats as gifts to your friends and family, view and manage created gifts.'}</Text>
           <ScrollView
-            // refreshControl={
-            //   <RefreshControl
-            //     refreshing={showLoader}
-            //     onRefresh={() => {
-            //       syncPermanentChannels( {
-            //         permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
-            //         metaSync: true
-            //       } )
-            //     }}
-            //   />
-            // }
             contentContainerStyle={{
               // flex: 1,
               paddingHorizontal: 38, paddingBottom: 20
@@ -1072,16 +1045,3 @@ const styles = StyleSheet.create( {
   }
 } )
 
-function makeNavigationOptions( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> {
-  return {
-    ...defaultStackScreenNavigationOptions,
-
-    title: 'Friends & Family',
-
-    headerRight: () => {
-      return (
-        <KnowMoreButton onpress={navigation.getParam( 'toggleKnowMoreSheet' )} />
-      )
-    },
-  }
-}

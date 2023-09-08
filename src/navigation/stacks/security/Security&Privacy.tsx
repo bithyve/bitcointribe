@@ -1,8 +1,4 @@
-import React from 'react'
-import {
-  createStackNavigator,
-  StackViewTransitionConfigs,
-} from 'react-navigation-stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import TwoFAValidation from '../../../pages/Accounts/TwoFAValidation'
 import ReLogin from '../../../pages/ReLogin'
 import CustodianRequestOTP from '../../../pages/CustodianRequest/CustodianRequestOTP'
@@ -55,184 +51,155 @@ import RestoreSeedWordsContent from '../../../pages/RestoreHexaWithKeeper/Restor
 import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 import Launch from '../../../pages/Launch'
 import Login from '../../../pages/Login'
-import Header from '../Header'
 import QRStack from '../home/QRStack'
 import SetNewPassword from '../../../pages/NewBHR/SetNewPassword'
 import  FNFToKeeper from '../../../pages/NewBHR/FNFToKeeper'
 import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
-import { translations } from '../../../common/content/LocContext'
-import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
 
-const strings  = translations[ 'stackTitle' ]
+const Stack = createNativeStackNavigator();
+const SecurityStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Home" component={ManageBackupNewBHR} options={{ header: null }} />
+    </Stack.Navigator>
+  )
+}
 
-const MODAL_ROUTES = [
-  'SecondaryDevice',
-  'TrustedContacts',
-  'CustodianRequestOTP',
-  'CustodianRequestAccepted',
-  'HealthCheckSecurityAnswer',
-  'Intermediate',
-]
+// TODO: add all the below screens to stack
+// const SecurityStack = createStackNavigator(
+//   {
+//     Home: {
+//       screen: ManageBackupNewBHR,
+//       navigationOptions: {
+//         header: null,
+//       },
 
-const SecurityStack = createStackNavigator(
-  {
-    Home: {
-      screen: ManageBackupNewBHR,
-      navigationOptions: {
-        header: null,
-        // tabBarVisibl
-      },
+//     },
+//     Launch,
+//     Login,
+//     ReLogin: {
+//       screen: ReLogin,
+//       navigationOptions: {
+//         gesturesEnabled: false,
+//       },
+//     },
+//     Intermediate,
+//     AccountDetails: {
+//       screen: AccountDetailsStack,
+//     },
+//     TransactionDetails: {
+//       screen: TransactionDetailsContainerScreen,
+//     },
+//     QRScanner: {
+//       screen: QRStack,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//     CustodianRequestOTP,
+//     CustodianRequestAccepted,
+//     SweepFundsFromExistingAccount,
+//     NewWalletNameRegenerateShare,
+//     NewWalletQuestionRegenerateShare,
+//     NewWalletGenerationOTP,
+//     WalletCreationSuccess,
+//     SecureScan,
+//     GoogleAuthenticatorOTP,
+//     SecondaryDeviceHistoryNewBHR,
+//     SettingGetNewPin,
+//     ContactsListForAssociateContact,
+//     NewTwoFASecret,
+//     TwoFASweepFunds,
+//     SendRequest,
+//     VoucherScanner,
+//     AddContactSendRequest,
+//     QrAndLink,
+//     ContactDetails,
+//     Receive,
+//     PairNewWallet,
+//     ManageBackupNewBHR,
+//     SecurityQuestionHistoryNewBHR,
+//     TrustedContactHistoryNewBHR,
+//     FNFToKeeper,
+//     AddContact: {
+//       screen: AddContactAddressBook,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//     PersonalCopyHistoryNewBHR,
+//     NewOwnQuestions,
+//     RestoreWithICloud,
+//     RestoreWithoutICloud,
+//     SettingsContents,
+//     SweepFunds,
+//     SweepFundsEnterAmount,
+//     SweepFundUseExitKey,
+//     SweepConfirmation,
+//     ScanRecoveryKey,
+//     UpgradeBackup,
+//     ConfirmKeys,
+//     TwoFAValidation,
+//     BackupSeedWordsContent: {
+//       screen: BackupSeedWordsContent,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//     RestoreSeedWordsContent,
+//     TwoFASetup: {
+//       screen: TwoFASetup,
+//       navigationOptions: {
+//         gesturesEnabled: false,
+//         header: null
+//       },
+//     },
+//     UpdateApp: {
+//       screen: UpdateApp,
+//       navigationOptions: {
+//         gesturesEnabled: false,
+//         header: null
+//       },
+//     },
+//     WyreIntegrationScreen: {
+//       screen: WyreIntegrationScreen,
+//       navigationOptions: {
+//         title: 'Wyre Home',
+//         header: null
+//       }
+//     },
+//     RequestKeyFromContact,
+//     TrustedContactNewBHR,
+//     SetNewPassword,
+//     CloudBackupHistory: {
+//       screen: CloudBackupHistory,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//     SeedBackupHistory: {
+//       screen: SeedBackupHistory,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//   },
+//   {
+//     headerLayoutPreset: 'center',
+//     defaultNavigationOptions: {
+//       header: null
+//     },
+//     navigationOptions: ( { navigation } ) => {
+//       let tabBarVisible = false
+//       if ( ( navigation.state.index === 0  && navigation.state.routes[ 0 ].routeName === 'Home' || navigation.state.index === 1 && navigation.state.routes[ 1 ]?.routeName === 'Home' ) ) {
+//         tabBarVisible = true
+//       }
 
-    },
-    Launch,
-    Login,
-    ReLogin: {
-      screen: ReLogin,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
-    Intermediate,
-    AccountDetails: {
-      screen: AccountDetailsStack,
-    },
-    TransactionDetails: {
-      screen: TransactionDetailsContainerScreen,
-    },
-    QRScanner: {
-      screen: QRStack,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    CustodianRequestOTP,
-    CustodianRequestAccepted,
-    SweepFundsFromExistingAccount,
-    NewWalletNameRegenerateShare,
-    NewWalletQuestionRegenerateShare,
-    NewWalletGenerationOTP,
-    WalletCreationSuccess,
-    SecureScan,
-    GoogleAuthenticatorOTP,
-    SecondaryDeviceHistoryNewBHR,
-    SettingGetNewPin,
-    ContactsListForAssociateContact,
-    NewTwoFASecret,
-    TwoFASweepFunds,
-    SendRequest,
-    VoucherScanner,
-    AddContactSendRequest,
-    QrAndLink,
-    ContactDetails,
-    Receive,
-    PairNewWallet,
-    // ManageBackupKeeper,
-    ManageBackupNewBHR,
-    // SecurityQuestionHistoryKeeper,
-    SecurityQuestionHistoryNewBHR,
-    // KeeperFeatures,
-    // TrustedContactHistoryKeeper,
-    TrustedContactHistoryNewBHR,
-    // KeeperDeviceHistory,
-    // PersonalCopyHistoryKeeper,
-    FNFToKeeper,
-    AddContact: {
-      screen: AddContactAddressBook,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    PersonalCopyHistoryNewBHR,
-    // CloudBackupHistory,
-    NewOwnQuestions,
-    RestoreWithICloud,
-    RestoreWithoutICloud,
-    SettingsContents,
-    SweepFunds,
-    SweepFundsEnterAmount,
-    SweepFundUseExitKey,
-    SweepConfirmation,
-    ScanRecoveryKey,
-    UpgradeBackup,
-    ConfirmKeys,
-    TwoFAValidation,
-    BackupSeedWordsContent: {
-      screen: BackupSeedWordsContent,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    RestoreSeedWordsContent,
-    TwoFASetup: {
-      screen: TwoFASetup,
-      navigationOptions: {
-        gesturesEnabled: false,
-        header: null
-      },
-    },
-    UpdateApp: {
-      screen: UpdateApp,
-      navigationOptions: {
-        gesturesEnabled: false,
-        header: null
-      },
-    },
-    WyreIntegrationScreen: {
-      screen: WyreIntegrationScreen,
-      navigationOptions: {
-        title: 'Wyre Home',
-        header: null
-      }
-    },
-    RequestKeyFromContact,
-    TrustedContactNewBHR,
-    SetNewPassword,
-    CloudBackupHistory: {
-      screen: CloudBackupHistory,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    SeedBackupHistory: {
-      screen: SeedBackupHistory,
-      navigationOptions: {
-        header: null,
-      },
-    },
-  },
-  {
-    headerLayoutPreset: 'center',
-    defaultNavigationOptions: {
-      header: null
-    },
-    navigationOptions: ( { navigation } ) => {
-      let tabBarVisible = false
-      if ( ( navigation.state.index === 0  && navigation.state.routes[ 0 ].routeName === 'Home' || navigation.state.index === 1 && navigation.state.routes[ 1 ]?.routeName === 'Home' ) ) {
-        tabBarVisible = true
-      }
-
-      return {
-        tabBarVisible,
-      }
-    },
-    // transitionConfig: ( transitionProps, prevTransitionProps ) => {
-
-    //   // 📝 Override the default presentation mode for screens that we
-    //   // want to present modally
-    //   const isModal = MODAL_ROUTES.some(
-    //     ( screenName ) =>
-    //       screenName === transitionProps.scene.route.routeName ||
-    //       ( prevTransitionProps &&
-    //         screenName === prevTransitionProps.scene.route.routeName ),
-    //   )
-
-    //   return StackViewTransitionConfigs.defaultTransitionConfig(
-    //     transitionProps,
-    //     prevTransitionProps,
-    //     isModal,
-    //   )
-    // },
-  },
-)
+//       return {
+//         tabBarVisible,
+//       }
+//     },
+//   },
+// )
 
 export default SecurityStack
