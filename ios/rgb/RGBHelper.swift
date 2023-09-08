@@ -364,4 +364,18 @@ import BitcoinDevKit
       callback("{error:\(error.localizedDescription)}")
     }
   }
+  
+  @objc func sendAsset(blindedUtxo: String, assetId: String){
+    var recipientMap: [String: [Recipient]] = [:]
+    let recipient = Recipient(blindedUtxo: blindedUtxo, amount: 100, consignmentEndpoints: ["endpoint1", "endpoint2"])
+    recipientMap[assetId] = [recipient]
+    
+    
+    
+    do{
+      let response = try self.rgbManager.rgbWallet?.send(online: self.rgbManager.online!, recipientMap: recipientMap, donation: false, feeRate: 2.0)
+      print(response)
+    }catch{
+      print(error)
+    }}
 }

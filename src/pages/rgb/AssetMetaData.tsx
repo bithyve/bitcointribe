@@ -18,6 +18,8 @@ import RGBServices from '../../services/RGBServices'
 import moment from 'moment'
 import HeaderTitle from '../../components/HeaderTitle'
 import Fonts from '../../common/Fonts'
+import LinearGradient from 'react-native-linear-gradient'
+import { hp, wp } from '../../common/data/responsiveness/responsive'
 
 const styles = StyleSheet.create( {
   lineItem: {
@@ -43,7 +45,24 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 14 ),
     color: '#2C3E50',
     fontFamily: Fonts.Regular
-  }
+  },
+  selectedContactsView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.blue,
+    borderRadius: 5,
+    height: 30,
+    width: 100,
+    paddingHorizontal: wp( 2 ),
+    marginTop: 15,
+    alignSelf: 'flex-end'
+  },
+  addNewText: {
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.Regular,
+    color: Colors.white,
+  },
 } )
 
 export const DetailsItem = ( { name, value } ) => {
@@ -128,17 +147,34 @@ const AssetMetaData = ( props ) => {
           }}>
             {
               asset.dataPaths && (
-                <View>
+                <View style={{
+                  marginBottom: 30
+                }}>
                   <Image
                     style={{
-                      height: '100%'
+                      height: '90%'
                     }}
                     resizeMode="contain"
                     source={{
                       uri: asset.dataPaths[ 0 ].filePath
                     }}
                   />
-
+                  <TouchableOpacity onPress={() => {
+                  }}>
+                    <LinearGradient colors={[ Colors.blue ]}
+                      start={{
+                        x: 0, y: 0
+                      }} end={{
+                        x: 1, y: 0
+                      }}
+                      locations={[ 0.2, 1 ]}
+                      style={{
+                        ...styles.selectedContactsView, backgroundColor: Colors.lightBlue,
+                      }}
+                    >
+                      <Text style={styles.addNewText}>Download</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
                 </View>
               )
             }
@@ -159,9 +195,19 @@ const AssetMetaData = ( props ) => {
             />
 
             <DetailsItem
-              name="Timestamp"
+              name="Issue Date"
               value={moment.unix( metaData.timestamp ).format( 'DD/MM/YY • hh:MMa' )}
             />
+
+            {
+              metaData.description && (
+                <DetailsItem
+                  name="Description"
+                  value={metaData.description}
+                />
+              )
+            }
+
 
           </ScrollView>
       }

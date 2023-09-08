@@ -65,6 +65,19 @@ export default function AssetsScreen( props ) {
   const renderTabs = () => {
     return (
       <View style={styles.tabContainer}>
+
+        <TouchableOpacity style={styles.collectibleContainer} onPress={() => {
+          setSelectedTab( 1 )
+        }} activeOpacity={1}>
+          <View style={[ styles.collectibleInnerContainer, {
+            backgroundColor: selectedTab == 1 ? Colors.CLOSE_ICON_COLOR : null,
+          } ]}>
+            <Text style={[ styles.collectibleText, {
+              color: selectedTab == 1 ? Colors.white : Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
+            } ]}>COINS</Text>
+          </View>
+        </TouchableOpacity>
+
         <TouchableOpacity style={styles.collectibleContainer} onPress={() => {
           setSelectedTab( 0 )
         }
@@ -75,17 +88,6 @@ export default function AssetsScreen( props ) {
             <Text style={[ styles.collectibleText, {
               color: selectedTab == 0 ? Colors.white : Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
             } ]}>COLLECTIBLES</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.collectibleContainer} onPress={() => {
-          setSelectedTab( 1 )
-        }} activeOpacity={1}>
-          <View style={[ styles.collectibleInnerContainer, {
-            backgroundColor: selectedTab == 1 ? Colors.CLOSE_ICON_COLOR : null,
-          } ]}>
-            <Text style={[ styles.collectibleText, {
-              color: selectedTab == 1 ? Colors.white : Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
-            } ]}>COINS</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -238,6 +240,9 @@ export default function AssetsScreen( props ) {
               showsHorizontalScrollIndicator={false}
               data={rgb121Assets}
               animationType={'NONE'}
+              style={{
+                marginVertical: 10
+              }}
               contentContainerStyle={styles.flatListStyle}
               renderItem={( { item, i } ) => renderCollectibleItems( item, i )}
             />

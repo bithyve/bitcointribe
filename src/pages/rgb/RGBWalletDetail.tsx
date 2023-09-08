@@ -33,6 +33,7 @@ import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
 import DetailsCard from './DetailsCard'
 import AccountChecking from '../../assets/images/accIcons/acc_checking.svg'
 import { syncRgb } from '../../store/actions/rgb'
+import moment from 'moment'
 
 enum SectionKind {
   TOP_TABS,
@@ -170,11 +171,14 @@ export default function RGBWalletDetail( props ) {
             <View style={styles.viewSectionContainer}>
               <FlatList
                 data={transactions}
+                style={{
+                  marginVertical: 20
+                }}
                 renderItem={( { item } ) =>
                   <TouchableOpacity style={styles.itemContainer} onPress={() =>{}}>
                     <View style={styles.textContainer}>
-                      <Text numberOfLines={1} style={styles.itemTitle}>{item.txid}</Text>
-                      <Text style={styles.itemDesc}>{item.confirmationTime}</Text>
+                      <Text numberOfLines={1} ellipsizeMode="middle" style={styles.itemTitle}>{item.txid}</Text>
+                      <Text style={styles.itemDesc}>{moment( Number( item.confirmationTime ) * 1000 ).format( 'DD/MM/YY • hh:MMa' )}</Text>
                     </View>
                     <View style={styles.currencyContainer}>
                       <View style={{
@@ -360,25 +364,17 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
   },
   itemContainer: {
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 2, height: 2
-    },
-    backgroundColor: Colors.white,
-    borderRadius: 8,
     marginHorizontal: 20,
     paddingHorizontal: 8,
     paddingVertical: 20,
-    marginTop: 20,
-    flexDirection:'row'
+    flexDirection:'row',
   },
   itemImage:{
     width: 35, height: 35, borderRadius: 20, backgroundColor:'gray'
   },
   textContainer:{
     flex:1,
-    marginStart: 10
+    marginHorizontal: 10
   },
   itemTitle:{
     color: '#2C3E50', fontFamily:Fonts.Regular, fontSize: RFValue( 12 )

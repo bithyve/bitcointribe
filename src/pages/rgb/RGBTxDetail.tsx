@@ -158,7 +158,7 @@ export default function RGBTxDetail( props ) {
           }}
           showKnowMore
           onSettingsPressed={() => { }}
-          balance={asset.futureBalance}
+          balance={asset.spendableBalance.toLocaleString()}
           cardColor={'#A29DD3'}
           title={asset.name}
           description={asset.ticker}
