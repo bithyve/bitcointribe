@@ -236,7 +236,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           isTestAccount={isTestAccount}
         />
         {accountShell.primarySubAccount.type !== AccountType.SWAN_ACCOUNT &&
-          !isBorderWallet && <KnowMoreButton />}
+          <KnowMoreButton />}
       </View>
     )
   }
