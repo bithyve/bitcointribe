@@ -37,7 +37,7 @@ import {
 import { withNavigation } from 'react-navigation'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { translations } from '../../common/content/LocContext'
-import { hp } from '../../common/data/responsiveness/responsive'
+import BWDetailsIcon from '../../assets/images/svgs/bwdetailsIcon.svg'
 
 export type Props = {
   accountShell: AccountShell;
@@ -174,13 +174,15 @@ const AccountDetailsCard: React.FC<Props> = ( {
           }}
         >
           <View style={styles.accountKindBadgeImage}>
-            {getAvatarForSubAccount(
-              primarySubAccount,
-              false,
-              false,
-              true,
-              isBorderWallet
-            )}
+            { accountShell.primarySubAccount.type === AccountType.BORDER_WALLET?
+              <BWDetailsIcon/>
+              :getAvatarForSubAccount(
+                primarySubAccount,
+                false,
+                false,
+                true,
+                isBorderWallet
+              )}
           </View>
           <View
             style={{
@@ -311,7 +313,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           ...StyleSheet.absoluteFillObject,
           backgroundColor:
             accountShell.primarySubAccount.type === AccountType.BORDER_WALLET
-              ? Colors.mango
+              ? Colors.bwBackground
               : shadowColorForAccountKind( primarySubAccount ),
           borderRadius: 15,
         }}
