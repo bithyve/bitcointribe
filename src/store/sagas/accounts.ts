@@ -965,7 +965,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           accountName: accountName? accountName: `Border Wallet ${borderWalletInstanceCount + 1}`,
           accountDescription: accountDescription? accountDescription: 'Border Wallet - Native SegWit',
           primarySeed: generatedSeed.toString( 'hex' ),
-          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT, borderWalletInstanceCount, null, DerivationPurpose.BIP84 ),
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT, 0, null, DerivationPurpose.BIP84 ),
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
           borderWalletAccountInfo,
         } )
