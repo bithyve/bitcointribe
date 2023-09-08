@@ -53,7 +53,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   const [ checkAccountModal, setCheckAccountModal ] = useState( false )
   const accountShell = useAccountShellForID( accountShellID )
   const primarySubAccount  = usePrimarySubAccountForShell( accountShell )
-  const account = useAccountByAccountShell(accountShell)
+  const account = useAccountByAccountShell( accountShell )
   //  const [ accountBalance, setAccountBalance ] = useState( primarySubAccount.balances )
 
 
@@ -66,7 +66,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }, [ navigation ] )
 
   const listItems = useMemo<SettingsListItem[]>( () => {
-    return [
+    const items =  [
       ...[
         {
           title: strings.NameDescription,
@@ -138,9 +138,11 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
         onOptionPressed: showArchiveModal,
         imageSource: () => <Archive />,
       },
-      {
-        title: "Backup with Border Wallet",
-        subtitle: strings.NameDescriptionSub,
+    ]
+    if( account.type === AccountType.BORDER_WALLET ) {
+      items.push( {
+        title: 'Backup with Border Wallet',
+        subtitle: 'Check health - grid, pattern, checksum and passphrase',
         screenName: 'BackupGridMnemonic',
         screenParams: {
           borderWalletGridType: account.borderWalletGridType,
@@ -148,8 +150,9 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
           borderWalletGridMnemonic: account.borderWalletGridMnemonic,
         },
         imageSource: () => <NameNDesc />,
-      },
-    ]
+      } )
+    }
+    return items
   }, [ accountShell, account ] )
 
   function handleListItemPress( listItem: SettingsListItem ) {

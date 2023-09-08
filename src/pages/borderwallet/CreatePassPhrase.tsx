@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   View,
   SafeAreaView,
@@ -7,6 +7,8 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
+  Platform,
+  Alert
 } from 'react-native'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -15,10 +17,124 @@ import Fonts from '../../common/Fonts'
 import { hp, wp } from '../../common/data/responsiveness/responsive'
 import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
+import Toast from '../../components/Toast'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
+import { Wallet } from '../../bitcoin/utilities/Interface'
+import { recoverWalletUsingMnemonic, restoreSeedWordFailed, setBorderWalletBackup } from '../../store/actions/BHR'
+import ModalContainer from '../../components/home/ModalContainer'
+import LoaderModal from '../../components/LoaderModal'
+import { completedWalletSetup } from '../../store/actions/setupAndAuth'
+import { setVersion } from '../../store/actions/versionHistory'
+import { translations } from '../../common/content/LocContext'
 
 const CreatePassPhrase = ( props ) => {
-  const [ headerTitle, setHeaderTitle ]=useState( 'Create Passphrase' )
-  const [ checksumWord, setChecksumWord ] = useState( '' )
+  const loaderMessage = {
+    heading: translations[ 'bhr' ].Importingyourwallet,
+    text: translations[ 'bhr' ].Thismaytake
+  }
+  const subPoints = [
+    translations[ 'bhr' ].Settingupmultipleaccounts,
+    translations[ 'bhr' ].Preloading,
+  ]
+  const bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
+  const mnemonic = props.navigation.getParam( 'mnemonic' )
+  const selected = props.navigation.getParam( 'selected' )
+  const isNewWallet = props.navigation.getParam( 'isNewWallet' )
+  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
+  const checksumWord = props.navigation.getParam( 'checksumWord' )
+  const [ headerTitle, setHeaderTitle ]=useState( 'Add Passphrase (optional)' )
+  const [ passphrase, setpassphrase ] = useState( '' )
+  const [ confirmPassphrase, setConfirmPassphrase ] = useState( '' )
+  const [ showLoader, setShowLoader ] = useState( false )
+  const [ loaderModal, setLoaderModal ] = useState( false )
+  const dispatch = useDispatch()
+  const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
+  const restoreSeedData = useSelector( ( state ) => state.bhr.loading.restoreSeedData )
+
+  useEffect( () => {
+    return () => {
+      dispatch( restoreSeedWordFailed( false ) )
+    }
+  }, [] )
+
+  useEffect( () => {
+    if( restoreSeedData == 'restoreSeedDataFailed' ){
+      setLoaderModal( false )
+      setTimeout( () => {
+        Alert.alert( 'No wallet found', 'Do you want to continue creating new wallet?', [
+          {
+            text: 'No',
+            onPress: () => {},
+            style: 'cancel',
+          },
+          {
+            text: 'Yes', onPress: () => continueToNextStep( '' )
+          },
+        ] )
+      }, 500 )
+    }
+  }, [ restoreSeedData ] )
+
+  useEffect( () => {
+    setLoaderModal( false )
+    if ( wallet && !isAccountCreation ) {
+      dispatch( completedWalletSetup() )
+      AsyncStorage.setItem( 'walletRecovered', 'true' )
+      dispatch( setVersion( 'Restored' ) )
+      props.navigation.navigate( 'HomeNav' )
+    }
+  }, [ wallet, isAccountCreation ] )
+
+  const onPressNext = () => {
+    if( passphrase === '' || confirmPassphrase === '' ) {
+      Toast( 'Please enter passphrase and confirm passphrase' )
+    } else if( passphrase !== confirmPassphrase ) {
+      Toast( 'Passphrase and confirm passphrase does not match' )
+    } else {
+      onPressSkip( passphrase )
+    }
+  }
+
+  const continueToNextStep = ( password = '' ) => {
+    isAccountCreation?  props.navigation.replace( 'ConfirmDownloadAccount', {
+      selected,
+      checksumWord,
+      mnemonic,
+      initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
+      gridType: props.navigation.getParam( 'gridType' ),
+      isAccountCreation,
+      passphrase: password
+    } ) : props.navigation.replace( 'ConfirmDownload', {
+      selected,
+      checksumWord,
+      mnemonic,
+      initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
+      gridType: props.navigation.getParam( 'gridType' ),
+      isAccountCreation,
+      passphrase: password
+    } )
+  }
+
+  const onPressSkip = ( password = '' ) => {
+    if( isNewWallet ) {
+      continueToNextStep( password )
+    } else {
+      setShowLoader( true )
+      setTimeout( () => {
+        setLoaderModal( true )
+        setTimeout( () => {
+          dispatch( recoverWalletUsingMnemonic( mnemonic, props.navigation.getParam( 'initialMnemonic' ) ) )
+        }, 500 )
+        dispatch( setBorderWalletBackup( true ) )
+      }, 1000 )
+    }
+  }
+
+  const onBackgroundOfLoader = () => {
+    setLoaderModal( false )
+  }
+
 
   return (
     <SafeAreaView
@@ -31,8 +147,8 @@ const CreatePassPhrase = ( props ) => {
         onPressBack={() => {
           props.navigation.goBack()
         }}
-        info1={'Step 4 of Create with Border Wallet'}
-        info={'This is the final step of creating your Border Wallet'}
+        info1={'Step 6 of Create with Border Wallet'}
+        info={'A passphrase in your wallet is not the same as a password. If you change it later, your wallet will still work, but the addresses will be different.'}
         selectedTitle={headerTitle}
       />
       <View style={styles.textInputWrapper}>
@@ -43,8 +159,10 @@ const CreatePassPhrase = ( props ) => {
             }
             placeholder={'Passphrase'}
             placeholderTextColor={Colors.textColorGrey}
-            value={checksumWord}
-            onChangeText={text => setChecksumWord( text )}
+            value={passphrase}
+            autoCapitalize='none'
+            secureTextEntry
+            onChangeText={text => setpassphrase( text )}
           />
         </View>
         <View>
@@ -52,10 +170,11 @@ const CreatePassPhrase = ( props ) => {
             style={
               styles.textBox
             }
-            placeholder={'Confirm passphrase'}
+            placeholder={'Confirm Passphrase'}
             placeholderTextColor={Colors.textColorGrey}
-            value={checksumWord}
-            onChangeText={text => setChecksumWord( text )}
+            value={confirmPassphrase}
+            autoCapitalize='none'
+            onChangeText={text => setConfirmPassphrase( text )}
           />
         </View>
       </View>
@@ -64,20 +183,23 @@ const CreatePassPhrase = ( props ) => {
           <View style={styles.statusIndicatorInactiveView} />
           <View style={styles.statusIndicatorInactiveView} />
           <View style={styles.statusIndicatorInactiveView} />
-          <View style={styles.statusIndicatorActiveView} />
           <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorActiveView} />
         </View>
         <View style={{
           flexDirection: 'row',
           alignItems: 'center'
         }}>
-          <Text style={styles.skipText}>Skip</Text>
           <TouchableOpacity
-            onPress={() => {
-            //   setGenerateEntropyGrid( true )
-              props.navigation.navigate( 'ConfirmDownload' )
-            }}
+            activeOpacity={0.6}
+            onPress={()=> onPressSkip( '' )}
           >
+            <Text style={styles.skipText}>Skip</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.6}
+            onPress={onPressNext}>
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
               start={{
                 x: 0, y: 0
@@ -92,6 +214,15 @@ const CreatePassPhrase = ( props ) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      <ModalContainer onBackground={onBackgroundOfLoader}  visible={loaderModal} closeBottomSheet={() => { }} >
+        <LoaderModal
+          headerText={loaderMessage.heading}
+          messageText={loaderMessage.text}
+          subPoints={subPoints}
+          bottomText={bottomTextMessage} />
+      </ModalContainer>
+
     </SafeAreaView>
   )
 }
@@ -100,7 +231,7 @@ const styles = StyleSheet.create( {
     marginHorizontal: wp( 25 ),
     marginVertical: hp( 10 ),
     paddingLeft: 15,
-    height: 120,
+    height: 50,
     borderRadius: 10,
     color: Colors.textColorGrey,
     fontFamily: Fonts.Light,
@@ -108,7 +239,7 @@ const styles = StyleSheet.create( {
     backgroundColor: '#FAFAFA'
   },
   textInputWrapper:{
-    height: '70%'
+    height: Platform.OS==='ios' ? '64%' : '56%'
   },
   item: {
     flexDirection: 'row',

@@ -20,13 +20,11 @@ const AddNewAccountCard: React.FC<Props> = ( {
 }: Props ) => {
   const { translations } = useContext( LocalizationContext )
   const add_new = translations[ 'home' ].add_new
-  const lnAccount = useActiveAccountShells().filter( account => account.primarySubAccount.type === AccountType.LIGHTNING_ACCOUNT )
-
   return (
     <TouchableOpacity activeOpacity={0.85}
       onPress={onPress}
       style={containerStyle}
-      disabled={lnAccount.length !==0}    >
+    >
       <View style={styles.cardContainer}>
         <View
           style={{

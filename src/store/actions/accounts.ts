@@ -74,13 +74,14 @@ export const getAllAccountsData = () => {
   }
 }
 
-export const createBorderWallet  = (primaryMnemonic: string, gridMnemonic: string,  gridType: GridType) => {
+export const createBorderWallet  = ( primaryMnemonic: string, gridMnemonic: string,  gridType: GridType, passphrase: '' ) => {
   return {
     type: CREATE_BORDER_WALLET,
     payload: {
       primaryMnemonic,
       gridMnemonic,
       gridType,
+      passphrase
     }
   }
 }

@@ -96,7 +96,8 @@ const ValidateBorderWalletChecksum = ( props ) => {
 
   const onPressVerify = () => {
     const selectedWord = checksumWord.split( ' ' )[ 1 ]
-    if( selectedWord === mnemonic.split( ' ' )[ 11 ] ) {
+    const mnemonicWords = mnemonic.split( ' ' )
+    if( selectedWord === mnemonicWords[ mnemonicWords.length - 1 ] ) {
       Toast( 'Checksum matched' )
       dispatch( setBorderWalletBackup( true ) )
       //TO-DO-BW

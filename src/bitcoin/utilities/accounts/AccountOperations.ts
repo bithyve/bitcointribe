@@ -48,7 +48,7 @@ export default class AccountOperations {
       bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
     }, 2, network, account.nextFreeAddressIndex, false ).address
     else {
-      const purpose = getPurpose(account.derivationPath)
+      const purpose = getPurpose( account.derivationPath )
       receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network, purpose )
     }
 
@@ -71,7 +71,8 @@ export default class AccountOperations {
     const hardGapLimit = 10
     const network = AccountUtilities.getNetworkByType( account.networkType )
 
-    const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
+    const purpose = getPurpose( account.derivationPath )
+
     let externalAddress: string
     if( ( account as MultiSigAccount ).is2FA ) externalAddress = AccountUtilities.createMultiSig( {
       primary: account.xpub,
@@ -275,7 +276,8 @@ export default class AccountOperations {
     } = {
     }
     for( const account of Object.values( accounts ) ){
-      const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
+      const purpose = getPurpose( account.derivationPath )
+
       const ownedAddresses = [] // owned address mapping
       // owned addresses are used for apt tx categorization and transfer amount calculation
 
@@ -366,7 +368,7 @@ export default class AccountOperations {
         hasNewTxn
       } = synchedAccounts[ account.id ]
       const { internalAddresses } = accountsInternals[ account.id ]
-      const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
+      const purpose = getPurpose( account.derivationPath )
 
       // update utxo sets and balances
       const balances: Balances = {
@@ -448,7 +450,7 @@ export default class AccountOperations {
   }> => {
     for ( const account of Object.values( accounts ) ) {
 
-      const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
+      const purpose = getPurpose( account.derivationPath )
       const hardGapLimit = 10 // hard refresh gap limit
       const addresses = []
 
@@ -566,7 +568,7 @@ export default class AccountOperations {
         }} ),
     }
 
-    const purpose = account.type === AccountType.SWAN_ACCOUNT? DerivationPurpose.BIP84: DerivationPurpose.BIP49
+    const purpose = getPurpose( account.derivationPath )
     for( const consumedUTXO of Object.values( consumedUTXOs ) ){
       let found = false
       // is out of bound external address?
@@ -920,7 +922,7 @@ export default class AccountOperations {
     customTxPrerequisites?: TransactionPrerequisiteElements,
     nSequence?: number,
   ): Promise<{
-    txb: bitcoinJS.TransactionBuilder;
+    PSBT: bitcoinJS.Psbt;
   }> => {
     try {
       let inputs, outputs
@@ -934,28 +936,52 @@ export default class AccountOperations {
 
       const network = AccountUtilities.getNetworkByType( account.networkType )
 
-      // console.log({ inputs, outputs });
-      const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
+      const PSBT: bitcoinJS.Psbt = new bitcoinJS.Psbt( {
         network,
-      )
+      } )
 
       for ( const input of inputs ) {
-        if( account.type === AccountType.SWAN_ACCOUNT ){
-          // native segwit
-          const privateKey = AccountUtilities.addressToPrivateKey(
-            input.address,
-            account
-          )
-          const keyPair = AccountUtilities.getKeyPair(
-            privateKey,
-            network
-          )
-          const p2wpkh = bitcoinJS.payments.p2wpkh( {
-            pubkey: keyPair.publicKey,
-            network,
+        const privateKey = AccountUtilities.addressToPrivateKey(
+          input.address,
+          account
+        )
+        const keyPair = AccountUtilities.getKeyPair(
+          privateKey,
+          network
+        )
+        const p2wpkh = bitcoinJS.payments.p2wpkh( {
+          pubkey: keyPair.publicKey,
+          network,
+        } )
+
+        const purpose = getPurpose( account.derivationPath )
+
+        if ( purpose === DerivationPurpose.BIP84 ) {
+          PSBT.addInput( {
+            hash: input.txId,
+            index: input.vout,
+            bip32Derivation: [],
+            witnessUtxo: {
+              script: p2wpkh.output,
+              value: input.value,
+            },
           } )
-          txb.addInput( input.txId, input.vout, nSequence, p2wpkh.output )
-        } else txb.addInput( input.txId, input.vout, nSequence )
+        } else if ( purpose === DerivationPurpose.BIP49 ) {
+          const p2sh = bitcoinJS.payments.p2sh( {
+            redeem: p2wpkh,
+          } )
+
+          PSBT.addInput( {
+            hash: input.txId,
+            index: input.vout,
+            bip32Derivation: [],
+            witnessUtxo: {
+              script: p2sh.output,
+              value: input.value,
+            },
+            redeemScript: p2wpkh.output,
+          } )
+        } else throw new Error( 'Unsupported input version' )
       }
 
       const sortedOuts = await AccountUtilities.sortOutputs(
@@ -966,11 +992,11 @@ export default class AccountOperations {
       )
 
       for ( const output of sortedOuts ) {
-        txb.addOutput( output.address, output.value )
+        PSBT.addOutput( output )
       }
 
       return {
-        txb,
+        PSBT,
       }
     } catch ( err ) {
       throw new Error( `Transaction creation failed: ${err.message}` )
@@ -980,10 +1006,10 @@ export default class AccountOperations {
   static signTransaction = (
     account: Account | MultiSigAccount,
     inputs: any,
-    txb: bitcoinJS.TransactionBuilder,
+    PSBT: bitcoinJS.Psbt,
     witnessScript?: any,
   ): {
-    signedTxb: bitcoinJS.TransactionBuilder;
+    signedPSBT: bitcoinJS.Psbt;
     childIndexArray: Array<{
       childIndex: number;
       inputIdentifier: {
@@ -1029,31 +1055,12 @@ export default class AccountOperations {
           redeemScript = AccountUtilities.getP2SH( keyPair, network ).redeem.output
         }
 
-        if( account.type === AccountType.SWAN_ACCOUNT ){
-          // native segwit
-          txb.sign(
-            vin,
-            keyPair,
-            null,
-            null,
-            input.value,
-          )
-        } else {
-          txb.sign(
-            vin,
-            keyPair,
-            redeemScript,
-            null,
-            input.value,
-            witnessScript,
-          )
-        }
-
+        PSBT.signInput( vin, keyPair )
         vin++
       }
 
       return {
-        signedTxb: txb, childIndexArray: childIndexArray.length? childIndexArray: null
+        signedPSBT: PSBT, childIndexArray: childIndexArray.length? childIndexArray: null
       }
     } catch ( err ) {
       throw new Error( `Transaction signing failed: ${err.message}` )
@@ -1063,9 +1070,9 @@ export default class AccountOperations {
   static multiSignTransaction = (
     account: MultiSigAccount,
     inputs: any,
-    txb: bitcoinJS.TransactionBuilder,
+    PSBT: bitcoinJS.Psbt,
   ): {
-    signedTxb: bitcoinJS.TransactionBuilder;
+    signedPSBT: bitcoinJS.Psbt;
   } => {
     let vin = 0
 
@@ -1082,19 +1089,12 @@ export default class AccountOperations {
       const redeemScript = Buffer.from( multiSig.scripts.redeem, 'hex' )
       const witnessScript = Buffer.from( multiSig.scripts.witness, 'hex' )
 
-      txb.sign(
-        vin,
-        keyPair,
-        redeemScript,
-        null,
-        input.value,
-        witnessScript,
-      )
+      PSBT.signInput( vin, keyPair )
       vin += 1
     } )
 
     return {
-      signedTxb: txb
+      signedPSBT: PSBT
     }
   };
 
@@ -1180,7 +1180,7 @@ export default class AccountOperations {
       txid: string;
      }
   > => {
-    const { txb } = await AccountOperations.createTransaction(
+    const { PSBT } = await AccountOperations.createTransaction(
       account,
       txPrerequisites,
       txnPriority,
@@ -1193,12 +1193,14 @@ export default class AccountOperations {
     else inputs = txPrerequisites[ txnPriority ].inputs
 
 
-    const { signedTxb, childIndexArray } = AccountOperations.signTransaction( account, inputs, txb )
-    let txHex
+    const { signedPSBT, childIndexArray } = AccountOperations.signTransaction( account, inputs, PSBT )
+    const areSignaturesValid = signedPSBT.validateSignaturesOfAllInputs()
+    if ( !areSignaturesValid ) throw new Error( 'Failed to broadcast: invalid signatures' )
 
+    let txHex
     if( ( account as MultiSigAccount ).is2FA ){
       if( token ){
-        const partiallySignedTxHex = signedTxb.buildIncomplete().toHex()
+        const partiallySignedTxHex = PSBT.extractTransaction().toHex()
         const { signedTxHex } =  await AccountUtilities.getSecondSignature(
           account.walletId,
           token,
@@ -1207,17 +1209,20 @@ export default class AccountOperations {
         )
         txHex = signedTxHex
       } else if( ( account as MultiSigAccount ).xprivs.secondary ){
-        const { signedTxb } = AccountOperations.multiSignTransaction(
+        const { signedPSBT } = AccountOperations.multiSignTransaction(
           ( account as MultiSigAccount ),
           inputs,
-          txb,
+          PSBT,
         )
-        txHex = signedTxb.build().toHex()
+        const tx = signedPSBT.finalizeAllInputs()
+        txHex = tx.extractTransaction().toHex()
+
         delete ( account as MultiSigAccount ).xprivs.secondary
       } else throw new Error( 'Multi-sig transaction failed: token/secondary-key missing' )
 
     } else {
-      txHex = signedTxb.build().toHex()
+      const tx = signedPSBT.finalizeAllInputs()
+      txHex = tx.extractTransaction().toHex()
     }
 
     const client = network === bitcoinJS.networks.bitcoin? ElectrumClient: TestElectrumClient
@@ -1248,18 +1253,7 @@ export default class AccountOperations {
   ): Promise<{
     txid: string;
    }> => {
-
-    console.log( 'skk1 privateKey from card==', privateKey )
-    console.log( 'skk1 recipientAddress==', recipientAddress )
-    console.log( 'skk1 averageTxFees==', averageTxFees )
-    console.log( 'skk1 network==', network )
-    console.log( 'skk1 derivationPurpose===', derivationPurpose )
-
     const keyPair = AccountUtilities.getKeyPair( privateKey, network )
-    console.log( 'skk1211 privatekey from keypair', JSON.stringify( keyPair.privateKey ) )
-    console.log( 'skk1211 privatekey from keypair (wif)', wif.encode( 128, keyPair.privateKey, true ) )
-    console.log( 'skk1211 publickey', keyPair.publicKey )
-    console.log( 'skk1211 publickey hex', AccountUtilities.deriveAddressFromKeyPair( keyPair, network, DerivationPurpose.BIP84 ) )
 
     // fetch input utxos against the address
     const { confirmedUTXOs } = await AccountUtilities.fetchBalanceTransactionByAddresses( [ address ], network )
@@ -1302,12 +1296,10 @@ export default class AccountOperations {
           },
         } )
 
-        // txb.addInput( input.txId, input.vout, null, p2wpkh.output )
       }
     }
     for ( const output of outputs ) PSBT.addOutput( output )
 
-    console.log( 'skk17' )
     // sign transaction
     let vin = 0
     for ( const input of inputs ) {
@@ -1316,19 +1308,15 @@ export default class AccountOperations {
       vin++
     }
 
-    console.log( 'skk before1 txid' )
     // broadcast transaciton
     const areSignaturesValid = PSBT.validateSignaturesOfAllInputs()
     if( areSignaturesValid ){
       const txHex =  PSBT.finalizeAllInputs().extractTransaction().toHex()
       const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
-      console.log( 'success', JSON.stringify( txid ) )
       return {
         txid
       }
-    }else{
-      console.log( 'oops' )
-    }
+    } else throw new Error( 'Invalid Signatures' )
   }
 
   static generateGifts = async (

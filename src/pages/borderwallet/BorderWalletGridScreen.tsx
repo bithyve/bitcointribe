@@ -110,8 +110,8 @@ const styles = StyleSheet.create( {
   },
   headerText:{
     color: Colors.blue,
-    fontSize: RFValue( 17 ),
-    fontFamily: Fonts.Medium,
+    fontSize: RFValue( 14 ),
+    fontFamily: Fonts.Light,
   },
   selectedPatternText: {
     fontSize: 12,
@@ -415,7 +415,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
                 <Text style={styles.ceilText}>{item}</Text>
               </View>
             )}
-            keyExtractor={( item ) => item}
+            // keyExtractor={( item ) => item}
           />
         </View>
       )}
@@ -443,7 +443,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
                   <Text style={styles.ceilText}>{( '000' + ( item + 1 ) ).substr( -3 )}</Text>
                 </View>
               )}
-              keyExtractor={( item ) => item.toString()}
+              // keyExtractor={( item ) => item.toString()}
             />
           </View>
 
@@ -496,7 +496,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
                         selected={selected}
                       />
                     )}
-                    keyExtractor={( item ) => item}
+                    // keyExtractor={( item ) => item}
                   />
                 ) )}
               </ScrollView>

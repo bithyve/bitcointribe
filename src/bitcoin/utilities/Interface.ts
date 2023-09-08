@@ -943,7 +943,7 @@ export interface Account {
     type: string;
   }[]
   node?: LNNode
-  
+
   borderWalletGridMnemonic?: string // only for account type border wallet
   borderWalletMnemonic?: string;  //only for account type border wallet
   borderWalletGridType?: GridType;//only for account type border walle

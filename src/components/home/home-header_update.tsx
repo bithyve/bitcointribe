@@ -43,7 +43,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { currencyKindSet } from '../../store/actions/preferences'
-import { KeeperType, LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { KeeperType, LevelData, LevelHealthInterface, Wallet } from '../../bitcoin/utilities/Interface'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import MaterialCurrencyCodeIcon, {
@@ -57,6 +57,7 @@ import { onPressKeeper } from '../../store/actions/BHR'
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
+import dbManager from '../../storage/realm/dbManager'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -116,6 +117,7 @@ const HomeHeader = ( {
   const iCloudErrors  = translations[ 'iCloudErrors' ]
   const driveErrors  = translations[ 'driveErrors' ]
   const dispatch = useDispatch()
+  const wallet: Wallet =  dbManager.getWallet()
 
   const [ cloudErrorModal, setCloudErrorModal ] = useState( false )
   const [ errorMsg, setErrorMsg ] = useState( '' )
@@ -279,7 +281,7 @@ const HomeHeader = ( {
 
       <Text ellipsizeMode="middle" style={{
         flex:1, color: Colors.backgroundColor1, marginLeft: wp( 1 ), fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, marginTop: wp( 0.8 )
-      }}>{backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus, borderWalletBackup )}
+      }}>{backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus, borderWalletBackup, wallet && wallet.borderWalletMnemonic !=='' )}
       </Text>
 
       {/* {isFirstMessageBold ? <Text ellipsizeMode="middle" numberOfLines={1} style={{

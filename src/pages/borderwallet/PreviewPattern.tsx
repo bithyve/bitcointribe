@@ -138,13 +138,6 @@ const PreviewPattern = ( { navigation } ) => {
   const rowHeaderRef = useRef()
   const [ loading, setLoading ] = useState( false )
 
-  useEffect( ()=> {
-    if( isValidate ) {
-      // navigation.navigate( 'CheckPasscode', {
-      //   backupType: 'borderWallet'
-      // } )
-    }
-  }, [] )
 
   return (
     <SafeAreaView style={styles.viewContainer}>
@@ -157,7 +150,7 @@ const PreviewPattern = ( { navigation } ) => {
           style={[ CommonStyles.headerLeftIconContainer, styles.headerWrapper, {
           } ]}
           onPress={() => {
-            navigation.goBack()
+            isValidate ? navigation.navigate( 'ValidateBorderWalletPattern' ) : navigation.goBack()
           }}
         >
           <View style={{
@@ -176,7 +169,7 @@ const PreviewPattern = ( { navigation } ) => {
             </View>
           </View>
           <TouchableOpacity style={styles.doneBtnWrapper} onPress={() => {
-            navigation.goBack()
+            isValidate ? navigation.navigate( 'ValidateBorderWalletPattern' ): navigation.goBack()
           }}>
             <Text style={styles.doneBtnText}>Done</Text>
           </TouchableOpacity>
@@ -197,7 +190,7 @@ const PreviewPattern = ( { navigation } ) => {
                 <Text style={styles.ceilText}>{item}</Text>
               </View>
             )}
-            keyExtractor={( item ) => item}
+            // keyExtractor={( item ) => item}
           />
         </View>
       )}
@@ -225,7 +218,7 @@ const PreviewPattern = ( { navigation } ) => {
                   <Text style={styles.ceilText}>{( '000' + ( item + 1 ) ).substr( -3 )}</Text>
                 </View>
               )}
-              keyExtractor={( item ) => item.toString()}
+              // keyExtractor={( item ) => item.toString()}
             />
           </View>
 
@@ -269,7 +262,7 @@ const PreviewPattern = ( { navigation } ) => {
                   }
                   }
                   numColumns={16}
-                  keyExtractor={item => item.id}
+                  // keyExtractor={item => item.id}
                 />
               </ScrollView>
             </ScrollView>

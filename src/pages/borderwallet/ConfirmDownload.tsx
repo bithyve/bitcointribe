@@ -7,7 +7,9 @@ import {
   FlatList,
   Text,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert,
+  Platform
 } from 'react-native'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -25,7 +27,7 @@ import useAccountShellCreationCompletionEffect from '../../utils/hooks/account-e
 const ConfirmDownload = ( props ) => {
   const { translations } = useContext( LocalizationContext )
   const common = translations[ 'common' ]
-  const [ headerTitle, setHeaderTitle ]=useState( 'Memorise/Download' )
+  const [ headerTitle, setHeaderTitle ]=useState( 'Summary for Border Wallet' )
   const [ successModal, setSuccessModal ] = useState( false )
   const [ loading, setLoading ] = useState( true )
   const mnemonic = props.navigation.getParam( 'mnemonic' )
@@ -34,27 +36,29 @@ const ConfirmDownload = ( props ) => {
   const checksumWord = props.navigation.getParam( 'checksumWord' )
   const initialMnemonic = props.navigation.getParam( 'initialMnemonic' )
   const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
+  const passphrase = props.navigation.getParam( 'passphrase' )
   const gridType = props.navigation.getParam( 'gridType' )
   const dispatch = useDispatch()
   type ItemProps = {title: string, id: string};
 
-
-  useAccountShellCreationCompletionEffect(()=>{
-    //TO-DO-CW
-    //Insert Successful Modal
-    props.navigation.navigate('Home')
-  })
-  
   const onPressContinue = () => {
-    if(isAccountCreation){
-          dispatch(createBorderWallet(mnemonic,initialMnemonic,gridType))
+    if( isAccountCreation ){
+      dispatch( createBorderWallet( mnemonic, initialMnemonic, gridType, passphrase ) )
+      //TO-DO- BW bind this to account creation redux state
+      // Alert.alert( 'Wallet Created!', 'Border Wallet has been succssefully created', [ {
+      //   text: 'Ok', onPress: ()=> {  props.navigation.navigate( 'Home' )}
+      // } ] )
+      setSuccessModal( true )
+      setTimeout( ()=>{
+        props.navigation.navigate( 'Home' )
+      }, 3000 )
     }
     else{
-      props.navigation.navigate('NewWalletName', {
-        mnemonic, initialMnemonic, gridType
-      } ) 
+      props.navigation.navigate( 'NewWalletName', {
+        mnemonic, initialMnemonic, gridType, passphrase
+      } )
     }
-              
+
   }
   const Item = ( { title, id }: ItemProps ) => (
     <View style={styles.item}>
@@ -76,7 +80,8 @@ const ConfirmDownload = ( props ) => {
         onPressBack={() => {
           props.navigation.goBack()
         }}
-        info1={'Confirm'}
+        info={'Make sure you have a way to regenerate the grid (using Regeneration Mnemonic or using PDF). Also remember the pattern, checksum word and Passphrase if used.'}
+        info1={'Final step'}
         selectedTitle={headerTitle}
       />
       <View style={styles.previewWrapper}>
@@ -122,14 +127,18 @@ const ConfirmDownload = ( props ) => {
             </View>
             <Text style={styles.title}>{checksumWord.split( ' ' )[ 1 ]}</Text>
           </View>
-          {/* <View>
-            <Text style={[ styles.previewTitle, {
-              marginLeft: 5, marginTop: 10
-            } ]}>Passphrase</Text>
-            <View style={styles.passPhraseWrapper}>
-              <Text>Do not go gentle into that good night, Old age should burn and rave at close of day</Text>
-            </View>
-          </View> */}
+          {
+            passphrase !== '' && (
+              <View>
+                <Text style={[ styles.previewTitle, {
+                  marginLeft: 5, marginTop: 10
+                } ]}>Passphrase</Text>
+                <View style={styles.passPhraseWrapper}>
+                  <Text>{passphrase}</Text>
+                </View>
+              </View>
+            )
+          }
         </View>
       </View>
       <View style={styles.bottomButtonView}>
@@ -151,6 +160,26 @@ const ConfirmDownload = ( props ) => {
           </TouchableOpacity>
         </View>
       </View>
+      <ModalContainer
+        onBackground={()=> setSuccessModal( false )}
+        visible={successModal}
+        closeBottomSheet={()=> setSuccessModal( false )}
+      >
+        <BorderWalletSuccessModal
+          title={'Border Wallet creation success!'}
+          info={''}
+          otherText={'Your Border Wallet has been added and is now ready for you to start using.'}
+          proceedButtonText={'Continue'}
+          isIgnoreButton={false}
+          closeModal={()=> setSuccessModal( false )}
+          onPressProceed={() => {setSuccessModal( false )}}
+          onPressIgnore={() => {
+            setSuccessModal( false )
+          }}
+          isBottomImage={true}
+          bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
+        />
+      </ModalContainer>
     </SafeAreaView>
   )
 }
@@ -182,7 +211,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     width: '100%',
     marginHorizontal: 20,
-    height: windowHeight>800? '70%' : '66%'
+    height: Platform.OS==='android'?'55%': '64%'
 
   },
   patternWrapper: {
@@ -199,7 +228,7 @@ const styles = StyleSheet.create( {
   },
   buttonView: {
     padding: 15,
-    width: 120,
+    width: 150,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
