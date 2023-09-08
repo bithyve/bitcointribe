@@ -88,7 +88,7 @@ const CreatePassPhrase = ( props ) => {
 
   const onPressNext = () => {
     if( passphrase === '' || confirmPassphrase === '' ) {
-      Toast( 'Please enter passphrase and confirm passphrase' )
+      Toast( 'Please enter Passphrase and confirm or Skip to proceed without it' )
     } else if( passphrase !== confirmPassphrase ) {
       Toast( 'Passphrase and confirm passphrase does not match' )
     } else {
