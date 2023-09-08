@@ -1,7 +1,6 @@
 import idx from 'idx'
 import React, { Component } from 'react'
 import { ImageBackground, View, StyleSheet, AppState, Platform, Linking } from 'react-native'
-import { withNavigationFocus } from 'react-navigation'
 import Loader from '../../components/loader'
 import { connect } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -204,4 +203,4 @@ const mapStateToProps = ( state ) => {
 
 export default connect( mapStateToProps, {
   getMessages
-} )( withNavigationFocus( Intermediate ) )
+} )( Intermediate )

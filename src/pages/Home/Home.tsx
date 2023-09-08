@@ -60,7 +60,6 @@ import {
   Wallet,
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
-import { withNavigationFocus } from 'react-navigation'
 import {
   updatePreference,
   setFCMToken,
@@ -617,40 +616,39 @@ const mapStateToProps = ( state ) => {
   }
 }
 
-export default withNavigationFocus(
-  connect( mapStateToProps, {
-    updateFCMTokens,
-    acceptExistingContactRequest,
-    rejectTrustedContact,
-    initializeHealthSetup,
-    clearWyreCache,
-    clearRampCache,
-    clearSwanCache,
-    updateSwanStatus,
-    fetchFeeRates,
-    fetchExchangeRates,
-    createTempSwanAccountInfo,
-    addTransferDetails,
-    notificationsUpdated,
-    setCurrencyCode,
-    updatePreference,
-    setFCMToken,
-    setSecondaryDeviceAddress,
-    setCardData,
-    setVersion,
-    setCloudData,
-    updateCloudPermission,
-    credsAuthenticated,
-    setShowAllAccount,
-    setIsPermissionGiven,
-    setupNotificationList,
-    updateNotificationList,
-    updateMessageStatusInApp,
-    updateMessageStatus,
-    getMessages,
-    syncPermanentChannels,
-  } )( Home )
-)
+export default
+connect( mapStateToProps, {
+  updateFCMTokens,
+  acceptExistingContactRequest,
+  rejectTrustedContact,
+  initializeHealthSetup,
+  clearWyreCache,
+  clearRampCache,
+  clearSwanCache,
+  updateSwanStatus,
+  fetchFeeRates,
+  fetchExchangeRates,
+  createTempSwanAccountInfo,
+  addTransferDetails,
+  notificationsUpdated,
+  setCurrencyCode,
+  updatePreference,
+  setFCMToken,
+  setSecondaryDeviceAddress,
+  setCardData,
+  setVersion,
+  setCloudData,
+  updateCloudPermission,
+  credsAuthenticated,
+  setShowAllAccount,
+  setIsPermissionGiven,
+  setupNotificationList,
+  updateNotificationList,
+  updateMessageStatusInApp,
+  updateMessageStatus,
+  getMessages,
+  syncPermanentChannels,
+} )( Home )
 
 const styles = StyleSheet.create( {
   cardContainer: {

@@ -21,7 +21,6 @@ import { UsNumberFormat } from '../../common/utilities'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import BottomSheet from 'reanimated-bottom-sheet'
 
-import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
 import RadioButton from '../../components/RadioButton'
@@ -47,6 +46,7 @@ interface SweepConfirmationStateTypes {
 }
 
 interface SweepConfirmationPropsTypes {
+  route: any;
   navigation: any;
   accounts: any;
   currencyToggleValue: any;
@@ -69,7 +69,7 @@ class SweepConfirmation extends Component<
       }, 2 )
     }
     this.state = {
-      accountData: this.props.navigation.getParam( 'accountData' ),
+      accountData: this.props.route.params.accountData,
       serviceType: REGULAR_ACCOUNT,
       totalAmount: 0,
       sliderValueText: 'Low Fee',
@@ -193,8 +193,8 @@ class SweepConfirmation extends Component<
               }}
             >
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </TouchableOpacity>
@@ -638,10 +638,8 @@ const mapStateToProps = ( state ) => {
   }
 }
 
-export default withNavigationFocus(
-  connect( mapStateToProps, {
-  } )( SweepConfirmation ),
-)
+export default connect( mapStateToProps, {
+} )( SweepConfirmation )
 
 const styles = StyleSheet.create( {
   successModalButtonView: {

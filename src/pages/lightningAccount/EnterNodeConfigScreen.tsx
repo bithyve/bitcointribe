@@ -38,7 +38,6 @@ import CheckMark from '../../assets/images/svgs/checkmark.svg'
 import { connect } from 'react-redux'
 import { addNewAccountShells } from '../../store/actions/accounts'
 import idx from 'idx'
-import { withNavigationFocus } from 'react-navigation'
 import Toast from '../../components/Toast'
 import { AccountType } from '../../bitcoin/utilities/Interface'
 import { goHomeAction } from '../../navigation/actions/NavigationActions'
@@ -293,11 +292,11 @@ EnterNodeConfigState
   initFromProps( props: any ) {
     const { navigation } = props
 
-    const node = navigation.getParam( 'node', null )
-    const index = navigation.getParam( 'index', null )
-    const active = navigation.getParam( 'active', null )
-    const saved = navigation.getParam( 'saved', null )
-    const newEntry = navigation.getParam( 'newEntry', null )
+    const node = props.route.params.node ? props.route.params.node : null
+    const index = props.route.params.index ? props.route.params.index : null
+    const active = props.route.params.active ? props.route.params.active:null
+    const saved = props.route.params.saved? props.route.params.saved:null
+    const newEntry = props.route.params.newEntry ? props.route.params.newEntry :null
 
     if ( node ) {
       const {

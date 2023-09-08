@@ -19,7 +19,6 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import {
   fetchEphemeralChannel,
@@ -126,8 +125,8 @@ class ConfirmKeys extends Component<
               style={styles.headerBackArrowView}
             >
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </TouchableOpacity>
@@ -488,11 +487,10 @@ const mapStateToProps = ( state ) => {
   }
 }
 
-export default withNavigationFocus(
-  connect( mapStateToProps, {
-    fetchEphemeralChannel,
-  } )( ConfirmKeys ),
-)
+export default
+connect( mapStateToProps, {
+  fetchEphemeralChannel,
+} )( ConfirmKeys )
 
 const styles = StyleSheet.create( {
   modalHeaderTitleView: {

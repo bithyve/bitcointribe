@@ -36,7 +36,7 @@ import { updateWalletName } from '../../../store/actions/trustedContacts'
 import { LevelHealthInterface, Wallet } from '../../../bitcoin/utilities/Interface'
 import CloudBackupStatus from '../../../common/data/enums/CloudBackupStatus'
 import { updateCloudData } from '../../../store/actions/cloud'
-import { NavigationActions, StackActions } from 'react-navigation'
+import { CommonActions } from '@react-navigation/native'
 // import { goHomeAction } from '../../../navigation/actions/NavigationActions'
 import { translations } from '../../../common/content/LocContext'
 import Options from '../../../assets/images/svgs/options.svg'
@@ -201,13 +201,13 @@ const AppInfo = ( props ) => {
           closeBottomSheet={() => setSuccess( false )}
           onPressConfirm={() => {
             setSuccess( false )
-            const resetAction = StackActions.reset( {
+            const resetAction = CommonActions.reset( {
               index: 0,
-              actions: [
-                NavigationActions.navigate( {
-                  routeName: 'Landing'
-                } )
-              ],
+              routes: [
+                {
+                  name: 'Landing',
+                }
+              ]
             } )
 
             props.navigation.dispatch( resetAction )
