@@ -11,7 +11,8 @@ import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import  BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import { inject, observer } from 'mobx-react'
 import { NavigationScreenConfig } from 'react-navigation'
-import { NavigationStackOptions } from 'react-navigation-stack'
+// import { NavigationStackOptions } from 'react-navigation-stack'
+import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import NavHeader from '../../components/account-details/AccountDetailsNavHeader'
 import TransactionList from './components/TransactionsList'
 import InvoicesList from './components/InvoicesList'
@@ -28,6 +29,9 @@ export enum Mode {
   LIGHTNING,
 }
 
+interface AccountDetailsPropsTypes {
+  navigation: any;
+}
 
 @inject(
   'InvoicesStore',
@@ -38,16 +42,31 @@ export enum Mode {
   'FeeStore',
 )
 @observer
-export class AccountDetails extends Component {
+export class AccountDetails extends Component<
+  AccountDetailsPropsTypes
+> {
+
   constructor( props ) {
     super( props )
     this.state = {
-      node: props.navigation.getParam( 'node' ),
-      accountShellID:props.navigation.getParam( 'accountShellID' ),
-      accountShell: props.accountShells.find( accountShell => accountShell.id === props.navigation.getParam( 'accountShellID' ) ),
+      node:  props.route.params.node,
+      accountShellID: props.route.params.accountShellID,
+      accountShell: props.accountShells.find( accountShell => accountShell.id === props.route.params.accountShellID ),
       mode: Mode.LIGHTNING,
     }
   }
+
+  componentDidMount() {
+    this.props.navigation.setOptions( {
+      header: () => (
+        <NavHeader accountShellID={this.state.accountShellID} onBackPressed={this.onBackPressed} />
+      ),
+    } )
+  }
+
+   onBackPressed =()=>  {
+     this.props.navigation.goBack()
+   }
 
 
   onReceiveButtonPress = ( size:any, title:string, node:any ) => {
@@ -321,19 +340,22 @@ const styles = StyleSheet.create( {
   },
 } )
 
-AccountDetails.navigationOptions = ( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> => {
-  return {
-    header() {
-      const { accountShellID } = navigation.state.params
-      return (
-        <NavHeader
-          accountShellID={accountShellID}
-          onBackPressed={() => navigation.pop()}
-        />
-      )
-    },
-  }
-}
+
+
+// AccountDetails.navigationOptions = ( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> => {
+//   // const defaultStackScreenNavigationOptions: NativeStackNavigationOptions = {
+//   return {
+//     header() {
+//       const { accountShellID } = navigation.state.params
+//       return (
+//         <NavHeader
+//           accountShellID={accountShellID}
+//           onBackPressed={() => navigation.pop()}
+//         />
+//       )
+//     },
+//   }
+// }
 
 // export default connect( mapStateToProps, mapDispatchToProps )( EnterNodeConfigScreen )
 
