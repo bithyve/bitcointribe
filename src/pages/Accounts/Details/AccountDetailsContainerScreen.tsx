@@ -49,6 +49,7 @@ import { AccountType } from '../../../bitcoin/utilities/Interface'
 import { translations } from '../../../common/content/LocContext'
 import { markReadTx } from '../../../store/actions/accounts'
 import ButtonBlue from '../../../components/ButtonBlue'
+import BorderWalletKnowMore from '../../../components/know-more-sheets/BorderWalletKnowMore'
 
 export type Props = {
   navigation: any;
@@ -80,6 +81,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const { averageTxFees, exchangeRates } = accountsState
 
   const [ showMore, setShowMore ] = useState( false )
+  const [ bwShowMore, setBWShowMore ] = useState( false )
 
   const isRefreshing = useMemo( () => {
     return ( accountShell.syncStatus===SyncStatus.IN_PROGRESS )
@@ -94,6 +96,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const AllowSecureAccount = useSelector(
     ( state ) => state.bhr.AllowSecureAccount,
   )
+  const isBorderWallet = primarySubAccount.type === AccountType.BORDER_WALLET
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
@@ -304,7 +307,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
             <View style={styles.viewAccountDetailsCard}>
               <AccountDetailsCard
                 accountShell={accountShell}
-                onKnowMorePressed={() => setShowMore( true )}
+                onKnowMorePressed={() => isBorderWallet ? setBWShowMore( true ): setShowMore( true )}
                 onSettingsPressed={navigateToAccountSettings}
                 swanDeepLinkContent={swanDeepLinkContent}
               />
@@ -412,6 +415,9 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       />
       <ModalContainer onBackground={()=>setShowMore( false )} visible={showMore} closeBottomSheet={() => {setShowMore( false )}}>
         {showKnowMoreSheet()}
+      </ModalContainer>
+      <ModalContainer onBackground={()=>setBWShowMore( false )} visible={bwShowMore} closeBottomSheet={() => {setBWShowMore( false )}}>
+        <BorderWalletKnowMore titleClicked={()=>setBWShowMore( false )}/>
       </ModalContainer>
       <ModalContainer onBackground={()=>showWebView( false )} visible={webView} closeBottomSheet={() => { showWebView( false ) }} >
         <RootSiblingParent>
