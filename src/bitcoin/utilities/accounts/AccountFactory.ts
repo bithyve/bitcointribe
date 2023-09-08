@@ -74,8 +74,6 @@ export function generateAccount(
   }
   if( type === AccountType.LIGHTNING_ACCOUNT ) {
     account.node = node
-  } else if( type === AccountType.RGB_ACCOUNT ) {
-    account.rgbConfig = rgbConfig
   }
   return account
 }

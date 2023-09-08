@@ -50,7 +50,6 @@ import {
   updateAccountSettings,
   FETCH_FEE_RATES,
   FETCH_EXCHANGE_RATES,
-  RECEIVE_RGB_ASSET,
 } from '../actions/accounts'
 import {
   setAllowSecureAccount,
@@ -78,7 +77,6 @@ import {
   UnecryptedStreamData,
   Wallet,
   LNNode,
-  RGBConfig
 } from '../../bitcoin/utilities/Interface'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -114,8 +112,6 @@ import { generateDeepLink } from '../../common/CommonFunctions'
 import Toast from '../../components/Toast'
 import RESTUtils from '../../utils/ln/RESTUtils'
 import { Alert } from 'react-native'
-import RGBServices from '../../services/RGBServices'
-import RgbSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/RgbSubAccountInfo'
 import { ELECTRUM_NOT_CONNECTED_ERR } from '../../bitcoin/electrum/client'
 import { setElectrumNotConnectedErr } from '../actions/nodeSettings'
 
@@ -645,32 +641,6 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
 }
 
 
-function* refreshRgbShellsWorker( { payload }: { payload: {
-  shells: AccountShell[],
-}} ){
-  const accountShells: AccountShell[] = payload.shells
-  const accountState: AccountsState = yield select(
-    ( state ) => state.accounts
-  )
-  const accounts: Accounts = accountState.accounts
-  yield put( accountShellRefreshStarted( accountShells ) )
-  const accountsToSync: Accounts = {
-  }
-  for( const accountShell of accountShells ){
-    accountsToSync[ accountShell.primarySubAccount.id ] = accounts[ accountShell.primarySubAccount.id ]
-  }
-  const { synchedAccounts } = yield call( syncRgbAccountsWorker, {
-    payload: {
-      accounts: accountsToSync,
-    }
-  } )
-  yield put( updateAccountShells( {
-    accounts: synchedAccounts
-  } ) )
-  yield put( accountShellRefreshCompleted( accountShells ) )
-
-}
-
 
 function* refreshLNShellsWorker( { payload }: { payload: {
   shells: AccountShell[],
@@ -696,29 +666,6 @@ function* refreshLNShellsWorker( { payload }: { payload: {
   } ) )
   yield put( recomputeNetBalance() )
   yield put( accountShellRefreshCompleted( accountShells ) )
-}
-
-function* syncRgbAccountsWorker( { payload }: {payload: {
-  accounts: Accounts }} ) {
-  const { accounts } = payload
-  for( const account of Object.values( accounts ) ){
-    const { mnemonic, xpub } = account.rgbConfig
-    const address = yield call( RGBServices.getAddress, mnemonic )
-    const sync = yield call( RGBServices.sync, mnemonic )
-    const balances = yield call( RGBServices.getBalance, mnemonic )
-    const transactions = yield call( RGBServices.getTransactions, mnemonic )
-    const assets = yield call( RGBServices.syncRgbAssets, mnemonic, xpub )
-    account.balances.confirmed = Number( balances.confirmed )
-    account.balances.unconfirmed = Number( balances.trustedPending )
-    account.rgb = {
-      bitcoinAssets: transactions,
-      rgb20Assets: assets.rgb20,
-      nextUnusedAddress: address
-    }
-  }
-  return {
-    synchedAccounts: accounts
-  }
 }
 
 function* syncLnAccountsWorker( { payload }: {payload: {
@@ -751,7 +698,6 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
   const testShellsToSync: AccountShell[] = [] // Note: should be synched separately due to network difference(testnet)
   const donationShellsToSync: AccountShell[] = []
   const lnShellsToSync: AccountShell[] = []
-  const rgbShellsToSync: AccountShell[] = []
   for ( const shell of shells ) {
     if( syncAll || shell.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
       if( !shell.primarySubAccount.isUsable ) continue
@@ -768,19 +714,11 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
           case AccountType.LIGHTNING_ACCOUNT:
             lnShellsToSync.push( shell )
             break
-          case AccountType.RGB_ACCOUNT:
-            rgbShellsToSync.push( shell )
-            break
           default:
             shellsToSync.push( shell )
       }
     }
   }
-  if( rgbShellsToSync.length ) yield call( refreshRgbShellsWorker, {
-    payload: {
-      shells: rgbShellsToSync,
-    }
-  } )
   if( shellsToSync.length ) yield call( refreshAccountShellsWorker, {
     payload: {
       shells: shellsToSync,
@@ -925,17 +863,6 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
           customDisplayName: account.accountName,
           customDescription: account.accountDescription,
           node: account.node
-        } )
-        break
-      case AccountType.RGB_ACCOUNT:
-        primarySubAccount = new RgbSubAccountInfo( {
-          id: account.id,
-          xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
-          isUsable: account.isUsable,
-          instanceNumber: account.instanceNum,
-          customDisplayName: account.accountName,
-          customDescription: account.accountDescription,
-          rgbConfig: account.rgbConfig
         } )
         break
   }
@@ -1088,22 +1015,6 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         } )
         return lnAccount
 
-      case AccountType.RGB_ACCOUNT:
-        const rgbAccountCount = recreationInstanceNumber !== undefined ? recreationInstanceNumber: ( accounts[ accountType ] )?.length | 0
-        const rgbConfig = yield call( RGBServices.generateKeys )
-        const rgbAccount: Account = yield call( generateAccount, {
-          walletId,
-          type: accountType,
-          instanceNum: rgbAccountCount,
-          accountName: accountName? accountName: defaultAccountName,
-          accountDescription: accountDescription? accountDescription: defaultAccountDescription,
-          primarySeed,
-          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, rgbAccountCount ),
-          networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
-          node: null,
-          rgbConfig
-        } )
-        return rgbAccount
   }
 }
 export interface newAccountDetails {

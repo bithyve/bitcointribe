@@ -154,10 +154,6 @@ class HexaConfig {
       series: 50,
       upperBound: 1,
     },
-    [ AccountType.RGB_ACCOUNT ]: {
-      series: 50,
-      upperBound: 1,
-    },
   }
 
   public BITHYVE_ESPLORA_API_ENDPOINTS = {

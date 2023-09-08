@@ -105,12 +105,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         node: selectedAccount.primarySubAccount.node
       } )
     }
-    if( selectedAccount.primarySubAccount.type === AccountType.RGB_ACCOUNT ) {
-      this.props.navigation.navigate( 'RGBWalletDetail', {
-        accountShellID: selectedAccount.id,
-        rgbConfig: selectedAccount.primarySubAccount.rgbConfig
-      } )
-    }
     else {
       this.props.navigation.navigate( 'AccountDetails', {
         accountShellID: selectedAccount.id,

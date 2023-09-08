@@ -67,8 +67,6 @@ const getAvatarForSubAccount = (
         return <Wallet />
       case SubAccountKind.LIGHTNING_ACCOUNT:
         return isHome ? <LightningHexa/> : <Lightning />
-      case SubAccountKind.RGB_ACCOUNT:
-        return isHome ? <RgbAccountIcon/> : <Lightning />
       case SubAccountKind.SERVICE:
         return getAvatarForServiceAccountKind( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind, isHome, isAccount )
       default:

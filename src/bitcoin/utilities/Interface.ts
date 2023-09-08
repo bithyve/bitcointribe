@@ -949,23 +949,6 @@ export interface Account {
     type: string;
   }[]
   node?: LNNode
-  rgbConfig?: RGBConfig,
-  refreshing?: boolean,
-  rgb?:{
-    bitcoinAssets?:any [],
-    rgb20Assets?:any [],
-    rgb121Assets?:any [],
-    nextUnusedAddress?: string,
-    receiveAssets?: {
-      message: string,
-      data?:{
-        invoice: string,
-        blindedUtxo: string,
-        expirationTimestamp: string,
-        blindingSecret:string,
-      }
-    }
-  }
 }
 export interface MultiSigAccount extends Account {
   is2FA: boolean,                       // is2FA enabled
