@@ -1,5 +1,5 @@
 import React from 'react'
-import { createStackNavigator } from 'react-navigation-stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import XPubSourceKind from '../../../common/data/enums/XPubSourceKind'
 import AccountSettingsEditDisplayPropertiesScreen from '../../../pages/Accounts/AccountSettings/AccountSettingsEditDisplayPropertiesScreen'
 import AccountSettingsMainScreen from '../../../pages/Accounts/AccountSettings/AccountSettingsMainScreen'
@@ -23,125 +23,146 @@ import BackupGridMnemonic from '../../../pages/borderwallet/BackupGridMnemonic'
 
 const strings  = translations[ 'stackTitle' ]
 
-const SubAccountSettingsStack = createStackNavigator(
-  {
-    AccountSettingsMain: {
-      screen: AccountSettingsMainScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          title: strings[ 'AccountSettings' ],
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-          },
+const Stack = createNativeStackNavigator();
+const SubAccountSettingsStack = () => {
+  return (
+    <Stack.Navigator initialRouteName= 'AccountSettingsMain'>
+      <Stack.Screen 
+        name="AccountSettingsMain"
+        component={AccountSettingsMainScreen}
+        options={
+          ({navigation}) => ({
+              title: strings[ 'AccountSettings' ],
+              headerLeft: () => {
+                return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+              }
+            })
         }
-      },
-    },
-    EditDisplayProperties: {
-      screen: AccountSettingsEditDisplayPropertiesScreen,
-      navigationOptions: {
-        title: strings[ 'NameDescription' ],
-      },
-    },
-    ReassignTransactionsMainOptions: {
-      screen: ReassignTransactionsMainOptionsScreen,
-      navigationOptions: {
-        title: strings[ 'ReassignTransactions' ],
-      },
-    },
-    SelectReassignableTransactions: {
-      screen: SelectReassignableTransactionsScreen,
-      navigationOptions: {
-        title: strings[ 'ReassignTransactions' ],
-      },
-    },
-    ReassignSubAccountSourcesSelectSources: {
-      screen: ReassignSubAccountSourcesSelectSourcesScreen,
-      navigationOptions: {
-        title: strings[ 'ReassignSources' ],
-      },
-    },
-    ReassignTransactionsSelectDestination: {
-      screen: ReassignTransactionsSelectDestinationScreen,
-      navigationOptions: ( { navigation } ) => {
-        const reassignmentKind = navigation.getParam( 'reassignmentKind' )
-        const nameText = reassignmentKind === XPubSourceKind.DESIGNATED ? 'Sources' : 'Transactions'
+      />
+    </Stack.Navigator>
+  )
+}
 
-        return {
-          title: `Reassign ${nameText}`,
-        }
-      },
-    },
-    EditVisibility: {
-      screen: AccountSettingsEditVisibilityScreen,
-      navigationOptions: {
-        title: 'Account Visibility',
-      },
-    },
-    ShowXPub: {
-      screen: XPubDetailsScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          ...defaultStackScreenNavigationOptions,
-          headerLeft: () => {
-            return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-          },
-        }
-      },
-    },
-    MergeAccounts: {
-      screen: AccountSettingsMergeAccountShellsScreen,
-      navigationOptions: {
-        title: strings[ 'MergeAccounts' ],
-      },
-    },
-    TransactionDetails: {
-      screen: TransactionDetailsContainerScreen,
-      navigationOptions: {
-        title: strings[ 'TransactionDetails' ],
-      },
-    },
-    BackupGridMnemonic: {
-      screen: BackupGridMnemonic,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    ValidateBorderWalletChecksum: {
-      screen: ValidateBorderWalletChecksum,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    ValidateBorderWalletPattern: {
-      screen: ValidateBorderWalletPattern,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    PreviewPattern: {
-      screen: PreviewPattern,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    CheckPasscode:{
-      screen: CheckPasscodeComponent,
-      navigationOptions:{
-        header:null
-      }
-    },
-  },
-  {
-    initialRouteName: 'AccountSettingsMain',
-    defaultNavigationOptions: ( { navigation } ) => {
-      return {
-        ...defaultStackScreenNavigationOptions,
-        headerLeft: () => {
-          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-        },
-      }
-    },
-  },
-)
+// TODO: add all other screens to stack
+// const SubAccountSettingsStack = createStackNavigator(
+//   {
+//     AccountSettingsMain: {
+//       screen: AccountSettingsMainScreen,
+//       navigationOptions: ( { navigation } ) => {
+//         return {
+//           title: strings[ 'AccountSettings' ],
+//           headerLeft: () => {
+//             return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+//           },
+//         }
+//       },
+//     },
+//     EditDisplayProperties: {
+//       screen: AccountSettingsEditDisplayPropertiesScreen,
+//       navigationOptions: {
+//         title: strings[ 'NameDescription' ],
+//       },
+//     },
+//     ReassignTransactionsMainOptions: {
+//       screen: ReassignTransactionsMainOptionsScreen,
+//       navigationOptions: {
+//         title: strings[ 'ReassignTransactions' ],
+//       },
+//     },
+//     SelectReassignableTransactions: {
+//       screen: SelectReassignableTransactionsScreen,
+//       navigationOptions: {
+//         title: strings[ 'ReassignTransactions' ],
+//       },
+//     },
+//     ReassignSubAccountSourcesSelectSources: {
+//       screen: ReassignSubAccountSourcesSelectSourcesScreen,
+//       navigationOptions: {
+//         title: strings[ 'ReassignSources' ],
+//       },
+//     },
+//     ReassignTransactionsSelectDestination: {
+//       screen: ReassignTransactionsSelectDestinationScreen,
+//       navigationOptions: ( { navigation } ) => {
+//         const reassignmentKind = navigation.getParam( 'reassignmentKind' )
+//         const nameText = reassignmentKind === XPubSourceKind.DESIGNATED ? 'Sources' : 'Transactions'
+
+//         return {
+//           title: `Reassign ${nameText}`,
+//         }
+//       },
+//     },
+//     EditVisibility: {
+//       screen: AccountSettingsEditVisibilityScreen,
+//       navigationOptions: {
+//         title: 'Account Visibility',
+//       },
+//     },
+//     ShowXPub: {
+//       screen: XPubDetailsScreen,
+//       navigationOptions: ( { navigation } ) => {
+//         return {
+//           ...defaultStackScreenNavigationOptions,
+//           headerLeft: () => {
+//             return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+//           },
+//         }
+//       },
+//     },
+//     MergeAccounts: {
+//       screen: AccountSettingsMergeAccountShellsScreen,
+//       navigationOptions: {
+//         title: strings[ 'MergeAccounts' ],
+//       },
+//     },
+//     TransactionDetails: {
+//       screen: TransactionDetailsContainerScreen,
+//       navigationOptions: {
+//         title: strings[ 'TransactionDetails' ],
+//       },
+//     },
+//     BackupGridMnemonic: {
+//       screen: BackupGridMnemonic,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//     ValidateBorderWalletChecksum: {
+//       screen: ValidateBorderWalletChecksum,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//     ValidateBorderWalletPattern: {
+//       screen: ValidateBorderWalletPattern,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//     PreviewPattern: {
+//       screen: PreviewPattern,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//     CheckPasscode:{
+//       screen: CheckPasscodeComponent,
+//       navigationOptions:{
+//         header:null
+//       }
+//     },
+//   },
+//   {
+//     initialRouteName: 'AccountSettingsMain',
+//     defaultNavigationOptions: ( { navigation } ) => {
+//       return {
+//         ...defaultStackScreenNavigationOptions,
+//         headerLeft: () => {
+//           return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+//         },
+//       }
+//     },
+//   },
+// )
 
 export default SubAccountSettingsStack

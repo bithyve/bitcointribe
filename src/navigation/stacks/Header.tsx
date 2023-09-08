@@ -3,7 +3,6 @@ import {
   View,
   Platform,
   Linking,
-  ImageBackground,
   AppState,
   Alert,
   StyleSheet,
@@ -17,7 +16,6 @@ import {
 import DeviceInfo from 'react-native-device-info'
 import * as RNLocalize from 'react-native-localize'
 import { connect } from 'react-redux'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import messaging from '@react-native-firebase/messaging'
 import {
   initializeTrustedContact,
@@ -32,21 +30,18 @@ import {
   getCurrencyImageByRegion, processRequestQR,
 } from '../../common/CommonFunctions/index'
 import NotificationListContent from '../../components/NotificationListContent'
-// import AddContactAddressBook from '../Contacts/AddContactAddressBook'
 import HomeHeader from '../../components/home/home-header_update'
-//import HomeHeader from '../../components/home/home-header'
 import Colors from '../../common/Colors'
 import idx from 'idx'
 import { v4 as uuid } from 'uuid'
 import moment from 'moment'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
-import { NavigationActions, StackActions, withNavigationFocus } from 'react-navigation'
+import { CommonActions, useIsFocused } from '@react-navigation/native'
 import TrustedContactRequestContent from '../../pages/Home/TrustedContactRequestContent'
 import BottomSheet from '@gorhom/bottom-sheet'
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
 import { AccountsState } from '../../store/reducers/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { NotificationType } from '../../components/home/NotificationType'
 import ModalContainer from '../../components/home/ModalContainer'
 import NotificationInfoContents from '../../components/NotificationInfoContents'
@@ -54,7 +49,6 @@ import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOp
 import Toast from '../../components/Toast'
 import { resetToHomeAction } from '../actions/NavigationActions'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import PushNotification from 'react-native-push-notification'
 import PushNotificationIOS from '@react-native-community/push-notification-ios'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
@@ -117,11 +111,9 @@ import { clearRampCache } from '../../store/actions/RampIntegration'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { setCloudData } from '../../store/actions/cloud'
 import { setShowAllAccount } from '../../store/actions/accounts'
-import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 import {
   updateLastSeen
 } from '../../store/actions/preferences'
-import QRModal from '../../pages/Accounts/QRModal'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../common/Fonts'
 import AcceptGift from '../../pages/FriendsAndFamily/AcceptGift'
@@ -211,7 +203,6 @@ interface HomePropsTypes {
   acceptExistingContactRequest: any;
   rejectTrustedContact: any;
   currentLevel: number;
-  isFocused: boolean;
   setCurrencyCode: any;
   currencyCode: any;
   setSecondaryDeviceAddress: any;
@@ -343,7 +334,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   onCodeScanned = async ( qrData ) => {
-    const { trustedContactRequest, giftRequest, link } = await processRequestQR( qrData )
+    const { trustedContactRequest, giftRequest } = await processRequestQR( qrData )
     if( trustedContactRequest ){
       this.setState( {
         trustedContactRequest
@@ -561,8 +552,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { appState } = this.state
     const { isPermissionSet, setIsPermissionGiven } = this.props
     try {
-      // TODO: Will this function ever be called if the state wasn't different? If not,
-      // I don't think we need to be holding on to `appState` in this component's state.
       if ( appState === nextAppState ) return
       if ( isPermissionSet ) {
         setIsPermissionGiven( false )
@@ -574,27 +563,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         },
         async () => {
           if ( nextAppState === 'active' ) {
-          //this.scheduleNotification()
           }
           if ( nextAppState === 'inactive' || nextAppState == 'background' ) {
             if( nextAppState === 'background' ) {
-              // this.closeBottomSheet()
             }
-            // console.log( 'inside if nextAppState', nextAppState )
             this.props.updatePreference( {
               key: 'hasShownNoInternetWarning',
               value: false,
             } )
-            // sss files removed
             this.props.updateLastSeen( new Date() )
-            // this.props.navigation.dispatch( [ NavigationActions.navigate( {
-            //   routeName: 'Bottomtab',
-            // } ),
-            NavigationActions.navigate( {
-              routeName: 'Intermediate',
-            } )
-          // ]
-            // )
+            CommonActions.navigate({
+              name: 'Intermediate'
+            })
           }
         }
       )
@@ -639,8 +619,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   createNotificationListeners = async () => {
     this.props.setIsPermissionGiven( true )
     PushNotification.configure( {
-      // largeIcon: 'ic_launcher',
-      // smallIcon:'ic_notification',
       onNotification: ( notification ) => {
         this.props.getMessages()
         if( notification.data && notification.data.content ){
@@ -652,10 +630,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.currentNotificationId = notificationId
         }
         this.notificationCheck()
-        // process the notification
         if ( notification.data ) {
-          // this.onNotificationOpen( notification )
-          // (required) Called when a remote is received or opened, or local notification is opened
           notification.finish( PushNotificationIOS.FetchResult.NoData )
         }
       },
@@ -725,7 +700,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   handleDeepLinkEvent = async ( { url } ) => {
-    const { navigation, isFocused } = this.props
+    const { navigation } = this.props
+    const isFocused = useIsFocused();
     // If the user is on one of Home's nested routes, and a
     // deep link is opened, we will navigate back to Home first.
     if ( !isFocused )
@@ -794,10 +770,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   componentDidMount = async() => {
-    // this.openBottomSheetOnLaunch(
-    //   BottomSheetKind.GIFT_REQUEST,
-    //   1
-    // )
     const {
       navigation,
       initializeHealthSetup,
@@ -1343,20 +1315,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       <TouchableOpacity
         onPress={() => {
           if ( text === 'View Account' ) {
-            // setGiftAcceptedModel( true )
-            const resetAction = StackActions.reset( {
+            this.props.navigation.dispatch(CommonActions.reset({
               index: 0,
-              actions: [
-                NavigationActions.navigate( {
-                  routeName: 'Landing'
-                } )
-              ],
-            } )
-
-            this.props.navigation.dispatch( resetAction )
-            // navigation.navigate( 'AccountDetails', {
-            //   accountShellID: primarySubAccount.accountShellID,
-            // } )
+              routes: [{ name: 'Landing' }],
+            }))
           } else {
             // setAcceptGiftModal( false )
             // setGiftAcceptedModel( true )
@@ -1556,19 +1518,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             <ErrorModalContents
               title={'Cloud Backup Error'}
               info={'The wallet could not be backed up.\n\nThis may be due to network issues. Please try again in sometime from Security & Privacy.\nIf the problem persists, contact us at hexa@bithyve.com'}
-              // errPoints={[ 'A network issue', 'Inadequate space in your cloud storage', 'A bug on our part' ]}
-              // note={'Please try again in some time.\nIn case the error persists,\nplease reach out to us on:'}
-              // links={[ {
-              //   link: 'hello@bithyve.com',
-              //   icon: require( '../../assets/images/icons/icon_email.png' )
-              // }, {
-              //   link: '@HexaWallet',
-              //   icon: require( '../../assets/images/socialicon/twitter.png' )
-              // }, {
-              //   link: 'https://t.me/HexaWallet',
-              //   icon: require( '../../assets/images/icons/icon_telegram.png' )
-              // }
-              // ]}
               onPressProceed={()=>{
                 if( this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' && this.props.cloudPermissionGranted ){
                   this.props.setCloudData()
@@ -1723,17 +1672,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       )
     }
     return (
-      // <ImageBackground
-      //   source={require( '../../assets/images/home-bg.png' )}
-      //   style={{
-      //     width: '100%',
-      //     height: '100%',
-      //     flex: 1,
-      //   }}
-      //   imageStyle={{
-      //     resizeMode: 'stretch',
-      //   }}
-      // >
       <View
         style={{
           height: heightPercentageToDP( Platform.OS == 'ios' ? '21.9%' : '20.3%' ),
@@ -1744,23 +1682,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   : 0,
         }}
       >
-        {/* <ImageBackground
-          // source={require( '../../assets/images/home-bg.png' )}
-          style={{
-            width: '100%',
-            height: '100%',
-            flex: 1,
-          }}
-          imageStyle={{
-            resizeMode: 'stretch',
-          }}
-        > */}
         <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-          // start={{
-          //   x: 0, y: 0.2
-          // }} end={{
-          //   x: 0.1, y: 0.1
-          // }}
           locations={[ 0.55, 1 ]}
           style={{
             width: '100%',
@@ -1780,10 +1702,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             CurrencyCode={currencyCode}
             navigation={navigation}
             currentLevel={currentLevel}
-          //  onSwitchToggle={this.onSwitchToggle}
-          // setCurrencyToggleValue={this.setCurrencyToggleValue}
-          // navigation={this.props.navigation}
-          // overallHealth={overallHealth}
           />
           <ModalContainer
             onBackground={() => {
@@ -1810,7 +1728,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             {this.renderBottomSheetContent()}
           </ModalContainer>
         </LinearGradient>
-        {/* </ImageBackground> */}
       </View>
     )
   }
@@ -1896,7 +1813,7 @@ const mapStateToProps = ( state ) => {
   }
 }
 
-export default withNavigationFocus(
+export default (
   connect( mapStateToProps, {
     updateFCMTokens,
     initializeTrustedContact,

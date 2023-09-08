@@ -1,5 +1,4 @@
 import React from 'react'
-import { createAppContainer, createSwitchNavigator } from 'react-navigation'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Launch from '../pages/Launch'
 import Login from '../pages/Login'
@@ -312,10 +311,21 @@ function HomeNavigator() {
 //   }
 // )
 
-const Navigator = createSwitchNavigator( {
-  SetupNav: SetupNavigator,
-  HomeNav: HomeNavigator,
-} )
+
+const SwitchStack = createNativeStackNavigator();
+//TODO: conditionally add below screens as createSwitchNavigator is removed
+function Navigator() {
+  return (
+    <SwitchStack.Navigator>
+      <SwitchStack.Screen name="SetupNav" component={SetupNavigator} />
+      <SwitchStack.Screen name="HomeNav" component={HomeNavigator} />
+    </SwitchStack.Navigator>
+  )
+}
+// const Navigator = createSwitchNavigator( {
+//   SetupNav: SetupNavigator,
+//   HomeNav: HomeNavigator,
+// } )
 
 
 export type BaseNavigationProp = {
@@ -324,4 +334,4 @@ export type BaseNavigationProp = {
   navigate: ( route: string, params?: Record<string, unknown> ) => void;
 } & Record<string, unknown>;
 
-export default createAppContainer( Navigator )
+export default Navigator

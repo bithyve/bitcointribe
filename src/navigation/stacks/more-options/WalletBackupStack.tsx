@@ -1,5 +1,5 @@
 import React from 'react'
-import { createStackNavigator } from 'react-navigation-stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { translations } from '../../../common/content/LocContext'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
@@ -23,101 +23,118 @@ import AccountSendConfirmationContainerScreen from '../../../pages/Accounts/Send
 import OTPAuthenticationScreen from '../../../pages/Accounts/Send/OTPAuthentication'
 import CheckPasscodeComponent from '../../../pages/NewBHR/CheckPasscodeComponent'
 
-const strings  = translations[ 'stackTitle' ]
+const Stack = createNativeStackNavigator();
+const WalletBackupStack = () => {
+  return (
+    <Stack.Navigator
+      initialRouteName='SeedBackupHistory'
+      screenOptions={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerLeft: () => {
+            return <SmallNavHeaderBackButton onPress={() => { navigation.goBack() }} />
+          },
+        }
+      }}
+    >
+      <Stack.Screen name="SeedBackupHistory" component={SeedBackupHistory} options={{ header: null }} />
+    </Stack.Navigator>
+  )
+}
 
-const WalletBackupStack = createStackNavigator(
-  {
-    SeedBackupHistory: {
-      screen: SeedBackupHistory,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    WalletBackup: {
-      screen: WalletBackup,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    SecondaryDeviceHistoryNewBHR,
-    TrustedContactHistoryNewBHR,
-    RestoreSeedWordsContent,
-    BackupSeedWordsContent: {
-      screen: BackupSeedWordsContent,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    TrustedContactNewBHR,
-    SetNewPassword: {
-      screen: SetNewPassword,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    CloudBackupHistory: {
-      screen: CloudBackupHistory,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    PersonalCopyHistoryNewBHR,
-    SecurityQuestionHistoryNewBHR,
-    AccountSend: {
-      screen: AccountSendContainerScreen,
-    },
-    TwoFAValidation,
-    TwoFASetup: {
-      screen: TwoFASetup,
-      navigationOptions: {
-        gesturesEnabled: false,
-        header: null
-      },
-    },
-    AccountDetails: {
-      screen: AccountDetailsStack,
-      navigationOptions: {
-        header: null,
-        // tabBarVisibl
-      },
-    },
-    SentAmountForContactForm: {
-      screen: SentAmountForContactFormScreen,
-      navigationOptions: {
-        title: 'Send To'
-      },
-    },
-    SendConfirmation: {
-      screen: AccountSendConfirmationContainerScreen,
-      navigationOptions: {
-        title: 'Send Confirmation',
+// TODO: 
+// const WalletBackupStack = createStackNavigator(
+//   {
+//     SeedBackupHistory: {
+//       screen: SeedBackupHistory,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//     WalletBackup: {
+//       screen: WalletBackup,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//     SecondaryDeviceHistoryNewBHR,
+//     TrustedContactHistoryNewBHR,
+//     RestoreSeedWordsContent,
+//     BackupSeedWordsContent: {
+//       screen: BackupSeedWordsContent,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//     TrustedContactNewBHR,
+//     SetNewPassword: {
+//       screen: SetNewPassword,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//     CloudBackupHistory: {
+//       screen: CloudBackupHistory,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//     PersonalCopyHistoryNewBHR,
+//     SecurityQuestionHistoryNewBHR,
+//     AccountSend: {
+//       screen: AccountSendContainerScreen,
+//     },
+//     TwoFAValidation,
+//     TwoFASetup: {
+//       screen: TwoFASetup,
+//       navigationOptions: {
+//         gesturesEnabled: false,
+//         header: null
+//       },
+//     },
+//     AccountDetails: {
+//       screen: AccountDetailsStack,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//     SentAmountForContactForm: {
+//       screen: SentAmountForContactFormScreen,
+//       navigationOptions: {
+//         title: 'Send To'
+//       },
+//     },
+//     SendConfirmation: {
+//       screen: AccountSendConfirmationContainerScreen,
+//       navigationOptions: {
+//         title: 'Send Confirmation',
 
-      },
-    },
-    OTPAuthentication: {
-      screen: OTPAuthenticationScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    CheckPasscode:{
-      screen: CheckPasscodeComponent,
-      navigationOptions:{
-        header:null
-      }
-    }
-  },
-  {
-    initialRouteName: 'SeedBackupHistory',
-    defaultNavigationOptions: ( { navigation } ) => {
-      return {
-        ...defaultStackScreenNavigationOptions,
-        headerLeft: () => {
-          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-        },
-      }
-    },
-  },
-)
+//       },
+//     },
+//     OTPAuthentication: {
+//       screen: OTPAuthenticationScreen,
+//       navigationOptions: {
+//         header: null,
+//       },
+//     },
+//     CheckPasscode:{
+//       screen: CheckPasscodeComponent,
+//       navigationOptions:{
+//         header:null
+//       }
+//     }
+//   },
+//   {
+//     initialRouteName: 'SeedBackupHistory',
+//     defaultNavigationOptions: ( { navigation } ) => {
+//       return {
+//         ...defaultStackScreenNavigationOptions,
+//         headerLeft: () => {
+//           return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+//         },
+//       }
+//     },
+//   },
+// )
 
 export default WalletBackupStack
