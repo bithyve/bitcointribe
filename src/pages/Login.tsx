@@ -53,15 +53,6 @@ import ConfirmSeedWordsModal from './NewBHR/ConfirmSeedWordsModal'
 import LinearGradient from 'react-native-linear-gradient'
 
 export default function Login( props ) {
-  // const subPoints = [
-  //   'Setting up multi-accounts',
-  //   'Fetching test sats & balances',
-  //   'Generating shares for back-up',
-  //   'Getting the latest details'
-  // ]
-  // const [ bottomTextMessage, setBottomTextMessage ] = useState(
-  //   'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
-  // )
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
   const common = translations[ 'common' ]
