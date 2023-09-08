@@ -22,7 +22,7 @@ import {  useBottomSheetModal } from '@gorhom/bottom-sheet'
 import UnHideArchiveAccountBottomSheet from '../../../components/bottom-sheets/account-management/UnHideArchiveAccountBottomSheet'
 import UnHideRestoreAccountSuccessBottomSheet from '../../../components/bottom-sheets/account-management/UnHideRestoreAccountSuccessBottomSheet'
 import ModalContainer from '../../../components/home/ModalContainerScroll'
-import { NavigationActions, StackActions } from 'react-navigation'
+import { CommonActions } from '@react-navigation/native'
 import CommonStyles from '../../../common/Styles/Styles'
 import HeaderTitle from '../../../components/HeaderTitle'
 import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
@@ -180,13 +180,11 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     return(
       <UnHideRestoreAccountSuccessBottomSheet
         onProceed={( accounShell )=>{
-          const resetAction = StackActions.reset( {
+          const resetAction = CommonActions.reset( {
             index: 0,
-            actions: [
-              NavigationActions.navigate( {
-                routeName: 'Landing'
-              } )
-            ],
+            routes: [ {
+              name: 'Landing'
+            } ],
           } )
 
           navigation.dispatch( resetAction )

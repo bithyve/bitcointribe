@@ -54,7 +54,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 import idx from 'idx'
 import { getNextFreeAddress } from '../../store/sagas/accounts'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import { NavigationActions, StackActions } from 'react-navigation'
+import { CommonActions } from '@react-navigation/native'
 
 
 const WalletBackup = ( props, navigation ) => {
@@ -1107,12 +1107,13 @@ const WalletBackup = ( props, navigation ) => {
           // note={''}
           onPressProceed={() => {
             setMultipleAcccountModal( false )
-            const resetAction = StackActions.reset( {
+            const resetAction = CommonActions.reset( {
               index: 0,
-              actions: [ NavigationActions.navigate( {
-                routeName: 'Landing'
-              } ) ],
+              routes: [ {
+                name: 'Landing'
+              } ],
             } )
+
             props.navigation.dispatch( resetAction )
 
           }}
