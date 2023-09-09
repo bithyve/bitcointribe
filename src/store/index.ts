@@ -60,6 +60,7 @@ import {
   accountCheckWatcher,
   addNewAccountShellsWatcher,
   autoSyncShellsWatcher,
+  createBorderWalletWatcher,
   createSmNResetTFAOrXPrivWatcher,
   fetchExchangeRatesWatcher,
   fetchFeeRatesWatcher,
@@ -216,6 +217,7 @@ const rootSaga = function* () {
     autoSyncShellsWatcher,
     validateTwoFAWatcher,
     createSmNResetTFAOrXPrivWatcher,
+    createBorderWalletWatcher,
     updateAccountSettingsWatcher,
     generateGiftsWatcher,
     //fBTC

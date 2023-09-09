@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { FlatList } from 'react-native'
+import { FlatList, ScrollView } from 'react-native'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import AccountCardColumn from './AccountCardColumn'
@@ -200,32 +200,34 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
 
   const [ scrollEnabled, setScrollEnabled ]=useState( true )
   return (
-    <FlatList
-      horizontal
-      scrollEnabled={scrollEnabled}
-      onTouchStart={event=> {
-        if ( event.nativeEvent.locationY < 600 )setScrollEnabled( false )
-      }}
-      onTouchEnd={event=>setScrollEnabled( true )}
-      contentContainerStyle={contentContainerStyle}
-      showsHorizontalScrollIndicator={false}
-      data={columnData}
-      keyExtractor={keyExtractor}
-      renderItem={( { item, index }: RenderItemProps ) => {
-        return <AccountCardColumn
-          key={index}
-          index={index}
-          cardData={item}
-          currentLevel={currentLevel}
-          // prependsAddButton={typeof item === 'string'}
-          onAccountCardSelected={onAccountSelected}
-          onAddNewAccountPressed={onAddNewSelected}
-          onCardLongPressed={onCardLongPressed}
-        />
+    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <FlatList
+        horizontal
+        scrollEnabled={scrollEnabled}
+        onTouchStart={event=> {
+          if ( event.nativeEvent.locationY < 600 )setScrollEnabled( false )
+        }}
+        onTouchEnd={event=>setScrollEnabled( true )}
+        contentContainerStyle={contentContainerStyle}
+        showsHorizontalScrollIndicator={false}
+        data={columnData}
+        keyExtractor={keyExtractor}
+        renderItem={( { item, index }: RenderItemProps ) => {
+          return <AccountCardColumn
+            key={index}
+            index={index}
+            cardData={item}
+            currentLevel={currentLevel}
+            // prependsAddButton={typeof item === 'string'}
+            onAccountCardSelected={onAccountSelected}
+            onAddNewAccountPressed={onAddNewSelected}
+            onCardLongPressed={onCardLongPressed}
+          />
 
 
-      }}
-    />
+        }}
+      />
+    </ScrollView>
   )
 }
 

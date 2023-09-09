@@ -55,6 +55,7 @@ import {
   fetchFeeRates,
 } from '../../store/actions/accounts'
 import {
+  AccountType,
   LevelHealthInterface,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
@@ -595,7 +596,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             // overallHealth={overallHealth}
           />
         </View> */}
-        <HomeContainer containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} swanDeepLinkContent={this.state.swanDeepLinkContent} />
+        <HomeContainer lnAcc={this.props.accountShells.filter( shell=>shell.primarySubAccount.type===AccountType.LIGHTNING_ACCOUNT )} containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} swanDeepLinkContent={this.state.swanDeepLinkContent} />
 
       </View>
     )

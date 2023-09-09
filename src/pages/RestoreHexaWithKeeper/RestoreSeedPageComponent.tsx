@@ -340,7 +340,7 @@ const RestoreSeedPageComponent = ( props ) => {
                       </TouchableOpacity>
                     )
                   }}
-                  ListFooterComponent={() => seedIndex == 1 &&
+                  ListFooterComponent={() => seedIndex == 1 && props.isTwelveCheckbox &&
                   <TouchableOpacity onPress={() => onCheckPressed()} style={{
                     flexDirection: 'row', alignItems: 'center'
                   }}>
@@ -532,6 +532,7 @@ const styles = StyleSheet.create( {
   },
   historyCard: {
     marginEnd: 15,
+    backgroundColor: Colors.backgroundColor1,
     // backgroundColor: Colors.gray7,
     borderRadius: 10,
     flex: 1 / 2,
@@ -589,10 +590,11 @@ const styles = StyleSheet.create( {
     alignItems: 'center'
   },
   numberText: {
-    color: Colors.numberFont,
+    color: Colors.blue,
     fontSize: RFValue( 20 ),
     fontFamily: Fonts.Regular,
-    marginEnd: 10
+    marginEnd: 5,
+    paddingStart: 2
   },
   nameText: {
     color: Colors.greyTextColor,
@@ -610,7 +612,6 @@ const styles = StyleSheet.create( {
     borderRadius: 10,
     // borderColor: '#E3E3E3',
     // borderWidth: 1
-    backgroundColor: Colors.backgroundColor1
   },
   selectedInput: {
     backgroundColor: Colors.white,

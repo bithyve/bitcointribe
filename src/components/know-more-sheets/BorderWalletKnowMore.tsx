@@ -1,0 +1,191 @@
+import React, { useState, useRef } from 'react'
+import { View, Image, Text, StyleSheet } from 'react-native'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { ScrollView } from 'react-native-gesture-handler'
+import { translations } from '../../common/content/LocContext'
+import CrossButton from '../../assets/images/svgs/icons_close.svg'
+
+export default function BorderWalletKnowMore( props ) {
+  const scrollViewRef = useRef<ScrollView>()
+  const strings  = translations[ 'accounts' ]
+
+  return (
+    <View style={{
+      ...styles.modalContainer, ...props.containerStyle
+    }}>
+      <View style={{
+        height: hp( 81 )
+      }}>
+        <View
+          style={{
+            flexDirection: 'row', justifyContent: 'center', alignItems: 'center'
+          }}
+        >
+          <Text style={styles.headerText}>Border Wallet</Text>
+          <AppBottomSheetTouchableWrapper style={{
+            width: wp( 8 ),
+            height: wp( 8 ),
+            borderRadius: wp( 4 ),
+            backgroundColor: Colors.blue,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: wp( 2 ),
+            marginLeft: -wp( 10 )
+          }}
+          onPress={() => props.titleClicked && props.titleClicked()}>
+            <CrossButton />
+          </AppBottomSheetTouchableWrapper>
+        </View>
+        <View style={styles.headerSeparator} />
+        <ScrollView
+          ref={scrollViewRef}
+          style={{
+          // flex: 1,
+            backgroundColor: Colors.blue,
+          }}
+          snapToInterval={hp( '85%' )}
+          decelerationRate="fast"
+        >
+          <View style={styles.ElementView}>
+            <Text
+              style={{
+                ...styles.infoText,
+                // marginTop: wp( '5%' ),
+              }}
+            >
+             This is a wallet account added to your Tribe app using Border Wallet feature by either adding a new one or by importing an existing grid
+            </Text>
+            <View style={{
+              justifyContent: 'center', alignItems: 'center'
+            }}>
+              <Image
+                source={require( '../../assets/images/icons/checking_account_info_1.png' )}
+                style={styles.helperImage}
+              />
+            </View>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginBottom: wp( '5%' ),
+              }}
+            >
+              If you restore the app, all the accounts including this one will be reinstated. Alternatively you can back this up separately by going into account settings
+            </Text>
+            {/* <AppBottomSheetTouchableWrapper
+              style={{
+                alignItems: 'center'
+              }}
+              onPress={() => {
+                scrollViewRef.current &&
+                scrollViewRef.current.scrollTo( {
+                  x: 0,
+                  y: hp( '75%' ),
+                  animated: true,
+                } )
+              }}
+            >
+              <FontAwesome
+                name="angle-double-down"
+                color={Colors.white}
+                size={40}
+              />
+            </AppBottomSheetTouchableWrapper> */}
+            <View style={{
+              justifyContent: 'center', alignItems: 'center'
+            }}>
+            </View>
+          </View>
+        </ScrollView>
+      </View>
+    </View>
+  )
+}
+const styles = StyleSheet.create( {
+  modalContainer: {
+    // height: '80%',
+    backgroundColor: Colors.blue,
+    alignSelf: 'center',
+    width: '100%',
+    elevation: 10,
+    shadowColor: Colors.borderColor,
+    shadowOpacity: 10,
+    shadowOffset: {
+      width: 0, height: 2
+    },
+  },
+  headerText: {
+    color: Colors.white,
+    fontFamily: Fonts.Medium,
+    fontSize: RFValue( 20 ),
+    marginTop: hp( '2%' ),
+    marginBottom: hp( '1%' ),
+    flex: 1,
+    textAlign: 'center'
+  },
+  headerSeparator: {
+    backgroundColor: Colors.homepageButtonColor,
+    height: 1,
+    marginLeft: wp( '5%' ),
+    marginRight: wp( '5%' ),
+    marginBottom: hp( '1%' ),
+  },
+  infoText: {
+    textAlign: 'center',
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.Regular,
+    marginLeft: wp( '8%' ),
+    marginRight: wp( '8%' ),
+  },
+  clickHereText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.Regular,
+    textDecorationLine: 'underline',
+    textAlign: 'center',
+  },
+  toKnowMoreText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.Regular,
+  },
+  linkView: {
+    flexDirection: 'row',
+    marginLeft: wp( '10%' ),
+    marginRight: wp( '10%' ),
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
+  ElementView: {
+    height: hp( '75%' ),
+    justifyContent: 'space-between',
+  },
+  separatorView: {
+    width: wp( '70%' ),
+    height: 0,
+    alignSelf: 'center',
+    marginBottom: wp( '1%' ),
+    borderStyle: 'dotted',
+    borderWidth: 1,
+    borderRadius: 1,
+    borderColor: Colors.white,
+  },
+  helperImage: {
+    width: wp( '80%' ),
+    height: wp( '60%' ),
+    resizeMode: 'contain',
+  },
+  bottomLinkView: {
+    marginLeft: wp( '10%' ),
+    marginRight: wp( '10%' ),
+    marginBottom: wp( '15%' ),
+  },
+} )

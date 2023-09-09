@@ -30,6 +30,11 @@ import WalletBackupStack from './WalletBackupStack'
 import WalletOption from '../../../pages/MoreOptions/WalletOption/WalletOption'
 import BackupWithKeeper from '../../../pages/NewBHR/BackupWithKeeper'
 import BackupMethods from '../../../pages/NewBHR/BackupMethods'
+import ValidateBorderWalletPattern from '../../../pages/borderwallet/ValidateBorderWalletPattern'
+import ValidateBorderWalletChecksum from '../../../pages/borderwallet/ValidateBorderWalletChecksum'
+import PreviewPattern from '../../../pages/borderwallet/PreviewPattern'
+import BackupGridMnemonic from '../../../pages/borderwallet/BackupGridMnemonic'
+import CheckPasscodeComponent from '../../../pages/NewBHR/CheckPasscodeComponent'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -84,6 +89,36 @@ const MoreOptionsStack = createStackNavigator(
       navigationOptions: {
         header: null,
       },
+    },
+    BackupGridMnemonic: {
+      screen: BackupGridMnemonic,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    ValidateBorderWalletChecksum: {
+      screen: ValidateBorderWalletChecksum,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    ValidateBorderWalletPattern: {
+      screen: ValidateBorderWalletPattern,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    PreviewPattern: {
+      screen: PreviewPattern,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    CheckPasscode:{
+      screen: CheckPasscodeComponent,
+      navigationOptions:{
+        header:null
+      }
     },
     BackupMethods: {
       screen: BackupMethods,

@@ -1,3 +1,8 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable consistent-return */
+/* eslint-disable camelcase */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-console */
 import config from '../HexaConfig'
 import ElectrumCli from 'electrum-client'
 import reverse from 'buffer-reverse'
@@ -44,8 +49,11 @@ let ELECTRUM_CLIENT: {
 export const ELECTRUM_NOT_CONNECTED_ERR =
   'Network Error: The current electrum node is not reachable, please try again with a different node'
 
+export const ELECTRUM_NOT_CONNECTED_ERR_TOR =
+  'Network Error: Connection currently failing over Tor, please disable Tor or try again using a different node'
 
 export default class ElectrumClient {
+  public static connectOverTor = false;
 
   public static async connect() {
     let timeoutId = null
@@ -174,7 +182,9 @@ export default class ElectrumClient {
 
   public static checkConnection() {
     if ( !ELECTRUM_CLIENT.isClientConnected ) {
-      const connectionError = ELECTRUM_NOT_CONNECTED_ERR
+      const connectionError = ElectrumClient.connectOverTor
+        ? ELECTRUM_NOT_CONNECTED_ERR_TOR
+        : ELECTRUM_NOT_CONNECTED_ERR
       throw new Error( connectionError )
     }
   }

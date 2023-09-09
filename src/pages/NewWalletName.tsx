@@ -44,6 +44,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { initNewBHRFlow } from '../store/actions/BHR'
 import LoaderModal from '../components/LoaderModal'
 import LinearGradient from 'react-native-linear-gradient'
+import BorderWalletSuccessModal from '../components/border-wallet/BorderWalletSuccessModal'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -61,6 +62,7 @@ export default function NewWalletName( props ) {
   const [ walletName, setWalletName ] = useState( '' )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ note, showNote ] = useState( true )
+  const [ successModal, setSuccessModal ] = useState( false )
   const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
   const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
@@ -79,6 +81,9 @@ export default function NewWalletName( props ) {
   const [ message, setMessage ] = useState( strings.Creatingyourwallet )
   const [ signUpStarted, setSignUpStarted ] = useState( false )
   const mnemonic = props.navigation.getParam( 'mnemonic' ) || null
+  const initialMnemonic = props.navigation.getParam( 'initialMnemonic' ) || ''
+  const gridType = props.navigation.getParam( 'gridType' ) || ''
+  const passphrase = props.navigation.getParam( 'passphrase' ) || ''
 
   useEffect( () => {
     if ( walletSetupCompleted ) {
@@ -198,8 +203,8 @@ export default function NewWalletName( props ) {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>
@@ -216,10 +221,10 @@ export default function NewWalletName( props ) {
             flex: 1
           }} >
             <HeaderTitle1
-              firstLineTitle={`${strings.Step1}`}
+              firstLineTitle={initialMnemonic ? 'Step 7 of Create with Border Wallet' : `${strings.Step1}` }
               secondLineBoldTitle={strings.NameyourWallet}
               secondLineTitle={''}
-              infoTextNormal={''}
+              infoTextNormal={initialMnemonic ? `${strings.Step1}` : ''}
               infoTextBold={''}
               infoTextNormal1={''}
               step={''}
@@ -283,7 +288,7 @@ export default function NewWalletName( props ) {
                     setTimeout( () => {
                       setSignUpStarted( true )
                       dispatch( updateCloudPermission( false ) )
-                      dispatch( setupWallet( walletName, null, mnemonic ) )
+                      dispatch( setupWallet( walletName, null, mnemonic, initialMnemonic, gridType, passphrase ) )
                       dispatch( initNewBHRFlow( true ) )
                       dispatch( setVersion( 'Current' ) )
                       const current = Date.now()

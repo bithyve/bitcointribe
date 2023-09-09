@@ -12,13 +12,20 @@ import PasscodeConfirm from '../pages/PasscodeConfirm'
 import WalletInitializationScreen from '../pages/WalletInitializationScreen'
 import RestoreSelectedContactsList from '../pages/Recovery/RestoreSelectedContactsList'
 import NewWalletName from '../pages/NewWalletName'
+import CreateWithBorderWallet from '../pages/borderwallet/CreateWithBorderWallet'
+import BorderWalletGridScreen from '../pages/borderwallet/BorderWalletGridScreen'
+import SelectEntropyGridType from '../pages/borderwallet/SelectEntropyGridType'
+import DownloadEncryptGrid from '../pages/borderwallet/DownloadEncryptGrid'
+import SelectChecksumWord from '../pages/borderwallet/SelectChecksumWord'
+import CreatePassPhrase from '../pages/borderwallet/CreatePassPhrase'
+import ConfirmDownload from '../pages/borderwallet/ConfirmDownload'
+import PreviewPattern from '../pages/borderwallet/PreviewPattern'
+import RecoverBorderWallet from '../pages/borderwallet/RecoverBorderWallet'
+import RegenerateEntropyGrid from '../pages/borderwallet/RegenerateEntropyGrid'
 import AccountSelection from '../pages/AccountSelection'
 import NewWalletQuestion from '../pages/NewWalletQuestion'
 import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice'
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts'
-import ReLogin from '../pages/ReLogin'
-import CustodianRequestOTP from '../pages/CustodianRequest/CustodianRequestOTP'
-import CustodianRequestAccepted from '../pages/CustodianRequest/CustodianRequestAccepted'
 import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery'
 import RecoveryQuestionScreen from '../pages/Recovery/RecoveryQuestionScreen'
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication'
@@ -29,18 +36,16 @@ import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions'
 import HomeStack from './stacks/home/HomeStack'
 import FriendsAndFamily from './stacks/F&F/F&FStack'
 import Colors from '../common/Colors'
-import Intermediate from '../pages/Intermediate'
 import CreateKeeperScreen from '../pages/CreateKeeperScreen'
 import RestoreWithICloud from '../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
 import { BottomTabBar, createBottomTabNavigator } from 'react-navigation-tabs'
-import { Text, View, Image, StyleSheet } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
   widthPercentageToDP,
 } from 'react-native-responsive-screen'
-import Svg, { G, Path, Defs } from 'react-native-svg'
 import HomeSVG from '../assets/images/tabs/home.svg'
 import HomeInactiveSVG from '../assets/images/tabs/home_inactive.svg'
 import Wallet_InactiveSVG from '../assets/images/tabs/wallet_inactive.svg'
@@ -54,10 +59,7 @@ import FnF from '../assets/images/tabs/fnf_active.svg'
 import RGBInactive from '../assets/images/tabs/rgb_inactive.svg'
 import RGBActive from '../assets/images/tabs/rgb_active.svg'
 import MoreOptionsStack from './stacks/more-options/MoreOptionsStack'
-import SecurityStack from './stacks/security/Security&Privacy'
-import BuyStack from './stacks/buy/BuyStack'
 import Header from './stacks/Header'
-import IconWithBadge from './stacks/security/IconWithBadge'
 import SmallNavHeaderBackButton from '../components/navigation/SmallNavHeaderBackButton'
 import defaultStackScreenNavigationOptions from './options/DefaultStackScreenNavigationOptions'
 import RestoreSeedWordsContent from '../pages/RestoreHexaWithKeeper/RestoreSeedWordsContent'
@@ -88,6 +90,16 @@ const SetupNavigator = createStackNavigator(
     PasscodeConfirm,
     NewWalletName,
     CreateKeeperScreen,
+    CreateWithBorderWallet,
+    SelectEntropyGridType,
+    DownloadEncryptGrid,
+    BorderWalletGridScreen,
+    SelectChecksumWord,
+    CreatePassPhrase,
+    ConfirmDownload,
+    PreviewPattern,
+    RecoverBorderWallet,
+    RegenerateEntropyGrid,
     AccountSelection,
     NewWalletQuestion,
     WalletInitialization: WalletInitializationScreen,

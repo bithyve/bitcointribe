@@ -29,6 +29,7 @@ enum SubAccountKind {
   FNF_ACCOUNT = 'FNF_ACCOUNT',
   SWAN_ACCOUNT = 'SWAN_ACCOUNT',
   LIGHTNING_ACCOUNT = 'LIGHTNING_ACCOUNT',
+  BORDER_WALLET = 'BORDER_WALLET'
 }
 
 export default SubAccountKind

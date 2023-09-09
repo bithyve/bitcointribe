@@ -4,6 +4,7 @@ import {
   View,
   StyleSheet,
   ScrollView,
+  SafeAreaView,
 } from 'react-native'
 import openLink from '../../../utils/OpenLink'
 import ListStyles from '../../../common/Styles/ListStyles'
@@ -34,96 +35,98 @@ export default class TransactionDetailsScreen extends Component {
         overScrollMode="never"
         bounces={false}
       >
-        <HeaderTitle
-          firstLineTitle={'Transaction Details'}
-          secondLineTitle={''}
-          infoTextNormal={''}
-          infoTextBold={''}
-          infoTextNormal1={''}
-          step={''}
-        />
+        <SafeAreaView style={styles.rootContainer}>
+          <HeaderTitle
+            firstLineTitle={'Transaction Details'}
+            secondLineTitle={''}
+            infoTextNormal={''}
+            infoTextBold={''}
+            infoTextNormal1={''}
+            step={''}
+          />
 
-        <View style={styles.bodySection}>
-          <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>Amount</Text>
-            <Text
-              style={{
-                ...ListStyles.listItemSubtitle,
-                marginBottom: 3,
-              }}
-            >
-              {`${this.state.transaction.amount} sats`}
-            </Text>
-          </View>
-          <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>
+          <View style={styles.bodySection}>
+            <View style={styles.lineItem}>
+              <Text style={ListStyles.listItemTitleTransaction}>Amount</Text>
+              <Text
+                style={{
+                  ...ListStyles.listItemSubtitle,
+                  marginBottom: 3,
+                }}
+              >
+                {`${this.state.transaction.amount} sats`}
+              </Text>
+            </View>
+            <View style={styles.lineItem}>
+              <Text style={ListStyles.listItemTitleTransaction}>
               Transaction ID
-            </Text>
-            <Text
-              style={{
-                ...ListStyles.listItemSubtitle,
-                marginBottom: 3,
-              }}
-              onPress={() =>{
-                if( this.props.NodeInfoStore.nodeInfo.testnet ){
-                  openLink(
-                    `https://blockstream.info/testnet/tx/${this.state.transaction.tx_hash}`
-                  )
-                } else {
-                  openLink(
-                    `https://blockstream.info/tx/${this.state.transaction.tx_hash}`
-                  )
+              </Text>
+              <Text
+                style={{
+                  ...ListStyles.listItemSubtitle,
+                  marginBottom: 3,
+                }}
+                onPress={() =>{
+                  if( this.props.NodeInfoStore.nodeInfo.testnet ){
+                    openLink(
+                      `https://blockstream.info/testnet/tx/${this.state.transaction.tx_hash}`
+                    )
+                  } else {
+                    openLink(
+                      `https://blockstream.info/tx/${this.state.transaction.tx_hash}`
+                    )
+                  }
+
                 }
 
-              }
+                }
+              >
+                {this.state.transaction.tx_hash}
+              </Text>
+            </View>
 
-              }
-            >
-              {this.state.transaction.tx_hash}
-            </Text>
-          </View>
-
-          <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>
+            <View style={styles.lineItem}>
+              <Text style={ListStyles.listItemTitleTransaction}>
               Destination Addresses
-            </Text>
-            <Text
-              style={{
-                ...ListStyles.listItemSubtitle,
-                marginBottom: 3,
-              }}
-            >
-              {this.state.transaction.dest_addresses.join( '\n' ) }
-            </Text>
-          </View>
+              </Text>
+              <Text
+                style={{
+                  ...ListStyles.listItemSubtitle,
+                  marginBottom: 3,
+                }}
+              >
+                {this.state.transaction.dest_addresses.join( '\n' ) }
+              </Text>
+            </View>
 
-          <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>Fees</Text>
-            <Text
-              style={{
-                ...ListStyles.listItemSubtitle,
-                marginBottom: 3,
-              }}
-            >
-              {`${this.state.transaction.total_fees} sats`}
-            </Text>
-          </View>
-          <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>
+            <View style={styles.lineItem}>
+              <Text style={ListStyles.listItemTitleTransaction}>Fees</Text>
+              <Text
+                style={{
+                  ...ListStyles.listItemSubtitle,
+                  marginBottom: 3,
+                }}
+              >
+                {`${this.state.transaction.total_fees} sats`}
+              </Text>
+            </View>
+            <View style={styles.lineItem}>
+              <Text style={ListStyles.listItemTitleTransaction}>
               Confirmations
-            </Text>
-            <Text
-              style={{
-                ...ListStyles.listItemSubtitle,
-                marginBottom: 3,
-              }}
-            >
-              {this.state.transaction.num_confirmations > 6
-                ? '6+'
-                : this.state.transaction.num_confirmations}
-            </Text>
+              </Text>
+              <Text
+                style={{
+                  ...ListStyles.listItemSubtitle,
+                  marginBottom: 3,
+                }}
+              >
+                {this.state.transaction.num_confirmations > 6
+                  ? '6+'
+                  : this.state.transaction.num_confirmations}
+              </Text>
+            </View>
           </View>
-        </View>
+        </SafeAreaView>
       </ScrollView>
     )
   }

@@ -4,8 +4,6 @@ project(':react-native-safe-area-context').projectDir = new File(rootProject.pro
 apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 include ':react-native-linear-gradient'
 project(':react-native-linear-gradient').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-linear-gradient/android')
-include ':react-native-fs'
-project(':react-native-fs').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-fs/android')
 include ':react-native-check-app-install'
 project(':react-native-check-app-install').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-check-app-install/android')
 include ':react-native-localize'

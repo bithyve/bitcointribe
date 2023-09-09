@@ -69,6 +69,7 @@ export default function Receive( props ) {
   const savingWarning = useSelector( ( state ) =>
     idx( state, ( _ ) => _.preferences.savingWarning ),
   )
+  const borderWalletBackup = useSelector( ( state ) => state.bhr.borderWalletBackup )
   const strings = translations[ 'accounts' ]
   const common = translations[ 'common' ]
   const [ SecureReceiveWarningBottomSheet ] = useState( React.createRef() )
@@ -178,10 +179,14 @@ export default function Receive( props ) {
         //await AsyncStorage.setItem('savingsWarning', 'true');
       }
     }
-
+    console.log( 'borderWalletBackup.status', !borderWalletBackup.status )
+    console.log( 'notSetup', levelData[ 0 ].keeper1.status === 'notSetup' )
+    console.log( 'seed', levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' )
+    console.log( 'Write down Backup Phrase', levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'Write down Backup Phrase' )
     if ( ( levelData[ 0 ].keeper1.status === 'notSetup' ) ||
       ( levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' &&
-        levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'Write down Backup Phrase' ) ) {
+        levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'Write down Backup Phrase' ) ||
+        !borderWalletBackup && !borderWalletBackup.status ) {
       setTimeout( () => {
         setBackupReminder( true )
       }, 500 )

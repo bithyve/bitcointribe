@@ -76,6 +76,17 @@ import RGBSend from '../../../pages/rgb/RGBSend'
 import IssueScreen from '../../../pages/rgb/IssueScreen'
 import AssetsDetailScreen from '../../../pages/Assets/AssetsDetailScreen'
 import CollectibleDetailScreen from '../../../pages/rgb/CollectibleDetailScreen'
+import CreateWithBorderWallet from '../../../pages/borderwallet/CreateWithBorderWallet'
+import SelectEntropyGridType from '../../../pages/borderwallet/SelectEntropyGridType'
+import DownloadEncryptGrid from '../../../pages/borderwallet/DownloadEncryptGrid'
+import BorderWalletGridScreen from '../../../pages/borderwallet/BorderWalletGridScreen'
+import SelectChecksumWord from '../../../pages/borderwallet/SelectChecksumWord'
+import CreatePassPhrase from '../../../pages/borderwallet/CreatePassPhrase'
+import ConfirmDownload from '../../../pages/borderwallet/ConfirmDownload'
+import PreviewPattern from '../../../pages/borderwallet/PreviewPattern'
+import ImportBorderWallet from '../../../pages/borderwallet/ImportBorderWallet'
+import RecoverBorderWallet from '../../../pages/borderwallet/RecoverBorderWallet'
+import ImportBWGrid from '../../../pages/borderwallet/ImportBWGrid'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -105,6 +116,7 @@ const HomeStack = createStackNavigator(
       screen: ReLogin,
       navigationOptions: {
         gesturesEnabled: false,
+        header: null,
       },
     },
     Login,
@@ -117,6 +129,78 @@ const HomeStack = createStackNavigator(
     },
     ScanNodeConfig: {
       screen: ScanNodeConfig,
+      navigationOptions: {
+        header: null
+      }
+    },
+    ImportBorderWallet: {
+      screen: ImportBorderWallet,
+      navigationOptions: {
+        header: null
+      }
+    },
+    CreateWithBorderWalletAccount: {
+      screen: CreateWithBorderWallet,
+      navigationOptions: {
+        header: null
+      }
+    },
+    SelectEntropyGridTypeAccount: {
+      screen: SelectEntropyGridType,
+      navigationOptions: {
+        header: null
+      }
+    },
+    DownloadEncryptGrid: {
+      screen: DownloadEncryptGrid,
+      navigationOptions: {
+        header: null
+      }
+    },
+    BorderWalletGridScreen: {
+      screen: BorderWalletGridScreen,
+      navigationOptions: {
+        header: null
+      }
+    },
+    SelectChecksumWordAccount: {
+      screen: SelectChecksumWord,
+      navigationOptions: {
+        header: null
+      }
+    },
+    CreatePassPhraseAccount: {
+      screen: CreatePassPhrase,
+      navigationOptions: {
+        header: null
+      }
+    },
+    ConfirmDownloadAccount: {
+      screen: ConfirmDownload,
+      navigationOptions: {
+        header: null
+      }
+    },
+    ConfirmDownload: {
+      screen: ConfirmDownload,
+      navigationOptions: {
+        header: null
+      }
+    },
+    PreviewPattern: {
+      screen: PreviewPattern,
+      navigationOptions: {
+        header: null
+      }
+    },
+    RecoverBorderWallet:{
+      screen: RecoverBorderWallet,
+      navigationOptions: {
+        header: null
+      }
+    },
+    ImportBWGrid: {
+      screen: ImportBWGrid,
       navigationOptions: {
         header: null
       }

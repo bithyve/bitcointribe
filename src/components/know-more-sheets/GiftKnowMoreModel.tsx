@@ -33,7 +33,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
             width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
             alignSelf: 'flex-end',
             backgroundColor: Colors.CLOSE_ICON_COLOR, alignItems: 'center', justifyContent: 'center',
-            marginTop: wp( 3 ), marginRight: wp( 3 ) , marginBottom:wp(-4),zIndex:999
+            marginTop: wp( 3 ), marginRight: wp( 3 ), marginBottom:wp( -4 ), zIndex:999
           }}
         >
           <FontAwesome name="close" color={Colors.white} size={19} style={{
@@ -48,7 +48,7 @@ export default function TestAccountKnowMoreSheetContents( props ) {
           onPress={() => props.titleClicked && props.titleClicked()}
         >
           <Text style={styles.headerText}>Gift Sats</Text>
-          
+
         </AppBottomSheetTouchableWrapper>
         <ScrollView
           ref={scrollViewRef}

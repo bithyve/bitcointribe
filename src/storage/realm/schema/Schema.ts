@@ -1,4 +1,5 @@
 import { ObjectSchema } from 'realm'
+import { GridType } from '../../../bitcoin/utilities/Interface'
 
 const UTXO = 'UTXO'
 const UTXOStatus = 'UTXOStatus'
@@ -441,6 +442,12 @@ export const WalletSchema: ObjectSchema = {
     },
     primaryMnemonic: {
       type: 'string', optional: true,
+    },
+    borderWalletMnemonic: {
+      type: 'string', default: ''
+    },
+    borderWalletGridType: {
+      type: 'string', default: GridType.WORDS
     },
     primarySeed: {
       type: 'string', optional: true,

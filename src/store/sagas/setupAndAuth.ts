@@ -43,12 +43,12 @@ import { connectToNode } from '../actions/nodeSettings'
 
 
 function* setupWalletWorker( { payload } ) {
-  const { walletName, security, mnemonic }: { walletName: string, security: { questionId: string, question: string, answer: string }, newBie:boolean, mnemonic: string } = payload
+  const { walletName, security, mnemonic, initialMnemonic, gridType, passphrase }: { walletName: string, security: { questionId: string, question: string, answer: string }, newBie:boolean, mnemonic: string, initialMnemonic: string, gridType: string, passphrase: string } = payload
   let primaryMnemonic = null
   if( mnemonic && mnemonic != null )
     primaryMnemonic = mnemonic
   else primaryMnemonic = bip39.generateMnemonic( )
-  const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
+  const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic, passphrase )
   const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
 
   // const wallet: Wallet = {
@@ -71,7 +71,9 @@ function* setupWalletWorker( { payload } ) {
     primarySeed: primarySeed.toString( 'hex' ),
     accounts: {
     },
-    version: DeviceInfo.getVersion()
+    version: DeviceInfo.getVersion(),
+    borderWalletMnemonic: initialMnemonic,
+    borderWalletGridType: gridType
   }
   const wallet: Wallet = {
     walletId,
@@ -82,7 +84,7 @@ function* setupWalletWorker( { payload } ) {
     // primarySeed: '',
     accounts: {
     },
-    version: DeviceInfo.getVersion()
+    version: DeviceInfo.getVersion(),
   }
   yield put( updateWallet( wallet ) )
   yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
@@ -90,7 +92,7 @@ function* setupWalletWorker( { payload } ) {
   // prepare default accounts for the wallet
 
   const accountsInfo: newAccountsInfo[] = []
-  const accountArray = [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT, AccountType.SWAN_ACCOUNT,
+  const accountArray = [ AccountType.TEST_ACCOUNT, AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT
     // Note New saving account create is off
     // AccountType.SAVINGS_ACCOUNT
   ]
