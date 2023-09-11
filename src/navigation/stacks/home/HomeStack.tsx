@@ -77,7 +77,7 @@ const HomeStack = () => {
     <Stack.Navigator
       initialRouteName='Home'
     >
-      <Stack.Screen name="Home" component={Home} options={{ header: null }} />
+      <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }

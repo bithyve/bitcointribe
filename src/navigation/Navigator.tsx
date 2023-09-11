@@ -62,7 +62,7 @@ import LinearGradient from 'react-native-linear-gradient'
 const SetupStack = createNativeStackNavigator();
 function SetupNavigator() {
   return (
-    <SetupStack.Navigator>
+    <SetupStack.Navigator initialRouteName='Launch' screenOptions={{ headerShown: false, headerTitleAlign: 'center' }}>
       <SetupStack.Screen name="Launch" component={Launch} />
       <SetupStack.Screen name="Login" component={Login} />
     </SetupStack.Navigator>
@@ -319,8 +319,8 @@ function Navigator() {
   return (
     <NavigationContainer>
       <SwitchStack.Navigator>
-        <SwitchStack.Screen name="SetupNav" component={SetupNavigator} />
-        <SwitchStack.Screen name="HomeNav" component={HomeNavigator} />
+          <SwitchStack.Screen name="SetupNav" component={SetupNavigator} options={{ headerShown: false }} />
+          <SwitchStack.Screen name="HomeNav" component={HomeNavigator} />
       </SwitchStack.Navigator>
     </NavigationContainer>
   )

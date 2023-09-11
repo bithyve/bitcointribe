@@ -237,16 +237,16 @@ export default function Login( props ) {
       } else {
         setloaderModal( false )
         if( !creationFlag ) {
-          props.navigation.navigate( 'Home', {
-            screen: 'Home'
+          props.navigation.navigate( 'HomeNav', {
+            screen: 'Landing'
           } )
         } else if( processedLink ){
-          props.navigation.navigate( 'Home', {
-            screen: 'Home',
+          props.navigation.navigate( 'HomeNav', {
+            screen: 'Landing',
             params: {
-              trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,
-              giftRequest: processedLink ? processedLink.giftRequest: null,
-              swanRequest: processedLink ? processedLink.swanRequest: null,
+              trustedContactRequest: processedLink.trustedContactRequest,
+              giftRequest: processedLink.giftRequest,
+              swanRequest: processedLink.swanRequest,
             }
           } )
         }

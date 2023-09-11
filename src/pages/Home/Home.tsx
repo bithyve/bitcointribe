@@ -4,7 +4,6 @@ import {
   StatusBar,
   View,
   Platform,
-  SafeAreaView
 } from 'react-native'
 import {
   heightPercentageToDP,
