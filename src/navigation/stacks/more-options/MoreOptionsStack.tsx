@@ -31,13 +31,110 @@ import PreviewPattern from '../../../pages/borderwallet/PreviewPattern'
 import BackupGridMnemonic from '../../../pages/borderwallet/BackupGridMnemonic'
 import CheckPasscodeComponent from '../../../pages/NewBHR/CheckPasscodeComponent'
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator()
 const MoreOptionsStack = () => {
   return (
     <Stack.Navigator
       initialRouteName='Home'
+      //to do screen option
+      // defaultNavigationOptions={( { navigation } )=>{
+      //   return {
+      //     ...defaultStackScreenNavigationOptions,
+      //     headerLeft: () => {
+      //       return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+      //     },
+      //   }
+      // }}
+      // screenOptions={({navigation})=>{
+
+      // }}
+
     >
-      <Stack.Screen name="Home" component={MoreOptionsContainerScreen} options={{ header: null }} />
+      <Stack.Screen name="MoreOptionsContainerScreen" component={MoreOptionsContainerScreen} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="Launch" component={Launch} />
+      <Stack.Screen name="Login" component={Login} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="Intermediate" component={Intermediate} />
+      <Stack.Screen name="ReLogin" component={ReLogin} options={{
+        headerShown: false,
+        gestureEnabled:false,
+      }} />
+      <Stack.Screen name="AccountManagement" component={AccountManagementStack} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="TransactionDetails" component={TransactionDetailsContainerScreen} />
+      <Stack.Screen name="PasscodeChangeSuccessPage" component={PasscodeChangeSuccessPage} options={{
+        headerShown: false,
+        gestureEnabled:false,
+      }}/>
+      <Stack.Screen name="FriendsAndFamily" component={FriendsAndFamilyScreen} options={{
+        title: 'Friends & Family',
+      }}/>
+      <Stack.Screen name="BackupWithKeeper" component={BackupWithKeeper} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="BackupGridMnemonic" component={BackupGridMnemonic} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="ValidateBorderWalletChecksum" component={ValidateBorderWalletChecksum} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="ValidateBorderWalletPattern" component={ValidateBorderWalletPattern} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="PreviewPattern" component={PreviewPattern} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="CheckPasscode" component={CheckPasscodeComponent} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="BackupMethods" component={BackupMethods} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="AppInfo" component={AppInfo} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="WalletSettings" component={WalletSettingsStack} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="NodeSettings" component={NodeSettingsContainerScreen}
+        options={( { navigation } ) => {
+          return {
+            title: 'Node Settings',
+            headerTitleStyle:{
+              color: Colors.blue,
+              fontSize: RFValue( 18 ),
+              fontFamily: Fonts.Medium,
+              textAlign: 'left',
+              marginHorizontal: 0
+            },
+            headerLeft: () => {
+              return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+            },
+          }
+        }}
+      />
+      <Stack.Screen name="FundingSources" component={FundingSourcesScreen} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="FundingSourceDetails" component={FundingSourceDetailsScreen} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="QRScanner" component={QRStack} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="VersionHistory" component={VersionHistoryScreen} options={{
+        title: 'Version History',
+      }} />
+      <Stack.Screen name="AccountDetails" component={AccountDetailsStack} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="SeedBackup" component={WalletBackupStack} options={{
+        headerShown: false,
+      }} />
     </Stack.Navigator>
   )
 }

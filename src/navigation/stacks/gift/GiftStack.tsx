@@ -1,3 +1,4 @@
+import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import QRStack from '../home/QRStack'
 import ContactDetails from '../../../pages/Contacts/ContactDetails'
@@ -23,13 +24,60 @@ import SetUpSatNextCardScreen from '../../../pages/Gift/SetUpSatNextCardScreen'
 import GiftCreatedScreen from '../../../pages/Gift/GiftCreatedScreen'
 import ClaimSatsScreen from '../../../pages/Gift/ClaimSatsScreen'
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator()
 const GiftStack = () => {
   return (
     <Stack.Navigator
-      initialRouteName='Home'
+      initialRouteName='GiftScreen'
     >
-      <Stack.Screen name="Home" component={GiftScreen} options={{ header: null }} />
+      <Stack.Screen name="GiftScreen" component={GiftScreen} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="ManageGifts" component={ManageGifts} />
+      <Stack.Screen name="EnterGiftDetails" component={EnterGiftDetails} />
+      <Stack.Screen name="GiftDetails" component={GiftDetails} />
+      <Stack.Screen name="SendViaLinkAndQR" component={SendViaLinkAndQR} />
+      <Stack.Screen name="CreateGift" component={CreateGift} />
+      <Stack.Screen name="SendGift" component={SendGift} />
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Launch" component={Launch} />
+      <Stack.Screen name="Intermediate" component={Intermediate} />
+      <Stack.Screen name="ReLogin" component={ReLogin} options={{
+        gestureEnabled:false
+      }}/>
+      <Stack.Screen name="ContactDetails" component={ContactDetails} options={{
+        headerShown: false
+      }}/>
+      <Stack.Screen name="AddContactSendRequest" component={AddContactSendRequest} options={{
+        headerShown: false
+      }}/>
+      <Stack.Screen name="QrAndLink" component={QrAndLink} options={{
+        headerShown: false
+      }}/>
+      <Stack.Screen name="AccountDetails" component={AccountDetailsStack} options={{
+        headerShown: false
+      }}/>
+      <Stack.Screen name="TransactionDetails" component={TransactionDetailsContainerScreen} options={{
+        title: 'TransactionDetails',
+      }}/>
+
+      <Stack.Screen name="QRScanner" component={QRStack} options={{
+        headerShown: false
+      }}/>
+
+      <Stack.Screen name="AddContact" component={AddContactAddressBook} options={{
+        headerShown: false
+      }}/>
+      <Stack.Screen name="RequestKeyFromContact" component={RequestKeyFromContact} />
+      <Stack.Screen name="SetUpSatNextCard" component={SetUpSatNextCardScreen} options={{
+        headerShown: false
+      }}/>
+      <Stack.Screen name="GiftCreated" component={GiftCreatedScreen} options={{
+        headerShown: false
+      }}/>
+      <Stack.Screen name="ClaimSats" component={ClaimSatsScreen} options={{
+        headerShown: false
+      }}/>
     </Stack.Navigator>
   )
 }

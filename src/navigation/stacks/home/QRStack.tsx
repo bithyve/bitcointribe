@@ -6,17 +6,17 @@ import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHea
 import HomeQRScannerScreen from '../../../pages/Home/HomeQRScannerScreen'
 import ReceiveQrScreen from '../../../pages/Home/ReceiveQrScreen'
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator()
 export default function QRStack() {
   return (
     <Stack.Navigator
       initialRouteName='QRRoot'
-      screenOptions={({navigation}) => ({
+      screenOptions={( { navigation } ) => ( {
         ...defaultStackScreenNavigationOptions,
         headerLeft: () => {
           return <SmallNavHeaderBackButton onPress={() => { navigation.goBack() }} />
         },
-      })}
+      } )}
     >
       <Stack.Screen name="QRRoot" component={HomeQRScannerScreen} options={( { navigation } ) => {
         return {

@@ -67,6 +67,9 @@ function SetupNavigator() {
     }}>
       <SetupStack.Screen name="Launch" component={Launch} />
       <SetupStack.Screen name="Login" component={Login} />
+      <SetupStack.Screen name="PasscodeConfirm" component={PasscodeConfirm} />
+      <SetupStack.Screen name="WalletInitialization" component={WalletInitializationScreen} />
+      <SetupStack.Screen name="NewWalletName" component={NewWalletName} />
     </SetupStack.Navigator>
   )
 }

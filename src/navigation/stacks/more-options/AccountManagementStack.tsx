@@ -10,7 +10,7 @@ import { translations } from '../../../common/content/LocContext'
 
 const strings  = translations[ 'stackTitle' ]
 
-const PanAccountSettingsStack = createNativeStackNavigator();
+const PanAccountSettingsStack = createNativeStackNavigator()
 function PanAccountSettings() {
   return (
     <PanAccountSettingsStack.Navigator
@@ -46,7 +46,7 @@ function PanAccountSettings() {
   )
 }
 
-const AccountManagementStack = createNativeStackNavigator();
+const AccountManagementStack = createNativeStackNavigator()
 export default function  AccountManagement() {
   return (
     <AccountManagementStack.Navigator
@@ -55,8 +55,12 @@ export default function  AccountManagement() {
         ...defaultStackScreenNavigationOptions,
       }}
     >
-      <AccountManagementStack.Screen name="AccountManagementRoot" component={AccountManagementContainerScreen} options={{ header: null }} />
-      <AccountManagementStack.Screen name="PanAccountSettings" component={PanAccountSettings} options={{ header: null }} />
+      <AccountManagementStack.Screen name="AccountManagementRoot" component={AccountManagementContainerScreen} options={{
+        headerShown: false,
+      }} />
+      <AccountManagementStack.Screen name="PanAccountSettings" component={PanAccountSettings} options={{
+        headerShown: false,
+      }} />
     </AccountManagementStack.Navigator>
   )
 }
