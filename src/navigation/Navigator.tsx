@@ -1,5 +1,5 @@
 import React from 'react'
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Launch from '../pages/Launch'
 import Login from '../pages/Login'
@@ -36,7 +36,7 @@ import CreateKeeperScreen from '../pages/CreateKeeperScreen'
 
 import RestoreWithICloud from '../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
-import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { View, StyleSheet } from 'react-native'
 import {
   heightPercentageToDP as hp,
@@ -59,10 +59,12 @@ import Filled_gift_tab from '../assets/images/satCards/filled_gift_tab.svg'
 import Gift_tab from '../assets/images/satCards/gift_tab.svg'
 import LinearGradient from 'react-native-linear-gradient'
 
-const SetupStack = createNativeStackNavigator();
+const SetupStack = createNativeStackNavigator()
 function SetupNavigator() {
   return (
-    <SetupStack.Navigator initialRouteName='Launch' screenOptions={{ headerShown: false, headerTitleAlign: 'center' }}>
+    <SetupStack.Navigator initialRouteName='Launch' screenOptions={{
+      headerShown: false, headerTitleAlign: 'center'
+    }}>
       <SetupStack.Screen name="Launch" component={Launch} />
       <SetupStack.Screen name="Login" component={Login} />
     </SetupStack.Navigator>
@@ -170,15 +172,105 @@ const GradientTab = props => {
   )
 }
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator()
 function BottomTab() {
   return (
-    <Tab.Navigator>
-      <Tab.Screen name="Home" component={HomeStack} />
+    <Tab.Navigator
+      initialRouteName="Home"
+      screenOptions={{
+        tabBarStyle:{
+          backgroundColor: Colors.THEAM_TEXT_COLOR
+
+        }
+      }}
+
+    >
+      <Tab.Screen name="Home" component={HomeStack}
+        options={{
+          headerShown: false,
+          tabBarLabel: '',
+          tabBarIcon: ( { focused } ) => (
+            <View style={{
+              marginTop: hp( '1.3%' )
+            }}>
+              {focused ?
+                <HomeSVG/>
+                :
+                <HomeInactiveSVG/>
+              }
+
+              {focused ?
+                <View style={styles.activeStyle}/>
+                :
+                <View style={styles.inactiveStyle}/>
+              }
+            </View>
+          ),
+        }}
+      />
+      <Tab.Screen name="FriendsAndFamily" component={FriendsAndFamily}
+        options={{
+          headerShown: false,
+          tabBarLabel: '',
+          tabBarIcon: ( { focused } ) => (
+            <View style={{
+              marginTop: hp( '1.3%' ),
+            }}>
+              {focused ?
+                <FnF /> : <FnFInactive />
+              }
+              {focused ?
+                <View style={styles.activeStyle}/>
+                :
+                <View style={styles.inactiveStyle}/>
+              }
+            </View>
+          ),
+        }}
+      />
+      <Tab.Screen name="GiftStack" component={GiftStack}
+        options={{
+          headerShown: false,
+          tabBarLabel: '',
+          tabBarIcon: ( { focused } ) => (
+            <View style={{
+              marginTop: hp( '0.85%' ),
+
+            }}>
+              {/* <IconWithBadge focused={focused} /> */}
+              {focused ?
+                <Filled_gift_tab /> : <Gift_tab />
+              }
+            </View>
+          ),
+        }}
+      />
+      <Tab.Screen name="MoreOptionsStack" component={MoreOptionsStack}
+        options={{
+          headerShown: false,
+          tabBarLabel: '',
+          tabBarIcon: ( { focused } ) => (
+            <View style={{
+              marginTop: hp( '1.3%' )
+            }}>
+              {focused ?
+                <Settings />
+                :
+                <SettingsInactive />
+              }
+              {focused ?
+                <View style={styles.activeStyle}/>
+                :
+                <View style={styles.inactiveStyle}/>
+              }
+            </View>
+          ),
+        }}
+      />
     </Tab.Navigator>
   )
 }
-//TODO: add all below bottom tabs 
+//TODO: add all below bottom tabs
 // const BottomTab = createBottomTabNavigator(
 //   {
 //     Home: {
@@ -281,11 +373,13 @@ function BottomTab() {
 //   },
 // )
 
-const HomeStackInit = createNativeStackNavigator();
+const HomeStackInit = createNativeStackNavigator()
 function HomeNavigator() {
   return (
     <HomeStackInit.Navigator>
-      <HomeStackInit.Screen name="Landing" component={BottomTab} />
+      <HomeStackInit.Screen name="Landing" component={BottomTab} options={{
+        headerShown: false
+      }}/>
     </HomeStackInit.Navigator>
   )
 }
@@ -313,14 +407,18 @@ function HomeNavigator() {
 // )
 
 
-const SwitchStack = createNativeStackNavigator();
+const SwitchStack = createNativeStackNavigator()
 //TODO: conditionally add below screens as createSwitchNavigator is removed
 function Navigator() {
   return (
     <NavigationContainer>
       <SwitchStack.Navigator>
-          <SwitchStack.Screen name="SetupNav" component={SetupNavigator} options={{ headerShown: false }} />
-          <SwitchStack.Screen name="HomeNav" component={HomeNavigator} />
+        <SwitchStack.Screen name="SetupNav" component={SetupNavigator} options={{
+          headerShown: false
+        }} />
+        <SwitchStack.Screen name="HomeNav" component={HomeNavigator} options={{
+          headerShown: false
+        }}/>
       </SwitchStack.Navigator>
     </NavigationContainer>
   )

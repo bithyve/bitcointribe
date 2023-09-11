@@ -71,13 +71,17 @@ import ImportBorderWallet from '../../../pages/borderwallet/ImportBorderWallet'
 import RecoverBorderWallet from '../../../pages/borderwallet/RecoverBorderWallet'
 import ImportBWGrid from '../../../pages/borderwallet/ImportBWGrid'
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator()
 const HomeStack = () => {
   return (
     <Stack.Navigator
       initialRouteName='Home'
     >
-      <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
+      <Stack.Screen name="Home" component={Home} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="Launch" component={Launch} options={{
+      }} />
     </Stack.Navigator>
   )
 }
