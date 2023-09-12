@@ -33,12 +33,16 @@ const GiftStack = () => {
       <Stack.Screen name="GiftScreen" component={GiftScreen} options={{
         headerShown: false
       }} />
-      <Stack.Screen name="ManageGifts" component={ManageGifts} />
+      <Stack.Screen name="ManageGifts" component={ManageGifts} options={{
+        headerShown:false
+      }}/>
       <Stack.Screen name="EnterGiftDetails" component={EnterGiftDetails} />
       <Stack.Screen name="GiftDetails" component={GiftDetails} />
       <Stack.Screen name="SendViaLinkAndQR" component={SendViaLinkAndQR} />
-      <Stack.Screen name="CreateGift" component={CreateGift} />
-      <Stack.Screen name="SendGift" component={SendGift} />
+      <Stack.Screen name="CreateGift" component={CreateGift} options={{
+        headerShown: false
+      }}/>
+      <Stack.Screen name="SendGift" component={SendGift}/>
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Launch" component={Launch} />
       <Stack.Screen name="Intermediate" component={Intermediate} />
