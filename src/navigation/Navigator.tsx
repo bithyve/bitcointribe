@@ -1,5 +1,5 @@
-import React from 'react'
-import { NavigationContainer } from '@react-navigation/native'
+import React, { useLayoutEffect } from 'react'
+import { NavigationContainer, getFocusedRouteNameFromRoute, useNavigationState } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Launch from '../pages/Launch'
 import Login from '../pages/Login'
@@ -157,12 +157,15 @@ function BottomTab() {
     <Tab.Navigator
       initialRouteName="Home"
       tabBar={GradientTab}
-      screenOptions={({ navigation, route }) => {
+      screenOptions={() => {
+        const homeNavRoutes = useNavigationState((state) => state.routes[1].state?.routes);
+        let showContent = true;
+        for( const route of homeNavRoutes || [] ) {
+          if (route.state?.routes?.length > 1) showContent = false;
+        }
         return ({
-        // TODO: test header and replace showContent value
-        // headerShown: false,
         header: () => {
-          return <Header showContent={true} />
+          return <Header showContent={showContent} />
         },
         tabBarShowLabel: false,
         tabBarStyle:{

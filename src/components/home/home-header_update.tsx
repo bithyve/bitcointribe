@@ -207,29 +207,6 @@ const HomeHeader = ( {
 
     return <TouchableOpacity
       onPress={()=> {
-      //   if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
-      //   levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup phrase' ){
-      //     if ( ( levelHealth.length == 0 ) ||
-      //     ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ||
-      //     ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == KeeperType.SECURITY_QUESTION )
-      //     ) {
-      //       const navigationParams = {
-      //         selectedTitle: navigationObj?.selectedKeeper?.name,
-      //         SelectedRecoveryKeyNumber: 1,
-      //         selectedKeeper: navigationObj?.selectedKeeper,
-      //         selectedLevelId: levelData[ 0 ].id
-      //       }
-      //       navigation.navigate( 'SeedBackupHistory', navigationParams )
-      //     } else {
-      //       setSelectedKeeper( levelData[ 0 ].keeper1 )
-      //       dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
-      //       setOnKeeperButtonClick( true )
-      //     }
-      //   } else navigation.navigate( 'WalletBackup' )
-      // // navigation.navigate( 'WalletBackup' ), {
-      //   // messageOne, messageTwo, isFirstMessageBold, isError, isInit
-      // // }
-      // }
         navigation.navigate( 'BackupMethods' )
       } }
       activeOpacity={0.6}

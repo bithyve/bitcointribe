@@ -326,9 +326,6 @@ const cardBorderRadius = 15
 const styles = StyleSheet.create( {
   rootContainer: {
     width: '100%',
-    // maxWidth: 440,
-    // maxHeight: hp(250),
-    // height: hp( 165 ),
     borderRadius: cardBorderRadius,
     elevation: 5,
     shadowOpacity: 0.62,

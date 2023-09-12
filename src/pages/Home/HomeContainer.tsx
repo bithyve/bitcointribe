@@ -118,8 +118,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       } )
     } else {
       this.props.navigation.navigate( 'AccountDetails', {
-        accountShellID: selectedAccount.id,
-        swanDeepLinkContent: this.props.swanDeepLinkContent
+        screen: 'AccountDetailsRoot',
+        params: {
+          accountShellID: selectedAccount.id,
+          swanDeepLinkContent: this.props.swanDeepLinkContent
+        }
       } )
     }
 
@@ -366,5 +369,5 @@ export default (
   connect( mapStateToProps, {
     setShowAllAccount,
     markAccountChecked
-  } )( (props: HomePropsTypes) => <Home {...props} navigation={useNavigation()}/> )
+  } )( (props: any) => <Home {...props} navigation={useNavigation()}/> )
 )

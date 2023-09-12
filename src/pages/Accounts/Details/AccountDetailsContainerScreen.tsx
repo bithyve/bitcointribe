@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import {
   View,
   StyleSheet,
@@ -65,19 +65,15 @@ const sectionListItemKeyExtractor = ( index ) => String( index )
 const AccountDetailsContainerScreen: React.FC<Props> = ({route, navigation}) => {
   const dispatch = useDispatch()
 
-  const accountShellID = useMemo(() => {
-    return route.params?.accountShellID;
-  }, [route.params]);
+  const accountShellID = route.params?.accountShellID;
 
-  const onBackPressed = useCallback(() => {
-    navigation.goBack();
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      header: () => (
+        <NavHeader accountShellID={accountShellID} onBackPressed={() => navigation.goBack()} />
+      ),
+    });
   }, [navigation]);
-
-  navigation.setOptions({
-    header: () => (
-      <NavHeader accountShellID={accountShellID} onBackPressed={onBackPressed} />
-    ),
-  });
 
   const strings  = translations[ 'accounts' ]
   const common  = translations[ 'common' ]
@@ -140,7 +136,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({route, navigation}) => 
 
   function navigateToAccountSettings() {
     navigation.navigate( 'SubAccountSettings', {
-      accountShellID,
+      screen: 'AccountSettingsMain',
+      params: {
+        accountShellID
+      }
     } )
   }
 

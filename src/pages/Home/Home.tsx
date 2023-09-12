@@ -357,32 +357,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   }
 
-  // notificationCheck = () =>{
-  //   const { messages } = this.props
-  //   if( messages && messages.length ){
-  //     this.updateBadgeCounter()
-  //     messages.sort( function ( left, right ) {
-  //       return moment.utc( right.timeStamp ).unix() - moment.utc( left.timeStamp ).unix()
-  //     } )
-  //     this.setState( {
-  //       notificationData: messages,
-  //       notificationDataChange: !this.state.notificationDataChange,
-  //     } )
-  //     if( this.currentNotificationId !== '' ) {
-  //       const message = messages.find( message => message.notificationId === this.currentNotificationId )
-  //       if( message ){
-  //         this.handleNotificationBottomSheetSelection( message )
-  //       }
-  //       this.currentNotificationId = ''
-  //     } else {
-  //       const message = messages.find( message => message.status === 'unread' )
-  //       if( message ){
-  //         this.handleNotificationBottomSheetSelection( message )
-  //       }
-  //     }
-  //   }
-  // }
-
   setUpFocusListener = () => {
     const { navigation } = this.props
 
@@ -541,32 +515,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         >
           {this.renderBottomSheetContent()}
         </ModalContainer>
-        {/* <Header fromScreen={'Home'} /> */}
-        {/* <View
-          style={{
-            flex: 3.8,
-            paddingTop:
-              Platform.OS == 'ios' && DeviceInfo.hasNotch
-                ? heightPercentageToDP( '5%' )
-                : 0,
-          }}
-        >
-          <HomeHeader
-            onPressNotifications={this.onPressNotifications}
-            notificationData={notificationData}
-            walletName={wallet.walletName}
-            getCurrencyImageByRegion={getCurrencyImageByRegion}
-            netBalance={netBalance}
-            exchangeRates={exchangeRates}
-            CurrencyCode={currencyCode}
-            navigation={navigation}
-            currentLevel={currentLevel}
-            //  onSwitchToggle={this.onSwitchToggle}
-            // setCurrencyToggleValue={this.setCurrencyToggleValue}
-            // navigation={this.props.navigation}
-            // overallHealth={overallHealth}
-          />
-        </View> */}
         <HomeContainer lnAcc={this.props.accountShells.filter( shell=>shell.primarySubAccount.type===AccountType.LIGHTNING_ACCOUNT )} containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} swanDeepLinkContent={this.state.swanDeepLinkContent} />
 
       </View>

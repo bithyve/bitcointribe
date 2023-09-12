@@ -7,11 +7,12 @@ import useTransactionsForAccountShell from '../../../utils/hooks/state-selectors
 import Colors from '../../../common/Colors'
 export type Props = {
   navigation: any;
+  route: any;
 };
 
 
-const TransactionsListContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-  const accountShell = useAccountShellFromRoute( navigation )
+const TransactionsListContainerScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
+  const accountShell = useAccountShellFromRoute( route )
   const transactions = useTransactionsForAccountShell( accountShell )
 
   function handleTransactionSelection( transaction: TransactionDescribing ) {

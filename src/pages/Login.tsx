@@ -238,11 +238,11 @@ export default function Login( props ) {
         setloaderModal( false )
         if( !creationFlag ) {
           props.navigation.navigate( 'HomeNav', {
-            screen: 'Landing'
+            screen: 'Home'
           } )
         } else if( processedLink ){
           props.navigation.navigate( 'HomeNav', {
-            screen: 'Landing',
+            screen: 'Home',
             params: {
               trustedContactRequest: processedLink.trustedContactRequest,
               giftRequest: processedLink.giftRequest,
