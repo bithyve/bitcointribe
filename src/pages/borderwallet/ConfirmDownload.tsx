@@ -30,14 +30,14 @@ const ConfirmDownload = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'Summary for Border Wallet' )
   const [ successModal, setSuccessModal ] = useState( false )
   const [ loading, setLoading ] = useState( true )
-  const mnemonic = props.navigation.getParam( 'mnemonic' )
+  const mnemonic = props.route.params?.mnemonic
   const grid = Array( 2048 ).fill( 0 )
-  const pattern = props.navigation.getParam( 'selected' )
-  const checksumWord = props.navigation.getParam( 'checksumWord' )
-  const initialMnemonic = props.navigation.getParam( 'initialMnemonic' )
-  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
-  const passphrase = props.navigation.getParam( 'passphrase' )
-  const gridType = props.navigation.getParam( 'gridType' )
+  const pattern = props.route.params?.selected
+  const checksumWord =props.route.params?.checksumWord
+  const initialMnemonic = props.route.params?.initialMnemonic
+  const isAccountCreation = props.route.params?.isAccountCreation
+  const passphrase = props.route.params?.passphrase
+  const gridType = props.route.params?.gridType
   const dispatch = useDispatch()
   type ItemProps = {title: string, id: string};
 

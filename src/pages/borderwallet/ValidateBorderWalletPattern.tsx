@@ -201,11 +201,11 @@ export const Ceil = ( { onPress, text, index, selected } ) => {
   )
 }
 
-const ValidateBorderWalletPattern = ( { navigation } ) => {
+const ValidateBorderWalletPattern = ( { route, navigation } ) => {
   const wallet: Wallet =  dbManager.getWallet()
-  const gridType = navigation.getParam( 'borderWalletGridType' )
-  const mnemonic = navigation.getParam( 'borderWalletMnemonic' )
-  const gridMnemonic = navigation.getParam( 'borderWalletGridMnemonic' )
+  const gridType = route.params?.borderWalletGridType
+  const mnemonic = route.params?.borderWalletMnemonic
+  const gridMnemonic = route.params?.borderWalletGridMnemonic
 
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )

@@ -22,10 +22,10 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 const wordlists = bip39.wordlists.english
 
 const SelectChecksumWord = ( props ) => {
-  const words = props.navigation.getParam( 'words' )
-  const selected = props.navigation.getParam( 'selected' )
-  const isNewWallet = props.navigation.getParam( 'isNewWallet' )
-  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
+  const words = props.route.params?.words
+  const selected = props.route.params?.selected
+  const isNewWallet = props.route.params?.isNewWallet
+  const isAccountCreation = props.route.params?.isAccountCreation
   const [ checksums, setChecksums ] = useState( [] )
   const [ headerTitle, setHeaderTitle ] = useState( 'Select Checksum Word' )
   const [ checksumWord, setChecksumWord ] = useState( 'Select checksum word' )
@@ -95,16 +95,16 @@ const SelectChecksumWord = ( props ) => {
       selected,
       checksumWord,
       mnemonic,
-      initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
-      gridType: props.navigation.getParam( 'gridType' ),
+      initialMnemonic: props.route.params?.initialMnemonic,
+      gridType: props.route.params?.gridType,
       isAccountCreation,
       isNewWallet
     } ) : props.navigation.navigate( 'CreatePassPhrase', {
       selected,
       checksumWord,
       mnemonic,
-      initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
-      gridType: props.navigation.getParam( 'gridType' ),
+      initialMnemonic: props.route.params?.initialMnemonic,
+      gridType: props.route.params?.gridType,
       isAccountCreation,
       isNewWallet
     } )

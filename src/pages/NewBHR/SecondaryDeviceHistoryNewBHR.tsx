@@ -66,7 +66,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ ErrorModal, setErrorModal ] = useState( false )
   const [ ConfirmFromSecondaryDeviceModal, setConfirmFromSecondaryDeviceModal ] = useState( false )
   const [ ChangeModal, setChangeModal ] = useState( false )
-  const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
+  const [ selectedKeeper, setSelectedKeeper ] = useState( props.route.params?.selectedKeeper )
 
   const [ oldChannelKey, setOldChannelKey ] = useState( selectedKeeper.channelKey ? selectedKeeper.channelKey : '' )
   const [ channelKey, setChannelKey ] = useState( selectedKeeper.channelKey ? selectedKeeper.channelKey : '' )
@@ -78,10 +78,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
   const [ keeperQR, setKeeperQR ] = useState( '' )
   const [ secondaryDeviceHistory, setSecondaryDeviceHistory ] = useState( historyArray )
-  const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
-  const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState( props.navigation.getParam( 'isPrimaryKeeper' ) )
+  const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState( props.route.params?.SelectedRecoveryKeyNumber )
+  const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState( props.route.params?.isPrimaryKeeper )
 
-  const isChangeKeeper = props.navigation.getParam( 'isChangeKeeperType' )
+  const isChangeKeeper = props.route.params?.isChangeKeeperType
   const [ isChange, setIsChange ] = useState( isChangeKeeper ? isChangeKeeper : false )
   const [ isReshare, setIsReshare ] = useState( isChangeKeeper ? false : selectedKeeper.status === 'notAccessible' && selectedKeeper.updatedAt == 0 ? true : false )
   const [ Contact, setContact ]: [any, any] = useState( null )
@@ -102,14 +102,14 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const OldMetaShares: MetaShare[] = [ ...oldMetaSharesKeeper ]
   const dispatch = useDispatch()
 
-  const index = props.navigation.getParam( 'index' )
+  const index = props.route.params?.index
   const [ approvalErrorModal, setApprovalErrorModal ] = useState( false )
-  const next = props.navigation.getParam( 'next' )
+  const next = props.route.params?.next
 
   useEffect( () => {
-    const selectedKeeper = props.navigation.getParam( 'selectedKeeper' )
-    const isChangeKeeper = props.navigation.getParam( 'isChangeKeeperType' )
-    const selectedRecoveryKeyNum = props.navigation.getParam( 'SelectedRecoveryKeyNumber' )
+    const selectedKeeper = props.route.params?.selectedKeeper
+    const isChangeKeeper = props.route.params?.isChangeKeeperType
+    const selectedRecoveryKeyNum = props.route.params?.SelectedRecoveryKeyNumber
 
     setSelectedRecoveryKeyNumber( selectedRecoveryKeyNum )
     setSelectedKeeper( selectedKeeper )
@@ -121,7 +121,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     )
     setChannelKey( selectedKeeper.channelKey ? selectedKeeper.channelKey : '' )
     setOldChannelKey( selectedKeeper.channelKey ? selectedKeeper.channelKey : '' )
-  }, [ props.navigation.state.params ] )
+  }, [ props.route.params ] )
 
   //DidMount
   useEffect( ()=>{
@@ -751,7 +751,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       </ModalContainer>
       <ModalContainer visible={keeperTypeModal} closeBottomSheet={()=>{setKeeperTypeModal( false )}} >
         <KeeperTypeModalContents
-          selectedLevelId={props.navigation.getParam( 'selectedLevelId' )}
+          selectedLevelId={props.route.params?.selectedLevelId}
           headerText={strings.Changebackupmethod}
           subHeader={strings.withanewcontact}
           onPressSetup={async ( type, name ) => {
@@ -759,7 +759,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             setSelectedKeeperName( name )
             // note remove PDF flow for level 2 & 3
             // if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
-            // else 
+            // else
             onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}

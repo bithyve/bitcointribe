@@ -55,7 +55,12 @@ export enum BottomSheetState {
   Open,
 }
 
-export default function NewWalletName( props ) {
+export type Props = {
+  route: any;
+  navigation: any;
+};
+
+const NewWalletName: React.FC<Props> = ( { route, navigation }: Props ) => {
   // const [ timerArray, setTimerArray ] = useState( [ 1, 1, 1 ] )
   // const [ timeLeft, setTimeLeft ] = useState( null )
   // const [ intervalRef, setIntervalRef ] = useState( null )
@@ -80,15 +85,15 @@ export default function NewWalletName( props ) {
   const subPoints = [ strings.multi, strings.creatingbackup, strings.preloading ]
   const [ message, setMessage ] = useState( strings.Creatingyourwallet )
   const [ signUpStarted, setSignUpStarted ] = useState( false )
-  const mnemonic = props.navigation.getParam( 'mnemonic' ) || null
-  const initialMnemonic = props.navigation.getParam( 'initialMnemonic' ) || ''
-  const gridType = props.navigation.getParam( 'gridType' ) || ''
-  const passphrase = props.navigation.getParam( 'passphrase' ) || ''
+  const mnemonic = route.params?.mnemonic || null
+  const initialMnemonic =  route.params?.initialMnemonic || ''
+  const gridType = route.params?.gridType|| ''
+  const passphrase =  route.params?.passphrase|| ''
 
   useEffect( () => {
     if ( walletSetupCompleted ) {
       setLoaderModal( false )
-      props.navigation.navigate( 'HomeNav', {
+      navigation.navigate( 'HomeNav', {
         walletName,
       } )
     }
@@ -118,7 +123,7 @@ export default function NewWalletName( props ) {
                 closeBottomSheet()
                 console.log( 'updateCloudPermission', flag )
                 dispatch( updateCloudPermission( flag ) )
-                props.navigation.navigate( 'NewWalletQuestion', {
+                navigation.navigate( 'NewWalletQuestion', {
                   walletName,
                 } )
               }}
@@ -126,7 +131,7 @@ export default function NewWalletName( props ) {
                 closeBottomSheet()
                 console.log( 'updateCloudPermission', flag )
                 dispatch( updateCloudPermission( flag ) )
-                props.navigation.navigate( 'NewWalletQuestion', {
+                navigation.navigate( 'NewWalletQuestion', {
                   walletName,
                 } )
               }}
@@ -134,7 +139,7 @@ export default function NewWalletName( props ) {
                 closeBottomSheet()
                 console.log( 'updateCloudPermission', true )
                 // dispatch( updateCloudPermission( true ) )
-                props.navigation.navigate( 'NewWalletQuestion', {
+                navigation.navigate( 'NewWalletQuestion', {
                   walletName,
                 } )
               }}
@@ -198,7 +203,7 @@ export default function NewWalletName( props ) {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.navigate( 'WalletInitialization' )
+              navigation.navigate( 'WalletInitialization' )
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -282,7 +287,7 @@ export default function NewWalletName( props ) {
                   onPress={() => {
                     setLoaderModal( true )
                     Keyboard.dismiss()
-                    // props.navigation.navigate( 'NewWalletQuestion', {
+                    // navigation.navigate( 'NewWalletQuestion', {
                     //   walletName,
                     // } )
                     setTimeout( () => {
@@ -471,3 +476,5 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Regular,
   },
 } )
+
+export default NewWalletName

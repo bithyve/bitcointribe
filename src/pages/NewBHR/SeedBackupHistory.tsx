@@ -77,8 +77,8 @@ const SeedBackupHistory = ( props ) => {
   const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
   const levelData = useSelector( ( state ) => state.bhr.levelData )
   const  keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
-  const SelectedRecoveryKeyNumber = props.navigation.getParam( 'SelectedRecoveryKeyNumber' )
-  const selectedKeeper = props.navigation.getParam( 'selectedKeeper' )
+  const SelectedRecoveryKeyNumber = props.route.params?.SelectedRecoveryKeyNumber
+  const selectedKeeper = props.route.params?.selectedKeeper
   const [ seedWordModal, setSeedWordModal ] = useState( false )
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
   const [ seedRandomNumber, setSeedRandomNumber ] = useState( [] )
@@ -271,7 +271,7 @@ const SeedBackupHistory = ( props ) => {
         },
         channelKey: selectedKeeper.channelKey,
       },
-      selectedLevelId: props.navigation.getParam( 'selectedLevelId' ),
+      selectedLevelId: props.route.params?.selectedLevelId,
       index: changeIndex,
     }
     if ( type == 'contact' ) {
@@ -404,7 +404,7 @@ const SeedBackupHistory = ( props ) => {
       <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => {setKeeperTypeModal( false )}} >
         <KeeperTypeModalContents
           selectedType={'seed'}
-          selectedLevelId={props.navigation.getParam( 'selectedLevelId' )}
+          selectedLevelId={props.route.params?.selectedLevelId}
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device or Cloud'}
           onPressSetup={async ( type, name ) => {

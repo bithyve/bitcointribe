@@ -57,7 +57,7 @@ const FNFToKeeper = ( props ) => {
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const trustedContacts: Trusted_Contacts = useSelector( ( state ) => state.trustedContacts.contacts )
   const dispatch = useDispatch()
-  const recreateChannel = props.navigation.getParam( 'recreateChannel' )
+  const recreateChannel = props.route.params?.recreateChannel
 
   useEffect( () => {
     const contacts: Trusted_Contacts = trustedContacts
@@ -78,7 +78,7 @@ const FNFToKeeper = ( props ) => {
     const contactDummy = {
       id: uuid(),
     }
-    props.navigation.state.params.onPressContinue( [ contactDummy ], recreateChannel )
+    props.route.params.onPressContinue( [ contactDummy ], recreateChannel )
     props.navigation.goBack()
   }
 
@@ -167,7 +167,7 @@ const FNFToKeeper = ( props ) => {
   }, [] )
 
   const onPressContinue = () => {
-    props.navigation.state.params.onPressContinue( contact, recreateChannel )
+    props.route.params.onPressContinue( contact, recreateChannel )
     props.navigation.goBack()
   }
 

@@ -22,9 +22,9 @@ const BackupGridMnemonic = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'Regenerate Entropy Grid' )
   const [ generateEntropyGrid, setGenerateEntropyGrid ] = useState( false )
   const [ isAccount, setIsAccount ] = useState( false )
-  const [ borderWalletGridType, seBborderWalletGridType ] = useState( props.navigation.getParam( 'borderWalletGridType' ) )
-  const borderWalletMnemonicAccount = props.navigation.getParam( 'borderWalletMnemonic' )
-  const borderWalletGridMnemonicAccount = props.navigation.getParam( 'borderWalletGridMnemonic' )
+  const [ borderWalletGridType, seBborderWalletGridType ] = useState( props.route.params?.borderWalletGridType )
+  const borderWalletMnemonicAccount =  props.route.params?.borderWalletMnemonic
+  const borderWalletGridMnemonicAccount = props.route.params?.borderWalletGridMnemonic
 
 
   const wallet: Wallet =  dbManager.getWallet()

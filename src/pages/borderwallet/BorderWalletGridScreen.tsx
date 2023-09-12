@@ -204,11 +204,11 @@ export const Ceil = ( { onPress, text, index, selected } ) => {
   )
 }
 
-const BorderWalletGridScreen = ( { navigation } ) => {
-  const mnemonic = navigation.getParam( 'mnemonic' )
-  const isNewWallet = navigation.getParam( 'isNewWallet' )
-  const isAccountCreation = navigation.getParam( 'isAccountCreation' )
-  const gridType = navigation.getParam( 'gridType' ) || GridType.WORDS
+const BorderWalletGridScreen = ( { route, navigation } ) => {
+  const mnemonic =  route.params?.mnemonic
+  const isNewWallet = route.params?.isNewWallet
+  const isAccountCreation =  route.params?.isAccountCreation
+  const gridType =  route.params?.gridType || GridType.WORDS
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
   const columnHeaderRef = useRef()
@@ -482,6 +482,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
               >
                 {grid.map( ( rowData, index ) => (
                   <FlatList
+                    key={index}
                     data={rowData}
                     horizontal
                     overScrollMode="never"
