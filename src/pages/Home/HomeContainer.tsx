@@ -32,6 +32,7 @@ import LNIcon from '../../assets/images/svgs/lightningWhiteWithBack.svg'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
+import { useNavigation } from '@react-navigation/native'
 
 export enum BottomSheetKind {
   SWAN_STATUS_INFO,
@@ -365,5 +366,5 @@ export default (
   connect( mapStateToProps, {
     setShowAllAccount,
     markAccountChecked
-  } )( Home )
+  } )( (props: HomePropsTypes) => <Home {...props} navigation={useNavigation()}/> )
 )

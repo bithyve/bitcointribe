@@ -58,6 +58,7 @@ import GiftStack from './stacks/gift/GiftStack'
 import Filled_gift_tab from '../assets/images/satCards/filled_gift_tab.svg'
 import Gift_tab from '../assets/images/satCards/gift_tab.svg'
 import LinearGradient from 'react-native-linear-gradient'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 const SetupStack = createNativeStackNavigator()
 function SetupNavigator() {
@@ -67,75 +68,50 @@ function SetupNavigator() {
     }}>
       <SetupStack.Screen name="Launch" component={Launch} />
       <SetupStack.Screen name="Login" component={Login} />
+      <SetupStack.Screen name="SettingGetNewPin" component={SettingGetNewPin} options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerLeft: () => {
+            return <SmallNavHeaderBackButton onPress={() => {
+              navigation.popToTop() }} />
+          },
+          title: 'Manage Passcode',
+          headerShown: true
+        }
+      }} />
       <SetupStack.Screen name="PasscodeConfirm" component={PasscodeConfirm} />
-      <SetupStack.Screen name="WalletInitialization" component={WalletInitializationScreen} />
       <SetupStack.Screen name="NewWalletName" component={NewWalletName} />
+      <SetupStack.Screen name="CreateKeeperScreen" component={CreateKeeperScreen} />
+      <SetupStack.Screen name="CreateWithBorderWallet" component={CreateWithBorderWallet} />
+      <SetupStack.Screen name="SelectEntropyGridType" component={SelectEntropyGridType} />
+      <SetupStack.Screen name="DownloadEncryptGrid" component={DownloadEncryptGrid} />
+      <SetupStack.Screen name="BorderWalletGridScreen" component={BorderWalletGridScreen} />
+      <SetupStack.Screen name="SelectChecksumWord" component={SelectChecksumWord} />
+      <SetupStack.Screen name="CreatePassPhrase" component={CreatePassPhrase} />
+      <SetupStack.Screen name="ConfirmDownload" component={ConfirmDownload} />
+      <SetupStack.Screen name="PreviewPattern" component={PreviewPattern} />
+      <SetupStack.Screen name="RecoverBorderWallet" component={RecoverBorderWallet} />
+      <SetupStack.Screen name="RegenerateEntropyGrid" component={RegenerateEntropyGrid} />
+      <SetupStack.Screen name="AccountSelection" component={AccountSelection} />
+      <SetupStack.Screen name="NewWalletQuestion" component={NewWalletQuestion} />
+      <SetupStack.Screen name="WalletInitialization" component={WalletInitializationScreen} />
+      <SetupStack.Screen name="RestoreSeedWordsContent" component={RestoreSeedWordsContent} />
+      <SetupStack.Screen name="WalletNameRecovery" component={WalletNameRecovery} />
+      <SetupStack.Screen name="RecoveryQuestion" component={RecoveryQuestionScreen} />
+      <SetupStack.Screen name="RestoreSelectedContactsList" component={RestoreSelectedContactsList} />
+      <SetupStack.Screen name="RestoreWalletBySecondaryDevice" component={RestoreWalletBySecondaryDevice} />
+      <SetupStack.Screen name="RestoreWalletByContacts" component={RestoreWalletByContacts} />
+      <SetupStack.Screen name="RecoveryCommunication" component={RecoveryCommunication} />
+      <SetupStack.Screen name="NewOwnQuestions" component={NewOwnQuestions} />
+      <SetupStack.Screen name="RecoveryQrScanner" component={QRScannerScreen} />
+      <SetupStack.Screen name="NewRecoveryOwnQuestions" component={NewRecoveryOwnQuestions} />
+      <SetupStack.Screen name="RestoreWithICloud" component={RestoreWithICloud} />
+      <SetupStack.Screen name="ScanRecoveryKey" component={ScanRecoveryKey} />
+      <SetupStack.Screen name="QRScanner" component={QRScannerScreen} />
+      <SetupStack.Screen name="UpdateApp" component={UpdateApp} options={{ gestureEnabled: false }} />
     </SetupStack.Navigator>
   )
 }
-//TODO: add all below screens to setupnavigator
-// const SetupNavigator = createStackNavigator(
-//   {
-//     Launch,
-//     Login,
-//     SettingGetNewPin: {
-//       screen: SettingGetNewPin,
-//       navigationOptions: ( { navigation } ) => {
-//         return {
-//           ...defaultStackScreenNavigationOptions,
-//           headerLeft: () => {
-//             return <SmallNavHeaderBackButton onPress={() => {
-//               navigation.popToTop() }} />
-//           },
-//           title: 'Manage Passcode',
-//           headerShown: true
-//         }
-//       },
-//     },
-//     PasscodeConfirm,
-//     NewWalletName,
-//     CreateKeeperScreen,
-//     CreateWithBorderWallet,
-//     SelectEntropyGridType,
-//     DownloadEncryptGrid,
-//     BorderWalletGridScreen,
-//     SelectChecksumWord,
-//     CreatePassPhrase,
-//     ConfirmDownload,
-//     PreviewPattern,
-//     RecoverBorderWallet,
-//     RegenerateEntropyGrid,
-//     AccountSelection,
-//     NewWalletQuestion,
-//     WalletInitialization: WalletInitializationScreen,
-//     RestoreSeedWordsContent,
-//     WalletNameRecovery,
-//     RecoveryQuestion: RecoveryQuestionScreen,
-//     RestoreSelectedContactsList,
-//     RestoreWalletBySecondaryDevice,
-//     RestoreWalletByContacts,
-//     RecoveryCommunication,
-//     NewOwnQuestions,
-//     RecoveryQrScanner: QRScannerScreen,
-//     NewRecoveryOwnQuestions,
-//     RestoreWithICloud,
-//     ScanRecoveryKey,
-//     QRScanner: QRScannerScreen,
-//     UpdateApp: {
-//       screen: UpdateApp,
-//       navigationOptions: {
-//         gesturesEnabled: false,
-//       },
-//     },
-//   },
-//   {
-//     initialRouteName: 'Launch',
-//     headerLayoutPreset: 'center',
-//     defaultNavigationOptions: () => ( {
-//       header: null,
-//     } ),
-//   },
-// )
 
 const styles= StyleSheet.create( {
   activeStyle:{
@@ -180,18 +156,23 @@ function BottomTab() {
   return (
     <Tab.Navigator
       initialRouteName="Home"
-      screenOptions={{
+      tabBar={GradientTab}
+      screenOptions={({ navigation, route }) => {
+        return ({
+        // TODO: test header and replace showContent value
+        // headerShown: false,
+        header: () => {
+          return <Header showContent={true} />
+        },
+        tabBarShowLabel: false,
         tabBarStyle:{
-          backgroundColor: Colors.THEAM_TEXT_COLOR
-
+          backgroundColor: 'transparent'
         }
-      }}
+      })}}
 
     >
       <Tab.Screen name="Home" component={HomeStack}
         options={{
-          headerShown: false,
-          tabBarLabel: '',
           tabBarIcon: ( { focused } ) => (
             <View style={{
               marginTop: hp( '1.3%' )
@@ -213,8 +194,6 @@ function BottomTab() {
       />
       <Tab.Screen name="FriendsAndFamily" component={FriendsAndFamily}
         options={{
-          headerShown: false,
-          tabBarLabel: '',
           tabBarIcon: ( { focused } ) => (
             <View style={{
               marginTop: hp( '1.3%' ),
@@ -233,8 +212,6 @@ function BottomTab() {
       />
       <Tab.Screen name="GiftStack" component={GiftStack}
         options={{
-          headerShown: false,
-          tabBarLabel: '',
           tabBarIcon: ( { focused } ) => (
             <View style={{
               marginTop: hp( '0.85%' ),
@@ -250,8 +227,6 @@ function BottomTab() {
       />
       <Tab.Screen name="MoreOptionsStack" component={MoreOptionsStack}
         options={{
-          headerShown: false,
-          tabBarLabel: '',
           tabBarIcon: ( { focused } ) => (
             <View style={{
               marginTop: hp( '1.3%' )
@@ -273,115 +248,21 @@ function BottomTab() {
     </Tab.Navigator>
   )
 }
-//TODO: add all below bottom tabs
-// const BottomTab = createBottomTabNavigator(
-//   {
-//     Home: {
-//       screen: HomeStack,
-//       navigationOptions: {
-//         tabBarIcon: ( { focused } ) => {
-//           return (
-//             <View style={{
-//               marginTop: hp( '1.3%' )
-//             }}>
-//               {focused ?
-//                 <HomeSVG/>
-//                 :
-//                 <HomeInactiveSVG/>
-//               }
-
-//               {focused ?
-//                 <View style={styles.activeStyle}/>
-//                 :
-//                 <View style={styles.inactiveStyle}/>
-//               }
-//             </View>
-//           )
-//         }
-//       }
-//     },
-//     Freiend: {
-//       screen: FriendsAndFamily,
-//       navigationOptions: {
-//         tabBarIcon: ( { focused } ) => {
-//           return (
-//             <View style={{
-//               marginTop: hp( '1.3%' )
-//             }}>
-//               {focused ?
-//                 <FnF /> : <FnFInactive />
-//               }
-//               {focused ?
-//                 <View style={styles.activeStyle}/>
-//                 :
-//                 <View style={styles.inactiveStyle}/>
-//               }
-//             </View>
-//           )
-//         }
-//       },
-//     },
-//     Securiy: {
-//       screen: GiftStack,
-//       navigationOptions: {
-//         tabBarIcon: ( { focused } ) => {
-//           return (
-//             <View style={{
-//               marginTop: hp( '0.85%' )
-//             }}>
-//               {/* <IconWithBadge focused={focused} /> */}
-//               {focused ?
-//                 <Filled_gift_tab /> : <Gift_tab />
-//               }
-//             </View>
-//           )
-//         }
-//       },
-//     },
-
-//     Setting: {
-//       screen: MoreOptionsStack,
-//       navigationOptions: {
-//         tabBarIcon: ( { focused } ) => {
-//           return (
-//             <View style={{
-//               marginTop: hp( '1.3%' )
-//             }}>
-//               {focused ?
-//                 <Settings />
-//                 :
-//                 <SettingsInactive />
-//               }
-//               {focused ?
-//                 <View style={styles.activeStyle}/>
-//                 :
-//                 <View style={styles.inactiveStyle}/>
-//               }
-//             </View>
-
-//           )
-//         }
-//       },
-//     },
-//   },
-//   {
-//     initialRouteName: 'Home',
-//     tabBarComponent: GradientTab,
-//     tabBarOptions: {
-//       showLabel: false,
-//       style: {
-//         backgroundColor: 'transparent',
-//       },
-//     }
-//   },
-// )
 
 const HomeStackInit = createNativeStackNavigator()
 function HomeNavigator() {
   return (
-    <HomeStackInit.Navigator>
+    <HomeStackInit.Navigator
+      screenOptions={( { navigation, route } ) => {
+        return {
+          header: () => {
+            return <Header showContent={true} navigation={navigation} route={route}
+            />
+          },
+        }
+      }}
+    >
       <HomeStackInit.Screen name="Landing" component={BottomTab} options={{
-        headerShown: false
       }}/>
     </HomeStackInit.Navigator>
   )
@@ -411,19 +292,20 @@ function HomeNavigator() {
 
 
 const SwitchStack = createNativeStackNavigator()
-//TODO: conditionally add below screens as createSwitchNavigator is removed
 function Navigator() {
   return (
-    <NavigationContainer>
-      <SwitchStack.Navigator>
-        <SwitchStack.Screen name="SetupNav" component={SetupNavigator} options={{
-          headerShown: false
-        }} />
-        <SwitchStack.Screen name="HomeNav" component={HomeNavigator} options={{
-          headerShown: false
-        }}/>
-      </SwitchStack.Navigator>
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <SwitchStack.Navigator>
+          <SwitchStack.Screen name="SetupNav" component={SetupNavigator} options={{
+            headerShown: false
+          }} />
+          <SwitchStack.Screen name="HomeNav" component={BottomTab} options={{
+            headerShown: false
+          }}/>
+        </SwitchStack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
   )
 }
 // const Navigator = createSwitchNavigator( {

@@ -36,7 +36,7 @@ const MoreOptionsStack = () => {
   return (
     <Stack.Navigator
       initialRouteName='Home'
-      //to do screen option
+      //TODO: screen option
       // defaultNavigationOptions={( { navigation } )=>{
       //   return {
       //     ...defaultStackScreenNavigationOptions,

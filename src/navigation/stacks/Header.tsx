@@ -34,6 +34,7 @@ import HomeHeader from '../../components/home/home-header_update'
 import Colors from '../../common/Colors'
 import idx from 'idx'
 import { v4 as uuid } from 'uuid'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import moment from 'moment'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
 import { CommonActions, useIsFocused } from '@react-navigation/native'
@@ -189,6 +190,7 @@ interface HomeStateTypes {
 interface HomePropsTypes {
   showContent: boolean;
   navigation: any;
+  route: any;
   notificationList: any;
   exchangeRates?: any[];
   levelHealth: LevelHealthInterface[];
@@ -700,7 +702,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   handleDeepLinkEvent = async ( { url } ) => {
-    const { navigation } = this.props
+    const { navigation } = this.props;
     const isFocused = useIsFocused();
     // If the user is on one of Home's nested routes, and a
     // deep link is opened, we will navigate back to Home first.
@@ -811,7 +813,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // set FCM token(if haven't already)
       this.storeFCMToken()
 
-      const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
+      const unhandledDeepLinkURL = this.props.route.params?.unhandledDeepLinkURL;
 
       if ( unhandledDeepLinkURL ) {
         navigation.setParams( {
@@ -917,11 +919,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   handleDeepLinkModal = () => {
-    const recoveryRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.recoveryRequest : null //this.props.navigation.getParam( 'recoveryRequest' )
-    const trustedContactRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.trustedContactRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
-    const giftRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.giftRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
-    const userKey = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.userKey : null//this.props.navigation.getParam( 'userKey' )
-    const swanRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.swanRequest : null//this.props.navigation.getParam( 'swanRequest' )
+    const { params } = this.props.route;
+    const recoveryRequest = params?.recoveryRequest || null;
+    const trustedContactRequest = params?.trustedContactRequest || null;
+    const giftRequest = params?.giftRequest || null;
+    const userKey = params?.userKey || null;
+    const swanRequest = params?.swanRequest || null;
     if ( swanRequest ) {
       this.setState( {
         swanDeepLinkContent:swanRequest.url,
@@ -1853,6 +1856,6 @@ export default (
     rejectedExistingContactRequest,
     notificationPressed,
     recomputeNetBalance
-  } )( Home )
+  } )( (props: any) => <Home {...props} navigation={useNavigation()} route={useRoute()}/> )
 )
 

@@ -25,7 +25,7 @@ const FriendsAndFamily = () => {
     <Stack.Navigator
       initialRouteName='Home'
     >
-      <Stack.Screen name="Home" component={FriendsAndFamilyScreen} options={{ header: null }} />
+      <Stack.Screen name="Home" component={FriendsAndFamilyScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }
