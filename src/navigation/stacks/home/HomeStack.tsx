@@ -77,11 +77,11 @@ const HomeStack = ({navigation, route}) => {
   useLayoutEffect(() => {
     const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
     if (routeName === "Home"){
-        navigation.setOptions({tabBarStyle: {display: 'flex'}});
+        navigation.setOptions({tabBarStyle: { display: 'flex', backgroundColor: 'transparent' }});
     }else {
         navigation.setOptions({tabBarStyle: {display: 'none'}});
     }
-}, [navigation, route]);
+  }, [navigation, route]);
   return (
     <Stack.Navigator
       initialRouteName='Home'
