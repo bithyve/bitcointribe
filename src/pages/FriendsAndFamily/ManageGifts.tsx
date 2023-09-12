@@ -53,7 +53,7 @@ const ManageGifts = ( props ) => {
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
   const { navigation } = props
-  const giftScreenNav = navigation.getParam( 'giftType' )
+  const giftScreenNav = props.route.params?.giftType
   const [ timer, setTimer ] = useState( true )
   // const [ giftDetails, showGiftDetails ] = useState( false )
   // const [ giftInfo, setGiftInfo ] = useState( null )
@@ -255,8 +255,8 @@ const ManageGifts = ( props ) => {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>

@@ -87,11 +87,12 @@ import LinearGradient from 'react-native-linear-gradient'
 const { height } = Dimensions.get( 'window' )
 
 export type Props = {
+  route:any;
   navigation: any;
 };
 
-const CreateGift = ( { navigation }: Props ) => {
-  const { selectedContact, statusFlag } = navigation?.state?.params
+const CreateGift = ( { route, navigation }: Props ) => {
+  const { selectedContact, statusFlag } = route?.params
   const dispatch = useDispatch()
   const activeAccounts = useActiveAccountShells().filter(
     ( shell ) => shell?.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT
@@ -1212,8 +1213,8 @@ const CreateGift = ( { navigation }: Props ) => {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>
