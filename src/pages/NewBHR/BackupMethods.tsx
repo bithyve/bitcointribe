@@ -122,7 +122,8 @@ export default function BackupMethods( { navigation } ) {
           style={{
             flexDirection: 'row',
           }}
-          onPress={() => navigation.navigate( 'SeedBackupHistory' )}
+          //TODO: check navigation
+          onPress={() => navigation.navigate( 'SeedBackup' )}
         >
           <View style={{
             width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, justifyContent: 'center', alignItems: 'center'

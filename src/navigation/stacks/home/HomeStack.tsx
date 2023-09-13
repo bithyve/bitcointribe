@@ -73,15 +73,23 @@ import RecoverBorderWallet from '../../../pages/borderwallet/RecoverBorderWallet
 import ImportBWGrid from '../../../pages/borderwallet/ImportBWGrid'
 
 const Stack = createNativeStackNavigator()
-const HomeStack = ({navigation, route}) => {
-  useLayoutEffect(() => {
-    const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
-    if (routeName === "Home"){
-        navigation.setOptions({tabBarStyle: { display: 'flex', backgroundColor: 'transparent' }});
+const HomeStack = ( { navigation, route } ) => {
+  useLayoutEffect( () => {
+    const routeName = getFocusedRouteNameFromRoute( route ) ?? 'Home'
+    if ( routeName === 'Home' ){
+      navigation.setOptions( {
+        tabBarStyle: {
+          display: 'flex', backgroundColor: 'transparent'
+        }
+      } )
     }else {
-        navigation.setOptions({tabBarStyle: {display: 'none'}});
+      navigation.setOptions( {
+        tabBarStyle: {
+          display: 'none'
+        }
+      } )
     }
-  }, [navigation, route]);
+  }, [ navigation, route ] )
   return (
     <Stack.Navigator
       initialRouteName='Home'

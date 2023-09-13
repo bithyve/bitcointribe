@@ -48,6 +48,11 @@ import ToggleContainer from './CurrencyToggle'
 
 const listItemKeyExtractor = ( item ) => item.id
 
+export type Props = {
+    route:any;
+    navigation: any;
+  };
+
 const ManageGifts = ( props ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]

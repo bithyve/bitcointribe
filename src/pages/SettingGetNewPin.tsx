@@ -36,7 +36,7 @@ export default function SettingGetNewPin( props ) {
   const [ confirmPasscode, setConfirmPasscode ] = useState( '' )
   const [ passcodeFlag, setPasscodeFlag ] = useState( true )
   const [ confirmPasscodeFlag, setConfirmPasscodeFlag ] = useState( 0 )
-  const oldPasscode = props.navigation.getParam( 'oldPasscode' )
+  const oldPasscode = props.route.params?.oldPasscode
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )

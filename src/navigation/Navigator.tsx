@@ -108,7 +108,9 @@ function SetupNavigator() {
       <SetupStack.Screen name="RestoreWithICloud" component={RestoreWithICloud} />
       <SetupStack.Screen name="ScanRecoveryKey" component={ScanRecoveryKey} />
       <SetupStack.Screen name="QRScanner" component={QRScannerScreen} />
-      <SetupStack.Screen name="UpdateApp" component={UpdateApp} options={{ gestureEnabled: false }} />
+      <SetupStack.Screen name="UpdateApp" component={UpdateApp} options={{
+        gestureEnabled: false
+      }} />
     </SetupStack.Navigator>
   )
 }
@@ -158,20 +160,20 @@ function BottomTab() {
       initialRouteName="Home"
       tabBar={GradientTab}
       screenOptions={() => {
-        const homeNavRoutes = useNavigationState((state) => state.routes[1].state?.routes);
-        let showContent = true;
+        const homeNavRoutes = useNavigationState( ( state ) => state.routes[ 1 ].state?.routes )
+        let showContent = true
         for( const route of homeNavRoutes || [] ) {
-          if (route.state?.routes?.length > 1) showContent = false;
+          if ( route.state?.routes?.length > 1 ) showContent = false
         }
-        return ({
-        header: () => {
-          return <Header showContent={showContent} />
-        },
-        tabBarShowLabel: false,
-        tabBarStyle:{
-          backgroundColor: 'transparent'
-        }
-      })}}
+        return ( {
+          header: () => {
+            return <Header showContent={showContent} />
+          },
+          tabBarShowLabel: false,
+          tabBarStyle:{
+            backgroundColor: 'transparent'
+          }
+        } )}}
 
     >
       <Tab.Screen name="Home" component={HomeStack}
