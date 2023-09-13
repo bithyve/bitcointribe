@@ -52,7 +52,7 @@ const MoreOptionsStack = ( { navigation, route } ) => {
   }, [ navigation, route ] )
   return (
     <Stack.Navigator
-      initialRouteName='Home'
+      initialRouteName='MoreOptionsContainerScreen'
       screenOptions={( { navigation } ) => {
         return {
           ...defaultStackScreenNavigationOptions,

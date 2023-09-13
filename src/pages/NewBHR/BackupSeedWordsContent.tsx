@@ -193,14 +193,20 @@ const BackupSeedWordsContent = ( props ) => {
             setSeedWordModal( false )
             const navigationParams =  props.route.params?.navigationParams
             if ( isChangeKeeperType ) {
-              props.navigation.navigate( 'SeedBackupHistory', {
-                navigationParams,
-                isChangeKeeperType: true,
+              props.navigation.navigate( 'SeedBackup', {
+                screen: 'SeedBackupHistory',
+                params: {
+                  navigationParams,
+                  isChangeKeeperType: true,
+                }
               } )
             } else {
-              props.navigation.navigate( 'SeedBackupHistory', {
-                navigationParams,
-                // isChangeKeeperType: true,
+              props.navigation.navigate( 'SeedBackup', {
+                screen: 'SeedBackupHistory',
+                params: {
+                  navigationParams,
+                  // isChangeKeeperType: true,
+                }
               } )
             }
           }}

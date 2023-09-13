@@ -313,7 +313,7 @@ const SeedBackupHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => {
-          props.navigation.navigate( 'Home' )
+          props.navigation.navigate( 'MoreOptionsContainerScreen' )
           // props.navigation.popToTop()
         }}
         selectedTitle={'Wallet backup'}
@@ -504,7 +504,7 @@ const SeedBackupHistory = ( props ) => {
           onPressIgnore={() => {
             setSeedBackupModal( false )
             // props.navigation.goBack()
-            props.navigation.navigate( 'Home' )
+            props.navigation.navigate( 'MoreOptionsContainerScreen' )
           }}
           isIgnoreButton={true}
         />
