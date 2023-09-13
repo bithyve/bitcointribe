@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useLayoutEffect } from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import MoreOptionsContainerScreen from '../../../pages/MoreOptions/MoreOptionsContainerScreen'
@@ -30,25 +30,37 @@ import ValidateBorderWalletChecksum from '../../../pages/borderwallet/ValidateBo
 import PreviewPattern from '../../../pages/borderwallet/PreviewPattern'
 import BackupGridMnemonic from '../../../pages/borderwallet/BackupGridMnemonic'
 import CheckPasscodeComponent from '../../../pages/NewBHR/CheckPasscodeComponent'
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native'
 
 const Stack = createNativeStackNavigator()
-const MoreOptionsStack = () => {
+const MoreOptionsStack = ( { navigation, route } ) => {
+  useLayoutEffect( () => {
+    const routeName = getFocusedRouteNameFromRoute( route ) ?? 'MoreOptionsContainerScreen'
+    if ( routeName === 'MoreOptionsContainerScreen' ){
+      navigation.setOptions( {
+        tabBarStyle: {
+          display: 'flex', backgroundColor: 'transparent'
+        }
+      } )
+    }else {
+      navigation.setOptions( {
+        tabBarStyle: {
+          display: 'none'
+        }
+      } )
+    }
+  }, [ navigation, route ] )
   return (
     <Stack.Navigator
       initialRouteName='Home'
-      //TODO: screen option
-      // defaultNavigationOptions={( { navigation } )=>{
-      //   return {
-      //     ...defaultStackScreenNavigationOptions,
-      //     headerLeft: () => {
-      //       return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-      //     },
-      //   }
-      // }}
-      // screenOptions={({navigation})=>{
-
-      // }}
-
+      screenOptions={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerLeft: () => {
+            return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+          },
+        }
+      }}
     >
       <Stack.Screen name="MoreOptionsContainerScreen" component={MoreOptionsContainerScreen} options={{
         headerShown: false,
@@ -138,181 +150,5 @@ const MoreOptionsStack = () => {
     </Stack.Navigator>
   )
 }
-
-// TODO: add all the below screens to stack
-// const MoreOptionsStack = createStackNavigator(
-//   {
-//     Home: {
-//       screen: MoreOptionsContainerScreen,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     Launch,
-//     Login:{
-//       screen: Login,
-//       navigationOptions: {
-//         header: null
-//       }
-//     },
-//     Intermediate,
-//     ReLogin: {
-//       screen: ReLogin,
-//       navigationOptions: {
-//         gesturesEnabled: false,
-//         header: null,
-//       },
-//     },
-//     AccountManagement: {
-//       screen: AccountManagementStack,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     TransactionDetails: {
-//       screen: TransactionDetailsContainerScreen,
-//     },
-//     PasscodeChangeSuccessPage: {
-//       screen: PasscodeChangeSuccessPage,
-//       navigationOptions: {
-//         gesturesEnabled: false,
-//         header: null,
-//       },
-//     },
-//     FriendsAndFamily: {
-//       screen: FriendsAndFamilyScreen,
-//       navigationOptions: {
-//         title: 'Friends & Family',
-//       },
-//     },
-//     BackupWithKeeper: {
-//       screen: BackupWithKeeper,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     BackupGridMnemonic: {
-//       screen: BackupGridMnemonic,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     ValidateBorderWalletChecksum: {
-//       screen: ValidateBorderWalletChecksum,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     ValidateBorderWalletPattern: {
-//       screen: ValidateBorderWalletPattern,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     PreviewPattern: {
-//       screen: PreviewPattern,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     CheckPasscode:{
-//       screen: CheckPasscodeComponent,
-//       navigationOptions:{
-//         header:null
-//       }
-//     },
-//     BackupMethods: {
-//       screen: BackupMethods,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     NodeSettings: {
-//       screen: NodeSettingsContainerScreen,
-//       navigationOptions: ( { navigation } ) => {
-//         return {
-//           title: 'Node Settings',
-//           headerTitleStyle:{
-//             color: Colors.blue,
-//             fontSize: RFValue( 18 ),
-//             fontFamily: Fonts.Medium,
-//             textAlign: 'left',
-//             marginHorizontal: 0
-//           },
-//           headerLeft: () => {
-//             return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-//           },
-//         }
-//       },
-//     },
-//     FundingSources: {
-//       screen: FundingSourcesScreen,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     FundingSourceDetails: {
-//       screen: FundingSourceDetailsScreen,
-//     },
-//     WalletSettings: {
-//       screen: WalletSettingsStack,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     QRScanner: {
-//       screen: QRStack,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     AppInfo: {
-//       screen: AppInfo,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     VersionHistory: {
-//       screen: VersionHistoryScreen,
-//       navigationOptions: {
-//         title: 'Version History',
-//       },
-//     },
-//     AccountDetails: {
-//       screen: AccountDetailsStack,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     SeedBackup: {
-//       screen: WalletBackupStack,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//   },
-//   {
-//     initialRouteName: 'Home',
-//     navigationOptions: ( { navigation } ) => {
-//       let tabBarVisible = false
-//       if ( ( navigation.state.index === 0  && navigation.state.routes[ 0 ].routeName === 'Home' || navigation.state.index === 1 && navigation.state.routes[ 1 ]?.routeName === 'Home' ) ) {
-//         tabBarVisible = true
-//       }
-
-//       return {
-//         tabBarVisible,
-//       }
-//     },
-//     defaultNavigationOptions: ( { navigation } ) => {
-//       return {
-//         ...defaultStackScreenNavigationOptions,
-//         headerLeft: () => {
-//           return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-//         },
-//       }
-//     },
-//   },
-// )
-
 
 export default MoreOptionsStack

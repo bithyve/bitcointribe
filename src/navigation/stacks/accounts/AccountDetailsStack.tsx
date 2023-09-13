@@ -10,9 +10,7 @@ import SubAccountSettingsStack from './SubAccountSettingsStack'
 import DonationAccountWebViewSettingsScreen from '../../../pages/Accounts/AccountSettings/DonationAccountWebViewSettingsScreen'
 import SendStack from '../send/SendStack'
 import SubAccountTFAHelpScreen from '../../../pages/Accounts/SubAccountTFAHelpScreen'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
 
-// TODO: test safeareaprovider and navigationContainer
 const Stack = createNativeStackNavigator()
 export default function AccountDetailsStack() {
   return (
