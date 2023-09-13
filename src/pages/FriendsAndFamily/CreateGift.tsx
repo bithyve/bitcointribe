@@ -268,7 +268,7 @@ const CreateGift = ( { route, navigation }: Props ) => {
             contact: selectedContact,
             senderName: name,
             themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
-            setActiveTab: navigation.state.params.setActiveTab,
+            setActiveTab: route.params?.setActiveTab,
           } )
         }
       }
@@ -415,7 +415,7 @@ const CreateGift = ( { route, navigation }: Props ) => {
                   navigation.navigate( 'AddContact', {
                     fromScreen: 'Gift',
                     giftId: ( createdGift as Gift ).id,
-                    setActiveTab: navigation.state.params.setActiveTab,
+                    setActiveTab: route.params?.setActiveTab,
                   } )
                   break
 
@@ -423,7 +423,7 @@ const CreateGift = ( { route, navigation }: Props ) => {
                   setGiftModal( false )
                   navigation.navigate( 'EnterGiftDetails', {
                     giftId: ( createdGift as Gift ).id,
-                    setActiveTab: navigation.state.params.setActiveTab,
+                    setActiveTab: route.params?.setActiveTab,
                   } )
                   break
             }

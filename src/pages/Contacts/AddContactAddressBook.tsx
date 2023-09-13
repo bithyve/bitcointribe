@@ -43,7 +43,7 @@ import LinearGradient from 'react-native-linear-gradient'
 
 export default function AddContactAddressBook( props ) {
   let [ selectedContacts, setSelectedContacts ] = useState( [] )
-  const [ editedContacts, setEditedContacts ] = useState( [ props.navigation.state.params?.contactToEdit ] )
+  const [ editedContacts, setEditedContacts ] = useState( [ props.route.params?.contactToEdit ] )
   const [ searchName, setSearchName ] = useState( '' )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ filterContactData, setFilterContactData ] = useState( [] )
@@ -297,39 +297,39 @@ export default function AddContactAddressBook( props ) {
   const onPressContinue = () => {
     if ( selectedContacts && selectedContacts.length ) {
 
-      if ( props.navigation.state.params?.fromScreen === 'Edit' ) {
-        selectedContacts[ 0 ].id = props.navigation.state.params?.contactToEdit.id
-        selectedContacts[ 0 ].channelKey = props.navigation.state.params?.contactToEdit.channelKey
+      if ( props.route.params?.fromScreen === 'Edit' ) {
+        selectedContacts[ 0 ].id = props.route.params?.contactToEdit.id
+        selectedContacts[ 0 ].channelKey = props.route.params?.contactToEdit.channelKey
         selectedContacts[ 0 ].displayedName = selectedContacts[ 0 ].name
-        selectedContacts[ 0 ].avatarImageSource = selectedContacts[ 0 ].image ? selectedContacts[ 0 ].image : props.navigation.state.params?.contactToEdit.avatarImageSource
+        selectedContacts[ 0 ].avatarImageSource = selectedContacts[ 0 ].image ? selectedContacts[ 0 ].image : props.route.params?.contactToEdit.avatarImageSource
         dispatch( editTrustedContact( {
-          channelKey: props.navigation.state.params?.contactToEdit.channelKey,
+          channelKey: props.route.params?.contactToEdit.channelKey,
           contactName: selectedContacts[ 0 ].name,
           image: selectedContacts[ 0 ].image
         } ) )
         props.navigation.navigate( 'ContactDetails', {
           contact: selectedContacts[ 0 ],
         } )
-      } else if ( props.navigation.state.params?.fromScreen === 'Gift' ) {
+      } else if ( props.route.params?.fromScreen === 'Gift' ) {
         props.navigation.replace( 'EnterGiftDetails', {
           fromScreen: 'Gift',
-          giftId: props.navigation.state.params?.giftId,
+          giftId: props.route.params?.giftId,
           contact: selectedContacts,
-          setActiveTab: props.navigation.state.params.setActiveTab
+          setActiveTab: props.route.params.setActiveTab
         } )
       } else {
-        if( props.navigation.state.params?.fromScreen === 'Invitation' ){
+        if( props.route.params?.fromScreen === 'Invitation' ){
           setCreateFNFInvite( true )
         }else{
           props.navigation.navigate( 'AddContactSendRequest', {
             SelectedContact: selectedContacts,
-            giftId: props.navigation.state.params?.giftId,
+            giftId: props.route.params?.giftId,
             headerText: strings.addContact,
             subHeaderText: strings.send,
             contactText: strings.adding,
-            senderName: props?.navigation?.state?.params?.senderName,
+            senderName: props?.route.params?.senderName,
             showDone: true,
-            note: props?.navigation?.state?.params?.note
+            note: props?.route.params?.note
           } )
 
         }
@@ -342,13 +342,13 @@ export default function AddContactAddressBook( props ) {
     setCreateFNFInvite( false )
     props.navigation.navigate( 'AddContactSendRequest', {
       SelectedContact: selectedContacts,
-      giftId: props.navigation.state.params?.giftId,
+      giftId: props.route.params?.giftId,
       headerText: strings.addContact,
       subHeaderText: strings.send,
       contactText: strings.adding,
-      senderName: props?.navigation?.state?.params?.senderName,
+      senderName: props?.route.params?.senderName,
       showDone: true,
-      note: props?.navigation?.state?.params?.note
+      note: props?.route.params?.note
     } )
   }
   const goCreateGifts = () => {
@@ -356,7 +356,7 @@ export default function AddContactAddressBook( props ) {
     props.navigation.navigate( 'CreateGift', {
       selectedContact: selectedContacts,
       statusFlag: 'Invitation',
-      giftId: props.navigation.state.params?.giftId,
+      giftId: props.route.params?.giftId,
     } )
   }
   const onPressBack = () => {
@@ -369,14 +369,14 @@ export default function AddContactAddressBook( props ) {
     }
     props.navigation.navigate( 'AddContactSendRequest', {
       SelectedContact: [ skippedContact ],
-      giftId: props.navigation.state.params?.giftId,
+      giftId: props.route.params?.giftId,
       headerText: strings.addContact,
       subHeaderText: strings.send,
       contactText: strings.adding,
       showDone: true,
       skipClicked: true,
-      senderName: props?.navigation?.state?.params?.senderName,
-      note: props?.navigation?.state?.params?.note
+      senderName: props?.route.params?.senderName,
+      note: props?.route.params?.note
     } )
   }
 
@@ -391,7 +391,7 @@ export default function AddContactAddressBook( props ) {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.pop( props.navigation.state.params?.fromScreen === 'Gift' ? 2 : 1 )
+            props.navigation.pop( props.route.params?.fromScreen === 'Gift' ? 2 : 1 )
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -691,7 +691,7 @@ export default function AddContactAddressBook( props ) {
                 </AppBottomSheetTouchableWrapper>
               )
             }
-            {props.navigation.state.params?.fromScreen === 'Edit' ?
+            {props.route.params?.fromScreen === 'Edit' ?
               null :
               <AppBottomSheetTouchableWrapper
                 onPress={() => onSkipContinue()}

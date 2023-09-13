@@ -28,7 +28,6 @@ import DashedContainer from '../pages/FriendsAndFamily/DashedContainer'
 import DashedLargeContainer from '../pages/FriendsAndFamily/DahsedLargeContainer'
 import ButtonGroupWithIcon from '../pages/FriendsAndFamily/ButtonGroupWithIcon'
 import ThemeList from '../pages/FriendsAndFamily/Theme'
-import { useNavigation } from '@react-navigation/native'
 import { nameToInitials } from '../common/CommonFunctions'
 import { DeepLinkEncryptionType } from '../bitcoin/utilities/Interface'
 
@@ -36,7 +35,6 @@ function RequestKeyFromContact( props ) {
   const [ shareLink, setShareLink ] = useState( '' )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
-  const navigation: any = useNavigation()
   const contact = props.contact && props.contact.contactDetails && props.contact.contactDetails[ 0 ]
   const [ serviceType, setServiceType ] = useState(
     props.serviceType ? props.serviceType : '',
@@ -100,12 +98,12 @@ function RequestKeyFromContact( props ) {
 
   const shareViaLinkOrQR = ( type ) => {
     props.onPressShare()
-    navigation.navigate( 'SendViaLinkAndQR', {
+    props.navigation.navigate( 'SendViaLinkAndQR', {
       type,
       qrCode: props.QR,
       link: shareLink,
       ...props,
-      setActiveTab: props.navigation.state.params.setActiveTab,
+      setActiveTab: props.route.params?.setActiveTab,
       OTP: props.encryptionKey, encryptLinkWith: props.encryptLinkWith
     } )
   }

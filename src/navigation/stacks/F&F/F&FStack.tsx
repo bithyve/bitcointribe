@@ -1,3 +1,4 @@
+import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import FriendsAndFamilyScreen from '../../../pages/FriendsAndFamily/FriendsAndFamilyScreen'
 import QRStack from '../home/QRStack'
@@ -18,104 +19,59 @@ import SendGift from '../../../pages/FriendsAndFamily/SendGift'
 import GiftDetails from '../../../pages/FriendsAndFamily/GiftDetails'
 import EnterGiftDetails from '../../../pages/FriendsAndFamily/EnterGiftDetails'
 import SendViaLinkAndQR from '../../../pages/FriendsAndFamily/SendViaLinkAndQR'
+import { useLayoutEffect } from 'react'
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native'
 
-const Stack = createNativeStackNavigator();
-const FriendsAndFamily = () => {
+const Stack = createNativeStackNavigator()
+const FriendsAndFamily = ( { navigation, route } ) => {
+  useLayoutEffect( () => {
+    const routeName = getFocusedRouteNameFromRoute( route ) ?? 'FriendsAndFamilyScreen'
+    if ( routeName === 'FriendsAndFamilyScreen' ){
+      navigation.setOptions( {
+        tabBarStyle: {
+          display: 'flex', backgroundColor: 'transparent'
+        }
+      } )
+    }else {
+      navigation.setOptions( {
+        tabBarStyle: {
+          display: 'none'
+        }
+      } )
+    }
+  }, [ navigation, route ] )
   return (
     <Stack.Navigator
-      initialRouteName='Home'
+      initialRouteName='FriendsAndFamilyScreen'
+      screenOptions={{
+        headerShown: false
+      }}
     >
-      <Stack.Screen name="Home" component={FriendsAndFamilyScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="FriendsAndFamilyScreen" component={FriendsAndFamilyScreen} />
+      <Stack.Screen name="ManageGifts" component={ManageGifts} />
+      <Stack.Screen name="EnterGiftDetails" component={EnterGiftDetails} />
+      <Stack.Screen name="GiftDetails" component={GiftDetails} />
+      <Stack.Screen name="SendViaLinkAndQR" component={SendViaLinkAndQR} />
+      <Stack.Screen name="CreateGift" component={CreateGift} />
+      <Stack.Screen name="SendGift" component={SendGift} />
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Launch" component={Launch} />
+      <Stack.Screen name="Intermediate" component={Intermediate} />
+      <Stack.Screen name="ReLogin" component={ReLogin} options={{
+        gestureEnabled: false
+      }} />
+      <Stack.Screen name="ContactDetails" component={ContactDetails} />
+      <Stack.Screen name="AddContactSendRequest" component={AddContactSendRequest} />
+      <Stack.Screen name="QrAndLink" component={QrAndLink} />
+      <Stack.Screen name="AccountDetails" component={AccountDetailsStack} />
+      <Stack.Screen name="QRScanner" component={QRStack} />
+      <Stack.Screen name="AddContact" component={AddContactAddressBook} />
+      <Stack.Screen name="TransactionDetails" component={TransactionDetailsContainerScreen} options={{
+        title: 'TransactionDetails'
+      }} />
+      <Stack.Screen name="RequestKeyFromContact" component={RequestKeyFromContact} />
     </Stack.Navigator>
   )
 }
-
-// TODO: add all the below screens in stack
-// const FriendsAndFamily = createStackNavigator(
-//   {
-//     Home: {
-//       screen: FriendsAndFamilyScreen,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     ManageGifts,
-//     EnterGiftDetails,
-//     GiftDetails,
-//     SendViaLinkAndQR,
-//     CreateGift,
-//     SendGift,
-//     Login,
-//     Launch,
-//     Intermediate,
-//     ReLogin: {
-//       screen: ReLogin,
-//       navigationOptions: {
-//         gesturesEnabled: false,
-//       },
-//     },
-//     ContactDetails: {
-//       screen: ContactDetails,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     AddContactSendRequest: {
-//       screen: AddContactSendRequest,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     QrAndLink: {
-//       screen: QrAndLink,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     AccountDetails: {
-//       screen: AccountDetailsStack,
-//       navigationOptions: {
-//         header: null,
-//         // tabBarVisibl
-//       },
-//     },
-//     TransactionDetails: {
-//       screen: TransactionDetailsContainerScreen,
-//       navigationOptions: {
-//         title: 'TransactionDetails',
-//       },
-//     },
-//     QRScanner: {
-//       screen: QRStack,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     AddContact: {
-//       screen: AddContactAddressBook,
-//       navigationOptions: {
-//         header: null,
-//       },
-//     },
-//     RequestKeyFromContact
-//   },
-//   {
-//     // mode: 'modal',
-//     initialRouteName: 'Home',
-//     defaultNavigationOptions: {
-//       header: null
-//     },
-//     navigationOptions: ( { navigation } ) => {
-//       let tabBarVisible = false
-//       if ( ( navigation.state.index === 0  && navigation.state.routes[ 0 ].routeName === 'Home' || navigation.state.index === 1 && navigation.state.routes[ 1 ]?.routeName === 'Home' ) ) {
-//         tabBarVisible = true
-//       }
-
-//       return {
-//         tabBarVisible,
-//       }
-//     },
-//   },
-// )
 
 export default FriendsAndFamily

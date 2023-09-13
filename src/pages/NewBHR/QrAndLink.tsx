@@ -50,9 +50,9 @@ export default function QrAndLink( props ) {
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
 
-  const Contact  = props.navigation.getParam( 'contact' )
-  const channelKey = props.navigation.getParam( 'channelKey' )
-  const shareType = props.navigation.getParam( 'shareType' )
+  const Contact  = props.route.params?.contact
+  const channelKey = props.route.params?.channelKey
+  const shareType = props.route.params?.shareType
   const trustedContacts: Trusted_Contacts = useTrustedContacts()
   const dispatch = useDispatch()
 

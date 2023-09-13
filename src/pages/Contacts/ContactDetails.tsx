@@ -90,6 +90,7 @@ const getImageIcon = ( item: ContactRecipientDescribing ) => {
 
 interface ContactDetailsPropTypes {
   navigation: any;
+  route: any;
   trustedContacts: Trusted_Contacts;
   trustedContactRecipients: ContactRecipientDescribing[],
   accountShells: AccountShell[];
@@ -233,9 +234,9 @@ class ContactDetails extends PureComponent<
       showAlertModal: false,
     }
 
-    this.contact = this.props.navigation.state.params.contact
-    this.contactsType = this.props.navigation.state.params.contactsType
-    this.isFromApproval = this.props.navigation.state.params.isFromApproval ? this.props.navigation.state.params.isFromApproval : false
+    this.contact = this.props.route.params?.contact
+    this.contactsType = this.props.route.params?.contactsType
+    this.isFromApproval = this.props.route.params?.isFromApproval ? this.props.route.params?.isFromApproval : false
     if ( this.contactsType == 'Keeper' ) {
       this.isExistingContact = this.contact.channelKey && this.props.keeperInfo.find( value => value.channelKey == this.contact.channelKey ) ? true : false
     }
@@ -250,11 +251,11 @@ class ContactDetails extends PureComponent<
     this.setState( {
       showQRClicked: true
     } )
-    if ( this.props.navigation.state.params.contactsType == 'I am the Keeper of' ) this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
+    if ( this.props.route.params?.contactsType === 'I am the Keeper of' ) this.props.getApprovalFromKeepers( true, trustedContacts[ this.contact.channelKey ] )
     this.setIsSendDisabledListener = this.props.navigation.addListener(
-      'didFocus',
+      'focus',
       () => {
-        this.contact = this.props.navigation.state.params.contact
+        this.contact = this.props.route.params?.contact
         this.forceUpdate()
         this.setState( {
           isSendDisabled: false,

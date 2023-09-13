@@ -112,7 +112,7 @@ const FNFIDENTIFICATIONDATA = [
   },
 ]
 
-const GiftDetails = ({ navigation }) => {
+const GiftDetails = ({ navigation, route }) => {
 
 
   const renderItem = ({ item }) => {
@@ -131,17 +131,17 @@ const GiftDetails = ({ navigation }) => {
   )
 
   const dispatch = useDispatch()
-  const { giftId, contact } = navigation.state.params
+  const { giftId, contact } = route.params
   const wallet: Wallet = useSelector(state => state.storage.wallet)
   const strings = translations['f&f']
   // const login = translations[ 'login' ]
   const common = translations['common']
   const [note, setNote] = useState(
-    navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
+    route.params?.giftMsg != undefined ? route.params.giftMsg :
       'Bitcoin is a new type of money that is not controlled by any government or company')
   const [encryptionType, setEncryptionType] = useState(DeepLinkEncryptionType.OTP)
   const [bottomNote, setbottomNote] = useState(
-    navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
+    route.params?.giftMsg != undefined ? route.params?.giftMsg :
       '')
   const [name, setName] = useState('')
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false)
@@ -204,8 +204,6 @@ const GiftDetails = ({ navigation }) => {
   useEffect(() => {
     setName(wallet.userName ? wallet.userName : wallet.walletName)
   }, [wallet.walletName, wallet.userName])
-
-  const { title, walletName, gift, avatar }: { title: string, walletName: string, gift: Gift, avatar: boolean } = navigation.state.params
 
 
   const IdentificationCard = ({ type, title, subtitle }) => {
@@ -571,7 +569,7 @@ const GiftDetails = ({ navigation }) => {
                 contact,
                 senderName: name,
                 themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
-                setActiveTab: navigation.state.params.setActiveTab
+                setActiveTab: route.params?.setActiveTab
               })
             }}
           >
@@ -603,7 +601,7 @@ const GiftDetails = ({ navigation }) => {
               showDone: true,
               themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
               senderName: name,
-              setActiveTab: navigation.state.params.setActiveTab
+              setActiveTab: route.params?.setActiveTab
             })
           } else if (condn === 'Add F&F and Send') {
             navigation.navigate('AddContact', {
@@ -611,7 +609,7 @@ const GiftDetails = ({ navigation }) => {
               giftId,
               note,
               senderName: name,
-              setActiveTab: navigation.state.params.setActiveTab
+              setActiveTab: route.params?.setActiveTab
             })
           } else {
             if (encryptionType === DeepLinkEncryptionType.SECRET_PHRASE) {
@@ -628,7 +626,7 @@ const GiftDetails = ({ navigation }) => {
               contact,
               senderName: name,
               themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
-              setActiveTab: navigation.state.params.setActiveTab
+              setActiveTab: route.params?.setActiveTab
             })
           }
 

@@ -37,15 +37,15 @@ export default function SendGift( props ) {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
 
-  const giftId = props.navigation.getParam( 'giftId' )
-  const note = props.navigation.getParam( 'note' )
-  const contactDetails = props.navigation.getParam( 'selectedContact' )
-  const giftLinkEncryptionType: DeepLinkEncryptionType = props.navigation.getParam( 'encryptionType' )
+  const giftId = props.route.params?.giftId
+  const note = props.route.params?.note
+  const contactDetails = props.route.params?.selectedContact
+  const giftLinkEncryptionType: DeepLinkEncryptionType = props.route.params?.encryptionType
 
-  const secretPhrase = props.navigation.getParam( 'secretPhrase' )
-  const secretPhraseHint = props.navigation.getParam( 'secretPhraseHint' )
-  const senderEditedName = props.navigation.getParam( 'senderName' )
-  const themeId = props.navigation.getParam( 'themeId' )
+  const secretPhrase = props.route.params?.secretPhrase
+  const secretPhraseHint = props.route.params?.secretPhraseHint
+  const senderEditedName = props.route.params?.senderName
+  const themeId = props.route.params?.themeId
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const fcmToken: string = useSelector( state => state.preferences.fcmTokenValue )

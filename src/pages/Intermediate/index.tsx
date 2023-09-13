@@ -121,51 +121,6 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
       }
     };
 
-
-    // handleLockCheck = () => {
-    //   const interval = setInterval( () => {
-    //     // check if it should be rendered
-    //     const TIME_OUT = 15000
-    //     const now: any = new Date()
-    //     const diff = Math.abs( now - this.props.lastSeen )
-    //     const { canLock } = this.state
-    //     if ( diff > TIME_OUT ) {
-    //       if ( canLock ) {
-    //         this.setState( {
-    //           canLock: false
-    //         }, () => {
-    //           this.props.navigation.push( 'ReLogin' )
-    //           clearInterval( interval )
-    //         } )
-    //       }
-    //     } else {
-    //       this.props.navigation.pop()
-    //       this.props.updateLastSeen()
-    //     }
-    //   }, 3000 )
-    // }
-
-
-    // handleAppStateChange = async ( nextAppState ) => {
-    //   const TIME_OUT = 15000
-    //   if ( ( Platform.OS === 'ios' && nextAppState === 'active' ) || ( Platform.OS === 'android' && nextAppState === 'background' ) ) {
-    //     const now: any = new Date()
-    //     const diff = Math.abs( now - this.props.lastSeen )
-    //     const { canLock } = this.state
-    //     if ( diff > TIME_OUT ) {
-    //       if ( canLock ) {
-    //         this.setState( {
-    //           canLock: false
-    //         }, () => this.props.navigation.push( 'ReLogin' ) )
-    //       }
-    //     } else {
-    //       this.props.navigation.pop()
-    //       this.props.updateLastSeen( new Date() )
-    //     }
-    //   }
-    // };
-
-
     componentWillUnmount() {
       this.appStateListener.remove()
     }

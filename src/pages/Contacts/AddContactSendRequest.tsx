@@ -66,8 +66,8 @@ export default function AddContactSendRequest( props ) {
   const [ timerModal, setTimerModal ] = useState( false )
   const [ renderTimer, setRenderTimer ] = useState( false )
   const accountsState: AccountsState = useSelector( state => state.accounts )
-  const giftId = props.navigation.getParam( 'giftId' )
-  const note = props.navigation.getParam( 'note' )
+  const giftId = props.route.params?.giftId
+  const note = props.route.params?.note
   const giftToSend = giftId? accountsState.gifts[ giftId ]: null
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ longLink, setLongLink ] = useState( '' )
@@ -75,42 +75,42 @@ export default function AddContactSendRequest( props ) {
   const [ selectedContactsCHKey, setSelectedContactsCHKey ] = useState( '' )
   const [ encryptLinkWith, setEncryptLinkWith ] = useState( giftId? null: DeepLinkEncryptionType.DEFAULT )
   const [ isOTPType, setIsOTPType ] = useState( false )
-  const themeId = props.navigation.getParam( 'themeId' )
-  const senderEditedName = props.navigation.getParam( 'senderName' )
-  const SelectedContact = props.navigation.getParam( 'SelectedContact' )
-    ? props.navigation.getParam( 'SelectedContact' )
+  const themeId = props.route.params?.themeId
+  const senderEditedName = props.route.params?.senderName
+  const SelectedContact = props.route.params?.SelectedContact
+    ? props.route.params?.SelectedContact
     : []
 
-  const headerText = props.navigation.getParam( 'headerText' )
-    ? props.navigation.getParam( 'headerText' )
+  const headerText = props.route.params?.headerText
+    ? props.route.params?.headerText
     : ''
 
-  const subHeaderText = props.navigation.getParam( 'subHeaderText' )
-    ? props.navigation.getParam( 'subHeaderText' )
+  const subHeaderText = props.route.params?.subHeaderText
+    ? props.route.params?.subHeaderText
     : ''
 
-  const contactText = props.navigation.getParam( 'contactText' )
-    ? props.navigation.getParam( 'contactText' )
+  const contactText = props.route.params?.contactText
+    ? props.route.params?.contactText
     : ''
 
-  const showDone = props.navigation.getParam( 'showDone' )
-    ? props.navigation.getParam( 'showDone' )
+  const showDone = props.route.params?.showDone
+    ? props.route.params?.showDone
     : false
 
-  const isKeeper = props.navigation.getParam( 'isKeeper' )
-    ? props.navigation.getParam( 'isKeeper' )
+  const isKeeper = props.route.params?.isKeeper
+    ? props.route.params?.isKeeper
     : false
 
-  const isPrimary = props.navigation.getParam( 'isPrimary' )
-    ? props.navigation.getParam( 'isPrimary' )
+  const isPrimary = props.route.params?.isPrimary
+    ? props.route.params?.isPrimary
     : false
 
-  const existingContact = props.navigation.getParam( 'existingContact' )
-    ? props.navigation.getParam( 'existingContact' )
+  const existingContact = props.route.params?.existingContact
+    ? props.route.params?.existingContact
     : false
 
-  const skipClicked = props.navigation.getParam( 'skipClicked' )
-    ? props.navigation.getParam( 'skipClicked' )
+  const skipClicked = props.route.params?.skipClicked
+    ? props.route.params?.skipClicked
     : false
 
   const [ Contact ] = useState(
@@ -447,32 +447,6 @@ export default function AddContactSendRequest( props ) {
               />
             </View>
           </TouchableOpacity>
-          {/* {giftId &&
-          <TouchableOpacity
-            onPress={() => props.navigation.pop( giftId ? 4 : 3 )}
-            style={{
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              backgroundColor: Colors.lightBlue,
-              paddingHorizontal: wp( 4 ),
-              paddingVertical: wp( 2 ),
-              marginRight: wp( 5 ),
-              borderRadius: wp( 2 )
-            }}
-          >
-            <Text
-              style={{
-                ...{
-                  color: Colors.backgroundColor1,
-                  fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.Regular,
-                }
-              }}
-            >
-            Done
-            </Text>
-          </TouchableOpacity>
-          } */}
         </View>
         <RequestKeyFromContact
           isModal={false}
