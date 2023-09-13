@@ -150,12 +150,10 @@ export default function ManageBackup( props ) {
         }
       } )
     } )
-    const focusListener = props.navigation.addListener( 'didFocus', () => {
+    const unsubscribe = props.navigation.addListener( 'focus', () => {
       updateAddressBook()
     } )
-    return () => {
-      focusListener.remove()
-    }
+    return unsubscribe
   }, [] )
 
   useEffect( () => {

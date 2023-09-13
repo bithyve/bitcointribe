@@ -72,9 +72,7 @@ const VoucherScanner = ( props ) => {
   const [ FBTCAccount_Data, setFBTCAccount_Data ] = useState( {
   } )
   const [ TextHideShow, setTextHideShow ] = useState( true )
-  const userKey1 = props.navigation.state.params
-    ? props.navigation.state.params.userKey
-    : ''
+  const userKey1 = props.route.params?.userKey || ''
   const [ bitcoinAddress, setBitcoinAddress ] = useState( '' )
   const QuoteDetails = useSelector( ( state ) => state.fbtc.getQuoteDetails )
   const executeOrderDetails = useSelector(

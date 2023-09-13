@@ -137,24 +137,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
   const approvalStatus = useSelector( ( state: RootStateOrAny ) => state.bhr.approvalStatus )
 
-  // useEffect( () => {
-  //   setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
-  //   setSelectedKeeper( selectedKeeper )
-  //   setIsReshare( props.navigation.getParam( 'isChangeKeeperType' ) ? false : selectedKeeper.status === 'notAccessible' && selectedKeeper.updatedAt == 0 ? true : false )
-  //   setIsChange(
-  //     props.navigation.getParam( 'isChangeKeeperType' )
-  //       ? props.navigation.getParam( 'isChangeKeeperType' )
-  //       : false
-  //   )
-  //   setOldChannelKey( selectedKeeper.channelKey ? selectedKeeper.channelKey : '' )
-  //   setShareType( selectedKeeper.shareType ? selectedKeeper.shareType : 'contact' )
-  // }, [ props.navigation.state.params ] )
-
   useEffect( () => {
     if ( isChange ) {
       // setTrustedContactModal( true )
       props.navigation.navigate( 'FNFToKeeper', {
-        ...props.navigation.state.params,
+        ...props.route.params,
         onPressContinue
       } )
     }
@@ -220,7 +207,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       if( selectedKeeper.status === 'notSetup' ) {
         // setTrustedContactModal( true )
         props.navigation.navigate( 'FNFToKeeper', {
-          ...props.navigation.state.params,
+          ...props.route.params,
           onPressContinue
         } )
       }
@@ -456,7 +443,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     } else {
       setReshareModal( false )
       props.navigation.navigate( 'FNFToKeeper', {
-        ...props.navigation.state.params,
+        ...props.route.params,
         onPressContinue,
         recreateChannel: true
       } )
@@ -477,7 +464,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         isIgnoreButton={true}
         onPressProceed={() => {
           props.navigation.navigate( 'FNFToKeeper', {
-            ...props.navigation.state.params,
+            ...props.route.params,
             onPressContinue
           } )
           setIsChange( true )
@@ -778,7 +765,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           onPressConfirm={() => {
             if( selectedKeeper.updatedAt == 0 ){
               props.navigation.navigate( 'FNFToKeeper', {
-                ...props.navigation.state.params,
+                ...props.route.params,
                 onPressContinue
               } )
             } else {

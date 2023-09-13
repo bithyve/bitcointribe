@@ -94,10 +94,10 @@ const PersonalCopyHistory = ( props ) => {
   const [ channelKey, setChannelKey ] = useState( props.route.params.selectedKeeper.channelKey ? props.route.params.selectedKeeper.channelKey : '' )
   const [ personalCopyDetails, setPersonalCopyDetails ] = useState( null )
   const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState(
-    props.navigation.state.params.SelectedRecoveryKeyNumber
+    props.route.params?.SelectedRecoveryKeyNumber
   )
   const [ selectedKeeper, setSelectedKeeper ] = useState(
-    props.navigation.state.params.selectedKeeper
+    props.route.params?.selectedKeeper
   )
   const [ isReshare, setIsReshare ] = useState( props.route.params.isChangeKeeperType ? false :
     props.route.params.selectedKeeper.status === 'notSetup' ? false : true
@@ -149,7 +149,7 @@ const PersonalCopyHistory = ( props ) => {
       dispatch( createChannelAssets( props.route.params.selectedKeeper.shareId ) )
     }
   }, [
-    props.navigation.state.params
+    props.route.params
   ] )
 
   useEffect( ()=>{
@@ -646,11 +646,11 @@ const PersonalCopyHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
+        selectedTitle={deviceText( props.route.params?.selectedTitle )}
         selectedTime={selectedKeeper.updatedAt
           ? getTime( selectedKeeper.updatedAt )
           : 'Never'}
-        moreInfo={deviceText( props.navigation.state.params.selectedTitle )}
+        moreInfo={deviceText( props.route.params?.selectedTitle )}
         headerImage={require( '../../assets/images/icons/note.png' )}
       />
       <View style={{

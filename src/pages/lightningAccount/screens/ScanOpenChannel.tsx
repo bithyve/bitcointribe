@@ -52,12 +52,12 @@ const styles = StyleSheet.create( {
 } )
 
 
-export default function ScanNodeConfig( { navigation } ) {
+export default function ScanNodeConfig( { navigation, route } ) {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'lightningAccount' ]
 
   async function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
-    const { onQrScan } = navigation.state.params
+    const { onQrScan } = route.params
     if( onQrScan ){
       onQrScan( scannedData )
     }

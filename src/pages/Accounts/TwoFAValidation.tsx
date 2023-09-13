@@ -42,8 +42,8 @@ export default function TwoFAValidation( props ) {
   const [ isConfirmDisabled, setIsConfirmDisabled ] = useState( true )
 
   const twoFAHelpFlags = useSelector( ( state ) => state.accounts.twoFAHelpFlags )
-  const fromWallet = props.navigation?.getParam( 'fromWallet' ) || false
-  const address = props.navigation?.getParam( 'address' ) || null
+  const fromWallet = props.route.params?.fromWallet || false
+  const address = props.route.params?.address || null
 
   const sendingState = useSendingState()
 

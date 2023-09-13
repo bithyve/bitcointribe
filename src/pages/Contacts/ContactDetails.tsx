@@ -959,32 +959,6 @@ class ContactDetails extends PureComponent<
             this.contact.trustKind !== ContactTrustKind.OTHER && this.contact.lastSeenActive ? null : (
               <CardWithArrow
                 onPress={() => {
-                  // Alert.alert(
-                  //   this.strings[ 'RemoveContact' ],
-                  //   this.strings[ 'sure' ],
-                  //   [
-                  //     {
-                  //       text: this.common[ 'yes' ],
-                  //       onPress: () => {
-                  //         this.props.removeTrustedContact( {
-                  //           channelKey: this.contact.channelKey
-                  //         } )
-                  //         this.setState( {
-                  //           showContactDetails: false
-                  //         } )
-                  //         this.props.navigation.goBack()
-                  //       },
-                  //     },
-                  //     {
-                  //       text: this.common[ 'cancel' ],
-                  //       onPress: () => { },
-                  //       style: 'cancel',
-                  //     },
-                  //   ],
-                  //   {
-                  //     cancelable: false
-                  //   }
-                  // )
                   this.setState( {
                     showAlertModal:true
                   } )

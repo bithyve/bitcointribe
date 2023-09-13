@@ -122,8 +122,8 @@ export default function SettingGetNewPin( props ) {
       if( oldPasscode === '' ) {
         dispatch( switchCredsChanged() )
         props.navigation.goBack()
-        if ( props.navigation.state.params.onPasscodeReset ) {
-          props.navigation.state.params.onPasscodeReset(  )
+        if ( props.route.params?.onPasscodeReset ) {
+          props.route.params?.onPasscodeReset(  )
         }
       } else {
         props.navigation.navigate( 'PasscodeChangeSuccessPage' )

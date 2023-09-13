@@ -22,7 +22,7 @@ import BackupGridMnemonic from '../../../pages/borderwallet/BackupGridMnemonic'
 
 const strings  = translations[ 'stackTitle' ]
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator()
 const SubAccountSettingsStack = () => {
   return (
     <Stack.Navigator
@@ -36,95 +36,107 @@ const SubAccountSettingsStack = () => {
         }
       }}
     >
-      <Stack.Screen 
+      <Stack.Screen
         name="AccountSettingsMain"
         component={AccountSettingsMainScreen}
         options={
-          ({navigation}) => ({
-              title: strings[ 'AccountSettings' ],
-              headerLeft: () => {
-                return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-              }
-            })
+          ( { navigation } ) => ( {
+            title: strings[ 'AccountSettings' ],
+            headerLeft: () => {
+              return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+            }
+          } )
         }
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="EditDisplayProperties"
         component={AccountSettingsEditDisplayPropertiesScreen}
         options={{
           title: strings[ 'NameDescription' ],
         }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="ReassignTransactionsMainOptions"
         component={ReassignTransactionsMainOptionsScreen}
         options={{
           title: strings[ 'ReassignTransactions' ],
         }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="SelectReassignableTransactions"
         component={SelectReassignableTransactionsScreen}
         options={{
           title: strings[ 'ReassignTransactions' ],
         }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="ReassignSubAccountSourcesSelectSources"
         component={ReassignSubAccountSourcesSelectSourcesScreen}
         options={{
           title: strings[ 'ReassignSources' ],
         }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="MergeAccounts"
         component={AccountSettingsMergeAccountShellsScreen}
         options={{
           title: strings[ 'MergeAccounts' ],
         }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="TransactionDetails"
         component={TransactionDetailsContainerScreen}
         options={{
           title: strings[ 'TransactionDetails' ],
         }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="BackupGridMnemonic"
         component={BackupGridMnemonic}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false
+        }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="ValidateBorderWalletChecksum"
         component={ValidateBorderWalletChecksum}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false
+        }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="ValidateBorderWalletPattern"
         component={ValidateBorderWalletPattern}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false
+        }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="PreviewPattern"
         component={PreviewPattern}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false
+        }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="CheckPasscode"
         component={CheckPasscodeComponent}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false
+        }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="ReassignTransactionsSelectDestination"
         component={ReassignTransactionsSelectDestinationScreen}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="EditVisibility"
         component={AccountSettingsEditVisibilityScreen}
-        options={{ title: 'Account Visibility' }}
+        options={{
+          title: 'Account Visibility'
+        }}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="ShowXPub"
         component={XPubDetailsScreen}
         options={( { navigation } ) => {

@@ -340,23 +340,6 @@ const styles = StyleSheet.create( {
   },
 } )
 
-
-
-// AccountDetails.navigationOptions = ( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> => {
-//   // const defaultStackScreenNavigationOptions: NativeStackNavigationOptions = {
-//   return {
-//     header() {
-//       const { accountShellID } = navigation.state.params
-//       return (
-//         <NavHeader
-//           accountShellID={accountShellID}
-//           onBackPressed={() => navigation.pop()}
-//         />
-//       )
-//     },
-//   }
-// }
-
 // export default connect( mapStateToProps, mapDispatchToProps )( EnterNodeConfigScreen )
 
 export default connect( mapStateToProps, mapDispatchToProps )( AccountDetails )

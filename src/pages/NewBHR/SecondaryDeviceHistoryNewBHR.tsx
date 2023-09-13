@@ -644,11 +644,11 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={props.navigation.state.params.selectedTitle}
+        selectedTitle={props.route.params?.selectedTitle}
         selectedTime={selectedKeeper.updatedAt
           ? getTime( selectedKeeper.updatedAt )
           : 'Never'}
-        moreInfo={props.navigation.state.params.selectedTitle}
+        moreInfo={props.route.params?.selectedTitle}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
       />
       <View style={{

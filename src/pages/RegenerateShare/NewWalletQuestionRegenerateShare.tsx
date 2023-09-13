@@ -51,7 +51,7 @@ export default function NewWalletQuestionRegenerateShare( props ) {
   const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
   const [ ansError, setAnsError ] = useState( '' )
   const dispatch = useDispatch()
-  const walletName = props.navigation.getParam( 'walletName' )
+  const walletName = props.route.params?.walletName
   // const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   // if (isInitialized) {
   //     props.navigation.navigate('HomeNav');
@@ -129,8 +129,8 @@ export default function NewWalletQuestionRegenerateShare( props ) {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>

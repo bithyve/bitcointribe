@@ -47,9 +47,7 @@ const PairNewWallet = ( props ) => {
   const FBTCAccountData = useSelector( ( state ) => state.fbtc.FBTCAccountData )
   const [ FBTCAccount_Data, setFBTCAccount_Data ] = useState( {
   } )
-  const userKey1 = props.navigation.state.params
-    ? props.navigation.state.params.userKey
-    : ''
+  const userKey1 = props.route.params?.userkey || ''
   const [ isUserRegistered, setIsUserRegistered ] = useState( false )
   const [ openCameraFlag, setOpenCameraFlag ] = useState( false )
   const [ voucherCode, setVoucherCode ] = useState( '' )

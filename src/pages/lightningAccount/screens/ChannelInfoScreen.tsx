@@ -50,8 +50,8 @@ export default class ChannelInfoScreen extends Component {
   constructor( props ) {
     super( props )
     this.state = {
-      channelInfo: this.props.navigation.getParam( 'channelInfo' ),
-      alias : this.props.navigation.getParam( 'alias' ),
+      channelInfo: props.route.params?.channelInfo,
+      alias : props.route.params?.alias,
       feeForm: false,
       feeValue: '2',
       closeChannelState: false,

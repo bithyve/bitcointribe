@@ -35,6 +35,7 @@ interface ScanRecoveryKeyStateTypes {
 
 interface ScanRecoveryKeyPropsTypes {
   navigation: any;
+  route: any;
   walletName: any;
 }
 
@@ -52,7 +53,7 @@ class ScanRecoveryKey extends Component<
   barcodeRecognized = async ( barcodes ) => {
     const barcode = getFormattedStringFromQRString( barcodes.data )
     //console.log("barcodes1", barcode);
-    this.props.navigation.state.params.scannedData( JSON.parse( barcode ) )
+    this.props.route.params?.scannedData( JSON.parse( barcode ) )
     this.props.navigation.goBack()
     if ( barcode ) {
       this.setState( {
@@ -124,7 +125,7 @@ class ScanRecoveryKey extends Component<
               }}>
                 Recovering Wallet
               </Text>
-              { this.props.walletName || this.props.navigation.state.params.walletName ? <Text style={styles.greyBoxText}>{`${this.props.walletName ? this.props.walletName : this.props.navigation.state.params.walletName ? this.props.navigation.state.params.walletName : ''}` + '’s Wallet'}</Text> : null }
+              { this.props.walletName || this.props.route.params?.walletName ? <Text style={styles.greyBoxText}>{`${this.props.walletName ? this.props.walletName : this.props.route.params?.walletName ? this.props.route.params.walletName : ''}` + '’s Wallet'}</Text> : null }
 
             </View>
           </View>

@@ -34,7 +34,7 @@ export default class OpenChannelScreen extends Component {
   constructor( props ) {
     super( props )
     this.state = {
-      node: props.navigation.getParam( 'node' ),
+      node: props.route.params?.node,
       node_pubkey_string: '',
       local_funding_amount: '',
       min_confs: '2',
