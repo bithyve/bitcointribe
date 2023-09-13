@@ -24,7 +24,6 @@ import ModalContainer from '../../components/home/ModalContainer'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { setCloudBackupStatus, setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
 import CloudStatus from '../../common/data/enums/CloudBackupStatus'
-import LinearGradient from 'react-native-linear-gradient'
 
 const currencyCode = [
   'BRL',
@@ -58,6 +57,7 @@ import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
 import dbManager from '../../storage/realm/dbManager'
+import { CommonActions } from '@react-navigation/native'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -207,7 +207,28 @@ const HomeHeader = ( {
 
     return <TouchableOpacity
       onPress={()=> {
-        navigation.navigate( 'BackupMethods' )
+        navigation.dispatch(state => {
+          const moreOptionsStackRoute = state.routes.find(route => route.name === 'MoreOptionsStack');
+          let updatedRoutes = state.routes;
+          if (moreOptionsStackRoute) {
+            updatedRoutes = [
+              ...state.routes.slice(0, -1),
+              {
+                ...state.routes[state.routes.length - 1], // Copy the existing MoreOptionsStack route
+                state: {
+                  ...(state.routes[state.routes.length - 1].state || {}),
+                  index: 1,
+                  routes: [{ name: 'MoreOptionsContainerScreen', key: 'MoreOptionsContainerKey' }, { name: 'BackupMethods', key: 'BackupMethodsKey' }], // Update the routes of MoreOptionsStack
+                },
+              }
+            ]
+          }
+          return CommonActions.reset({
+            ...state,
+            index: 3,
+            routes: updatedRoutes,
+          });
+        })
       } }
       activeOpacity={0.6}
       style={{
@@ -274,13 +295,11 @@ const HomeHeader = ( {
   }
 
   useEffect( () => {
-    const focusListener = navigation.addListener( 'didFocus', () => {
+    const unsubscribe = navigation.addListener( 'focus', () => {
       getMessageToShow()
     } )
-    return () => {
-      focusListener.remove()
-    }
-  }, [] )
+    return unsubscribe;
+  }, [navigation] )
 
   const getMessageToShow = () => {
     if( levelData[ 0 ].keeper2.updatedAt == 0 && currentLevel == 0 && cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
