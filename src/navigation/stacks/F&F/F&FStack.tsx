@@ -21,6 +21,7 @@ import EnterGiftDetails from '../../../pages/FriendsAndFamily/EnterGiftDetails'
 import SendViaLinkAndQR from '../../../pages/FriendsAndFamily/SendViaLinkAndQR'
 import { useLayoutEffect } from 'react'
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native'
+import Colors from '../../../common/Colors'
 
 const Stack = createNativeStackNavigator()
 const FriendsAndFamily = ( { navigation, route } ) => {
@@ -29,7 +30,7 @@ const FriendsAndFamily = ( { navigation, route } ) => {
     if ( routeName === 'FriendsAndFamilyScreen' ){
       navigation.setOptions( {
         tabBarStyle: {
-          display: 'flex', backgroundColor: 'transparent'
+          display: 'flex', backgroundColor: Colors.darkBlue
         }
       } )
     }else {

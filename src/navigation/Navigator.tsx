@@ -171,7 +171,7 @@ function BottomTab() {
           },
           tabBarShowLabel: false,
           tabBarStyle:{
-            backgroundColor: 'transparent'
+            backgroundColor: Colors.darkBlue
           }
         } )}}
 

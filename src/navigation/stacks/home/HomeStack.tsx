@@ -71,6 +71,7 @@ import PreviewPattern from '../../../pages/borderwallet/PreviewPattern'
 import ImportBorderWallet from '../../../pages/borderwallet/ImportBorderWallet'
 import RecoverBorderWallet from '../../../pages/borderwallet/RecoverBorderWallet'
 import ImportBWGrid from '../../../pages/borderwallet/ImportBWGrid'
+import Colors from '../../../common/Colors'
 
 const Stack = createNativeStackNavigator()
 const HomeStack = ( { navigation, route } ) => {
@@ -79,7 +80,7 @@ const HomeStack = ( { navigation, route } ) => {
     if ( routeName === 'Home' ){
       navigation.setOptions( {
         tabBarStyle: {
-          display: 'flex', backgroundColor: 'transparent'
+          display: 'flex', backgroundColor: Colors.darkBlue
         }
       } )
     }else {

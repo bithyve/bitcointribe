@@ -39,7 +39,7 @@ const MoreOptionsStack = ( { navigation, route } ) => {
     if ( routeName === 'MoreOptionsContainerScreen' ){
       navigation.setOptions( {
         tabBarStyle: {
-          display: 'flex', backgroundColor: 'transparent'
+          display: 'flex', backgroundColor: Colors.darkBlue
         }
       } )
     }else {

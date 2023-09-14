@@ -24,6 +24,7 @@ import SetUpSatNextCardScreen from '../../../pages/Gift/SetUpSatNextCardScreen'
 import GiftCreatedScreen from '../../../pages/Gift/GiftCreatedScreen'
 import ClaimSatsScreen from '../../../pages/Gift/ClaimSatsScreen'
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native'
+import Colors from '../../../common/Colors'
 
 const Stack = createNativeStackNavigator()
 const GiftStack = ( { navigation, route } ) => {
@@ -32,7 +33,7 @@ const GiftStack = ( { navigation, route } ) => {
     if ( routeName === 'GiftScreen' ){
       navigation.setOptions( {
         tabBarStyle: {
-          display: 'flex', backgroundColor: 'transparent'
+          display: 'flex', backgroundColor: Colors.darkBlue
         }
       } )
     }else {

@@ -57,6 +57,7 @@ import SetNewPassword from '../../../pages/NewBHR/SetNewPassword'
 import  FNFToKeeper from '../../../pages/NewBHR/FNFToKeeper'
 import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native'
+import Colors from '../../../common/Colors'
 
 const Stack = createNativeStackNavigator()
 const SecurityStack = ( { navigation, route } ) => {
@@ -65,7 +66,7 @@ const SecurityStack = ( { navigation, route } ) => {
     if ( routeName === 'ManageBackupNewBHR' ){
       navigation.setOptions( {
         tabBarStyle: {
-          display: 'flex', backgroundColor: 'transparent'
+          display: 'flex', backgroundColor: Colors.darkBlue
         }
       } )
     }else {
