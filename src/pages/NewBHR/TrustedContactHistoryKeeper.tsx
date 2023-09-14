@@ -816,48 +816,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
       <ModalContainer onBackground={()=>setErrorModal( false )} visible={ErrorModal} closeBottomSheet={() => setErrorModal( false )}>
         {renderErrorModalContent()}
       </ModalContainer>
-      {/* <ModalContainer visible={showQrCode} closeBottomSheet={() => setShowQrCode( false )}>
-        <RequestKeyFromContact
-          isModal={true}
-          headerText={`Send Recovery Key${'\n'}to contact`}
-          subHeaderText={'Send Key to Keeper, you can change your Keeper, or their primary mode of contact'}
-          contactText={'Sharing Recovery Key with'}
-          contact={chosenContact}
-          QR={trustedQR}
-          link={trustedLink}
-          contactEmail={''}
-          onPressBack={() => {
-            // ( shareBottomSheet as any ).current.snapTo( 0 )
-            props.navigation.goBack()
-          }}
-          onPressDone={() => {
-            if( props.navigation.getParam( 'isChangeKeeperType' ) ){
-              props.navigation.pop( 2 )
-            } else {
-              props.navigation.pop( 1 )
-            }
-            // ( shareBottomSheet as any ).current.snapTo( 0 )
-          }}
-          onPressShare={() => {
-            if ( isOTPType ) {
-              setTimeout( () => {
-                setRenderTimer( true )
-              }, 2 )
-              // ( shareBottomSheet as any ).current.snapTo( 0 );
-              props.navigation.goBack()
-              setShareOtpWithTrustedContactModal( true )
-            }
-            else {
-              // ( shareBottomSheet as any ).current.snapTo( 0 )
-              props.navigation.goBack()
-              const popAction = StackActions.pop( {
-                n: isChange ? 2 : 1
-              } )
-              props.navigation.dispatch( popAction )
-            }
-          }}
-        />
-      </ModalContainer> */}
       <ModalContainer onBackground={()=>setShowFNFList( false )} visible={showFNFList} closeBottomSheet={() => setShowFNFList( false )}>
         <View
           style={{

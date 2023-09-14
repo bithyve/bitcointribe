@@ -21,29 +21,24 @@ import CurrencyKindToggleSwitch from '../../../components/CurrencyKindToggleSwit
 import Toast from '../../../components/Toast'
 import { updateDonationPreferences } from '../../../store/actions/accounts'
 import { useDispatch } from 'react-redux'
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
 import { BaseNavigationProp } from '../../../navigation/Navigator'
 import { DonationAccount } from '../../../bitcoin/utilities/Interface'
-
-export type NavigationParams = {
-  account: Record<string, unknown>;
-};
-
-export type NavigationProp = {
-  params: NavigationParams;
-} & BaseNavigationProp;
+import { ParamListBase, RouteProp } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 export type Props = {
-  navigation: NavigationProp;
+  navigation: NativeStackNavigationProp<ParamListBase>;
+  route: RouteProp<{params: {account: any}}>;
 };
 
-const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
 
   const donationAccount: DonationAccount = useMemo( () => {
-    return navigation.getParam( 'account' )
-  }, [ navigation.params ] )
+    return route.params?.account
+  }, [ route.params ] )
 
   const insets = useSafeAreaInsets()
 
@@ -155,12 +150,12 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
 
   return (
     <View style={{
-        ...styles.modalContentContainer,
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom,
-        paddingLeft: insets.left,
-        paddingRight: insets.right
-      }}>
+      ...styles.modalContentContainer,
+      paddingTop: insets.top,
+      paddingBottom: insets.bottom,
+      paddingLeft: insets.left,
+      paddingRight: insets.right
+    }}>
       <KeyboardAvoidingView
         style={{
           flex: 1
@@ -176,7 +171,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
             <View style={{
               flexDirection: 'row', alignItems: 'center'
             }}>
-              <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} /> 
+              <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
 
               <View>
                 <Text style={NavStyles.modalHeaderTitleText}>

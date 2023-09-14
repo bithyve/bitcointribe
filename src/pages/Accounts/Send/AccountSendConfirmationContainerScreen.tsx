@@ -1,11 +1,10 @@
-import React, { useMemo, useState, useCallback, useEffect } from 'react'
+import React, { useMemo, useState, useCallback, useEffect, useLayoutEffect } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Dimensions } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import AccountShell from '../../../common/data/models/AccountShell'
-import { BaseNavigationProp } from '../../../navigation/Navigator'
 import { useSelector, useDispatch } from 'react-redux'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
@@ -25,7 +24,7 @@ import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSen
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
+import defaultStackScreenNavigationOptions from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import ModalContainer from '../../../components/home/ModalContainer'
 import { AccountType, MultiSigAccount, NetworkType, TxPriority } from '../../../bitcoin/utilities/Interface'
@@ -34,21 +33,25 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import HeadingAndSubHeading from '../../../components/HeadingAndSubHeading'
 import { AccountsState } from '../../../store/reducers/accounts'
 import LoaderModal from '../../../components/LoaderModal'
-
-export type NavigationParams = {
-};
-
-type NavigationProp = {
-  params: NavigationParams;
-} & BaseNavigationProp;
+import { NavigationProp, ParamListBase, RouteProp } from '@react-navigation/native'
 
 export type Props = {
-  navigation: NavigationProp;
+  navigation: NavigationProp<ParamListBase>;
+  route: RouteProp<{ params: {handleBackButtonPress : () => void, fromWallet: any }}>
 };
 
 const { height } = Dimensions.get( 'window' )
 
-const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
+const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
+  useLayoutEffect( () => {
+    navigation.setOptions( {
+      ...defaultStackScreenNavigationOptions,
+
+      headerLeft: () => {
+        return <SmallNavHeaderBackButton onPress={route.params?.handleBackButtonPress} />
+      },
+    } )
+  }, [] )
   const dispatch = useDispatch()
   const strings  = translations[ 'accounts' ]
   const common  = translations[ 'common' ]
@@ -73,7 +76,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const [ note, setNote ] = useState( '' )
   const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.LOW )
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
-  const fromWallet = navigation?.getParam( 'fromWallet' ) || false
+  const fromWallet = route.params?.fromWallet || false
 
   const sourceAccountHeadlineText = useMemo( () => {
     const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
@@ -119,13 +122,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         isSuccess={true}
         accountKind={sourcePrimarySubAccount.kind}
       />
-    //   ,
-    //   {
-    //     ...defaultBottomSheetConfigs,
-    //     dismissOnOverlayPress: false,
-    //     dismissOnScrollDown: false,
-    //     snapPoints: [ '52%', '52%' ],
-    //   },
     )
   }
 
@@ -408,16 +404,5 @@ const styles = StyleSheet.create( {
   },
 
 } )
-
-
-AccountSendConfirmationContainerScreen.navigationOptions = ( { navigation } ): NavigationOptions => {
-  return {
-    ...defaultStackScreenNavigationOptions,
-
-    headerLeft: () => {
-      return <SmallNavHeaderBackButton onPress={navigation.getParam( 'handleBackButtonPress' )} />
-    },
-  }
-}
 
 export default AccountSendConfirmationContainerScreen

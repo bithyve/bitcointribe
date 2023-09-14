@@ -18,9 +18,10 @@ import { RFValue } from 'react-native-responsive-fontsize'
 
 export type Props = {
   navigation: any;
+  route: any;
 };
 
-const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const WyreOrderFormScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
 
   const dispatch = useDispatch()
   const { wyreHostedUrl, wyreReceiveAddress } = useWyreIntegrationState()
@@ -28,8 +29,8 @@ const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
 
   const currentSubAccount: ExternalServiceSubAccountInfo = useMemo( () => {
-    return navigation.getParam( 'currentSubAccount' )
-  }, [ navigation.state.params ] )
+    return route.params?.currentSubAccount
+  }, [ route.params ] )
 
   const wyreAccountShell = useAccountShellForID( currentSubAccount.accountShellID )
 

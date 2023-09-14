@@ -661,14 +661,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           data={sortedHistory( secondaryDeviceHistory )}
           confirmButtonText={isChange ? 'Share Now' : selectedKeeper.updatedAt > 0 ? 'Confirm' : 'Share Now' }
           onPressConfirm={() => {
-          // Note change Flow comment out due to Change flow start on level one
-          //   if( isChange || props.navigation.getParam( 'selectedKeeper' ).updatedAt == 0 ){
-          //     // setShowQr( true )
-          //     // createGuardian()
-          //     Toast( 'Something went wrong' )
-          //   } else {
-          //     initiateBackupWithDeviceFlow()
-          //   }
             initiateBackupWithDeviceFlow()
           }}
           reshareButtonText={'Reshare'}

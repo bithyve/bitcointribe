@@ -247,9 +247,6 @@ const PersonalCopyHistory = ( props ) => {
   useEffect( () => {
     if( pdfCreatedSuccessfully ){
       setConfirmDisable( false )
-
-      // if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
-      // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
       setPersonalCopyShareModal( true )
       dispatch( setChannelAssets ( {
       }, null ) )
@@ -679,7 +676,6 @@ const PersonalCopyHistory = ( props ) => {
             setPersonalCopyShareModal( true )
           }}
           isChangeKeeperAllow={false}
-          // isChangeKeeperAllow={isChange ? false : ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 || props.navigation.getParam( 'selectedKeeper' ).status == 'notAccessible' ) ? true : false}
           changeButtonText={'Change'}
           onPressChange={() => {
             // ( keeperTypeBottomSheet as any ).current.snapTo( 1 )

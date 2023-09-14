@@ -34,8 +34,8 @@ import { Wallet } from '../../bitcoin/utilities/Interface'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 
 export default function RecoveryCommunication( props ) {
-  const contact = props.navigation.getParam( 'contact' )
-  const index = props.navigation.getParam( 'index' )
+  const contact = props.route.params?.contact
+  const index = props.route.params?.index
   const [
     trustedContactQrBottomSheet,
     setTrustedContactQrBottomSheet,

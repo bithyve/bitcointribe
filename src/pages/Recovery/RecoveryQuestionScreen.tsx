@@ -27,7 +27,7 @@ import commonStyle from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export default function RecoveryQuestionScreen( props ) {
-  const walletName = props.navigation.getParam( 'walletName' )
+  const walletName = props.route.params?.walletName
   const dispatch = useDispatch()
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {

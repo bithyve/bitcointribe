@@ -62,7 +62,7 @@ class SweepConfirmation extends Component<
   transfer: any;
   constructor( props ) {
     super( props )
-    this.isSendMax = false //props.navigation.getParam('isSendMax');
+    this.isSendMax = false
     if ( this.isSendMax ) {
       setTimeout( () => {
         this.onPrioritySelect( 'Medium Fee' )

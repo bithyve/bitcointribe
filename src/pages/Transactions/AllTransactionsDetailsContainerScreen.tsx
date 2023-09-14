@@ -15,6 +15,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export type Props = {
   navigation,
+  route
 };
 
 // TODO: Refactor after integrating data model changes from `feature/account-management`
@@ -75,8 +76,8 @@ const getImageByAccountType = ( accountType, primaryAccType? ) => {
   }
 }
 
-const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-  const transaction: TransactionDetails = navigation.getParam( 'transaction' )
+const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
+  const transaction: TransactionDetails = route.params?.transaction
 
   const formattedConfirmationsText = useMemo( () => {
     return transaction.accountType === 'Test Account' ?

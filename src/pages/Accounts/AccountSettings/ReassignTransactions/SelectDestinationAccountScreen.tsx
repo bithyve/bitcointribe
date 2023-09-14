@@ -27,18 +27,20 @@ const HeaderSection: React.FC = () => {
 const ReassignTransactionsSelectDestinationAccountScreen: React.FC<Props> = ( { route, navigation }: Props ) => {
   const dispatch = useDispatch()
 
-  useLayoutEffect(() => {
+  useLayoutEffect( () => {
     const reassignmentKind = route.params?.reassignmentKind
     const nameText = reassignmentKind === XPubSourceKind.DESIGNATED ? 'Sources' : 'Transactions'
-    navigation.setOptions({title: `Reassign ${nameText}`});
-  }, [navigation, route])
+    navigation.setOptions( {
+      title: `Reassign ${nameText}`
+    } )
+  }, [ navigation, route ] )
   const currentAccountShell = useAccountShellFromRoute( route )
   const selectableAccountShells = useCompatibleAccountShells( currentAccountShell )
   const [ selectedAccountShellID, setSelectedAccountShellID ] = useState<string>( null )
 
   const selectedTransactionIDs = useMemo( () => {
-    return navigation.getParam( 'selectedTransactionIDs', [] )
-  }, [ navigation ] )
+    return route.params?.selectedTransactionIDs || []
+  }, [ route.params ] )
 
   const canProceed = useMemo( () => {
     return selectedAccountShellID != null
