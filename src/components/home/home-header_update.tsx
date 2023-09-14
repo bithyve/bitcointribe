@@ -207,28 +207,33 @@ const HomeHeader = ( {
 
     return <TouchableOpacity
       onPress={()=> {
-        navigation.dispatch(state => {
-          const moreOptionsStackRoute = state.routes.find(route => route.name === 'MoreOptionsStack');
-          let updatedRoutes = state.routes;
-          if (moreOptionsStackRoute) {
+        navigation.dispatch( state => {
+          const moreOptionsStackRoute = state.routes.find( route => route.name === 'MoreOptionsStack' )
+          let updatedRoutes = state.routes
+          if ( moreOptionsStackRoute ) {
             updatedRoutes = [
-              ...state.routes.slice(0, -1),
+              ...state.routes.slice( 0, -1 ),
               {
-                ...state.routes[state.routes.length - 1], // Copy the existing MoreOptionsStack route
+                ...state.routes[ state.routes.length - 1 ], // Copy the existing MoreOptionsStack route
                 state: {
-                  ...(state.routes[state.routes.length - 1].state || {}),
+                  ...( state.routes[ state.routes.length - 1 ].state || {
+                  } ),
                   index: 1,
-                  routes: [{ name: 'MoreOptionsContainerScreen', key: 'MoreOptionsContainerKey' }, { name: 'BackupMethods', key: 'BackupMethodsKey' }], // Update the routes of MoreOptionsStack
+                  routes: [ {
+                    name: 'MoreOptionsContainerScreen', key: 'MoreOptionsContainerKey'
+                  }, {
+                    name: 'BackupMethods', key: 'BackupMethodsKey'
+                  } ], // Update the routes of MoreOptionsStack
                 },
               }
             ]
           }
-          return CommonActions.reset({
+          return CommonActions.reset( {
             ...state,
             index: 3,
             routes: updatedRoutes,
-          });
-        })
+          } )
+        } )
       } }
       activeOpacity={0.6}
       style={{
@@ -298,8 +303,8 @@ const HomeHeader = ( {
     const unsubscribe = navigation.addListener( 'focus', () => {
       getMessageToShow()
     } )
-    return unsubscribe;
-  }, [navigation] )
+    return unsubscribe
+  }, [ navigation ] )
 
   const getMessageToShow = () => {
     if( levelData[ 0 ].keeper2.updatedAt == 0 && currentLevel == 0 && cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
