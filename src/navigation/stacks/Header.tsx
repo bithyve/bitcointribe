@@ -574,9 +574,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               value: false,
             } )
             this.props.updateLastSeen( new Date() )
-            CommonActions.navigate({
+            CommonActions.navigate( {
               name: 'Intermediate'
-            })
+            } )
           }
         }
       )
@@ -702,8 +702,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   handleDeepLinkEvent = async ( { url } ) => {
-    const { navigation } = this.props;
-    const isFocused = useIsFocused();
+    const { navigation } = this.props
+    const isFocused = useIsFocused()
     // If the user is on one of Home's nested routes, and a
     // deep link is opened, we will navigate back to Home first.
     if ( !isFocused )
@@ -813,7 +813,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // set FCM token(if haven't already)
       this.storeFCMToken()
 
-      const unhandledDeepLinkURL = this.props.route.params?.unhandledDeepLinkURL;
+      const unhandledDeepLinkURL = this.props.route.params?.unhandledDeepLinkURL
 
       if ( unhandledDeepLinkURL ) {
         navigation.setParams( {
@@ -919,12 +919,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   handleDeepLinkModal = () => {
-    const { params } = this.props.route;
-    const recoveryRequest = params?.recoveryRequest || null;
-    const trustedContactRequest = params?.trustedContactRequest || null;
-    const giftRequest = params?.giftRequest || null;
-    const userKey = params?.userKey || null;
-    const swanRequest = params?.swanRequest || null;
+    const { params } = this.props.route
+    const recoveryRequest = params?.recoveryRequest || null
+    const trustedContactRequest = params?.trustedContactRequest || null
+    const giftRequest = params?.giftRequest || null
+    const userKey = params?.userKey || null
+    const swanRequest = params?.swanRequest || null
     if ( swanRequest ) {
       this.setState( {
         swanDeepLinkContent:swanRequest.url,
@@ -969,9 +969,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   cleanupListeners() {
-    if ( typeof this.focusListener === 'function' ) {
-      this.props.navigation.removeListener( 'didFocus', this.focusListener )
-    }
+    this.focusListener?.()
 
     if ( typeof this.appStateListener === 'function' ) {
       this.appStateListener.remove()
@@ -1000,7 +998,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   setUpFocusListener = () => {
     const { navigation } = this.props
 
-    this.focusListener = navigation.addListener( 'didFocus', () => {
+    this.focusListener = navigation.addListener( 'focus', () => {
       this.props.recomputeNetBalance()
       this.setCurrencyCodeFromAsync()
       this.props.fetchExchangeRates( this.props.currencyCode )
@@ -1318,10 +1316,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       <TouchableOpacity
         onPress={() => {
           if ( text === 'View Account' ) {
-            this.props.navigation.dispatch(CommonActions.reset({
+            this.props.navigation.dispatch( CommonActions.reset( {
               index: 0,
-              routes: [{ name: 'Landing' }],
-            }))
+              routes: [ {
+                name: 'Landing'
+              } ],
+            } ) )
           } else {
             // setAcceptGiftModal( false )
             // setGiftAcceptedModel( true )
@@ -1856,6 +1856,6 @@ export default (
     rejectedExistingContactRequest,
     notificationPressed,
     recomputeNetBalance
-  } )( (props: any) => <Home {...props} navigation={useNavigation()} route={useRoute()}/> )
+  } )( ( props: any ) => <Home {...props} navigation={useNavigation()} route={useRoute()}/> )
 )
 

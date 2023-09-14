@@ -169,11 +169,11 @@ class GiftScreen extends React.Component<
   }
 
   componentWillUnmount() {
-    ( this.focusListener )?.remove()
+    this.focusListener?.()
   }
 
   setUpFocusListener = () => {
-    this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
+    this.focusListener = this.props.navigation.addListener( 'focus', () => {
 
       this.setState( {
         showIndicator: true

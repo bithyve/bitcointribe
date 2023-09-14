@@ -275,7 +275,7 @@ class ContactDetails extends PureComponent<
   }
 
   componentWillUnmount() {
-    this.setIsSendDisabledListener.remove()
+    this.setIsSendDisabledListener()
   }
 
   componentDidUpdate( prevProps, prevState ) {

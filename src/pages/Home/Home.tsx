@@ -360,7 +360,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   setUpFocusListener = () => {
     const { navigation } = this.props
 
-    this.focusListener = navigation.addListener( 'didFocus', () => {
+    this.focusListener = navigation.addListener( 'focus', () => {
 
       this.setCurrencyCodeFromAsync()
       this.props.fetchExchangeRates( this.props.currencyCode )
@@ -377,9 +377,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   cleanupListeners() {
-    if ( typeof this.focusListener === 'function' ) {
-      this.props.navigation.removeListener( 'didFocus', this.focusListener )
-    }
+    this.focusListener?.()
   }
 
   openBottomSheet = (

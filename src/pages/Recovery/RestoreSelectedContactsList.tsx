@@ -91,19 +91,19 @@ export default function RestoreSelectedContactsList( props ) {
   useEffect( () => {
     let temp = null
     // onPullDown();
-    const focusListener = props.navigation.addListener( 'didFocus', () => {
+    const focusListener = props.navigation.addListener( 'focus', () => {
       getSelectedContactList()
       temp = setInterval( () => {
         // onPullDown();
       }, 30000 )
     } )
-    const focusListener1 = props.navigation.addListener( 'didBlur', () => {
+    const focusListener1 = props.navigation.addListener( 'blur', () => {
       getSelectedContactList()
       clearInterval( temp )
     } )
     return () => {
-      focusListener.remove()
-      focusListener1.remove()
+      focusListener()
+      focusListener1()
     }
   }, [] )
 

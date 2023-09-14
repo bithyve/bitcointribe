@@ -187,12 +187,10 @@ const WalletBackup = ( props, navigation ) => {
     } )
     // console.log( 'accountsState on walletbackup====>' + JSON.stringify( accountsState.accountShells ) )
 
-    const focusListener = props.navigation.addListener( 'didFocus', () => {
+    const unsubscribe = props.navigation.addListener( 'focus', () => {
       updateAddressBook()
     } )
-    return () => {
-      focusListener.remove()
-    }
+    return unsubscribe
   }, [] )
 
   useEffect( () => {
@@ -674,12 +672,10 @@ const WalletBackup = ( props, navigation ) => {
   }
 
   useEffect( () => {
-    const focusListener = props.navigation.addListener( 'didFocus', () => {
+    const unsubscribe = props.navigation.addListener( 'focus', () => {
       getMessageToShow()
     } )
-    return () => {
-      focusListener.remove()
-    }
+    return unsubscribe
   }, [] )
   const showBackupMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
