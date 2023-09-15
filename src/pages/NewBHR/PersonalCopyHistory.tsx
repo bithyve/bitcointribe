@@ -52,7 +52,6 @@ import { historyArray } from '../../common/CommonVars/commonVars'
 import ModalContainer from '../../components/home/ModalContainer'
 import { getIndex } from '../../common/utilities'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
-import dbManager from '../../storage/realm/dbManager'
 import { isEmpty } from '../../common/CommonFunctions'
 import {
   widthPercentageToDP as wp,

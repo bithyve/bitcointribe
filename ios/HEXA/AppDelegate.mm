@@ -2,6 +2,7 @@
 #import <Firebase.h>
 #import <UserNotifications/UserNotifications.h>
 #import <RNCPushNotificationIOS.h>
+#import "ExpoModulesCore-Swift.h"
 #import "HEXA-Swift.h"
 #import <React/RCTBundleURLProvider.h>
 
