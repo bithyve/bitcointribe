@@ -1,38 +1,35 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as ExpoContacts from 'expo-contacts'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
+  ActivityIndicator,
+  Linking,
   PermissionsAndroid,
   Platform,
-  TextInput,
   SafeAreaView,
-  Linking,
-  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { FlatList } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import EvilIcons from 'react-native-vector-icons/EvilIcons'
+import { useDispatch, useSelector } from 'react-redux'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
-import RadioButton from '../components/RadioButton'
-import AntDesign from 'react-native-vector-icons/AntDesign'
-import ExpoContacts from 'expo-contacts'
-import EvilIcons from 'react-native-vector-icons/EvilIcons'
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
-import { FlatList } from 'react-native-gesture-handler'
-import BottomSheet from 'reanimated-bottom-sheet'
-import DeviceInfo from 'react-native-device-info'
+import { LocalizationContext } from '../common/content/LocContext'
 import ErrorModalContents from '../components/ErrorModalContents'
 import ModalHeader from '../components/ModalHeader'
+import RadioButton from '../components/RadioButton'
 import Toast from '../components/Toast'
-import { useDispatch, useSelector } from 'react-redux'
 import { setIsPermissionGiven } from '../store/actions/preferences'
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import ModalContainer from './home/ModalContainer'
-import { LocalizationContext } from '../common/content/LocContext'
 
 export default function ContactList( props ) {
   let [ selectedContacts, setSelectedContacts ] = useState( [] )

@@ -5688,10 +5688,10 @@ expo-constants@~14.3.0:
     "@expo/config" "~8.0.0"
     uuid "^3.3.2"
 
-expo-contacts@12.2.0:
-  version "12.2.0"
-  resolved "https://registry.yarnpkg.com/expo-contacts/-/expo-contacts-12.2.0.tgz#31325aa4c3d1e2c14085e43c499a5825329e739c"
-  integrity sha512-ZVRbF3OEGQ02nwwqaBxEic761mio8+GHo8I6jy/UQ5CF5azauY+2LUA5JskmuZbBAZMqZfhkbnZ56w8RXXcE5A==
+expo-contacts@^12.4.0:
+  version "12.4.0"
+  resolved "https://registry.yarnpkg.com/expo-contacts/-/expo-contacts-12.4.0.tgz#58f86165d44bf9e83621684148a9c0c09c2fbaa8"
+  integrity sha512-PXLvORckrXaerGSfASjGlY2WA/Cb4m5KHFUa0SHpT+sB3tsctyoUKK8rxiwo9vaGS1up7YmvWnbfdX57S9qRNw==
   dependencies:
     uuid "^3.4.0"
 

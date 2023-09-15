@@ -1,58 +1,53 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import Navigator from './src/navigation/Navigator';
-import { Provider } from 'react-redux';
-import { Provider as MobxProvider } from 'mobx-react';
-import Stores from './src/mobxstore';
-import makeStore from './src/store';
-import NoInternetModalContents from './src/components/NoInternetModalContents';
-import { useDispatch } from 'react-redux';
-import NetInfo from '@react-native-community/netinfo';
-import {
-  getVersion,
-  getBuildId,
-  getBuildNumber,
-} from 'react-native-device-info';
-import { setApiHeaders } from './src/services/api';
-import { updatePreference } from './src/store/actions/preferences';
-import usePreferencesState from './src/utils/hooks/state-selectors/preferences/UsePreferencesState';
 import {
   BottomSheetModalProvider,
   useBottomSheetModal,
-} from '@gorhom/bottom-sheet';
-import defaultBottomSheetConfigs from './src/common/configs/BottomSheetConfigs';
-import getActiveRouteName from './src/utils/navigation/GetActiveRouteName';
-import { LogBox } from 'react-native';
-import ModalContainer from './src/components/home/ModalContainer';
-import { RootSiblingParent } from 'react-native-root-siblings';
+} from '@gorhom/bottom-sheet'
+import NetInfo from '@react-native-community/netinfo'
+import { Provider as MobxProvider } from 'mobx-react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { LogBox } from 'react-native'
+import {
+  getBuildNumber,
+  getVersion
+} from 'react-native-device-info'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { RootSiblingParent } from 'react-native-root-siblings'
+import { Provider, useDispatch } from 'react-redux'
+import { LocalizationProvider } from './src/common/content/LocContext'
+import NoInternetModalContents from './src/components/NoInternetModalContents'
+import ModalContainer from './src/components/home/ModalContainer'
+import Stores from './src/mobxstore'
+import Navigator from './src/navigation/Navigator'
+import { setApiHeaders } from './src/services/api'
+import makeStore from './src/store'
+import { updatePreference } from './src/store/actions/preferences'
+import usePreferencesState from './src/utils/hooks/state-selectors/preferences/UsePreferencesState'
+import getActiveRouteName from './src/utils/navigation/GetActiveRouteName'
+LogBox.ignoreAllLogs( true )
 
-import { LocalizationProvider } from './src/common/content/LocContext';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-LogBox.ignoreAllLogs(true);
-
-export const URI_PREFIX = 'hexa://';
+export const URI_PREFIX = 'hexa://'
 
 async function configureAPIHeaders() {
-  const version = await getVersion();
-  const buildNumber = getBuildNumber();
+  const version = await getVersion()
+  const buildNumber = getBuildNumber()
 
-  setApiHeaders({
+  setApiHeaders( {
     appVersion: version,
     appBuildNumber: buildNumber,
-  });
+  } )
 }
 
 export default function AppWrapper() {
   // Creates and holds an instance of the store so only children in the `Provider`'s
   // context can have access to it. (see: https://stackoverflow.com/a/60329482/8859365)
-  const store = makeStore();
-
+  const store = makeStore()
   function updare() {}
 
-  useEffect(() => {
-    (async () => {
-      configureAPIHeaders();
-    })();
-  }, []);
+  useEffect( () => {
+    ( async () => {
+      configureAPIHeaders()
+    } )()
+  }, [] )
 
   return (
     <MobxProvider
@@ -83,42 +78,43 @@ export default function AppWrapper() {
         </RootSiblingParent>
       </GestureHandlerRootView>
     </MobxProvider>
-  );
+  )
 }
 
 function AppContent() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } =
-    useBottomSheetModal();
-  const [noInternetModal, showNoInternetModal] = useState(false);
-  const preferencesState = usePreferencesState();
-  const [previousScreenName, setPreviousScreenName] = useState<string | null>();
-  const [currentScreenName, setCurrentScreenName] = useState<string | null>();
-  const forceUpdate = useState()[1].bind(null, {});
+    useBottomSheetModal()
+  const [ noInternetModal, showNoInternetModal ] = useState( false )
+  const preferencesState = usePreferencesState()
+  const [ previousScreenName, setPreviousScreenName ] = useState<string | null>()
+  const [ currentScreenName, setCurrentScreenName ] = useState<string | null>()
+  const forceUpdate = useState()[ 1 ].bind( null, {
+  } )
 
   function update() {
-    forceUpdate();
+    forceUpdate()
   }
-  const canShowNoInternetWarning = useMemo(() => {
+  const canShowNoInternetWarning = useMemo( () => {
     return (
       currentScreenName != 'Login' &&
       currentScreenName != 'Launch' &&
       currentScreenName != 'ReLogin' &&
       preferencesState.hasShownNoInternetWarning === false
-    );
+    )
   }, [
     previousScreenName,
     currentScreenName,
     preferencesState.hasShownNoInternetWarning,
-  ]);
+  ] )
 
   async function resetInternetWarningFlag() {
     await dispatch(
-      updatePreference({
+      updatePreference( {
         key: 'hasShownNoInternetWarning',
         value: false,
-      }),
-    );
+      } ),
+    )
   }
 
   // const showNoInternetWarning = useCallback( () => {
@@ -137,60 +133,60 @@ function AppContent() {
   // }, [ presentBottomSheet, dismissBottomSheet ] )
 
   function setupInternetWarningListener() {
-    return NetInfo.addEventListener(state => {
+    return NetInfo.addEventListener( state => {
       if (
         state.isInternetReachable == null ||
         canShowNoInternetWarning == false
       ) {
-        return;
+        return
       }
 
-      if (state.isInternetReachable) {
-        showNoInternetModal(false);
+      if ( state.isInternetReachable ) {
+        showNoInternetModal( false )
       } else {
-        showNoInternetModal(true);
+        showNoInternetModal( true )
       }
-    });
+    } )
   }
 
-  useEffect(() => {
+  useEffect( () => {
     return () => {
       // reset when the app component unmounts
-      resetInternetWarningFlag();
-    };
-  }, []);
+      resetInternetWarningFlag()
+    }
+  }, [] )
 
-  useEffect(() => {
-    const unsubscribe = setupInternetWarningListener();
+  useEffect( () => {
+    const unsubscribe = setupInternetWarningListener()
 
     return () => {
-      unsubscribe();
-    };
-  }, []);
+      unsubscribe()
+    }
+  }, [] )
 
   return (
     <>
       <Navigator
-        onNavigationStateChange={async (prevState, currentState) => {
-          setPreviousScreenName(getActiveRouteName(prevState));
-          setCurrentScreenName(getActiveRouteName(currentState));
+        onNavigationStateChange={async ( prevState, currentState ) => {
+          setPreviousScreenName( getActiveRouteName( prevState ) )
+          setCurrentScreenName( getActiveRouteName( currentState ) )
         }}
       />
       <ModalContainer
         visible={noInternetModal}
         closeBottomSheet={() => {
-          showNoInternetModal(false);
+          showNoInternetModal( false )
         }}>
         <NoInternetModalContents
           onPressTryAgain={() => {
-            showNoInternetModal(false);
+            showNoInternetModal( false )
           }}
           onPressIgnore={() => {
-            resetInternetWarningFlag();
-            showNoInternetModal(false);
+            resetInternetWarningFlag()
+            showNoInternetModal( false )
           }}
         />
       </ModalContainer>
     </>
-  );
+  )
 }

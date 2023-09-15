@@ -1,45 +1,41 @@
-import React, { useEffect, useState, useContext } from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Platform,
-  PermissionsAndroid,
-  Linking,
-  SafeAreaView,
-  TouchableOpacity,
-  StatusBar
-} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useSelector, useDispatch } from 'react-redux'
+import * as ExpoContacts from 'expo-contacts'
+import React, { useContext, useEffect, useState } from 'react'
 import {
-  widthPercentageToDP as wp,
+  PermissionsAndroid,
+  Platform,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native'
+import { FlatList } from 'react-native-gesture-handler'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Icon from 'react-native-vector-icons/MaterialIcons'
+import { useDispatch, useSelector } from 'react-redux'
+import { v4 as uuid } from 'uuid'
+import { Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import { FlatList } from 'react-native-gesture-handler'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CommonStyles from '../../common/Styles/Styles'
-import RadioButton from '../../components/RadioButton'
-import  ExpoContacts from 'expo-contacts'
-import Icon from 'react-native-vector-icons/MaterialIcons'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import AntDesign from 'react-native-vector-icons/AntDesign'
-import { setIsPermissionGiven, setContactPermissionAsked } from '../../store/actions/preferences'
-import ModalContainer from '../../components/home/ModalContainer'
-import { Trusted_Contacts } from '../../bitcoin/utilities/Interface'
-import { v4 as uuid } from 'uuid'
-import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
-import { editTrustedContact } from '../../store/actions/trustedContacts'
-import HeaderTitle1 from '../../components/HeaderTitle1'
 import { LocalizationContext } from '../../common/content/LocContext'
-import PaginationIcon from '../../assets/images/svgs/pagination_1.svg'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import HeaderTitle1 from '../../components/HeaderTitle1'
+import RadioButton from '../../components/RadioButton'
 import CreateFNFInvite from '../../components/friends-and-family/CreateFNFInvite'
-import LinearGradient from 'react-native-linear-gradient'
+import ModalContainer from '../../components/home/ModalContainer'
+import { setContactPermissionAsked, setIsPermissionGiven } from '../../store/actions/preferences'
+import { editTrustedContact } from '../../store/actions/trustedContacts'
 
 export default function AddContactAddressBook( props ) {
   let [ selectedContacts, setSelectedContacts ] = useState( [] )

@@ -79,7 +79,7 @@
     "elliptic": "^6.5.4",
     "events": "^1.1.1",
     "expo": "^48.0.0",
-    "expo-contacts": "12.2.0",
+    "expo-contacts": "^12.4.0",
     "icepick": "^2.4.0",
     "idx": "^2.5.6",
     "jail-monkey": "^2.3.2",

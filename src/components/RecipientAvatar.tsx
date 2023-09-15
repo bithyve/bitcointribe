@@ -1,12 +1,11 @@
+import * as ExpoContacts from 'expo-contacts'
 import React, { useContext, useEffect, useState } from 'react'
-import { View, Text, Image, Platform, PermissionsAndroid } from 'react-native'
-import ExpoContacts from 'expo-contacts'
+import { Image, PermissionsAndroid, Platform, Text, View } from 'react-native'
 import Colors from '../common/Colors'
-import ImageStyles from '../common/Styles/ImageStyles'
 import { nameToInitials } from '../common/CommonFunctions'
-import { RecipientDescribing } from '../common/data/models/interfaces/RecipientDescribing'
-import RecipientKind from '../common/data/enums/RecipientKind'
 import { LocalizationContext } from '../common/content/LocContext'
+import RecipientKind from '../common/data/enums/RecipientKind'
+import { RecipientDescribing } from '../common/data/models/interfaces/RecipientDescribing'
 
 export type Props = {
   recipient: RecipientDescribing;
