@@ -22,7 +22,7 @@ DerivedData
 *.xcuserstate
 project.xcworkspace
 ios/HEXA.xcodeproj/project.pbxproj
-
+.xcode.env.local
 
 # Android/IntelliJ
 #
