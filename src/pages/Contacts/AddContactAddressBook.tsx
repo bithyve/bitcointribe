@@ -627,7 +627,7 @@ export default function AddContactAddressBook( props ) {
                         {item.name && item.name.split( ' ' ).map( ( x, index ) => {
                           const i = item.name.split( ' ' ).length
                           return (
-                            <Text style={{
+                            <Text key={`${x}_${index}`} style={{
                               color: selected ? Colors.white : Colors.black
                             }}>
                               {index !== i - 1 ? `${x} ` :

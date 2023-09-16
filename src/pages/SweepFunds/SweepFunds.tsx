@@ -1,47 +1,42 @@
-import React, { useState, useEffect, useCallback, Component } from 'react'
+import React, { Component } from 'react'
 import {
-  View,
+  BackHandler,
   Image,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  TextInput,
-  KeyboardAvoidingView,
   Platform,
-  Keyboard,
   SafeAreaView,
   StatusBar,
-  BackHandler,
-  Alert,
-  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import DeviceInfo from 'react-native-device-info'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import DeviceInfo from 'react-native-device-info'
 import BottomSheet from 'reanimated-bottom-sheet'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 
-import AntDesign from 'react-native-vector-icons/AntDesign'
-import { UsNumberFormat } from '../../common/utilities'
 import { ScrollView } from 'react-native-gesture-handler'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-  TRUSTED_CONTACTS,
   TEST_ACCOUNT,
+  TRUSTED_CONTACTS,
 } from '../../common/constants/wallet-service-types'
+import { UsNumberFormat } from '../../common/utilities'
 
-import config from '../../bitcoin/HexaConfig'
-import { connect } from 'react-redux'
 import idx from 'idx'
+import { connect } from 'react-redux'
+import config from '../../bitcoin/HexaConfig'
+import BottomInfoBox from '../../components/BottomInfoBox'
 import ModalHeader from '../../components/ModalHeader'
 import RemoveSelectedAcoount from './RemoveSelectedAccount'
-import BottomInfoBox from '../../components/BottomInfoBox'
 
 interface SweepFundsPropsTypes {
   route: any;
@@ -266,9 +261,9 @@ class SweepFunds extends Component<SweepFundsPropsTypes, SweepFundsStateTypes> {
           width: wp( '85%' ), alignSelf: 'center'
         }}>
           <ScrollView horizontal={true}>
-            {accountData.map( ( item ) => {
+            {accountData.map( ( item, index ) => {
               return (
-                <View style={styles.view1}>
+                <View key={`${JSON.stringify( item )}_${index}`} style={styles.view1}>
                   <View style={{
                     flexDirection: 'row'
                   }}>

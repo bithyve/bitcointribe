@@ -1,37 +1,37 @@
+import idx from 'idx'
 import React, { Component } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
   Image,
-  ScrollView,
-  Platform,
   ImageBackground,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import DeviceInfo from 'react-native-device-info'
 import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { connect } from 'react-redux'
-import idx from 'idx'
 import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from '../../components/ModalHeader'
-import DeviceInfo from 'react-native-device-info'
-import ConfirmSweepFunds from './ConfirmSweepFunds'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
-import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
-import AntDesign from 'react-native-vector-icons/AntDesign'
-import { recoverMmnemonic, removeSecondaryMnemonic } from '../../store/actions/BHR'
-import { generateSecondaryXpriv, clearTransfer, secondaryXprivGenerated } from '../../store/actions/accounts'
-import ResetTwoFASuccess from '../Accounts/ResetTwoFASuccess'
 import LoaderModal from '../../components/LoaderModal'
+import ModalHeader from '../../components/ModalHeader'
+import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
+import { recoverMmnemonic, removeSecondaryMnemonic } from '../../store/actions/BHR'
+import { clearTransfer, generateSecondaryXpriv, secondaryXprivGenerated } from '../../store/actions/accounts'
+import ResetTwoFASuccess from '../Accounts/ResetTwoFASuccess'
+import ConfirmSweepFunds from './ConfirmSweepFunds'
 
 interface SweepFundUseExitKeyStateTypes {
   listData: any[];
@@ -284,6 +284,7 @@ SweepFundUseExitKeyPropsTypes,
             if( item.type == 'device' || item.type == 'primaryKeeper' )
               return (
                 <TouchableOpacity
+                  key={`${JSON.stringify( item )}_${index}`}
                   style={{
                     ...styles.cardsView,
                     borderBottomWidth: index == 2 ? 0 : 4,

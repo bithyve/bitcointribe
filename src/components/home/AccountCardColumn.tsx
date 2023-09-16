@@ -35,6 +35,7 @@ const AccountCardColumn: React.FC<Props> = ( {
         return typeof accountShell === 'string' ?
           (
             <AddNewAccountCard
+              key={accountShell}
               containerStyle={styles.cardContainer}
               onPress={onAddNewAccountPressed}
             />

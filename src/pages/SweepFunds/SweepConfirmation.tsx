@@ -1,33 +1,33 @@
 import React, { Component } from 'react'
 import {
-  View,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  StatusBar,
-  ScrollView,
   Image,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { UsNumberFormat } from '../../common/utilities'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import BottomSheet from 'reanimated-bottom-sheet'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { UsNumberFormat } from '../../common/utilities'
 
+import idx from 'idx'
 import { connect } from 'react-redux'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
-import RadioButton from '../../components/RadioButton'
-import idx from 'idx'
-import ModalHeader from '../../components/ModalHeader'
-import CustomPriorityContent from '../../components/CustomPriorityContent'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import CustomPriorityContent from '../../components/CustomPriorityContent'
+import ModalHeader from '../../components/ModalHeader'
+import RadioButton from '../../components/RadioButton'
 import SendConfirmationContent from '../Accounts/SendConfirmationContent'
 
 interface SweepConfirmationStateTypes {
@@ -211,9 +211,9 @@ class SweepConfirmation extends Component<
           width: wp( '85%' ), alignSelf: 'center'
         }}>
           <ScrollView horizontal={true}>
-            {accountData.map( ( item ) => {
+            {accountData.map( ( item, index ) => {
               return (
-                <View style={styles.view1}>
+                <View key={`${JSON.stringify( item )}_${index}`} style={styles.view1}>
                   <View style={{
                     flexDirection: 'row'
                   }}>
@@ -246,9 +246,10 @@ class SweepConfirmation extends Component<
             <View style={{
               flexDirection: 'row', alignItems: 'center'
             }}>
-              {accountData.map( ( item ) => {
+              {accountData.map( ( item, index ) => {
                 return (
                   <Text
+                    key={`${JSON.stringify( item )}_${index}`}
                     style={{
                       color: Colors.blue,
                       fontSize: RFValue( 12 ),

@@ -1,49 +1,40 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  StatusBar,
-  TouchableOpacity,
-  Platform,
-  ScrollView,
-  Alert
-} from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import CommonStyles from '../../common/Styles/Styles'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import NavStyles from '../../common/Styles/NavStyles'
-import BottomSheet from 'reanimated-bottom-sheet'
-import DeviceInfo from 'react-native-device-info'
-import SendViaLink from '../../components/SendViaLink'
-import { generateDeepLink, getDeepLinkKindFromContactsRelationType, isEmpty } from '../../common/CommonFunctions'
-import SendViaQR from '../../components/SendViaQR'
-import config from '../../bitcoin/HexaConfig'
-import ModalHeader from '../../components/ModalHeader'
-import TimerModalContents from './TimerModalContents'
-import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import ShareOtpWithContact from '../NewBHR/ShareOtpWithTrustedContact'
-import { DeepLinkEncryptionType, DeepLinkKind, QRCodeTypes, TrustedContact, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
-import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels, updateTrustedContacts } from '../../store/actions/trustedContacts'
-import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
-import idx from 'idx'
-import Toast from '../../components/Toast'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
-import ModalContainer from '../../components/home/ModalContainer'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import Secure2FA from './Secure2FAModal'
 import * as ExpoContacts from 'expo-contacts'
+import idx from 'idx'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
+import {
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  TouchableOpacity,
+  View
+} from 'react-native'
+import DeviceInfo from 'react-native-device-info'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { useDispatch, useSelector } from 'react-redux'
+import { DeepLinkEncryptionType, DeepLinkKind, QRCodeTypes, TrustedContact, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import Colors from '../../common/Colors'
+import { generateDeepLink, getDeepLinkKindFromContactsRelationType } from '../../common/CommonFunctions'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
 import { LocalizationContext } from '../../common/content/LocContext'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import RequestKeyFromContact from '../../components/RequestKeyFromContact'
+import Toast from '../../components/Toast'
+import ModalContainer from '../../components/home/ModalContainer'
+import { InitTrustedContactFlowKind, initializeTrustedContact, updateTrustedContacts } from '../../store/actions/trustedContacts'
 import { AccountsState } from '../../store/reducers/accounts'
+import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
 import ChangeSelection from '../FriendsAndFamily/ChangeSelection'
+import ShareOtpWithContact from '../NewBHR/ShareOtpWithTrustedContact'
+import Secure2FA from './Secure2FAModal'
+import TimerModalContents from './TimerModalContents'
 
 export default function AddContactSendRequest( props ) {
   const { translations, formatString } = useContext( LocalizationContext )
@@ -53,16 +44,8 @@ export default function AddContactSendRequest( props ) {
   const [ OTP, setOTP ] = useState( '' )
   const [ secure2FAModal, setSecure2FAModal ] = useState( false )
   const [ changeSelection, setChangeSelection ] = useState( false )
-  const [ SendViaLinkBottomSheet ] = useState(
-    React.createRef(),
-  )
   const [ encryptionKey, setEncryptKey ] = useState( '' )
-  const [ SendViaQRBottomSheet ] = useState(
-    React.createRef(),
-  )
-  const [ ContactRequestBottomSheet ] = useState(
-    React.createRef(),
-  )
+
   const [ timerModal, setTimerModal ] = useState( false )
   const [ renderTimer, setRenderTimer ] = useState( false )
   const accountsState: AccountsState = useSelector( state => state.accounts )
@@ -313,77 +296,8 @@ export default function AddContactSendRequest( props ) {
     setTimeout( () => {
       setRenderTimer( true )
     }, 2 )
-    // const TCRequestTimer = JSON.parse(
-    //   await AsyncStorage.getItem( 'TCRequestTimer' ),
-    // );
-    // ( SendViaLinkBottomSheet as any ).current.snapTo( 0 )
-    // if ( !TCRequestTimer ) {
-    //   ( TimerModalBottomSheet as any ).current.snapTo( 1 )
-    // }
   }
 
-  const renderSendViaLinkContents = useCallback( () => {
-    if ( !isEmpty( Contact ) ) {
-      return (
-        <SendViaLink
-          isFromReceive={true}
-          headerText={common.share}
-          subHeaderText={strings.sendTo}
-          contactText={contactText}
-          contact={Contact ? Contact : null}
-          infoText={`Click here to accept contact request from ${
-            wallet.walletName
-          }' Bitcoin Tribe wallet - link will expire in ${
-            config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
-          } hours`}
-          link={trustedLink}
-          contactEmail={''}
-          onPressBack={() => {
-            if ( SendViaLinkBottomSheet.current )
-              ( SendViaLinkBottomSheet as any ).current.snapTo( 0 )
-          }}
-          onPressDone={async () => {
-            setTimeout( () => {
-              setRenderTimer( true )
-            }, 2 )
-            if ( isOTPType ) {
-              setShareOtpWithTrustedContactModel( true )
-            } else {
-              // openTimer()
-            }
-            ( SendViaLinkBottomSheet as any ).current.snapTo( 0 )
-          }}
-        />
-      )
-    }
-  }, [ Contact, trustedLink ] )
-
-  const numberWithCommas = ( x ) => {
-    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
-  }
-
-
-  const renderSendViaQRContents = useCallback( () => {
-    return (
-      <SendViaQR
-        isFromReceive={true}
-        headerText={'Friends & Family Request'}
-        subHeaderText={'Scan the QR from your Contact\'s Bitcoin Tribe Wallet'}
-        contactText={contactText}
-        contact={Contact}
-        QR={trustedQR}
-        contactEmail={''}
-        onPressBack={() => {
-          if ( SendViaQRBottomSheet.current )
-            ( SendViaQRBottomSheet as any ).current.snapTo( 0 )
-        }}
-        onPressDone={() => {
-          ( SendViaQRBottomSheet as any ).current.snapTo( 0 )
-          // openTimer()
-        }}
-      />
-    )
-  }, [ Contact, trustedQR ] )
 
   const renderTimerModalContents = useCallback( () => {
     return (
@@ -441,8 +355,8 @@ export default function AddContactSendRequest( props ) {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>
@@ -506,111 +420,6 @@ export default function AddContactSendRequest( props ) {
           />
         </TouchableOpacity>
         }
-        {/* <View style={{
-          marginTop: 'auto'
-        }}>
-          <View style={{
-            marginBottom: hp( '1%' )
-          }}>
-            <BottomInfoBox
-              title={'Friends & Family request'}
-              infoText={
-                'Your contact will have to accept your request for you to add them'
-              }
-            />
-          </View> */}
-        {/* <View
-            style={{
-              flexDirection: 'row',
-              backgroundColor: Colors.blue,
-              height: 60,
-              borderRadius: 10,
-              marginLeft: 25,
-              marginRight: 25,
-              marginBottom: hp( '4%' ),
-              justifyContent: 'space-evenly',
-              alignItems: 'center',
-              shadowColor: Colors.shadowBlue,
-              shadowOpacity: 1,
-              shadowOffset: {
-                width: 15, height: 15
-              },
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => {
-                createTrustedContact()
-                if ( SendViaLinkBottomSheet.current )
-                  ( SendViaLinkBottomSheet as any ).current.snapTo( 1 )
-              }}
-              style={styles.buttonInnerView}
-            >
-              <Image
-                source={require( '../../assets/images/icons/openlink.png' )}
-                style={styles.buttonImage}
-              />
-              <Text style={styles.buttonText}>Share</Text>
-            </TouchableOpacity>
-            <View
-              style={{
-                width: 1, height: 30, backgroundColor: Colors.white
-              }}
-            />
-            <TouchableOpacity
-              style={styles.buttonInnerView}
-              onPress={() => {
-                createTrustedContact()
-                if ( SendViaQRBottomSheet.current )
-                  ( SendViaQRBottomSheet as any ).current.snapTo( 1 )
-              }}
-            >
-              <Image
-                source={require( '../../assets/images/icons/qr-code.png' )}
-                style={styles.buttonImage}
-              />
-              <Text style={styles.buttonText}>QR</Text>
-            </TouchableOpacity>
-          </View> */}
-        {/* </View> */}
-        {/* <BottomSheet
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={SendViaLinkBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '45%' )
-              : hp( '46%' ),
-          ]}
-          renderContent={renderSendViaLinkContents}
-          renderHeader={renderSendViaLinkHeader}
-        />
-        <BottomSheet
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={SendViaQRBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '46%' )
-              : hp( '46%' ),
-          ]}
-          renderContent={renderSendViaQRContents}
-          renderHeader={renderSendViaQRHeader}
-        /> */}
-        {/* <BottomSheet
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={ContactRequestBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '86%' )
-              : hp( '86%' ),
-          ]}
-          renderContent={renderContactRequest}
-          renderHeader={renderContactRequestHeader}
-        /> */}
         <ModalContainer onBackground={()=>setSecure2FAModal( false )} visible={secure2FAModal} closeBottomSheet={() => {}} >
           <Secure2FA
             closeBottomSheet={()=> setSecure2FAModal( false )}

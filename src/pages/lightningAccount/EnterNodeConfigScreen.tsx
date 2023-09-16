@@ -1,47 +1,40 @@
 /* eslint-disable react/jsx-key */
-import React, { useState, useEffect, useContext } from 'react'
+import { inject, observer } from 'mobx-react'
+import React from 'react'
 import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
   SafeAreaView,
-  Text,
-  StatusBar,
-  KeyboardAvoidingView,
   ScrollView,
-  Image,
-  Platform,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
+import { CheckBox, Input } from 'react-native-elements'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import { connect } from 'react-redux'
+import { AccountType } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import CommonStyles from '../../common/Styles/Styles'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { LocalizationContext } from '../../common/content/LocContext'
-import HeaderTitle from '../../components/HeaderTitle'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { translations } from '../../common/content/LocContext'
-import { inject, observer } from 'mobx-react'
-import AddressUtils, { DEFAULT_LNDHUB } from '../../utils/ln/AddressUtils'
-import LndConnectUtils from '../../utils/ln/LndConnectUtils'
-import RESTUtils from '../../utils/ln/RESTUtils'
-import { newAccountsInfo } from '../../store/sagas/accounts'
-import SettingsStore from '../../mobxstore/SettingsStore'
-import { Button, CheckBox, Header, Icon, Input } from 'react-native-elements'
 import FormStyles from '../../common/Styles/FormStyles'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import CheckMark from '../../assets/images/svgs/checkmark.svg'
-import { connect } from 'react-redux'
-import { addNewAccountShells } from '../../store/actions/accounts'
-import idx from 'idx'
+import CommonStyles from '../../common/Styles/Styles'
+import { translations } from '../../common/content/LocContext'
+import HeaderTitle from '../../components/HeaderTitle'
 import Toast from '../../components/Toast'
-import { AccountType } from '../../bitcoin/utilities/Interface'
+import SettingsStore from '../../mobxstore/SettingsStore'
 import { goHomeAction } from '../../navigation/actions/NavigationActions'
-import LinearGradient from 'react-native-linear-gradient'
+import { addNewAccountShells } from '../../store/actions/accounts'
+import { newAccountsInfo } from '../../store/sagas/accounts'
+import { DEFAULT_LNDHUB } from '../../utils/ln/AddressUtils'
+import RESTUtils from '../../utils/ln/RESTUtils'
 
 const styles = StyleSheet.create( {
   viewContainer: {
@@ -557,9 +550,10 @@ render() {
             }}
           >
             <ScrollView>
-              {nodeTypes.map( ( item ) => {
+              {nodeTypes.map( ( item, index ) => {
                 return (
                   <TouchableOpacity
+                    key={`${JSON.stringify( item )}_${index}`}
                     disabled
                     onPress={() => {
                       this.setState( {
