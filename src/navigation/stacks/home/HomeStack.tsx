@@ -76,6 +76,7 @@ import PreviewPattern from '../../../pages/borderwallet/PreviewPattern'
 import ImportBorderWallet from '../../../pages/borderwallet/ImportBorderWallet'
 import RecoverBorderWallet from '../../../pages/borderwallet/RecoverBorderWallet'
 import ImportBWGrid from '../../../pages/borderwallet/ImportBWGrid'
+import ImportWalletPassphrase from '../../../pages/borderwallet/ImportWalletPassphrase'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -160,6 +161,12 @@ const HomeStack = createStackNavigator(
     },
     CreatePassPhraseAccount: {
       screen: CreatePassPhrase,
+      navigationOptions: {
+        header: null
+      }
+    },
+    ImportWalletPassphrase: {
+      screen: ImportWalletPassphrase,
       navigationOptions: {
         header: null
       }
