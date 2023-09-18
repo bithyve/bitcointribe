@@ -26,6 +26,7 @@ const SelectChecksumWord = ( props ) => {
   const selected = props.navigation.getParam( 'selected' )
   const isNewWallet = props.navigation.getParam( 'isNewWallet' )
   const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
+  const isImportAccount = props.navigation.getParam( 'isImportAccount' )
   const [ checksums, setChecksums ] = useState( [] )
   const [ headerTitle, setHeaderTitle ] = useState( 'Select Checksum Word' )
   const [ checksumWord, setChecksumWord ] = useState( 'Select checksum word' )
@@ -99,13 +100,13 @@ const SelectChecksumWord = ( props ) => {
       gridType: props.navigation.getParam( 'gridType' ),
       isAccountCreation,
       isNewWallet
-    } ) : props.navigation.navigate( 'CreatePassPhrase', {
+    } ) : props.navigation.navigate( 'ImportWalletPassphrase', {
       selected,
       checksumWord,
       mnemonic,
       initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
       gridType: props.navigation.getParam( 'gridType' ),
-      isAccountCreation,
+      isImportAccount,
       isNewWallet
     } )
   }

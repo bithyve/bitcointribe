@@ -208,6 +208,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
   const mnemonic = navigation.getParam( 'mnemonic' )
   const isNewWallet = navigation.getParam( 'isNewWallet' )
   const isAccountCreation = navigation.getParam( 'isAccountCreation' )
+  const isImportAccount = navigation.getParam( 'isImportAccount' )
   const gridType = navigation.getParam( 'gridType' ) || GridType.WORDS
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
@@ -322,7 +323,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
         initialMnemonic: mnemonic,
         isNewWallet,
         gridType,
-        isAccountCreation,
+        isImportAccount,
       } )
   }
 
@@ -380,7 +381,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
             />
           </View>
           <View>
-            <Text style={styles.headerText}>{isNewWallet ? 'Step 4: Create a Pattern' : 'Select your Pattern'}</Text>
+            <Text style={styles.headerText}>{isNewWallet ? 'Step 4: Create a Pattern0' : 'Select your Pattern'}</Text>
           </View>
           {
             isNewWallet && (

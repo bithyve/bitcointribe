@@ -79,7 +79,7 @@ const ImportBWGrid = ( props ) => {
       props.navigation.navigate( 'BorderWalletGridScreen', {
         mnemonic,
         isNewWallet: true,
-        isAccountCreation: true
+        isImportAccount: true
       } )
     } else {
       Toast( 'Invalid mnemonic' )
