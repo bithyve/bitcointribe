@@ -66,7 +66,7 @@ export default function Login( props ) {
   const strings = translations[ 'login' ]
   const common = translations[ 'common' ]
   const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
-  const currentLevel: number = useSelector( ( state ) => state.bhr.currentLevel )
+  // const currentLevel: number = useSelector( ( state ) => state.bhr.currentLevel )
   const levelHealth = useSelector( ( state ) => state.bhr.levelHealth )
 
   const getRandomMessage = () => {
