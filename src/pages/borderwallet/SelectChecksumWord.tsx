@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from 'react'
+import * as bip39 from 'bip39'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
+  FlatList,
   SafeAreaView,
   StatusBar,
   StyleSheet,
-  FlatList,
   Text,
   TouchableOpacity,
+  View,
 } from 'react-native'
-import Colors from '../../common/Colors'
+import deviceInfoModule from 'react-native-device-info'
+import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
-import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
+import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
+import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsive'
-import LinearGradient from 'react-native-linear-gradient'
-import deviceInfoModule from 'react-native-device-info'
-import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
-import * as bip39 from 'bip39'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 
 const wordlists = bip39.wordlists.english
 
@@ -26,6 +26,7 @@ const SelectChecksumWord = ( props ) => {
   const selected = props.route.params?.selected
   const isNewWallet = props.route.params?.isNewWallet
   const isAccountCreation = props.route.params?.isAccountCreation
+  const isImportAccount = props.route.params?.isImportAccount
   const [ checksums, setChecksums ] = useState( [] )
   const [ headerTitle, setHeaderTitle ] = useState( 'Select Checksum Word' )
   const [ checksumWord, setChecksumWord ] = useState( 'Select checksum word' )
@@ -99,13 +100,13 @@ const SelectChecksumWord = ( props ) => {
       gridType: props.route.params?.gridType,
       isAccountCreation,
       isNewWallet
-    } ) : props.navigation.navigate( 'CreatePassPhrase', {
+    } ) : props.navigation.navigate( 'ImportWalletPassphrase', {
       selected,
       checksumWord,
       mnemonic,
       initialMnemonic: props.route.params?.initialMnemonic,
       gridType: props.route.params?.gridType,
-      isAccountCreation,
+      isImportAccount,
       isNewWallet
     } )
   }
