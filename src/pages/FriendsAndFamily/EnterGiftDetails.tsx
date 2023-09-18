@@ -200,6 +200,8 @@ const GiftDetails = ( { navigation, route } ) => {
     setName( wallet.userName ? wallet.userName : wallet.walletName )
   }, [ wallet.walletName, wallet.userName ] )
 
+  const { title, walletName, gift, avatar }: { title: string, walletName: string, gift: Gift, avatar: boolean } = navigation.state.params
+
 
   const IdentificationCard = ( { type, title, subtitle } ) => {
     return (
@@ -1364,7 +1366,7 @@ const styles = StyleSheet.create( {
     marginVertical: 10,
   },
   identificationHeading: {
-    color: '#006DB4',
+    color: Colors.blue,
     fontSize: 13,
     fontWeight: '400',
     fontFamily: Fonts.Regular,
