@@ -176,25 +176,63 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     return(
       <UnHideRestoreAccountSuccessBottomSheet
         onProceed={( accounShell )=>{
-          const resetAction = CommonActions.reset( {
-            index: 0,
-            routes: [ {
-              name: 'Landing'
-            } ],
-          } )
-
-          navigation.dispatch( resetAction )
           if( ( primarySubAccount as SubAccountDescribing ).type === AccountType.LIGHTNING_ACCOUNT ) {
-            navigation.navigate( 'LNAccountDetails', {
-              accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
-              node: ( primarySubAccount as SubAccountDescribing ).node
+            const resetAction = CommonActions.reset( {
+              index: 0,
+              routes: [ {
+                name: 'Home',
+                key: 'HomeKey',
+                state: {
+                  routes: [
+                    {
+                      name: 'Home',
+                      key: 'HomeKey'
+                    },
+                    {
+                      name: 'LNAccountDetails',
+                      key: 'LNAccountDetailsKey',
+                      params: {
+                        screen: 'AccountDetailsRoot',
+                        params: {
+                          accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
+                          node: ( primarySubAccount as SubAccountDescribing ).node
+                        }
+                      }
+                    }
+                  ]
+                }
+              } ],
             } )
-          } else {
-            navigation.navigate( 'AccountDetails', {
-              accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
-            } )
-          }
 
+            navigation.dispatch( resetAction )
+          } else {
+            const resetAction = CommonActions.reset( {
+              index: 0,
+              routes: [ {
+                name: 'Home',
+                key: 'HomeKey',
+                state: {
+                  routes: [
+                    {
+                      name: 'Home',
+                      key: 'HomeKey'
+                    },
+                    {
+                      name: 'AccountDetails',
+                      key: 'AccountDetailsKey',
+                      params: {
+                        screen: 'AccountDetailsRoot',
+                        params: {
+                          accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
+                        }
+                      }
+                    }
+                  ]
+                }
+              } ],
+            } )
+            navigation.dispatch( resetAction )
+          }
         }
         }
         onClose={() => showSuccessModel( false )}
