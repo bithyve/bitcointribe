@@ -1,37 +1,33 @@
-import React, { useState, useMemo, useCallback, useEffect, useDebugValue } from 'react'
-import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity, ScrollView, StatusBar, Button } from 'react-native'
-import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
-import AccountShell from '../../../common/data/models/AccountShell'
-import { Account, AccountType, MultiSigAccount, Wallet } from '../../../bitcoin/utilities/Interface'
-import { accountShellsOrderUpdated, resetAccountUpdateFlag, updateAccountSettings } from '../../../store/actions/accounts'
-import ReorderAccountShellsDraggableList from '../../../components/more-options/account-management/ReorderAccountShellsDraggableList'
-import ButtonBlue from '../../../components/ButtonBlue'
-import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+import { CommonActions } from '@react-navigation/native'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ListItem } from 'react-native-elements'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
+import { AccountType, Wallet } from '../../../bitcoin/utilities/Interface'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
-import { ListItem } from 'react-native-elements'
 import ListStyles from '../../../common/Styles/ListStyles'
-import {  useBottomSheetModal } from '@gorhom/bottom-sheet'
+import CommonStyles from '../../../common/Styles/Styles'
+import { translations } from '../../../common/content/LocContext'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+import AccountShell from '../../../common/data/models/AccountShell'
+import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
+import ButtonBlue from '../../../components/ButtonBlue'
+import HeaderTitle from '../../../components/HeaderTitle'
 import UnHideArchiveAccountBottomSheet from '../../../components/bottom-sheets/account-management/UnHideArchiveAccountBottomSheet'
 import UnHideRestoreAccountSuccessBottomSheet from '../../../components/bottom-sheets/account-management/UnHideRestoreAccountSuccessBottomSheet'
 import ModalContainer from '../../../components/home/ModalContainerScroll'
-import { CommonActions } from '@react-navigation/native'
-import CommonStyles from '../../../common/Styles/Styles'
-import HeaderTitle from '../../../components/HeaderTitle'
+import ReorderAccountShellsDraggableList from '../../../components/more-options/account-management/ReorderAccountShellsDraggableList'
 import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
-import { translations } from '../../../common/content/LocContext'
-import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
-import { recreateAccounts, syncMissingAccounts, updateSynchedMissingAccount } from '../../../store/actions/upgrades'
-import { sweepMissingAccounts } from '../../../store/actions/upgrades'
-import { TextInput } from 'react-native-paper'
-import LinearGradient from 'react-native-linear-gradient'
+import { accountShellsOrderUpdated, resetAccountUpdateFlag, updateAccountSettings } from '../../../store/actions/accounts'
+import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
 
 export type Props = {
   navigation: any;
@@ -241,10 +237,11 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     setHasChangedOrder( false )
   }
 
-  function renderItem( accountShell ){
+  function renderItem( accountShell, index ){
     const primarySubAccount = accountShell.primarySubAccount
     return (
       <ListItem
+        key={`${JSON.stringify( accountShell )}_${index}`}
         activeOpacity={1}
         // onPress={()=>setNumberOfTabs( prev => prev+1 )}
         containerStyle={{
@@ -565,8 +562,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
               <View style={{
                 height: 'auto'
               }}>
-                {orderedAccountShells.map( ( accountShell: AccountShell ) => {
-                  return renderItem( accountShell )
+                {orderedAccountShells.map( ( accountShell: AccountShell, index: number ) => {
+                  return renderItem( accountShell, index )
                 } )
                 }
               </View>
@@ -590,8 +587,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
               <View style={{
                 height: 'auto'
               }}>
-                {hiddenAccountShells.map( ( accountShell: AccountShell ) => {
-                  return renderItem( accountShell )
+                {hiddenAccountShells.map( ( accountShell: AccountShell, index: number ) => {
+                  return renderItem( accountShell, index )
                 } )
                 }
               </View>
@@ -610,8 +607,8 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
               <View style={{
                 height: 'auto'
               }}>
-                {archivedAccountShells.map( ( accountShell: AccountShell ) => {
-                  return renderItem( accountShell )
+                {archivedAccountShells.map( ( accountShell: AccountShell, index: number ) => {
+                  return renderItem( accountShell, index )
                 } )
                 }
               </View>
