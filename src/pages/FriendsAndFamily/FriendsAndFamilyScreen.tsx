@@ -509,7 +509,7 @@ class FriendsAndFamilyScreen extends React.Component<
   }
 
   onAllGiftClick = () => {
-    this.props.navigation.navigate('GiftStack')
+    this.props.navigation.navigate( 'GiftStack' )
   }
 
   render() {
@@ -560,13 +560,15 @@ class FriendsAndFamilyScreen extends React.Component<
               </Text>
               <ToggleContainer />
             </View> */}
-           <TouchableOpacity onPress={this.onAllGiftClick} style={styles.giftContainer}>
+          <TouchableOpacity onPress={this.onAllGiftClick} style={styles.giftContainer}>
             {/* <Image style={styles.giftImage}
             source={require( '../../assets/images/svgs/icon_gift.svg' )} /> */}
             <GiftIcon/>
-            <View style={{flex:1, paddingLeft: 10}}>
+            <View style={{
+              flex:1, paddingLeft: 10
+            }}>
               <Text style={styles.giftText}>All Gifts</Text>
-              <Text numberOfLines={2} style={styles.giftDescText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</Text>
+              <Text numberOfLines={2} style={styles.giftDescText}>All the gifts you have created, not sent, and gifts you have received</Text>
             </View>
             <ArrowRight />
           </TouchableOpacity>
@@ -971,23 +973,23 @@ const styles = StyleSheet.create( {
     height: wp( '10%' ),
   },
   giftContainer:{
-      width: '90%',
-      // height: hp( '15%' ),
-      backgroundColor: Colors.gray7,
-      shadowOpacity: 0.06,
-      shadowOffset: {
-        width: 10, height: 10
-      },
-      shadowRadius: 10,
-      elevation: 2,
-      alignSelf: 'center',
-      borderRadius: wp( 2 ),
-      marginTop: hp( 3 ),
-      paddingHorizontal: wp( 8 ),
-      paddingVertical: hp(3),
-      justifyContent:'center',
-      flexDirection:'row',
-      alignItems:'center'
+    width: '90%',
+    // height: hp( '15%' ),
+    backgroundColor: Colors.gray7,
+    shadowOpacity: 0.06,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 10,
+    elevation: 2,
+    alignSelf: 'center',
+    borderRadius: wp( 2 ),
+    marginTop: hp( 3 ),
+    paddingHorizontal: wp( 8 ),
+    paddingVertical: hp( 3 ),
+    justifyContent:'center',
+    flexDirection:'row',
+    alignItems:'center'
   },
   giftImage:{
     width: 40,
@@ -996,12 +998,12 @@ const styles = StyleSheet.create( {
     // backgroundColor:'red'
   },
   giftText:{
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.Medium,
     color: Colors.THEAM_TEXT_COLOR
   },
   giftDescText: {
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     fontFamily: Fonts.Regular,
     color: Colors.THEAM_INFO_TEXT_COLOR,
     marginTop: 4,
