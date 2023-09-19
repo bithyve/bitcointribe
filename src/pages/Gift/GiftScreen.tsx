@@ -132,7 +132,7 @@ class GiftScreen extends React.Component<
       showGiftModal: false,
       showGiftFailureModal: false,
       cardDetails: null,
-      showNFCModal: true,
+      showNFCModal: false,
       satCardBalance: 0,
       showAlertModal: false,
       errorMessage: '',
