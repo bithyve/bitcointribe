@@ -132,7 +132,7 @@ class GiftScreen extends React.Component<
       showGiftModal: false,
       showGiftFailureModal: false,
       cardDetails: null,
-      showNFCModal: false,
+      showNFCModal: true,
       satCardBalance: 0,
       showAlertModal: false,
       errorMessage: '',
@@ -770,7 +770,9 @@ class GiftScreen extends React.Component<
             closeModal
           />
         </ModalContainer>
-        <NfcPrompt visible={this.state.showNFCModal} />
+        <NfcPrompt visible={this.state.showNFCModal} close={()=>this.setState( {
+          showNFCModal: false
+        } )}/>
         <ModalContainer onBackground={this.onClaimClose} visible={this.state.claimVerification} closeBottomSheet={this.onClaimClose}  >
           <ClaimSatComponent
             title={'Claim SATSCARD™'}
