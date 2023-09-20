@@ -1071,7 +1071,6 @@ const CreateGift = ( { navigation }: Props ) => {
       </View>
     )
   }
-
   const accountElement = (
     item,
     onPressCallBack,
@@ -1111,7 +1110,7 @@ const CreateGift = ( { navigation }: Props ) => {
                 marginTop: hp( 0.5 ),
               }}
             >
-              {getAvatarForSubAccount( item.primarySubAccount, false, true )}
+              {getAvatarForSubAccount( item.primarySubAccount, false, true, true, item.primarySubAccount && item.primarySubAccount.type === AccountType.BORDER_WALLET )}
             </View>
             <View
               style={{
@@ -1212,8 +1211,8 @@ const CreateGift = ( { navigation }: Props ) => {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>
