@@ -1,43 +1,44 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useNavigation } from '@react-navigation/native'
+import idx from 'idx'
 import React, { PureComponent } from 'react'
 import {
+  Platform,
+  StyleProp,
+  StyleSheet,
   Text,
   View,
-  StyleSheet,
-  ViewStyle,
-  StyleProp,
-  Platform
+  ViewStyle
 } from 'react-native'
-import Colors from '../../common/Colors'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { connect } from 'react-redux'
-import idx from 'idx'
-import HomeAccountCardsList from './HomeAccountCardsList'
-import AccountShell from '../../common/data/models/AccountShell'
-import { setShowAllAccount, markAccountChecked } from '../../store/actions/accounts'
-import Fonts from './../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import ToggleContainer from './ToggleContainer'
-import HomeBuyCard from './HomeBuyCard'
-import { LocalizationContext } from '../../common/content/LocContext'
-import { AccountType } from '../../bitcoin/utilities/Interface'
-import dbManager from '../../storage/realm/dbManager'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import ModalContainer from '../../components/home/ModalContainer'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { connect } from 'react-redux'
 import BWIcon from '../../assets/images/svgs/bw.svg'
 import IconRight from '../../assets/images/svgs/icon_arrow_right.svg'
 import LNIcon from '../../assets/images/svgs/lightningWhiteWithBack.svg'
+import { AccountType } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { LocalizationContext } from '../../common/content/LocContext'
+import AccountShell from '../../common/data/models/AccountShell'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
-import { useNavigation } from '@react-navigation/native'
+import ModalContainer from '../../components/home/ModalContainer'
+import dbManager from '../../storage/realm/dbManager'
+import { markAccountChecked, setShowAllAccount } from '../../store/actions/accounts'
+import HomeAccountCardsList from './HomeAccountCardsList'
+import HomeBuyCard from './HomeBuyCard'
+import ToggleContainer from './ToggleContainer'
 
 export enum BottomSheetKind {
   SWAN_STATUS_INFO,
   WYRE_STATUS_INFO,
   RAMP_STATUS_INFO,
+  ADD_A_WALLET_INFO
 }
 interface HomeStateTypes {
   currencyCode?: string;
@@ -106,7 +107,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
   };
 
-  handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
+  handleAccountCardSelection =async ( selectedAccount: AccountShell ) => {
     if( selectedAccount.primarySubAccount.hasNewTxn ) {
       this.props.markAccountChecked( selectedAccount.id )
     }
@@ -116,7 +117,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         swanDeepLinkContent: this.props.swanDeepLinkContent,
         node: selectedAccount.primarySubAccount.node
       } )
-    } else {
+    }
+    else {
       this.props.navigation.navigate( 'AccountDetails', {
         screen: 'AccountDetailsRoot',
         params: {
@@ -369,5 +371,5 @@ export default (
   connect( mapStateToProps, {
     setShowAllAccount,
     markAccountChecked
-  } )( (props: any) => <Home {...props} navigation={useNavigation()}/> )
+  } )( ( props: any ) => <Home {...props} navigation={useNavigation()}/> )
 )

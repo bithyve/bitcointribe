@@ -85,6 +85,8 @@ import { setShowAllAccount } from '../../store/actions/accounts'
 import HomeContainer from './HomeContainer'
 import ModalContainer from '../../components/home/ModalContainer'
 import LinearGradient from 'react-native-linear-gradient'
+import BottomSheetAddWalletInfo from '../../components/bottom-sheets/add-wallet/BottomSheetAddWalletInfo'
+import BottomSheetWalletHeader from '../Accounts/BottomSheetWalletHeader'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -95,6 +97,7 @@ export enum BottomSheetKind {
   TAB_BAR_BUY_MENU,
   TRUSTED_CONTACT_REQUEST,
   ADD_CONTACT_FROM_ADDRESS_BOOK,
+  ADD_A_WALLET_INFO,
   NOTIFICATIONS_LIST,
   SWAN_STATUS_INFO,
   WYRE_STATUS_INFO,
@@ -481,6 +484,30 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 }}
                 // onPress={this.closeBottomSheet}
                 onPress={this.onBackPress}
+              />
+            </>
+          )
+
+        case BottomSheetKind.ADD_A_WALLET_INFO:
+          return (
+            <>
+              <BottomSheetWalletHeader title="Add a wallet" onPress={this.closeBottomSheet} />
+              <BottomSheetAddWalletInfo
+                onRGBWalletClick={() => {
+                  this.closeBottomSheet()
+                  const accountShell = this.props.accountShells[ 1 ]
+                  this.props.navigation.navigate( 'NewRGBWallet', {
+                    accountShellID: accountShell.id,
+                  } )
+                }}
+                onLighteningWalletClick={() => {
+                  this.closeBottomSheet()
+                  this.props.navigation.navigate( 'ScanNodeConfig', {
+                    currentSubAccount: null,
+                  } )
+                }}
+                title1='RGB Wallet'
+                title2='Lightening Wallet'
               />
             </>
           )

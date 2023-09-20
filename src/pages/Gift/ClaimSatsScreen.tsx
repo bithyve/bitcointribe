@@ -590,8 +590,8 @@ const ClaimSatsScreen = ( { navigation } ) => {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>
@@ -796,7 +796,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
           </View>
         }
       </SafeAreaView>
-      <NfcPrompt visible={showNFCModal} />
+      <NfcPrompt visible={showNFCModal} close={()=> setNFCModal( false )}/>
       <ModalContainer onBackground={() => { setShowAlertModal( false ) }} visible={showAlertModal} closeBottomSheet={() => { }}>
         <AlertModalContents
           info={errorMessage != '' ? errorMessage : 'SatCards not detected'}

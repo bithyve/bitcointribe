@@ -103,7 +103,6 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
 
   postSplashScreenActions = async () => {
     try {
-      console.log( 'walletId', this.props.walletId )
       if( this.props.walletId ){
         this.props.getMessages()
       }

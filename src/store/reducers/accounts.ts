@@ -333,7 +333,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
             accountDescription: account.accountDescription,
             accountXpub: account.xpub,
             accountVisibility: account.accountVisibility,
-            hasNewTxn: account.hasNewTxn
+            hasNewTxn: account.hasNewTxn,
           }
           AccountShell.updatePrimarySubAccountDetails(
             shell,

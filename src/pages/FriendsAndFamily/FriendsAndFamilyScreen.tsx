@@ -1,47 +1,50 @@
+import idx from 'idx'
 import React from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  StatusBar,
   ActivityIndicator,
-  Image
+  Image,
+  RefreshControl,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { connect } from 'react-redux'
-import idx from 'idx'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import { ListItem } from 'react-native-elements'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  syncPermanentChannels,
-  PermanentChannelsSyncKind,
-} from '../../store/actions/trustedContacts'
-import { KeeperInfoInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
-import BottomInfoBox from '../../components/BottomInfoBox'
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { connect } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from '../../components/ModalHeader'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
-import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
-import { ListItem } from 'react-native-elements'
-import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
+import GiftIcon from '../../assets/images/svgs/gift_icon.svg'
+import ArrowRight from '../../assets/images/svgs/icon_arrow_right.svg'
+import { KeeperInfoInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import { LocalizationContext } from '../../common/content/LocContext'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import {
   ContactRecipientDescribing,
 } from '../../common/data/models/interfaces/RecipientDescribing'
-import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
-import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
-import Loader from '../../components/loader'
-import ImageStyles from '../../common/Styles/ImageStyles'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
+import ModalHeader from '../../components/ModalHeader'
 import RecipientAvatar from '../../components/RecipientAvatar'
+import SmallHeaderModal from '../../components/SmallHeaderModal'
+import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
 import ModalContainer from '../../components/home/ModalContainer'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { LocalizationContext } from '../../common/content/LocContext'
+import Loader from '../../components/loader'
+import {
+  PermanentChannelsSyncKind,
+  syncPermanentChannels,
+} from '../../store/actions/trustedContacts'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+
 import LinearGradient from 'react-native-linear-gradient'
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -473,6 +476,10 @@ class FriendsAndFamilyScreen extends React.Component<
     )
   }
 
+  onAllGiftClick = () => {
+    this.props.navigation.navigate( 'GiftStack' )
+  }
+
   render() {
     const { syncPermanentChannels, navigation } = this.props
     const { isLoadContacts, addFnF } = this.state
@@ -496,6 +503,37 @@ class FriendsAndFamilyScreen extends React.Component<
               <ActivityIndicator color={Colors.white} size='large'/>
             </ModalContainer>
           }
+
+          {/* <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              paddingVertical: wp( 4 ),
+              paddingHorizontal: wp( 4 ),
+              alignItems: 'center'
+            }}>
+              <Text style={{
+                color: Colors.blue,
+                fontSize: RFValue( 16 ),
+                marginLeft: 2,
+                fontFamily: Fonts.Medium,
+
+              }}>
+              My Accounts
+              </Text>
+              <ToggleContainer />
+            </View> */}
+          <TouchableOpacity onPress={this.onAllGiftClick} style={styles.giftContainer}>
+            {/* <Image style={styles.giftImage}
+            source={require( '../../assets/images/svgs/icon_gift.svg' )} /> */}
+            <GiftIcon/>
+            <View style={{
+              flex:1, paddingLeft: 10
+            }}>
+              <Text style={styles.giftText}>All Gifts</Text>
+              <Text numberOfLines={2} style={styles.giftDescText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</Text>
+            </View>
+            <ArrowRight />
+          </TouchableOpacity>
           <View style={{
             flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: hp( 3.5 ), marginRight: wp( 6 )
           }}>
@@ -518,7 +556,7 @@ class FriendsAndFamilyScreen extends React.Component<
                 } )
               }}
             >
-              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+              <LinearGradient colors={[ Colors.blue, Colors.blue ]}
                 start={{
                   x: 0, y: 0
                 }} end={{
@@ -530,7 +568,7 @@ class FriendsAndFamilyScreen extends React.Component<
                 }}
               >
                 <Text style={[ styles.contactText, {
-                  fontSize: RFValue( 24 ), lineHeight:30
+                  fontSize: RFValue( 18 ), lineHeight:30
                 } ]}>+</Text>
                 <Text style={styles.contactText}>{this.strings[ 'AddNew' ]}</Text>
               </LinearGradient>
@@ -736,7 +774,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-around'
   },
   contactText: {
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.Regular,
     color: Colors.white
   },
@@ -827,5 +865,42 @@ const styles = StyleSheet.create( {
   moreImage: {
     width: wp( '10%' ),
     height: wp( '10%' ),
+  },
+  giftContainer:{
+    width: '90%',
+    // height: hp( '15%' ),
+    backgroundColor: Colors.gray7,
+    shadowOpacity: 0.06,
+    shadowOffset: {
+      width: 10, height: 10
+    },
+    shadowRadius: 10,
+    elevation: 2,
+    alignSelf: 'center',
+    borderRadius: wp( 2 ),
+    marginTop: hp( 3 ),
+    paddingHorizontal: wp( 8 ),
+    paddingVertical: hp( 3 ),
+    justifyContent:'center',
+    flexDirection:'row',
+    alignItems:'center'
+  },
+  giftImage:{
+    width: 40,
+    height: 40,
+    marginEnd: 16,
+    // backgroundColor:'red'
+  },
+  giftText:{
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.Medium,
+    color: Colors.THEAM_TEXT_COLOR
+  },
+  giftDescText: {
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.Regular,
+    color: Colors.THEAM_INFO_TEXT_COLOR,
+    marginTop: 4,
+    marginEnd: 4
   }
 } )

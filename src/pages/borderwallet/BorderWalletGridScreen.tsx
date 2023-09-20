@@ -1,32 +1,32 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react'
+import * as bip39 from 'bip39'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  StatusBar,
-  TouchableOpacity,
-  ScrollView,
+  ActivityIndicator,
   FlatList,
   InteractionManager,
-  ActivityIndicator,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native'
-import Colors from '../../common/Colors'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import CommonStyles from '../../common/Styles/Styles'
-import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import * as bip39 from 'bip39'
-import uheprng from '../../utils/uheprng'
-import { RFValue } from 'react-native-responsive-fontsize'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import IconRight from '../../assets/images/svgs/icon_right.svg'
-import ModalContainer from '../../components/home/ModalContainer'
-import CreateMemorablePattern from '../../components/border-wallet/CreateMemorablePattern'
-import Toast from '../../components/Toast'
 import StartAgain from '../../assets/images/svgs/startagain.svg'
 import { GridType } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
+import Toast from '../../components/Toast'
+import CreateMemorablePattern from '../../components/border-wallet/CreateMemorablePattern'
+import ModalContainer from '../../components/home/ModalContainer'
+import uheprng from '../../utils/uheprng'
 
 const wordlists = bip39.wordlists.english
 export const columns = [
@@ -208,6 +208,7 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
   const mnemonic =  route.params?.mnemonic
   const isNewWallet = route.params?.isNewWallet
   const isAccountCreation =  route.params?.isAccountCreation
+  const isImportAccount = route.params?.isImportAccount
   const gridType =  route.params?.gridType || GridType.WORDS
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
@@ -322,7 +323,7 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
         initialMnemonic: mnemonic,
         isNewWallet,
         gridType,
-        isAccountCreation,
+        isImportAccount,
       } )
   }
 
@@ -380,7 +381,7 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
             />
           </View>
           <View>
-            <Text style={styles.headerText}>{isNewWallet ? 'Step 4: Create a Pattern' : 'Select your Pattern'}</Text>
+            <Text style={styles.headerText}>{isNewWallet ? 'Step 4: Create a Pattern0' : 'Select your Pattern'}</Text>
           </View>
           {
             isNewWallet && (

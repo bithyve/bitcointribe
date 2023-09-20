@@ -1,4 +1,4 @@
-import { Account, AccountType, DonationAccount, MultiSigAccount, NetworkType, LNNode, DerivationPurpose } from '../Interface'
+import { Account, AccountType, DonationAccount, MultiSigAccount, NetworkType, LNNode, RGBConfig, DerivationPurpose } from '../Interface'
 import crypto from 'crypto'
 import AccountUtilities from './AccountUtilities'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
@@ -102,8 +102,8 @@ export function generateAccount(
     return account
 
   } catch ( error ) {
+    return null
   }
-
 }
 
 export function generateMultiSigAccount(

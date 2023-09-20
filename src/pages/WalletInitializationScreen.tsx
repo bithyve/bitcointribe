@@ -293,7 +293,7 @@ const WalletInitializationScreen = props => {
           `${strings.proceeding} `
         }
         linkText={strings.TermsService}
-        onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
+        onPress={() => openLink( 'https://bitcointribe.app/terms-of-service/' )}
       />
       <ModalContainer onBackground={() =>setGenerateEntropyGrid( false )}
         visible={generateEntropyGrid}

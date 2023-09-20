@@ -115,6 +115,8 @@ import { generateDeepLink } from '../../common/CommonFunctions'
 import Toast from '../../components/Toast'
 import RESTUtils from '../../utils/ln/RESTUtils'
 import { Alert } from 'react-native'
+import { ELECTRUM_NOT_CONNECTED_ERR } from '../../bitcoin/electrum/client'
+import { setElectrumNotConnectedErr } from '../actions/nodeSettings'
 import BorderWalletSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/BorderWalletSubAccount'
 
 // to be used by react components(w/ dispatch)
@@ -591,50 +593,58 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
 }} ) {
   const accountShells: AccountShell[] = payload.shells
   const options: { hardRefresh?: boolean } = payload.options
-  yield put( accountShellRefreshStarted( accountShells ) )
-  const accountState: AccountsState = yield select(
-    ( state ) => state.accounts
-  )
-  const accountIds = []
-  const accounts: Accounts = accountState.accounts
-  const accountsToSync: Accounts = {
-  }
-  for( const accountShell of accountShells ){
-    accountsToSync[ accountShell.primarySubAccount.id ] = accounts[ accountShell.primarySubAccount.id ]
-  }
-
-  const { synchedAccounts, activeAddressesWithNewTxsMap } = yield call( syncAccountsWorker, {
-    payload: {
-      accounts: accountsToSync,
-      options,
+  try {
+    yield put( accountShellRefreshStarted( accountShells ) )
+    const accountState: AccountsState = yield select(
+      ( state ) => state.accounts
+    )
+    const accountIds = []
+    const accounts: Accounts = accountState.accounts
+    const accountsToSync: Accounts = {
     }
-  } )
-
-  yield put( updateAccountShells( {
-    accounts: synchedAccounts
-  } ) )
-  yield put( accountShellRefreshCompleted( accountShells ) )
-
-  let computeNetBalance = false
-  for ( const [ key, synchedAcc ] of Object.entries( synchedAccounts ) ) {
-    yield call( dbManager.updateAccount, ( synchedAcc as Account ).id, synchedAcc )
-    if( ( synchedAcc as Account ).hasNewTxn ) {
-      accountIds.push( ( synchedAcc as Account ).id )
-      computeNetBalance = true
+    for( const accountShell of accountShells ){
+      accountsToSync[ accountShell.primarySubAccount.id ] = accounts[ accountShell.primarySubAccount.id ]
     }
-  }
-  if( accountIds.length > 0 ) {
-    yield put( updateWalletImageHealth( {
-      updateAccounts: true,
-      accountIds: accountIds
+
+    const { synchedAccounts, activeAddressesWithNewTxsMap } = yield call( syncAccountsWorker, {
+      payload: {
+        accounts: accountsToSync,
+        options,
+      }
+    } )
+
+    yield put( updateAccountShells( {
+      accounts: synchedAccounts
     } ) )
+
+    let computeNetBalance = false
+    for ( const [ key, synchedAcc ] of Object.entries( synchedAccounts ) ) {
+      yield call( dbManager.updateAccount, ( synchedAcc as Account ).id, synchedAcc )
+      if( ( synchedAcc as Account ).hasNewTxn ) {
+        accountIds.push( ( synchedAcc as Account ).id )
+        computeNetBalance = true
+      }
+    }
+    if( accountIds.length > 0 ) {
+      yield put( updateWalletImageHealth( {
+        updateAccounts: true,
+        accountIds: accountIds
+      } ) )
+    }
+
+    if( computeNetBalance ) yield put( recomputeNetBalance() )
+
+    // update F&F channels if any new txs found on an assigned address
+    if( activeAddressesWithNewTxsMap && Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
+  } catch( err ){
+    if ( [ ELECTRUM_NOT_CONNECTED_ERR ].includes( err?.message ) )
+      yield put( setElectrumNotConnectedErr( err?.message ) )
+  } finally {
+    yield put( accountShellRefreshCompleted( accountShells ) )
   }
-
-  if( computeNetBalance ) yield put( recomputeNetBalance() )
-
-  // update F&F channels if any new txs found on an assigned address
-  if( activeAddressesWithNewTxsMap && Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
 }
+
+
 
 function* refreshLNShellsWorker( { payload }: { payload: {
   shells: AccountShell[],
@@ -688,7 +698,6 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
   const shells: AccountShell[] = yield select(
     ( state ) => state.accounts.accountShells
   )
-
   const shellsToSync: AccountShell[] = []
   const testShellsToSync: AccountShell[] = [] // Note: should be synched separately due to network difference(testnet)
   const donationShellsToSync: AccountShell[] = []
@@ -709,13 +718,11 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
           case AccountType.LIGHTNING_ACCOUNT:
             lnShellsToSync.push( shell )
             break
-
           default:
             shellsToSync.push( shell )
       }
     }
   }
-
   if( shellsToSync.length ) yield call( refreshAccountShellsWorker, {
     payload: {
       shells: shellsToSync,
@@ -739,6 +746,9 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
       shells: lnShellsToSync,
     }
   } )
+
+
+
 }
 
 export const autoSyncShellsWatcher = createWatcher(
@@ -1059,6 +1069,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           node
         } )
         return lnAccount
+
   }
 }
 export interface newAccountDetails {
@@ -1066,8 +1077,8 @@ export interface newAccountDetails {
   description?: string,
   is2FAEnabled?: boolean,
   doneeName?: string,
-  youtubeURL: string,
-  imageURL: any,
+  youtubeURL?: string,
+  imageURL?: any,
   node?: LNNode
 }
 

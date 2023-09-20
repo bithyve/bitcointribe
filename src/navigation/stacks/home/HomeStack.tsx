@@ -1,77 +1,89 @@
-import React, { useLayoutEffect } from 'react'
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import TwoFAValidation from '../../../pages/Accounts/TwoFAValidation'
-import ReLogin from '../../../pages/ReLogin'
-import CustodianRequestOTP from '../../../pages/CustodianRequest/CustodianRequestOTP'
-import CustodianRequestAccepted from '../../../pages/CustodianRequest/CustodianRequestAccepted'
-import SweepFundsFromExistingAccount from '../../../pages/RegenerateShare/SweepFundsFromExistingAccount'
-import NewWalletNameRegenerateShare from '../../../pages/RegenerateShare/NewWalletNameRegenerateShare'
-import NewWalletQuestionRegenerateShare from '../../../pages/RegenerateShare/NewWalletQuestionRegenerateShare'
-import NewWalletGenerationOTP from '../../../pages/RegenerateShare/NewWalletGenerationOTP'
-import WalletCreationSuccess from '../../../pages/RegenerateShare/WalletCreationSuccess'
-import SecureScan from '../../../pages/Accounts/SecureScan'
+import React, { useLayoutEffect } from 'react'
+import Colors from '../../../common/Colors'
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
+import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
+import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
 import GoogleAuthenticatorOTP from '../../../pages/Accounts/GoogleAuthenticatorOTP'
-import TwoFASetup from '../../../pages/Accounts/TwoFASetup'
-import SecondaryDeviceHistoryNewBHR from '../../../pages/NewBHR/SecondaryDeviceHistoryNewBHR'
-import SettingGetNewPin from '../../../pages/SettingGetNewPin'
-import ContactsListForAssociateContact from '../../../pages/CustodianRequest/ContactsListForAssociateContact'
 import NewTwoFASecret from '../../../pages/Accounts/NewTwoFASecret'
-import TwoFASweepFunds from '../../../pages/Accounts/TwoFASweepFunds'
-import UpdateApp from '../../../pages/UpdateApp'
-import SendRequest from '../../../pages/Contacts/SendRequest'
-import VoucherScanner from '../../../pages/FastBitcoin/VoucherScanner'
-import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
-import QrAndLink from '../../../pages/NewBHR/QrAndLink'
-import ContactDetails from '../../../pages/Contacts/ContactDetails'
 import Receive from '../../../pages/Accounts/Receive'
+import SecureScan from '../../../pages/Accounts/SecureScan'
+import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
+import TwoFASetup from '../../../pages/Accounts/TwoFASetup'
+import TwoFASweepFunds from '../../../pages/Accounts/TwoFASweepFunds'
+import TwoFAValidation from '../../../pages/Accounts/TwoFAValidation'
+import AssetsDetailScreen from '../../../pages/Assets/AssetsDetailScreen'
+import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
+import ContactDetails from '../../../pages/Contacts/ContactDetails'
+import SendRequest from '../../../pages/Contacts/SendRequest'
+import ContactsListForAssociateContact from '../../../pages/CustodianRequest/ContactsListForAssociateContact'
+import CustodianRequestAccepted from '../../../pages/CustodianRequest/CustodianRequestAccepted'
+import CustodianRequestOTP from '../../../pages/CustodianRequest/CustodianRequestOTP'
 import PairNewWallet from '../../../pages/FastBitcoin/PairNewWallet'
+import VoucherScanner from '../../../pages/FastBitcoin/VoucherScanner'
+import Home from '../../../pages/Home/Home'
 import Intermediate from '../../../pages/Intermediate'
-import NewOwnQuestions from '../../../pages/NewOwnQuestions'
-import AccountDetailsStack from '../accounts/AccountDetailsStack'
-import WyreIntegrationScreen from '../../../pages/WyreIntegration/WyreIntegrationScreen'
 import Launch from '../../../pages/Launch'
-import EnterNodeConfig from '../../../pages/lightningAccount/EnterNodeConfigScreen'
-import ScanNodeConfig from '../../../pages/lightningAccount/ScanNodeConfigScreen'
-import RestoreWithICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithICloud'
-import RestoreWithoutICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithoutICloud'
-import SettingsContents from '../../../pages/SettingsContents'
-import SweepFunds from '../../../pages/SweepFunds/SweepFunds'
-import SweepFundsEnterAmount from '../../../pages/SweepFunds/SweepFundsEnterAmount'
-import SweepFundUseExitKey from '../../../pages/SweepFunds/SweepFundUseExitKey'
-import SweepConfirmation from '../../../pages/SweepFunds/SweepConfirmation'
-import ScanRecoveryKey from '../../../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
-import UpgradeBackup from '../../../pages/UpgradeBackupWithKeeper/UpgradeBackup'
-import ConfirmKeys from '../../../pages/UpgradeBackupWithKeeper/ConfirmKeys'
+import Login from '../../../pages/Login'
+import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
 import ManageBackupNewBHR from '../../../pages/NewBHR/ManageBackup'
+import PersonalCopyHistoryNewBHR from '../../../pages/NewBHR/PersonalCopyHistory'
+import QrAndLink from '../../../pages/NewBHR/QrAndLink'
+import SecondaryDeviceHistoryNewBHR from '../../../pages/NewBHR/SecondaryDeviceHistoryNewBHR'
 import SecurityQuestionHistoryNewBHR from '../../../pages/NewBHR/SecurityQuestionHistory'
 import TrustedContactHistoryNewBHR from '../../../pages/NewBHR/TrustedContactHistoryKeeper'
-import PersonalCopyHistoryNewBHR from '../../../pages/NewBHR/PersonalCopyHistory'
-import AddNewAccountStack from '../accounts/AddNewAccountStack'
-import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
-import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
-import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
+import NewOwnQuestions from '../../../pages/NewOwnQuestions'
 import RampOrderFormScreen from '../../../pages/RampIntegration/RampOrderFormScreen'
-import QRStack from '../home/QRStack'
-import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
-import LnAccountStack from '../accounts/LnAccountStack'
-import Home from '../../../pages/Home/Home'
-import Login from '../../../pages/Login'
-import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
-import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
-import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
-import CreateWithBorderWallet from '../../../pages/borderwallet/CreateWithBorderWallet'
-import SelectEntropyGridType from '../../../pages/borderwallet/SelectEntropyGridType'
-import DownloadEncryptGrid from '../../../pages/borderwallet/DownloadEncryptGrid'
+import ReLogin from '../../../pages/ReLogin'
+import NewWalletGenerationOTP from '../../../pages/RegenerateShare/NewWalletGenerationOTP'
+import NewWalletNameRegenerateShare from '../../../pages/RegenerateShare/NewWalletNameRegenerateShare'
+import NewWalletQuestionRegenerateShare from '../../../pages/RegenerateShare/NewWalletQuestionRegenerateShare'
+import SweepFundsFromExistingAccount from '../../../pages/RegenerateShare/SweepFundsFromExistingAccount'
+import WalletCreationSuccess from '../../../pages/RegenerateShare/WalletCreationSuccess'
+import RestoreWithICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithICloud'
+import RestoreWithoutICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithoutICloud'
+import ScanRecoveryKey from '../../../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
+import SettingGetNewPin from '../../../pages/SettingGetNewPin'
+import SettingsContents from '../../../pages/SettingsContents'
+import SweepConfirmation from '../../../pages/SweepFunds/SweepConfirmation'
+import SweepFundUseExitKey from '../../../pages/SweepFunds/SweepFundUseExitKey'
+import SweepFunds from '../../../pages/SweepFunds/SweepFunds'
+import SweepFundsEnterAmount from '../../../pages/SweepFunds/SweepFundsEnterAmount'
+import UpdateApp from '../../../pages/UpdateApp'
+import ConfirmKeys from '../../../pages/UpgradeBackupWithKeeper/ConfirmKeys'
+import UpgradeBackup from '../../../pages/UpgradeBackupWithKeeper/UpgradeBackup'
+import WyreIntegrationScreen from '../../../pages/WyreIntegration/WyreIntegrationScreen'
+import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
 import BorderWalletGridScreen from '../../../pages/borderwallet/BorderWalletGridScreen'
-import SelectChecksumWord from '../../../pages/borderwallet/SelectChecksumWord'
-import CreatePassPhrase from '../../../pages/borderwallet/CreatePassPhrase'
 import ConfirmDownload from '../../../pages/borderwallet/ConfirmDownload'
-import PreviewPattern from '../../../pages/borderwallet/PreviewPattern'
-import ImportBorderWallet from '../../../pages/borderwallet/ImportBorderWallet'
-import RecoverBorderWallet from '../../../pages/borderwallet/RecoverBorderWallet'
+import CreatePassPhrase from '../../../pages/borderwallet/CreatePassPhrase'
+import CreateWithBorderWallet from '../../../pages/borderwallet/CreateWithBorderWallet'
+import DownloadEncryptGrid from '../../../pages/borderwallet/DownloadEncryptGrid'
 import ImportBWGrid from '../../../pages/borderwallet/ImportBWGrid'
-import Colors from '../../../common/Colors'
+import ImportBorderWallet from '../../../pages/borderwallet/ImportBorderWallet'
+import ImportWalletPassphrase from '../../../pages/borderwallet/ImportWalletPassphrase'
+import PreviewPattern from '../../../pages/borderwallet/PreviewPattern'
+import RecoverBorderWallet from '../../../pages/borderwallet/RecoverBorderWallet'
+import SelectChecksumWord from '../../../pages/borderwallet/SelectChecksumWord'
+import SelectEntropyGridType from '../../../pages/borderwallet/SelectEntropyGridType'
+import EnterNodeConfig from '../../../pages/lightningAccount/EnterNodeConfigScreen'
+import ScanNodeConfig from '../../../pages/lightningAccount/ScanNodeConfigScreen'
+import AssetMetaData from '../../../pages/rgb/AssetMetaData'
+import AssetTransferDetails from '../../../pages/rgb/AssetTransferDetails'
+import CollectibleDetailScreen from '../../../pages/rgb/CollectibleDetailScreen'
+import IssueScreen from '../../../pages/rgb/IssueScreen'
+import NewRGBWallet from '../../../pages/rgb/NewRGBWallet'
+import RGB121TxDetail from '../../../pages/rgb/RGB121TxDetail'
+import RGBReceive from '../../../pages/rgb/RGBReceive'
+import RGBSend from '../../../pages/rgb/RGBSend'
+import RGBTxDetail from '../../../pages/rgb/RGBTxDetail'
+import RGBWalletDetail from '../../../pages/rgb/RGBWalletDetail'
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
+import AccountDetailsStack from '../accounts/AccountDetailsStack'
+import AddNewAccountStack from '../accounts/AddNewAccountStack'
+import LnAccountStack from '../accounts/LnAccountStack'
+import QRStack from '../home/QRStack'
 
 const Stack = createNativeStackNavigator()
 const HomeStack = ( { navigation, route } ) => {
@@ -144,6 +156,9 @@ const HomeStack = ( { navigation, route } ) => {
       <Stack.Screen name="CreatePassPhraseAccount" component={CreatePassPhrase} options={{
         headerShown: false
       }} />
+      <Stack.Screen name="ImportWalletPassphrase" component={ImportWalletPassphrase} options={{
+        headerShown: false
+      }} />
       <Stack.Screen name="ConfirmDownloadAccount" component={ConfirmDownload} options={{
         headerShown: false
       }} />
@@ -160,6 +175,39 @@ const HomeStack = ( { navigation, route } ) => {
         headerShown: false
       }} />
       <Stack.Screen name="EnterNodeConfig" component={EnterNodeConfig} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="NewRGBWallet" component={NewRGBWallet} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="RGBWalletDetail" component={RGBWalletDetail} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="RGBReceive" component={RGBReceive} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="RGBSend" component={RGBSend} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="IssueScreen" component={IssueScreen} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="RGB121TxDetail" component={RGB121TxDetail} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="RGBTxDetail" component={RGBTxDetail} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="AssetMetaData" component={AssetMetaData} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="AssetTransferDetails" component={AssetTransferDetails} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="AssetsDetailScreen" component={AssetsDetailScreen} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="CollectibleDetailScreen" component={CollectibleDetailScreen} options={{
         headerShown: false
       }} />
       <Stack.Screen name="NewWyreAccountDetails" component={NewWyreAccountDetailsScreen} options={{

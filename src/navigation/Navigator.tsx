@@ -1,64 +1,65 @@
-import React, { useLayoutEffect } from 'react'
-import { NavigationContainer, getFocusedRouteNameFromRoute, useNavigationState } from '@react-navigation/native'
+import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { NavigationContainer, useNavigationState } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import React from 'react'
+import { StyleSheet, View } from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP
+} from 'react-native-responsive-screen'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+import Filled_gift_tab from '../assets/images/satCards/filled_gift_tab.svg'
+import Gift_tab from '../assets/images/satCards/gift_tab.svg'
+import FnFInactive from '../assets/images/tabs/f&f.svg'
+import FnF from '../assets/images/tabs/fnf_active.svg'
+import RGBActive from '../assets/images/tabs/rgb_active.svg'
+import RGBInactive from '../assets/images/tabs/rgb_inactive.svg'
+import SettingsInactive from '../assets/images/tabs/settings.svg'
+import Settings from '../assets/images/tabs/settings_active.svg'
+import Wallet_activeSVG from '../assets/images/tabs/wallet_active.svg'
+import Wallet_InactiveSVG from '../assets/images/tabs/wallet_inactive.svg'
+import Colors from '../common/Colors'
+import SmallNavHeaderBackButton from '../components/navigation/SmallNavHeaderBackButton'
+import AccountSelection from '../pages/AccountSelection'
+import CreateKeeperScreen from '../pages/CreateKeeperScreen'
 import Launch from '../pages/Launch'
 import Login from '../pages/Login'
-import SettingGetNewPin from '../pages/SettingGetNewPin'
-import PasscodeConfirm from '../pages/PasscodeConfirm'
-import WalletInitializationScreen from '../pages/WalletInitializationScreen'
-import RestoreSelectedContactsList from '../pages/Recovery/RestoreSelectedContactsList'
+import NewOwnQuestions from '../pages/NewOwnQuestions'
 import NewWalletName from '../pages/NewWalletName'
-import CreateWithBorderWallet from '../pages/borderwallet/CreateWithBorderWallet'
+import NewWalletQuestion from '../pages/NewWalletQuestion'
+import PasscodeConfirm from '../pages/PasscodeConfirm'
+import QRScannerScreen from '../pages/QRScannerScreen'
+import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions'
+import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication'
+import RecoveryQuestionScreen from '../pages/Recovery/RecoveryQuestionScreen'
+import RestoreSelectedContactsList from '../pages/Recovery/RestoreSelectedContactsList'
+import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts'
+import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice'
+import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery'
+import RestoreSeedWordsContent from '../pages/RestoreHexaWithKeeper/RestoreSeedWordsContent'
+import RestoreWithICloud from '../pages/RestoreHexaWithKeeper/RestoreWithICloud'
+import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
+import SettingGetNewPin from '../pages/SettingGetNewPin'
+import UpdateApp from '../pages/UpdateApp'
+import WalletInitializationScreen from '../pages/WalletInitializationScreen'
 import BorderWalletGridScreen from '../pages/borderwallet/BorderWalletGridScreen'
-import SelectEntropyGridType from '../pages/borderwallet/SelectEntropyGridType'
-import DownloadEncryptGrid from '../pages/borderwallet/DownloadEncryptGrid'
-import SelectChecksumWord from '../pages/borderwallet/SelectChecksumWord'
-import CreatePassPhrase from '../pages/borderwallet/CreatePassPhrase'
 import ConfirmDownload from '../pages/borderwallet/ConfirmDownload'
+import CreatePassPhrase from '../pages/borderwallet/CreatePassPhrase'
+import CreateWithBorderWallet from '../pages/borderwallet/CreateWithBorderWallet'
+import DownloadEncryptGrid from '../pages/borderwallet/DownloadEncryptGrid'
 import PreviewPattern from '../pages/borderwallet/PreviewPattern'
 import RecoverBorderWallet from '../pages/borderwallet/RecoverBorderWallet'
 import RegenerateEntropyGrid from '../pages/borderwallet/RegenerateEntropyGrid'
-import AccountSelection from '../pages/AccountSelection'
-import NewWalletQuestion from '../pages/NewWalletQuestion'
-import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice'
-import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts'
-import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery'
-import RecoveryQuestionScreen from '../pages/Recovery/RecoveryQuestionScreen'
-import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication'
-import QRScannerScreen from '../pages/QRScannerScreen'
-import UpdateApp from '../pages/UpdateApp'
-import NewOwnQuestions from '../pages/NewOwnQuestions'
-import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions'
-import HomeStack from './stacks/home/HomeStack'
-import FriendsAndFamily from './stacks/F&F/F&FStack'
-import Colors from '../common/Colors'
-import CreateKeeperScreen from '../pages/CreateKeeperScreen'
-
-import RestoreWithICloud from '../pages/RestoreHexaWithKeeper/RestoreWithICloud'
-import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
-import { BottomTabBar, createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { View, StyleSheet } from 'react-native'
-import {
-  heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
-  widthPercentageToDP,
-} from 'react-native-responsive-screen'
-import HomeSVG from '../assets/images/tabs/home.svg'
-import HomeInactiveSVG from '../assets/images/tabs/home_inactive.svg'
-import SettingsInactive from '../assets/images/tabs/settings.svg'
-import Settings from '../assets/images/tabs/settings_active.svg'
-import FnFInactive from '../assets/images/tabs/f&f.svg'
-import FnF from '../assets/images/tabs/fnf_active.svg'
-import MoreOptionsStack from './stacks/more-options/MoreOptionsStack'
-import Header from './stacks/Header'
-import SmallNavHeaderBackButton from '../components/navigation/SmallNavHeaderBackButton'
+import SelectChecksumWord from '../pages/borderwallet/SelectChecksumWord'
+import SelectEntropyGridType from '../pages/borderwallet/SelectEntropyGridType'
 import defaultStackScreenNavigationOptions from './options/DefaultStackScreenNavigationOptions'
-import RestoreSeedWordsContent from '../pages/RestoreHexaWithKeeper/RestoreSeedWordsContent'
+import FriendsAndFamily from './stacks/F&F/F&FStack'
+import Header from './stacks/Header'
+import AssetsStack from './stacks/assets/AssetsStack'
 import GiftStack from './stacks/gift/GiftStack'
-import Filled_gift_tab from '../assets/images/satCards/filled_gift_tab.svg'
-import Gift_tab from '../assets/images/satCards/gift_tab.svg'
-import LinearGradient from 'react-native-linear-gradient'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
+import HomeStack from './stacks/home/HomeStack'
+import MoreOptionsStack from './stacks/more-options/MoreOptionsStack'
 
 const SetupStack = createNativeStackNavigator()
 function SetupNavigator() {
@@ -183,9 +184,30 @@ function BottomTab() {
               marginTop: hp( '1.3%' )
             }}>
               {focused ?
-                <HomeSVG/>
+                <Wallet_activeSVG/>
                 :
-                <HomeInactiveSVG/>
+                <Wallet_InactiveSVG/>
+              }
+
+              {focused ?
+                <View style={styles.activeStyle}/>
+                :
+                <View style={styles.inactiveStyle}/>
+              }
+            </View>
+          ),
+        }}
+      />
+      <Tab.Screen name="Assets" component={AssetsStack}
+        options={{
+          tabBarIcon: ( { focused } ) => (
+            <View style={{
+              marginTop: hp( '1.3%' )
+            }}>
+              {focused ?
+                <RGBActive/>
+                :
+                <RGBInactive/>
               }
 
               {focused ?

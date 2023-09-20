@@ -170,8 +170,8 @@ export default function SettingsContents( props ) {
               }}
             >
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </TouchableOpacity>
@@ -333,7 +333,7 @@ export default function SettingsContents( props ) {
             }}
           />
           <AppBottomSheetTouchableWrapper
-            onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
+            onPress={() => openLink( 'https://bitcointribe.app/terms-of-service/' )}
           >
             <Text style={styles.addModalTitleText}>Terms of Service</Text>
           </AppBottomSheetTouchableWrapper>

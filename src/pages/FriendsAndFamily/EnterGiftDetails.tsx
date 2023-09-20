@@ -1364,7 +1364,7 @@ const styles = StyleSheet.create( {
     marginVertical: 10,
   },
   identificationHeading: {
-    color: '#006DB4',
+    color: Colors.blue,
     fontSize: 13,
     fontWeight: '400',
     fontFamily: Fonts.Regular,
