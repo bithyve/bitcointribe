@@ -601,7 +601,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           />
 
           <AppBottomSheetTouchableWrapper
-            onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
+            onPress={() => openLink( 'https://bitcointribe.app/terms-of-service/' )}
           >
             <Text style={styles.addModalTitleText}>Terms of Service</Text>
           </AppBottomSheetTouchableWrapper>

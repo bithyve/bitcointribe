@@ -36,13 +36,14 @@ const ConfirmDownload = ( props ) => {
   const checksumWord = props.navigation.getParam( 'checksumWord' )
   const initialMnemonic = props.navigation.getParam( 'initialMnemonic' )
   const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
+  const isImportAccount = props.navigation.getParam( 'isImportAccount' )
   const passphrase = props.navigation.getParam( 'passphrase' )
   const gridType = props.navigation.getParam( 'gridType' )
   const dispatch = useDispatch()
   type ItemProps = {title: string, id: string};
 
   const onPressContinue = () => {
-    if( isAccountCreation ){
+    if( isAccountCreation || isImportAccount ){
       dispatch( createBorderWallet( mnemonic, initialMnemonic, gridType, passphrase ) )
       //TO-DO- BW bind this to account creation redux state
       // Alert.alert( 'Wallet Created!', 'Border Wallet has been succssefully created', [ {
@@ -166,7 +167,7 @@ const ConfirmDownload = ( props ) => {
         closeBottomSheet={()=> setSuccessModal( false )}
       >
         <BorderWalletSuccessModal
-          title={'Border Wallet creation success!'}
+          title={isImportAccount? 'Border wallet imported successfully.' : 'Border wallet created successfully.'}
           info={''}
           otherText={'Your Border Wallet has been added and is now ready for you to start using.'}
           proceedButtonText={'Continue'}

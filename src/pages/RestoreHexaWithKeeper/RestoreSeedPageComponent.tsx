@@ -30,7 +30,6 @@ const RestoreSeedPageComponent = ( props ) => {
   const [ SelectedOption, setSelectedOption ] = useState( 0 )
   const SelectOption = ( Id ) => {
   }
-
   const [ seedData, setSeedData ] = useState( [
     {
       id: 1, name: ''
@@ -77,6 +76,8 @@ const RestoreSeedPageComponent = ( props ) => {
   const positionAnimatedValue = React.useRef( new Animated.Value( 0 ) ).current
   const onPageSelectedPosition = useRef( new Animated.Value( 0 ) ).current
   const inputRange = [ 0, partialSeedData.length ]
+  const inputRefs = useRef<Array<TextInput | null>>( [] )
+
   const scrollX = Animated.add(
     scrollOffsetAnimatedValue,
     positionAnimatedValue
@@ -175,35 +176,37 @@ const RestoreSeedPageComponent = ( props ) => {
   }
 
   const getIndex = ( index, seedIndex ) => {
-    let newIndex = index + 1 + ( seedIndex * 6 )
-    let isAdd = false
-    if ( index % 2 == 0 ) isAdd = true
+    const newIndex = index + 1 + ( seedIndex * 6 )
 
-    let tempNumber = 0
-    if ( index == 0 || index == 5 ) tempNumber = 0
-    else if ( index == 1 || index == 4 ) tempNumber = 2
-    else tempNumber = 1
+    // let newIndex = index + 1 + ( seedIndex * 6 )
+    // let isAdd = false
+    // if ( index % 2 == 0 ) isAdd = true
 
-    if ( isAdd )
-      newIndex -= tempNumber
-    else newIndex += tempNumber
+    // let tempNumber = 0
+    // if ( index == 0 || index == 5 ) tempNumber = 0
+    // else if ( index == 1 || index == 4 ) tempNumber = 2
+    // else tempNumber = 1
+
+    // if ( isAdd )
+    //   newIndex -= tempNumber
+    // else newIndex += tempNumber
 
     return newIndex
   }
 
   const getTextIndex = ( index ) => {
-    let newIndex = index
-    let isAdd = false
-    if ( index % 2 == 0 ) isAdd = true
+    const newIndex = index
+    // let isAdd = false
+    // if ( index % 2 == 0 ) isAdd = true
 
-    let tempNumber = 0
-    if ( index == 0 || index == 5 ) tempNumber = 0
-    else if ( index == 1 || index == 4 ) tempNumber = 2
-    else tempNumber = 1
+    // let tempNumber = 0
+    // if ( index == 0 || index == 5 ) tempNumber = 0
+    // else if ( index == 1 || index == 4 ) tempNumber = 2
+    // else tempNumber = 1
 
-    if ( isAdd )
-      newIndex -= tempNumber
-    else newIndex += tempNumber
+    // if ( isAdd )
+    //   newIndex -= tempNumber
+    // else newIndex += tempNumber
 
     return newIndex
   }
