@@ -277,19 +277,24 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
 
   function renderItem( accountShell, index ){
     const primarySubAccount = accountShell.primarySubAccount
+    const isBorderWallet = primarySubAccount.type === AccountType.BORDER_WALLET
     return (
       <ListItem
         key={`${JSON.stringify( accountShell )}_${index}`}
         activeOpacity={1}
         // onPress={()=>setNumberOfTabs( prev => prev+1 )}
         containerStyle={{
-          marginLeft: wp( '4%' ),
-          marginRight: wp( '4%' ),
+          marginHorizontal: wp( '4%' ),
           backgroundColor: Colors.backgroundColor
         }}
       >
-        {getAvatarForSubAccount( primarySubAccount, false, true )}
-
+        <View style={{
+          width: '15%',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          {getAvatarForSubAccount( primarySubAccount, false, true, true, isBorderWallet )}
+        </View>
         <ListItem.Content>
           <ListItem.Title
             style={[ ListStyles.listItemTitle, {
