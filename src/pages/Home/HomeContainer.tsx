@@ -42,6 +42,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import BWIcon from '../../assets/images/svgs/bw.svg'
 import IconRight from '../../assets/images/svgs/icon_arrow_right.svg'
 import LNIcon from '../../assets/images/svgs/lightningWhiteWithBack.svg'
+import TestIcon from '../../assets/images/svgs/testAccountHome.svg'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
@@ -293,9 +294,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
             <AppBottomSheetTouchableWrapper
               disabled={this.props.lnAcc.length !== 0}
-              style={[ styles.menuWrapper, {
-                marginBottom: hp( 5 )
-              } ]} onPress={()=>
+              style={styles.menuWrapper} onPress={()=>
               {
                 this.setState( {
                   visibleModal: false
@@ -309,6 +308,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               <View style={styles.titleWrapper}>
                 <Text style={styles.titleText}>Add a Lightning Wallet</Text>
                 <Text style={styles.subTitleText}>Add a Lightning node to enable a separate account on Tribe </Text>
+              </View>
+              <View style={styles.iconRightWrapper}>
+                <IconRight/>
+              </View>
+            </AppBottomSheetTouchableWrapper>
+
+            <AppBottomSheetTouchableWrapper
+              disabled={this.props.lnAcc.length !== 0}
+              style={[ styles.menuWrapper, {
+                marginBottom: hp( 5 )
+              } ]} onPress={()=> console.log( 'test' )}>
+              <View style={styles.iconWrapper}>
+                <TestIcon/>
+              </View>
+              <View style={styles.titleWrapper}>
+                <Text style={styles.titleText}>Add a Test Account</Text>
+                <Text style={styles.subTitleText}>Add a test account on Tribe </Text>
               </View>
               <View style={styles.iconRightWrapper}>
                 <IconRight/>
