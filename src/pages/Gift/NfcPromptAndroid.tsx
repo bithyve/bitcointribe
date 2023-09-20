@@ -1,10 +1,17 @@
-import { Animated, Image, Modal, StyleSheet, Text, View } from 'react-native'
+import { Animated, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import React from 'react'
+import { RFValue } from 'react-native-responsive-fontsize'
 
-function NfcPrompt( { visible } ) {
+import { wp } from '../../common/data/responsiveness/responsive'
+import Colors from '../../common/Colors'
+import { translations } from '../../common/content/LocContext'
+
+import Fonts from '../../common/Fonts'
+
+function NfcPrompt( { visible, close } ) {
   const animation = React.useRef( new Animated.Value( 0 ) ).current
-
+  const common  = translations[ 'common' ]
   visible
     ? Animated.timing( animation, {
       duration: 500,
@@ -52,6 +59,14 @@ function NfcPrompt( { visible } ) {
             <Text>{'Scanning'}</Text>
             <Text>{'Please tap until the modal dismisses...'}</Text>
           </View>
+          <TouchableOpacity
+            onPress={() => {
+              close()
+            }}
+            style={styles.successModalButtonView}
+          >
+            <Text style={styles.proceedButtonText}>{common.cancel}</Text>
+          </TouchableOpacity>
         </Animated.View>
         <Animated.View style={[ styles.promptBg, bgAnimStyle ]} />
       </View>
@@ -82,6 +97,21 @@ const styles = StyleSheet.create( {
     borderRadius: 20,
     margin: 20,
     zIndex: 2,
+  },
+  successModalButtonView: {
+    height: wp( 38 ),
+    width: wp( 100 ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    elevation: 10,
+    backgroundColor: Colors.blue,
+    alignSelf: 'flex-end',
+  },
+  proceedButtonText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.Medium,
   },
 } )
 

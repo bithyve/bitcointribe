@@ -797,7 +797,9 @@ class GiftScreen extends React.Component<
             closeModal
           />
         </ModalContainer>
-        <NfcPrompt visible={this.state.showNFCModal} />
+        <NfcPrompt visible={this.state.showNFCModal} close={()=>this.setState( {
+          showNFCModal: false
+        } )}/>
         <ModalContainer onBackground={this.onClaimClose} visible={this.state.claimVerification} closeBottomSheet={this.onClaimClose}  >
           <ClaimSatComponent
             title={'Claim SATSCARD™'}
