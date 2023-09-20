@@ -4,7 +4,8 @@ import {
   View,
   ViewStyle,
   StyleProp,
-  Platform
+  Platform,
+  StyleSheet
 } from 'react-native'
 import Colors from '../../common/Colors'
 import {

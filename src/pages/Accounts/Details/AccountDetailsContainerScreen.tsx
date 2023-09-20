@@ -146,15 +146,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     } ) )
   }
 
-
-  useEffect( () => {
-    if ( electrumClientConnectionStatus?.setElectrumNotConnectedErr ) {
-      Toast( `${electrumClientConnectionStatus.setElectrumNotConnectedErr}` )
-      dispatch( resetElectrumNotConnectedErr() )
-    }
-  }, [ electrumClientConnectionStatus?.setElectrumNotConnectedErr ] )
-
-
   useEffect( () => {
     return () => {
       dismissBottomSheet()
