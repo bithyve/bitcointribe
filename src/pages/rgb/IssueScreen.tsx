@@ -1,26 +1,26 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, SafeAreaView, StatusBar } from 'react-native'
-import FormStyles from '../../common/Styles/FormStyles'
+import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { Input } from 'react-native-elements'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { launchImageLibrary } from 'react-native-image-picker'
+import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
-import Colors from '../../common/Colors'
 import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import Fonts from '../../common/Fonts'
-import LinearGradient from 'react-native-linear-gradient'
-import CommonStyles from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import RGBServices from '../../services/RGBServices'
 import { useDispatch } from 'react-redux'
-import { syncRgb } from '../../store/actions/rgb'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import FormStyles from '../../common/Styles/FormStyles'
+import CommonStyles from '../../common/Styles/Styles'
 import Toast from '../../components/Toast'
-import { launchImageLibrary } from 'react-native-image-picker'
+import RGBServices from '../../services/RGBServices'
+import { syncRgb } from '../../store/actions/rgb'
 
 export default function IssueScreen( props ) {
 
-  const issueType = props.navigation.getParam( 'issueType' )
+  const issueType = props.route.params?.issueType
   const dispatch = useDispatch()
   const [ name, setName ] = useState( '' )
   const [ description, setDescription ] = useState( '' )

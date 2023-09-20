@@ -1,37 +1,39 @@
-import React from 'react'
-import { createStackNavigator, StackViewTransitionConfigs } from 'react-navigation-stack'
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import React, { useLayoutEffect } from 'react'
+import Colors from '../../../common/Colors'
 import AssetsScreen from '../../../pages/Assets/AssetsScreen'
 
 // const strings  = translations[ 'stackTitle' ]
+const Stack = createNativeStackNavigator()
 
-const AssetsStack = createStackNavigator(
-  {
-    Home: {
-      screen: AssetsScreen,
-      navigationOptions: {
-        header: null,
-        // tabBarVisibl
-      },
-    },
-    // ManageGifts,
-  },
-  {
-    // mode: 'modal',
-    initialRouteName: 'Home',
-    defaultNavigationOptions: {
-      header: null
-    },
-    navigationOptions: ( { navigation } ) => {
-      let tabBarVisible = false
-      if ( ( navigation.state.index === 0  && navigation.state.routes[ 0 ].routeName === 'Home' || navigation.state.index === 1 && navigation.state.routes[ 1 ]?.routeName === 'Home' ) ) {
-        tabBarVisible = true
-      }
-
-      return {
-        tabBarVisible,
-      }
-    },
-  },
-)
+const AssetsStack = ( { navigation, route } ) => {
+  useLayoutEffect( () => {
+    const routeName = getFocusedRouteNameFromRoute( route ) ?? 'AssetsScreen'
+    if ( routeName === 'AssetsScreen' ){
+      navigation.setOptions( {
+        tabBarStyle: {
+          display: 'flex', backgroundColor: Colors.darkBlue
+        }
+      } )
+    }else {
+      navigation.setOptions( {
+        tabBarStyle: {
+          display: 'none'
+        }
+      } )
+    }
+  }, [ navigation, route ] )
+  return (
+    <Stack.Navigator
+      initialRouteName='AssetsScreen'
+      screenOptions={{
+        headerShown: false
+      }}
+    >
+      <Stack.Screen name="AssetsScreen" component={AssetsScreen} />
+    </Stack.Navigator>
+  )
+}
 
 export default AssetsStack
