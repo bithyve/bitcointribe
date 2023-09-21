@@ -81,7 +81,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   }
   componentDidMount() {
-    console.log( 'accountShells', this.props.accountShells.filter( shell => shell?.primarySubAccount.type === AccountType.TEST_ACCOUNT ) )
     setTimeout( () => {
       const dbWallet =  dbManager.getWallet()
       if( dbWallet!=undefined && dbWallet!=null ){
@@ -287,19 +286,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 const accountShell = this.props.accountShells.filter( shell => shell?.primarySubAccount.type === AccountType.TEST_ACCOUNT )
                 this.props.updateAccountSettings(
                   {
-                    payload:{
-                      accountShell: accountShell,
-                      settings: {
-                        accountName: accountShell[ 0 ].primarySubAccount.customDisplayName,
-                        accountDescription: accountShell[ 0 ].primarySubAccount.customDescription,
-                        visibility: AccountVisibility.DEFAULT,
-                      },
-                    }
+                    accountShell: accountShell[ 0 ],
+                    settings: {
+                      accountName: accountShell[ 0 ].primarySubAccount.customDisplayName,
+                      accountDescription: accountShell[ 0 ].primarySubAccount.customDescription,
+                      visibility: AccountVisibility.DEFAULT,
+                    },
                   }
                 )
-                // this.props.navigation.navigate( 'AccountDetails', {
-                //   accountShellID: accountShell[ 0 ].primarySubAccount.accountShellID,
-                // } )
+                this.props.navigation.navigate( 'AccountDetails', {
+                  accountShellID: accountShell[ 0 ].primarySubAccount.accountShellID,
+                } )
               }}>
               <View style={styles.iconWrapper}>
                 <TestIcon/>
