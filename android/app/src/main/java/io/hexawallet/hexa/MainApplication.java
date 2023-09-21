@@ -36,6 +36,7 @@ public class MainApplication extends Application implements ReactApplication {
             packages.add(new PdfPasswordPackage());
             packages.add(new GoogleDrivePackage());
             packages.add(new PDFPackage());
+            packages.add(new RGBPackage());
             return packages;
         }
 
