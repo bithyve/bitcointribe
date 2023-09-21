@@ -1754,7 +1754,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             resizeMode: 'stretch',
           }}
         > */}
-        <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+        <LinearGradient colors={[ Colors.blue, Colors.blue ]}
           // start={{
           //   x: 0, y: 0.2
           // }} end={{

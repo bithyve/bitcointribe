@@ -381,7 +381,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   return (
     <View style={{
-      backgroundColor: Colors.darkBlue
+      backgroundColor: Colors.blue
     }}>
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
       {/* <Header from={'More'} /> */}

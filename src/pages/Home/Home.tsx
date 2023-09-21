@@ -523,7 +523,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   render() {
     return (
       <View style={{
-        backgroundColor: Colors.darkBlue
+        backgroundColor: Colors.blue
       }}>
         <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
           start={{
