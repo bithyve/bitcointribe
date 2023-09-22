@@ -12,6 +12,7 @@ import {
   View
 } from 'react-native'
 import { ListItem } from 'react-native-elements'
+import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
@@ -44,8 +45,6 @@ import {
   syncPermanentChannels,
 } from '../../store/actions/trustedContacts'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
-
-import LinearGradient from 'react-native-linear-gradient'
 interface FriendsAndFamilyPropTypes {
   navigation: any;
   isFocused: boolean;

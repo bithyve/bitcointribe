@@ -655,7 +655,8 @@ class GiftScreen extends React.Component<
     } = this.state
     return (
       <SafeAreaView style={{
-        flex:1
+        flex:1,
+        backgroundColor: Colors.blue
       }}>
         <StatusBar backgroundColor={Colors.blue} barStyle='dark-content' />
         <View style={styles.accountCardsSectionContainer}>
