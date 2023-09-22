@@ -8,34 +8,32 @@ import {
   ActiveAddressAssignee,
   ActiveAddresses,
   AverageTxFees,
+  AverageTxFeesByNetwork,
   Balances,
   DerivationPurpose,
-  DonationAccount,
   Gift,
   GiftStatus,
   GiftThemeId,
   GiftType,
   InputUTXOs,
   MultiSigAccount,
+  NetworkType,
   Transaction,
   TransactionPrerequisite,
   TransactionPrerequisiteElements,
-  TxPriority,
   TransactionType,
-  NetworkType,
-  AverageTxFeesByNetwork,
+  TxPriority
 } from '../Interface'
 
-import AccountUtilities from './AccountUtilities'
 import coinselect from 'coinselect'
 import coinselectSplit from 'coinselect/split'
-import config from '../../HexaConfig'
 import crypto from 'crypto'
 import idx from 'idx'
-import wif from 'wif'
+import config from '../../HexaConfig'
 import ElectrumClient from '../../electrum/client'
 import TestElectrumClient from '../../electrum/test-client'
 import { getPurpose } from './AccountFactory'
+import AccountUtilities from './AccountUtilities'
 
 export default class AccountOperations {
 
@@ -48,7 +46,7 @@ export default class AccountOperations {
       bithyve: ( account as MultiSigAccount ).xpubs.bithyve,
     }, 2, network, account.nextFreeAddressIndex, false ).address
     else {
-      const purpose = getPurpose( account.derivationPath )
+      const purpose = getPurpose( account.derivationPath, account.type )
       receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network, purpose )
     }
 
@@ -71,7 +69,7 @@ export default class AccountOperations {
     const hardGapLimit = 10
     const network = AccountUtilities.getNetworkByType( account.networkType )
 
-    const purpose = getPurpose( account.derivationPath )
+    const purpose = getPurpose( account.derivationPath, account.type  )
 
     let externalAddress: string
     if( ( account as MultiSigAccount ).is2FA ) externalAddress = AccountUtilities.createMultiSig( {
@@ -276,7 +274,7 @@ export default class AccountOperations {
     } = {
     }
     for( const account of Object.values( accounts ) ){
-      const purpose = getPurpose( account.derivationPath )
+      const purpose = getPurpose( account.derivationPath, account.type )
 
       const ownedAddresses = [] // owned address mapping
       // owned addresses are used for apt tx categorization and transfer amount calculation
@@ -368,7 +366,7 @@ export default class AccountOperations {
         hasNewTxn
       } = synchedAccounts[ account.id ]
       const { internalAddresses } = accountsInternals[ account.id ]
-      const purpose = getPurpose( account.derivationPath )
+      const purpose = getPurpose( account.derivationPath, account.type )
 
       // update utxo sets and balances
       const balances: Balances = {
@@ -450,7 +448,7 @@ export default class AccountOperations {
   }> => {
     for ( const account of Object.values( accounts ) ) {
 
-      const purpose = getPurpose( account.derivationPath )
+      const purpose = getPurpose( account.derivationPath, account.type )
       const hardGapLimit = 10 // hard refresh gap limit
       const addresses = []
 
@@ -496,7 +494,10 @@ export default class AccountOperations {
 
       const client = network === bitcoinJS.networks.bitcoin? ElectrumClient: TestElectrumClient
       // sync utxos & balances
+
+      console.log( 'addresses', addresses )
       const utxosByAddress = await client.syncUTXOByAddress( addresses, network )
+      console.log( 'utxosByAddress', utxosByAddress )
 
       const balances: Balances = {
         confirmed: 0,
@@ -568,7 +569,7 @@ export default class AccountOperations {
         }} ),
     }
 
-    const purpose = getPurpose( account.derivationPath )
+    const purpose = getPurpose( account.derivationPath, account.type )
     for( const consumedUTXO of Object.values( consumedUTXOs ) ){
       let found = false
       // is out of bound external address?
@@ -954,7 +955,7 @@ export default class AccountOperations {
           network,
         } )
 
-        const purpose = getPurpose( account.derivationPath )
+        const purpose = getPurpose( account.derivationPath, account.type )
 
         if ( purpose === DerivationPurpose.BIP84 ) {
           PSBT.addInput( {
