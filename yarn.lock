@@ -10947,6 +10947,11 @@ rn-fetch-blob@^0.12.0:
     semver "^5.0.1"
     xtend "^4.0.0"
 
+rn-secure-storage@^2.0.8:
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/rn-secure-storage/-/rn-secure-storage-2.0.8.tgz#ccdb0aa3e69239b77fecc3a3dee88ddfa46371e3"
+  integrity sha512-byk51qL+4GNfaBxs30TZsv3l1vXRry8Pck3q2xzwNUYfSyEdTn8NnCW2l8hOog0XEGCJdfbeFy5+EgCVnMsRAQ==
+
 rn-tooltip@^3.0.2:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/rn-tooltip/-/rn-tooltip-3.0.3.tgz#33232c76b90fc6d90ced565ddd5aab5517761a21"
