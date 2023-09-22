@@ -200,6 +200,8 @@ const GiftDetails = ( { navigation, route } ) => {
     setName( wallet.userName ? wallet.userName : wallet.walletName )
   }, [ wallet.walletName, wallet.userName ] )
 
+  const { title, walletName, gift, avatar }: { title: string, walletName: string, gift: Gift, avatar: boolean } = navigation.state.params
+
 
   const IdentificationCard = ( { type, title, subtitle } ) => {
     return (

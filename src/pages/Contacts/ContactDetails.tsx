@@ -1,66 +1,69 @@
-import React, { PureComponent, createRef, useMemo } from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  Image,
-  ScrollView,
-  Platform,
-  Alert,
-} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { connect } from 'react-redux'
 import idx from 'idx'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { nameToInitials, isEmpty } from '../../common/CommonFunctions'
-import _ from 'underscore'
 import moment from 'moment'
-import BottomSheet from 'reanimated-bottom-sheet'
-import SendViaLink from '../../components/SendViaLink'
-import ModalHeader from '../../components/ModalHeader'
-import DeviceInfo from 'react-native-device-info'
+import React, { PureComponent, createRef } from 'react'
 import {
-  ErrorSending, updateSecondaryShard, getApprovalFromKeepers, setOpenToApproval
-} from '../../store/actions/BHR'
-import { UploadSMSuccessfully, setSecondaryDataInfoStatus } from '../../store/actions/BHR'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import SendViaQR from '../../components/SendViaQR'
-import BottomInfoBox from '../../components/BottomInfoBox'
+  Alert,
+  Image,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native'
+import DeviceInfo from 'react-native-device-info'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { connect } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
+import _ from 'underscore'
+import More from '../../assets/images/svgs/icon_more.svg'
 import {
   AccountType,
   KeeperInfoInterface,
   QRCodeTypes, StreamData, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts, Wallet,
 } from '../../bitcoin/utilities/Interface'
-import { PermanentChannelsSyncKind, removeTrustedContact, syncPermanentChannels } from '../../store/actions/trustedContacts'
-import AccountShell from '../../common/data/models/AccountShell'
-import { sourceAccountSelectedForSending, addRecipientForSending, recipientSelectedForAmountSetting, amountForRecipientUpdated } from '../../store/actions/sending'
-import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import ModalContainer from '../../components/home/ModalContainer'
-import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import { resetStackToSend } from '../../navigation/actions/NavigationActions'
-import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
-import EditContactScreen from './EditContact'
-import { agoTextForLastSeen } from '../../components/send/LastSeenActiveUtils'
-import BackIconTitle from '../../utils/BackIconTitle'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import CardWithArrow from '../../components/CardWithArrow'
-import More from '../../assets/images/svgs/icon_more.svg'
+import Colors from '../../common/Colors'
+import { isEmpty, nameToInitials } from '../../common/CommonFunctions'
+import Fonts from '../../common/Fonts'
 import { translations } from '../../common/content/LocContext'
-import QRModal from '../Accounts/QRModal'
-import Loader from '../../components/loader'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
+import AccountShell from '../../common/data/models/AccountShell'
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import AlertModalContents from '../../components/AlertModalContents'
-import LinearGradient from 'react-native-linear-gradient'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import CardWithArrow from '../../components/CardWithArrow'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import ModalHeader from '../../components/ModalHeader'
+import RequestKeyFromContact from '../../components/RequestKeyFromContact'
+import SendViaLink from '../../components/SendViaLink'
+import SendViaQR from '../../components/SendViaQR'
+import ModalContainer from '../../components/home/ModalContainer'
+import Loader from '../../components/loader'
+import { agoTextForLastSeen } from '../../components/send/LastSeenActiveUtils'
+import { resetStackToSend } from '../../navigation/actions/NavigationActions'
+import {
+  ErrorSending,
+  UploadSMSuccessfully,
+  getApprovalFromKeepers, setOpenToApproval,
+  setSecondaryDataInfoStatus,
+  updateSecondaryShard
+} from '../../store/actions/BHR'
+import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting, sourceAccountSelectedForSending } from '../../store/actions/sending'
+import { PermanentChannelsSyncKind, removeTrustedContact, syncPermanentChannels } from '../../store/actions/trustedContacts'
+import BackIconTitle from '../../utils/BackIconTitle'
+import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
+import QRModal from '../Accounts/QRModal'
+import EditContactScreen from './EditContact'
 
 const getImageIcon = ( item: ContactRecipientDescribing ) => {
   if ( Object.keys( item ).length ) {
@@ -653,6 +656,7 @@ class ContactDetails extends PureComponent<
     if ( !isEmpty( this.contact ) ) {
       return (
         <RequestKeyFromContact
+          navigation={this.props.navigation}
           isModal={true}
           headerText={`Send Recovery Key${'\n'}to contact`}
           subHeaderText={'Send Key to Keeper, you can change your Keeper, or their primary mode of contact'}

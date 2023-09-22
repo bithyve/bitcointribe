@@ -1072,7 +1072,6 @@ const CreateGift = ( { route, navigation }: Props ) => {
       </View>
     )
   }
-
   const accountElement = (
     item,
     onPressCallBack,
@@ -1112,7 +1111,7 @@ const CreateGift = ( { route, navigation }: Props ) => {
                 marginTop: hp( 0.5 ),
               }}
             >
-              {getAvatarForSubAccount( item.primarySubAccount, false, true )}
+              {getAvatarForSubAccount( item.primarySubAccount, false, true, true, item.primarySubAccount && item.primarySubAccount.type === AccountType.BORDER_WALLET )}
             </View>
             <View
               style={{

@@ -7,7 +7,7 @@ import SentAmountForContactFormScreen from '../../../pages/Accounts/Send/SentAmo
 import AccountSendConfirmationContainerScreen from '../../../pages/Accounts/Send/AccountSendConfirmationContainerScreen'
 import OTPAuthenticationScreen from '../../../pages/Accounts/Send/OTPAuthentication'
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator()
 export default function SendStack() {
   return (
     <Stack.Navigator
@@ -22,9 +22,15 @@ export default function SendStack() {
       }}
     >
       <Stack.Screen name="SendRoot" component={AccountSendContainerScreen} />
-      <Stack.Screen name="SentAmountForContactForm" component={SentAmountForContactFormScreen} options={{ title: 'Send To' }} />
-      <Stack.Screen name="SendConfirmation" component={AccountSendConfirmationContainerScreen} options={{ title: 'Send Confirmation' }} />
-      <Stack.Screen name="OTPAuthentication" component={OTPAuthenticationScreen} options={{ header: null }} />
+      <Stack.Screen name="SentAmountForContactForm" component={SentAmountForContactFormScreen} options={{
+        title: 'Send To'
+      }} />
+      <Stack.Screen name="SendConfirmation" component={AccountSendConfirmationContainerScreen} options={{
+        title: 'Send Confirmation'
+      }} />
+      <Stack.Screen name="OTPAuthentication" component={OTPAuthenticationScreen} options={{
+        headerShown:false
+      }} />
     </Stack.Navigator>
   )
 }
