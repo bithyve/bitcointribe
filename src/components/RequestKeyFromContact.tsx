@@ -97,7 +97,8 @@ function RequestKeyFromContact( props ) {
       link: shareLink,
       // ...props,
       setActiveTab: props.setActiveTab,
-      OTP: props.encryptionKey, encryptLinkWith: props.encryptLinkWith
+      OTP: props.encryptionKey, encryptLinkWith: props.encryptLinkWith,
+      senderName: props.senderName ? props.senderName : ''
     } )
   }
   const setPhoneNumber = () => {
