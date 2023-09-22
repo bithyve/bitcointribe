@@ -57,7 +57,7 @@ export default function Login( props ) {
   const strings = translations[ 'login' ]
   const common = translations[ 'common' ]
   const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
-  const currentLevel: number = useSelector( ( state ) => state.bhr.currentLevel )
+  // const currentLevel: number = useSelector( ( state ) => state.bhr.currentLevel )
   const levelHealth = useSelector( ( state ) => state.bhr.levelHealth )
 
   const getRandomMessage = () => {
@@ -607,12 +607,12 @@ export default function Login( props ) {
                     marginHorizontal: 15,
                   }}
                   onPress={()=> {
-                    if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
-                      setJailBrokenTitle( strings.EncryptionKeyNotSet )
-                      setJailBrokenInfo( strings.Youcanreset )
-                      setErrorModal( true )
-                      return
-                    }
+                    // if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+                    //   setJailBrokenTitle( strings.EncryptionKeyNotSet )
+                    //   setJailBrokenInfo( strings.Youcanreset )
+                    //   setErrorModal( true )
+                    //   return
+                    // }
                     if ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == 'seed' ) {
                       // showSecuiritySeedWordModal( true )
                       // Alert.alert( 'In case you have forgotten passcode, please setup the wallet again and restore it' )

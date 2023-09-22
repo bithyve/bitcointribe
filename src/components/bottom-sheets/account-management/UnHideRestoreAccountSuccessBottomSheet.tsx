@@ -28,6 +28,8 @@ const renderAccount = ( accountInfo, accountVisibility ) => {
       marginBottom: wp( 5 ),
       padding: 10,
       backgroundColor: Colors.backgroundColor1,
+      height: hp( 10 ),
+      alignItems: 'center'
     }}>
       <View>
         {getAvatarForSubAccount( accountInfo, false, true )}

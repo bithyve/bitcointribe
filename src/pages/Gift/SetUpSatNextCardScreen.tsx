@@ -363,7 +363,7 @@ export default function SetUpSatNextCardScreen( props ) {
           bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>
-      <NfcPrompt visible={showNFCModal} />
+      <NfcPrompt visible={showNFCModal} close={()=> setNFCModal( false )}/>
     </SafeAreaView>
   )
 }
