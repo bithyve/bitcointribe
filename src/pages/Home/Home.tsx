@@ -1,90 +1,88 @@
+import PushNotificationIOS from '@react-native-community/push-notification-ios'
 import React, { createRef, PureComponent } from 'react'
 import {
-  StyleSheet,
-  StatusBar,
-  View,
   Platform,
+  StatusBar,
+  StyleSheet,
+  View,
 } from 'react-native'
 import {
   heightPercentageToDP,
-  widthPercentageToDP,
-} from 'react-native-responsive-screen'
-import PushNotificationIOS from '@react-native-community/push-notification-ios'
-import Colors from '../../common/Colors'
-import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
+import { connect } from 'react-redux'
+import Colors from '../../common/Colors'
 import {
   SECURE_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import {
+  acceptExistingContactRequest,
   initializeHealthSetup,
-  updateCloudPermission,
-  acceptExistingContactRequest
+  updateCloudPermission
 } from '../../store/actions/BHR'
-import { connect } from 'react-redux'
+import {
+  getMessages,
+  notificationsUpdated,
+  setupNotificationList,
+  updateFCMTokens,
+  updateMessageStatus,
+  updateMessageStatusInApp,
+  updateNotificationList,
+} from '../../store/actions/notifications'
+import {
+  setCardData,
+  setCurrencyCode,
+  setIsPermissionGiven,
+} from '../../store/actions/preferences'
 import {
   rejectTrustedContact,
   syncPermanentChannels,
 } from '../../store/actions/trustedContacts'
-import {
-  updateFCMTokens,
-  notificationsUpdated,
-  setupNotificationList,
-  updateNotificationList,
-  updateMessageStatusInApp,
-  updateMessageStatus,
-  getMessages,
-} from '../../store/actions/notifications'
-import {
-  setCurrencyCode,
-  setCardData,
-  setIsPermissionGiven,
-} from '../../store/actions/preferences'
 //import HomeHeader from '../../components/home/home-header'
+import BottomSheet from '@gorhom/bottom-sheet'
 import idx from 'idx'
-import {
-  BottomTab,
-} from '../../components/home/custom-bottom-tabs'
+import moment from 'moment'
+import LinearGradient from 'react-native-linear-gradient'
 import * as RNLocalize from 'react-native-localize'
-import {
-  addTransferDetails,
-  fetchExchangeRates,
-  fetchFeeRates,
-} from '../../store/actions/accounts'
 import {
   AccountType,
   LevelHealthInterface,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
-import moment from 'moment'
-import {
-  updatePreference,
-  setFCMToken,
-  setSecondaryDeviceAddress,
-} from '../../store/actions/preferences'
-import BottomSheetHeader from '../Accounts/BottomSheetHeader'
-import BottomSheet from '@gorhom/bottom-sheet'
-import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
-import { AccountsState } from '../../store/reducers/accounts'
-import AccountShell from '../../common/data/models/AccountShell'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
-import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
-import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
+import AccountShell from '../../common/data/models/AccountShell'
+import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
 import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
 import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
-import { setVersion } from '../../store/actions/versionHistory'
-import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../../store/actions/SwanIntegration'
-import { clearRampCache } from '../../store/actions/RampIntegration'
-import { clearWyreCache } from '../../store/actions/WyreIntegration'
-import { setCloudData } from '../../store/actions/cloud'
-import { credsAuthenticated } from '../../store/actions/setupAndAuth'
-import { setShowAllAccount } from '../../store/actions/accounts'
-import HomeContainer from './HomeContainer'
+import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
+import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
+import {
+  BottomTab,
+} from '../../components/home/custom-bottom-tabs'
 import ModalContainer from '../../components/home/ModalContainer'
-import LinearGradient from 'react-native-linear-gradient'
+import {
+  addTransferDetails,
+  fetchExchangeRates,
+  fetchFeeRates,
+  setShowAllAccount,
+} from '../../store/actions/accounts'
+import { setCloudData } from '../../store/actions/cloud'
+import {
+  setFCMToken,
+  setSecondaryDeviceAddress,
+  updatePreference,
+} from '../../store/actions/preferences'
+import { clearRampCache } from '../../store/actions/RampIntegration'
+import { credsAuthenticated } from '../../store/actions/setupAndAuth'
+import { clearSwanCache, createTempSwanAccountInfo, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import { setVersion } from '../../store/actions/versionHistory'
+import { clearWyreCache } from '../../store/actions/WyreIntegration'
+import { AccountsState } from '../../store/reducers/accounts'
+import BottomSheetHeader from '../Accounts/BottomSheetHeader'
+import HomeContainer from './HomeContainer'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -493,9 +491,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   render() {
     return (
       <View style={{
-        backgroundColor: Colors.darkBlue
+        backgroundColor: Colors.blue
       }}>
-        <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+        <LinearGradient colors={[ Colors.blue, Colors.blue ]}
           start={{
             x: 0, y: 0
           }} end={{

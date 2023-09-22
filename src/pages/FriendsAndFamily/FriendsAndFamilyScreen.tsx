@@ -1,48 +1,48 @@
+import idx from 'idx'
 import React from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  StatusBar,
   ActivityIndicator,
-  Image
+  Image,
+  RefreshControl,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { connect } from 'react-redux'
-import idx from 'idx'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import { ListItem } from 'react-native-elements'
+import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  syncPermanentChannels,
-  PermanentChannelsSyncKind,
-} from '../../store/actions/trustedContacts'
-import { KeeperInfoInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
-import BottomInfoBox from '../../components/BottomInfoBox'
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { connect } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from '../../components/ModalHeader'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
-import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
-import { ListItem } from 'react-native-elements'
-import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
+import { KeeperInfoInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import { LocalizationContext } from '../../common/content/LocContext'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import {
   ContactRecipientDescribing,
 } from '../../common/data/models/interfaces/RecipientDescribing'
-import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
-import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
-import Loader from '../../components/loader'
-import ImageStyles from '../../common/Styles/ImageStyles'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
+import ModalHeader from '../../components/ModalHeader'
 import RecipientAvatar from '../../components/RecipientAvatar'
+import SmallHeaderModal from '../../components/SmallHeaderModal'
+import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
 import ModalContainer from '../../components/home/ModalContainer'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { LocalizationContext } from '../../common/content/LocContext'
-import LinearGradient from 'react-native-linear-gradient'
+import Loader from '../../components/loader'
+import {
+  PermanentChannelsSyncKind,
+  syncPermanentChannels,
+} from '../../store/actions/trustedContacts'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 interface FriendsAndFamilyPropTypes {
   navigation: any;
   isFocused: boolean;
@@ -518,7 +518,7 @@ class FriendsAndFamilyScreen extends React.Component<
                 } )
               }}
             >
-              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+              <LinearGradient colors={[ Colors.blue, Colors.blue ]}
                 start={{
                   x: 0, y: 0
                 }} end={{

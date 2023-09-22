@@ -10,55 +10,52 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
 import { KeeperInfoInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import {
   PermanentChannelsSyncKind,
   syncPermanentChannels,
 } from '../../store/actions/trustedContacts'
-import {
-  heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
-} from 'react-native-responsive-screen'
 
 import Add from '../../assets/images/svgs/add.svg'
 
-import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
-import AlertModalContents from '../../components/AlertModalContents'
-import BottomSheet from 'reanimated-bottom-sheet'
+import axios from 'axios'
 import { CKTapCard } from 'cktap-protocol-react-native'
-import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
-import ClaimSatComponent from './ClaimSatComponent'
+import idx from 'idx'
+import React from 'react'
+import { ListItem } from 'react-native-elements'
+import { RFValue } from 'react-native-responsive-fontsize'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { connect } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
+import Gifts from '../../assets/images/satCards/gifts.svg'
+import Sat_card from '../../assets/images/satCards/sats_card.svg'
 import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import { LocalizationContext } from '../../common/content/LocContext'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import {
   ContactRecipientDescribing,
 } from '../../common/data/models/interfaces/RecipientDescribing'
-import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
-import DeviceInfo from 'react-native-device-info'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Fonts from '../../common/Fonts'
+import AlertModalContents from '../../components/AlertModalContents'
+import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
+import ModalHeader from '../../components/ModalHeader'
+import RecipientAvatar from '../../components/RecipientAvatar'
+import SmallHeaderModal from '../../components/SmallHeaderModal'
 import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
-import Gift from '../../assets/images/svgs/icon_gift.svg'
+import ModalContainer from '../../components/home/ModalContainer'
+import Loader from '../../components/loader'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import ToggleContainer from '../FriendsAndFamily/CurrencyToggle'
+import ClaimSatComponent from './ClaimSatComponent'
 import GiftBoxComponent from './GiftBoxCmponent'
 import GiftUnwrappedComponent from './GiftUnwrappedComponent'
-import Gifts from '../../assets/images/satCards/gifts.svg'
-import ImageStyles from '../../common/Styles/ImageStyles'
-import { ListItem } from 'react-native-elements'
-import Loader from '../../components/loader'
-import { LocalizationContext } from '../../common/content/LocContext'
-import ModalContainer from '../../components/home/ModalContainer'
-import ModalHeader from '../../components/ModalHeader'
 import NfcPrompt from './NfcPromptAndroid'
-import { RFValue } from 'react-native-responsive-fontsize'
-import React from 'react'
-import RecipientAvatar from '../../components/RecipientAvatar'
-import Sat_card from '../../assets/images/satCards/sats_card.svg'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
-import ToggleContainer from '../FriendsAndFamily/CurrencyToggle'
 import VerifySatModalContents from './VerifySatModalContents'
-import axios from 'axios'
-import { connect } from 'react-redux'
-import idx from 'idx'
-import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 
 interface GiftPropTypes {
   navigation: any;
@@ -652,7 +649,7 @@ class GiftScreen extends React.Component<
     } = this.state
     return (
       <View style={{
-        backgroundColor: Colors.darkBlue
+        backgroundColor: Colors.blue
       }}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         <View style={styles.accountCardsSectionContainer}>
