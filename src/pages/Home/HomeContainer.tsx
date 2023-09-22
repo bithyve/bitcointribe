@@ -23,7 +23,7 @@ import idx from 'idx'
 import { withNavigationFocus } from 'react-navigation'
 import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
-import { setShowAllAccount, markAccountChecked } from '../../store/actions/accounts'
+import { setShowAllAccount, markAccountChecked, updateAccountSettings } from '../../store/actions/accounts'
 import { SwanIntegrationState } from '../../store/reducers/SwanIntegration'
 import Fonts from './../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -42,9 +42,11 @@ import ModalContainer from '../../components/home/ModalContainer'
 import BWIcon from '../../assets/images/svgs/bw.svg'
 import IconRight from '../../assets/images/svgs/icon_arrow_right.svg'
 import LNIcon from '../../assets/images/svgs/lightningWhiteWithBack.svg'
+import TestIcon from '../../assets/images/svgs/testAccountHome.svg'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
 
 export enum BottomSheetKind {
   SWAN_STATUS_INFO,
@@ -70,8 +72,10 @@ interface HomePropsTypes {
   openBottomSheet: any;
   swanDeepLinkContent: string | null;
   markAccountChecked: any;
+  updateAccountSettings: any,
   exchangeRates?: any[];
-  lnAcc?: AccountShell[]
+  lnAcc?: AccountShell[],
+  accountShells?:any
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -159,10 +163,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     // }
   };
-
   numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
+
   render() {
     const {
       currentLevel,
@@ -269,7 +273,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               <Text style={styles.titleText}>Adding or Importing a wallet will appear on the Home Screen as a separate tile</Text>
             </View>
             <AppBottomSheetTouchableWrapper style={styles.menuWrapper} onPress={()=> {
-              console.log( 'log' )
               this.setState( {
                 visibleModal: false
               } )
@@ -293,9 +296,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
             <AppBottomSheetTouchableWrapper
               disabled={this.props.lnAcc.length !== 0}
-              style={[ styles.menuWrapper, {
-                marginBottom: hp( 5 )
-              } ]} onPress={()=>
+              style={styles.menuWrapper} onPress={()=>
               {
                 this.setState( {
                   visibleModal: false
@@ -309,6 +310,40 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               <View style={styles.titleWrapper}>
                 <Text style={styles.titleText}>Add a Lightning Wallet</Text>
                 <Text style={styles.subTitleText}>Add a Lightning node to enable a separate account on Tribe </Text>
+              </View>
+              <View style={styles.iconRightWrapper}>
+                <IconRight/>
+              </View>
+            </AppBottomSheetTouchableWrapper>
+
+            <AppBottomSheetTouchableWrapper
+              style={[ styles.menuWrapper, {
+                marginBottom: hp( 5 )
+              } ]} onPress={()=>{
+                this.setState( {
+                  visibleModal:false
+                } )
+                const accountShell = this.props.accountShells.filter( shell => shell?.primarySubAccount.type === AccountType.TEST_ACCOUNT )
+                this.props.updateAccountSettings(
+                  {
+                    accountShell: accountShell[ 0 ],
+                    settings: {
+                      accountName: accountShell[ 0 ].primarySubAccount.customDisplayName,
+                      accountDescription: accountShell[ 0 ].primarySubAccount.customDescription,
+                      visibility: AccountVisibility.DEFAULT,
+                    },
+                  }
+                )
+                this.props.navigation.navigate( 'AccountDetails', {
+                  accountShellID: accountShell[ 0 ].primarySubAccount.accountShellID,
+                } )
+              }}>
+              <View style={styles.iconWrapper}>
+                <TestIcon/>
+              </View>
+              <View style={styles.titleWrapper}>
+                <Text style={styles.titleText}>Add a Test Account</Text>
+                <Text style={styles.subTitleText}>Add a test account on Tribe </Text>
               </View>
               <View style={styles.iconRightWrapper}>
                 <IconRight/>
@@ -359,6 +394,7 @@ const mapStateToProps = ( state ) => {
     currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
     startRegistration: idx( state, ( _ ) => _.swanIntegration.startRegistration ),
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
+    accountShells: idx( state, ( _ )=>_.accounts.accountShells )
   }
 }
 const styles = StyleSheet.create( {
@@ -408,6 +444,7 @@ const styles = StyleSheet.create( {
 export default withNavigationFocus(
   connect( mapStateToProps, {
     setShowAllAccount,
-    markAccountChecked
+    markAccountChecked,
+    updateAccountSettings
   } )( Home )
 )

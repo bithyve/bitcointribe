@@ -380,7 +380,6 @@ function* syncTxAfterRestore( restoredAccounts ) {
           accountShells[ shellIndex ].primarySubAccount.transactions.splice( i, 1 )
         }
       } )
-      console.log( 'AFTER', accountShells )
     }
   }
 
@@ -1156,7 +1155,6 @@ function* updateAccountSettingsWorker( { payload }: {
       visibility?: AccountVisibility,
     },
 }} ) {
-
   const { accountShell, settings } = payload
   const { accountName, accountDescription, visibility } = settings
 
@@ -1165,7 +1163,6 @@ function* updateAccountSettingsWorker( { payload }: {
     if( accountName ) account.accountName = accountName
     if( accountDescription ) account.accountDescription = accountDescription
     if( visibility ) account.accountVisibility = visibility
-
     yield put( updateAccountShells( {
       accounts: {
         [ account.id ]: account
@@ -1288,7 +1285,6 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
   } catch ( error ) {
     yield put( setResetTwoFALoader( false ) )
     Alert.alert( 'Invalid Wallet 2FA' )
-    console.log( 'error CREATE_SM_N_RESETTFA_OR_XPRIV', error )
   }
 }
 
@@ -1417,7 +1413,6 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
       yield put( refreshAccountShells( [ shellToSync ], {
       } ) )
     } else {
-      console.log( 'Gifts generation failed' )
       yield put( giftCreationSuccess( false ) )
     }
 
