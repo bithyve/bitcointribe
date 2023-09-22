@@ -2,17 +2,17 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import bip21 from 'bip21'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
-import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
-import config from '../../HexaConfig'
-import _ from 'lodash'
-import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType, DonationAccount, ActiveAddresses, TransactionType, DerivationPurpose } from '../Interface'
-import { DONATION_ACCOUNT, SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
-import Toast from '../../../components/Toast'
-import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
-import { BH_AXIOS, SIGNING_AXIOS } from '../../../services/api'
+import bs58check from 'bs58check'
 import idx from 'idx'
+import _ from 'lodash'
 import { generateRandomString } from '../../../common/CommonFunctions'
+import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
+import { SUB_PRIMARY_ACCOUNT } from '../../../common/constants/wallet-service-types'
+import Toast from '../../../components/Toast'
+import { BH_AXIOS, SIGNING_AXIOS } from '../../../services/api'
+import config from '../../HexaConfig'
+import { Account, AccountType, ActiveAddresses, DerivationPurpose, DonationAccount, MultiSigAccount, NetworkType, ScannedAddressKind, Transaction, TransactionType } from '../Interface'
 import { getPurpose } from './AccountFactory'
 
 
@@ -183,7 +183,7 @@ export default class AccountUtilities {
   static addressToPrivateKey = ( address: string, account: Account ): string => {
     const { nextFreeAddressIndex, nextFreeChangeAddressIndex, xpub, xpriv, networkType } = account
     const network = AccountUtilities.getNetworkByType( networkType )
-    const purpose = getPurpose( account.derivationPath )
+    const purpose = getPurpose( account.derivationPath, account.type )
     const closingExtIndex = nextFreeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT : config.GAP_LIMIT )
     for ( let itr = 0; itr <= nextFreeAddressIndex + closingExtIndex; itr++ ) {
       if ( AccountUtilities.getAddressByIndex( xpub, false, itr, network, purpose ) === address )
@@ -362,7 +362,7 @@ export default class AccountUtilities {
       value: number;
     }>
   > => {
-    const purpose = getPurpose( account.derivationPath )
+    const purpose = getPurpose( account.derivationPath, account.type )
     for ( const output of outputs ) {
       if ( !output.address ) {
         let changeAddress: string
