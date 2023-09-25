@@ -17,6 +17,7 @@ import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../components/BottomInfoBox'
 import getFormattedStringFromQRString from '../utils/qr-codes/GetFormattedStringFromQRData'
+import CameraUnauthorized from '../components/CameraUnauthorized'
 
 export type Props = {
   navigation: any;
@@ -111,6 +112,7 @@ const QRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
               }}
               onBarCodeRead={barcode => barcodeRecognized( barcode )}
               captureAudio={false}
+              notAuthorizedView={<CameraUnauthorized/>}
             >
               {/* ---- Scanner frame indicators ---- */}
               <View

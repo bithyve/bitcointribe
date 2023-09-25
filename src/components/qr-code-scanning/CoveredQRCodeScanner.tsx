@@ -1,10 +1,11 @@
-import React, { useState, useRef } from 'react'
-import { View, StyleSheet, ImageBackground, ImageSourcePropType } from 'react-native'
+import React, { useRef, useState } from 'react'
+import { ImageBackground, ImageSourcePropType, StyleSheet, View } from 'react-native'
+import { BarCodeReadEvent, RNCamera } from 'react-native-camera'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import { RNCamera, BarCodeReadEvent } from 'react-native-camera'
-import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
+import { useDispatch } from 'react-redux'
 import { setIsPermissionGiven } from '../../store/actions/preferences'
-import { useSelector, useDispatch } from 'react-redux'
+import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
+import CameraUnauthorized from '../CameraUnauthorized'
 
 export type Props = {
   containerStyle?: Record<string, unknown>;
@@ -80,6 +81,7 @@ const CoveredQRCodeScanner: React.FC<Props> = ( {
             setIsCameraOpen( false )
           }}
           captureAudio={false}
+          notAuthorizedView={<CameraUnauthorized/>}
         >
           <CameraFrameIndicators />
         </RNCamera>
