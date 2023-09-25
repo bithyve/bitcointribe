@@ -327,11 +327,6 @@ const styles = StyleSheet.create( {
   tabContainer: {
     height: 45, borderRadius: 10, backgroundColor: Colors.white,
     flexDirection: 'row',
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 2, height: 2
-    },
     marginHorizontal: wp( 6 ),
     marginTop: hp( 2 )
   },
