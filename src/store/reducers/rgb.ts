@@ -1,14 +1,14 @@
-import { RGBConfig } from '../../bitcoin/utilities/Interface'
+import { RGBConfig } from '../../bitcoin/utilities/Interface';
 import {
   RGB_SYNCING,
   SET_NEXT_FREE_ADDRESS,
   SET_RECEIVE_DATA,
+  SET_RGB121_ASSETS,
+  SET_RGB20_ASSETS,
   SET_RGB_CONFIG,
   SET_RGB_ONCHAIN_BALANCE,
-  SET_RGB_TXNS,
-  SET_RGB20_ASSETS,
-  SET_RGB121_ASSETS
-} from '../actions/rgb'
+  SET_RGB_TXNS
+} from '../actions/rgb';
 
 const initialState: {
   config: RGBConfig;
@@ -44,7 +44,7 @@ const initialState: {
     assetId: string;
     transactions: [];
   }[];
-  rgb121Assets: []
+  rgb25Assets: []
 } = {
   config: {
     bdkDir: '',
@@ -76,7 +76,7 @@ const initialState: {
   },
   transactions: [],
   rgb20Assets: [],
-  rgb121Assets: []
+  rgb25Assets: []
 }
 //
 
@@ -120,7 +120,7 @@ export default ( state = initialState, action ) => {
       case SET_RGB121_ASSETS:
         return {
           ...state,
-          rgb121Assets: action.payload.assets,
+          rgb25Assets: action.payload.assets,
         }
       default:
         return state

@@ -1,31 +1,31 @@
+import StaggeredList from '@mindinventory/react-native-stagger-view'
 import React, { useEffect, useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
+  FlatList,
+  Image,
+  RefreshControl,
   ScrollView,
   StatusBar,
-  Image,
-  FlatList,
-  RefreshControl
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
+import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import LinearGradient from 'react-native-linear-gradient'
 import { translations } from '../../common/content/LocContext'
-import ModalContainer from '../../components/home/ModalContainer'
 import BottomSheetAddWalletInfo from '../../components/bottom-sheets/add-wallet/BottomSheetAddWalletInfo'
-import BottomSheetCoinsHeader from './BottomSheetCoinsHeader'
-import StaggeredList from '@mindinventory/react-native-stagger-view'
-import { useSelector, useDispatch } from 'react-redux'
+import ModalContainer from '../../components/home/ModalContainer'
 import { syncRgb } from '../../store/actions/rgb'
-import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
+import BottomSheetCoinsHeader from './BottomSheetCoinsHeader'
 
 const keyExtractor = ( item: any ) => item.toString()
 
@@ -198,7 +198,7 @@ export default function AssetsScreen( props ) {
           <TouchableOpacity onPress={() => {
             setBottomSheetState( BottomSheetState.Open )
           }}>
-            <LinearGradient colors={[ Colors.blue ]}
+            <LinearGradient colors={[ Colors.blue, Colors.blue ]}
               start={{
                 x: 0, y: 0
               }} end={{

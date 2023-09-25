@@ -161,7 +161,7 @@ const AssetMetaData = ( props ) => {
                   />
                   <TouchableOpacity onPress={() => {
                   }}>
-                    <LinearGradient colors={[ Colors.blue ]}
+                    <LinearGradient colors={[ Colors.blue,Colors.blue ]}
                       start={{
                         x: 0, y: 0
                       }} end={{

@@ -1,8 +1,8 @@
 import { call, put, select } from 'redux-saga/effects'
-import { createWatcher } from '../utils/utilities'
-import { SYNC_RGB, RECEIVE_RGB_ASSET, setNextFreeAddress, setRgbOnchainBalances, setRgbSyncing, setRgbTxns, setReceiveData, setRgb20Assets, setRgb121Assets } from '../actions/rgb'
 import { RGBConfig } from '../../bitcoin/utilities/Interface'
 import RGBServices from '../../services/RGBServices'
+import { RECEIVE_RGB_ASSET, SYNC_RGB, setNextFreeAddress, setReceiveData, setRgb121Assets, setRgb20Assets, setRgbOnchainBalances, setRgbSyncing, setRgbTxns } from '../actions/rgb'
+import { createWatcher } from '../utils/utilities'
 
 export function* syncRgbWorker(  ) {
   try{
@@ -15,10 +15,9 @@ export function* syncRgbWorker(  ) {
     if( balances ) yield put( setRgbOnchainBalances( balances ) )
     const transactions = yield call( RGBServices.getTransactions, mnemonic )
     yield put( setRgbTxns( transactions ) )
-
     const assets = yield call( RGBServices.syncRgbAssets, mnemonic, xpub )
     if( assets.rgb20 ) yield put( setRgb20Assets( assets.rgb20 ) )
-    if( assets.rgb121 ) yield put( setRgb121Assets( assets.rgb121 ) )
+    if( assets.rgb25 ) yield put( setRgb121Assets( assets.rgb25 ) )
     yield put( setRgbSyncing( false ) )
   }
   catch( err ){
