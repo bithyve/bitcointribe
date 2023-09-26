@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { Input } from 'react-native-elements'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
@@ -69,72 +70,76 @@ export default function RGBSend ( props ) {
 
         </View>
       </View> */}
+      <KeyboardAwareScrollView
+        bounces={false}
+        overScrollMode="never"
+        style={styles.rootContainer}>
+        <View style={styles.bodySection}>
+          <Input
+            inputContainerStyle={[
+              FormStyles.textInputContainer,
+              styles.textInputContainer,
+            ]}
+            inputStyle={FormStyles.inputText}
+            placeholder={'Pay to'}
+            placeholderTextColor={FormStyles.placeholderText.color}
+            underlineColorAndroid={'transparent'}
+            value={payTo}
+            onChangeText={( text ) => {
+              setPayTo( text )
+            }}
+            numberOfLines={1}
+          />
 
-      <View style={styles.bodySection}>
-        <Input
-          inputContainerStyle={[
-            FormStyles.textInputContainer,
-            styles.textInputContainer,
-          ]}
-          inputStyle={FormStyles.inputText}
-          placeholder={'Pay to'}
-          placeholderTextColor={FormStyles.placeholderText.color}
-          underlineColorAndroid={'transparent'}
-          value={payTo}
-          onChangeText={( text ) => {
-            setPayTo( text )
-          }}
-          numberOfLines={1}
-        />
-
-        <Input
-          inputContainerStyle={[
-            FormStyles.textInputContainer,
-            styles.textInputContainer,
-          ]}
-          inputStyle={FormStyles.inputText}
-          placeholder={'Amount to pay'}
-          placeholderTextColor={FormStyles.placeholderText.color}
-          underlineColorAndroid={'transparent'}
-          value={amount}
-          onChangeText={( text ) => {
-            setamount( text )
-          }}
-          keyboardType="number-pad"
-          numberOfLines={1}
-        />
-        <Input
-          inputContainerStyle={[
-            FormStyles.textInputContainer,
-            styles.textInputContainer,
-          ]}
-          inputStyle={FormStyles.inputText}
-          placeholder={'Fee rates'}
-          placeholderTextColor={FormStyles.placeholderText.color}
-          underlineColorAndroid={'transparent'}
-          value={fee}
-          onChangeText={( text ) => {
-            setfee( text )
-          }}
-          keyboardType="number-pad"
-          numberOfLines={1}
-        />
-        <View style={styles.footerSection}>
-          <TouchableOpacity onPress={SendButtonClick}>
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
-              style={styles.sendBtnWrapper}
-            >
-              <Text style={styles.sendBtnText}>{common.send}</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          <Input
+            inputContainerStyle={[
+              FormStyles.textInputContainer,
+              styles.textInputContainer,
+            ]}
+            inputStyle={FormStyles.inputText}
+            placeholder={'Amount to pay'}
+            placeholderTextColor={FormStyles.placeholderText.color}
+            underlineColorAndroid={'transparent'}
+            value={amount}
+            onChangeText={( text ) => {
+              setamount( text )
+            }}
+            keyboardType="number-pad"
+            numberOfLines={1}
+          />
+          <Input
+            inputContainerStyle={[
+              FormStyles.textInputContainer,
+              styles.textInputContainer,
+            ]}
+            inputStyle={FormStyles.inputText}
+            placeholder={'Fee rates'}
+            placeholderTextColor={FormStyles.placeholderText.color}
+            underlineColorAndroid={'transparent'}
+            value={fee}
+            onChangeText={( text ) => {
+              setfee( text )
+            }}
+            keyboardType="number-pad"
+            numberOfLines={1}
+          />
+          <View style={styles.footerSection}>
+            <TouchableOpacity onPress={SendButtonClick}>
+              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                start={{
+                  x: 0, y: 0
+                }} end={{
+                  x: 1, y: 0
+                }}
+                locations={[ 0.2, 1 ]}
+                style={styles.sendBtnWrapper}
+              >
+                <Text style={styles.sendBtnText}>{common.send}</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </KeyboardAwareScrollView>
     </View>
   )
 }
