@@ -2,6 +2,7 @@ package io.hexawallet.hexa
 
 import android.util.Log
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import org.rgbtools.AssetRgb20
 import org.rgbtools.Balance
 import org.rgbtools.BlindData
@@ -36,17 +37,24 @@ object RGBHelper {
     }
 
     private fun startRGBReceiving(): String {
-        val filter = listOf(
-            RefreshFilter(RefreshTransferStatus.WAITING_COUNTERPARTY, true),
-            RefreshFilter(RefreshTransferStatus.WAITING_COUNTERPARTY, false)
-        )
-        val refresh = RGBWalletRepository.wallet.refresh(RGBWalletRepository.online, null, filter)
-        Log.d(TAG, "startRGBReceiving:asset ")
-        val blindedData = getBlindedUTXO(null, AppConstants.rgbBlindDuration)
-        Log.d(TAG, "startRGBReceiving: "+blindedData)
-        val gson = Gson()
-        val json = gson.toJson(blindedData)
-        return json.toString()
+        try {
+            val filter = listOf(
+                RefreshFilter(RefreshTransferStatus.WAITING_COUNTERPARTY, true),
+                RefreshFilter(RefreshTransferStatus.WAITING_COUNTERPARTY, false)
+            )
+            val refresh = RGBWalletRepository.wallet.refresh(RGBWalletRepository.online, null, filter)
+            Log.d(TAG, "startRGBReceiving:asset ")
+            val blindedData = getBlindedUTXO(null, AppConstants.rgbBlindDuration)
+            Log.d(TAG, "startRGBReceiving: "+blindedData)
+            val gson = Gson()
+            val json = gson.toJson(blindedData)
+            return json.toString()
+        }catch (e: Exception) {
+            val message = e.message
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("error", message)
+            return jsonObject.toString()
+        }
     }
 
     fun receiveAsset(): String {
@@ -57,6 +65,8 @@ object RGBHelper {
         return try {
             callback()
         } catch (e: RgbLibException) {
+            Log.d(TAG, "handleMissingFunds: RgbLibException ${e.message}")
+            val jsonObject = JsonObject()
             when (e) {
                 is RgbLibException.InsufficientBitcoins,
                 is RgbLibException.InsufficientAllocationSlots -> {
@@ -133,21 +143,33 @@ object RGBHelper {
     }
 
     fun issueRgb20Asset(ticker: String, name: String, amounts: List<ULong>): String {
-        //checkMaxAssets()
-        val contract = handleMissingFunds { issueAssetRgb20(ticker, name, amounts) }
-        val gson = Gson()
-        val json = gson.toJson(contract)
-        return json.toString()
+        return try {
+            Log.d(TAG, "issueRgb20Asset: ticker= $ticker name= $name amounts= $amounts")
+
+            //checkMaxAssets()
+            val contract = handleMissingFunds { issueAssetRgb20(ticker, name, amounts) }
+            val gson = Gson()
+            val json = gson.toJson(contract)
+            return json.toString()
+        }catch (e: Exception) {
+            Log.d(TAG, "issueRgb20Asset: Exception= ${e.message}")
+            val message = e.message
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("error", message)
+            return jsonObject.toString()
+        }
     }
 
     fun issueAssetRgb20(ticker: String, name: String, amounts: List<ULong>): AssetRgb20 {
-        return RGBWalletRepository.wallet.issueAssetRgb20(
+         val asset = RGBWalletRepository.wallet.issueAssetRgb20(
             RGBWalletRepository.online,
             ticker,
             name,
             AppConstants.rgbDefaultPrecision,
             amounts
         )
+        Log.d(TAG, "issueAssetRgb20: New asset = ${asset.assetId}")
+        return  asset
     }
 
     fun createUTXOs(): UByte {
@@ -171,6 +193,7 @@ object RGBHelper {
                         AppConstants.satsForRgb,
                         AppConstants.defaultFeeRate
                     )
+                Log.d(TAG, "createUTXOs: txid=${txid}")
             } catch (e: Exception) {
                 throw Exception("Insufficient sats for RGB")
             }

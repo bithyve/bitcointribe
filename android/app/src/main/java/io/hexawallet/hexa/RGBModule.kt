@@ -6,6 +6,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import org.rgbtools.BitcoinNetwork
 
 import kotlin.math.log
@@ -62,12 +63,30 @@ class RGBModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
 
     @ReactMethod
     fun receiveAsset( mnemonic:String, network: String, promise: Promise){
-        promise.resolve(RGBHelper.receiveAsset())
+        try {
+            promise.resolve(RGBHelper.receiveAsset())
+        }catch (e: Exception) {
+            val message = e.message
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("error", message)
+            promise.resolve(jsonObject.toString())
+        }
     }
     @ReactMethod
     fun issueRgb20Asset( ticker: String, name: String, supply: String, promise: Promise){
-        val amounts = listOf(supply)
-        promise.resolve(RGBHelper.issueRgb20Asset(ticker, name, amounts.map { it.toULong() }))
+        Log.d(TAG, "issueRgb20Asset: ${supply}")
+        try {
+            val amounts = listOf(supply)
+            val response = RGBHelper.issueRgb20Asset(ticker, name, amounts.map { it.toULong() })
+            promise.resolve(response)
+        }catch (e: Exception) {
+            Log.d(TAG, "issueRgb20Asset:e.message ${e.message}")
+
+            val message = e.message
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("error", message)
+            promise.resolve(jsonObject.toString())
+        }
     }
 
     @ReactMethod
