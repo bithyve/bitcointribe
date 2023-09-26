@@ -1,19 +1,19 @@
-import React, {  } from 'react'
+import moment from 'moment'
+import React from 'react'
 import {
-  StyleSheet,
-  View,
   SafeAreaView,
-  TouchableOpacity,
   ScrollView,
-  Text
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
-import CommonStyles from '../../common/Styles/Styles'
 import ListStyles from '../../common/Styles/ListStyles'
-import moment from 'moment'
+import CommonStyles from '../../common/Styles/Styles'
 import HeaderTitle from '../../components/HeaderTitle'
-import { RFValue } from 'react-native-responsive-fontsize'
 
 const styles = StyleSheet.create( {
   lineItem: {
@@ -45,8 +45,8 @@ const DetailsItem = ( { name, value } ) => {
 }
 
 const AssetTransferDetails = ( props ) => {
-  const asset = props.navigation.getParam( 'asset' )
-  const item = props.navigation.getParam( 'item' )
+  const asset = props.route.params.asset
+  const item = props.route.params.item
 
   return (
     <SafeAreaView style={{
