@@ -64,4 +64,14 @@ class RGBModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
         val amounts = listOf(supply)
         promise.resolve(RGBHelper.issueRgb20Asset(ticker, name, amounts.map { it.toULong() }))
     }
+
+    @ReactMethod
+    fun getRgbAssetMetaData( assetId: String, promise: Promise){
+        promise.resolve(RGBHelper.getMetadata(assetId))
+    }
+
+    @ReactMethod
+    fun getRgbAssetTransactions( assetId: String, promise: Promise){
+        promise.resolve(RGBHelper.getAssetTransfers(assetId))
+    }
 }

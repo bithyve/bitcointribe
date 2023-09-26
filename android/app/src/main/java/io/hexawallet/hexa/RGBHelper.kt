@@ -6,6 +6,7 @@ import org.rgbtools.AssetRgb20
 import org.rgbtools.Balance
 import org.rgbtools.BlindData
 import org.rgbtools.Metadata
+import org.rgbtools.Recipient
 import org.rgbtools.RefreshFilter
 import org.rgbtools.RefreshTransferStatus
 import org.rgbtools.RgbLibException
@@ -99,6 +100,43 @@ object RGBHelper {
 
     fun getMetadata(assetID: String): Metadata {
         return RGBWalletRepository.wallet.getAssetMetadata(RGBWalletRepository.online, assetID)
+    }
+
+    fun getAssetTransfers(assetID: String): String {
+        return Gson().toJson(RGBWalletRepository.wallet.listTransfers(assetID)).toString()
+    }
+
+    fun getTransactions(): String {
+        return Gson().toJson(RGBWalletRepository.wallet.listTransactions(RGBWalletRepository.online)).toString()
+    }
+
+    fun refresh(assetID: String? = null, light: Boolean = false): Boolean {
+        Log.d(TAG, "refresh: "+assetID)
+        val filter =
+            if (light)
+                listOf(
+                    RefreshFilter(RefreshTransferStatus.WAITING_COUNTERPARTY, true),
+                    RefreshFilter(RefreshTransferStatus.WAITING_COUNTERPARTY, false)
+                )
+            else listOf()
+        val refresh = RGBWalletRepository.wallet.refresh(RGBWalletRepository.online, assetID, filter)
+        Log.d(TAG, "refresh: $refresh")
+        return refresh
+    }
+
+    fun send(
+        assetID: String,
+        blindedUTXO: String,
+        amount: ULong,
+        consignmentEndpoints: List<String>,
+        feeRate: Float,
+    ): String {
+        return RGBWalletRepository.wallet.send(
+            RGBWalletRepository.online,
+            mapOf(assetID to listOf(Recipient(blindedUTXO, amount, consignmentEndpoints))),
+            false,
+            feeRate,
+        )
     }
 
     fun issueRgb20Asset(ticker: String, name: String, amounts: List<ULong>): String {
