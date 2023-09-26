@@ -13,7 +13,6 @@ import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transacti
 import TwoFASetup from '../../../pages/Accounts/TwoFASetup'
 import TwoFASweepFunds from '../../../pages/Accounts/TwoFASweepFunds'
 import TwoFAValidation from '../../../pages/Accounts/TwoFAValidation'
-import AssetsDetailScreen from '../../../pages/Assets/AssetsDetailScreen'
 import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
 import ContactDetails from '../../../pages/Contacts/ContactDetails'
 import SendRequest from '../../../pages/Contacts/SendRequest'
@@ -69,16 +68,6 @@ import SelectChecksumWord from '../../../pages/borderwallet/SelectChecksumWord'
 import SelectEntropyGridType from '../../../pages/borderwallet/SelectEntropyGridType'
 import EnterNodeConfig from '../../../pages/lightningAccount/EnterNodeConfigScreen'
 import ScanNodeConfig from '../../../pages/lightningAccount/ScanNodeConfigScreen'
-import AssetMetaData from '../../../pages/rgb/AssetMetaData'
-import AssetTransferDetails from '../../../pages/rgb/AssetTransferDetails'
-import CollectibleDetailScreen from '../../../pages/rgb/CollectibleDetailScreen'
-import IssueScreen from '../../../pages/rgb/IssueScreen'
-import NewRGBWallet from '../../../pages/rgb/NewRGBWallet'
-import RGB121TxDetail from '../../../pages/rgb/RGB121TxDetail'
-import RGBReceive from '../../../pages/rgb/RGBReceive'
-import RGBSend from '../../../pages/rgb/RGBSend'
-import RGBTxDetail from '../../../pages/rgb/RGBTxDetail'
-import RGBWalletDetail from '../../../pages/rgb/RGBWalletDetail'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import AddNewAccountStack from '../accounts/AddNewAccountStack'
@@ -89,6 +78,7 @@ const Stack = createNativeStackNavigator()
 const HomeStack = ( { navigation, route } ) => {
   useLayoutEffect( () => {
     const routeName = getFocusedRouteNameFromRoute( route ) ?? 'Home'
+    console.log( 'routeName', routeName )
     if ( routeName === 'Home' ){
       navigation.setOptions( {
         tabBarStyle: {
@@ -175,39 +165,6 @@ const HomeStack = ( { navigation, route } ) => {
         headerShown: false
       }} />
       <Stack.Screen name="EnterNodeConfig" component={EnterNodeConfig} options={{
-        headerShown: false
-      }} />
-      <Stack.Screen name="NewRGBWallet" component={NewRGBWallet} options={{
-        headerShown: false
-      }} />
-      <Stack.Screen name="RGBWalletDetail" component={RGBWalletDetail} options={{
-        headerShown: false
-      }} />
-      <Stack.Screen name="RGBReceive" component={RGBReceive} options={{
-        headerShown: false
-      }} />
-      <Stack.Screen name="RGBSend" component={RGBSend} options={{
-        headerShown: false
-      }} />
-      <Stack.Screen name="IssueScreen" component={IssueScreen} options={{
-        headerShown: false
-      }} />
-      <Stack.Screen name="RGB121TxDetail" component={RGB121TxDetail} options={{
-        headerShown: false
-      }} />
-      <Stack.Screen name="RGBTxDetail" component={RGBTxDetail} options={{
-        headerShown: false
-      }} />
-      <Stack.Screen name="AssetMetaData" component={AssetMetaData} options={{
-        headerShown: false
-      }} />
-      <Stack.Screen name="AssetTransferDetails" component={AssetTransferDetails} options={{
-        headerShown: false
-      }} />
-      <Stack.Screen name="AssetsDetailScreen" component={AssetsDetailScreen} options={{
-        headerShown: false
-      }} />
-      <Stack.Screen name="CollectibleDetailScreen" component={CollectibleDetailScreen} options={{
         headerShown: false
       }} />
       <Stack.Screen name="NewWyreAccountDetails" component={NewWyreAccountDetailsScreen} options={{
