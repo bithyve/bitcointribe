@@ -15,5 +15,7 @@ struct Constants{
   static let mainnetElectrumUrl = "electrum.acinq.co:50002"
   static let rgbHttpJsonRpcProtocol = "rgbhttpjsonrpc:"
   static let proxyURL = "https://proxy.iriswallet.com/json-rpc"
-  static let proxyConsignmentEndpoint = rgbHttpJsonRpcProtocol + proxyURL
+  static let proxyConsignmentEndpoint = "rpcs://proxy.iriswallet.com/0.2/json-rpc"
+  static let satsForRgb = 9000
+
 }
