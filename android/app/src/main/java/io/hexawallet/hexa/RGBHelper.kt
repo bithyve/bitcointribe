@@ -18,13 +18,6 @@ object RGBHelper {
 
     val TAG = "RGBHelper"
 
-    fun generateNewKeys() {
-        val keys = generateKeys(RGBWalletRepository.rgbNetwork)
-        val gson = Gson()
-        val json = gson.toJson(keys)
-        json.toString()
-    }
-
     fun syncRgbAssets(): String {
         return try {
             val filter = listOf(

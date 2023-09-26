@@ -5,6 +5,7 @@ import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
+import com.google.gson.Gson
 import org.rgbtools.BitcoinNetwork
 
 import kotlin.math.log
@@ -20,7 +21,11 @@ class RGBModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
 
     @ReactMethod
     fun generateKeys(network: String, promise: Promise) {
-        promise.resolve(RGBHelper.generateNewKeys())
+        val rgbNetwork = if(network == "TESTNET") BitcoinNetwork.TESTNET else BitcoinNetwork.MAINNET
+        val keys = org.rgbtools.generateKeys(rgbNetwork)
+        val gson = Gson()
+        val json = gson.toJson(keys)
+        promise.resolve(json.toString())
     }
 
     @ReactMethod
