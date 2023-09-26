@@ -1,24 +1,23 @@
+import moment from 'moment'
 import React, { useContext, useMemo } from 'react'
 import {
-  View,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  View
 } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import moment from 'moment'
+import { useSelector } from 'react-redux'
+import semver from 'semver'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { LocalizationContext } from '../../common/content/LocContext'
-import {  useSelector } from 'react-redux'
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
-import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import semver from 'semver'
+import { LocalizationContext } from '../../common/content/LocContext'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 
 const DashedLargeContainer = ( props ) => {
   const { translations } = useContext( LocalizationContext )
@@ -127,7 +126,7 @@ const DashedLargeContainer = ( props ) => {
               }}>
                 {props.subText}
               </Text>
-              {!props.isAccept ? '\n\nScan the QR follow the steps to receive bitcoin in your Bitcoin Tribe bitcoin wallet': '\n\nYou can either add the sats to an Account or retain it to forward to your loved ones.'}
+              {!props.isAccept ? '\n\nScan the QR and receive bitcoin in your Bitcoin Tribe bitcoin wallet.': '\n\nYou can either add the sats to an Account or retain it to forward to your loved ones.'}
             </Text>
           </View>
           {props.date &&

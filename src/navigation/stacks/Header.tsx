@@ -1,96 +1,30 @@
+import BottomSheet from '@gorhom/bottom-sheet'
+import PushNotificationIOS from '@react-native-community/push-notification-ios'
+import messaging from '@react-native-firebase/messaging'
+import { CommonActions, useIsFocused, useNavigation, useRoute } from '@react-navigation/native'
+import idx from 'idx'
+import moment from 'moment'
 import React, { createRef, PureComponent } from 'react'
 import {
-  View,
-  Platform,
-  Linking,
-  AppState,
   Alert,
+  AppState,
+  Linking,
+  Platform,
   StyleSheet,
+  Text,
   TouchableOpacity,
-  Text
+  View
 } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
+import LinearGradient from 'react-native-linear-gradient'
+import * as RNLocalize from 'react-native-localize'
+import PushNotification from 'react-native-push-notification'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP, widthPercentageToDP,
-  // widthPercentageToDP,
 } from 'react-native-responsive-screen'
-import DeviceInfo from 'react-native-device-info'
-import * as RNLocalize from 'react-native-localize'
 import { connect } from 'react-redux'
-import messaging from '@react-native-firebase/messaging'
-import {
-  initializeTrustedContact,
-  rejectTrustedContact,
-  InitTrustedContactFlowKind,
-  PermanentChannelsSyncKind,
-  syncPermanentChannels,
-  fetchGiftFromTemporaryChannel,
-  rejectGift,
-} from '../../store/actions/trustedContacts'
-import {
-  getCurrencyImageByRegion, processRequestQR,
-} from '../../common/CommonFunctions/index'
-import NotificationListContent from '../../components/NotificationListContent'
-import HomeHeader from '../../components/home/home-header_update'
-import Colors from '../../common/Colors'
-import idx from 'idx'
 import { v4 as uuid } from 'uuid'
-import { useNavigation, useRoute } from '@react-navigation/native'
-import moment from 'moment'
-import { credsAuthenticated } from '../../store/actions/setupAndAuth'
-import { CommonActions, useIsFocused } from '@react-navigation/native'
-import TrustedContactRequestContent from '../../pages/Home/TrustedContactRequestContent'
-import BottomSheet from '@gorhom/bottom-sheet'
-import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
-import { AccountsState } from '../../store/reducers/accounts'
-import AccountShell from '../../common/data/models/AccountShell'
-import { NotificationType } from '../../components/home/NotificationType'
-import ModalContainer from '../../components/home/ModalContainer'
-import NotificationInfoContents from '../../components/NotificationInfoContents'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
-import Toast from '../../components/Toast'
-import { resetToHomeAction } from '../actions/NavigationActions'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import PushNotification from 'react-native-push-notification'
-import PushNotificationIOS from '@react-native-community/push-notification-ios'
-import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
-import AddContactAddressBook from '../../pages/Contacts/AddContactAddressBook'
-import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
-import BottomSheetHeader from '../../pages/Accounts/BottomSheetHeader'
-import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
-import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
-import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import {
-  initializeHealthSetup,
-  updateCloudPermission,
-  acceptExistingContactRequest,
-  updateSecondaryShard,
-  rejectedExistingContactRequest
-} from '../../store/actions/BHR'
-import {
-  updateFCMTokens,
-  notificationsUpdated,
-  setupNotificationList,
-  updateNotificationList,
-  updateMessageStatusInApp,
-  updateMessageStatus,
-  getMessages,
-  notificationPressed,
-} from '../../store/actions/notifications'
-import {
-  setCurrencyCode,
-  setCardData,
-  setIsPermissionGiven,
-} from '../../store/actions/preferences'
-import {
-  processDeepLink,
-} from '../../common/CommonFunctions/index'
-import {
-  addTransferDetails,
-  fetchFeeRates,
-  fetchExchangeRates,
-  recomputeNetBalance
-} from '../../store/actions/accounts'
 import {
   AccountType,
   DeepLinkEncryptionType,
@@ -101,29 +35,88 @@ import {
   Trusted_Contacts,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
-import {
-  updatePreference,
-  setFCMToken,
-  setSecondaryDeviceAddress,
-} from '../../store/actions/preferences'
-import { setVersion } from '../../store/actions/versionHistory'
-import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../../store/actions/SwanIntegration'
-import { clearRampCache } from '../../store/actions/RampIntegration'
-import { clearWyreCache } from '../../store/actions/WyreIntegration'
-import { setCloudData } from '../../store/actions/cloud'
-import { setShowAllAccount } from '../../store/actions/accounts'
-import {
-  updateLastSeen
-} from '../../store/actions/preferences'
-import { RFValue } from 'react-native-responsive-fontsize'
-import Fonts from '../../common/Fonts'
-import AcceptGift from '../../pages/FriendsAndFamily/AcceptGift'
-import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
-import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Relay from '../../bitcoin/utilities/Relay'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import Colors from '../../common/Colors'
+import {
+  getCurrencyImageByRegion,
+  processDeepLink,
+  processRequestQR,
+} from '../../common/CommonFunctions/index'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
+import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
+import AccountShell from '../../common/data/models/AccountShell'
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
+import Fonts from '../../common/Fonts'
+import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
+import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
+import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
 import ClipboardAutoRead from '../../components/ClipboardAutoRead'
-import LinearGradient from 'react-native-linear-gradient'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
+import HomeHeader from '../../components/home/home-header_update'
+import ModalContainer from '../../components/home/ModalContainer'
+import { NotificationType } from '../../components/home/NotificationType'
+import NotificationInfoContents from '../../components/NotificationInfoContents'
+import NotificationListContent from '../../components/NotificationListContent'
+import Toast from '../../components/Toast'
+import BottomSheetHeader from '../../pages/Accounts/BottomSheetHeader'
+import AddContactAddressBook from '../../pages/Contacts/AddContactAddressBook'
+import AcceptGift from '../../pages/FriendsAndFamily/AcceptGift'
+import TrustedContactRequestContent from '../../pages/Home/TrustedContactRequestContent'
+import {
+  addTransferDetails,
+  fetchExchangeRates,
+  fetchFeeRates,
+  recomputeNetBalance,
+  setShowAllAccount
+} from '../../store/actions/accounts'
+import {
+  acceptExistingContactRequest,
+  initializeHealthSetup,
+  rejectedExistingContactRequest,
+  updateCloudPermission,
+  updateSecondaryShard
+} from '../../store/actions/BHR'
+import { setCloudData } from '../../store/actions/cloud'
+import {
+  getMessages,
+  notificationPressed,
+  notificationsUpdated,
+  setupNotificationList,
+  updateFCMTokens,
+  updateMessageStatus,
+  updateMessageStatusInApp,
+  updateNotificationList,
+} from '../../store/actions/notifications'
+import {
+  setCardData,
+  setCurrencyCode,
+  setFCMToken,
+  setIsPermissionGiven,
+  setSecondaryDeviceAddress,
+  updateLastSeen,
+  updatePreference,
+} from '../../store/actions/preferences'
+import { clearRampCache } from '../../store/actions/RampIntegration'
+import { credsAuthenticated } from '../../store/actions/setupAndAuth'
+import { clearSwanCache, createTempSwanAccountInfo, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import {
+  fetchGiftFromTemporaryChannel,
+  initializeTrustedContact,
+  InitTrustedContactFlowKind,
+  PermanentChannelsSyncKind,
+  rejectGift,
+  rejectTrustedContact,
+  syncPermanentChannels,
+} from '../../store/actions/trustedContacts'
+import { setVersion } from '../../store/actions/versionHistory'
+import { clearWyreCache } from '../../store/actions/WyreIntegration'
+import { AccountsState } from '../../store/reducers/accounts'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import { resetToHomeAction } from '../actions/NavigationActions'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -1685,7 +1678,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   : 0,
         }}
       >
-        <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+        <LinearGradient colors={[ Colors.blue, Colors.blue ]}
           locations={[ 0.55, 1 ]}
           style={{
             width: '100%',
