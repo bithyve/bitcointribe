@@ -12,6 +12,7 @@ import BitcoinDevKit
 @objc class RGBHelper : NSObject {
   
   var rgbManager : RgbManager
+  var TAG = "TRIBE-RGB"
   
   override init() {
     self.rgbManager = RgbManager.shared
@@ -22,7 +23,7 @@ import BitcoinDevKit
     let walletData = WalletData(dataDir: "", bitcoinNetwork: RgbLib.BitcoinNetwork.testnet, databaseType: RgbLib.DatabaseType.sqlite, pubkey: "", mnemonic: "")
     do{
       let wallet = try Wallet(walletData: walletData)
-      let address = try wallet.blind(assetId: nil, amount: nil, durationSeconds: 86400, consignmentEndpoints: [Constants.proxyConsignmentEndpoint])
+      let address = try wallet.blind(assetId: nil, amount: nil, durationSeconds: 86400, transportEndpoints: [Constants.proxyConsignmentEndpoint])
     } catch{
       
     }
@@ -42,8 +43,8 @@ import BitcoinDevKit
       jsonObject["ticker"] = metaData.ticker
       jsonObject["description"] = metaData.description
       jsonObject["timestamp"] = metaData.timestamp
-      jsonObject["assetType"] = "\(metaData.assetType)"
-      jsonObject["parentId"] = metaData.parentId
+      jsonObject["assetType"] = "\(metaData.assetIface)"
+      //jsonObject["parentId"] = metaData.parentId
       jsonObject["issuedSupply"] = metaData.issuedSupply
 
       let jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted)
@@ -73,11 +74,11 @@ import BitcoinDevKit
         jsonObject["blindedUtxo"] = transfer.blindedUtxo
         jsonObject["changeUtxo"] = transfer.changeUtxo
         jsonObject["consignmentEndpoints"] =
-          transfer.consignmentEndpoints.map{ endpoint in
+          transfer.transportEndpoints.map{ endpoint in
             return [
               "endpoint": endpoint.endpoint,
               "used": endpoint.used,
-              "protocol": "\(endpoint.protocol)"
+              "transportType": "\(endpoint.transportType)"
               ]
           }
           
@@ -106,7 +107,7 @@ import BitcoinDevKit
   func getRgbAssets()->String{
     do{
       let refresh = try self.rgbManager.rgbWallet!.refresh(online: self.rgbManager.online!, assetId: nil, filter: [RgbLib.RefreshFilter(status: RefreshTransferStatus.waitingCounterparty, incoming: true), RgbLib.RefreshFilter(status: RefreshTransferStatus.waitingCounterparty, incoming: false)])
-      let assets = try self.rgbManager.rgbWallet!.listAssets(filterAssetTypes: [])
+      let assets = try self.rgbManager.rgbWallet!.listAssets(filterAssetIfaces: [])
       var jsonArray = [[String: Any]]()
       var jsonRgb121Array = [[String: Any]]()
       for asset in assets.rgb20! {
@@ -120,7 +121,7 @@ import BitcoinDevKit
         jsonObject["precision"] = asset.precision
         jsonArray.append(jsonObject)
       }
-      for asset in assets.rgb121! {
+      for asset in assets.rgb25! {
         var jsonRgb121Object = [String: Any]()
         jsonRgb121Object["assetId"] = asset.assetId
         jsonRgb121Object["futureBalance"] = asset.balance.future
@@ -129,7 +130,7 @@ import BitcoinDevKit
         jsonRgb121Object["description"] = asset.description
         jsonRgb121Object["name"] = asset.name
         jsonRgb121Object["precision"] = asset.precision
-        jsonRgb121Object["parentId"] = asset.parentId
+        //jsonRgb121Object["parentId"] = asset.parentId
 
         var jsonDataPaths: [[String: Any]] = []
 
@@ -159,9 +160,9 @@ import BitcoinDevKit
   
   func genReceiveData(mnemonic: String, btcNetwotk: String)->String{
     do{
-      let refresh = try self.rgbManager.rgbWallet!.refresh(online: self.rgbManager.online!, assetId: nil, filter: [RgbLib.RefreshFilter(status: RefreshTransferStatus.waitingCounterparty, incoming: true), RgbLib.RefreshFilter(status: RefreshTransferStatus.waitingCounterparty, incoming: false)])
-      
-      let bindData = try self.rgbManager.rgbWallet!.blind(assetId: nil, amount: nil, durationSeconds: 86400, consignmentEndpoints: [Constants.proxyConsignmentEndpoint])
+      let refresh_ = try self.rgbManager.rgbWallet!.refresh(online: self.rgbManager.online!, assetId: nil, filter: [RgbLib.RefreshFilter(status: RefreshTransferStatus.waitingCounterparty, incoming: true), RgbLib.RefreshFilter(status: RefreshTransferStatus.waitingCounterparty, incoming: false)])
+      print("\(TAG) refresh_\(refresh_)")
+      let bindData = try self.rgbManager.rgbWallet!.blind(assetId: nil, amount: nil, durationSeconds: 86400, transportEndpoints: [Constants.proxyConsignmentEndpoint])
       let data: [String: Any] = [
         "invoice": bindData.invoice,
         "blindedUtxo": bindData.blindedUtxo,
@@ -172,14 +173,15 @@ import BitcoinDevKit
       return json
       
     }catch{
-      print("Type of error")
+      print("\(TAG)  Type of error")
       print(type(of: error))
-      print("ERROR: \(error)")
+      print("\(TAG) ERROR: \(error)")
     let address = self.rgbManager.rgbWallet!.getAddress()
+      print("address :\(address)")
       let bdkWallet = BDKHelper.getWallet(mnemonic: mnemonic, network: btcNetwotk)
       BDKHelper.sync(wallet: bdkWallet!)
       do{
-        let txid = BDKHelper.sendToAddress(address: address, amount: 9000, fee: 3.0, wallet: bdkWallet!)
+        let txid = BDKHelper.sendToAddress(address: address, amount: UInt64(Constants.satsForRgb), fee: 3.0, wallet: bdkWallet!)
 
         if(txid != "") {
           var newUTXOs = UInt8(0)
@@ -205,7 +207,7 @@ import BitcoinDevKit
         return json
 
       }catch{
-        print(error)
+        print("\(TAG) \(error)")
       }
       return "\(error)"
 
@@ -345,8 +347,8 @@ import BitcoinDevKit
   }
   
   @objc func issueRgb121Asset(name: String, description: String, supply: String, filePath: String, callback: @escaping ((String) -> Void)) -> Void{
-    do{
-      let asset = try self.rgbManager.rgbWallet?.issueAssetRgb121(online: self.rgbManager.online!, name: name, description: description, precision: 0, amounts: [UInt64(UInt64(supply)!)], parentId: nil, filePath: filePath)
+    /*do{
+      let asset = try self.rgbManager.rgbWallet?.issueAssetRgb25(online: self.rgbManager.online!, name: name, description: description, precision: 0, amounts: [UInt64(UInt64(supply)!)], parentId: nil, filePath: filePath)
       let data: [String: Any] = [
         "assetId": asset?.assetId,
         "name": asset?.name,
@@ -362,12 +364,12 @@ import BitcoinDevKit
     } catch{
       print(error)
       callback("{error:\(error.localizedDescription)}")
-    }
+    }*/
   }
   
   @objc func sendAsset(blindedUtxo: String, assetId: String){
     var recipientMap: [String: [Recipient]] = [:]
-    let recipient = Recipient(blindedUtxo: blindedUtxo, amount: 100, consignmentEndpoints: ["endpoint1", "endpoint2"])
+    let recipient = Recipient(blindedUtxo: blindedUtxo, amount: 100, transportEndpoints: ["endpoint1", "endpoint2"])
     recipientMap[assetId] = [recipient]
     
     
