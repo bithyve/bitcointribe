@@ -90,6 +90,23 @@ class RGBModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
     }
 
     @ReactMethod
+    fun issueRgb25Asset( description: String, name: String, supply: String,filePath: String, promise: Promise){
+        Log.d(TAG, "issueRgb25Asset: ${name}")
+        try {
+            val amounts = listOf(supply)
+            val response = RGBHelper.issueRgb25Asset(description, name, amounts.map { it.toULong() }, filePath)
+            promise.resolve(response)
+        }catch (e: Exception) {
+            Log.d(TAG, "issueRgb20Asset:e.message ${e.message}")
+
+            val message = e.message
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("error", message)
+            promise.resolve(jsonObject.toString())
+        }
+    }
+
+    @ReactMethod
     fun getRgbAssetMetaData( assetId: String, promise: Promise){
         promise.resolve(RGBHelper.getMetadata(assetId))
     }

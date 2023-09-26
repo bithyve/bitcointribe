@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.rgbtools.AssetRgb20
+import org.rgbtools.AssetRgb25
 import org.rgbtools.Balance
 import org.rgbtools.BlindData
 import org.rgbtools.Metadata
@@ -160,7 +161,24 @@ object RGBHelper {
         }
     }
 
-    fun issueAssetRgb20(ticker: String, name: String, amounts: List<ULong>): AssetRgb20 {
+    fun issueRgb25Asset(description: String, name: String, amounts: List<ULong>, filePath: String): String {
+        return try {
+            Log.d(TAG, "issueRgb25Asset: filePath= $filePath name= $name")
+            //checkMaxAssets()
+            val contract = handleMissingFunds { issueAssetRgb25(description, name, amounts, filePath) }
+            val gson = Gson()
+            val json = gson.toJson(contract)
+            return json.toString()
+        }catch (e: Exception) {
+            Log.d(TAG, "issueRgb25Asset: Exception= ${e.message}")
+            val message = e.message
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("error", message)
+            return jsonObject.toString()
+        }
+    }
+
+    private fun issueAssetRgb20(ticker: String, name: String, amounts: List<ULong>): AssetRgb20 {
          val asset = RGBWalletRepository.wallet.issueAssetRgb20(
             RGBWalletRepository.online,
             ticker,
@@ -169,6 +187,19 @@ object RGBHelper {
             amounts
         )
         Log.d(TAG, "issueAssetRgb20: New asset = ${asset.assetId}")
+        return  asset
+    }
+
+    private fun issueAssetRgb25(description: String, name: String, amounts: List<ULong>, filePath: String): AssetRgb25 {
+        val asset = RGBWalletRepository.wallet.issueAssetRgb25(
+            RGBWalletRepository.online,
+            name,
+            description,
+            AppConstants.rgbDefaultPrecision,
+            amounts,
+            filePath
+        )
+        Log.d(TAG, "issueAssetRgb25: New asset = ${asset.assetId}")
         return  asset
     }
 
