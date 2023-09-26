@@ -491,7 +491,7 @@ class FriendsAndFamilyScreen extends React.Component<
     } = this.state
     return (
       <View style={{
-        backgroundColor: Colors.darkBlue
+        backgroundColor: Colors.blue
       }}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         <View style={styles.accountCardsSectionContainer}>
@@ -529,7 +529,7 @@ class FriendsAndFamilyScreen extends React.Component<
               flex:1, paddingLeft: 10
             }}>
               <Text style={styles.giftText}>All Gifts</Text>
-              <Text numberOfLines={2} style={styles.giftDescText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</Text>
+              <Text numberOfLines={2} style={styles.giftDescText}>All the gifts you have created, not sent, and gifts you have received</Text>
             </View>
             <ArrowRight />
           </TouchableOpacity>

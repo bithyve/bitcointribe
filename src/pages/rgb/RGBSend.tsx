@@ -1,20 +1,18 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, SafeAreaView, StatusBar } from 'react-native'
-import ListStyles from '../../common/Styles/ListStyles'
-import FormStyles from '../../common/Styles/FormStyles'
+import React, { useState } from 'react'
+import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { Input } from 'react-native-elements'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
-import Colors from '../../common/Colors'
 import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import Fonts from '../../common/Fonts'
-import { translations } from '../../common/content/LocContext'
-import LinearGradient from 'react-native-linear-gradient'
-import CommonStyles from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { hp } from '../../common/data/responsiveness/responsive'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import FormStyles from '../../common/Styles/FormStyles'
+import CommonStyles from '../../common/Styles/Styles'
+import { translations } from '../../common/content/LocContext'
 
 export default function RGBSend ( props ) {
   const strings  = translations[ 'settings' ]
@@ -23,50 +21,54 @@ export default function RGBSend ( props ) {
   const [ payTo, setPayTo ] = useState( '' )
   const [ amount, setamount ] = useState( '' )
   const [ fee, setfee ] = useState( '' )
-  
+
   function SendButtonClick() {
 
   }
   return (
-<View style={{
+    <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
+
       <SafeAreaView style={{
         flex: 0
       }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={CommonStyles.headerContainer}>
-              <TouchableOpacity
-                style={CommonStyles.headerLeftIconContainer}
-                onPress={() => {
-                  props.navigation.goBack()
-                }}
-              >
-                <View style={CommonStyles.headerLeftIconInnerContainer}>
-                  <FontAwesome
-                    name="long-arrow-left"
-                    color={Colors.homepageButtonColor}
-                    size={17}
-                  />
-                </View>
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.headerTitleText}>{common.send}</Text>
-            <Text style={styles.headerSubTitleText}>{'Lorem ipsum dolor sit amet, consec tetur'}</Text>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.headerTitleText}>{common.send}</Text>
+      <Text style={styles.headerSubTitleText}>{'Enter Bitcoin address manually'}</Text>
 
-      <View style={[ListStyles.infoHeaderSection, {height: '20%',flexDirection: 'row'
-            }]}>
-      <Text style={[styles.infoHeaderText, {color: Colors.THEAM_INFO_TEXT_COLOR, paddingTop: 15}]}>{'Sending From:'}</Text>
+      {/* <View style={[ ListStyles.infoHeaderSection, {
+        height: '20%', flexDirection: 'row'
+      } ]}>
+        <Text style={[ styles.infoHeaderText, {
+          color: Colors.THEAM_INFO_TEXT_COLOR, paddingTop: 15
+        } ]}>{'Sending From:'}</Text>
         <View style={{
-            height: '20%',
-            justifyContent: 'space-between',
-            paddingHorizontal:hp(4),
+          height: '20%',
+          justifyContent: 'space-between',
+          paddingHorizontal:hp( 4 ),
         }}>
           <Text style={ListStyles.infoHeaderTitleText}>{'Savings Account'}</Text>
           <Text numberOfLines={2} style={styles.infoHeaderText}>{'Available to spend 5,000 sats'}</Text>
 
         </View>
-      </View>
+      </View> */}
 
       <View style={styles.bodySection}>
         <Input
@@ -101,7 +103,7 @@ export default function RGBSend ( props ) {
           keyboardType="number-pad"
           numberOfLines={1}
         />
-         <Input
+        <Input
           inputContainerStyle={[
             FormStyles.textInputContainer,
             styles.textInputContainer,
@@ -117,21 +119,21 @@ export default function RGBSend ( props ) {
           keyboardType="number-pad"
           numberOfLines={1}
         />
-         <View style={styles.footerSection}>
-        <TouchableOpacity onPress={SendButtonClick}>
-          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-            start={{
-              x: 0, y: 0
-            }} end={{
-              x: 1, y: 0
-            }}
-            locations={[ 0.2, 1 ]}
-            style={styles.sendBtnWrapper}
-          >
-            <Text style={styles.sendBtnText}>{common.send}</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.footerSection}>
+          <TouchableOpacity onPress={SendButtonClick}>
+            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+              start={{
+                x: 0, y: 0
+              }} end={{
+                x: 1, y: 0
+              }}
+              locations={[ 0.2, 1 ]}
+              style={styles.sendBtnWrapper}
+            >
+              <Text style={styles.sendBtnText}>{common.send}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   )
@@ -175,12 +177,13 @@ const styles = StyleSheet.create( {
     color: Colors.THEAM_INFO_TEXT_COLOR,
     fontFamily: Fonts.Regular,
     marginLeft: 20,
-    marginTop:3
+    marginTop:3,
+    marginBottom:20
   },
   infoHeaderText: {
     fontSize: RFValue( 12 ),
     color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
     fontFamily: Fonts.Regular,
   },
-  
+
 } )
