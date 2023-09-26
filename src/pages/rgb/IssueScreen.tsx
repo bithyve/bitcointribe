@@ -33,7 +33,7 @@ export default function IssueScreen( props ) {
     try {
       if( issueType === 'collectible' ) {
         setRequesting( true )
-        const newAsset = await RGBServices.issueRgb121Asset( name, description, totalAmount, attachedfile )
+        const newAsset = await RGBServices.issueRgb25Asset( name, description, totalAmount, attachedfile )
         setRequesting( false )
         if( newAsset.assetId ) {
           props.navigation.goBack()

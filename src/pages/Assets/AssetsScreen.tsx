@@ -36,7 +36,7 @@ export enum BottomSheetState {
   Open,
 }
 export default function AssetsScreen( props ) {
-  const { syncing, balances, rgb20Assets, rgb121Assets } = useSelector( state => state.rgb )
+  const { syncing, balances, rgb20Assets, rgb25Assets } = useSelector( state => state.rgb )
   const dispatch = useDispatch()
   const strings = translations[ 'f&f' ]
   const [ selectedTab, setSelectedTab ] = useState( 0 )
@@ -46,7 +46,7 @@ export default function AssetsScreen( props ) {
 
   ] )
   const [ bottomSheetState, setBottomSheetState ] = useState( BottomSheetState.Closed )
-
+  // console.log( 'rgb25Assets', rgb25Assets[ 0 ].dataPaths[ 0 ].filePath )
   useEffect( () => {
     const assets = []
     assets.push( {
@@ -139,7 +139,7 @@ export default function AssetsScreen( props ) {
           />
         </View>
         <Text style={styles.collectibleOuterText}>{item.name}</Text>
-        <Text style={styles.collectibleAmountText}>{item.spendableBalance.toLocaleString()}</Text>
+        <Text style={styles.collectibleAmountText}>{item.balance? item.balance.spendable:item.spendableBalance}</Text>
       </TouchableOpacity>
     )
   }
@@ -238,7 +238,7 @@ export default function AssetsScreen( props ) {
               numColumns={3}
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
-              data={rgb121Assets}
+              data={rgb25Assets}
               animationType={'NONE'}
               style={{
                 marginVertical: 10

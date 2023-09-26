@@ -143,16 +143,14 @@ const AssetMetaData = ( props ) => {
             height: '70%'
           }}/> :
           <ScrollView contentContainerStyle={{
-            padding: 20
+            padding: 20, flex: 1
           }}>
             {
               asset.dataPaths && (
-                <View style={{
-                  marginBottom: 30
-                }}>
+                <View>
                   <Image
                     style={{
-                      height: '90%'
+                      height: '60%'
                     }}
                     resizeMode="contain"
                     source={{

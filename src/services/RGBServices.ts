@@ -110,8 +110,8 @@ export default class RGBServices{
     return JSON.parse( data )
   }
 
-  static issueRgb121Asset = async ( name: string, description: string, supply: string, filePath: string ): Promise<{}> => {
-    const data = await RGB.issueRgb121Asset(
+  static issueRgb25Asset = async ( name: string, description: string, supply: string, filePath: string ): Promise<{}> => {
+    const data = await RGB.issueRgb25Asset(
       description, name, supply, filePath
     )
     console.log( data )
