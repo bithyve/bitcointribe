@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import {
   FlatList,
   Image,
+  Platform,
   RefreshControl,
   ScrollView,
   StatusBar,
@@ -134,7 +135,10 @@ export default function AssetsScreen( props ) {
         <View style={index == 7 ? styles.randomImageContainer : styles.imageContainer}>
           <Image style={styles.image}
             source={{
-              uri: item.dataPaths[ 0 ].filePath
+              uri: Platform.select( {
+                android: `file://${item.dataPaths[ 0 ].filePath}`,
+                ios: item.dataPaths[ 0 ].filePath
+              } )
             }}
           />
         </View>

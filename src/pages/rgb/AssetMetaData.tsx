@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import {
   ActivityIndicator,
   Image,
+  Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -154,7 +155,10 @@ const AssetMetaData = ( props ) => {
                     }}
                     resizeMode="contain"
                     source={{
-                      uri: asset.dataPaths[ 0 ].filePath
+                      uri: Platform.select( {
+                        android: `file://${asset.dataPaths[ 0 ].filePath}`,
+                        ios: asset.dataPaths[ 0 ].filePath
+                      } )
                     }}
                   />
                   <TouchableOpacity onPress={() => {
