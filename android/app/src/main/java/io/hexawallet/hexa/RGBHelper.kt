@@ -98,8 +98,8 @@ object RGBHelper {
         )
     }
 
-    fun getMetadata(assetID: String): Metadata {
-        return RGBWalletRepository.wallet.getAssetMetadata(RGBWalletRepository.online, assetID)
+    fun getMetadata(assetID: String): String {
+        return Gson().toJson(RGBWalletRepository.wallet.getAssetMetadata(RGBWalletRepository.online, assetID)).toString()
     }
 
     fun getAssetTransfers(assetID: String): String {

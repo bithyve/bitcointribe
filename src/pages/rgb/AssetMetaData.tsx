@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from 'react'
+import moment from 'moment'
+import React, { useEffect, useState } from 'react'
 import {
-  StyleSheet,
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  StatusBar,
-  Text,
   ActivityIndicator,
+  Image,
+  SafeAreaView,
   ScrollView,
-  Image
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
-import CommonStyles from '../../common/Styles/Styles'
-import { RFValue } from 'react-native-responsive-fontsize'
-import RGBServices from '../../services/RGBServices'
-import moment from 'moment'
-import HeaderTitle from '../../components/HeaderTitle'
 import Fonts from '../../common/Fonts'
-import LinearGradient from 'react-native-linear-gradient'
-import { hp, wp } from '../../common/data/responsiveness/responsive'
+import CommonStyles from '../../common/Styles/Styles'
+import { wp } from '../../common/data/responsiveness/responsive'
+import HeaderTitle from '../../components/HeaderTitle'
+import RGBServices from '../../services/RGBServices'
 
 const styles = StyleSheet.create( {
   lineItem: {
@@ -83,7 +83,7 @@ export const DetailsItem = ( { name, value } ) => {
 
 const AssetMetaData = ( props ) => {
   const [ loading, setLoading ] = useState( true )
-  const asset = props.navigation.getParam( 'asset' )
+  const asset = props.route.params.asset
   const [ metaData, setMetaData ] = useState( {
   } )
 
@@ -161,7 +161,7 @@ const AssetMetaData = ( props ) => {
                   />
                   <TouchableOpacity onPress={() => {
                   }}>
-                    <LinearGradient colors={[ Colors.blue,Colors.blue ]}
+                    <LinearGradient colors={[ Colors.blue, Colors.blue ]}
                       start={{
                         x: 0, y: 0
                       }} end={{
