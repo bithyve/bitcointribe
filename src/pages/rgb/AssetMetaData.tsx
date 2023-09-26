@@ -181,7 +181,7 @@ const AssetMetaData = ( props ) => {
             <Text style={styles.title}>Asset Meta Data</Text>
             <DetailsItem
               name="Asset ID"
-              value={metaData.assetId}
+              value={asset.assetId}
             />
 
             <DetailsItem
@@ -191,7 +191,7 @@ const AssetMetaData = ( props ) => {
 
             <DetailsItem
               name="Asset Type"
-              value={metaData.assetType}
+              value={metaData.assetIface}
             />
 
             <DetailsItem

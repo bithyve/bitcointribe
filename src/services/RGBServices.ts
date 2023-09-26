@@ -1,4 +1,4 @@
-import {  NativeModules } from 'react-native'
+import { NativeModules } from 'react-native'
 import { NetworkType, RGBConfig } from '../bitcoin/utilities/Interface'
 
 const { RGB } = NativeModules
@@ -59,7 +59,7 @@ export default class RGBServices{
   }
 
   static syncRgbAssets = async ( mnemonic: string, pubKey: string ): Promise<string> => {
-    const assets = await RGB.syncRgbAsset(
+    const assets = await RGB.syncRgbAssets(
       mnemonic,
       pubKey,
       NETWORK
