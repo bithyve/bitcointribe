@@ -1,26 +1,23 @@
 import NavStyles from '../../common/Styles/NavStyles'
-import { NavigationScreenConfig } from 'react-navigation'
-import { NavigationStackOptions } from 'react-navigation-stack'
+import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import { Platform } from 'react-native'
 
-
-export type NavigationOptions = NavigationScreenConfig<NavigationStackOptions, any>;
-
-
-const defaultStackScreenNavigationOptions: NavigationScreenConfig<NavigationStackOptions, any> = {
+const defaultStackScreenNavigationOptions: NativeStackNavigationOptions = {
   headerTitleStyle: NavStyles.modalHeaderTitleText,
 
-  headerTitleContainerStyle: {
-    // Prefer left-aligned title text
-    justifyContent: 'flex-start',
+  //TODO:- replace these below commented properties with new style properties
 
-    // offset the spacing applied by default b/w the left container and title container
-    marginLeft: Platform.OS === 'ios' ? -16 : -5,
-  },
+  // headerTitleContainerStyle: {
+  //   // Prefer left-aligned title text
+  //   justifyContent: 'flex-start',
 
-  headerRightContainerStyle: {
-    paddingRight: 16,
-  },
+  //   // offset the spacing applied by default b/w the left container and title container
+  //   marginLeft: Platform.OS === 'ios' ? -16 : -5,
+  // },
+
+  // headerRightContainerStyle: {
+  //   paddingRight: 16,
+  // },
 }
 
 

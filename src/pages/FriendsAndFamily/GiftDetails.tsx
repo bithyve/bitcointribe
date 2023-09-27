@@ -59,7 +59,7 @@ import Feather from 'react-native-vector-icons/Feather'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 
 
-const GiftDetails = ( { navigation } ) => {
+const GiftDetails = ( { route, navigation } ) => {
 
 
   const dispatch = useDispatch()
@@ -77,7 +77,7 @@ const GiftDetails = ( { navigation } ) => {
     gift: Gift;
     avatar: boolean;
     contactDetails: any;
-  } = navigation.state.params
+  } = route.params
 
   const [ isOpen, setIsOpen ] = useState( false )
   const [ acceptGift, setAcceptGiftModal ] = useState( false )
@@ -552,7 +552,7 @@ const GiftDetails = ( { navigation } ) => {
           navigation.navigate( 'EnterGiftDetails', {
             giftId: ( gift as Gift ).id,
             giftMsg:gift.note,
-            setActiveTab: navigation.state.params.setActiveTab
+            setActiveTab: route.params.setActiveTab
           } )
         }, gift.status === GiftStatus.SENT ? 'Resend' : 'Send Gift' ) ) : null}
         {/* Add To Account */}

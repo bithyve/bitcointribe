@@ -73,8 +73,8 @@ const CloudBackupHistory = ( props ) => {
   const [ showAlertModal, setShowAlertModal ]=useState( false )
   const levelData = useSelector( ( state ) => state.bhr.levelData )
   const  keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
-  const SelectedRecoveryKeyNumber = props.navigation.getParam( 'SelectedRecoveryKeyNumber' )
-  const selectedKeeper = props.navigation.getParam( 'selectedKeeper' )
+  const SelectedRecoveryKeyNumber = props.route.params?.SelectedRecoveryKeyNumber
+  const selectedKeeper = props.route.params?.selectedKeeper
   const sortedHistory = ( history ) => {
     if( !history ) return
     const currentHistory = history.filter( ( element ) => {
@@ -240,7 +240,7 @@ const CloudBackupHistory = ( props ) => {
         channelKey: selectedKeeper.channelKey
       },
       index: changeIndex,
-      selectedLevelId: props.navigation.getParam( 'selectedLevelId' )
+      selectedLevelId: props.route.params?.selectedLevelId
     }
     if ( type == 'contact' ) {
       props.navigation.goBack()
@@ -364,7 +364,7 @@ const CloudBackupHistory = ( props ) => {
       <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => {setKeeperTypeModal( false )}} >
         <KeeperTypeModalContents
           selectedType='cloud'
-          selectedLevelId={props.navigation.getParam( 'selectedLevelId' )}
+          selectedLevelId={props.route.params?.selectedLevelId}
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device or Cloud'}
           onPressSetup={async ( type, name ) => {

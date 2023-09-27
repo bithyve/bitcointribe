@@ -1,37 +1,37 @@
-import React, { useState, useCallback, useEffect, useContext } from 'react'
-import {
-  View,
-  StyleSheet,
-  SafeAreaView,
-  StatusBar,
-  TouchableOpacity,
-  ScrollView
-} from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import CommonStyles from '../../common/Styles/Styles'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import TimerModalContents from '../../pages/Contacts/TimerModalContents'
-import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import ShareOtpWithContact from '../NewBHR/ShareOtpWithTrustedContact'
-import ModalContainer from '../../components/home/ModalContainer'
-import Secure2FA from '../Contacts/Secure2FAModal'
-import { DeepLinkEncryptionType, KeeperType, MetaShare, QRCodeTypes, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
-import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
-import { updateTrustedContacts } from '../../store/actions/trustedContacts'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
-import Toast from '../../components/Toast'
 import idx from 'idx'
-import { generateDeepLink, getDeepLinkKindFromContactsRelationType } from '../../common/CommonFunctions'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
+import {
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
+import { DeepLinkEncryptionType, KeeperType, QRCodeTypes, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import Colors from '../../common/Colors'
+import { generateDeepLink, getDeepLinkKindFromContactsRelationType } from '../../common/CommonFunctions'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
 import { LocalizationContext } from '../../common/content/LocContext'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import RequestKeyFromContact from '../../components/RequestKeyFromContact'
+import Toast from '../../components/Toast'
+import ModalContainer from '../../components/home/ModalContainer'
+import TimerModalContents from '../../pages/Contacts/TimerModalContents'
+import { updateTrustedContacts } from '../../store/actions/trustedContacts'
+import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
+import Secure2FA from '../Contacts/Secure2FAModal'
+import ShareOtpWithContact from '../NewBHR/ShareOtpWithTrustedContact'
 
 export default function QrAndLink( props ) {
   const { translations, formatString } = useContext( LocalizationContext )
@@ -50,9 +50,9 @@ export default function QrAndLink( props ) {
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
 
-  const Contact  = props.navigation.getParam( 'contact' )
-  const channelKey = props.navigation.getParam( 'channelKey' )
-  const shareType = props.navigation.getParam( 'shareType' )
+  const Contact  = props.route.params?.contact
+  const channelKey = props.route.params?.channelKey
+  const shareType = props.route.params?.shareType
   const trustedContacts: Trusted_Contacts = useTrustedContacts()
   const dispatch = useDispatch()
 
@@ -206,14 +206,15 @@ export default function QrAndLink( props ) {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>
           </TouchableOpacity>
         </View>
         <RequestKeyFromContact
+          navigation={props.navigation}
           isModal={false}
           // headerText={'Request Recovery Secret from trusted contact'}
           subHeaderText={Contact.displayedName || Contact.name ? formatString( strings.withHexa, Contact.displayedName ? Contact.displayedName : Contact.name ) : strings.addKeeper}

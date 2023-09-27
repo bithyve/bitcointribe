@@ -1,18 +1,20 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces';
+import React, { useMemo } from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces'
 
 export type Props = {
   navigation: any;
+  route: any;
 };
 
 
-const TransactionDetailsScreenContainer: React.FC<Props> = ({
+const TransactionDetailsScreenContainer: React.FC<Props> = ( {
   navigation,
-}: Props) => {
-  const transactionID: TransactionDescribing = useMemo(() => {
-    return navigation.getParam('txID');
-  }, [navigation]);
+  route
+}: Props ) => {
+  const transactionID: TransactionDescribing = useMemo( () => {
+    return route.params?.txID
+  }, [ navigation ] )
 
   // const transaction: TransactionDescribing = useTransactionDescription(transactionID);
 
@@ -21,12 +23,12 @@ const TransactionDetailsScreenContainer: React.FC<Props> = ({
       <Text>New TransactionDetails Container</Text>
       <Text>Transaction ID: {transactionID}</Text>
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
   }
-});
+} )
 
-export default TransactionDetailsScreenContainer;
+export default TransactionDetailsScreenContainer

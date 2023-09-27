@@ -1,12 +1,11 @@
-import React, {useContext, useEffect, useState} from 'react'
-import { View, Text, Image, Platform, PermissionsAndroid } from 'react-native'
-import * as Permissions from 'expo-permissions'
+import * as ExpoContacts from 'expo-contacts'
+import React, { useContext, useEffect, useState } from 'react'
+import { Image, PermissionsAndroid, Platform, Text, View } from 'react-native'
 import Colors from '../common/Colors'
-import ImageStyles from '../common/Styles/ImageStyles'
 import { nameToInitials } from '../common/CommonFunctions'
-import { RecipientDescribing } from '../common/data/models/interfaces/RecipientDescribing'
-import RecipientKind from '../common/data/enums/RecipientKind'
 import { LocalizationContext } from '../common/content/LocContext'
+import RecipientKind from '../common/data/enums/RecipientKind'
+import { RecipientDescribing } from '../common/data/models/interfaces/RecipientDescribing'
 
 export type Props = {
   recipient: RecipientDescribing;
@@ -18,7 +17,7 @@ const RecipientAvatar: React.FC<Props> = ( {
   recipient,
   contentContainerStyle
 }: Props ) => {
-  const [contactPermission, setContactPermission] = useState(false)
+  const [ contactPermission, setContactPermission ] = useState( false )
 
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
@@ -26,7 +25,7 @@ const RecipientAvatar: React.FC<Props> = ( {
 
   const checkForContactPermissions = async () => {
     try {
-      if (Platform.OS === 'android') {
+      if ( Platform.OS === 'android' ) {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.READ_CONTACTS, {
             title: strings.hexaWould,
@@ -36,28 +35,28 @@ const RecipientAvatar: React.FC<Props> = ( {
           }
         )
         if ( granted !== PermissionsAndroid.RESULTS.GRANTED ) {
-          setContactPermission(false)
+          setContactPermission( false )
         } else {
-          setContactPermission(true)
+          setContactPermission( true )
         }
-      } else if (Platform.OS === 'ios') {
-        const { status } = await Permissions.getAsync( Permissions.CONTACTS )
+      } else if ( Platform.OS === 'ios' ) {
+        const { status } = await ExpoContacts.requestPermissionsAsync()
         if ( status === 'denied' ) {
-          setContactPermission(false)
+          setContactPermission( false )
         } else {
-          setContactPermission(true)
+          setContactPermission( true )
         }
       }
-    } catch (e) {
-      console.log("PERMISSION_ERROR", e)
+    } catch ( e ) {
+      console.log( 'PERMISSION_ERROR', e )
     }
   }
 
-  useEffect(() => {
-    checkForContactPermissions();
-  }, [contactPermission])
+  useEffect( () => {
+    checkForContactPermissions()
+  }, [ contactPermission ] )
 
-  if ( contactPermission && (recipient.avatarImageSource || recipient.image) ) {
+  if ( contactPermission && ( recipient.avatarImageSource || recipient.image ) ) {
     return (
       <View
         style={{

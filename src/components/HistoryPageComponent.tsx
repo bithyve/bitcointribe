@@ -1,19 +1,18 @@
 import React, { useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   ScrollView,
-  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
-import Fonts from '../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 import Colors from '../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
+import Fonts from '../common/Fonts'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import BottomInfoBox from './BottomInfoBox'
 
@@ -136,6 +135,7 @@ const HistoryPageComponent = ( props ) => {
             {[ 1, 2, 3, 4 ].map( ( value ) => {
               return (
                 <View
+                  key={value}
                   style={{
                     margin: wp( '3%' ),
                     backgroundColor: Colors.white,

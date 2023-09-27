@@ -20,14 +20,14 @@ const TrustedContacts = ( props ) => {
   }, [] )
 
   const onPressContinue = useCallback( () => {
-    props.navigation.state.params.onPressContinue( contacts )
-  }, [ contacts, props.navigation.state.params.onPressContinue ] )
+    props.route.params?.onPressContinue( contacts )
+  }, [ contacts, props.route.params?.onPressContinue ] )
 
   const onPressSkip = () => {
     const contactDummy = {
       id: uuid(),
     }
-    props.navigation.state.params.onPressContinue( [ contactDummy ] )
+    props.route.params?.onPressContinue( [ contactDummy ] )
   }
 
   const renderContactList = useCallback(
@@ -126,7 +126,7 @@ const TrustedContacts = ( props ) => {
             send Recovery Keys
           </Text>
         </Text>
-        {props.navigation.state.params.LoadContacts ? renderContactList() : null}
+        {props.route.params?.LoadContacts ? renderContactList() : null}
       </View>
     </SafeAreaView>
   )

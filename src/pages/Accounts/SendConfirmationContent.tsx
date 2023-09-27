@@ -1,29 +1,28 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
-  View,
   Image,
-  Text,
   StyleSheet,
-  Platform,
+  Text,
+  View
 } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import { ScrollView } from 'react-native-gesture-handler'
+import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import { ScrollView } from 'react-native-gesture-handler'
-import RecipientComponent from './RecipientComponent'
-import DeviceInfo from 'react-native-device-info'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import LinearGradient from 'react-native-linear-gradient'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import RecipientComponent from './RecipientComponent'
 
 export default function SendConfirmationContent( props ) {
   const renderRecipientItem = ( recipient: RecipientDescribing ) => {
     return (
       <RecipientComponent
+        key={recipient.id}
         recipient={recipient}
         selectedContactId={'0'}
         accountKind={props.accountKind}

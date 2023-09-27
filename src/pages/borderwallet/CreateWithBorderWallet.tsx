@@ -23,7 +23,7 @@ import Fonts from '../../common/Fonts'
 const CreateWithBorderWallet = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'Generate New Entropy Grid' )
   const [ generateEntropyGrid, setGenerateEntropyGrid ] = useState( false )
-  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
+  const isAccountCreation = props.route.params?.isAccountCreation || false
 
   const mnemonic =  bip39.generateMnemonic()
 
@@ -87,10 +87,10 @@ const CreateWithBorderWallet = ( props ) => {
                 mnemonic,
                 isAccountCreation,
               } ):
-              props.navigation.navigate( 'SelectEntropyGridType', {
-                mnemonic,
-                isAccountCreation,
-              } )
+                props.navigation.navigate( 'SelectEntropyGridType', {
+                  mnemonic,
+                  isAccountCreation,
+                } )
             }}
           >
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}

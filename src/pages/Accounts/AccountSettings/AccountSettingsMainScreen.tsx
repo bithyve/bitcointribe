@@ -27,6 +27,7 @@ const SELECTABLE_VISIBILITY_OPTIONS = [
 
 export type Props = {
   navigation: any;
+  route: any;
 };
 
 export type SettingsListItem = {
@@ -41,10 +42,8 @@ export type SettingsListItem = {
 const listItemKeyExtractor = ( item: SettingsListItem ) => item.title
 
 
-const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-  const accountShellID = useMemo( () => {
-    return navigation.getParam( 'accountShellID' )
-  }, [ navigation ] )
+const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
+  const accountShellID = route.params?.accountShellID;
   const dispatch = useDispatch()
   const strings  = translations[ 'accounts' ]
   const [ showRescanning, setShowRescanning ] = useState( false )
@@ -232,7 +231,6 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
         isError={false}
         onProceed={() => {
           handleAccountArchive()
-          // closeArchiveModal()
           setShowAccountArchiveModal( false )
         }}
         onBack={() => setShowAccountArchiveModal( false )}
@@ -246,46 +244,17 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
     if ( primarySubAccount.balances.confirmed + primarySubAccount.balances.unconfirmed === 0 ) {
       setShowAccountArchiveModal( true )
     } else {
-      // checkAccountBalance()
       setCheckAccountModal( true )
     }
   }
 
   function handleTransactionDataSelectionFromRescan( transactionData: RescannedTransactionData ) {
-    // dismissBottomSheet()
     setShowRescanning( false )
     navigation.navigate( 'TransactionDetails', {
       transaction: transactionData.details,
       accountShellID: accountShell.id,
     } )
   }
-
-  // const showRescanningPromptBottomSheet = () => {
-  //   return (
-  //     <AccountShellRescanningPromptBottomSheet
-  //       onContinue={() => {
-  //         setShowRescanningPrompt( false )
-  //         setTimeout( () => {
-  //           // showRescanningBottomSheet()
-  //           setShowRescanning( true )
-  //         }, 800 )
-  //       }}
-  //       onDismiss={() => setShowRescanningPrompt( false )}
-  //     />
-  //   )
-  // }
-
-
-  // const showRescanningBottomSheet = () => {
-  //   return (
-  //     <AccountShellRescanningBottomSheet
-  //       accountShell={accountShell}
-  //       onDismiss={() => setShowRescanning( false )}
-  //       onTransactionDataSelected={handleTransactionDataSelectionFromRescan}
-  //     />
-  //   )
-  // }
-
 
   return (
     <>
@@ -306,14 +275,6 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       <ModalContainer onBackground={()=>setCheckAccountModal( false )} visible={checkAccountModal} closeBottomSheet={() => {}}>
         {checkAccountBalance()}
       </ModalContainer>
-
-      {/* <ModalContainer onBackground={()=>setShowRescanningPrompt( false )} visible={showRescanningPrompt} closeBottomSheet={() => {}}>
-        {showRescanningPromptBottomSheet()}
-      </ModalContainer>
-
-      <ModalContainer onBackground={()=>setShowRescanning( false )} visible={showRescanning} closeBottomSheet={() => {}}>
-        {showRescanningBottomSheet()}
-      </ModalContainer> */}
     </>
   )
 }

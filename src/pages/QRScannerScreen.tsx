@@ -20,10 +20,11 @@ import getFormattedStringFromQRString from '../utils/qr-codes/GetFormattedString
 
 export type Props = {
   navigation: any;
+  route: any;
 };
 
-const QRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-  const title = navigation.getParam( 'title' )
+const QRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
+  const title = route.params.title;
   const cameraRef = createRef<RNCamera>()
   const [ isCameraOpen, setIsCameraOpen ] = useState( true )
   const [ scanQRFlag, setScanQRFlag ] = useState( [ RNCamera.Constants.BarCodeType.qr ] )
@@ -33,7 +34,7 @@ const QRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
       setScanQRFlag( [] )
       setIsCameraOpen( false )
 
-      navigation.state.params.onCodeScanned(
+      route.params?.onCodeScanned(
         getFormattedStringFromQRString( barcodes.data ),
       )
 

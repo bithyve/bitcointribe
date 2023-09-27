@@ -21,7 +21,7 @@ import {
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { useSelector } from 'react-redux'
-import { withNavigation } from 'react-navigation'
+import { useNavigation } from '@react-navigation/native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Wallet } from '../../bitcoin/utilities/Interface'
 
@@ -33,6 +33,8 @@ function validateAllowedCharacters( answer: string ): boolean {
 }
 
 function SecuritySeedWord( props ) {
+  const navigation: any = useNavigation()
+
   const { security }: Wallet = useSelector(
     ( state ) => state.storage.wallet,
   )
@@ -57,7 +59,7 @@ function SecuritySeedWord( props ) {
       } else {
         if( !props.title1 ) {
           props.onClose()
-          props.navigation.navigate( 'ReLogin', {
+          navigation.navigate( 'ReLogin', {
             isPasscodeCheck: true,
             onPasscodeVerify: props.onPasscodeVerify ? props.onPasscodeVerify : null
           } )
@@ -295,7 +297,7 @@ function SecuritySeedWord( props ) {
   )
 }
 
-export default withNavigation( SecuritySeedWord )
+export default  SecuritySeedWord
 
 const styles = StyleSheet.create( {
   modalContentContainer: {

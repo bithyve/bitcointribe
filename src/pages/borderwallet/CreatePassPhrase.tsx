@@ -38,11 +38,11 @@ const CreatePassPhrase = ( props ) => {
     translations[ 'bhr' ].Preloading,
   ]
   const bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
-  const mnemonic = props.navigation.getParam( 'mnemonic' )
-  const selected = props.navigation.getParam( 'selected' )
-  const isNewWallet = props.navigation.getParam( 'isNewWallet' )
-  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
-  const checksumWord = props.navigation.getParam( 'checksumWord' )
+  const mnemonic = props.route.params?.mnemonic
+  const selected = props.route.params?.selected
+  const isNewWallet = props.route.params?.isNewWallet
+  const isAccountCreation =  props.route.params?.isAccountCreation
+  const checksumWord = props.route.params?.checksumWord
   const [ headerTitle, setHeaderTitle ]=useState( 'Add Passphrase (optional)' )
   const [ passphrase, setpassphrase ] = useState( '' )
   const [ confirmPassphrase, setConfirmPassphrase ] = useState( '' )
@@ -101,16 +101,16 @@ const CreatePassPhrase = ( props ) => {
       selected,
       checksumWord,
       mnemonic,
-      initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
-      gridType: props.navigation.getParam( 'gridType' ),
+      initialMnemonic: props.route.params?.initialMnemonic,
+      gridType: props.route.params?.gridType,
       isAccountCreation,
       passphrase: password
     } ) : props.navigation.replace( 'ConfirmDownload', {
       selected,
       checksumWord,
       mnemonic,
-      initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
-      gridType: props.navigation.getParam( 'gridType' ),
+      initialMnemonic: props.route.params?.initialMnemonic,
+      gridType: props.route.params?.gridType,
       isAccountCreation,
       passphrase: password
     } )
@@ -124,7 +124,7 @@ const CreatePassPhrase = ( props ) => {
       setTimeout( () => {
         setLoaderModal( true )
         setTimeout( () => {
-          dispatch( recoverWalletUsingMnemonic( mnemonic, props.navigation.getParam( 'initialMnemonic' ) ) )
+          dispatch( recoverWalletUsingMnemonic( mnemonic, props.route.params?.initialMnemonic  ) )
         }, 500 )
         dispatch( setBorderWalletBackup( true ) )
       }, 1000 )

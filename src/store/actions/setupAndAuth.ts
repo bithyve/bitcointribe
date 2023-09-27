@@ -10,7 +10,6 @@ export const CHANGE_AUTH_CRED = 'CHANGE_AUTH_CRED'
 export const RESET_PIN = 'RESET_PIN'
 export const SWITCH_CREDS_CHANGED = 'SWITCH_CREDS_CHANGED'
 export const INIT_RECOVERY_COMPLETED = 'INIT_RECOVERY_COMPLETED'
-import { AccountType } from '../../bitcoin/utilities/Interface'
 import * as Cipher from '../../common/encryption'
 import * as SecureStore from '../../storage/secure-store'
 

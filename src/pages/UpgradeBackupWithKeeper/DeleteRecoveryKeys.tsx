@@ -1,65 +1,70 @@
-import React, { useState } from 'react';
-import { View, Image, Text, StyleSheet, ImageBackground } from 'react-native';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+import React from 'react'
+import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 
-export default function DeleteRecoveryKeys(props) {
+export default function DeleteRecoveryKeys( props ) {
   return (
     <View style={styles.modalContentContainer}>
       <View style={styles.successModalHeaderView}>
         <Text style={styles.headerTitleText}>{props.title}</Text>
         <Text style={styles.headerInfoText}>{props.subText}</Text>
       </View>
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{
+        flex: 1, justifyContent: 'center', alignItems: 'center'
+      }}>
         {props.dataList.length
-          ? props.dataList.map((item) => (
-              <View style={styles.greyBox}>
-                <ImageBackground
-                  source={require('../../assets/images/icons/Ellipse.png')}
-                  style={{ ...styles.cardsImageView, marginRight: 10 }}
+          ? props.dataList.map( ( item, index ) => (
+            <View key={`${JSON.stringify( item )}_${index}`} style={styles.greyBox}>
+              <ImageBackground
+                source={require( '../../assets/images/icons/Ellipse.png' )}
+                style={{
+                  ...styles.cardsImageView, marginRight: 10
+                }}
+              >
+                <Image
+                  source={
+                    item.type == 'contact'
+                      ? require( '../../assets/images/icons/icon_contact.png' )
+                      : item.type == 'device'
+                        ? require( '../../assets/images/icons/icon_secondarydevice.png' )
+                        : require( '../../assets/images/icons/icon_contact.png' )
+                  }
+                  style={styles.cardImage}
+                />
+              </ImageBackground>
+              <View style={{
+                marginLeft: 5, flex: 1
+              }}>
+                <Text style={styles.greyBoxText}>
+                  {'Delete Recovery Key From'}
+                </Text>
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    ...styles.greyBoxText,
+                    fontSize: RFValue( 20 ),
+                  }}
                 >
-                  <Image
-                    source={
-                      item.type == 'contact'
-                        ? require('../../assets/images/icons/icon_contact.png')
-                        : item.type == 'device'
-                        ? require('../../assets/images/icons/icon_secondarydevice.png')
-                        : require('../../assets/images/icons/icon_contact.png')
-                    }
-                    style={styles.cardImage}
-                  />
-                </ImageBackground>
-                <View style={{ marginLeft: 5, flex: 1 }}>
-                  <Text style={styles.greyBoxText}>
-                    {'Delete Recovery Key From'}
-                  </Text>
-                  <Text
-                    numberOfLines={1}
-                    style={{
-                      ...styles.greyBoxText,
-                      fontSize: RFValue(20),
-                    }}
-                  >
-                    {item.name}
-                  </Text>
-                  <Text
-                    style={{
-                      ...styles.greyBoxText,
-                      fontSize: RFValue(10),
-                    }}
-                  >
-                    {item.typeName}
-                  </Text>
-                </View>
+                  {item.name}
+                </Text>
+                <Text
+                  style={{
+                    ...styles.greyBoxText,
+                    fontSize: RFValue( 10 ),
+                  }}
+                >
+                  {item.typeName}
+                </Text>
               </View>
-            ))
+            </View>
+          ) )
           : null}
       </View>
       <View style={styles.successModalAmountView}>
@@ -81,75 +86,77 @@ export default function DeleteRecoveryKeys(props) {
         </AppBottomSheetTouchableWrapper>
       </View>
     </View>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.Medium,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.Regular,
-    marginTop: wp('1.5%'),
+    marginTop: wp( '1.5%' ),
   },
   bottomInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.Regular,
-    marginBottom: hp('1%'),
+    marginBottom: hp( '1%' ),
     marginTop: 'auto',
   },
   bottomButtonsView: {
-    height: hp('15%'),
+    height: hp( '15%' ),
     flexDirection: 'row',
     alignItems: 'center',
   },
   transparentButtonView: {
-    height: wp('13%'),
-    width: wp('35%'),
+    height: wp( '13%' ),
+    width: wp( '35%' ),
     justifyContent: 'center',
     alignItems: 'center',
   },
   successModalHeaderView: {
-    marginRight: wp('8%'),
-    marginLeft: wp('8%'),
-    marginTop: wp('4%'),
+    marginRight: wp( '8%' ),
+    marginLeft: wp( '8%' ),
+    marginTop: wp( '4%' ),
   },
   successModalAmountView: {
     justifyContent: 'center',
-    marginRight: wp('8%'),
-    marginLeft: wp('8%'),
+    marginRight: wp( '8%' ),
+    marginLeft: wp( '8%' ),
     marginTop: 'auto',
   },
   successModalButtonView: {
-    height: wp('13%'),
-    width: wp('35%'),
+    height: wp( '13%' ),
+    width: wp( '35%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: {
+      width: 15, height: 15
+    },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
-    marginLeft: wp('8%'),
+    marginLeft: wp( '8%' ),
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.Medium,
   },
   greyBox: {
-    width: wp('90%'),
+    width: wp( '90%' ),
     borderRadius: 10,
     backgroundColor: Colors.backgroundColor1,
     padding: 10,
@@ -157,12 +164,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   greyBoxImage: {
-    width: wp('15%'),
-    height: wp('15%'),
+    width: wp( '15%' ),
+    height: wp( '15%' ),
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
-    borderRadius: wp('15%') / 2,
+    borderRadius: wp( '15%' ) / 2,
     borderColor: Colors.white,
     borderWidth: 1,
     shadowOffset: {
@@ -177,25 +184,25 @@ const styles = StyleSheet.create({
   greyBoxText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.Regular,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
   },
   successModalImage: {
-    width: wp('30%'),
-    height: wp('35%'),
+    width: wp( '30%' ),
+    height: wp( '35%' ),
     marginLeft: 'auto',
     resizeMode: 'stretch',
     marginRight: -5,
   },
   cardsImageView: {
-    width: wp('20%'),
-    height: wp('20%'),
+    width: wp( '20%' ),
+    height: wp( '20%' ),
     justifyContent: 'center',
     alignItems: 'center',
   },
   cardImage: {
-    width: wp('7%'),
-    height: wp('7%'),
+    width: wp( '7%' ),
+    height: wp( '7%' ),
     resizeMode: 'contain',
-    marginBottom: wp('1%'),
+    marginBottom: wp( '1%' ),
   },
-});
+} )

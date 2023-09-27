@@ -35,7 +35,7 @@ import { setOpenToApproval } from '../../store/actions/BHR'
 import LinearGradient from 'react-native-linear-gradient'
 
 export default function CheckPasscodeComponent( props ) {
-  const backupType = props.navigation.getParam( 'backupType' )
+  const backupType = props.route.params?.backupType
   console.log( 'backupType', backupType )
   const dispatch = useDispatch()
   const { translations } = useContext( LocalizationContext )

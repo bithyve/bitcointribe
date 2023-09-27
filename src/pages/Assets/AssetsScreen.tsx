@@ -1,31 +1,32 @@
+import StaggeredList from '@mindinventory/react-native-stagger-view'
 import React, { useEffect, useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
+  FlatList,
+  Image,
+  Platform,
+  RefreshControl,
   ScrollView,
   StatusBar,
-  Image,
-  FlatList,
-  RefreshControl
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
+import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import LinearGradient from 'react-native-linear-gradient'
 import { translations } from '../../common/content/LocContext'
-import ModalContainer from '../../components/home/ModalContainer'
 import BottomSheetAddWalletInfo from '../../components/bottom-sheets/add-wallet/BottomSheetAddWalletInfo'
-import BottomSheetCoinsHeader from './BottomSheetCoinsHeader'
-import StaggeredList from '@mindinventory/react-native-stagger-view'
-import { useSelector, useDispatch } from 'react-redux'
+import ModalContainer from '../../components/home/ModalContainer'
 import { syncRgb } from '../../store/actions/rgb'
-import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
+import BottomSheetCoinsHeader from './BottomSheetCoinsHeader'
 
 const keyExtractor = ( item: any ) => item.toString()
 
@@ -36,7 +37,7 @@ export enum BottomSheetState {
   Open,
 }
 export default function AssetsScreen( props ) {
-  const { syncing, balances, rgb20Assets, rgb121Assets } = useSelector( state => state.rgb )
+  const { syncing, balances, rgb20Assets, rgb25Assets } = useSelector( state => state.rgb )
   const dispatch = useDispatch()
   const strings = translations[ 'f&f' ]
   const [ selectedTab, setSelectedTab ] = useState( 0 )
@@ -46,7 +47,7 @@ export default function AssetsScreen( props ) {
 
   ] )
   const [ bottomSheetState, setBottomSheetState ] = useState( BottomSheetState.Closed )
-
+  // console.log( 'rgb25Assets', rgb25Assets[ 0 ].dataPaths[ 0 ].filePath )
   useEffect( () => {
     const assets = []
     assets.push( {
@@ -115,7 +116,7 @@ export default function AssetsScreen( props ) {
         </View>
         <Text numberOfLines={1} style={styles.nameText}>{item.name}</Text>
         <Text style={styles.labelOuterText}>{item.ticker}</Text>
-        <Text style={styles.amountText}>{item.amount.toLocaleString()}</Text>
+        <Text style={styles.amountText}>{item.balance? item.balance.spendable:item.amount}</Text>
       </TouchableOpacity>
     )
   }
@@ -134,12 +135,15 @@ export default function AssetsScreen( props ) {
         <View style={index == 7 ? styles.randomImageContainer : styles.imageContainer}>
           <Image style={styles.image}
             source={{
-              uri: item.dataPaths[ 0 ].filePath
+              uri: Platform.select( {
+                android: `file://${item.dataPaths[ 0 ].filePath}`,
+                ios: item.dataPaths[ 0 ].filePath
+              } )
             }}
           />
         </View>
         <Text style={styles.collectibleOuterText}>{item.name}</Text>
-        <Text style={styles.collectibleAmountText}>{item.spendableBalance.toLocaleString()}</Text>
+        <Text style={styles.collectibleAmountText}>{item.balance? item.balance.spendable:item.spendableBalance}</Text>
       </TouchableOpacity>
     )
   }
@@ -178,7 +182,7 @@ export default function AssetsScreen( props ) {
 
   return (
     <View style={{
-      backgroundColor: Colors.darkBlue
+      backgroundColor: Colors.blue
     }}>
       <ScrollView
         refreshControl={
@@ -198,7 +202,7 @@ export default function AssetsScreen( props ) {
           <TouchableOpacity onPress={() => {
             setBottomSheetState( BottomSheetState.Open )
           }}>
-            <LinearGradient colors={[ Colors.blue ]}
+            <LinearGradient colors={[ Colors.blue, Colors.blue ]}
               start={{
                 x: 0, y: 0
               }} end={{
@@ -238,7 +242,7 @@ export default function AssetsScreen( props ) {
               numColumns={3}
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
-              data={rgb121Assets}
+              data={rgb25Assets}
               animationType={'NONE'}
               style={{
                 marginVertical: 10
@@ -327,11 +331,6 @@ const styles = StyleSheet.create( {
   tabContainer: {
     height: 45, borderRadius: 10, backgroundColor: Colors.white,
     flexDirection: 'row',
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 2, height: 2
-    },
     marginHorizontal: wp( 6 ),
     marginTop: hp( 2 )
   },

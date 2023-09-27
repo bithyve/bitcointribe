@@ -131,9 +131,9 @@ const styles = StyleSheet.create( {
   }
 } )
 
-const PreviewPattern = ( { navigation } ) => {
-  const pattern = navigation.getParam( 'pattern' )
-  const isValidate = navigation.getParam( 'isValidate' ) || false
+const PreviewPattern = ( { route, navigation } ) => {
+  const pattern =  route.params?.pattern
+  const isValidate = route.params?.isValidate|| false
   const columnHeaderRef = useRef()
   const rowHeaderRef = useRef()
   const [ loading, setLoading ] = useState( false )

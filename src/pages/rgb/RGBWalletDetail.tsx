@@ -1,39 +1,39 @@
-import React, { useState, useMemo } from 'react'
+import moment from 'moment'
+import React, { useMemo, useState } from 'react'
 import {
-  StyleSheet,
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  StatusBar,
-  Text,
-  Image,
   FlatList,
-  SectionList,
+  Image,
   RefreshControl,
+  SafeAreaView,
+  SectionList,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Fonts from '../../common/Fonts'
-import Colors from '../../common/Colors'
-import CommonStyles from '../../common/Styles/Styles'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
-import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
-import NetworkKind from '../../common/data/enums/NetworkKind'
+import AccountChecking from '../../assets/images/accIcons/acc_checking.svg'
+import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import { getCurrencyImageByRegion } from '../../common/CommonFunctions'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
 import BitcoinUnit, { displayNameForBitcoinUnit } from '../../common/data/enums/BitcoinUnit'
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
-import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../components/MaterialCurrencyCodeIcon'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import NetworkKind from '../../common/data/enums/NetworkKind'
+import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../components/MaterialCurrencyCodeIcon'
+import { syncRgb } from '../../store/actions/rgb'
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
-import { getCurrencyImageByRegion } from '../../common/CommonFunctions'
-import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
 import DetailsCard from './DetailsCard'
-import AccountChecking from '../../assets/images/accIcons/acc_checking.svg'
-import { syncRgb } from '../../store/actions/rgb'
-import moment from 'moment'
 
 enum SectionKind {
   TOP_TABS,

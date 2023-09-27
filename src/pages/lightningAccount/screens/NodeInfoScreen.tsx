@@ -1,27 +1,27 @@
 /* eslint-disable react/jsx-key */
+import { inject, observer } from 'mobx-react'
 import React, { Component } from 'react'
 import {
-  Text,
-  View,
-  StyleSheet,
-  ScrollView,
   ActivityIndicator,
   Clipboard,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
-  Image
+  View
 } from 'react-native'
-import ListStyles from '../../../common/Styles/ListStyles'
-import Colors from '../../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
-import Fonts from '../../../common/Fonts'
-import HeaderTitle1 from '../../../components/HeaderTitle1'
-import { inject, observer } from 'mobx-react'
-import Toast from '../../../components/Toast'
-import QRCode from '../../../components/QRCode'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
+import Colors from '../../../common/Colors'
+import Fonts from '../../../common/Fonts'
+import ListStyles from '../../../common/Styles/ListStyles'
+import HeaderTitle1 from '../../../components/HeaderTitle1'
+import QRCode from '../../../components/QRCode'
+import Toast from '../../../components/Toast'
 @inject(
   'NodeInfoStore',
 )
@@ -175,8 +175,8 @@ export default class NodeInfoScreen extends Component {
           </View>
           {
             uris.length > 0 && (
-              uris.map( uri => (
-                <View style={[ styles.lineItem, {
+              uris.map( ( uri, index ) => (
+                <View key={`${uri}_${index}`} style={[ styles.lineItem, {
                   alignItems: 'center'
                 } ]}>
                   <View>

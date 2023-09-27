@@ -1,24 +1,24 @@
+import moment from 'moment'
 import React from 'react'
 import {
-  View,
   Image,
-  Text,
   StyleSheet,
+  Text,
+  View,
 } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import moment from 'moment'
-import { UsNumberFormat } from '../../common/utilities'
 import {
-  TEST_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
+  TEST_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
+import { UsNumberFormat } from '../../common/utilities'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import openLink from '../../utils/OpenLink'
 
@@ -249,8 +249,9 @@ export default function TransactionDetailsBottomSheetContent( props ) {
                 ? 'To Addresses'
                 : 'To Address'}
             </Text>
-            {txDetails.recipientAddresses.map( ( address ) => (
+            {txDetails.recipientAddresses.map( ( address, index ) => (
               <Text
+                key={`${address}_${index}`}
                 style={{
                   color: Colors.textColorGrey,
                   fontFamily: Fonts.Regular,
@@ -276,8 +277,9 @@ export default function TransactionDetailsBottomSheetContent( props ) {
                 ? 'From Addresses'
                 : 'From Address'}
             </Text>
-            {txDetails.senderAddresses.map( ( address ) => (
+            {txDetails.senderAddresses.map( ( address, index ) => (
               <Text
+                key={`${address}_${index}`}
                 style={{
                   color: Colors.textColorGrey,
                   fontFamily: Fonts.Regular,

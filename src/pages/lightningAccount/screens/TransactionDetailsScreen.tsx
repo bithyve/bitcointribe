@@ -23,8 +23,8 @@ export default class TransactionDetailsScreen extends Component {
   constructor( props ) {
     super( props )
     this.state = {
-      transaction: this.props.navigation.getParam( 'transaction' ),
-      accountShellId: this.props.navigation.getParam( 'accountShellId' ),
+      transaction: props.route.params?.transaction,
+      accountShellId: props.route.params?.accountShellId,
     }
   }
 

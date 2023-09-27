@@ -67,7 +67,7 @@ export default function NewOwnQuestions( props ) {
   const [ hideShowConfirmAnswer, setHideShowConfirmAnswer ] = useState( true )
   const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
   const dispatch = useDispatch()
-  const walletName = props.navigation.getParam( 'walletName' )
+  const walletName = props.route.params?.walletName
   const [ answerError, setAnswerError ] = useState( '' )
   const [ tempAns, setTempAns ] = useState( '' )
   const [ isEditable, setIsEditable ] = useState( true )

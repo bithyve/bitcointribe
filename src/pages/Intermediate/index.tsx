@@ -1,7 +1,6 @@
 import idx from 'idx'
 import React, { Component } from 'react'
 import { ImageBackground, View, StyleSheet, AppState, Platform, Linking } from 'react-native'
-import { withNavigationFocus } from 'react-navigation'
 import Loader from '../../components/loader'
 import { connect } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -27,6 +26,7 @@ interface IntermediateStateTypes {
 
 class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTypes> {
   url: any;
+  appStateListener: any;
   constructor( props ) {
     super( props )
     this.state = {
@@ -36,7 +36,7 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
   }
 
     componentDidMount = () => {
-      AppState.addEventListener( 'change', this.handleAppStateChange )
+      this.appStateListener = AppState.addEventListener( 'change', this.handleAppStateChange )
       Linking.addEventListener( 'url', this.handleDeepLinkEvent )
       Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {
         url
@@ -121,53 +121,8 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
       }
     };
 
-
-    // handleLockCheck = () => {
-    //   const interval = setInterval( () => {
-    //     // check if it should be rendered
-    //     const TIME_OUT = 15000
-    //     const now: any = new Date()
-    //     const diff = Math.abs( now - this.props.lastSeen )
-    //     const { canLock } = this.state
-    //     if ( diff > TIME_OUT ) {
-    //       if ( canLock ) {
-    //         this.setState( {
-    //           canLock: false
-    //         }, () => {
-    //           this.props.navigation.push( 'ReLogin' )
-    //           clearInterval( interval )
-    //         } )
-    //       }
-    //     } else {
-    //       this.props.navigation.pop()
-    //       this.props.updateLastSeen()
-    //     }
-    //   }, 3000 )
-    // }
-
-
-    // handleAppStateChange = async ( nextAppState ) => {
-    //   const TIME_OUT = 15000
-    //   if ( ( Platform.OS === 'ios' && nextAppState === 'active' ) || ( Platform.OS === 'android' && nextAppState === 'background' ) ) {
-    //     const now: any = new Date()
-    //     const diff = Math.abs( now - this.props.lastSeen )
-    //     const { canLock } = this.state
-    //     if ( diff > TIME_OUT ) {
-    //       if ( canLock ) {
-    //         this.setState( {
-    //           canLock: false
-    //         }, () => this.props.navigation.push( 'ReLogin' ) )
-    //       }
-    //     } else {
-    //       this.props.navigation.pop()
-    //       this.props.updateLastSeen( new Date() )
-    //     }
-    //   }
-    // };
-
-
     componentWillUnmount() {
-      // AppState.removeEventListener( 'change', this.handleAppStateChange )
+      this.appStateListener.remove()
     }
 
 
@@ -203,4 +158,4 @@ const mapStateToProps = ( state ) => {
 
 export default connect( mapStateToProps, {
   getMessages
-} )( withNavigationFocus( Intermediate ) )
+} )( Intermediate )

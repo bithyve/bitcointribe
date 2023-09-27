@@ -31,10 +31,9 @@ import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
 import GiftCard from '../../assets/images/svgs/icon_gift.svg'
 import DashedContainer from '../FriendsAndFamily/DashedContainer'
 import Illustration from '../../assets/images/svgs/illustration.svg'
-import { NavigationActions, StackActions } from 'react-navigation'
 import AcceptGift from '../FriendsAndFamily/AcceptGift'
 import { launchImageLibrary } from 'react-native-image-picker'
-import LocalQRCode from '@remobile/react-native-qrcode-local-image'
+// import LocalQRCode from '@remobile/react-native-qrcode-local-image'
 import Toast from '../../components/Toast'
 
 export type Props = {
@@ -74,7 +73,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
       return
     }
 
-    const onCodeScanned = navigation.getParam( 'onCodeScanned' )
+    const onCodeScanned = this.props.route.params.onCodeScanned
     try {
       if ( typeof onCodeScanned === 'function' ) onCodeScanned( getFormattedStringFromQRString( scannedData ) )
     } catch ( error ) {
@@ -117,15 +116,15 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
       response => {
         if ( response.assets ) {
           const uri = response.assets[ 0 ].uri.toString().replace( 'file://', '' )
-          LocalQRCode.decode( uri, ( error, result ) => {
-            if ( !error ) {
-              handleBarcodeRecognized( {
-                data: result
-              } )
-            } else {
-              Toast( 'No QR code found in the selected image' )
-            }
-          } )
+          // LocalQRCode.decode( uri, ( error, result ) => {
+          //   if ( !error ) {
+          //     handleBarcodeRecognized( {
+          //       data: result
+          //     } )
+          //   } else {
+          //     Toast( 'No QR code found in the selected image' )
+          //   }
+          // } )
         }
       },
     )

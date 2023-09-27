@@ -2,11 +2,9 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Alert } from 'react-native'
 import { useDispatch } from 'react-redux'
-import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import SendHelpContents from '../../../components/Helper/SendHelpContents'
 import { clearTransfer } from '../../../store/actions/accounts'
-import { initialKnowMoreSendSheetShown } from '../../../store/actions/preferences'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import usePreferencesState from '../../../utils/hooks/state-selectors/preferences/UsePreferencesState'
 import defaultStackScreenNavigationOptions from '../../../navigation/options/DefaultStackScreenNavigationOptions'
@@ -26,33 +24,57 @@ import useSendableAccountShells from '../../../utils/hooks/state-selectors/sendi
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import idx from 'idx'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
-import { NavigationScreenConfig } from 'react-navigation'
-import { NavigationStackOptions } from 'react-navigation-stack'
 import BottomSheetHandle from '../../../components/bottom-sheets/BottomSheetHandle'
 import Colors from '../../../common/Colors'
-import ModalContainer from '../../../components/home/ModalContainer'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../../store/actions/trustedContacts'
 import AccountUtilities from '../../../bitcoin/utilities/accounts/AccountUtilities'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import useWalletState from '../../../utils/hooks/state-selectors/storage/useWalletState'
 
 export type Props = {
+  route: any;
   navigation: any;
 };
 
-const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
+const AccountSendContainerScreen: React.FC<Props> = ( { route, navigation }: Props ) => {
   const dispatch = useDispatch()
-  const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
+  const { dismiss: dismissBottomSheet } = useBottomSheetModal()
   const [ isShowingKnowMoreSheet, setIsShowingKnowMoreSheet ] = useState( false )
 
+  navigation.setOptions(( { route, navigation } ) => {
+    const subAccountKind = route.params?.subAccountKind;
+    return {
+      ...defaultStackScreenNavigationOptions,
+      headerLeft: () => {
+        return (
+          <SmallNavHeaderBackButton
+            onPress={() => {
+              clearTransfer( subAccountKind )
+              navigation.popToTop()
+            }}
+          />
+        )
+      },
+      title: 'Send',
+      headerRight: () => {
+        if ( subAccountKind != SubAccountKind.TEST_ACCOUNT ) {
+          return null
+        } else {
+          return (
+            <KnowMoreButton onpress={() => {
+              route.params?.toggleKnowMoreSheet()}} />
+          )
+        }
+      },
+    }
+  })
   const accountShell = useSourceAccountShellForSending()
   const account = useAccountByAccountShell( accountShell )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const sendableAccountShells = useSendableAccountShells( accountShell )
   const sendableContacts = useSendableTrustedContactRecipients()
-  const fromWallet = navigation?.getParam( 'fromWallet' ) || false
-  const address = navigation?.getParam( 'address' ) || ''
+  const fromWallet = route.params?.fromWallet || false
+  const address = route.params?.address || ''
 
   const accountsState = useAccountsState()
   const sendingState = useSendingState()
@@ -191,26 +213,9 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     }} />
   }
 
-  // const showKnowMoreBottomSheet = useCallback( () => {
-  //   presentBottomSheet(
-  //     <SendHelpContents titleClicked={dismissBottomSheet} />,
-  //     {
-  //       ...defaultBottomSheetConfigs,
-  //       snapPoints: [ 0, '89%' ],
-  //       handleComponent: KnowMoreBottomSheetHandle,
-  //       onChange: ( newIndex ) => {
-  //         if ( newIndex < 1 ) {
-  //           dispatch( initialKnowMoreSendSheetShown() )
-  //         }
-  //       }
-  //     },
-  //   )
-  // }, [ presentBottomSheet, dismissBottomSheet ] )
   const showKnowMoreBottomSheet = () => {
     return(
-      // <ModalContainer visible={true} closeBottomSheet={() => {}}>
       <SendHelpContents titleClicked={dismissBottomSheet} />
-      // </ModalContainer>
     )
   }
 
@@ -221,7 +226,6 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   }, [ hasShownInitialKnowMoreSendSheet, primarySubAccount.kind ] )
 
   useEffect( () => {
-    // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
     if ( primarySubAccount.isTFAEnabled ) {
       const twoFASetupDetails = idx( wallet, ( _ ) => _.details2FA )
       const twoFAValid = idx( accountsState, ( _ ) => _.twoFAHelpFlags.twoFAValid )
@@ -247,39 +251,6 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       onRecipientSelected={handleRecipientSelection}
     />
   )
-}
-
-
-AccountSendContainerScreen.navigationOptions = ( { navigation, } ) : NavigationScreenConfig<NavigationStackOptions, any> => {
-  const subAccountKind = navigation.getParam( 'subAccountKind' )
-
-  return {
-    ...defaultStackScreenNavigationOptions,
-
-    headerLeft: () => {
-      return (
-        <SmallNavHeaderBackButton
-          onPress={() => {
-            clearTransfer( subAccountKind )
-            navigation.popToTop()
-          }}
-        />
-      )
-    },
-
-    title: 'Send',
-
-    headerRight: () => {
-      if ( subAccountKind != SubAccountKind.TEST_ACCOUNT ) {
-        return null
-      } else {
-        return (
-          <KnowMoreButton onpress={() => {
-            navigation.getParam( 'toggleKnowMoreSheet' )()}} />
-        )
-      }
-    },
-  }
 }
 
 export default AccountSendContainerScreen

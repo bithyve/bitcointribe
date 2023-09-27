@@ -1,41 +1,41 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ScrollView,
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  TouchableWithoutFeedback,
   SafeAreaView,
+  ScrollView,
   StatusBar,
-  ActivityIndicator
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
-import NavStyles from '../../common/Styles/NavStyles'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
+import NavStyles from '../../common/Styles/NavStyles'
 import CommonStyles from '../../common/Styles/Styles'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import BottomInfoBox from '../../components/BottomInfoBox'
 
-import QRCode from '../../components/QRCode'
-import CopyThisText from '../../components/CopyThisText'
-import { translations } from '../../common/content/LocContext'
-import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
 import { useDispatch, useSelector } from 'react-redux'
+import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
+import { translations } from '../../common/content/LocContext'
+import CopyThisText from '../../components/CopyThisText'
+import QRCode from '../../components/QRCode'
 import Toast from '../../components/Toast'
 import { receiveRgbAsset } from '../../store/actions/rgb'
 
 export default function RGBReceive( props ) {
   const strings = translations[ 'accounts' ]
   const common = translations[ 'common' ]
-  const assetType: RGB_ASSET_TYPE = props.navigation.getParam( 'assetType' ) || RGB_ASSET_TYPE.BITCOIN
+  const assetType: RGB_ASSET_TYPE = props.route.params.assetType || RGB_ASSET_TYPE.BITCOIN
   const dispatch = useDispatch()
   const [ receivingAddress, setReceivingAddress ] = useState( null )
   const [ paymentURI, setPaymentURI ] = useState( null )
@@ -47,22 +47,7 @@ export default function RGBReceive( props ) {
     if ( assetType == RGB_ASSET_TYPE.BITCOIN ) {
       setReceivingAddress( nextFreeAddress )
     } else {
-      if ( data ) {
-        if ( data.expirationTimestamp ) {
-          const now = Date.now() / 1000
-          const exp = Number( data.expirationTimestamp )
-          if ( exp - now > 100 ) {
-            setReceivingAddress( data.invoice )
-            setRequesting( false )
-          } else {
-            dispatch( receiveRgbAsset() )
-          }
-        } else {
-          dispatch( receiveRgbAsset() )
-        }
-      } else {
-        dispatch( receiveRgbAsset() )
-      }
+      dispatch( receiveRgbAsset() )
     }
   }, [] )
 

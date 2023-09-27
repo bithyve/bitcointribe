@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   View,
   StyleSheet,
@@ -11,101 +11,100 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Image,
-} from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { launchImageLibrary } from "react-native-image-picker";
-import storage from "@react-native-firebase/storage";
+} from 'react-native'
+import Icon from 'react-native-vector-icons/Ionicons'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { launchImageLibrary } from 'react-native-image-picker'
+import storage from '@react-native-firebase/storage'
 
-import FormStyles from "../../../../common/Styles/FormStyles";
-import Colors from "../../../../common/Colors";
-import Fonts from "../../../../common/Fonts";
-import { useDispatch, useSelector } from "react-redux";
-import { addNewAccountShells } from "../../../../store/actions/accounts";
-import useAccountShellCreationCompletionEffect from "../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect";
-import { resetStackToAccountDetails } from "../../../../navigation/actions/NavigationActions";
-import { DonationSubAccountDescribing } from "../../../../common/data/models/SubAccountInfo/Interfaces";
-import { RFValue } from "react-native-responsive-fontsize";
-import openLink from "../../../../utils/OpenLink";
-import SourceAccountKind from "../../../../common/data/enums/SourceAccountKind";
-import Loader from "../../../../components/loader";
-import ButtonBlue from "../../../../components/ButtonBlue";
-import { newAccountsInfo } from "../../../../store/sagas/accounts";
-import { AccountType, Wallet } from "../../../../bitcoin/utilities/Interface";
-import useAccountsState from "../../../../utils/hooks/state-selectors/accounts/UseAccountsState";
+import FormStyles from '../../../../common/Styles/FormStyles'
+import Colors from '../../../../common/Colors'
+import Fonts from '../../../../common/Fonts'
+import { useDispatch, useSelector } from 'react-redux'
+import { addNewAccountShells } from '../../../../store/actions/accounts'
+import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
+import { resetStackToAccountDetails } from '../../../../navigation/actions/NavigationActions'
+import { DonationSubAccountDescribing } from '../../../../common/data/models/SubAccountInfo/Interfaces'
+import { RFValue } from 'react-native-responsive-fontsize'
+import openLink from '../../../../utils/OpenLink'
+import SourceAccountKind from '../../../../common/data/enums/SourceAccountKind'
+import Loader from '../../../../components/loader'
+import ButtonBlue from '../../../../components/ButtonBlue'
+import { newAccountsInfo } from '../../../../store/sagas/accounts'
+import { AccountType, Wallet } from '../../../../bitcoin/utilities/Interface'
+import useAccountsState from '../../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 
 export type Props = {
   navigation: any;
+  route: any;
 };
 
-const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
-  navigation,
-}: Props) => {
-  const dispatch = useDispatch();
-  const nameInputRef = useRef<Input>(null);
-  const currentSubAccount: DonationSubAccountDescribing = useMemo(() => {
-    return navigation.getParam("currentSubAccount");
-  }, [navigation.state.params]);
+const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
+  const dispatch = useDispatch()
+  const nameInputRef = useRef<Input>( null )
+  const currentSubAccount: DonationSubAccountDescribing = useMemo( () => {
+    return route.params?.currentSubAccount
+  }, [ route.params ] )
 
-  const wallet: Wallet = useSelector((state) => state.storage.wallet);
-  const { accountShells } = useAccountsState();
-  const [accountName, setAccountName] = useState("");
-  const [doneeName, setDoneeName] = useState(currentSubAccount.doneeName);
-  const [accountDescription, setAccountDescription] = useState("");
-  const [isTFAEnabled, setIsTFAEnabled] = useState(
+  const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
+  const { accountShells } = useAccountsState()
+  const [ accountName, setAccountName ] = useState( '' )
+  const [ doneeName, setDoneeName ] = useState( currentSubAccount.doneeName )
+  const [ accountDescription, setAccountDescription ] = useState( '' )
+  const [ isTFAEnabled, setIsTFAEnabled ] = useState(
     currentSubAccount.isTFAEnabled
-  );
-  const [organisedBy, setOrganisedBy] = useState("");
-  const [youtubeUrl, setyoutubeUrl] = useState("");
-  const [showLoader, setShowLoader] = useState(false);
-  const [pickImageUrl, setPickImageUrl] = useState("");
-  const [photo, setPhoto] = React.useState(null);
+  )
+  const [ organisedBy, setOrganisedBy ] = useState( '' )
+  const [ youtubeUrl, setyoutubeUrl ] = useState( '' )
+  const [ showLoader, setShowLoader ] = useState( false )
+  const [ pickImageUrl, setPickImageUrl ] = useState( '' )
+  const [ photo, setPhoto ] = React.useState( null )
 
   const AllowSecureAccount = useSelector(
-    (state) => state.bhr.AllowSecureAccount
-  );
+    ( state ) => state.bhr.AllowSecureAccount
+  )
 
-  const canProceed = useMemo(() => {
-    return accountName.length > 0 && accountDescription.length > 0 && pickImageUrl.length > 0;
-  }, [accountName, doneeName, accountDescription, pickImageUrl]);
+  const canProceed = useMemo( () => {
+    return accountName.length > 0 && accountDescription.length > 0 && pickImageUrl.length > 0
+  }, [ accountName, doneeName, accountDescription, pickImageUrl ] )
 
-  useEffect(() => {
-    nameInputRef.current?.focus();
-  }, []);
+  useEffect( () => {
+    nameInputRef.current?.focus()
+  }, [] )
 
-  useAccountShellCreationCompletionEffect(() => {
-    const shellId = accountShells[accountShells.length - 1].id;
+  useAccountShellCreationCompletionEffect( () => {
+    const shellId = accountShells[ accountShells.length - 1 ].id
     navigation.dispatch(
-      resetStackToAccountDetails({
+      resetStackToAccountDetails( {
         accountShellID: shellId,
-      })
-    );
-  });
+      } )
+    )
+  } )
   const handleChoosePhoto = () => {
     try {
       launchImageLibrary(
         {
           noData: true,
         },
-        async (response) => {
-          if (response.didCancel) {
-            console.log("Image picker cancelled");
+        async ( response ) => {
+          if ( response.didCancel ) {
+            console.log( 'Image picker cancelled' )
           } else {
-            await setPhoto(response.assets[0]);
+            await setPhoto( response.assets[ 0 ] )
             await setPickImageUrl(
-              Platform.OS === "ios"
-                ? response.assets[0].uri.replace("file://", "")
-                : response.assets[0].uri
-            );
+              Platform.OS === 'ios'
+                ? response.assets[ 0 ].uri.replace( 'file://', '' )
+                : response.assets[ 0 ].uri
+            )
           }
         }
-      );
-    } catch (e) {
-      console.log(e);
+      )
+    } catch ( e ) {
+      console.log( e )
     }
-  };
+  }
   async function handleProceedButtonPress() {
-    setShowLoader(true);
+    setShowLoader( true )
     const reference = await storage().ref(
       `/hexa-donation-uploads/dev/${photo.fileName}`
     )
@@ -130,12 +129,12 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
         youtubeURL: youtubeUrl,
         imageURL: firebaseImageUrl,
       },
-    };
-    dispatch(addNewAccountShells([newAccountInfo]));
+    }
+    dispatch( addNewAccountShells( [ newAccountInfo ] ) )
   }
 
   async function openTermsAndConditions() {
-    await openLink("https://hexawallet.io/donee-terms-conditions/");
+    await openLink( 'https://hexawallet.io/donee-terms-conditions/' )
   }
 
   return (
@@ -145,10 +144,10 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
         backgroundColor: Colors.offWhite,
       }}
     >
-      <StatusBar backgroundColor={"white"} barStyle="dark-content" />
+      <StatusBar backgroundColor={'white'} barStyle="dark-content" />
       <KeyboardAvoidingView
         style={styles.rootContainer}
-        behavior={Platform.OS == "ios" ? "padding" : "height"}
+        behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
       >
         <TouchableOpacity onPress={() => navigation.pop()}>
           <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
@@ -170,14 +169,14 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
                   <>
                     <TouchableOpacity
                       style={styles.closeIconWrapper}
-                      onPress={() => setPickImageUrl("")}
+                      onPress={() => setPickImageUrl( '' )}
                     >
-                      <Icon name={"close-outline"} color={"#000"} size={20} />
+                      <Icon name={'close-outline'} color={'#000'} size={20} />
                     </TouchableOpacity>
                     <Image
                       style={{
                         height: 120,
-                        width: "99%",
+                        width: '99%',
                         borderRadius: 10,
                       }}
                       source={{
@@ -187,18 +186,20 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
                   </>
                 ) : (
                   <View style={styles.plusIconWrapper}>
-                    <Icon name={"add-outline"} color={"#006DB4"} size={25} />
+                    <Icon name={'add-outline'} color={'#006DB4'} size={25} />
                     <Text style={styles.uploadImgText}>Upload Image</Text>
                   </View>
                 )}
               </TouchableOpacity>
             </>
-            <View style={{ width: "67%" }}>
+            <View style={{
+              width: '67%'
+            }}>
               <TextInput
-                style={[styles.textInputContainer, styles.descInputContainer]}
-                placeholder={"Enter donation name"}
+                style={[ styles.textInputContainer, styles.descInputContainer ]}
+                placeholder={'Enter donation name'}
                 placeholderTextColor={FormStyles.placeholderText.color}
-                underlineColorAndroid={"transparent"}
+                underlineColorAndroid={'transparent'}
                 value={accountName}
                 maxLength={24}
                 numberOfLines={1}
@@ -207,10 +208,10 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
                 ref={nameInputRef}
               />
               <TextInput
-                style={[styles.textInputContainer, styles.descInputContainer]}
-                placeholder={"Organised by"}
+                style={[ styles.textInputContainer, styles.descInputContainer ]}
+                placeholder={'Organised by'}
                 placeholderTextColor={FormStyles.placeholderText.color}
-                underlineColorAndroid={"transparent"}
+                underlineColorAndroid={'transparent'}
                 value={organisedBy}
                 numberOfLines={1}
                 textContentType="name"
@@ -222,11 +223,13 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
             <TextInput
               style={[
                 styles.descInputContainer,
-                { height: 50, marginVertical: 5 },
+                {
+                  height: 50, marginVertical: 5
+                },
               ]}
-              placeholder={"Paste youtube url"}
+              placeholder={'Paste youtube url'}
               placeholderTextColor={FormStyles.placeholderText.color}
-              underlineColorAndroid={"transparent"}
+              underlineColorAndroid={'transparent'}
               value={youtubeUrl}
               numberOfLines={1}
               textContentType="URL"
@@ -235,11 +238,13 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
             <TextInput
               style={[
                 styles.descInputContainer,
-                { height: 70, marginVertical: 5 },
+                {
+                  height: 70, marginVertical: 5
+                },
               ]}
-              placeholder={"Enter a description"}
+              placeholder={'Enter a description'}
               placeholderTextColor={FormStyles.placeholderText.color}
-              underlineColorAndroid={"transparent"}
+              underlineColorAndroid={'transparent'}
               value={accountDescription}
               numberOfLines={4}
               textContentType="name"
@@ -257,7 +262,9 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
               Enable two factor authentication
             </Text>
           </View> */}
-          <View style={{ flexDirection: "row", marginVertical: 10 }}>
+          <View style={{
+            flexDirection: 'row', marginVertical: 10
+          }}>
             <Text style={styles.agreeTermsText}>
               By clicking proceed you agree to our
             </Text>
@@ -278,10 +285,10 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ({
         {showLoader ? <Loader isLoading={true} /> : null}
       </KeyboardAvoidingView>
     </SafeAreaView>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
     margin: 25,
@@ -293,26 +300,26 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   titleText: {
-    fontSize: RFValue(25),
+    fontSize: RFValue( 25 ),
     color: Colors.darkBlue,
     fontFamily: Fonts.Regular,
   },
   uploadImgParrentView: {
-    flexDirection: "row",
-    width: "100%",
+    flexDirection: 'row',
+    width: '100%',
     marginBottom: 5,
   },
   uploadImgWrapperView: {
     backgroundColor: Colors.white,
     borderRadius: 20,
-    width: "30%",
-    justifyContent: "center",
-    alignItems: "center",
+    width: '30%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   uploadImgText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.Regular,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     marginTop: 10,
   },
   textInputContainer: {
@@ -325,47 +332,47 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: Colors.white,
-    width: "100%",
+    width: '100%',
     paddingHorizontal: 20,
     color: Colors.textColorGrey,
     fontFamily: Fonts.Regular,
-    fontSize: RFValue(12),
-    textAlign: "left",
+    fontSize: RFValue( 12 ),
+    textAlign: 'left',
   },
   inputText: {
     paddingHorizontal: 20,
     color: Colors.textColorGrey,
     fontFamily: Fonts.Regular,
-    fontSize: RFValue(12),
-    textAlign: "left",
+    fontSize: RFValue( 12 ),
+    textAlign: 'left',
   },
   checkTwoFAuthView: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: 10,
   },
   checkTwoFAuthText: {
     marginLeft: 10,
     color: Colors.gray4,
     fontFamily: Fonts.Regular,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
   },
   agreeTermsText: {
     color: Colors.gray4,
     fontFamily: Fonts.Medium,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
   },
   termsAndConditionText: {
     color: Colors.darkBlue,
     fontFamily: Fonts.Italic,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
   },
   proceedBtnView: {
     backgroundColor: Colors.darkBlue,
     padding: 15,
-    alignItems: "center",
-    justifyContent: "center",
-    width: "30%",
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '30%',
     borderRadius: 10,
     marginTop: 20,
     shadowColor: Colors.skyBlue,
@@ -375,31 +382,31 @@ const styles = StyleSheet.create({
   proceedBtnText: {
     color: Colors.white,
     fontFamily: Fonts.Medium,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
   },
   footerSection: {
     paddingVertical: 10,
-    alignItems: "flex-start",
+    alignItems: 'flex-start',
   },
   //
   closeIconWrapper: {
-    position: "absolute",
+    position: 'absolute',
     top: -2,
     right: -3,
-    backgroundColor: "#FFF",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
     zIndex: 999,
     borderRadius: 20,
   },
   plusIconWrapper: {
     height: 110,
-    width: "99%",
-    alignItems: "center",
-    justifyContent: "center",
+    width: '99%',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: Colors.white,
     borderRadius: 20,
   },
-});
+} )
 
-export default AddNewDonationAccountDetailsScreen;
+export default AddNewDonationAccountDetailsScreen

@@ -1,25 +1,26 @@
-import React, { useState, useEffect } from 'react'
+import moment from 'moment'
+import React, { useEffect, useState } from 'react'
 import {
-  StyleSheet,
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  StatusBar,
-  Text,
   ActivityIndicator,
+  Image,
+  Platform,
+  SafeAreaView,
   ScrollView,
-  Image
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
-import CommonStyles from '../../common/Styles/Styles'
-import { RFValue } from 'react-native-responsive-fontsize'
-import RGBServices from '../../services/RGBServices'
-import moment from 'moment'
-import HeaderTitle from '../../components/HeaderTitle'
 import Fonts from '../../common/Fonts'
-import LinearGradient from 'react-native-linear-gradient'
-import { hp, wp } from '../../common/data/responsiveness/responsive'
+import CommonStyles from '../../common/Styles/Styles'
+import { wp } from '../../common/data/responsiveness/responsive'
+import HeaderTitle from '../../components/HeaderTitle'
+import RGBServices from '../../services/RGBServices'
 
 const styles = StyleSheet.create( {
   lineItem: {
@@ -83,7 +84,7 @@ export const DetailsItem = ( { name, value } ) => {
 
 const AssetMetaData = ( props ) => {
   const [ loading, setLoading ] = useState( true )
-  const asset = props.navigation.getParam( 'asset' )
+  const asset = props.route.params.asset
   const [ metaData, setMetaData ] = useState( {
   } )
 
@@ -143,25 +144,26 @@ const AssetMetaData = ( props ) => {
             height: '70%'
           }}/> :
           <ScrollView contentContainerStyle={{
-            padding: 20
+            padding: 20, flex: 1
           }}>
             {
               asset.dataPaths && (
-                <View style={{
-                  marginBottom: 30
-                }}>
+                <View>
                   <Image
                     style={{
-                      height: '90%'
+                      height: '60%'
                     }}
                     resizeMode="contain"
                     source={{
-                      uri: asset.dataPaths[ 0 ].filePath
+                      uri: Platform.select( {
+                        android: `file://${asset.dataPaths[ 0 ].filePath}`,
+                        ios: asset.dataPaths[ 0 ].filePath
+                      } )
                     }}
                   />
                   <TouchableOpacity onPress={() => {
                   }}>
-                    <LinearGradient colors={[ Colors.blue ]}
+                    <LinearGradient colors={[ Colors.blue, Colors.blue ]}
                       start={{
                         x: 0, y: 0
                       }} end={{
@@ -181,7 +183,7 @@ const AssetMetaData = ( props ) => {
             <Text style={styles.title}>Asset Meta Data</Text>
             <DetailsItem
               name="Asset ID"
-              value={metaData.assetId}
+              value={asset.assetId}
             />
 
             <DetailsItem
@@ -191,7 +193,7 @@ const AssetMetaData = ( props ) => {
 
             <DetailsItem
               name="Asset Type"
-              value={metaData.assetType}
+              value={metaData.assetIface}
             />
 
             <DetailsItem

@@ -1,16 +1,15 @@
 import React, { useState } from 'react'
-import { View, Image, Text, StyleSheet, Linking } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper'
-import { ScrollView } from 'react-native-gesture-handler'
 import BottomInfoBox from './BottomInfoBox'
 
 export default function AdvanceSettings( props ) {
@@ -56,9 +55,10 @@ export default function AdvanceSettings( props ) {
       <ScrollView style={{
         flex: 1
       }}>
-        {PageData.map( ( item ) => {
+        {PageData.map( ( item, index ) => {
           return (
             <AppBottomSheetTouchableWrapper
+              key={`${JSON.stringify( item )}_${index}`}
               onPress={() => props.onPressAdvanceSetting( item.type )}
               style={styles.selectedContactsView}
             >

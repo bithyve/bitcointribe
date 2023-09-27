@@ -154,12 +154,12 @@ export default function SetUpSatCardScreen( props ) {
   useEffect( () => {
     dispatch( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     dispatch( setOpenToApproval( false, [], null ) )
-    Linking.addEventListener( 'url', handleDeepLinkEvent )
+    const subscription = Linking.addEventListener( 'url', handleDeepLinkEvent )
     //Linking.getInitialURL().then( handleDeepLinking )
     BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
     return () => {
       BackHandler.removeEventListener( 'hardwareBackPress', hardwareBackPressCustom )
-      Linking.removeEventListener( 'url', handleDeepLinkEvent )
+      subscription.remove()
     }
 
   }, [] )
