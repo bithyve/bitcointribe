@@ -1,56 +1,54 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react'
+import firebase from '@react-native-firebase/app'
+import messaging from '@react-native-firebase/messaging'
+import JailMonkey from 'jail-monkey'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import {
+  BackHandler,
+  Keyboard,
+  Linking,
+  Platform,
+  StatusBar,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
-  StatusBar,
-  Platform,
-  BackHandler,
-  Linking,
-  Keyboard,
-  Alert
+  View
 } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { credsAuth } from '../store/actions/setupAndAuth'
-import BottomSheet from 'reanimated-bottom-sheet'
-import LoaderModal from '../components/LoaderModal'
-import JailMonkey from 'jail-monkey'
 import DeviceInfo from 'react-native-device-info'
-import ErrorModalContents from '../components/ErrorModalContents'
-import { processDeepLink } from '../common/CommonFunctions'
-import ModalContainer from '../components/home/ModalContainer'
-import firebase from '@react-native-firebase/app'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  setIsPermissionGiven,
-  setFCMToken
-} from '../store/actions/preferences'
-import messaging from '@react-native-firebase/messaging'
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
+import Relay from '../bitcoin/utilities/Relay'
+import Colors from '../common/Colors'
+import { processDeepLink } from '../common/CommonFunctions'
+import Fonts from '../common/Fonts'
+import { LocalizationContext } from '../common/content/LocContext'
+import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
+import AlertModalContents from '../components/AlertModalContents'
+import ErrorModalContents from '../components/ErrorModalContents'
+import LoaderModal from '../components/LoaderModal'
+import Toast from '../components/Toast'
+import BottomInputModalContainer from '../components/home/BottomInputModalContainer'
+import ModalContainer from '../components/home/ModalContainer'
+import { setOpenToApproval } from '../store/actions/BHR'
+import { setCloudBackupStatus } from '../store/actions/cloud'
 import {
   updateFCMTokens,
 } from '../store/actions/notifications'
-import Relay from '../bitcoin/utilities/Relay'
-import { LocalizationContext } from '../common/content/LocContext'
-import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
-import { setCloudBackupStatus } from '../store/actions/cloud'
-import { setOpenToApproval } from '../store/actions/BHR'
-import SecurityQuestion from './NewBHR/SecurityQuestion'
-import Toast from '../components/Toast'
-import SecuritySeedWord from './NewBHR/SecuritySeedWord'
-import AlertModalContents from '../components/AlertModalContents'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import BottomInputModalContainer from '../components/home/BottomInputModalContainer'
+import {
+  setFCMToken,
+  setIsPermissionGiven
+} from '../store/actions/preferences'
+import { credsAuth } from '../store/actions/setupAndAuth'
 import ConfirmSeedWordsModal from './NewBHR/ConfirmSeedWordsModal'
-import LinearGradient from 'react-native-linear-gradient'
+import SecurityQuestion from './NewBHR/SecurityQuestion'
+import SecuritySeedWord from './NewBHR/SecuritySeedWord'
 
 export default function Login( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -598,7 +596,7 @@ export default function Login( props ) {
             alignItems: 'center',
             justifyContent: 'flex-end'
           }}>
-            {
+            {/* {
               attempts >= 3&&(
                 <TouchableOpacity
                   style={{
@@ -635,7 +633,7 @@ export default function Login( props ) {
                   }}>{strings.ForgotPasscode}</Text>
                 </TouchableOpacity>
               )
-            }
+            } */}
             <TouchableOpacity
               disabled={passcode.length !==4}
               activeOpacity={0.7}

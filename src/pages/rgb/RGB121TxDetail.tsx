@@ -127,7 +127,7 @@ export default function RGB121TxDetail( props ) {
   const onViewMorePressed = () => {
 
   }
-
+  console.log( 'assetassetasset', asset.futureBalance )
   return (
     <SafeAreaView style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -160,7 +160,7 @@ export default function RGB121TxDetail( props ) {
           }}
           showKnowMore
           onSettingsPressed={() => { }}
-          balance={asset.futureBalance}
+          balance={asset.balance.spendable}
           cardColor={'#B7B7B7'}
           title={asset.name}
           description={asset.description}

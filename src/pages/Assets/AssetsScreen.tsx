@@ -394,7 +394,7 @@ const styles = StyleSheet.create( {
   },
   image: {
     width: '100%',
-    borderRadius: 4,
+    borderRadius: 10,
     aspectRatio: 1
   },
 

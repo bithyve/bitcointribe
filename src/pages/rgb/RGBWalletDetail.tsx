@@ -152,7 +152,7 @@ export default function RGBWalletDetail( props ) {
               <DetailsCard
                 onKnowMorePressed={() => {}}
                 onSettingsPressed={()=>{}}
-                balance={balances.confirmed}
+                balance={balances.spendable}
                 cardColor='#88B283'
                 title='Bitcoin Wallet'
                 description=''

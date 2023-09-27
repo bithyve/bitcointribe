@@ -329,7 +329,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           } )}
         >
           <BorderWalletSuccessModal
-            title={'Border Wallet creation success!'}
+            title={'Border wallet created successfully.'}
             info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit,'}
             otherText={'Your Border Wallet has been added and is now ready for you to start using.'}
             proceedButtonText={'Continue'}
