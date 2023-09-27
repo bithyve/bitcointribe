@@ -4,15 +4,13 @@ import messaging from '@react-native-firebase/messaging'
 import { CommonActions, useIsFocused, useNavigation, useRoute } from '@react-navigation/native'
 import idx from 'idx'
 import moment from 'moment'
-import React, { createRef, PureComponent } from 'react'
+import React, { PureComponent, createRef } from 'react'
 import {
   Alert,
   AppState,
   Linking,
   Platform,
   StyleSheet,
-  Text,
-  TouchableOpacity,
   View
 } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
@@ -30,10 +28,10 @@ import {
   DeepLinkEncryptionType,
   KeeperInfoInterface,
   LevelHealthInterface,
-  notificationType,
   QRCodeTypes,
   Trusted_Contacts,
   Wallet,
+  notificationType,
 } from '../../bitcoin/utilities/Interface'
 import Relay from '../../bitcoin/utilities/Relay'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
@@ -43,36 +41,29 @@ import {
   processDeepLink,
   processRequestQR,
 } from '../../common/CommonFunctions/index'
+import Fonts from '../../common/Fonts'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 import AccountShell from '../../common/data/models/AccountShell'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
-import Fonts from '../../common/Fonts'
-import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
-import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
-import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
 import ClipboardAutoRead from '../../components/ClipboardAutoRead'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
-import HomeHeader from '../../components/home/home-header_update'
-import ModalContainer from '../../components/home/ModalContainer'
-import { NotificationType } from '../../components/home/NotificationType'
 import NotificationInfoContents from '../../components/NotificationInfoContents'
 import NotificationListContent from '../../components/NotificationListContent'
 import Toast from '../../components/Toast'
+import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
+import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
+import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
+import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
+import ModalContainer from '../../components/home/ModalContainer'
+import { NotificationType } from '../../components/home/NotificationType'
+import HomeHeader from '../../components/home/home-header_update'
 import BottomSheetHeader from '../../pages/Accounts/BottomSheetHeader'
 import AddContactAddressBook from '../../pages/Contacts/AddContactAddressBook'
 import AcceptGift from '../../pages/FriendsAndFamily/AcceptGift'
 import TrustedContactRequestContent from '../../pages/Home/TrustedContactRequestContent'
-import {
-  addTransferDetails,
-  fetchExchangeRates,
-  fetchFeeRates,
-  recomputeNetBalance,
-  setShowAllAccount
-} from '../../store/actions/accounts'
 import {
   acceptExistingContactRequest,
   initializeHealthSetup,
@@ -80,6 +71,16 @@ import {
   updateCloudPermission,
   updateSecondaryShard
 } from '../../store/actions/BHR'
+import { clearRampCache } from '../../store/actions/RampIntegration'
+import { clearSwanCache, createTempSwanAccountInfo, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import { clearWyreCache } from '../../store/actions/WyreIntegration'
+import {
+  addTransferDetails,
+  fetchExchangeRates,
+  fetchFeeRates,
+  recomputeNetBalance,
+  setShowAllAccount
+} from '../../store/actions/accounts'
 import { setCloudData } from '../../store/actions/cloud'
 import {
   getMessages,
@@ -100,20 +101,17 @@ import {
   updateLastSeen,
   updatePreference,
 } from '../../store/actions/preferences'
-import { clearRampCache } from '../../store/actions/RampIntegration'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
-import { clearSwanCache, createTempSwanAccountInfo, updateSwanStatus } from '../../store/actions/SwanIntegration'
 import {
-  fetchGiftFromTemporaryChannel,
-  initializeTrustedContact,
   InitTrustedContactFlowKind,
   PermanentChannelsSyncKind,
+  fetchGiftFromTemporaryChannel,
+  initializeTrustedContact,
   rejectGift,
   rejectTrustedContact,
   syncPermanentChannels,
 } from '../../store/actions/trustedContacts'
 import { setVersion } from '../../store/actions/versionHistory'
-import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { AccountsState } from '../../store/reducers/accounts'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import { resetToHomeAction } from '../actions/NavigationActions'
@@ -363,8 +361,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   navigateToQRScreen = () => {
-    this.props.navigation.navigate( 'QRScanner', {
-      onCodeScanned:  this.onCodeScanned,
+    this.props.navigation.navigate( 'HomeNav', {
+      screen: this.props.route.name,
+      params: {
+        screen: 'QRScanner',
+        params: {
+          onCodeScanned:  this.onCodeScanned,
+        }
+      }
     } )
   };
 
@@ -557,11 +561,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           appState: nextAppState,
         },
         async () => {
-          if ( nextAppState === 'active' ) {
-          }
           if ( nextAppState === 'inactive' || nextAppState == 'background' ) {
-            if( nextAppState === 'background' ) {
-            }
             this.props.updatePreference( {
               key: 'hasShownNoInternetWarning',
               value: false,
@@ -1304,30 +1304,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       return
     }
   };
-  renderButton = ( text ) => {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          if ( text === 'View Account' ) {
-            this.props.navigation.dispatch( CommonActions.reset( {
-              index: 0,
-              routes: [ {
-                name: 'Landing'
-              } ],
-            } ) )
-          } else {
-            // setAcceptGiftModal( false )
-            // setGiftAcceptedModel( true )
-          }
-        }}
-        style={{
-          ...styles.buttonView
-        }}
-      >
-        <Text style={styles.buttonText}>{text}</Text>
-      </TouchableOpacity>
-    )
-  }
 
   renderAcceptModal = () => {
 

@@ -1,8 +1,8 @@
 import React from 'react'
 import {
-  StyleSheet,
-  StatusBar,
   ImageBackground,
+  StatusBar,
+  StyleSheet,
 } from 'react-native'
 import {
   heightPercentageToDP,
@@ -25,7 +25,6 @@ const BuyMenu = () => {
       }}
     >
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-      {/* <Header fromScreen={'Buy'} /> */}
       <BuyContainer containerView={styles.accountCardsSectionContainer} />
 
     </ImageBackground>

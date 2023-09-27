@@ -335,11 +335,6 @@ function Navigator() {
     </SafeAreaProvider>
   )
 }
-// const Navigator = createSwitchNavigator( {
-//   SetupNav: SetupNavigator,
-//   HomeNav: HomeNavigator,
-// } )
-
 
 export type BaseNavigationProp = {
   getParam: ( param: string ) => any;
