@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { Input } from 'react-native-elements'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { launchImageLibrary } from 'react-native-image-picker'
@@ -28,8 +28,10 @@ export default function IssueScreen( props ) {
   const [ ticker, setTicker ] = useState( '' )
   const [ attachedfile, setAttachedFile ] = useState( 'Attach File' )
   const [ requesting, setRequesting ] = useState( false )
+  const [ loading, setLoading ] = useState( true )
 
   async function IssueAssetClick() {
+    setLoading( true )
     try {
       if( issueType === 'collectible' ) {
         setRequesting( true )
@@ -56,6 +58,7 @@ export default function IssueScreen( props ) {
       }
     } catch ( error ) {
       setRequesting( false )
+      setLoading( false )
       Toast( `Failed ${error}` )
       console.log( 'error', error )
     }
@@ -83,6 +86,20 @@ export default function IssueScreen( props ) {
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
+      {
+        loading &&
+        <View style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 15,
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10
+        }}>
+          <ActivityIndicator size="large" color={Colors.darkBlue} />
+        </View>
+      }
       <SafeAreaView style={{
         flex: 0
       }} />
