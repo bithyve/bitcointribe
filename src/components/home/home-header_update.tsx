@@ -1,29 +1,43 @@
-import React, { useMemo, useEffect, useContext, useState } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { CommonActions } from '@react-navigation/native'
+import moment from 'moment'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import {
-  View,
+  Image,
+  ImageBackground,
+  Platform,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
-  ImageBackground,
-  Image,
-  Platform,
+  View,
 } from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import Fonts from './../../common/Fonts'
-import CommonStyles from '../../common/Styles/Styles'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { UsNumberFormat } from '../../common/utilities'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
-import CurrencyKindToggleSwitch from '../../components/CurrencyKindToggleSwitch'
+import { LevelData, LevelHealthInterface, Wallet } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
+import CommonStyles from '../../common/Styles/Styles'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { LocalizationContext } from '../../common/content/LocContext'
-import ModalContainer from '../../components/home/ModalContainer'
+import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import { UsNumberFormat } from '../../common/utilities'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import { setCloudBackupStatus, setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
-import CloudStatus from '../../common/data/enums/CloudBackupStatus'
+import ModalContainer from '../../components/home/ModalContainer'
+import dbManager from '../../storage/realm/dbManager'
+import { setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import MaterialCurrencyCodeIcon, {
+  materialIconCurrencyCodes,
+} from '../MaterialCurrencyCodeIcon'
+import Fonts from './../../common/Fonts'
 
 const currencyCode = [
   'BRL',
@@ -36,45 +50,6 @@ const currencyCode = [
   'INR',
   'EUR',
 ]
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { getCurrencyImageName } from '../../common/CommonFunctions/index'
-import AntDesign from 'react-native-vector-icons/AntDesign'
-import CurrencyKind from '../../common/data/enums/CurrencyKind'
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
-import { currencyKindSet } from '../../store/actions/preferences'
-import { KeeperType, LevelData, LevelHealthInterface, Wallet } from '../../bitcoin/utilities/Interface'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
-import MaterialCurrencyCodeIcon, {
-  materialIconCurrencyCodes,
-} from '../MaterialCurrencyCodeIcon'
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import moment from 'moment'
-import { onPressKeeper } from '../../store/actions/BHR'
-import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
-import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
-import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
-import dbManager from '../../storage/realm/dbManager'
-import { CommonActions } from '@react-navigation/native'
-
-function setCurrencyCodeToImage( currencyName, currencyColor ) {
-  return (
-    <View
-      style={{
-        marginRight: 5,
-        marginBottom: wp( '0.7%' ),
-      }}
-    >
-      <MaterialCommunityIcons
-        name={currencyName}
-        color={currencyColor == 'light' ? Colors.white : Colors.lightBlue}
-        size={wp( '3.5%' )}
-      />
-    </View>
-  )
-}
 
 const HomeHeader = ( {
   onPressNotifications,
@@ -230,7 +205,7 @@ const HomeHeader = ( {
           }
           return CommonActions.reset( {
             ...state,
-            index: 3,
+            index: 4,
             routes: updatedRoutes,
           } )
         } )
