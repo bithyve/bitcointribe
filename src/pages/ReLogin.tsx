@@ -1,30 +1,31 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
+  SafeAreaView,
+  StatusBar,
   StyleSheet,
   Text,
-  View,
-  SafeAreaView,
   TouchableOpacity,
-  StatusBar,
+  View,
 } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { useDispatch, useSelector } from 'react-redux'
 import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth'
 
 export default function Login( props ) {
-  const pattern = props.route.params?.pattern
-  const isValidate = props.route.params?.isValidate || false
+  const pattern = props.navigation.getParam( 'pattern' )
+  const isValidate = props.navigation.getParam( 'isValidate' ) || false
   const [ passcode, setPasscode ] = useState( '' )
   const [ passcodeFlag, setPasscodeFlag ] = useState( true )
   const [ checkAuth, setCheckAuth ] = useState( false )
+  const [ passcodeCheck, setPasscodeCheck ] = useState( false )
 
   function onPressNumber( text ) {
     let tmpPasscode = passcode
@@ -32,6 +33,7 @@ export default function Login( props ) {
       if ( text != 'x' ) {
         tmpPasscode += text
         setPasscode( tmpPasscode )
+        setCheckAuth( false )
       }
     }
     if ( passcode && text == 'x' ) {
@@ -41,7 +43,7 @@ export default function Login( props ) {
   }
 
   const dispatch = useDispatch()
-  const { reLogin, authenticationFailed } = useSelector(
+  const { reLogin, isAuthenticated, authenticationFailed } = useSelector(
     state => state.setupAndAuth,
   )
 
@@ -62,12 +64,24 @@ export default function Login( props ) {
     }
   }, [ authenticationFailed ] )
 
+  useEffect( () => {
+    if( isAuthenticated && passcodeCheck )
+      if( isAuthenticated ){
+        props.navigation.navigate( 'PreviewPattern', {
+          pattern: pattern,
+          isValidate: isValidate
+        } )
+      }
+  }, [ isAuthenticated ] )
+
   const checkReloginNext = () => {
-    props.navigation.navigate( 'PreviewPattern', {
-      pattern: pattern,
-      isValidate: isValidate
-    } )
+    setTimeout( () => {
+      setCheckAuth( false )
+      setPasscodeCheck( true )
+      dispatch( credsAuth( passcode ) )
+    }, 2 )
   }
+
   const loginNext = () => {
     setCheckAuth( false )
     dispatch( credsAuth( passcode, true ) )

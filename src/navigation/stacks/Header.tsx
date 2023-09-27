@@ -777,7 +777,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     )
     requestAnimationFrame( () => {
       // Keeping autoSync disabled
-      credsAuthenticated( false )
+      // credsAuthenticated( false )
       //console.log( 'isAuthenticated*****', this.props.isAuthenticated )
       this.syncChannel()
       this.closeBottomSheet()
