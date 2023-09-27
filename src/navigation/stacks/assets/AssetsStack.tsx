@@ -14,6 +14,7 @@ import RGBReceive from '../../../pages/rgb/RGBReceive'
 import RGBSend from '../../../pages/rgb/RGBSend'
 import RGBTxDetail from '../../../pages/rgb/RGBTxDetail'
 import RGBWalletDetail from '../../../pages/rgb/RGBWalletDetail'
+import SendAsset from '../../../pages/rgb/SendAsset'
 import QRStack from '../home/QRStack'
 
 // const strings  = translations[ 'stackTitle' ]
@@ -54,6 +55,9 @@ const AssetsStack = ( { navigation, route } ) => {
         headerShown: false
       }} />
       <Stack.Screen name="RGBSend" component={RGBSend} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="SendAsset" component={SendAsset} options={{
         headerShown: false
       }} />
       <Stack.Screen name="QRScanner" component={QRStack} options={{

@@ -85,11 +85,11 @@ const AssetTransferDetails = ( props ) => {
         />
         <DetailsItem
           name="Transaction ID"
-          value={item.txid}
+          value={item.idx}
         />
         <DetailsItem
           name="Date"
-          value={moment.unix( item.createdAt ).format( 'DD/MM/YY • hh:MMa' )}
+          value={moment.unix( item.updatedAt ).format( 'DD/MM/YY • hh:MM' )}
         />
         <DetailsItem
           name="Status"

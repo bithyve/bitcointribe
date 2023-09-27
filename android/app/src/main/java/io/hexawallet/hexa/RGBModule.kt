@@ -91,14 +91,12 @@ class RGBModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
 
     @ReactMethod
     fun issueRgb25Asset( description: String, name: String, supply: String,filePath: String, promise: Promise){
-        Log.d(TAG, "issueRgb25Asset: ${name}")
         try {
             val amounts = listOf(supply)
             val response = RGBHelper.issueRgb25Asset(description, name, amounts.map { it.toULong() }, filePath)
             promise.resolve(response)
         }catch (e: Exception) {
             Log.d(TAG, "issueRgb20Asset:e.message ${e.message}")
-
             val message = e.message
             val jsonObject = JsonObject()
             jsonObject.addProperty("error", message)
@@ -114,5 +112,17 @@ class RGBModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
     @ReactMethod
     fun getRgbAssetTransactions( assetId: String, promise: Promise){
         promise.resolve(RGBHelper.getAssetTransfers(assetId))
+    }
+
+    @ReactMethod
+    fun sendAsset( assetId: String, blindedUTXO: String, amount: String, consignmentEndpoints: String, promise: Promise){
+        try {
+            val endpoints = listOf(consignmentEndpoints)
+            Log.d(TAG, "sendAsset: consignmentEndpoints=$consignmentEndpoints")
+            promise.resolve(RGBHelper.send(assetId, blindedUTXO, amount.toULong(), endpoints))
+        }catch (e: Exception) {
+            Log.d(TAG, "sendAsset:e.message ${e.message}")
+            promise.resolve(e.message)
+        }
     }
 }

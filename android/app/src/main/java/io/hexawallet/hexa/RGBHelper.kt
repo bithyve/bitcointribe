@@ -115,7 +115,6 @@ object RGBHelper {
     }
 
     fun refresh(assetID: String? = null, light: Boolean = false): Boolean {
-        Log.d(TAG, "refresh: "+assetID)
         val filter =
             if (light)
                 listOf(
@@ -133,14 +132,15 @@ object RGBHelper {
         blindedUTXO: String,
         amount: ULong,
         consignmentEndpoints: List<String>,
-        feeRate: Float,
+        feeRate: Float = AppConstants.defaultFeeRate,
     ): String {
-        return RGBWalletRepository.wallet.send(
+        val sendResponse = handleMissingFunds { RGBWalletRepository.wallet.send(
             RGBWalletRepository.online,
-            mapOf(assetID to listOf(Recipient(blindedUTXO, amount, consignmentEndpoints))),
+            mapOf(assetID to listOf(Recipient(blindedUTXO, amount, listOf(AppConstants.proxyConsignmentEndpoint)))),
             false,
             feeRate,
-        )
+        ) }
+        return sendResponse
     }
 
     fun issueRgb20Asset(ticker: String, name: String, amounts: List<ULong>): String {

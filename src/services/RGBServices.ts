@@ -117,4 +117,12 @@ export default class RGBServices{
     console.log( data )
     return JSON.parse( data )
   }
+
+  static sendAsset = async ( assetId: string, blindedUTXO: string, amount: string, consignmentEndpoints: string ): Promise<{}> => {
+    const data = await RGB.sendAsset(
+      assetId, blindedUTXO, amount, consignmentEndpoints
+    )
+    console.log( data )
+    return data
+  }
 }
