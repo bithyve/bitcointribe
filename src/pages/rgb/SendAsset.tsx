@@ -14,6 +14,7 @@ import Fonts from '../../common/Fonts'
 import FormStyles from '../../common/Styles/FormStyles'
 import CommonStyles from '../../common/Styles/Styles'
 import { translations } from '../../common/content/LocContext'
+import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
 
 export default function RGBSend ( props ) {
@@ -30,7 +31,12 @@ export default function RGBSend ( props ) {
       const utxo = payTo.match( /~\/~\/([^?]+)\?/ )[ 1 ]
       const endpoint = payTo.match( /endpoints=([^&]+)/ )[ 1 ]
       const response = await RGBServices.sendAsset( asset.assetId, utxo, amount, endpoint )
-      console.log( response )
+      if( response.txid ) {
+        Toast( 'Sent Successfully' )
+        props.navigation.goBack()
+      } else {
+        Toast( 'Failed' )
+      }
     } catch ( error ) {
       console.log( error )
     }

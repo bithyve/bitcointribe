@@ -125,4 +125,9 @@ export default class RGBServices{
     console.log( data )
     return data
   }
+
+  static getUnspents = async ( ): Promise<{}> => {
+    const data = await RGB.getUnspents()
+    return JSON.parse( data )
+  }
 }

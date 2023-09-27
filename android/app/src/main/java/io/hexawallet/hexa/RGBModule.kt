@@ -121,8 +121,20 @@ class RGBModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
             Log.d(TAG, "sendAsset: consignmentEndpoints=$consignmentEndpoints")
             promise.resolve(RGBHelper.send(assetId, blindedUTXO, amount.toULong(), endpoints))
         }catch (e: Exception) {
-            Log.d(TAG, "sendAsset:e.message ${e.message}")
-            promise.resolve(e.message)
+            val message = e.message
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("error", message)
+            promise.resolve(jsonObject.toString())
         }
+    }
+
+    @ReactMethod
+    fun getUnspents(promise: Promise){
+        val rgbUtxo = RGBHelper.getUnspents()
+        val bitcoinUtxo = BdkHelper.getUnspents()
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("rgb", Gson().toJson(rgbUtxo))
+        jsonObject.addProperty("bitcoin", Gson().toJson(bitcoinUtxo))
+        promise.resolve(jsonObject.toString())
     }
 }

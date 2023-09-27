@@ -7,14 +7,12 @@ import org.rgbtools.AssetRgb20
 import org.rgbtools.AssetRgb25
 import org.rgbtools.Balance
 import org.rgbtools.BlindData
-import org.rgbtools.Metadata
 import org.rgbtools.Recipient
 import org.rgbtools.RefreshFilter
 import org.rgbtools.RefreshTransferStatus
 import org.rgbtools.RgbLibException
-import org.rgbtools.generateKeys
+import org.rgbtools.Unspent
 import kotlin.Exception
-import kotlin.math.log
 
 object RGBHelper {
 
@@ -134,13 +132,15 @@ object RGBHelper {
         consignmentEndpoints: List<String>,
         feeRate: Float = AppConstants.defaultFeeRate,
     ): String {
-        val sendResponse = handleMissingFunds { RGBWalletRepository.wallet.send(
+        val txid = handleMissingFunds { RGBWalletRepository.wallet.send(
             RGBWalletRepository.online,
-            mapOf(assetID to listOf(Recipient(blindedUTXO, amount, listOf(AppConstants.proxyConsignmentEndpoint)))),
+            mapOf(assetID to listOf(Recipient(blindedUTXO, amount, listOf("rpcs://proxy.iriswallet.com/json-rpc")))),
             false,
             feeRate,
         ) }
-        return sendResponse
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("txid", txid)
+        return jsonObject.toString()
     }
 
     fun issueRgb20Asset(ticker: String, name: String, amounts: List<ULong>): String {
@@ -240,5 +240,8 @@ object RGBHelper {
         }
     }
 
+    fun getUnspents(): List<Unspent> {
+        return RGBWalletRepository.wallet.listUnspents(false)
+    }
 
 }
