@@ -366,7 +366,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       params: {
         screen: 'QRScanner',
         params: {
-          onCodeScanned:  this.onCodeScanned,
+          screen: 'QRRoot',
+          params: {
+            onCodeScanned:  this.onCodeScanned,
+          }
         }
       }
     } )

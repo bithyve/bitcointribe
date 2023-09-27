@@ -11,7 +11,8 @@ import IssueScreen from '../../../pages/rgb/IssueScreen'
 import NewRGBWallet from '../../../pages/rgb/NewRGBWallet'
 import RGB121TxDetail from '../../../pages/rgb/RGB121TxDetail'
 import RGBReceive from '../../../pages/rgb/RGBReceive'
-import RGBSend from '../../../pages/rgb/RGBSend'
+import RGBSendManually from '../../../pages/rgb/RGBSendManually'
+import RGBSendWithQR from '../../../pages/rgb/RGBSendWithQR'
 import RGBTxDetail from '../../../pages/rgb/RGBTxDetail'
 import RGBWalletDetail from '../../../pages/rgb/RGBWalletDetail'
 import SendAsset from '../../../pages/rgb/SendAsset'
@@ -54,7 +55,10 @@ const AssetsStack = ( { navigation, route } ) => {
       <Stack.Screen name="RGBReceive" component={RGBReceive} options={{
         headerShown: false
       }} />
-      <Stack.Screen name="RGBSend" component={RGBSend} options={{
+      <Stack.Screen name="RGBSendWithQR" component={RGBSendWithQR} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="RGBSendManually" component={RGBSendManually} options={{
         headerShown: false
       }} />
       <Stack.Screen name="SendAsset" component={SendAsset} options={{
