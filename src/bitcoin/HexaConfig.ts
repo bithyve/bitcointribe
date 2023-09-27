@@ -1,31 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as bitcoinJS from 'bitcoinjs-lib'
-import {
-  DerivativeAccount,
-  DerivativeAccounts,
-  TrustedContactDerivativeAccount,
-  DonationDerivativeAccount,
-  SwanDerivativeAccount,
-  RampDerivativeAccount,
-  WyreDerivativeAccount,
-  AccountType,
-  NetworkType,
-} from './utilities/Interface'
+import _ from 'lodash'
 import Config from 'react-native-config'
 import {
   DONATION_ACCOUNT,
-  SUB_PRIMARY_ACCOUNT,
-  WYRE,
   RAMP,
-  SWAN
+  SUB_PRIMARY_ACCOUNT,
+  SWAN,
+  WYRE
 } from '../common/constants/wallet-service-types'
 import PersonalNode from '../common/data/models/PersonalNode'
-import _ from 'lodash'
 import { APP_STAGE } from '../common/interfaces/Interfaces'
+import {
+  AccountType,
+  DerivativeAccount,
+  DerivativeAccounts,
+  DonationDerivativeAccount,
+  NetworkType,
+  RampDerivativeAccount,
+  SwanDerivativeAccount,
+  TrustedContactDerivativeAccount,
+  WyreDerivativeAccount,
+} from './utilities/Interface'
 
 class HexaConfig {
   //RAMP details
-  public RAMP_BASE_URL: string = Config.RAMP_BASE_URL ? Config.RAMP_BASE_URL.trim() : 'https://buy.ramp.network/'
+  public RAMP_BASE_URL: string = Config.RAMP_BASE_URL ? Config.RAMP_BASE_URL.trim() : 'https://app.ramp.network/'
   public RAMP_REFERRAL_CODE: string = Config.RAMP_REFERRAL_CODE ? Config.RAMP_REFERRAL_CODE.trim() : 'ku67r7oh5juc27bmb3h5pek8y5heyb5bdtfa66pr'
   //SWAN details
   public SWAN_CLIENT_ID:string = Config.SWAN_CLIENT_ID || 'hexa'
