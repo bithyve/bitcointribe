@@ -85,7 +85,7 @@ export default function RGBWalletDetail( props ) {
         <View style={styles.footerSection}>
           <SendAndReceiveButtonsFooter
             onSendPressed={() => {
-              props.navigation.navigate( 'RGBSend' )
+              props.navigation.navigate( 'RGBSendWithQR' )
             }}
             onReceivePressed={() => {
               props.navigation.navigate( 'RGBReceive', {
