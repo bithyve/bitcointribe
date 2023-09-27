@@ -5,9 +5,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
-import {
-  widthPercentageToDP as wp,
-} from 'react-native-responsive-screen'
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
@@ -15,11 +13,10 @@ import FormStyles from '../../common/Styles/FormStyles'
 import CommonStyles from '../../common/Styles/Styles'
 import { translations } from '../../common/content/LocContext'
 
-export default function RGBSend ( props ) {
-  const strings  = translations[ 'settings' ]
+export default function RGBSendManually ( props ) {
   const common  = translations[ 'common' ]
 
-  const [ payTo, setPayTo ] = useState( '' )
+  const [ payTo, setPayTo ] = useState( props.route.params?.address ?? '' )
   const [ amount, setamount ] = useState( '' )
   const [ fee, setfee ] = useState( '' )
 
@@ -54,22 +51,6 @@ export default function RGBSend ( props ) {
       <Text style={styles.headerTitleText}>{common.send}</Text>
       <Text style={styles.headerSubTitleText}>{'Enter Bitcoin address manually'}</Text>
 
-      {/* <View style={[ ListStyles.infoHeaderSection, {
-        height: '20%', flexDirection: 'row'
-      } ]}>
-        <Text style={[ styles.infoHeaderText, {
-          color: Colors.THEAM_INFO_TEXT_COLOR, paddingTop: 15
-        } ]}>{'Sending From:'}</Text>
-        <View style={{
-          height: '20%',
-          justifyContent: 'space-between',
-          paddingHorizontal:hp( 4 ),
-        }}>
-          <Text style={ListStyles.infoHeaderTitleText}>{'Savings Account'}</Text>
-          <Text numberOfLines={2} style={styles.infoHeaderText}>{'Available to spend 5,000 sats'}</Text>
-
-        </View>
-      </View> */}
       <KeyboardAwareScrollView
         bounces={false}
         overScrollMode="never"
