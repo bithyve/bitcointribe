@@ -170,7 +170,7 @@ export default function RGBWalletDetail( props ) {
           return (
             <View style={styles.viewSectionContainer}>
               <FlatList
-                data={transactions}
+                data={transactions.reverse()}
                 style={{
                   marginVertical: 20
                 }}
@@ -178,7 +178,11 @@ export default function RGBWalletDetail( props ) {
                   <TouchableOpacity style={styles.itemContainer} onPress={() =>{}}>
                     <View style={styles.textContainer}>
                       <Text numberOfLines={1} ellipsizeMode="middle" style={styles.itemTitle}>{item.txid}</Text>
-                      <Text style={styles.itemDesc}>{moment( Number( item.confirmationTime ) * 1000 ).format( 'DD/MM/YY • hh:MMa' )}</Text>
+                      {
+                        item.confirmationTime && (
+                          <Text style={styles.itemDesc}>{moment.unix( Number( item.confirmationTime.timestamp ) ).format( 'DD/MM/YY • hh:MMa' )}</Text>
+                        )
+                      }
                     </View>
                     <View style={styles.currencyContainer}>
                       <View style={{
