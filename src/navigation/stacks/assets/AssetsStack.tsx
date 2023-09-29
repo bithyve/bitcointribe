@@ -16,6 +16,7 @@ import RGBSendWithQR from '../../../pages/rgb/RGBSendWithQR'
 import RGBTxDetail from '../../../pages/rgb/RGBTxDetail'
 import RGBWalletDetail from '../../../pages/rgb/RGBWalletDetail'
 import SendAsset from '../../../pages/rgb/SendAsset'
+import UnspentList from '../../../pages/rgb/UnspentList'
 import QRStack from '../home/QRStack'
 
 // const strings  = translations[ 'stackTitle' ]
@@ -77,6 +78,9 @@ const AssetsStack = ( { navigation, route } ) => {
         headerShown: false
       }} />
       <Stack.Screen name="AssetMetaData" component={AssetMetaData} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="UnspentList" component={UnspentList} options={{
         headerShown: false
       }} />
       <Stack.Screen name="AssetTransferDetails" component={AssetTransferDetails} options={{

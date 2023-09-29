@@ -150,7 +150,11 @@ export default function RGBWalletDetail( props ) {
               paddingHorizontal: 20,
             }}>
               <DetailsCard
-                onKnowMorePressed={() => {}}
+                showKnowMore
+                knowMoreText='View UTXO'
+                onKnowMorePressed={() => {
+                  props.navigation.navigate( 'UnspentList' )
+                }}
                 onSettingsPressed={()=>{}}
                 balance={balances.spendable}
                 cardColor='#88B283'

@@ -127,7 +127,7 @@ export default function RGB121TxDetail( props ) {
   const onViewMorePressed = () => {
 
   }
-  console.log( 'assetassetasset', asset.futureBalance )
+
   return (
     <SafeAreaView style={{
       flex: 1, backgroundColor: Colors.backgroundColor
