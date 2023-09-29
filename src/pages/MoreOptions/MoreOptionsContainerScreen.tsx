@@ -6,21 +6,21 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
+import CrossButton from '../../assets/images/svgs/icons_close.svg'
+import DocumentPad from '../../assets/images/svgs/icons_document_copy.svg'
 import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
 import AppInfo from '../../assets/images/svgs/icon_info.svg'
 import Wallet from '../../assets/images/svgs/icon_settings.svg'
 import Telegram from '../../assets/images/svgs/icon_telegram.svg'
-import CrossButton from '../../assets/images/svgs/icons_close.svg'
-import DocumentPad from '../../assets/images/svgs/icons_document_copy.svg'
 import Node from '../../assets/images/svgs/node.svg'
 import QueActive from '../../assets/images/svgs/question_inactive.svg'
 import { LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
-import Fonts from '../../common/Fonts'
 import { LocalizationContext } from '../../common/content/LocContext'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
+import Fonts from '../../common/Fonts'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import ModalContainer from '../../components/home/ModalContainer'
 import { toggleClipboardAccess } from '../../store/actions/misc'
@@ -549,7 +549,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              Linking.openURL( 'https://t.me/bitcoinTribe_' )
+              Linking.openURL( 'https://t.me/BitcoinTribeSupport' )
                 .then( ( _data ) => { } )
                 .catch( ( _error ) => {
                   alert( 'Make sure Telegram installed on your device' )
