@@ -1,50 +1,45 @@
-import React, { useEffect, useState, useContext } from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Platform,
-  PermissionsAndroid,
-  Linking,
-  SafeAreaView,
-  TouchableOpacity,
-  StatusBar
-} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useSelector, useDispatch } from 'react-redux'
+import * as ExpoContacts from 'expo-contacts'
+import React, { useContext, useEffect, useState } from 'react'
 import {
-  widthPercentageToDP as wp,
+  PermissionsAndroid,
+  Platform,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native'
+import { FlatList } from 'react-native-gesture-handler'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Icon from 'react-native-vector-icons/MaterialIcons'
+import { useDispatch, useSelector } from 'react-redux'
+import { v4 as uuid } from 'uuid'
+import { Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import { FlatList } from 'react-native-gesture-handler'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CommonStyles from '../../common/Styles/Styles'
-import RadioButton from '../../components/RadioButton'
-import * as ExpoContacts from 'expo-contacts'
-import Icon from 'react-native-vector-icons/MaterialIcons'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import AntDesign from 'react-native-vector-icons/AntDesign'
-import * as Permissions from 'expo-permissions'
-import { setIsPermissionGiven, setContactPermissionAsked } from '../../store/actions/preferences'
-import ModalContainer from '../../components/home/ModalContainer'
-import { Trusted_Contacts } from '../../bitcoin/utilities/Interface'
-import { v4 as uuid } from 'uuid'
-import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
-import { editTrustedContact } from '../../store/actions/trustedContacts'
-import HeaderTitle1 from '../../components/HeaderTitle1'
 import { LocalizationContext } from '../../common/content/LocContext'
-import PaginationIcon from '../../assets/images/svgs/pagination_1.svg'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import HeaderTitle1 from '../../components/HeaderTitle1'
+import RadioButton from '../../components/RadioButton'
 import CreateFNFInvite from '../../components/friends-and-family/CreateFNFInvite'
-import LinearGradient from 'react-native-linear-gradient'
+import ModalContainer from '../../components/home/ModalContainer'
+import { setContactPermissionAsked, setIsPermissionGiven } from '../../store/actions/preferences'
+import { editTrustedContact } from '../../store/actions/trustedContacts'
 
 export default function AddContactAddressBook( props ) {
   let [ selectedContacts, setSelectedContacts ] = useState( [] )
-  const [ editedContacts, setEditedContacts ] = useState( [ props.navigation.state.params?.contactToEdit ] )
+  const [ editedContacts, setEditedContacts ] = useState( [ props.route.params?.contactToEdit ] )
   const [ searchName, setSearchName ] = useState( '' )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ filterContactData, setFilterContactData ] = useState( [] )
@@ -135,9 +130,7 @@ export default function AddContactAddressBook( props ) {
         getContact()
       }
     } else if ( Platform.OS === 'ios' ) {
-      const { status, expires, permissions } = await Permissions.askAsync(
-        Permissions.CONTACTS,
-      )
+      const { status } = await ExpoContacts.requestPermissionsAsync()
       if ( status === 'denied' ) {
         setContactPermissionIOS( false )
         setErrorMessage( strings.cannotSelect )
@@ -160,7 +153,7 @@ export default function AddContactAddressBook( props ) {
         getContactPermission()
       }
     } else if ( Platform.OS === 'ios' ) {
-      if ( ( await Permissions.getAsync( Permissions.CONTACTS ) ).status === 'undetermined' ) {
+      if ( ( await ExpoContacts.requestPermissionsAsync() ).status === 'undetermined' ) {
         setModal( true )
       }
       else {
@@ -300,39 +293,39 @@ export default function AddContactAddressBook( props ) {
   const onPressContinue = () => {
     if ( selectedContacts && selectedContacts.length ) {
 
-      if ( props.navigation.state.params?.fromScreen === 'Edit' ) {
-        selectedContacts[ 0 ].id = props.navigation.state.params?.contactToEdit.id
-        selectedContacts[ 0 ].channelKey = props.navigation.state.params?.contactToEdit.channelKey
+      if ( props.route.params?.fromScreen === 'Edit' ) {
+        selectedContacts[ 0 ].id = props.route.params?.contactToEdit.id
+        selectedContacts[ 0 ].channelKey = props.route.params?.contactToEdit.channelKey
         selectedContacts[ 0 ].displayedName = selectedContacts[ 0 ].name
-        selectedContacts[ 0 ].avatarImageSource = selectedContacts[ 0 ].image ? selectedContacts[ 0 ].image : props.navigation.state.params?.contactToEdit.avatarImageSource
+        selectedContacts[ 0 ].avatarImageSource = selectedContacts[ 0 ].image ? selectedContacts[ 0 ].image : props.route.params?.contactToEdit.avatarImageSource
         dispatch( editTrustedContact( {
-          channelKey: props.navigation.state.params?.contactToEdit.channelKey,
+          channelKey: props.route.params?.contactToEdit.channelKey,
           contactName: selectedContacts[ 0 ].name,
           image: selectedContacts[ 0 ].image
         } ) )
         props.navigation.navigate( 'ContactDetails', {
           contact: selectedContacts[ 0 ],
         } )
-      } else if ( props.navigation.state.params?.fromScreen === 'Gift' ) {
+      } else if ( props.route.params?.fromScreen === 'Gift' ) {
         props.navigation.replace( 'EnterGiftDetails', {
           fromScreen: 'Gift',
-          giftId: props.navigation.state.params?.giftId,
+          giftId: props.route.params?.giftId,
           contact: selectedContacts,
-          setActiveTab: props.navigation.state.params.setActiveTab
+          setActiveTab: props.route.params.setActiveTab
         } )
       } else {
-        if( props.navigation.state.params?.fromScreen === 'Invitation' ){
+        if( props.route.params?.fromScreen === 'Invitation' ){
           setCreateFNFInvite( true )
         }else{
           props.navigation.navigate( 'AddContactSendRequest', {
             SelectedContact: selectedContacts,
-            giftId: props.navigation.state.params?.giftId,
+            giftId: props.route.params?.giftId,
             headerText: strings.addContact,
             subHeaderText: strings.send,
             contactText: strings.adding,
-            senderName: props?.navigation?.state?.params?.senderName,
+            senderName: props?.route.params?.senderName,
             showDone: true,
-            note: props?.navigation?.state?.params?.note
+            note: props?.route.params?.note
           } )
 
         }
@@ -345,13 +338,13 @@ export default function AddContactAddressBook( props ) {
     setCreateFNFInvite( false )
     props.navigation.navigate( 'AddContactSendRequest', {
       SelectedContact: selectedContacts,
-      giftId: props.navigation.state.params?.giftId,
+      giftId: props.route.params?.giftId,
       headerText: strings.addContact,
       subHeaderText: strings.send,
       contactText: strings.adding,
-      senderName: props?.navigation?.state?.params?.senderName,
+      senderName: props?.route.params?.senderName,
       showDone: true,
-      note: props?.navigation?.state?.params?.note
+      note: props?.route.params?.note
     } )
   }
   const goCreateGifts = () => {
@@ -359,7 +352,7 @@ export default function AddContactAddressBook( props ) {
     props.navigation.navigate( 'CreateGift', {
       selectedContact: selectedContacts,
       statusFlag: 'Invitation',
-      giftId: props.navigation.state.params?.giftId,
+      giftId: props.route.params?.giftId,
     } )
   }
   const onPressBack = () => {
@@ -372,14 +365,14 @@ export default function AddContactAddressBook( props ) {
     }
     props.navigation.navigate( 'AddContactSendRequest', {
       SelectedContact: [ skippedContact ],
-      giftId: props.navigation.state.params?.giftId,
+      giftId: props.route.params?.giftId,
       headerText: strings.addContact,
       subHeaderText: strings.send,
       contactText: strings.adding,
       showDone: true,
       skipClicked: true,
-      senderName: props?.navigation?.state?.params?.senderName,
-      note: props?.navigation?.state?.params?.note
+      senderName: props?.route.params?.senderName,
+      note: props?.route.params?.note
     } )
   }
 
@@ -394,7 +387,7 @@ export default function AddContactAddressBook( props ) {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.pop( props.navigation.state.params?.fromScreen === 'Gift' ? 2 : 1 )
+            props.navigation.pop( props.route.params?.fromScreen === 'Gift' ? 2 : 1 )
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -634,7 +627,7 @@ export default function AddContactAddressBook( props ) {
                         {item.name && item.name.split( ' ' ).map( ( x, index ) => {
                           const i = item.name.split( ' ' ).length
                           return (
-                            <Text style={{
+                            <Text key={`${x}_${index}`} style={{
                               color: selected ? Colors.white : Colors.black
                             }}>
                               {index !== i - 1 ? `${x} ` :
@@ -694,7 +687,7 @@ export default function AddContactAddressBook( props ) {
                 </AppBottomSheetTouchableWrapper>
               )
             }
-            {props.navigation.state.params?.fromScreen === 'Edit' ?
+            {props.route.params?.fromScreen === 'Edit' ?
               null :
               <AppBottomSheetTouchableWrapper
                 onPress={() => onSkipContinue()}
@@ -805,7 +798,7 @@ const styles = StyleSheet.create( {
   },
   proceedButtonText: {
     color: Colors.blue,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.Medium
   },
   modalContentContainer: {
@@ -840,11 +833,12 @@ const styles = StyleSheet.create( {
   buttonText: {
     color: Colors.white,
     fontFamily: Fonts.Medium,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 12 ),
+    paddingHorizontal:5
   },
   bottomButtonView: {
     height: hp( '6%' ),
-    width: wp( '40%' ),
+    width: wp( '43%' ),
     backgroundColor: Colors.blue,
     borderRadius: 10,
     justifyContent: 'center',

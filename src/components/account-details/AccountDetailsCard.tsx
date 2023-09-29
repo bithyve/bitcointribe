@@ -1,79 +1,43 @@
+import { useNavigation } from '@react-navigation/native'
 import React, { useEffect, useMemo, useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  ImageBackground,
-  Image,
-  ImageSourcePropType,
   AppState,
+  Image,
+  StyleSheet,
+  Text,
+  View
 } from 'react-native'
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import Fonts from '../../common/Fonts'
-import Colors from '../../common/Colors'
-import ButtonStyles from '../../common/Styles/ButtonStyles'
-import { RFValue } from 'react-native-responsive-fontsize'
-import LabeledBalanceDisplay from '../LabeledBalanceDisplay'
 import { Button } from 'react-native-elements'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import AccountShell from '../../common/data/models/AccountShell'
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
-import { subAccountSettingsUpdateCompleted } from '../../store/actions/accounts'
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
-import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
-import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
-import { AccountType } from '../../bitcoin/utilities/Interface'
-import { useSelector } from 'react-redux'
-import ModalContainer from '../home/ModalContainer'
-import BottomSheetSwanInfo from '../bottom-sheets/swan/BottomSheetSwanInfo'
-import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
-import { useDispatch } from 'react-redux'
-import {
-  clearSwanCache,
-  isSwanVisited,
-  updateSwanStatus,
-} from '../../store/actions/SwanIntegration'
-import { withNavigation } from 'react-navigation'
+import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import { translations } from '../../common/content/LocContext'
+import { useDispatch, useSelector } from 'react-redux'
 import BWDetailsIcon from '../../assets/images/svgs/bwdetailsIcon.svg'
+import { AccountType } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import ButtonStyles from '../../common/Styles/ButtonStyles'
+import { translations } from '../../common/content/LocContext'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import SubAccountKind from '../../common/data/enums/SubAccountKind'
+import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
+import AccountShell from '../../common/data/models/AccountShell'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import { clearSwanCache, isSwanVisited, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import LabeledBalanceDisplay from '../LabeledBalanceDisplay'
+import BottomSheetSwanInfo from '../bottom-sheets/swan/BottomSheetSwanInfo'
+import ModalContainer from '../home/ModalContainer'
 
 export type Props = {
   accountShell: AccountShell;
   onKnowMorePressed: () => void;
   onSettingsPressed: () => void;
   swanDeepLinkContent: string | null;
-  navigation: any;
 };
 
-function backgroundImageForAccountKind(
-  primarySubAccount: SubAccountDescribing
-): ImageSourcePropType {
-  switch ( primarySubAccount.kind ) {
-      case SubAccountKind.TEST_ACCOUNT:
-        return require( '../../assets/images/carouselImages/test_account_background.png' )
-      case SubAccountKind.REGULAR_ACCOUNT:
-        return require( '../../assets/images/carouselImages/regular_account_background.png' )
-      case SubAccountKind.SECURE_ACCOUNT:
-        return require( '../../assets/images/carouselImages/savings_account_background.png' )
-      case SubAccountKind.DONATION_ACCOUNT:
-        return require( '../../assets/images/carouselImages/donation_account_background.png' )
-      case SubAccountKind.SERVICE:
-        switch (
-          ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind
-        ) {
-            case ServiceAccountKind.WYRE:
-              return require( '../../assets/images/carouselImages/wyre_account_background.png' )
-            case ServiceAccountKind.RAMP:
-              return require( '../../assets/images/carouselImages/ramp_account_background.png' )
-            case ServiceAccountKind.SWAN:
-              return require( '../../assets/images/carouselImages/swan_account_background.png' )
-        }
-      default:
-        return require( '../../assets/images/carouselImages/savings_account_background.png' )
-  }
-}
 
 function shadowColorForAccountKind(
   primarySubAccount: SubAccountDescribing
@@ -109,9 +73,9 @@ const AccountDetailsCard: React.FC<Props> = ( {
   accountShell,
   onKnowMorePressed,
   onSettingsPressed,
-  swanDeepLinkContent,
-  navigation,
+  swanDeepLinkContent
 }: Props ) => {
+  const navigation: any = useNavigation()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const [ swanModal, showSwanModal ] = useState( false )
   const dispatch = useDispatch()
@@ -123,8 +87,8 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const common = translations[ 'common' ]
 
   useEffect( () => {
-    AppState.addEventListener( 'change', onAppStateChange )
-    return () => AppState.removeEventListener( 'change', onAppStateChange )
+    const subscription = AppState.addEventListener( 'change', onAppStateChange )
+    return () => subscription.remove()
   }, [] )
 
   const onAppStateChange = ( state ) => {
@@ -331,9 +295,6 @@ const cardBorderRadius = 15
 const styles = StyleSheet.create( {
   rootContainer: {
     width: '100%',
-    // maxWidth: 440,
-    // maxHeight: hp(250),
-    // height: hp( 165 ),
     borderRadius: cardBorderRadius,
     elevation: 5,
     shadowOpacity: 0.62,
@@ -423,6 +384,6 @@ const styles = StyleSheet.create( {
   },
 } )
 
-export default withNavigation( AccountDetailsCard )
+export default AccountDetailsCard
 
 export { shadowColorForAccountKind }

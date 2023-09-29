@@ -74,7 +74,7 @@ export default function Receive( props ) {
   const common = translations[ 'common' ]
   const [ SecureReceiveWarningBottomSheet ] = useState( React.createRef() )
   const [ amount, setAmount ] = useState( '' )
-  const accountShell: AccountShell = props.navigation.getParam( 'accountShell' )
+  const accountShell: AccountShell = props.route.params?.accountShell
   const account: Account = useAccountByAccountShell( accountShell )
   const [ receivingAddress, setReceivingAddress ] = useState( null )
   const [ paymentURI, setPaymentURI ] = useState( null )
@@ -246,7 +246,7 @@ export default function Receive( props ) {
       <SafeAreaView style={{
         flex: 0
       }} />
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.LIGHT_BACKGROUND} barStyle="dark-content" />
       <TouchableWithoutFeedback onPress={() => onPressTouchableWrapper()}>
         <KeyboardAvoidingView
           style={{

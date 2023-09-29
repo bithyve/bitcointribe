@@ -1,36 +1,34 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  StyleSheet,
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  ScrollView,
-  StatusBar,
-  Text,
-  Image,
+  ActivityIndicator,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
-  Keyboard,
-  TouchableWithoutFeedback,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
   TextInput,
-  ActivityIndicator,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
 } from 'react-native'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Fonts from '../../common/Fonts'
-import Colors from '../../common/Colors'
-import QuestionList from '../../common/QuestionList'
-import CommonStyles from '../../common/Styles/Styles'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import Feather from 'react-native-vector-icons/Feather'
-import { RFValue } from 'react-native-responsive-fontsize'
-import HeaderTitle from '../../components/HeaderTitle'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import QuestionList from '../../common/QuestionList'
+import CommonStyles from '../../common/Styles/Styles'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import HeaderTitle from '../../components/HeaderTitle'
 
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { initializeSetup } from '../../store/actions/setupAndAuth'
 
 export default function NewWalletQuestionRegenerateShare( props ) {
@@ -51,7 +49,7 @@ export default function NewWalletQuestionRegenerateShare( props ) {
   const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
   const [ ansError, setAnsError ] = useState( '' )
   const dispatch = useDispatch()
-  const walletName = props.navigation.getParam( 'walletName' )
+  const walletName = props.route.params?.walletName
   // const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   // if (isInitialized) {
   //     props.navigation.navigate('HomeNav');
@@ -129,8 +127,8 @@ export default function NewWalletQuestionRegenerateShare( props ) {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>
@@ -192,6 +190,7 @@ export default function NewWalletQuestionRegenerateShare( props ) {
                 <View style={styles.dropdownBoxModal}>
                   {dropdownBoxList.map( ( value, index ) => (
                     <TouchableOpacity
+                      key={value.id}
                       onPress={() => {
                         setDropdownBoxValue( value )
                         setDropdownBoxOpenClose( false )

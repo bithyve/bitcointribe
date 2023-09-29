@@ -48,9 +48,10 @@ import Toast from '../../components/Toast'
 
 export type Props = {
   navigation: any;
+  route: any;
 };
 
-const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
+const SubAccountTFAHelpScreen = ( { navigation, route }: Props ) => {
   const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ qrModal, showQRModel ] = useState( false )
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
@@ -66,7 +67,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   ] = useState( React.createRef<BottomSheet>() )
   const [ serverNotRespondingModal, showServerNotRespondingModal ] = useState( false )
   const accountsState: AccountsState = useAccountsState()
-  const sourceAccountShell = navigation.getParam( 'sourceAccountShell' )
+  const sourceAccountShell = route.params?.sourceAccountShell
   const dispatch = useDispatch()
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const keeperInfo: KeeperInfoInterface[] = useSelector( ( state ) => state.bhr.keeperInfo )
@@ -268,8 +269,8 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
               }}
             >
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </AppBottomSheetTouchableWrapper>

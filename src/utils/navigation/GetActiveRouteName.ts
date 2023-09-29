@@ -1,16 +1,11 @@
-import { NavigationState } from "react-navigation";
+import { useNavigationState } from '@react-navigation/native'
 
-export default function getActiveRouteName(navigationState: NavigationState) {
-  if (!navigationState) {
-    return null;
-  }
+export default function getActiveRouteName( ) {
 
-  const route = navigationState.routes[navigationState.index];
+  return useNavigationState( ( state ) =>
+    state.routes[ state.index - 1 ]?.name
+      ? state.routes[ state.index - 1 ].name
+      : 'None'
+  )
 
-  // Dive into nested navigators
-  if (route.routes) {
-    return getActiveRouteName(route);
-  }
-
-  return route.routeName;
 }

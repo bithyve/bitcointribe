@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import { TouchableOpacity, TouchableWithoutFeedback, Modal, View, Keyboard, Platform, AppState, KeyboardAvoidingView, ScrollView } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
-import { ScreenCornerRadius } from 'react-native-screen-corner-radius'
 
 const BottomInputModalContainer = ( {
   visible,
@@ -28,11 +27,11 @@ const BottomInputModalContainer = ( {
   }
 
   useEffect( () => {
-    AppState.addEventListener(
+    const subscription = AppState.addEventListener(
       'change',
       onAppStateChange
     )
-    return () => AppState.removeEventListener( 'change', onAppStateChange )
+    return () => subscription.remove()
   }, [] )
   useEffect( () => {
     const keyboardDidShowListener = Keyboard.addListener(

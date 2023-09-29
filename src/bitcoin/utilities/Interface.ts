@@ -896,6 +896,14 @@ export interface LNNode {
   enableTor?: boolean
 }
 
+export interface RGBConfig {
+  mnemonic: string,
+  xpub: string,
+  xpubFingerprint: string,
+  bdkDir: string,
+  rgbDir: string
+}
+
 export interface Account {
   id: string,                           // account identifier(derived from xpub)
   isUsable: boolean,                    // true if account is usable
@@ -992,6 +1000,7 @@ export enum AccountType {
   EXCHANGE_ACCOUNT = 'EXCHANGE_ACCOUNT',
   FNF_ACCOUNT = 'FNF_ACCOUNT',
   LIGHTNING_ACCOUNT = 'LIGHTNING_ACCOUNT',
+  RGB_ACCOUNT = 'RGB_ACCOUNT',
   BORDER_WALLET = 'BORDER_WALLET',
 }
 
@@ -1008,6 +1017,11 @@ export enum DeepLinkKind {
   GIFT = 'GIFT',
   CONTACT_GIFT = 'CONTACT_GIFT',
   CAMPAIGN = 'CAMPAIGN'
+}
+
+export enum RGB_ASSET_TYPE {
+  BITCOIN = 'BITCOIN',
+  RGB20 = 'RGB20'
 }
 
 export enum ShortLinkDomain {

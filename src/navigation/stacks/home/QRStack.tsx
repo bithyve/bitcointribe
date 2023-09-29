@@ -1,52 +1,39 @@
 import React from 'react'
-import { createStackNavigator } from 'react-navigation-stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import HomeQRScannerScreen from '../../../pages/Home/HomeQRScannerScreen'
 import ReceiveQrScreen from '../../../pages/Home/ReceiveQrScreen'
-import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
 
-
-const QRStack = createStackNavigator(
-  {
-    QRRoot: {
-      screen: HomeQRScannerScreen,
-      navigationOptions: ( { navigation } ) => {
+const Stack = createNativeStackNavigator()
+export default function QRStack() {
+  return (
+    <Stack.Navigator
+      initialRouteName='QRRoot'
+      screenOptions={( { navigation } ) => ( {
+        ...defaultStackScreenNavigationOptions,
+        headerLeft: () => {
+          return <SmallNavHeaderBackButton onPress={() => { navigation.goBack() }} />
+        },
+      } )}
+    >
+      <Stack.Screen name="QRRoot" component={HomeQRScannerScreen} options={( { navigation } ) => {
         return {
           title: 'QR',
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.goBack() }} />
           },
         }
-      },
-    },
-
-    ReceiveQR: {
-      screen: ReceiveQrScreen,
-      navigationOptions: ( { navigation } ) => {
+      }} />
+      <Stack.Screen name="ReceiveQR" component={ReceiveQrScreen} options={( { navigation } ) => {
         return {
           title: 'Receive',
           headerLeft: () => {
-            return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-          }
+            return <SmallNavHeaderBackButton onPress={() => { navigation.goBack() }} />
+          },
         }
-      },
-    },
-
-  },
-  {
-    initialRouteName: 'QRRoot',
-    defaultNavigationOptions: ( { navigation } ) => {
-      return {
-        ...defaultStackScreenNavigationOptions,
-        headerLeft: () => {
-          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-        },
-      }
-    },
-  },
-)
-
-
-export default QRStack
+      }} />
+    </Stack.Navigator>
+  )
+}

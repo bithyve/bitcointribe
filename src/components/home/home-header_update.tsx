@@ -24,7 +24,6 @@ import ModalContainer from '../../components/home/ModalContainer'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { setCloudBackupStatus, setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
 import CloudStatus from '../../common/data/enums/CloudBackupStatus'
-import LinearGradient from 'react-native-linear-gradient'
 
 const currencyCode = [
   'BRL',
@@ -58,6 +57,7 @@ import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
 import dbManager from '../../storage/realm/dbManager'
+import { CommonActions } from '@react-navigation/native'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -207,30 +207,33 @@ const HomeHeader = ( {
 
     return <TouchableOpacity
       onPress={()=> {
-      //   if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
-      //   levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup phrase' ){
-      //     if ( ( levelHealth.length == 0 ) ||
-      //     ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ||
-      //     ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == KeeperType.SECURITY_QUESTION )
-      //     ) {
-      //       const navigationParams = {
-      //         selectedTitle: navigationObj?.selectedKeeper?.name,
-      //         SelectedRecoveryKeyNumber: 1,
-      //         selectedKeeper: navigationObj?.selectedKeeper,
-      //         selectedLevelId: levelData[ 0 ].id
-      //       }
-      //       navigation.navigate( 'SeedBackupHistory', navigationParams )
-      //     } else {
-      //       setSelectedKeeper( levelData[ 0 ].keeper1 )
-      //       dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
-      //       setOnKeeperButtonClick( true )
-      //     }
-      //   } else navigation.navigate( 'WalletBackup' )
-      // // navigation.navigate( 'WalletBackup' ), {
-      //   // messageOne, messageTwo, isFirstMessageBold, isError, isInit
-      // // }
-      // }
-        navigation.navigate( 'BackupMethods' )
+        navigation.dispatch( state => {
+          const moreOptionsStackRoute = state.routes.find( route => route.name === 'MoreOptionsStack' )
+          let updatedRoutes = state.routes
+          if ( moreOptionsStackRoute ) {
+            updatedRoutes = [
+              ...state.routes.slice( 0, -1 ),
+              {
+                ...state.routes[ state.routes.length - 1 ], // Copy the existing MoreOptionsStack route
+                state: {
+                  ...( state.routes[ state.routes.length - 1 ].state || {
+                  } ),
+                  index: 1,
+                  routes: [ {
+                    name: 'MoreOptionsContainerScreen', key: 'MoreOptionsContainerKey'
+                  }, {
+                    name: 'BackupMethods', key: 'BackupMethodsKey'
+                  } ], // Update the routes of MoreOptionsStack
+                },
+              }
+            ]
+          }
+          return CommonActions.reset( {
+            ...state,
+            index: 3,
+            routes: updatedRoutes,
+          } )
+        } )
       } }
       activeOpacity={0.6}
       style={{
@@ -297,13 +300,11 @@ const HomeHeader = ( {
   }
 
   useEffect( () => {
-    const focusListener = navigation.addListener( 'didFocus', () => {
+    const unsubscribe = navigation.addListener( 'focus', () => {
       getMessageToShow()
     } )
-    return () => {
-      focusListener.remove()
-    }
-  }, [] )
+    return unsubscribe
+  }, [ navigation ] )
 
   const getMessageToShow = () => {
     if( levelData[ 0 ].keeper2.updatedAt == 0 && currentLevel == 0 && cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {

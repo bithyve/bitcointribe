@@ -1,5 +1,6 @@
 import React from 'react'
-import { createStackNavigator } from 'react-navigation-stack'
+import { NavigationContainer } from '@react-navigation/native'
+import { NativeStackNavigationOptions, createNativeStackNavigator } from '@react-navigation/native-stack'
 import AccountDetailsContainerScreen from '../../../pages/Accounts/Details/AccountDetailsContainerScreen'
 import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 import TransactionsListContainerScreen from '../../../pages/Accounts/Transactions/TransactionsListContainerScreen'
@@ -9,71 +10,38 @@ import SubAccountSettingsStack from './SubAccountSettingsStack'
 import DonationAccountWebViewSettingsScreen from '../../../pages/Accounts/AccountSettings/DonationAccountWebViewSettingsScreen'
 import SendStack from '../send/SendStack'
 import SubAccountTFAHelpScreen from '../../../pages/Accounts/SubAccountTFAHelpScreen'
-// import TwoFASetup from '../../../pages/Accounts/TwoFASetup'
-import { translations } from '../../../common/content/LocContext'
 
-const strings  = translations[ 'stackTitle' ]
-
-const AccountDetailsStack = createStackNavigator(
-  {
-    AccountDetailsRoot: AccountDetailsContainerScreen,
-    Send: {
-      screen: SendStack,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    TransactionsList: {
-      screen: TransactionsListContainerScreen,
-      navigationOptions: {
-        title: 'All Transactions',
-      },
-    },
-    TransactionDetails: {
-      screen: TransactionDetailsContainerScreen,
-      navigationOptions: {
-        title: 'TransactionDetails',
-      },
-    },
-    DonationAccountWebViewSettings: {
-      screen: DonationAccountWebViewSettingsScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
-
-    SubAccountSettings: {
-      screen: SubAccountSettingsStack,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    SubAccountTFAHelp: {
-      screen: SubAccountTFAHelpScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    // TwoFASetup: {
-    //   screen: TwoFASetup,
-    //   navigationOptions: {
-    //     gesturesEnabled: false,
-    //     header: null
-    //   },
-    // },
-  },
-  {
-    // mode: 'modal',
-    initialRouteName: 'AccountDetailsRoot',
-    defaultNavigationOptions: ( { navigation } ) => {
-      return {
+const Stack = createNativeStackNavigator()
+export default function AccountDetailsStack() {
+  return (
+    <Stack.Navigator
+      initialRouteName='AccountDetailsRoot'
+      screenOptions={( { navigation } ): NativeStackNavigationOptions => ( {
         ...defaultStackScreenNavigationOptions,
-        headerLeft: () => {
-          return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-        },
-      }
-    },
-  },
-)
+        headerLeft: () => <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+      } )}
+    >
+      <Stack.Screen name="AccountDetailsRoot" component={AccountDetailsContainerScreen} />
+      <Stack.Screen name="Send" component={SendStack} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="TransactionsList" component={TransactionsListContainerScreen} options={{
+        title: 'All Transactions'
+      }} />
+      <Stack.Screen name="TransactionDetails" component={TransactionDetailsContainerScreen} options={{
+        title: 'TransactionDetails'
+      }} />
+      <Stack.Screen name="DonationAccountWebViewSettings" component={DonationAccountWebViewSettingsScreen} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="SubAccountSettings" component={SubAccountSettingsStack} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="SubAccountTFAHelp" component={SubAccountTFAHelpScreen} options={{
+        headerShown: false
+      }} />
+    </Stack.Navigator>
 
-export default AccountDetailsStack
+  )
+}
+

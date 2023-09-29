@@ -19,7 +19,7 @@ export default class SettingsScreen extends Component {
   constructor( props: any ) {
     super( props )
     this.state = {
-      navigation: this.props.navigation.getParam( 'navigation' ),
+      navigation: props.route.params?.navigation,
     }
     this.settingOptions = [
       {

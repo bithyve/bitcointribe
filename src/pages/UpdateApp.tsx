@@ -27,16 +27,9 @@ import { setReleaseCases } from '../store/actions/preferences'
 export default function UpdateApp( props ) {
   const dispatch = useDispatch()
 
-  const releaseDataObj = props.navigation.state.params && props.navigation.state.params.releaseData
-    ? props.navigation.state.params.releaseData
-    : []
-  const isOpenFromNotificationList = props.navigation.state.params &&
-  props.navigation.state.params.isOpenFromNotificationList
-    ? props.navigation.state.params.isOpenFromNotificationList
-    : false
-  const releaseNumber = props.navigation.state.params && props.navigation.state.params.releaseNumber
-    ? props.navigation.state.params.releaseNumber
-    : ''
+  const releaseDataObj = props.route.params?.releaseData || []
+  const isOpenFromNotificationList = props.route.params?.isOpenFromNotificationList || false
+  const releaseNumber = props.route.params?.releaseNumber || ''
 
   const [ releaseNotes, setReleaseNotes ] = useState( [] )
   const [ isUpdateMandatory, setIsUpdateMandatory ] = useState( false )
@@ -198,8 +191,8 @@ export default function UpdateApp( props ) {
                 }}
               >
                 <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                  name="long-arrow-left"
+                  color={Colors.homepageButtonColor}
                   size={17}
                 />
               </TouchableOpacity> ) : null}

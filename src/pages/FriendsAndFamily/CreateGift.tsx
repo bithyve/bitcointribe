@@ -87,11 +87,12 @@ import LinearGradient from 'react-native-linear-gradient'
 const { height } = Dimensions.get( 'window' )
 
 export type Props = {
+  route:any;
   navigation: any;
 };
 
-const CreateGift = ( { navigation }: Props ) => {
-  const { selectedContact, statusFlag } = navigation?.state?.params
+const CreateGift = ( { route, navigation }: Props ) => {
+  const { selectedContact, statusFlag } = route?.params
   const dispatch = useDispatch()
   const activeAccounts = useActiveAccountShells().filter(
     ( shell ) => shell?.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT
@@ -267,7 +268,7 @@ const CreateGift = ( { navigation }: Props ) => {
             contact: selectedContact,
             senderName: name,
             themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
-            setActiveTab: navigation.state.params.setActiveTab,
+            setActiveTab: route.params?.setActiveTab,
           } )
         }
       }
@@ -414,7 +415,7 @@ const CreateGift = ( { navigation }: Props ) => {
                   navigation.navigate( 'AddContact', {
                     fromScreen: 'Gift',
                     giftId: ( createdGift as Gift ).id,
-                    setActiveTab: navigation.state.params.setActiveTab,
+                    setActiveTab: route.params?.setActiveTab,
                   } )
                   break
 
@@ -422,7 +423,7 @@ const CreateGift = ( { navigation }: Props ) => {
                   setGiftModal( false )
                   navigation.navigate( 'EnterGiftDetails', {
                     giftId: ( createdGift as Gift ).id,
-                    setActiveTab: navigation.state.params.setActiveTab,
+                    setActiveTab: route.params?.setActiveTab,
                   } )
                   break
             }

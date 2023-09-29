@@ -1,39 +1,32 @@
-import React, { useState, useCallback, useEffect, useContext } from 'react'
-import { View, Text, StatusBar, ScrollView, TouchableOpacity, SafeAreaView, StyleSheet, Image, FlatList, Platform, PermissionsAndroid, TextInput, Linking } from 'react-native'
-import Fonts from '../../common/Fonts'
-import BackupStyles from './Styles'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import ContactList from '../../components/ContactList'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import CommonStyles from '../../common/Styles/Styles'
-import HeaderTitle from '../../components/HeaderTitle'
-import { StreamData, TrustedContactRelationTypes, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
-import trustedContacts from '../../store/reducers/trustedContacts'
-import { useSelector, useDispatch } from 'react-redux'
-import ImageStyles from '../../common/Styles/ImageStyles'
-import RecipientAvatar from '../../components/RecipientAvatar'
-import LastSeenActiveIndicator from '../../components/LastSeenActiveIndicator'
-import { agoTextForLastSeen } from '../../components/send/LastSeenActiveUtils'
-import idx from 'idx'
-import { v4 as uuid } from 'uuid'
-import EvilIcons from 'react-native-vector-icons/EvilIcons'
-import { setIsPermissionGiven } from '../../store/actions/preferences'
-import * as Permissions from 'expo-permissions'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as ExpoContacts from 'expo-contacts'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import ModalContainer from '../../components/home/ModalContainer'
-import RadioButton from '../../components/RadioButton'
-import AntDesign from 'react-native-vector-icons/AntDesign'
+import idx from 'idx'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { FlatList, Linking, PermissionsAndroid, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import EvilIcons from 'react-native-vector-icons/EvilIcons'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { useDispatch, useSelector } from 'react-redux'
+import { v4 as uuid } from 'uuid'
+import { StreamData, TrustedContactRelationTypes, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import ImageStyles from '../../common/Styles/ImageStyles'
 import { LocalizationContext } from '../../common/content/LocContext'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import LastSeenActiveIndicator from '../../components/LastSeenActiveIndicator'
+import RadioButton from '../../components/RadioButton'
+import RecipientAvatar from '../../components/RecipientAvatar'
+import ModalContainer from '../../components/home/ModalContainer'
+import { setIsPermissionGiven } from '../../store/actions/preferences'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
+import BackupStyles from './Styles'
 
 
 const FNFToKeeper = ( props ) => {
@@ -58,7 +51,7 @@ const FNFToKeeper = ( props ) => {
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const trustedContacts: Trusted_Contacts = useSelector( ( state ) => state.trustedContacts.contacts )
   const dispatch = useDispatch()
-  const recreateChannel = props.navigation.getParam( 'recreateChannel' )
+  const recreateChannel = props.route.params?.recreateChannel
 
   useEffect( () => {
     const contacts: Trusted_Contacts = trustedContacts
@@ -79,7 +72,7 @@ const FNFToKeeper = ( props ) => {
     const contactDummy = {
       id: uuid(),
     }
-    props.navigation.state.params.onPressContinue( [ contactDummy ], recreateChannel )
+    props.route.params.onPressContinue( [ contactDummy ], recreateChannel )
     props.navigation.goBack()
   }
 
@@ -168,7 +161,7 @@ const FNFToKeeper = ( props ) => {
   }, [] )
 
   const onPressContinue = () => {
-    props.navigation.state.params.onPressContinue( contact, recreateChannel )
+    props.route.params.onPressContinue( contact, recreateChannel )
     props.navigation.goBack()
   }
 
@@ -204,7 +197,7 @@ const FNFToKeeper = ( props ) => {
         getContactPermission()
       }
     } else if ( Platform.OS === 'ios' ) {
-      if( ( await Permissions.getAsync( Permissions.CONTACTS ) ).status === 'undetermined' ){
+      if( ( await ExpoContacts.requestPermissionsAsync() ).status === 'undetermined' ){
         // ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
         setPermissionsModal( true )
       }
@@ -251,7 +244,7 @@ const FNFToKeeper = ( props ) => {
         getContact()
       }
     } else if ( Platform.OS === 'ios' ) {
-      const { status } = await Permissions.getAsync( Permissions.CONTACTS )
+      const { status } = await ExpoContacts.requestPermissionsAsync()
       if ( status === 'denied' ) {
         setContactPermissionIOS( false )
         setErrorMessage( strings.cannotSelect )

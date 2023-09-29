@@ -21,30 +21,26 @@ import CurrencyKindToggleSwitch from '../../../components/CurrencyKindToggleSwit
 import Toast from '../../../components/Toast'
 import { updateDonationPreferences } from '../../../store/actions/accounts'
 import { useDispatch } from 'react-redux'
-import { SafeAreaView } from 'react-navigation'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
 import { BaseNavigationProp } from '../../../navigation/Navigator'
 import { DonationAccount } from '../../../bitcoin/utilities/Interface'
-
-export type NavigationParams = {
-  account: Record<string, unknown>;
-};
-
-export type NavigationProp = {
-  params: NavigationParams;
-} & BaseNavigationProp;
+import { ParamListBase, RouteProp } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 export type Props = {
-  navigation: NavigationProp;
+  navigation: NativeStackNavigationProp<ParamListBase>;
+  route: RouteProp<{params: {account: any}}>;
 };
 
-const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
 
   const donationAccount: DonationAccount = useMemo( () => {
-    return navigation.getParam( 'account' )
-  }, [ navigation.params ] )
+    return route.params?.account
+  }, [ route.params ] )
 
+  const insets = useSafeAreaInsets()
 
   const [ isDonationTotalEnable, setIsDonationTotalEnable ] = useState(
     donationAccount.configuration.displayBalance
@@ -153,7 +149,13 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
   ] )
 
   return (
-    <SafeAreaView style={styles.modalContentContainer}>
+    <View style={{
+      ...styles.modalContentContainer,
+      paddingTop: insets.top,
+      paddingBottom: insets.bottom,
+      paddingLeft: insets.left,
+      paddingRight: insets.right
+    }}>
       <KeyboardAvoidingView
         style={{
           flex: 1
@@ -169,7 +171,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
             <View style={{
               flexDirection: 'row', alignItems: 'center'
             }}>
-              <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} /> 
+              <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
 
               <View>
                 <Text style={NavStyles.modalHeaderTitleText}>
@@ -353,41 +355,6 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
               />
             </View>
 
-            {/* <View style={{
-              ...styles.rowContainer, marginTop: 10
-            }}>
-              <Image
-                style={styles.imageStyle}
-                source={require( '../../../assets/images/icons/icon_donation_total.png' )}
-              />
-              <View style={styles.textContainer}>
-                <Text style={styles.titleTextStyle}>Outgoing Transactions</Text>
-                <Text
-                  style={{
-                    ...styles.modalInfoText,
-                    marginTop: wp( '1.2%' ),
-                    color: Colors.lightTextColor,
-                  }}
-                >
-                  Show outgoing donation transactions
-                </Text>
-              </View>
-              <CurrencyKindToggleSwitch
-                changeSettingToggle={true}
-                thumbSize={wp( '6%' )}
-                isNotImage={true}
-                trackColor={Colors.lightBlue}
-                thumbColor={
-                  isOutgoingTxnEnabled ? Colors.blue : Colors.white
-                }
-                onpress={() => {
-                  if( isIncomingTxnEnabled || isOutgoingTxnEnabled ) setIsOutgoingTxnEnabled( ( prevState ) => !prevState )
-                }
-                }
-                isOn={isOutgoingTxnEnabled}
-              />
-            </View> */}
-
             <View style={styles.rowContainer}>
               <View
                 style={{
@@ -429,7 +396,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   )
 }
 

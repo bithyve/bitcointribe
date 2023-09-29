@@ -1,57 +1,46 @@
-import React, { createRef, PureComponent } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useNavigation } from '@react-navigation/native'
+import idx from 'idx'
+import React, { PureComponent } from 'react'
 import {
+  Platform,
+  StyleProp,
+  StyleSheet,
   Text,
   View,
-  StyleSheet,
-  ViewStyle,
-  StyleProp,
-  Image,
-  Platform
+  ViewStyle
 } from 'react-native'
-import {
-  heightPercentageToDP,
-  widthPercentageToDP,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { connect } from 'react-redux'
-//import HomeHeader from '../../components/home/home-header'
-import idx from 'idx'
-import { withNavigationFocus } from 'react-navigation'
-import HomeAccountCardsList from './HomeAccountCardsList'
-import AccountShell from '../../common/data/models/AccountShell'
-import { setShowAllAccount, markAccountChecked, updateAccountSettings } from '../../store/actions/accounts'
-import { SwanIntegrationState } from '../../store/reducers/SwanIntegration'
-import Fonts from './../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { ScrollView } from 'react-native-gesture-handler'
-import ToggleContainer from './ToggleContainer'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
-import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
-import HomeBuyCard from './HomeBuyCard'
-import { LocalizationContext } from '../../common/content/LocContext'
-import { AccountType } from '../../bitcoin/utilities/Interface'
-import dbManager from '../../storage/realm/dbManager'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import ModalContainer from '../../components/home/ModalContainer'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { connect } from 'react-redux'
 import BWIcon from '../../assets/images/svgs/bw.svg'
 import IconRight from '../../assets/images/svgs/icon_arrow_right.svg'
 import LNIcon from '../../assets/images/svgs/lightningWhiteWithBack.svg'
 import TestIcon from '../../assets/images/svgs/testAccountHome.svg'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
+import { AccountType } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import { LocalizationContext } from '../../common/content/LocContext'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
+import AccountShell from '../../common/data/models/AccountShell'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
+import ModalContainer from '../../components/home/ModalContainer'
+import dbManager from '../../storage/realm/dbManager'
+import { markAccountChecked, setShowAllAccount, updateAccountSettings } from '../../store/actions/accounts'
+import Fonts from './../../common/Fonts'
+import HomeAccountCardsList from './HomeAccountCardsList'
+import HomeBuyCard from './HomeBuyCard'
+import ToggleContainer from './ToggleContainer'
 
 export enum BottomSheetKind {
   SWAN_STATUS_INFO,
   WYRE_STATUS_INFO,
   RAMP_STATUS_INFO,
+  ADD_A_WALLET_INFO
 }
 interface HomeStateTypes {
   currencyCode?: string;
@@ -114,21 +103,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         AsyncStorage.setItem( 'randomSeedWord', JSON.stringify( asyncSeedData ) )
       }
     }, 2000 )
-    // if( dbWallet ){
-    //   this.BorderWalletCreation( dbWallet && dbWallet )
-    // }
-
   }
-  // BorderWalletCreation= ( dbWallet )=> {
-  //   console.log( 'walletType', this.state.walletType )
-  //   console.log( 'dbWallet.borderWalletMnemonic', dbWallet.borderWalletMnemonic && dbWallet.borderWalletMnemonic )
-  //   if( dbWallet.borderWalletMnemonic && dbWallet.borderWalletMnemonic ){
-  //     this.setState( {
-  //       visibleWalletModal: true
-  //     } )
-  //   }
-
-  // }
   navigateToAddNewAccountScreen = () => {
     //BW-TO-DO
     this.setState( {
@@ -136,15 +111,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
   };
 
-  handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
-    // if (
-    //   this.props.startRegistration &&
-    //   selectedAccount.primarySubAccount.kind === SubAccountKind.SERVICE &&
-    // ( selectedAccount.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
-    // ) {
-    //   this.props.openBottomSheet( 6, null, true )
-
-    // } else {
+  handleAccountCardSelection =async ( selectedAccount: AccountShell ) => {
     if( selectedAccount.primarySubAccount.hasNewTxn ) {
       this.props.markAccountChecked( selectedAccount.id )
     }
@@ -154,10 +121,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         swanDeepLinkContent: this.props.swanDeepLinkContent,
         node: selectedAccount.primarySubAccount.node
       } )
-    } else {
+    }
+    else {
       this.props.navigation.navigate( 'AccountDetails', {
-        accountShellID: selectedAccount.id,
-        swanDeepLinkContent: this.props.swanDeepLinkContent
+        screen: 'AccountDetailsRoot',
+        params: {
+          accountShellID: selectedAccount.id,
+          swanDeepLinkContent: this.props.swanDeepLinkContent
+        }
       } )
     }
 
@@ -184,8 +155,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           marginTop: hp( 3 ),
           marginLeft: wp( 4 ),
           marginRight: wp( 6 ),
-          // alignItems: 'center',
-          // backgroundColor: 'red'
         }}>
           <Text style={{
             color: Colors.THEAM_TEXT_COLOR,
@@ -218,7 +187,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             <HomeBuyCard
               cardContainer={{
                 backgroundColor: 'white',
-                // marginLeft: wp( 4 ),
                 marginRight: wp( 2 ),
                 height: hp( Platform.OS == 'ios' ? '13%' : '15%' ),
                 width:wp( '91%' ),
@@ -229,12 +197,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 borderRadius: wp( 2 ),
                 padding: hp( '1.4%' ),
                 flexDirection: 'row',
-              // shadowColor: Colors.shadowColor,
-              // shadowOpacity: 1,
-              // shadowOffset: {
-              //   width: 10, height: 10
-              // },
-              // elevation: 6
               }}
               amount={exchangeRates ? this.numberWithCommas( exchangeRates[ currencyCode ]?.last.toFixed( 2 ) ) : ''}
               incramount={''}
@@ -441,10 +403,10 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Medium,
   }
 } )
-export default withNavigationFocus(
+export default (
   connect( mapStateToProps, {
     setShowAllAccount,
     markAccountChecked,
     updateAccountSettings
-  } )( Home )
+  } )( ( props: any ) => <Home {...props} navigation={useNavigation()}/> )
 )

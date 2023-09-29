@@ -1,12 +1,9 @@
 import React from 'react'
-import { View, Text } from 'react-native'
-import { createAppContainer } from 'react-navigation'
-import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs'
-import { createStackNavigator } from 'react-navigation-stack'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import NewRampAccountDetailsScreen from '../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
 import NewWyreAccountDetailsScreen from '../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
 import FriendsAndFamilyScreen from '../pages/FriendsAndFamily/FriendsAndFamilyScreen'
-import Home from '../pages/Home/Home'
 import HomeContainer from '../pages/Home/HomeContainer'
 import RampOrderFormScreen from '../pages/RampIntegration/RampOrderFormScreen'
 import WyreOrderFormScreen from '../pages/WyreIntegration/WyreOrderFormScreen'
@@ -16,124 +13,66 @@ import MoreOptionsStack from './stacks/more-options/MoreOptionsStack'
 import Colors from '../common/Colors'
 import AllTransactionsStack from './stacks/transactions/AllTransactionsStack'
 
-const HomeStack = createStackNavigator(
-  {
-    HomeRoot: {
-      screen: HomeContainer,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    AddNewAccount: {
-      screen: AddNewAccountStack,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    NewWyreAccountDetails: {
-      screen: NewWyreAccountDetailsScreen,
-      navigationOptions: {
+const Stack = createNativeStackNavigator()
+function HomeStack() {
+  return (
+    <Stack.Navigator
+      initialRouteName='HomeRoot'
+    >
+      <Stack.Screen name="HomeRoot" component={HomeContainer} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="AddNewAccount" component={AddNewAccountStack} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="NewWyreAccountDetails" component={NewWyreAccountDetailsScreen} options={{
         title: 'Setup Wyre Account'
-      }
-    },
-    NewRampAccountDetails: {
-      screen: NewRampAccountDetailsScreen,
-      navigationOptions: {
+      }} />
+      <Stack.Screen name="NewRampAccountDetails" component={NewRampAccountDetailsScreen} options={{
         title: 'Setup Ramp Account'
-      }
-    },
-    PlaceWyreOrder: {
-      screen: WyreOrderFormScreen,
-      navigationOptions: {
+      }} />
+      <Stack.Screen name="PlaceWyreOrder" component={WyreOrderFormScreen} options={{
         title: 'Buy with Wyre'
-      }
-    },
-    PlaceRampOrder: {
-      screen: RampOrderFormScreen,
-      navigationOptions: {
+      }} />
+      <Stack.Screen name="PlaceRampOrder" component={RampOrderFormScreen} options={{
         title: 'Buy with Ramp'
-      }
-    },
-    AllTransactions: {
-      screen: AllTransactionsStack,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    FriendsAndFamily: FriendsAndFamilyScreen,
-    QRScanner: {
-      screen: QRStack,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    MoreOptions: {
-      screen: MoreOptionsStack,
-      navigationOptions: {
-        header: null,
-      },
-    },
-  },
-  {
-    // mode: 'modal',
-    initialRouteName: 'HomeRoot',
-    // defaultNavigationOptions: ( { navigation } ) => {
-    //   return {
-    //     ...defaultStackScreenNavigationOptions,
-    //     headerLeft: () => {
-    //       return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-    //     },
-    //   }
-    // },
-    // transitionConfig: ( transitionProps, prevTransitionProps ) => {
-    //   const previousRouteName = prevTransitionProps?.scene.route.routeName
-    //   const newRouteName = transitionProps.scene.route.routeName
+      }} />
+      <Stack.Screen name="AllTransactions" component={AllTransactionsStack} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="FriendsAndFamily" component={FriendsAndFamilyScreen} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="QRScanner" component={QRStack} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="MoreOptions" component={MoreOptionsStack} options={{
+        headerShown: false
+      }} />
+    </Stack.Navigator>
+  )
+}
 
-    //   // 📝 Override the default presentation mode for screens that we
-    //   // want to present modally
-    //   const isModal = MODAL_ROUTES.some(
-    //     ( screenName ) => [ previousRouteName, newRouteName ].includes( screenName )
-    //   )
-
-    //   return StackViewTransitionConfigs.defaultTransitionConfig(
-    //     transitionProps,
-    //     prevTransitionProps,
-    //     isModal,
-    //   )
-    // },
-  },
-)
-export default createAppContainer( createMaterialBottomTabNavigator(
-  {
-    Album: {
-      screen: HomeStack
-    },
-    Library: {
-      screen: FriendsAndFamilyScreen
-    },
-    History: {
-      screen: HomeStack
-    },
-    Cart: {
-      screen: HomeStack
-    },
-  },
-
-  {
-    initialRouteName: 'Album',
-    activeColor: '#f0edf6',
-    inactiveColor: '#3e2465',
-    barStyle: {
-      // backgroundColor: '#694fad',
-      overflow:'hidden',
-      // position: 'absolute',
-      // left: 20,
-      // right: 20,
-      // bottom: 25,
-      // elevation: 0,
-      backgroundColor: Colors.blue,
-      borderRadius: 45,
-      margin: 15
-    },
-  }
-) )
+const Tab = createBottomTabNavigator()
+export default function AppContainer() {
+  return (
+    <Tab.Navigator
+      initialRouteName='Album'
+      screenOptions={{
+        tabBarActiveTintColor: '#f0edf6',
+        tabBarInactiveTintColor: '#3e2465',
+        tabBarStyle: {
+          overflow:'hidden',
+          backgroundColor: Colors.blue,
+          borderRadius: 45,
+          margin: 15
+        }
+      }}
+    >
+      <Tab.Screen name="Album" component={HomeStack} />
+      <Tab.Screen name="Library" component={FriendsAndFamilyScreen} />
+      <Tab.Screen name="History" component={HomeStack} />
+      <Tab.Screen name="Cart" component={HomeStack} />
+    </Tab.Navigator>
+  )
+}

@@ -95,6 +95,7 @@ export const setAllAccountsData = ( accounts ) => {
   }
 }
 
+
 export const accountChecked = ( accountShells: AccountShell [], accounts: Accounts ) => {
   return {
     type: ACCOUNT_CHECKED,

@@ -74,7 +74,7 @@ function validateAllowedCharacters( answer: string ): boolean {
   return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
 }
 
-export default function NewWalletQuestion( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
+export default function NewWalletQuestion( props ) {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
   const common = translations[ 'common' ]//SecurityCenter
@@ -115,8 +115,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ knowMore, setKnowMore ] = useState( false )
 
   const dispatch = useDispatch()
-  const walletName = props.navigation.getParam( 'walletName' )
-  const newUser = props.navigation.getParam( 'newUser' )
+  const walletName =  props.route.params?.walletName
+  const newUser = props.route.params?.newUser
 
   const [ answerError, setAnswerError ] = useState( '' )
   const [ pswdError, setPswdError ] = useState( '' )

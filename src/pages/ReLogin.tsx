@@ -20,8 +20,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth'
 
 export default function Login( props ) {
-  const pattern = props.navigation.getParam( 'pattern' )
-  const isValidate = props.navigation.getParam( 'isValidate' ) || false
+  const pattern = props.route.params?.pattern
+  const isValidate = props.route.params?.isValidate || false
   const [ passcode, setPasscode ] = useState( '' )
   const [ passcodeFlag, setPasscodeFlag ] = useState( true )
   const [ checkAuth, setCheckAuth ] = useState( false )
@@ -46,8 +46,8 @@ export default function Login( props ) {
   )
 
   if ( reLogin ) {
-    if ( props.navigation.state.params.isPasscodeCheck ){
-      if( props.navigation.state.params.onPasscodeVerify ) props.navigation.state.params.onPasscodeVerify( )
+    if ( props.route.params?.isPasscodeCheck ){
+      if( props.route.params?.onPasscodeVerify ) props.route.params?.onPasscodeVerify( )
       props.navigation.goBack() }
     else props.navigation.pop( 2 )
     dispatch( switchReLogin( false, true ) )

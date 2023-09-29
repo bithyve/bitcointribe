@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="22.799" height="21.242" viewBox="0 0 22.799 21.242">
+  <g id="wallet" transform="translate(1814.5 -4817.294)" opacity="0.7">
+    <g id="wallet-2" data-name="wallet" transform="translate(-1814 4817.794)">
+      <path id="Shape" d="M19.619,4.34A4.339,4.339,0,0,0,15.279,0H4.34A4.34,4.34,0,0,0,0,4.34V17.314a2.958,2.958,0,0,0,2.972,2.927H19.817A1.967,1.967,0,0,0,21.8,18.289V6.51a2.336,2.336,0,0,0-2.18-2.171Z" transform="translate(0 0)" fill="none" stroke="#fafafa" stroke-width="1"/>
+    </g>
+    <g id="wallet-3" data-name="wallet" transform="translate(-1811.813 4819.965)">
+      <path id="Shape-2" data-name="Shape" d="M15.259,2.169H0V1.815A1.814,1.814,0,0,1,1.817,0H13.442a1.815,1.815,0,0,1,1.817,1.815v.352Z" transform="translate(0 0)" fill="#fafafa"/>
+    </g>
+    <path id="Path" d="M2.142,4.3a2.179,2.179,0,1,1,.826-.166,2.152,2.152,0,0,1-.826.166Z" transform="translate(-1800.455 4827.795)" fill="#fafafa" stroke="rgba(0,0,0,0)" stroke-width="1"/>
+  </g>
+</svg>

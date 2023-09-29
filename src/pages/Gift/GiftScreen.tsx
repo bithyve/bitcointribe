@@ -1,10 +1,10 @@
 import {
   ActivityIndicator,
   Alert,
+  Dimensions,
   Image,
-  ImageBackground,
   Platform,
-  RefreshControl,
+  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -12,67 +12,56 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
 import { KeeperInfoInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import {
   PermanentChannelsSyncKind,
   syncPermanentChannels,
 } from '../../store/actions/trustedContacts'
-import {
-  heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
-} from 'react-native-responsive-screen'
 
-import Add_gifts from '../../assets/images/satCards/Add_gifts.svg'
 import Add from '../../assets/images/svgs/add.svg'
 
-import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
-import AlertModalContents from '../../components/AlertModalContents'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import BottomSheet from 'reanimated-bottom-sheet'
+import axios from 'axios'
 import { CKTapCard } from 'cktap-protocol-react-native'
-import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
-import ClaimSatComponent from './ClaimSatComponent'
+import idx from 'idx'
+import React from 'react'
+import { ListItem } from 'react-native-elements'
+import { RFValue } from 'react-native-responsive-fontsize'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { connect } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
+import Gifts from '../../assets/images/satCards/gifts.svg'
+import Sat_card from '../../assets/images/satCards/sats_card.svg'
+import ArrowRight from '../../assets/images/svgs/icon_arrow_right.svg'
 import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import CommonStyles from '../../common/Styles/Styles'
+import { LocalizationContext } from '../../common/content/LocContext'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import {
   ContactRecipientDescribing,
 } from '../../common/data/models/interfaces/RecipientDescribing'
-import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
-import DeviceInfo from 'react-native-device-info'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Fonts from '../../common/Fonts'
+import AlertModalContents from '../../components/AlertModalContents'
+import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
+import ModalHeader from '../../components/ModalHeader'
+import RecipientAvatar from '../../components/RecipientAvatar'
+import SmallHeaderModal from '../../components/SmallHeaderModal'
 import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
-import Gift from '../../assets/images/svgs/icon_gift.svg'
+import ModalContainer from '../../components/home/ModalContainer'
+import Loader from '../../components/loader'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import ToggleContainer from '../FriendsAndFamily/CurrencyToggle'
+import ClaimSatComponent from './ClaimSatComponent'
 import GiftBoxComponent from './GiftBoxCmponent'
 import GiftUnwrappedComponent from './GiftUnwrappedComponent'
-import Gifts from '../../assets/images/satCards/gifts.svg'
-import Header from '../../navigation/stacks/Header'
-import ImageStyles from '../../common/Styles/ImageStyles'
-import KnowMoreButton from '../../components/KnowMoreButton'
-import { ListItem } from 'react-native-elements'
-import Loader from '../../components/loader'
-import { LocalizationContext } from '../../common/content/LocContext'
-import ModalContainer from '../../components/home/ModalContainer'
-import ModalHeader from '../../components/ModalHeader'
-import { NavigationScreenConfig } from 'react-navigation'
-import { NavigationStackOptions } from 'react-navigation-stack'
 import NfcPrompt from './NfcPromptAndroid'
-import {
-  REGULAR_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
-import { RFValue } from 'react-native-responsive-fontsize'
-import React from 'react'
-import RecipientAvatar from '../../components/RecipientAvatar'
-import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
-import Sat_card from '../../assets/images/satCards/sats_card.svg'
-import SeedBacupModalContents from '../NewBHR/SeedBacupModalContents'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
-import ToggleContainer from '../FriendsAndFamily/CurrencyToggle'
 import VerifySatModalContents from './VerifySatModalContents'
-import axios from 'axios'
-import { connect } from 'react-redux'
-import defaultStackScreenNavigationOptions from '../../navigation/options/DefaultStackScreenNavigationOptions'
-import idx from 'idx'
-import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+
+const { height } = Dimensions.get( 'window' )
 
 interface GiftPropTypes {
   navigation: any;
@@ -112,7 +101,6 @@ class GiftScreen extends React.Component<
   GiftPropTypes,
   GiftStateTypes
 > {
-  // static navigationOptions = makeNavigationOptions;
   static contextType = LocalizationContext
 
   addContactAddressBookBottomSheetRef: React.RefObject<BottomSheet>;
@@ -121,7 +109,6 @@ class GiftScreen extends React.Component<
   card: CKTapCard;
   strings: object;
 
-  // card = useRef( new CKTapCard() ).current
   constructor( props, context ) {
     super( props, context )
 
@@ -185,11 +172,11 @@ class GiftScreen extends React.Component<
   }
 
   componentWillUnmount() {
-    ( this.focusListener )?.remove()
+    this.focusListener?.()
   }
 
   setUpFocusListener = () => {
-    this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
+    this.focusListener = this.props.navigation.addListener( 'focus', () => {
 
       this.setState( {
         showIndicator: true
@@ -667,10 +654,11 @@ class GiftScreen extends React.Component<
       showIndicator
     } = this.state
     return (
-      <View style={{
-        backgroundColor: Colors.darkBlue
+      <SafeAreaView style={{
+        flex:1,
+        backgroundColor: Colors.blue
       }}>
-        <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
+        <StatusBar backgroundColor={Colors.blue} barStyle='dark-content' />
         <View style={styles.accountCardsSectionContainer}>
           {showIndicator &&
             <ModalContainer onBackground={() => this.setState( {
@@ -698,6 +686,31 @@ class GiftScreen extends React.Component<
               </Text>
               <ToggleContainer />
             </View> */}
+          <View
+            style={[
+              CommonStyles.headerContainer,
+              {
+                backgroundColor: Colors.backgroundColor1,
+                marginRight: wp( 4 ),
+                marginVertical: height < 720 ? wp( 0 ) : 'auto',
+              },
+            ]}
+          >
+            <TouchableOpacity
+              style={CommonStyles.headerLeftIconContainer}
+              onPress={() => {
+                navigation.pop()
+              }}
+            >
+              <View style={CommonStyles.headerLeftIconInnerContainer}>
+                <FontAwesome
+                  name="long-arrow-left"
+                  color={Colors.homepageButtonColor}
+                  size={17}
+                />
+              </View>
+            </TouchableOpacity>
+          </View>
           <View style={{
             flexDirection: 'row', marginHorizontal: 30, marginTop: 15, alignItems: 'flex-end'
           }}>
@@ -707,7 +720,7 @@ class GiftScreen extends React.Component<
               marginStart: 10,
               marginBottom: 5,
             } ]}>
-              {this.strings[ 'giftsats' ]}
+              {this.strings[ 'gift' ]}
             </Text>
             {/* <View style={{marginTop: 10, justifyContent: 'center', alignSelf: 'flex-end'}}> */}
 
@@ -718,42 +731,34 @@ class GiftScreen extends React.Component<
             marginHorizontal: 39, fontSize: RFValue( 11 ), color: Colors.THEAM_INFO_TEXT_COLOR, fontFamily: Fonts.Ragular, marginTop: 18
           }}>{'Give sats as gifts to your friends and family, view and manage created gifts.'}</Text>
           <ScrollView
-            // refreshControl={
-            //   <RefreshControl
-            //     refreshing={showLoader}
-            //     onRefresh={() => {
-            //       syncPermanentChannels( {
-            //         permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
-            //         metaSync: true
-            //       } )
-            //     }}
-            //   />
-            // }
             contentContainerStyle={{
               // flex: 1,
-              paddingHorizontal: 38, paddingBottom: 20
+              paddingHorizontal: 21, paddingBottom: 20
             }}
           >
             <GiftBoxComponent
-              titleText={'Create New Gift'}
-              subTitleText={this.strings[ 'giftSubTextF&F' ]}
+              titleText={'Create a new gift'}
+              subTitleText={'Create gifts and send to your family and friends'}
               onPress={() => {
 
                 this.props.navigation.navigate( 'CreateGift', {
                 // setActiveTab: buttonPress
                 } )}}
               image={<Add />}
+              rightArrow={<ArrowRight/>}
             />
             <GiftBoxComponent
-              titleText={'Available Gifts'}
-              subTitleText={'All the gifts you have created, not sent, \nand gifts you have received are shown here'}
+              titleText={'All Gifts'}
+              subTitleText={'All the gifts you have created, not sent, and gifts you have received'}
               onPress={() => this.props.navigation.navigate( 'ManageGifts', {
                 giftType : '0'
               } )}
               image={<Gifts />}
+              rightArrow={<ArrowRight/>}
+
             />
             <GiftBoxComponent
-              titleText={'Claim SATSCARD'}
+              titleText={'Claim your Satscard'}
               scTitleText={'TM'}
               subTitleText={'Move sats from your SATSCARD™'}
               scSubText={'TM'}
@@ -761,6 +766,7 @@ class GiftScreen extends React.Component<
               onPress={() => this.setState( {
                 showVerification:true
               } )}
+              rightArrow={<ArrowRight/>}
               image={<Sat_card/>}
             />
           </ScrollView>
@@ -842,7 +848,7 @@ class GiftScreen extends React.Component<
             bottomImage={require( '../../assets/images/icons/errorImage.png' )}
           />
         </ModalContainer>
-      </View>
+      </SafeAreaView>
       /* feature/2.0 */
     )
   }
@@ -958,19 +964,20 @@ const styles = StyleSheet.create( {
     marginHorizontal: wp( 1 )
   },
   accountCardsSectionContainer: {
-    height: hp( '71.46%' ),
+    // height: hp( '71.46%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor1,
-    opacity: 1,
-    borderTopLeftRadius: 25,
-    shadowColor: 'black',
-    shadowOpacity: 0.4,
-    shadowOffset: {
-      width: 2,
-      height: -1,
-    },
-    flexDirection: 'column',
-    justifyContent: 'space-around',
+    flex:1
+    // opacity: 1,
+    // borderTopLeftRadius: 25,
+    // shadowColor: 'black',
+    // shadowOpacity: 0.4,
+    // shadowOffset: {
+    // width: 2,
+    // height: -1,
+    // },
+    // flexDirection: 'column',
+    // justifyContent: 'space-around',
   },
   contactText: {
     // marginLeft: 10,
@@ -1074,16 +1081,3 @@ const styles = StyleSheet.create( {
   }
 } )
 
-function makeNavigationOptions( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> {
-  return {
-    ...defaultStackScreenNavigationOptions,
-
-    title: 'Friends & Family',
-
-    headerRight: () => {
-      return (
-        <KnowMoreButton onpress={navigation.getParam( 'toggleKnowMoreSheet' )} />
-      )
-    },
-  }
-}

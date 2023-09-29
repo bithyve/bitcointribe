@@ -53,15 +53,6 @@ import ConfirmSeedWordsModal from './NewBHR/ConfirmSeedWordsModal'
 import LinearGradient from 'react-native-linear-gradient'
 
 export default function Login( props ) {
-  // const subPoints = [
-  //   'Setting up multi-accounts',
-  //   'Fetching test sats & balances',
-  //   'Generating shares for back-up',
-  //   'Getting the latest details'
-  // ]
-  // const [ bottomTextMessage, setBottomTextMessage ] = useState(
-  //   'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
-  // )
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
   const common = translations[ 'common' ]
@@ -140,12 +131,12 @@ export default function Login( props ) {
   useEffect( () => {
     dispatch( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     dispatch( setOpenToApproval( false, [], null ) )
-    Linking.addEventListener( 'url', handleDeepLinkEvent )
+    const subscription = Linking.addEventListener( 'url', handleDeepLinkEvent )
     //Linking.getInitialURL().then( handleDeepLinking )
     BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
     return () => {
       BackHandler.removeEventListener( 'hardwareBackPress', hardwareBackPressCustom )
-      Linking.removeEventListener( 'url', handleDeepLinkEvent )
+      subscription.remove()
     }
 
   }, [] )
@@ -246,16 +237,16 @@ export default function Login( props ) {
       } else {
         setloaderModal( false )
         if( !creationFlag ) {
-          props.navigation.navigate( 'Home', {
+          props.navigation.navigate( 'HomeNav', {
             screen: 'Home'
           } )
         } else if( processedLink ){
-          props.navigation.navigate( 'Home', {
+          props.navigation.navigate( 'HomeNav', {
             screen: 'Home',
             params: {
-              trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,
-              giftRequest: processedLink ? processedLink.giftRequest: null,
-              swanRequest: processedLink ? processedLink.swanRequest: null,
+              trustedContactRequest: processedLink.trustedContactRequest,
+              giftRequest: processedLink.giftRequest,
+              swanRequest: processedLink.swanRequest,
             }
           } )
         }

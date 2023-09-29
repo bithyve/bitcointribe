@@ -10,7 +10,6 @@ import { useDispatch } from 'react-redux'
 import AccountShell from '../../../common/data/models/AccountShell'
 import { ContactRecipientDescribing, RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
-import { BaseNavigationProp } from '../../../navigation/Navigator'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
 import useSelectedRecipientForSendingByID from '../../../utils/hooks/state-selectors/sending/UseSelectedRecipientForSendingByID'
@@ -37,19 +36,14 @@ import { translations } from '../../../common/content/LocContext'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import { NetworkType } from '../../../bitcoin/utilities/Interface'
 import LinearGradient from 'react-native-linear-gradient'
-
-export type NavigationParams = {
-};
-
-export type NavigationProp = {
-  params: NavigationParams;
-} & BaseNavigationProp;
+import { NavigationProp, ParamListBase, RouteProp } from '@react-navigation/native'
 
 export type Props = {
-  navigation: NavigationProp;
+  navigation: NavigationProp<ParamListBase>;
+  route: RouteProp<{params: { selectedRecipientID: string, fromWallet: any }}>
 };
 
-const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props ) => {
+const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
   const dispatch = useDispatch()
 
   const [ sendFailureModal, setFailure ] = useState( false )
@@ -58,7 +52,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const common  = translations[ 'common' ]
 
   const selectedRecipients = useSelectedRecipientsForSending()
-  const currentRecipient = useSelectedRecipientForSendingByID( navigation.getParam( 'selectedRecipientID' ) )
+  const currentRecipient = useSelectedRecipientForSendingByID( route.params?.selectedRecipientID )
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const sourceAccount = useAccountByAccountShell( sourceAccountShell )
@@ -72,7 +66,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
-  const fromWallet = navigation?.getParam( 'fromWallet' ) || false
+  const fromWallet = route.params?.fromWallet || false
 
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
 

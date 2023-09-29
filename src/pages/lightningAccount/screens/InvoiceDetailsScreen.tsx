@@ -21,7 +21,7 @@ export default class TransactionDetailsScreen extends Component {
   constructor( props ) {
     super( props )
     this.state={
-      invoice: props.navigation.getParam( 'invoice', null ),
+      invoice: props.route.params?.invoice || null,
     }
   }
 

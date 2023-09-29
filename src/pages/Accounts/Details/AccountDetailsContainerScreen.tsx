@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import {
   View,
   StyleSheet,
@@ -15,7 +15,7 @@ import KnowMoreBottomSheet, {
   KnowMoreBottomSheetHandle,
 } from '../../../components/account-details/AccountDetailsKnowMoreBottomSheet'
 import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces'
-import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useTransactionReassignmentCompletedEffect from '../../../utils/hooks/account-effects/UseTransactionReassignmentCompletedEffect'
 import TransactionReassignmentSuccessBottomSheet from '../../../components/bottom-sheets/account-management/TransactionReassignmentSuccessBottomSheet'
@@ -24,9 +24,6 @@ import useAccountShellMergeCompletionEffect from '../../../utils/hooks/account-e
 import AccountShellMergeSuccessBottomSheet from '../../../components/bottom-sheets/account-management/AccountShellMergeSuccessBottomSheet'
 import AccountShell from '../../../common/data/models/AccountShell'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
-import { NavigationScreenConfig } from 'react-navigation'
-import { NavigationStackOptions } from 'react-navigation-stack'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import { fetchExchangeRates, fetchFeeRates, refreshAccountShells } from '../../../store/actions/accounts'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
@@ -52,6 +49,7 @@ import ButtonBlue from '../../../components/ButtonBlue'
 import BorderWalletKnowMore from '../../../components/know-more-sheets/BorderWalletKnowMore'
 
 export type Props = {
+  route: any;
   navigation: any;
 };
 
@@ -64,17 +62,25 @@ enum SectionKind {
 const sectionListItemKeyExtractor = ( index ) => String( index )
 
 
-const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
+const AccountDetailsContainerScreen: React.FC<Props> = ({route, navigation}) => {
   const dispatch = useDispatch()
-  const accountShellID = useMemo( () => {
-    return navigation.getParam( 'accountShellID' )
-  }, [ navigation ] )
+
+  const accountShellID = route.params?.accountShellID;
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      header: () => (
+        <NavHeader accountShellID={accountShellID} onBackPressed={() => navigation.goBack()} />
+      ),
+    });
+  }, [navigation]);
+
   const strings  = translations[ 'accounts' ]
   const common  = translations[ 'common' ]
 
   const [ webView, showWebView ] = useState( false )
-  const swanDeepLinkContent = navigation.getParam( 'swanDeepLinkContent' )
-  const accountShell = useAccountShellFromNavigation( navigation )
+  const swanDeepLinkContent = route.params?.swanDeepLinkContent
+  const accountShell = useAccountShellFromRoute(route)
   const accountsState = useAccountsState()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const account = useAccountByAccountShell( accountShell )
@@ -130,7 +136,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
 
   function navigateToAccountSettings() {
     navigation.navigate( 'SubAccountSettings', {
-      accountShellID,
+      screen: 'AccountSettingsMain',
+      params: {
+        accountShellID
+      }
     } )
   }
 
@@ -249,7 +258,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
         isIgnoreButton={true}
         onPressProceed={() => {
           setSecureAccountAlert( false )
-          navigation.pop()
+          navigation.goBack()
         }}
         onPressIgnore={() => {
           setSecureAccountKnowMore( true )
@@ -482,19 +491,5 @@ const styles = StyleSheet.create( {
     paddingVertical: 15,
   },
 } )
-
-AccountDetailsContainerScreen.navigationOptions = ( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> => {
-  return {
-    header() {
-      const { accountShellID } = navigation.state.params
-      return (
-        <NavHeader
-          accountShellID={accountShellID}
-          onBackPressed={() => navigation.pop()}
-        />
-      )
-    },
-  }
-}
 
 export default AccountDetailsContainerScreen
