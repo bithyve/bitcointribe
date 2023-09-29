@@ -121,7 +121,7 @@ export default function IssueScreen( props ) {
         </TouchableOpacity>
       </View>
       <Text style={styles.headerTitleText}>{'Issue ' + issueType}</Text>
-      <Text style={styles.headerSubTitleText}>{'Lorem ipsum dolor sit amet, consec tetur'}</Text>
+      {/* <Text style={styles.headerSubTitleText}>{'Lorem ipsum dolor sit amet, consec tetur'}</Text> */}
 
       <View style={styles.bodySection}>
         <Input
@@ -256,15 +256,16 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 20 ),
     marginLeft: 20,
     fontFamily: Fonts.Regular,
+    marginBottom: 22
   },
-  headerSubTitleText: {
-    fontSize: RFValue( 12 ),
-    color: Colors.THEAM_INFO_TEXT_COLOR,
-    fontFamily: Fonts.Regular,
-    marginLeft: 20,
-    marginTop: 6,
-    marginBottom: 20
-  },
+  // headerSubTitleText: {
+  //   fontSize: RFValue( 12 ),
+  //   color: Colors.THEAM_INFO_TEXT_COLOR,
+  //   fontFamily: Fonts.Regular,
+  //   marginLeft: 20,
+  //   marginTop: 6,
+  //   marginBottom: 20
+  // },
   attachPlaceholderText: {
     flex: 1,
     paddingHorizontal: 20,
