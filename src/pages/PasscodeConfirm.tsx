@@ -1,27 +1,26 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
+  SafeAreaView,
+  StatusBar,
   StyleSheet,
   Text,
-  View,
-  SafeAreaView,
   TouchableOpacity,
-  StatusBar,
-  // NativeModules
+  View,
 } from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { useDispatch, useSelector } from 'react-redux'
-import { storeCreds } from '../store/actions/setupAndAuth'
 import { LocalizationContext } from '../common/content/LocContext'
 import BottomInfoBox from '../components/BottomInfoBox'
-import LinearGradient from 'react-native-linear-gradient'
+import { storeCreds } from '../store/actions/setupAndAuth'
 
 export default function PasscodeConfirm( props ) {
   const [ passcode, setPasscode ] = useState( '' )
@@ -489,7 +488,7 @@ export default function PasscodeConfirm( props ) {
               <BottomInfoBox
                 backgroundColor={Colors.white}
                 title={''}
-                infoText={'Make sure you remember your passcode. If you forget your passcode, you will have to restore from backup to regain access to the wallet'}
+                infoText={'Your app storage is encrypted by the passcode. You will not be able to log in if you forget the passcode and will have to recover your wallet using the recovery flow'}
               />
             </View>
           }

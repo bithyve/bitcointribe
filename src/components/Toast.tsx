@@ -8,7 +8,7 @@ import Toast from 'react-native-root-toast'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import Colors from '../common/Colors'
 
-export default (  message, icon, toastPosition=-15 ) => {
+export default (  message, icon = '', toastPosition=-15 ) => {
   return Toast.show( <View style={{
     flexDirection:'row',
     justifyContent:'flex-start',

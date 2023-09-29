@@ -85,6 +85,7 @@ export default function Login( props ) {
   // const [ loaderBottomSheet ] = useState(
   //   React.createRef<BottomSheet>(),
   // )
+  const [ showPasscodeErrorModal, setPasscodeErrorModal ] = useState( false )
   const [ loaderModal, setloaderModal ] = useState( false )
   const [ errorModal, setErrorModal ] = useState( false )
   const [ showAlertModal, setShowAlertModal ]=useState( false )
@@ -337,15 +338,13 @@ export default function Login( props ) {
       setTimeout( () => {
         // loaderBottomSheet.current.snapTo( 0 )
         setloaderModal( false )
-      }, 300 )
-
-      return (
-        <View style={{
-          marginLeft: 'auto'
-        }}>
-          <Text style={styles.errorText}>{strings.Incorrect}</Text>
-        </View>
-      )
+      }, 100 )
+    }
+    if( !checkAuth ){
+      setTimeout( () => setloaderModal( false ), 800 )
+      setTimeout( ()=>{
+        setPasscodeErrorModal( true )
+      }, 1000 )
     }
   }
 
@@ -587,7 +586,7 @@ export default function Login( props ) {
                   </Text>
                 </View>
               </View>
-              {checkPasscode()}
+              {/* {checkPasscode()} */}
             </View>
           </View>
 
@@ -605,12 +604,12 @@ export default function Login( props ) {
                     marginHorizontal: 15,
                   }}
                   onPress={()=> {
-                    // if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
-                    //   setJailBrokenTitle( strings.EncryptionKeyNotSet )
-                    //   setJailBrokenInfo( strings.Youcanreset )
-                    //   setErrorModal( true )
-                    //   return
-                    // }
+                    if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+                      setJailBrokenTitle( strings.EncryptionKeyNotSet )
+                      setJailBrokenInfo( strings.Youcanreset )
+                      setErrorModal( true )
+                      return
+                    }
                     if ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == 'seed' ) {
                       // showSecuiritySeedWordModal( true )
                       // Alert.alert( 'In case you have forgotten passcode, please setup the wallet again and restore it' )
@@ -880,6 +879,17 @@ export default function Login( props ) {
           proceedButtonText={'Okay'}
           onPressProceed={() => {
             setShowAlertModal( false )
+          }}
+          isBottomImage={false}
+          // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        />
+      </ModalContainer>
+      <ModalContainer onBackground={()=>{setPasscodeErrorModal( false )}} visible={showPasscodeErrorModal} closeBottomSheet={() => { }}>
+        <AlertModalContents
+          info={'You have entered the incorrect passcode. Please, try again. If you don’t remember your passcode, you will have to recover your wallet through the recovery flow'}
+          proceedButtonText={'Okay'}
+          onPressProceed={() => {
+            setPasscodeErrorModal( false )
           }}
           isBottomImage={false}
           // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
