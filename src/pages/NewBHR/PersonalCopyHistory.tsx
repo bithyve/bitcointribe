@@ -41,7 +41,7 @@ import {
   Trusted_Contacts,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
-import { StackActions } from 'react-navigation'
+import { StackActions } from '@react-navigation/native'
 import QRModal from '../Accounts/QRModal'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import { setIsPermissionGiven } from '../../store/actions/preferences'
@@ -52,12 +52,16 @@ import { historyArray } from '../../common/CommonVars/commonVars'
 import ModalContainer from '../../components/home/ModalContainer'
 import { getIndex } from '../../common/utilities'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
-import dbManager from '../../storage/realm/dbManager'
 import { isEmpty } from '../../common/CommonFunctions'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+
+export type Props = {
+  route: any;
+  navigation: any;
+};
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
@@ -84,34 +88,32 @@ const PersonalCopyHistory = ( props ) => {
   // ] = useState( React.createRef() )
 
   const [ personalCopyShareModal, setPersonalCopyShareModal ] = useState( false )
-  const selectedPersonalCopy = props.navigation.getParam(
-    'selectedPersonalCopy'
-  )
-  const [ oldChannelKey, setOldChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
-  const [ channelKey, setChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
+  const selectedPersonalCopy = props.route.params.selectedPersonalCopy
+  const [ oldChannelKey, setOldChannelKey ] = useState( props.route.params.selectedKeeper.channelKey ? props.route.params.selectedKeeper.channelKey : '' )
+  const [ channelKey, setChannelKey ] = useState( props.route.params.selectedKeeper.channelKey ? props.route.params.selectedKeeper.channelKey : '' )
   const [ personalCopyDetails, setPersonalCopyDetails ] = useState( null )
   const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState(
-    props.navigation.state.params.SelectedRecoveryKeyNumber
+    props.route.params?.SelectedRecoveryKeyNumber
   )
   const [ selectedKeeper, setSelectedKeeper ] = useState(
-    props.navigation.state.params.selectedKeeper
+    props.route.params?.selectedKeeper
   )
-  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false :
-    props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
+  const [ isReshare, setIsReshare ] = useState( props.route.params.isChangeKeeperType ? false :
+    props.route.params.selectedKeeper.status === 'notSetup' ? false : true
   )
   const levelData = useSelector( ( state ) => state.bhr.levelData )
 
   const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
   const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
   const pdfInfo = useSelector( ( state ) => state.bhr.pdfInfo )
-  const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' )
-    ? props.navigation.getParam( 'isChangeKeeperType' )
+  const [ isChange, setIsChange ] = useState( props.route.params.isChangeKeeperType
+    ?  props.route.params.isChangeKeeperType
     : false )
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const pdfDataConfirm = useSelector( ( state ) => state.bhr.loading.pdfDataConfirm )
   const pdfCreatedSuccessfully = useSelector( ( state ) => state.bhr.pdfCreatedSuccessfully )
   const [ confirmDisable, setConfirmDisable ] = useState( true )
-  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
+  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.route.params.isChangeKeeperType  ? false : props.route.params.isChangeKeeperAllow )
   const metaSharesKeeper = useSelector( ( state ) => state.bhr.metaSharesKeeper )
   const oldMetaSharesKeeper = useSelector( ( state ) => state.bhr.oldMetaSharesKeeper )
 
@@ -132,21 +134,21 @@ const PersonalCopyHistory = ( props ) => {
   const [ pdfUpgradeModal, setPdfUpgradeModal ] = useState( false )
 
   useEffect( () => {
-    setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
-    setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
+    setSelectedRecoveryKeyNumber( props.route.params.SelectedRecoveryKeyNumber )
+    setSelectedKeeper( props.route.params.selectedKeeper )
     setIsReshare(
-      props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
+      props.route.params.isChangeKeeperType ? false : props.route.params.selectedKeeper.status === 'notSetup' ? false : true
     )
     setIsChange(
-      props.navigation.getParam( 'isChangeKeeperType' )
-        ? props.navigation.getParam( 'isChangeKeeperType' )
+      props.route.params.isChangeKeeperType
+        ? props.route.params.isChangeKeeperType
         : false
     )
-    if( !channelAssets.shareId || ( channelAssets.shareId && channelAssets.shareId != props.navigation.getParam( 'selectedKeeper' ).shareId ) ){
-      dispatch( createChannelAssets( props.navigation.getParam( 'selectedKeeper' ).shareId ) )
+    if( !channelAssets.shareId || ( channelAssets.shareId && channelAssets.shareId != props.route.params.selectedKeeper.shareId ) ){
+      dispatch( createChannelAssets( props.route.params.selectedKeeper.shareId ) )
     }
   }, [
-    props.navigation.state.params
+    props.route.params
   ] )
 
   useEffect( ()=>{
@@ -157,7 +159,7 @@ const PersonalCopyHistory = ( props ) => {
       id: uuid(),
       name: 'Personal Copy'
     }
-    setContact( props.navigation.getParam( 'isChangeKeeperType' ) || pdfUpgrade ? Contact : selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : Contact )
+    setContact( props.route.params.isChangeKeeperType || pdfUpgrade ? Contact : selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : Contact )
   }, [ ] )
 
   const sendApprovalRequestToPK = ( ) => {
@@ -177,7 +179,7 @@ const PersonalCopyHistory = ( props ) => {
         ? setStoragePermissionModal( false )
         : setStoragePermissionModal( true )
     }
-    if( hasStoragePermission && props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ){
+    if( hasStoragePermission && props.route.params.selectedKeeper.status === 'notSetup' ){
       generatePDF()
     }
   }, [ hasStoragePermission ] )
@@ -244,9 +246,6 @@ const PersonalCopyHistory = ( props ) => {
   useEffect( () => {
     if( pdfCreatedSuccessfully ){
       setConfirmDisable( false )
-
-      // if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
-      // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
       setPersonalCopyShareModal( true )
       dispatch( setChannelAssets ( {
       }, null ) )
@@ -316,20 +315,20 @@ const PersonalCopyHistory = ( props ) => {
             // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
             setPersonalCopyShareModal( false )
             if (
-              props.navigation.getParam( 'prevKeeperType' ) &&
-              props.navigation.getParam( 'isChange' ) &&
-              props.navigation.getParam( 'contactIndex' ) &&
-              props.navigation.getParam( 'prevKeeperType' ) == 'contact' &&
-              props.navigation.getParam( 'contactIndex' ) != null
+              props.route.params.prevKeeperType &&
+              props.route.params.isChange &&
+              props.route.params.contactIndex &&
+              props.route.params.prevKeeperType ==='contact'&&
+              props.route.params.contactIndex !== null
             ) {
               dispatch(
                 emptyShareTransferDetailsForContactChange(
-                  props.navigation.getParam( 'contactIndex' )
+                  props.route.params.contactIndex
                 )
               )
             }
             setIsReshare( true )
-            if( props.navigation.getParam( 'isChangeKeeperType' ) ){
+            if( props.route.params.isChangeKeeperType ){
               props.navigation.pop( 2 )
             } else {
               props.navigation.pop( 1 )
@@ -571,9 +570,7 @@ const PersonalCopyHistory = ( props ) => {
             setQrBottomSheetsFlag( false )
             // ( QrBottomSheet as any ).current.snapTo( 0 )
             setQRModal( false )
-            const popAction = StackActions.pop( {
-              n: isChange ? 2 : 1
-            } )
+            const popAction = StackActions.pop( isChange ? 2 : 1 )
             props.navigation.dispatch( popAction )
           } else {
             dispatch( setApprovalStatus( false ) )
@@ -645,11 +642,11 @@ const PersonalCopyHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
+        selectedTitle={deviceText( props.route.params?.selectedTitle )}
         selectedTime={selectedKeeper.updatedAt
           ? getTime( selectedKeeper.updatedAt )
           : 'Never'}
-        moreInfo={deviceText( props.navigation.state.params.selectedTitle )}
+        moreInfo={deviceText( props.route.params?.selectedTitle )}
         headerImage={require( '../../assets/images/icons/note.png' )}
       />
       <View style={{
@@ -678,7 +675,6 @@ const PersonalCopyHistory = ( props ) => {
             setPersonalCopyShareModal( true )
           }}
           isChangeKeeperAllow={false}
-          // isChangeKeeperAllow={isChange ? false : ( props.navigation.getParam( 'selectedKeeper' ).updatedAt > 0 || props.navigation.getParam( 'selectedKeeper' ).status == 'notAccessible' ) ? true : false}
           changeButtonText={'Change'}
           onPressChange={() => {
             // ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
@@ -698,16 +694,16 @@ const PersonalCopyHistory = ( props ) => {
       </ModalContainer>
       <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => setKeeperTypeModal( false )} >
         <KeeperTypeModalContents
-          selectedLevelId={props.navigation.getParam( 'selectedLevelId' )}
+          selectedLevelId={props.route.params.selectedLevelId}
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device'}
           onPressSetup={async ( type, name ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
-             // note remove PDF flow for level 2 & 3
+            // note remove PDF flow for level 2 & 3
             // if( type == 'pdf' ) { setIsChangeClicked( true ); sendApprovalRequestToPK( ) }
             // else
-             onPressChangeKeeperType( type, name )
+            onPressChangeKeeperType( type, name )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           keeper={selectedKeeper}

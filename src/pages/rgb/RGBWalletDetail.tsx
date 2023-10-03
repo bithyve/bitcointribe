@@ -1,39 +1,39 @@
-import React, { useState, useMemo } from 'react'
+import moment from 'moment'
+import React, { useMemo, useState } from 'react'
 import {
-  StyleSheet,
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  StatusBar,
-  Text,
-  Image,
   FlatList,
-  SectionList,
+  Image,
   RefreshControl,
+  SafeAreaView,
+  SectionList,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Fonts from '../../common/Fonts'
-import Colors from '../../common/Colors'
-import CommonStyles from '../../common/Styles/Styles'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
-import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
-import NetworkKind from '../../common/data/enums/NetworkKind'
+import AccountChecking from '../../assets/images/accIcons/acc_checking.svg'
+import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import { getCurrencyImageByRegion } from '../../common/CommonFunctions'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
 import BitcoinUnit, { displayNameForBitcoinUnit } from '../../common/data/enums/BitcoinUnit'
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
-import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../components/MaterialCurrencyCodeIcon'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import NetworkKind from '../../common/data/enums/NetworkKind'
+import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../components/MaterialCurrencyCodeIcon'
+import { syncRgb } from '../../store/actions/rgb'
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
-import { getCurrencyImageByRegion } from '../../common/CommonFunctions'
-import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
 import DetailsCard from './DetailsCard'
-import AccountChecking from '../../assets/images/accIcons/acc_checking.svg'
-import { syncRgb } from '../../store/actions/rgb'
-import moment from 'moment'
 
 enum SectionKind {
   TOP_TABS,
@@ -85,7 +85,7 @@ export default function RGBWalletDetail( props ) {
         <View style={styles.footerSection}>
           <SendAndReceiveButtonsFooter
             onSendPressed={() => {
-              props.navigation.navigate( 'RGBSend' )
+              props.navigation.navigate( 'RGBSendWithQR' )
             }}
             onReceivePressed={() => {
               props.navigation.navigate( 'RGBReceive', {
@@ -150,9 +150,13 @@ export default function RGBWalletDetail( props ) {
               paddingHorizontal: 20,
             }}>
               <DetailsCard
-                onKnowMorePressed={() => {}}
+                showKnowMore
+                knowMoreText='View UTXO'
+                onKnowMorePressed={() => {
+                  props.navigation.navigate( 'UnspentList' )
+                }}
                 onSettingsPressed={()=>{}}
-                balance={balances.confirmed}
+                balance={balances.spendable}
                 cardColor='#88B283'
                 title='Bitcoin Wallet'
                 description=''
@@ -170,7 +174,7 @@ export default function RGBWalletDetail( props ) {
           return (
             <View style={styles.viewSectionContainer}>
               <FlatList
-                data={transactions}
+                data={transactions.reverse()}
                 style={{
                   marginVertical: 20
                 }}
@@ -178,7 +182,11 @@ export default function RGBWalletDetail( props ) {
                   <TouchableOpacity style={styles.itemContainer} onPress={() =>{}}>
                     <View style={styles.textContainer}>
                       <Text numberOfLines={1} ellipsizeMode="middle" style={styles.itemTitle}>{item.txid}</Text>
-                      <Text style={styles.itemDesc}>{moment( Number( item.confirmationTime ) * 1000 ).format( 'DD/MM/YY • hh:MMa' )}</Text>
+                      {
+                        item.confirmationTime && (
+                          <Text style={styles.itemDesc}>{moment.unix( Number( item.confirmationTime.timestamp ) ).format( 'DD/MM/YY • hh:MMa' )}</Text>
+                        )
+                      }
                     </View>
                     <View style={styles.currencyContainer}>
                       <View style={{

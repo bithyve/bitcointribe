@@ -1,26 +1,26 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, SafeAreaView, StatusBar } from 'react-native'
-import FormStyles from '../../common/Styles/FormStyles'
+import { ActivityIndicator, SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { Input } from 'react-native-elements'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { launchImageLibrary } from 'react-native-image-picker'
+import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
-import Colors from '../../common/Colors'
 import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import Fonts from '../../common/Fonts'
-import LinearGradient from 'react-native-linear-gradient'
-import CommonStyles from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import RGBServices from '../../services/RGBServices'
 import { useDispatch } from 'react-redux'
-import { syncRgb } from '../../store/actions/rgb'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import FormStyles from '../../common/Styles/FormStyles'
+import CommonStyles from '../../common/Styles/Styles'
 import Toast from '../../components/Toast'
-import { launchImageLibrary } from 'react-native-image-picker'
+import RGBServices from '../../services/RGBServices'
+import { syncRgb } from '../../store/actions/rgb'
 
 export default function IssueScreen( props ) {
 
-  const issueType = props.navigation.getParam( 'issueType' )
+  const issueType = props.route.params?.issueType
   const dispatch = useDispatch()
   const [ name, setName ] = useState( '' )
   const [ description, setDescription ] = useState( '' )
@@ -28,12 +28,14 @@ export default function IssueScreen( props ) {
   const [ ticker, setTicker ] = useState( '' )
   const [ attachedfile, setAttachedFile ] = useState( 'Attach File' )
   const [ requesting, setRequesting ] = useState( false )
+  const [ loading, setLoading ] = useState( true )
 
   async function IssueAssetClick() {
+    setLoading( true )
     try {
       if( issueType === 'collectible' ) {
         setRequesting( true )
-        const newAsset = await RGBServices.issueRgb121Asset( name, description, totalAmount, attachedfile )
+        const newAsset = await RGBServices.issueRgb25Asset( name, description, totalAmount, attachedfile )
         setRequesting( false )
         if( newAsset.assetId ) {
           props.navigation.goBack()
@@ -56,6 +58,7 @@ export default function IssueScreen( props ) {
       }
     } catch ( error ) {
       setRequesting( false )
+      setLoading( false )
       Toast( `Failed ${error}` )
       console.log( 'error', error )
     }
@@ -83,6 +86,20 @@ export default function IssueScreen( props ) {
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
+      {
+        loading &&
+        <View style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 15,
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10
+        }}>
+          <ActivityIndicator size="large" color={Colors.darkBlue} />
+        </View>
+      }
       <SafeAreaView style={{
         flex: 0
       }} />
@@ -104,7 +121,7 @@ export default function IssueScreen( props ) {
         </TouchableOpacity>
       </View>
       <Text style={styles.headerTitleText}>{'Issue ' + issueType}</Text>
-      <Text style={styles.headerSubTitleText}>{'Lorem ipsum dolor sit amet, consec tetur'}</Text>
+      {/* <Text style={styles.headerSubTitleText}>{'Lorem ipsum dolor sit amet, consec tetur'}</Text> */}
 
       <View style={styles.bodySection}>
         <Input
@@ -239,15 +256,16 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 20 ),
     marginLeft: 20,
     fontFamily: Fonts.Regular,
+    marginBottom: 22
   },
-  headerSubTitleText: {
-    fontSize: RFValue( 12 ),
-    color: Colors.THEAM_INFO_TEXT_COLOR,
-    fontFamily: Fonts.Regular,
-    marginLeft: 20,
-    marginTop: 6,
-    marginBottom: 20
-  },
+  // headerSubTitleText: {
+  //   fontSize: RFValue( 12 ),
+  //   color: Colors.THEAM_INFO_TEXT_COLOR,
+  //   fontFamily: Fonts.Regular,
+  //   marginLeft: 20,
+  //   marginTop: 6,
+  //   marginBottom: 20
+  // },
   attachPlaceholderText: {
     flex: 1,
     paddingHorizontal: 20,

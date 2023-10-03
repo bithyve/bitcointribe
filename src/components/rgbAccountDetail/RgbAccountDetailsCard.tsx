@@ -1,15 +1,14 @@
 import React from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
   Image,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native'
-import Fonts from '../../common/Fonts'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { withNavigation } from 'react-navigation'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 import { translations } from '../../common/content/LocContext'
 import { hp } from '../../common/data/responsiveness/responsive'
 
@@ -194,5 +193,5 @@ const styles = StyleSheet.create( {
   }
 } )
 
-export default withNavigation( RgbAccountDetailsCard )
+export default RgbAccountDetailsCard
 

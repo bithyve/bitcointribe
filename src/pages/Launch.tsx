@@ -52,6 +52,8 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
 
   errorBottomSheet: any;
   url: any;
+  appStateSubscribe:any;
+  linkStateSubscribe:any;
   constructor( props ) {
     super( props )
     this.errorBottomSheet = React.createRef()
@@ -85,8 +87,12 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
 
 
   componentWillUnmount = () => {
-    AppState.removeEventListener( 'change', this.handleAppStateChange )
-    Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
+    if( this.appStateSubscribe ){
+      this.appStateSubscribe.remove()
+    }
+    if( this.linkStateSubscribe ){
+      this.linkStateSubscribe.remove()
+    }
   };
 
   handleAppStateChange = ( nextAppState ) => {

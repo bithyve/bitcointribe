@@ -54,7 +54,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 import idx from 'idx'
 import { getNextFreeAddress } from '../../store/sagas/accounts'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import { NavigationActions, StackActions } from 'react-navigation'
+import { CommonActions } from '@react-navigation/native'
 
 
 const WalletBackup = ( props, navigation ) => {
@@ -187,12 +187,10 @@ const WalletBackup = ( props, navigation ) => {
     } )
     // console.log( 'accountsState on walletbackup====>' + JSON.stringify( accountsState.accountShells ) )
 
-    const focusListener = props.navigation.addListener( 'didFocus', () => {
+    const unsubscribe = props.navigation.addListener( 'focus', () => {
       updateAddressBook()
     } )
-    return () => {
-      focusListener.remove()
-    }
+    return unsubscribe
   }, [] )
 
   useEffect( () => {
@@ -200,7 +198,7 @@ const WalletBackup = ( props, navigation ) => {
   }, [] )
 
   function handleBackButtonClick() {
-    props.navigation.navigate( 'Home' )
+    props.navigation.navigate( 'MoreOptionsContainerScreen' )
     return true
   }
 
@@ -674,12 +672,10 @@ const WalletBackup = ( props, navigation ) => {
   }
 
   useEffect( () => {
-    const focusListener = props.navigation.addListener( 'didFocus', () => {
+    const unsubscribe = props.navigation.addListener( 'focus', () => {
       getMessageToShow()
     } )
-    return () => {
-      focusListener.remove()
-    }
+    return unsubscribe
   }, [] )
   const showBackupMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
@@ -806,7 +802,7 @@ const WalletBackup = ( props, navigation ) => {
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
             // props.navigation.pop()
-            props.navigation.navigate( 'Home' )
+            props.navigation.navigate( 'MoreOptionsContainerScreen' )
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -1107,12 +1103,13 @@ const WalletBackup = ( props, navigation ) => {
           // note={''}
           onPressProceed={() => {
             setMultipleAcccountModal( false )
-            const resetAction = StackActions.reset( {
+            const resetAction = CommonActions.reset( {
               index: 0,
-              actions: [ NavigationActions.navigate( {
-                routeName: 'Landing'
-              } ) ],
+              routes: [ {
+                name: 'Landing'
+              } ],
             } )
+
             props.navigation.dispatch( resetAction )
 
           }}

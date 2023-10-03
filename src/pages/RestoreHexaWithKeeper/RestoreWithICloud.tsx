@@ -22,7 +22,6 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import {
   walletCheckIn,
@@ -1429,26 +1428,25 @@ const mapStateToProps = ( state ) => {
   }
 }
 
-export default withNavigationFocus(
-  connect( mapStateToProps, {
-    recoverWalletUsingIcloud,
-    recoverWallet,
-    getCloudDataRecovery,
-    clearCloudCache,
-    initNewBHRFlow,
-    walletCheckIn,
-    completedWalletSetup,
-    setVersion,
-    initializeRecovery,
-    setCloudBackupStatus,
-    downloadBackupData,
-    putKeeperInfo,
-    setupHealth,
-    setCloudErrorMessage,
-    setDownloadedBackupData,
-    restoreWithoutUsingIcloud,
-  } )( RestoreWithICloud )
-)
+export default
+connect( mapStateToProps, {
+  recoverWalletUsingIcloud,
+  recoverWallet,
+  getCloudDataRecovery,
+  clearCloudCache,
+  initNewBHRFlow,
+  walletCheckIn,
+  completedWalletSetup,
+  setVersion,
+  initializeRecovery,
+  setCloudBackupStatus,
+  downloadBackupData,
+  putKeeperInfo,
+  setupHealth,
+  setCloudErrorMessage,
+  setDownloadedBackupData,
+  restoreWithoutUsingIcloud,
+} )( RestoreWithICloud )
 
 const styles = StyleSheet.create( {
   modalHeaderTitleView: {

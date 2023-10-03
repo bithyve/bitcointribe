@@ -17,13 +17,11 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { connect } from 'react-redux'
-//import HomeHeader from '../../components/home/home-header'
 import idx from 'idx'
 import {
   AccountType,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
-import { withNavigationFocus } from 'react-navigation'
 import BottomSheetHeader from '../Accounts/BottomSheetHeader'
 import BottomSheet from '@gorhom/bottom-sheet'
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
@@ -73,7 +71,6 @@ interface HomePropsTypes {
     clearSwanCache: any;
     updateSwanStatus: any;
     createTempSwanAccountInfo: any;
-    isFocused: boolean;
     swanDeepLinkContent: string | null;
     cardDataProps: any;
     wyreDeepLinkContent: string | null;
@@ -383,7 +380,7 @@ const mapStateToProps = ( state ) => {
   }
 }
 
-export default withNavigationFocus(
+export default (
   connect( mapStateToProps, {
     clearWyreCache,
     clearRampCache,
@@ -398,9 +395,6 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
     width: widthPercentageToDP( '95%' ),
     height: hp( 9 ),
-    // height: heightPercentageToDP( '7%' ),
-    // borderColor: Colors.borderColor,
-    // borderWidth: 1,
     borderRadius: widthPercentageToDP( 3 ),
     marginBottom: 10,
     alignItems: 'center',
@@ -412,11 +406,6 @@ const styles = StyleSheet.create( {
   },
 
   floatingActionButtonContainer: {
-    // position: 'absolute',
-    // zIndex: 0,
-    // bottom: TAB_BAR_HEIGHT,
-    // right: 0,
-    // flexDirection: 'row',
     justifyContent: 'flex-end',
     alignSelf: 'flex-end',
     padding: heightPercentageToDP( 1.5 ),

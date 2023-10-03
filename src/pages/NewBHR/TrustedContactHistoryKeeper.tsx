@@ -84,7 +84,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ ChangeModal, setChangeModal ] = useState( false )
   const [ shareOtpWithTrustedContactModal, setShareOtpWithTrustedContactModal ] = useState( false )
   const [ keeperDeviceConfirmMessageModal, setKeeperDeviceConfirmMessageModal ] = useState( false )
-  const  selectedKeeper  = props.navigation.getParam( 'selectedKeeper' )
+  const  selectedKeeper  = props.route.params?.selectedKeeper
   const [ oldChannelKey, setOldChannelKey ] = useState( selectedKeeper.channelKey ? selectedKeeper.channelKey : '' )
   const [ channelKey, setChannelKey ] = useState( selectedKeeper.channelKey ? selectedKeeper.channelKey : '' )
   const [ errorMessage, setErrorMessage ] = useState( '' )
@@ -105,11 +105,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
   const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
-  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : selectedKeeper.status === 'notAccessible' && selectedKeeper.updatedAt == 0 ? true : false )
-  const [ selectedTitle, setSelectedTitle ] = useState( props.navigation.getParam( 'selectedTitle' ) )
-  const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
-  const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) )
-  const [ chosenContact, setChosenContact ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? null :
+  const [ isReshare, setIsReshare ] = useState( props.route.params?.isChangeKeeperType ? false : selectedKeeper.status === 'notAccessible' && selectedKeeper.updatedAt == 0 ? true : false )
+  const [ selectedTitle, setSelectedTitle ] = useState( props.route.params?.selectedTitle )
+  const [ SelectedRecoveryKeyNumber, setSelectedRecoveryKeyNumber ] = useState( props.route.params?.SelectedRecoveryKeyNumber )
+  const [ isChange, setIsChange ] = useState( props.route.params?.isChangeKeeperType )
+  const [ chosenContact, setChosenContact ] = useState( props.route.params?.isChangeKeeperType ? null :
     selectedKeeper && selectedKeeper.data && selectedKeeper.data.index
       ? selectedKeeper.data
       : null,
@@ -130,31 +130,18 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const trustedContacts: Trusted_Contacts = useSelector( ( state: RootStateOrAny ) => state.trustedContacts.contacts )
   const [ contacts, setContacts ] = useState( [] )
   const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
-  const index = props.navigation.getParam( 'index' )
+  const index = props.route.params?.index
   const dispatch = useDispatch()
   const [ approvalErrorModal, setApprovalErrorModal ] = useState( false )
   const [ qrModal, setQRModal ] = useState( false )
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
   const approvalStatus = useSelector( ( state: RootStateOrAny ) => state.bhr.approvalStatus )
 
-  // useEffect( () => {
-  //   setSelectedRecoveryKeyNumber( props.navigation.getParam( 'SelectedRecoveryKeyNumber' ) )
-  //   setSelectedKeeper( selectedKeeper )
-  //   setIsReshare( props.navigation.getParam( 'isChangeKeeperType' ) ? false : selectedKeeper.status === 'notAccessible' && selectedKeeper.updatedAt == 0 ? true : false )
-  //   setIsChange(
-  //     props.navigation.getParam( 'isChangeKeeperType' )
-  //       ? props.navigation.getParam( 'isChangeKeeperType' )
-  //       : false
-  //   )
-  //   setOldChannelKey( selectedKeeper.channelKey ? selectedKeeper.channelKey : '' )
-  //   setShareType( selectedKeeper.shareType ? selectedKeeper.shareType : 'contact' )
-  // }, [ props.navigation.state.params ] )
-
   useEffect( () => {
     if ( isChange ) {
       // setTrustedContactModal( true )
       props.navigation.navigate( 'FNFToKeeper', {
-        ...props.navigation.state.params,
+        ...props.route.params,
         onPressContinue
       } )
     }
@@ -220,7 +207,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       if( selectedKeeper.status === 'notSetup' ) {
         // setTrustedContactModal( true )
         props.navigation.navigate( 'FNFToKeeper', {
-          ...props.navigation.state.params,
+          ...props.route.params,
           onPressContinue
         } )
       }
@@ -456,7 +443,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     } else {
       setReshareModal( false )
       props.navigation.navigate( 'FNFToKeeper', {
-        ...props.navigation.state.params,
+        ...props.route.params,
         onPressContinue,
         recreateChannel: true
       } )
@@ -477,7 +464,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         isIgnoreButton={true}
         onPressProceed={() => {
           props.navigation.navigate( 'FNFToKeeper', {
-            ...props.navigation.state.params,
+            ...props.route.params,
             onPressContinue
           } )
           setIsChange( true )
@@ -778,7 +765,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           onPressConfirm={() => {
             if( selectedKeeper.updatedAt == 0 ){
               props.navigation.navigate( 'FNFToKeeper', {
-                ...props.navigation.state.params,
+                ...props.route.params,
                 onPressContinue
               } )
             } else {
@@ -829,48 +816,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
       <ModalContainer onBackground={()=>setErrorModal( false )} visible={ErrorModal} closeBottomSheet={() => setErrorModal( false )}>
         {renderErrorModalContent()}
       </ModalContainer>
-      {/* <ModalContainer visible={showQrCode} closeBottomSheet={() => setShowQrCode( false )}>
-        <RequestKeyFromContact
-          isModal={true}
-          headerText={`Send Recovery Key${'\n'}to contact`}
-          subHeaderText={'Send Key to Keeper, you can change your Keeper, or their primary mode of contact'}
-          contactText={'Sharing Recovery Key with'}
-          contact={chosenContact}
-          QR={trustedQR}
-          link={trustedLink}
-          contactEmail={''}
-          onPressBack={() => {
-            // ( shareBottomSheet as any ).current.snapTo( 0 )
-            props.navigation.goBack()
-          }}
-          onPressDone={() => {
-            if( props.navigation.getParam( 'isChangeKeeperType' ) ){
-              props.navigation.pop( 2 )
-            } else {
-              props.navigation.pop( 1 )
-            }
-            // ( shareBottomSheet as any ).current.snapTo( 0 )
-          }}
-          onPressShare={() => {
-            if ( isOTPType ) {
-              setTimeout( () => {
-                setRenderTimer( true )
-              }, 2 )
-              // ( shareBottomSheet as any ).current.snapTo( 0 );
-              props.navigation.goBack()
-              setShareOtpWithTrustedContactModal( true )
-            }
-            else {
-              // ( shareBottomSheet as any ).current.snapTo( 0 )
-              props.navigation.goBack()
-              const popAction = StackActions.pop( {
-                n: isChange ? 2 : 1
-              } )
-              props.navigation.dispatch( popAction )
-            }
-          }}
-        />
-      </ModalContainer> */}
       <ModalContainer onBackground={()=>setShowFNFList( false )} visible={showFNFList} closeBottomSheet={() => setShowFNFList( false )}>
         <View
           style={{
@@ -931,7 +876,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       </ModalContainer>
       <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => {setKeeperTypeModal( false )}} >
         <KeeperTypeModalContents
-          selectedLevelId={props.navigation.getParam( 'selectedLevelId' )}
+          selectedLevelId={props.route.params?.selectedLevelId}
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device'}
           onPressSetup={async ( type, name ) => {

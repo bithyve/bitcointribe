@@ -1,6 +1,5 @@
 import React from 'react'
-import { createStackNavigator } from 'react-navigation-stack'
-import { translations } from '../../../common/content/LocContext'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import LNAccountDetails from '../../../pages/lightningAccount/AccountDetails'
 import ViewAllScreen from '../../../pages/lightningAccount/ViewAllScreen'
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderBackButton'
@@ -22,181 +21,93 @@ import NodeInfoScreen from '../../../pages/lightningAccount/screens/NodeInfoScre
 import ScanOpenChannel from '../../../pages/lightningAccount/screens/ScanOpenChannel'
 import Colors from '../../../common/Colors.js'
 
-const AccountDetailsStack = createStackNavigator(
-  {
-    AccountDetailsRoot: LNAccountDetails,
-    ViewAll: ViewAllScreen,
-    ReceiveCoin:{
-      screen: ReceiveCoinScreen,
-      navigationOptions: {
+const Stack = createNativeStackNavigator()
+const AccountDetailsStack = () => {
+  return (
+    <Stack.Navigator
+      initialRouteName='AccountDetailsRoot'
+      screenOptions={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
+        }
+      }}
+    >
+      <Stack.Screen name="AccountDetailsRoot" component={LNAccountDetails}/>
+      <Stack.Screen name="ViewAll" component={ViewAllScreen}/>
+      <Stack.Screen name="ReceiveCoin" component={ReceiveCoinScreen} options={{
         title: '',
-        headerStyle:{
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-        },
-      }
-    },
-    ScanOpenChannel: {
-      screen: ScanOpenChannel,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    NodeInfoScreen: {
-      screen: NodeInfoScreen,
-      navigationOptions: {
+        headerShadowVisible: false
+      }}/>
+      <Stack.Screen name="ScanOpenChannel" component={ScanOpenChannel} options={{
+        headerShown: false
+      }}/>
+      <Stack.Screen name="NodeInfoScreen" component={NodeInfoScreen} options={{
         title: '',
-        headerStyle:{
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-          backgroundColor:Colors.offWhite
-        },
-      }
-    },
-    Payments: {
-      screen: PaymentsScreen,
-      navigationOptions: {
+        headerShadowVisible: false,
+        headerStyle: {
+          backgroundColor: Colors.offWhite
+        }
+      }}/>
+      <Stack.Screen name="Payments" component={PaymentsScreen} options={{
         title: '',
-        headerStyle:{
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-        },
-      }
-    },
-    AccountSettings: {
-      screen: SubAccountSettingsStack,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    OnChainSend: {
-      screen: OnChainSendScreen,
-      navigationOptions: {
+        headerShadowVisible: false
+      }} />
+      <Stack.Screen name="AccountSettings" component={SubAccountSettingsStack} options={{
+        headerShown: false
+      }}/>
+      <Stack.Screen name="OnChainSend" component={OnChainSendScreen} options={{
         title: 'Send To',
-        headerStyle:{
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-        },
-      }
-    },
-    PaymentDetailsScreen: {
-      screen: PaymentDetailsScreen,
-      navigationOptions: {
+        headerShadowVisible: false
+      }}/>
+      <Stack.Screen name="PaymentDetailsScreen" component={PaymentDetailsScreen} options={{
         title: '',
-        headerStyle:{
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-        },
-      }
-    },
-    PayInvoice: {
-      screen: PayInvoiceScreen,
-      navigationOptions: {
+        headerShadowVisible: false
+      }}/>
+      <Stack.Screen name="PayInvoice" component={PayInvoiceScreen} options={{
         title: '',
-        headerStyle:{
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-        },
-      }
-    },
-    SendScreen: {
-      screen: SendScreen,
-      navigationOptions: {
+        headerShadowVisible: false
+      }}/>
+      <Stack.Screen name="SendScreen" component={SendScreen} options={{
         title: '',
-        headerStyle:{
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-        },
-      }
-    },
-
-    SettingsScreen: {
-      screen: SettingsScreen,
-      navigationOptions: {
+        headerShadowVisible: false
+      }}/>
+      <Stack.Screen name="SettingsScreen" component={SettingsScreen} options={{
         title: '',
-        headerStyle:{
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-          backgroundColor:Colors.offWhite
-        },
-      }
-    },
-
-    ChannelsListScreen: {
-      screen: ChannelsListScreen,
-      navigationOptions: {
+        headerShadowVisible: false,
+        headerStyle: {
+          backgroundColor: Colors.offWhite
+        }
+      }}/>
+      <Stack.Screen name="ChannelsListScreen" component={ChannelsListScreen} options={{
         title: '',
-        headerStyle:{
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-          backgroundColor:Colors.backgroundColor
-        },
-      }
-    },
-
-    ChannelInfoScreen: {
-      screen: ChannelInfoScreen,
-      navigationOptions: {
+        headerShadowVisible: false,
+        headerStyle: {
+          backgroundColor: Colors.backgroundColor
+        }
+      }}/>
+      <Stack.Screen name="ChannelInfoScreen" component={ChannelInfoScreen} options={{
         title: '',
-        headerStyle:{
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-          backgroundColor:Colors.backgroundColor
-        },
-      }
-    },
-
-    InvoiceDetailsScreen: {
-      screen: InvoiceDetailsScreen,
-      navigationOptions: {
+        headerShadowVisible: false,
+        headerStyle: {
+          backgroundColor: Colors.backgroundColor
+        }
+      }}/>
+      <Stack.Screen name="InvoiceDetailsScreen" component={InvoiceDetailsScreen} options={{
         title: '',
-        headerStyle:{
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-        },
-      }
-    },
-
-    TransactionDetailsScreen: {
-      screen: TransactionDetailsScreen,
-      navigationOptions: {
+        headerShadowVisible: false
+      }}/>
+      <Stack.Screen name="TransactionDetailsScreen" component={TransactionDetailsScreen} options={{
         title: '',
-        headerStyle:{
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-        },
-      }
-    },
-
-    ChannelOpenScreen: {
-      screen: ChannelOpenScreen,
-      navigationOptions: {
-        header: null
-      }
-    },
-  },
-  {
-    initialRouteName: 'AccountDetailsRoot',
-    defaultNavigationOptions: ( { navigation } ) => {
-      return {
-        ...defaultStackScreenNavigationOptions,
-        headerLeft: () => {
-          return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-        },
-      }
-    },
-  }, )
+        headerShadowVisible: false
+      }}/>
+      <Stack.Screen name="ChannelOpenScreen" component={ChannelOpenScreen} options={{
+        headerShown: false
+      }}/>
+    </Stack.Navigator>
+  )
+}
 
 export default AccountDetailsStack

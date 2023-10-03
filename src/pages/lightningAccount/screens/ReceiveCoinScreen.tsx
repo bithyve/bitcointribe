@@ -27,8 +27,8 @@ export default class ReceiveCoinScreen extends Component {
     super( props )
     this.state = {
       selectedIndex: 0,
-      size: this.props.navigation.getParam( 'size' ),
-      title: this.props.navigation.getParam( 'title' ),
+      size: props.route.params?.size,
+      title: props.route.params?.title,
       common: translations [ 'common' ],
       strings: translations [ 'accounts' ],
       amount: '',
@@ -81,22 +81,6 @@ export default class ReceiveCoinScreen extends Component {
             numberOfLines={1}
             keyboardType="number-pad"
           />
-          {/* <Input
-            placeholder={'Enter invoice expiration in seconds'}
-            value={this.state.expiry}
-            containerStyle={{
-            }}
-            inputContainerStyle={[ FormStyles.textInputContainer ]}
-            inputStyle={FormStyles.inputText}
-            placeholderTextColor={FormStyles.placeholderText.color}
-            onChangeText={( text: string ) =>
-              this.setState( {
-                expiry: text.trim(),
-              } )
-            }
-            numberOfLines={1}
-            keyboardType="number-pad"
-          /> */}
           <Text style={{
             fontSize: RFValue( 16 ),
             color: Colors.blue,

@@ -1,38 +1,38 @@
-import React, { useContext, useState, useEffect } from 'react'
+import moment from 'moment'
+import React, { useContext, useEffect, useState } from 'react'
 import {
-  StyleSheet,
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  StatusBar,
-  Text,
+  ActivityIndicator,
   FlatList,
-  ActivityIndicator
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Fonts from '../../common/Fonts'
-import Colors from '../../common/Colors'
-import CommonStyles from '../../common/Styles/Styles'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { LocalizationContext } from '../../common/content/LocContext'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch } from 'react-redux'
-import LinearGradient from 'react-native-linear-gradient'
-import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
+import { LocalizationContext } from '../../common/content/LocContext'
 import NetworkKind from '../../common/data/enums/NetworkKind'
-import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
-import { fetchExchangeRates, fetchFeeRates } from '../../store/actions/accounts'
 import RGBServices from '../../services/RGBServices'
-import moment from 'moment'
+import { fetchExchangeRates, fetchFeeRates } from '../../store/actions/accounts'
+import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
+import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
 import DetailsCard from './DetailsCard'
 
 export default function RGBTxDetail( props ) {
   const dispatch = useDispatch()
   const { translations } = useContext( LocalizationContext )
   const accountStr = translations[ 'accounts' ]
-  const asset = props.navigation.getParam( 'asset' )
+  const asset = props.route.params.asset
   const accountsState = useAccountsState()
   const { averageTxFees, exchangeRates } = accountsState
   const [ loading, setLoading ] = useState( true )
@@ -77,7 +77,9 @@ export default function RGBTxDetail( props ) {
         <View style={styles.footerSection}>
           <SendAndReceiveButtonsFooter
             onSendPressed={() => {
-              props.navigation.navigate( 'RGBSend' )
+              props.navigation.navigate( 'SendAsset', {
+                asset
+              } )
             }}
             onReceivePressed={() => {
               props.navigation.navigate( 'RGBReceive', {
@@ -115,7 +117,7 @@ export default function RGBTxDetail( props ) {
               color: item.kind === 'receive' || item.kind ==='issuance' ? '#04A777' : '#FD746C'
             } ]}
           >
-            {item.amount.toLocaleString()}
+            {item.amount}
           </Text>
         </View>
       </TouchableOpacity>
@@ -158,7 +160,7 @@ export default function RGBTxDetail( props ) {
           }}
           showKnowMore
           onSettingsPressed={() => { }}
-          balance={asset.spendableBalance.toLocaleString()}
+          balance={asset.balance.spendable}
           cardColor={'#A29DD3'}
           title={asset.name}
           description={asset.ticker}

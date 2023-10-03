@@ -1,11 +1,12 @@
-import { Account, AccountType, DonationAccount, MultiSigAccount, NetworkType, LNNode, RGBConfig, DerivationPurpose } from '../Interface'
 import crypto from 'crypto'
-import AccountUtilities from './AccountUtilities'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import { borderWalletAccountInfo } from '../../../store/sagas/accounts'
+import { Account, AccountType, DerivationPurpose, DonationAccount, LNNode, MultiSigAccount, NetworkType } from '../Interface'
+import AccountUtilities from './AccountUtilities'
 
-export const getPurpose = ( derivationPath: string ): DerivationPurpose => {
+export const getPurpose = ( derivationPath: string, accountType?: AccountType ): DerivationPurpose => {
   const purpose = parseInt( derivationPath.split( '/' )[ 1 ], 10 )
+  if( accountType === AccountType.SWAN_ACCOUNT ) return DerivationPurpose.BIP84
   switch ( purpose ) {
       case DerivationPurpose.BIP84:
         return DerivationPurpose.BIP84

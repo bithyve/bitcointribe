@@ -25,7 +25,7 @@ import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Int
 import { AccountType } from '../../../bitcoin/utilities/Interface'
 import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
-import { withNavigation } from 'react-navigation'
+import { useNavigation } from '@react-navigation/native'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { translations } from '../../../common/content/LocContext'
 import { Mode } from '../AccountDetails'
@@ -377,5 +377,5 @@ const styles = StyleSheet.create( {
   }
 } )
 
-export default withNavigation( AccountDetailsCard )
+export default AccountDetailsCard
 

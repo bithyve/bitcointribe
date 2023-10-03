@@ -1,32 +1,32 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react'
+import * as bip39 from 'bip39'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  StatusBar,
-  TouchableOpacity,
-  ScrollView,
+  ActivityIndicator,
   FlatList,
   InteractionManager,
-  ActivityIndicator,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native'
-import Colors from '../../common/Colors'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import CommonStyles from '../../common/Styles/Styles'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import * as bip39 from 'bip39'
-import uheprng from '../../utils/uheprng'
-import { RFValue } from 'react-native-responsive-fontsize'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import IconRight from '../../assets/images/svgs/icon_right.svg'
-import Fonts from '../../common/Fonts'
-import Toast from '../../components/Toast'
 import StartAgain from '../../assets/images/svgs/startagain.svg'
-import dbManager from '../../storage/realm/dbManager'
 import { GridType, Wallet } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
+import Toast from '../../components/Toast'
+import dbManager from '../../storage/realm/dbManager'
 import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
+import uheprng from '../../utils/uheprng'
 
 const wordlists = bip39.wordlists.english
 const columns = [
@@ -201,11 +201,11 @@ export const Ceil = ( { onPress, text, index, selected } ) => {
   )
 }
 
-const ValidateBorderWalletPattern = ( { navigation } ) => {
+const ValidateBorderWalletPattern = ( { route, navigation } ) => {
   const wallet: Wallet =  dbManager.getWallet()
-  const gridType = navigation.getParam( 'borderWalletGridType' )
-  const mnemonic = navigation.getParam( 'borderWalletMnemonic' )
-  const gridMnemonic = navigation.getParam( 'borderWalletGridMnemonic' )
+  const gridType = route.params?.borderWalletGridType
+  const mnemonic = route.params?.borderWalletMnemonic
+  const gridMnemonic = route.params?.borderWalletGridMnemonic
 
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
@@ -486,6 +486,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
               >
                 {grid.map( ( rowData, index ) => (
                   <FlatList
+                    key={index}
                     data={rowData}
                     horizontal
                     overScrollMode="never"
@@ -494,6 +495,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
                     showsHorizontalScrollIndicator={false}
                     renderItem={( { item, index: i } ) => (
                       <Ceil
+                        key={`${item}_${index}`}
                         onPress={( i ) => onCeilPress( i )}
                         text={item}
                         index={index * 16 + i}

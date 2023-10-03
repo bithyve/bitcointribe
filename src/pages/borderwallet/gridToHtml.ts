@@ -45,6 +45,9 @@ export const generateGridHtmlString = ( array, mnemonic, gridType = GridType.WOR
 <html>
 <head>
 <style>
+* {
+  font-family: monospace;
+}
 p, h4 {
 font-size: 10px;
 text-align: center;

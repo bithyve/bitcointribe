@@ -1,20 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
+  Platform,
   ScrollView,
+  StyleSheet,
+  Text,
   TextInput,
-  Platform
+  View
 } from 'react-native'
-import Colors from '../common/Colors'
-import QuestionList from '../common/QuestionList'
-import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import QuestionList from '../common/QuestionList'
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper'
 
 export default function HealthCheckSecurityQuestionModalContents( props ) {
@@ -94,7 +92,7 @@ export default function HealthCheckSecurityQuestionModalContents( props ) {
                         <View style={styles.dropdownBoxModal}>
                           <ScrollView>
                             {dropdownBoxList.map( ( value, index ) =>
-                              <AppBottomSheetTouchableWrapper onPress={() => {
+                              <AppBottomSheetTouchableWrapper key={`${value.id}_${index}`} onPress={() => {
                                 if ( securityQuestion != value.question ) {
                                   setErrorText( 'Wrong question selected' )
                                 }

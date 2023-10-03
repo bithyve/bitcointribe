@@ -70,7 +70,9 @@ export default function BackupMethods( { navigation } ) {
   }, [] )
 
   function onKeeperButtonPress () {
-    navigation.navigate( 'SeedBackupHistory' )
+    navigation.navigate( 'SeedBackup', {
+      screen: 'SeedBackupHistory'
+    } )
   }
 
   function onPressBackupWithKeeper() {
@@ -122,7 +124,10 @@ export default function BackupMethods( { navigation } ) {
           style={{
             flexDirection: 'row',
           }}
-          onPress={() => navigation.navigate( 'SeedBackupHistory' )}
+          //TODO: check
+          onPress={() => navigation.navigate( 'SeedBackup', {
+            screen: 'SeedBackupHistory'
+          } )}
         >
           <View style={{
             width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white, justifyContent: 'center', alignItems: 'center'

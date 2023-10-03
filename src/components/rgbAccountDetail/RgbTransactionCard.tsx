@@ -1,20 +1,18 @@
 import React from 'react'
 import {
-  View,
-  Text,
   StyleSheet,
-  Image,
+  Text,
+  View
 } from 'react-native'
-import Fonts from '../../common/Fonts'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { withNavigation } from 'react-navigation'
-import { translations } from '../../common/content/LocContext'
-import { hp, wp } from '../../common/data/responsiveness/responsive'
-import ArrowRight from '../../assets/images/svgs/icon_arrow_right.svg'
-import IconSent from '../../assets/images/icons/icon_sent.svg'
+import { RFValue } from 'react-native-responsive-fontsize'
 import IconReceive from '../../assets/images/icons/icon_recieve.svg'
+import IconSent from '../../assets/images/icons/icon_sent.svg'
+import ArrowRight from '../../assets/images/svgs/icon_arrow_right.svg'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { translations } from '../../common/content/LocContext'
+import { wp } from '../../common/data/responsiveness/responsive'
 
 
 export type Props = {
@@ -87,5 +85,5 @@ const styles = StyleSheet.create( {
   },
 } )
 
-export default withNavigation( RgbTransactionCard )
+export default RgbTransactionCard
 

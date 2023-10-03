@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native'
 import QRCode from '../../../components/QRCode'
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import CopyThisText from '../../../components/CopyThisText'
-import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
-import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import defaultStackScreenNavigationOptions  from '../../../navigation/options/DefaultStackScreenNavigationOptions'
+import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
 import { Account,  AccountType,  MultiSigAccount, NetworkType, Wallet } from '../../../bitcoin/utilities/Interface'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
@@ -25,11 +25,19 @@ enum XpubTypes {
 }
 
 export type Props = {
+  route: any;
   navigation: any;
 };
 
-const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
-  const accountShell = useAccountShellFromNavigation( navigation )
+const XPubDetailsScreen: React.FC<Props> = ( { route, navigation }: Props ) => {
+  const accountShell = useAccountShellFromRoute( route )
+  useLayoutEffect( () => {
+    const primarySubAccountName = route.params?.primarySubAccountName
+    navigation.setOptions( {
+      ...defaultStackScreenNavigationOptions,
+      title: `${primarySubAccountName} xPub`
+    } )
+  }, [ navigation, route ] )
   const account: Account | MultiSigAccount = useAccountByAccountShell( accountShell )
   const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
   const [ xpubs, setXpubs ] = useState( [] )
@@ -289,18 +297,5 @@ const styles = StyleSheet.create( {
     elevation: 2,
   },
 } )
-
-
-
-XPubDetailsScreen.navigationOptions = ( { navigation } ): NavigationOptions => {
-  const primarySubAccountName = navigation.getParam( 'primarySubAccountName' )
-
-  return {
-    ...defaultStackScreenNavigationOptions,
-
-    title: `${primarySubAccountName} xPub`,
-  }
-}
-
 
 export default XPubDetailsScreen
