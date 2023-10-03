@@ -495,9 +495,7 @@ export default class AccountOperations {
       const client = account.type === AccountType.TEST_ACCOUNT?  TestElectrumClient: ElectrumClient
       // sync utxos & balances
 
-      console.log( 'addresses', addresses )
       const utxosByAddress = await client.syncUTXOByAddress( addresses, network )
-      console.log( 'utxosByAddress', utxosByAddress )
 
       const balances: Balances = {
         confirmed: 0,

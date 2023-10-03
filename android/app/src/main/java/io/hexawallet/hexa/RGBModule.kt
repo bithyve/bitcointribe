@@ -137,4 +137,14 @@ class RGBModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
         jsonObject.addProperty("bitcoin", Gson().toJson(bitcoinUtxo))
         promise.resolve(jsonObject.toString())
     }
+
+    @ReactMethod
+    fun refreshAsset(assetId: String, promise: Promise){
+        val rgbUtxo = RGBHelper.getUnspents()
+        val bitcoinUtxo = BdkHelper.getUnspents()
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("rgb", Gson().toJson(rgbUtxo))
+        jsonObject.addProperty("bitcoin", Gson().toJson(bitcoinUtxo))
+        promise.resolve(jsonObject.toString())
+    }
 }

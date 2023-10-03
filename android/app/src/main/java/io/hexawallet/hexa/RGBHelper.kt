@@ -13,6 +13,7 @@ import org.rgbtools.RefreshTransferStatus
 import org.rgbtools.RgbLibException
 import org.rgbtools.Unspent
 import kotlin.Exception
+import kotlin.math.log
 
 object RGBHelper {
 
@@ -20,13 +21,24 @@ object RGBHelper {
 
     fun syncRgbAssets(): String {
         return try {
-            val filter = listOf(
-                RefreshFilter(RefreshTransferStatus.WAITING_COUNTERPARTY, true),
-                RefreshFilter(RefreshTransferStatus.WAITING_COUNTERPARTY, false)
-            )
+
+           // val filter = listOf()
             val refresh =
-                RGBWalletRepository.wallet.refresh(RGBWalletRepository.online, null, filter)
-            val assets = RGBWalletRepository.wallet.listAssets(listOf())
+                RGBWalletRepository.wallet.refresh(RGBWalletRepository.online, null, listOf())
+            var assets = RGBWalletRepository.wallet.listAssets(listOf())
+            val rgb25Assets = assets.rgb25
+            val rgb20Assets = assets.rgb20
+            if (rgb20Assets != null) {
+                for (rgb20Asset in rgb20Assets) {
+                    val assetRefresh = RGBWalletRepository.wallet.refresh(RGBWalletRepository.online, rgb20Asset.assetId, listOf())
+                }
+            }
+            if (rgb25Assets != null) {
+                for (rgb25Asset in rgb25Assets) {
+                    val assetRefresh = RGBWalletRepository.wallet.refresh(RGBWalletRepository.online, rgb25Asset.assetId, listOf())
+                }
+            }
+            assets = RGBWalletRepository.wallet.listAssets(listOf())
             val gson = Gson()
             val json = gson.toJson(assets)
             json.toString()
@@ -242,6 +254,10 @@ object RGBHelper {
 
     fun getUnspents(): List<Unspent> {
         return RGBWalletRepository.wallet.listUnspents(false)
+    }
+
+    fun refreshAsset(assetID: String) {
+        //return RGBWalletRepository.wallet.refresh(assetID, )
     }
 
 }

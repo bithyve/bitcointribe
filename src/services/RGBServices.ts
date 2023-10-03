@@ -123,7 +123,7 @@ export default class RGBServices{
       assetId, blindedUTXO, amount, consignmentEndpoints
     )
     console.log( data )
-    return data
+    return JSON.parse( data )
   }
 
   static getUnspents = async ( ): Promise<{}> => {

@@ -47,7 +47,7 @@ export default function AssetsScreen( props ) {
 
   ] )
   const [ bottomSheetState, setBottomSheetState ] = useState( BottomSheetState.Closed )
-  // console.log( 'rgb25Assets', rgb25Assets[ 0 ].dataPaths[ 0 ].filePath )
+
   useEffect( () => {
     const assets = []
     assets.push( {
