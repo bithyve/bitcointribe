@@ -17,5 +17,5 @@ struct Constants{
   static let proxyURL = "https://proxy.iriswallet.com/json-rpc"
   static let proxyConsignmentEndpoint = "rpcs://proxy.iriswallet.com/0.2/json-rpc"
   static let satsForRgb = 9000
-
+  static let defaultFee : Float = 1.5
 }

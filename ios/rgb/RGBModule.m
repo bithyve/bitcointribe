@@ -84,7 +84,7 @@ RCT_EXPORT_METHOD(getTransactions:(NSString*)mnemonic
    ];
 }
 
-RCT_EXPORT_METHOD(syncRgbAsset:(NSString*)mnemonic
+RCT_EXPORT_METHOD(syncRgbAssets:(NSString*)mnemonic
                   pubKey:(NSString *)pubKey
                   network:(NSString *)network
                   resolver:(RCTPromiseResolveBlock)resolve
@@ -158,7 +158,7 @@ RCT_EXPORT_METHOD(issueRgb20Asset:(NSString*)ticker
   }];
 }
 
-RCT_EXPORT_METHOD(issueRgb121Asset:(NSString*)description
+RCT_EXPORT_METHOD(issueRgb25Asset:(NSString*)description
                   name:(NSString *)name
                   supply:(NSString *)supply
                   filePath:(NSString *)filePath
@@ -166,7 +166,21 @@ RCT_EXPORT_METHOD(issueRgb121Asset:(NSString*)description
                   rejecter:(RCTPromiseRejectBlock)reject){
   RGBHelper *helper = [[RGBHelper alloc]init];
   
-  [helper issueRgb121AssetWithName:name description:description supply:supply filePath:filePath callback:^(NSString * _Nonnull response) {
+  [helper issueRgb25AssetWithName:name description:description supply:supply filePath:filePath callback:^(NSString * _Nonnull response) {
+    resolve(response);
+  }
+   ];
+}
+
+RCT_EXPORT_METHOD(sendAsset:(NSString*)assetId
+                  blindedUTXO:(NSString *)blindedUTXO
+                  amount:(NSString *)amount
+                  consignmentEndpoints:(NSString *)consignmentEndpoints
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+  RGBHelper *helper = [[RGBHelper alloc]init];
+  
+  [helper sendAssetWithAssetId:assetId blindedUtxo:blindedUTXO amount:amount consignmentEndpoints:consignmentEndpoints callback:^(NSString * _Nonnull response) {
     resolve(response);
   }
    ];
