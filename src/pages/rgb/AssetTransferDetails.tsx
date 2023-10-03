@@ -1,6 +1,7 @@
 import moment from 'moment'
 import React from 'react'
 import {
+  Linking,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -26,16 +27,27 @@ const styles = StyleSheet.create( {
   },
 } )
 
-const DetailsItem = ( { name, value } ) => {
+const DetailsItem = ( { name, value, subDetailPressable = false } ) => {
   return(
     <View style={styles.lineItem}>
       <Text style={ListStyles.listItemTitleTransaction}>{name}</Text>
       <Text
+        onPress={() => {
+          if ( subDetailPressable ) {
+            Linking.canOpenURL( `https://blockstream.info/testnet/tx/${value}` ).then( supported => {
+              if( supported ) {
+                Linking.openURL( `https://blockstream.info/testnet/tx/${value}` )
+              }
+            } )
+          }
+        }}
         selectable
         numberOfLines={1}
         ellipsizeMode="middle"
         style={[ ListStyles.listItemSubtitle, {
-          marginBottom: 3
+          marginBottom: 3,
+          textDecorationLine: subDetailPressable ? 'underline' : 'none',
+          color: subDetailPressable ? Colors.primaryAccent : Colors.greyTextColor
         } ]}
       >
         {value}
@@ -83,10 +95,20 @@ const AssetTransferDetails = ( props ) => {
           name="Amount"
           value={item.amount}
         />
-        <DetailsItem
-          name="Transaction ID"
-          value={item.idx}
-        />
+        {item.kind !== 'ISSUANCE' && (
+          <DetailsItem
+            name="Transaction ID"
+            value={item.txid}
+            subDetailPressable
+          />
+        )}
+        {item.kind !== 'ISSUANCE' && item.changeUtxo?.txid && (
+          <DetailsItem
+            name="Change UTXO"
+            value={item.changeUtxo.txid}
+            subDetailPressable
+          />
+        )}
         <DetailsItem
           name="Date"
           value={moment.unix( item.updatedAt ).format( 'DD/MM/YY • hh:MM' )}
