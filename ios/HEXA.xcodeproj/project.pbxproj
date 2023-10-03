@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -53,6 +53,27 @@
 		CCF1689525FB8FE60038E126 /* HexaWalletBackup.json in Resources */ = {isa = PBXBuildFile; fileRef = CCF1689425FB8FE60038E126 /* HexaWalletBackup.json */; };
 		D45D423F823D4B4F96F81CDC /* Montserrat-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FD2C9FFB56CD431FBFFABD4B /* Montserrat-Italic.ttf */; };
 		EB01814ADA60C1AAE80592C9 /* libPods-HEXA Stage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ED5CA33679351410597FFE38 /* libPods-HEXA Stage.a */; };
+		F40ABF232ACC2A69003389CC /* RgbManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF1C2ACC2A69003389CC /* RgbManager.swift */; };
+		F40ABF242ACC2A69003389CC /* RgbManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF1C2ACC2A69003389CC /* RgbManager.swift */; };
+		F40ABF252ACC2A69003389CC /* RgbManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF1C2ACC2A69003389CC /* RgbManager.swift */; };
+		F40ABF262ACC2A69003389CC /* RGBHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF1E2ACC2A69003389CC /* RGBHelper.swift */; };
+		F40ABF272ACC2A69003389CC /* RGBHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF1E2ACC2A69003389CC /* RGBHelper.swift */; };
+		F40ABF282ACC2A69003389CC /* RGBHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF1E2ACC2A69003389CC /* RGBHelper.swift */; };
+		F40ABF292ACC2A69003389CC /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF1F2ACC2A69003389CC /* Utility.swift */; };
+		F40ABF2A2ACC2A69003389CC /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF1F2ACC2A69003389CC /* Utility.swift */; };
+		F40ABF2B2ACC2A69003389CC /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF1F2ACC2A69003389CC /* Utility.swift */; };
+		F40ABF2C2ACC2A69003389CC /* BDKHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF202ACC2A69003389CC /* BDKHelper.swift */; };
+		F40ABF2D2ACC2A69003389CC /* BDKHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF202ACC2A69003389CC /* BDKHelper.swift */; };
+		F40ABF2E2ACC2A69003389CC /* BDKHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF202ACC2A69003389CC /* BDKHelper.swift */; };
+		F40ABF2F2ACC2A69003389CC /* RGBModule.m in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF212ACC2A69003389CC /* RGBModule.m */; };
+		F40ABF302ACC2A69003389CC /* RGBModule.m in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF212ACC2A69003389CC /* RGBModule.m */; };
+		F40ABF312ACC2A69003389CC /* RGBModule.m in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF212ACC2A69003389CC /* RGBModule.m */; };
+		F40ABF322ACC2A69003389CC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF222ACC2A69003389CC /* Constants.swift */; };
+		F40ABF332ACC2A69003389CC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF222ACC2A69003389CC /* Constants.swift */; };
+		F40ABF342ACC2A69003389CC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40ABF222ACC2A69003389CC /* Constants.swift */; };
+		F42743282ACC3E3A0085FAA3 /* RgbLib in Frameworks */ = {isa = PBXBuildFile; productRef = F42743272ACC3E3A0085FAA3 /* RgbLib */; };
+		F427432A2ACC3E410085FAA3 /* RgbLib in Frameworks */ = {isa = PBXBuildFile; productRef = F42743292ACC3E410085FAA3 /* RgbLib */; };
+		F427432C2ACC3E480085FAA3 /* RgbLib in Frameworks */ = {isa = PBXBuildFile; productRef = F427432B2ACC3E480085FAA3 /* RgbLib */; };
 		F450099E299BB94B009F3355 /* Montserrat-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 63D24441726E4404BC7B7B2E /* Montserrat-Regular.ttf */; };
 		F450099F299BB953009F3355 /* Montserrat-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 196ECDEACD8644898512DACB /* Montserrat-Bold.ttf */; };
 		F45009A0299BB959009F3355 /* Montserrat-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FD2C9FFB56CD431FBFFABD4B /* Montserrat-Italic.ttf */; };
@@ -60,12 +81,15 @@
 		F45009A2299BB961009F3355 /* Montserrat-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7EBDAB1C01FE4D629B1A7C39 /* Montserrat-MediumItalic.ttf */; };
 		F45009A3299BB965009F3355 /* Montserrat-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5676B1BA3B1B4E3F9D29308A /* Montserrat-Medium.ttf */; };
 		F45009A4299BB96A009F3355 /* Montserrat-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 95620CD1F8B44203A87BE6F7 /* Montserrat-SemiBold.ttf */; };
+		F459C22C2ACC3EF100D5CA74 /* BitcoinDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = F459C22B2ACC3EF100D5CA74 /* BitcoinDevKit */; };
+		F459C22E2ACC3EF800D5CA74 /* BitcoinDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = F459C22D2ACC3EF800D5CA74 /* BitcoinDevKit */; };
 		F49AA80D26A0284D0097D815 /* BackgroundViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F49AA80B26A0284D0097D815 /* BackgroundViewController.m */; };
 		F49AA80E26A0284D0097D815 /* BackgroundViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F49AA80B26A0284D0097D815 /* BackgroundViewController.m */; };
 		F49AA80F26A0284D0097D815 /* BackgroundViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F49AA80B26A0284D0097D815 /* BackgroundViewController.m */; };
 		F49AA81026A0284D0097D815 /* BackgroundViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F49AA80C26A0284D0097D815 /* BackgroundViewController.xib */; };
 		F49AA81126A0284D0097D815 /* BackgroundViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F49AA80C26A0284D0097D815 /* BackgroundViewController.xib */; };
 		F49AA81226A0284D0097D815 /* BackgroundViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = F49AA80C26A0284D0097D815 /* BackgroundViewController.xib */; };
+		F4BC16FF2ACC2CB70078E13C /* BitcoinDevKit in Frameworks */ = {isa = PBXBuildFile; productRef = F4BC16FE2ACC2CB70078E13C /* BitcoinDevKit */; };
 		F4FBDE50299CCE9F00B3E6E2 /* Montserrat-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 63D24441726E4404BC7B7B2E /* Montserrat-Regular.ttf */; };
 		F4FBDE51299CCEA400B3E6E2 /* Montserrat-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 196ECDEACD8644898512DACB /* Montserrat-Bold.ttf */; };
 		F4FBDE52299CCEA900B3E6E2 /* Montserrat-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FD2C9FFB56CD431FBFFABD4B /* Montserrat-Italic.ttf */; };
@@ -155,6 +179,13 @@
 		ED5CA33679351410597FFE38 /* libPods-HEXA Stage.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA Stage.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE6F36351DD345FAB2CDA5DE /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		F336309BA1AAAEB9081B313A /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-HEXA/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		F40ABF1C2ACC2A69003389CC /* RgbManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RgbManager.swift; sourceTree = "<group>"; };
+		F40ABF1D2ACC2A69003389CC /* RGBModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RGBModule.h; sourceTree = "<group>"; };
+		F40ABF1E2ACC2A69003389CC /* RGBHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RGBHelper.swift; sourceTree = "<group>"; };
+		F40ABF1F2ACC2A69003389CC /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
+		F40ABF202ACC2A69003389CC /* BDKHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BDKHelper.swift; sourceTree = "<group>"; };
+		F40ABF212ACC2A69003389CC /* RGBModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RGBModule.m; sourceTree = "<group>"; };
+		F40ABF222ACC2A69003389CC /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		F49AA80A26A0284D0097D815 /* BackgroundViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BackgroundViewController.h; sourceTree = "<group>"; };
 		F49AA80B26A0284D0097D815 /* BackgroundViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BackgroundViewController.m; sourceTree = "<group>"; };
 		F49AA80C26A0284D0097D815 /* BackgroundViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BackgroundViewController.xib; sourceTree = "<group>"; };
@@ -167,6 +198,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F42743282ACC3E3A0085FAA3 /* RgbLib in Frameworks */,
+				F4BC16FF2ACC2CB70078E13C /* BitcoinDevKit in Frameworks */,
 				6111482F2506463F00ED433D /* CloudKit.framework in Frameworks */,
 				B3881CB8798EC7B9E014156F /* libPods-HEXA.a in Frameworks */,
 			);
@@ -176,8 +209,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F459C22C2ACC3EF100D5CA74 /* BitcoinDevKit in Frameworks */,
 				6182F77B250B23D7005B6ECE /* CloudKit.framework in Frameworks */,
 				68FF04C186598B551572E840 /* libPods-HEXA Dev.a in Frameworks */,
+				F427432A2ACC3E410085FAA3 /* RgbLib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,8 +220,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F459C22E2ACC3EF800D5CA74 /* BitcoinDevKit in Frameworks */,
 				6182F7A7250B2742005B6ECE /* CloudKit.framework in Frameworks */,
 				EB01814ADA60C1AAE80592C9 /* libPods-HEXA Stage.a in Frameworks */,
+				F427432C2ACC3E480085FAA3 /* RgbLib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,6 +301,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				F4EABE022ACC289A007DCBA0 /* rgb */,
 				1FFF37032AA1D883008EA5DA /* AppDelegate.mm */,
 				1FFF37052AA1D893008EA5DA /* AppDelegate.mm */,
 				1FFF37072AA1D89B008EA5DA /* AppDelegate.mm */,
@@ -374,6 +412,20 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		F4EABE022ACC289A007DCBA0 /* rgb */ = {
+			isa = PBXGroup;
+			children = (
+				F40ABF202ACC2A69003389CC /* BDKHelper.swift */,
+				F40ABF222ACC2A69003389CC /* Constants.swift */,
+				F40ABF1E2ACC2A69003389CC /* RGBHelper.swift */,
+				F40ABF1C2ACC2A69003389CC /* RgbManager.swift */,
+				F40ABF1D2ACC2A69003389CC /* RGBModule.h */,
+				F40ABF212ACC2A69003389CC /* RGBModule.m */,
+				F40ABF1F2ACC2A69003389CC /* Utility.swift */,
+			);
+			path = rgb;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -395,6 +447,10 @@
 			dependencies = (
 			);
 			name = HEXA;
+			packageProductDependencies = (
+				F4BC16FE2ACC2CB70078E13C /* BitcoinDevKit */,
+				F42743272ACC3E3A0085FAA3 /* RgbLib */,
+			);
 			productName = HEXA;
 			productReference = 13B07F961A680F5B00A75B9A /* Bitcoin Tribe.app */;
 			productType = "com.apple.product-type.application";
@@ -418,6 +474,10 @@
 			dependencies = (
 			);
 			name = "HEXA Dev";
+			packageProductDependencies = (
+				F42743292ACC3E410085FAA3 /* RgbLib */,
+				F459C22B2ACC3EF100D5CA74 /* BitcoinDevKit */,
+			);
 			productName = HEXA;
 			productReference = 6182F796250B23D7005B6ECE /* Bitcoin Tribe Dev.app */;
 			productType = "com.apple.product-type.application";
@@ -442,6 +502,10 @@
 			dependencies = (
 			);
 			name = "HEXA Stage";
+			packageProductDependencies = (
+				F427432B2ACC3E480085FAA3 /* RgbLib */,
+				F459C22D2ACC3EF800D5CA74 /* BitcoinDevKit */,
+			);
 			productName = HEXA;
 			productReference = 6182F7C2250B2742005B6ECE /* Bitcoin Tribe Stag.app */;
 			productType = "com.apple.product-type.application";
@@ -478,6 +542,10 @@
 				Base,
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
+			packageReferences = (
+				F4BC16FD2ACC2CB70078E13C /* XCRemoteSwiftPackageReference "bdk-swift" */,
+				F4E6AC8B2ACC39C200F4A790 /* XCRemoteSwiftPackageReference "rgb-lib-swift" */,
+			);
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1012,11 +1080,17 @@
 				1FFF37042AA1D883008EA5DA /* AppDelegate.mm in Sources */,
 				6111483A250647BD00ED433D /* PdfPassword.m in Sources */,
 				611148352506478E00ED433D /* PdfGenerate.swift in Sources */,
+				F40ABF292ACC2A69003389CC /* Utility.swift in Sources */,
+				F40ABF2F2ACC2A69003389CC /* RGBModule.m in Sources */,
+				F40ABF262ACC2A69003389CC /* RGBHelper.swift in Sources */,
 				CCF1689225FB8FCF0038E126 /* iCloud.m in Sources */,
 				F49AA80D26A0284D0097D815 /* BackgroundViewController.m in Sources */,
+				F40ABF232ACC2A69003389CC /* RgbManager.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				CCF1689025FB8FC50038E126 /* iCloudHelper.swift in Sources */,
+				F40ABF322ACC2A69003389CC /* Constants.swift in Sources */,
 				0DF76F60FB9FB773D6F11699 /* ExpoModulesProvider.swift in Sources */,
+				F40ABF2C2ACC2A69003389CC /* BDKHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1024,9 +1098,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F40ABF2A2ACC2A69003389CC /* Utility.swift in Sources */,
 				1FFF37062AA1D893008EA5DA /* AppDelegate.mm in Sources */,
+				F40ABF242ACC2A69003389CC /* RgbManager.swift in Sources */,
 				4D38330426009F8900F82BDB /* iCloudHelper.swift in Sources */,
+				F40ABF2D2ACC2A69003389CC /* BDKHelper.swift in Sources */,
+				F40ABF272ACC2A69003389CC /* RGBHelper.swift in Sources */,
 				4D38330326009EDE00F82BDB /* iCloud.m in Sources */,
+				F40ABF332ACC2A69003389CC /* Constants.swift in Sources */,
+				F40ABF302ACC2A69003389CC /* RGBModule.m in Sources */,
 				6182F777250B23D7005B6ECE /* PdfPassword.m in Sources */,
 				F49AA80E26A0284D0097D815 /* BackgroundViewController.m in Sources */,
 				6182F778250B23D7005B6ECE /* PdfGenerate.swift in Sources */,
@@ -1038,9 +1118,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F40ABF2B2ACC2A69003389CC /* Utility.swift in Sources */,
 				1FFF37082AA1D89B008EA5DA /* AppDelegate.mm in Sources */,
+				F40ABF252ACC2A69003389CC /* RgbManager.swift in Sources */,
 				4D3833072600BD0A00F82BDB /* iCloud.m in Sources */,
+				F40ABF2E2ACC2A69003389CC /* BDKHelper.swift in Sources */,
+				F40ABF282ACC2A69003389CC /* RGBHelper.swift in Sources */,
 				4D3833082600BD0A00F82BDB /* iCloudHelper.swift in Sources */,
+				F40ABF342ACC2A69003389CC /* Constants.swift in Sources */,
+				F40ABF312ACC2A69003389CC /* RGBModule.m in Sources */,
 				6182F7A3250B2742005B6ECE /* PdfPassword.m in Sources */,
 				F49AA80F26A0284D0097D815 /* BackgroundViewController.m in Sources */,
 				6182F7A4250B2742005B6ECE /* PdfGenerate.swift in Sources */,
@@ -1067,8 +1153,11 @@
 				INFOPLIST_FILE = HEXA/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
@@ -1107,8 +1196,11 @@
 				INFOPLIST_FILE = HEXA/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
@@ -1267,8 +1359,11 @@
 				INFOPLIST_FILE = "HEXA/HEXA.Dev-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe dev";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
@@ -1523,8 +1618,11 @@
 				INFOPLIST_FILE = "HEXA/HEXA.Dev-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe dev";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
@@ -1562,8 +1660,11 @@
 				INFOPLIST_FILE = "HEXA/HEXA.Stage-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe stag";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
@@ -1601,8 +1702,11 @@
 				INFOPLIST_FILE = "HEXA/HEXA.Stage-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Bitcoin Tribe stag";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
@@ -1674,7 +1778,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
-				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					/usr/lib/swift,
+					"$(inherited)",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
@@ -1730,7 +1837,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
-				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					/usr/lib/swift,
+					"$(inherited)",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
@@ -1783,6 +1893,58 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F4BC16FD2ACC2CB70078E13C /* XCRemoteSwiftPackageReference "bdk-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/bitcoindevkit/bdk-swift";
+			requirement = {
+				kind = revision;
+				revision = 9c69d6255c251ba606e7aad94969c8d24b0ea344;
+			};
+		};
+		F4E6AC8B2ACC39C200F4A790 /* XCRemoteSwiftPackageReference "rgb-lib-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RGB-Tools/rgb-lib-swift";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F42743272ACC3E3A0085FAA3 /* RgbLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4E6AC8B2ACC39C200F4A790 /* XCRemoteSwiftPackageReference "rgb-lib-swift" */;
+			productName = RgbLib;
+		};
+		F42743292ACC3E410085FAA3 /* RgbLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4E6AC8B2ACC39C200F4A790 /* XCRemoteSwiftPackageReference "rgb-lib-swift" */;
+			productName = RgbLib;
+		};
+		F427432B2ACC3E480085FAA3 /* RgbLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4E6AC8B2ACC39C200F4A790 /* XCRemoteSwiftPackageReference "rgb-lib-swift" */;
+			productName = RgbLib;
+		};
+		F459C22B2ACC3EF100D5CA74 /* BitcoinDevKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4BC16FD2ACC2CB70078E13C /* XCRemoteSwiftPackageReference "bdk-swift" */;
+			productName = BitcoinDevKit;
+		};
+		F459C22D2ACC3EF800D5CA74 /* BitcoinDevKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4BC16FD2ACC2CB70078E13C /* XCRemoteSwiftPackageReference "bdk-swift" */;
+			productName = BitcoinDevKit;
+		};
+		F4BC16FE2ACC2CB70078E13C /* BitcoinDevKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4BC16FD2ACC2CB70078E13C /* XCRemoteSwiftPackageReference "bdk-swift" */;
+			productName = BitcoinDevKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 83CBB9F71A601CBA00E9B192 /* Project object */;
 }
