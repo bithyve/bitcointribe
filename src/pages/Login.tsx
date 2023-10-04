@@ -886,7 +886,7 @@ export default function Login( props ) {
       </ModalContainer>
       <ModalContainer onBackground={()=>{setPasscodeErrorModal( false )}} visible={showPasscodeErrorModal} closeBottomSheet={() => { }}>
         <AlertModalContents
-          info={'You have entered the incorrect passcode. Please, try again. If you don’t remember your passcode, you will have to recover your wallet through the recovery flow'}
+          info={'You have entered an incorrect passcode. Pls, try again. If you don’t remember your passcode, you will have to recover your wallet through the recovery flow'}
           proceedButtonText={'Okay'}
           onPressProceed={() => {
             setPasscodeErrorModal( false )
