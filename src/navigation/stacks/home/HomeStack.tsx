@@ -213,7 +213,9 @@ const HomeStack = ( { navigation, route } ) => {
       <Stack.Screen name="GoogleAuthenticatorOTP" component={GoogleAuthenticatorOTP} />
       <Stack.Screen name="SecondaryDeviceHistoryNewBHR" component={SecondaryDeviceHistoryNewBHR} />
       <Stack.Screen name="SettingGetNewPin" component={SettingGetNewPin} />
-      <Stack.Screen name="ContactsListForAssociateContact" component={ContactsListForAssociateContact} />
+      <Stack.Screen name="ContactsListForAssociateContact" component={ContactsListForAssociateContact} options={{
+        headerShown: false
+      }} />
       <Stack.Screen name="NewTwoFASecret" component={NewTwoFASecret} />
       <Stack.Screen name="TwoFASweepFunds" component={TwoFASweepFunds} />
       <Stack.Screen name="SendRequest" component={SendRequest} />
