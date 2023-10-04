@@ -4,8 +4,8 @@ import { FlatList } from 'react-native-gesture-handler'
 import { ActivityIndicator } from 'react-native-paper'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-    heightPercentageToDP as hp,
-    widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -160,14 +160,13 @@ const styles = StyleSheet.create( {
     zIndex: 10,
   },
   listItemStyle: {
-    marginVertical: hp( 1.5 ),
-    flex: 1,
+    marginVertical: hp( 0.5 ),
     borderRadius: 10,
-    padding: wp( 3 ),
+    padding: wp( 2 ),
     backgroundColor: '#fff',
     shadowOpacity: 0.5,
     shadowRadius: 10,
-    elevation: 4,
+    elevation: 1,
     marginHorizontal: wp( 3 ),
   },
   txIdText: {
