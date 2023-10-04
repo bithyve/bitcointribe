@@ -1,52 +1,47 @@
+import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import {
-  View,
-  StyleSheet,
   Alert,
   RefreshControl,
   SectionList,
+  StyleSheet,
+  View,
 } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
-import NavHeader from '../../../components/account-details/AccountDetailsNavHeader'
-import AccountDetailsCard from '../../../components/account-details/AccountDetailsCard'
-import SendAndReceiveButtonsFooter from './SendAndReceiveButtonsFooter'
-import { useBottomSheetModal } from '@gorhom/bottom-sheet'
-import KnowMoreBottomSheet, {
-  KnowMoreBottomSheetHandle,
-} from '../../../components/account-details/AccountDetailsKnowMoreBottomSheet'
-import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces'
-import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
-import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import useTransactionReassignmentCompletedEffect from '../../../utils/hooks/account-effects/UseTransactionReassignmentCompletedEffect'
-import TransactionReassignmentSuccessBottomSheet from '../../../components/bottom-sheets/account-management/TransactionReassignmentSuccessBottomSheet'
-import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
-import useAccountShellMergeCompletionEffect from '../../../utils/hooks/account-effects/UseAccountShellMergeCompletionEffect'
-import AccountShellMergeSuccessBottomSheet from '../../../components/bottom-sheets/account-management/AccountShellMergeSuccessBottomSheet'
-import AccountShell from '../../../common/data/models/AccountShell'
-import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
-import { fetchExchangeRates, fetchFeeRates, refreshAccountShells } from '../../../store/actions/accounts'
-import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
-import NetworkKind from '../../../common/data/enums/NetworkKind'
-import config from '../../../bitcoin/HexaConfig'
-import SubAccountKind from '../../../common/data/enums/SubAccountKind'
-import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
-import { Button } from 'react-native-elements'
-import DonationWebPageBottomSheet from '../../../components/bottom-sheets/DonationWebPageBottomSheet'
-import TransactionsPreviewSection from './TransactionsPreviewSection'
-import SyncStatus from '../../../common/data/enums/SyncStatus'
-import { sourceAccountSelectedForSending } from '../../../store/actions/sending'
-import idx from 'idx'
-import Colors from '../../../common/Colors'
-import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import ModalContainer from '../../../components/home/ModalContainer'
 import { RootSiblingParent } from 'react-native-root-siblings'
-import ErrorModalContents from '../../../components/ErrorModalContents'
-import SavingAccountAlertBeforeLevel2 from '../../../components/know-more-sheets/SavingAccountAlertBeforeLevel2'
+import { useDispatch, useSelector } from 'react-redux'
+import config from '../../../bitcoin/HexaConfig'
 import { AccountType } from '../../../bitcoin/utilities/Interface'
+import Colors from '../../../common/Colors'
+import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 import { translations } from '../../../common/content/LocContext'
-import { markReadTx } from '../../../store/actions/accounts'
+import NetworkKind from '../../../common/data/enums/NetworkKind'
+import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
+import SubAccountKind from '../../../common/data/enums/SubAccountKind'
+import SyncStatus from '../../../common/data/enums/SyncStatus'
+import AccountShell from '../../../common/data/models/AccountShell'
+import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces'
 import ButtonBlue from '../../../components/ButtonBlue'
+import ErrorModalContents from '../../../components/ErrorModalContents'
+import AccountDetailsCard from '../../../components/account-details/AccountDetailsCard'
+import KnowMoreBottomSheet from '../../../components/account-details/AccountDetailsKnowMoreBottomSheet'
+import NavHeader from '../../../components/account-details/AccountDetailsNavHeader'
+import DonationWebPageBottomSheet from '../../../components/bottom-sheets/DonationWebPageBottomSheet'
+import AccountShellMergeSuccessBottomSheet from '../../../components/bottom-sheets/account-management/AccountShellMergeSuccessBottomSheet'
+import TransactionReassignmentSuccessBottomSheet from '../../../components/bottom-sheets/account-management/TransactionReassignmentSuccessBottomSheet'
+import ModalContainer from '../../../components/home/ModalContainer'
 import BorderWalletKnowMore from '../../../components/know-more-sheets/BorderWalletKnowMore'
+import SavingAccountAlertBeforeLevel2 from '../../../components/know-more-sheets/SavingAccountAlertBeforeLevel2'
+import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
+import { fetchExchangeRates, fetchFeeRates, markReadTx, refreshAccountShells } from '../../../store/actions/accounts'
+import { sourceAccountSelectedForSending } from '../../../store/actions/sending'
+import useAccountShellMergeCompletionEffect from '../../../utils/hooks/account-effects/UseAccountShellMergeCompletionEffect'
+import useTransactionReassignmentCompletedEffect from '../../../utils/hooks/account-effects/UseTransactionReassignmentCompletedEffect'
+import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
+import SendAndReceiveButtonsFooter from './SendAndReceiveButtonsFooter'
+import TransactionsPreviewSection from './TransactionsPreviewSection'
 
 export type Props = {
   route: any;
@@ -62,25 +57,25 @@ enum SectionKind {
 const sectionListItemKeyExtractor = ( index ) => String( index )
 
 
-const AccountDetailsContainerScreen: React.FC<Props> = ({route, navigation}) => {
+const AccountDetailsContainerScreen: React.FC<Props> = ( { route, navigation } ) => {
   const dispatch = useDispatch()
 
-  const accountShellID = route.params?.accountShellID;
+  const accountShellID = route.params?.accountShellID
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
+  useLayoutEffect( () => {
+    navigation.setOptions( {
       header: () => (
         <NavHeader accountShellID={accountShellID} onBackPressed={() => navigation.goBack()} />
       ),
-    });
-  }, [navigation]);
+    } )
+  }, [ navigation ] )
 
   const strings  = translations[ 'accounts' ]
   const common  = translations[ 'common' ]
 
   const [ webView, showWebView ] = useState( false )
   const swanDeepLinkContent = route.params?.swanDeepLinkContent
-  const accountShell = useAccountShellFromRoute(route)
+  const accountShell = useAccountShellFromRoute( route )
   const accountsState = useAccountsState()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const account = useAccountByAccountShell( accountShell )
@@ -302,7 +297,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ({route, navigation}) => 
     dispatch( sourceAccountSelectedForSending( accountShell ) )
 
     navigation.navigate( 'Send', {
-      subAccountKind: primarySubAccount.kind,
+      screen: 'SendRoot',
+      params: {
+        subAccountKind: primarySubAccount.kind,
+      }
     } )
   }
 
