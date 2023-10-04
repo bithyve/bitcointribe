@@ -28,7 +28,7 @@ export default function IssueScreen( props ) {
   const [ ticker, setTicker ] = useState( '' )
   const [ attachedfile, setAttachedFile ] = useState( 'Attach File' )
   const [ requesting, setRequesting ] = useState( false )
-  const [ loading, setLoading ] = useState( true )
+  const [ loading, setLoading ] = useState( false )
 
   async function IssueAssetClick() {
     setLoading( true )
