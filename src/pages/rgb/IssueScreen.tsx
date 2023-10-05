@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ActivityIndicator, SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Keyboard, SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { Input } from 'react-native-elements'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { launchImageLibrary } from 'react-native-image-picker'
@@ -32,28 +32,41 @@ export default function IssueScreen( props ) {
 
   async function IssueAssetClick() {
     setLoading( true )
+    Keyboard.dismiss()
     try {
       if( issueType === 'collectible' ) {
-        setRequesting( true )
-        const newAsset = await RGBServices.issueRgb25Asset( name, description, totalAmount, attachedfile )
-        setRequesting( false )
-        if( newAsset.assetId ) {
-          props.navigation.goBack()
-          dispatch( syncRgb() )
-          Toast( 'Asset created' )
+        if ( !name || !description || !totalAmount || !attachedfile ) {
+          Toast( 'Please enter all details.' )
+          setLoading( false )
         } else {
-          Toast( `Failed ${newAsset.error}` )
+          setRequesting( true )
+          const newAsset = await RGBServices.issueRgb25Asset( name, description, totalAmount, attachedfile )
+          setRequesting( false )
+          if( newAsset.assetId ) {
+            props.navigation.goBack()
+            dispatch( syncRgb() )
+            Toast( 'Asset created' )
+          } else {
+            setLoading( false )
+            Toast( `Failed ${newAsset.error}` )
+          }
         }
       } else {
-        setRequesting( true )
-        const newAsset = await RGBServices.issueRgb20Asset( ticker, name, totalAmount )
-        setRequesting( false )
-        if( newAsset.assetId ) {
-          props.navigation.goBack()
-          dispatch( syncRgb() )
-          Toast( 'Asset created' )
+        if ( !ticker || !name || !totalAmount ) {
+          Toast( 'Please enter all details.' )
+          setLoading( false )
         } else {
-          Toast( `Failed ${newAsset.error}` )
+          setRequesting( true )
+          const newAsset = await RGBServices.issueRgb20Asset( ticker, name, totalAmount )
+          setRequesting( false )
+          if( newAsset.assetId ) {
+            props.navigation.goBack()
+            dispatch( syncRgb() )
+            Toast( 'Asset created' )
+          } else {
+            setLoading( false )
+            Toast( `Failed ${newAsset.error}` )
+          }
         }
       }
     } catch ( error ) {
