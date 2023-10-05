@@ -37,62 +37,44 @@ const CoveredQRCodeScanner: React.FC<Props> = ( {
   onCodeScanned,
 }: Props ) => {
   const [ isCameraOpen, setIsCameraOpen ] = useState( true )
-  const dispatch = useDispatch()
-
-  const CameraCover: React.FC = () => {
-    return (
-      <AppBottomSheetTouchableWrapper onPress={() => {
-        setIsCameraOpen( true )
-        dispatch( setIsPermissionGiven( true ) )
-        // let data ={
-        //   key: "a9a1a6b7f20c58a55f83c949",
-        //   name: 'primaryk'
-        // }
-        // onCodeScanned(data)
-      }} >
-        <ImageBackground
-          source={coverImageSource}
-          style={{
-            ...styles.rootContainer, ...containerStyle
-          }}
-        >
-          <CameraFrameIndicators />
-        </ImageBackground>
-      </AppBottomSheetTouchableWrapper>
-    )
-  }
-
-  // TODO: It would probably be good to abstract this into its own component file
-  // so we can use it independently of the toggleable cover overlay.
-  const Scanner: React.FC = () => {
-    const cameraRef = useRef<RNCamera>()
-
-    return (
-      <View style={{
-        ...styles.rootContainer, ...containerStyle
-      }}>
-        <RNCamera
-          ref={cameraRef}
-          style={{
-            flex: 1,
-          }}
-          onBarCodeRead={( event: BarCodeReadEvent ) => {
-            onCodeScanned( event )
-            setIsCameraOpen( false )
-          }}
-          captureAudio={false}
-          notAuthorizedView={<CameraUnauthorized/>}
-        >
-          <CameraFrameIndicators />
-        </RNCamera>
-      </View >
-    )
-  }
 
   if ( isCameraOpen ) {
-    return <Scanner />
+    const cameraRef = useRef<RNCamera>()
+
+    return <View style={{
+      ...styles.rootContainer, ...containerStyle
+    }}>
+      <RNCamera
+        ref={cameraRef}
+        style={{
+          flex: 1,
+        }}
+        onBarCodeRead={( event: BarCodeReadEvent ) => {
+          onCodeScanned( event )
+          setIsCameraOpen( false )
+        }}
+        captureAudio={false}
+        notAuthorizedView={<CameraUnauthorized/>}
+      >
+        <CameraFrameIndicators />
+      </RNCamera>
+    </View >
   } else {
-    return <CameraCover />
+    const dispatch = useDispatch()
+
+    return <AppBottomSheetTouchableWrapper onPress={() => {
+      setIsCameraOpen( true )
+      dispatch( setIsPermissionGiven( true ) )
+    }} >
+      <ImageBackground
+        source={coverImageSource}
+        style={{
+          ...styles.rootContainer, ...containerStyle
+        }}
+      >
+        <CameraFrameIndicators />
+      </ImageBackground>
+    </AppBottomSheetTouchableWrapper>
   }
 }
 

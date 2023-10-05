@@ -1,35 +1,35 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
-import React, { useCallback, useEffect, useState } from 'react'
-import { Alert } from 'react-native'
-import { useDispatch } from 'react-redux'
-import SubAccountKind from '../../../common/data/enums/SubAccountKind'
-import SendHelpContents from '../../../components/Helper/SendHelpContents'
-import { clearTransfer } from '../../../store/actions/accounts'
-import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import usePreferencesState from '../../../utils/hooks/state-selectors/preferences/UsePreferencesState'
-import defaultStackScreenNavigationOptions from '../../../navigation/options/DefaultStackScreenNavigationOptions'
-import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
-import KnowMoreButton from '../../../components/KnowMoreButton'
-import { BarCodeReadEvent } from 'react-native-camera'
-import { ScannedAddressKind, Wallet } from '../../../bitcoin/utilities/Interface'
-import Toast from '../../../components/Toast'
-import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
-import { makeAddressRecipientDescription } from '../../../utils/sending/RecipientFactories'
-import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
-import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting } from '../../../store/actions/sending'
-import AccountSendScreen from './AccountSendScreen'
-import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
-import useSendableTrustedContactRecipients from '../../../utils/hooks/state-selectors/sending/UseSendableTrustedContactRecipients'
-import useSendableAccountShells from '../../../utils/hooks/state-selectors/sending/UseSendableAccountShells'
-import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import idx from 'idx'
-import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
-import BottomSheetHandle from '../../../components/bottom-sheets/BottomSheetHandle'
-import Colors from '../../../common/Colors'
-import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../../store/actions/trustedContacts'
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
+import { Alert } from 'react-native'
+import { BarCodeReadEvent } from 'react-native-camera'
+import { useDispatch } from 'react-redux'
+import { ScannedAddressKind, Wallet } from '../../../bitcoin/utilities/Interface'
 import AccountUtilities from '../../../bitcoin/utilities/accounts/AccountUtilities'
+import Colors from '../../../common/Colors'
+import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
+import SubAccountKind from '../../../common/data/enums/SubAccountKind'
+import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
+import SendHelpContents from '../../../components/Helper/SendHelpContents'
+import KnowMoreButton from '../../../components/KnowMoreButton'
+import Toast from '../../../components/Toast'
+import BottomSheetHandle from '../../../components/bottom-sheets/BottomSheetHandle'
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
+import defaultStackScreenNavigationOptions from '../../../navigation/options/DefaultStackScreenNavigationOptions'
+import { clearTransfer } from '../../../store/actions/accounts'
+import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting } from '../../../store/actions/sending'
+import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../../store/actions/trustedContacts'
+import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
+import usePreferencesState from '../../../utils/hooks/state-selectors/preferences/UsePreferencesState'
+import useSendableAccountShells from '../../../utils/hooks/state-selectors/sending/UseSendableAccountShells'
+import useSendableTrustedContactRecipients from '../../../utils/hooks/state-selectors/sending/UseSendableTrustedContactRecipients'
+import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
+import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 import useWalletState from '../../../utils/hooks/state-selectors/storage/useWalletState'
+import { makeAddressRecipientDescription } from '../../../utils/sending/RecipientFactories'
+import AccountSendScreen from './AccountSendScreen'
 
 export type Props = {
   route: any;
@@ -41,9 +41,9 @@ const AccountSendContainerScreen: React.FC<Props> = ( { route, navigation }: Pro
   const { dismiss: dismissBottomSheet } = useBottomSheetModal()
   const [ isShowingKnowMoreSheet, setIsShowingKnowMoreSheet ] = useState( false )
 
-  navigation.setOptions(( { route, navigation } ) => {
-    const subAccountKind = route.params?.subAccountKind;
-    return {
+  useLayoutEffect( () => {
+    const subAccountKind = route.params?.subAccountKind
+    navigation.setOptions( {
       ...defaultStackScreenNavigationOptions,
       headerLeft: () => {
         return (
@@ -66,8 +66,9 @@ const AccountSendContainerScreen: React.FC<Props> = ( { route, navigation }: Pro
           )
         }
       },
-    }
-  })
+    } )
+  }, [ navigation, route ] )
+
   const accountShell = useSourceAccountShellForSending()
   const account = useAccountByAccountShell( accountShell )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
