@@ -26,13 +26,13 @@ import {
 } from '../store/actions/notifications'
 import { LocalizationContext } from '../common/content/LocContext'
 import ElectrumClient from '../bitcoin/electrum/client'
-import PersonalNode from '../common/data/models/PersonalNode'
 import TestElectrumClient from '../bitcoin/electrum/test-client'
 import { predefinedMainnetNodes, predefinedTestnetNodes } from '../bitcoin/electrum/predefinedNodes'
 import TestnetElectrumClient from '../bitcoin/electrum/test-client'
 import { NetworkType } from '../bitcoin/utilities/Interface'
 // import RestClient from '../services/rest/RestClient'
 import config from '../bitcoin/HexaConfig'
+import PersonalNode from '../common/data/models/PersonalNode'
 
 type LaunchScreenProps = {
   navigation: any;
@@ -57,6 +57,7 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
     this.errorBottomSheet = React.createRef()
     // console.log( ':LAUNCH' )
   }
+
 
   componentDidMount = async() => {
     this.setupElectrumClients()
@@ -97,7 +98,6 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
 
   postSplashScreenActions = async () => {
     try {
-      console.log( 'walletId', this.props.walletId )
       if( this.props.walletId ){
         this.props.getMessages()
       }
@@ -236,10 +236,9 @@ const mapStateToProps = ( state ) => {
     walletId: idx( state, ( _ ) => _.preferences.walletId ),
     walletExists: idx( state, ( _ ) => _.storage.walletExists ),
     torEnabled: idx( state, ( _ ) => _.preferences.torEnabled ),
-    personalNodes: idx( state, ( _ ) => _.nodeSettings.personalNodes )
   }
 }
 
 export default connect( mapStateToProps, {
-  getMessages
+  getMessages,
 } )( Launch )

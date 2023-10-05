@@ -50,6 +50,8 @@ import { translations } from '../../../common/content/LocContext'
 import { markReadTx } from '../../../store/actions/accounts'
 import ButtonBlue from '../../../components/ButtonBlue'
 import BorderWalletKnowMore from '../../../components/know-more-sheets/BorderWalletKnowMore'
+import Toast from '../../../components/Toast'
+import { resetElectrumNotConnectedErr } from '../../../store/actions/nodeSettings'
 
 export type Props = {
   navigation: any;
@@ -97,6 +99,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     ( state ) => state.bhr.AllowSecureAccount,
   )
   const isBorderWallet = primarySubAccount.type === AccountType.BORDER_WALLET
+  const electrumClientConnectionStatus = useSelector(
+    ( state ) => state.nodeSettings.electrumClientConnectionStatus
+  )
+
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
@@ -145,6 +151,15 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       hardRefresh: true,
     } ) )
   }
+
+
+  useEffect( () => {
+    if ( electrumClientConnectionStatus?.setElectrumNotConnectedErr ) {
+      Toast( `${electrumClientConnectionStatus.setElectrumNotConnectedErr}` )
+      dispatch( resetElectrumNotConnectedErr() )
+    }
+  }, [ electrumClientConnectionStatus?.setElectrumNotConnectedErr ] )
+
 
   useEffect( () => {
     return () => {

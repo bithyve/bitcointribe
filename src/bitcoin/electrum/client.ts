@@ -69,6 +69,7 @@ export default class ElectrumClient {
         }
       }
 
+
       ELECTRUM_CLIENT.electrumClient = new ElectrumCli(
         ( global as any ).net,
         ( global as any ).tls,
