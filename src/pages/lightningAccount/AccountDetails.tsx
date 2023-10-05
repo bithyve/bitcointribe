@@ -1,22 +1,18 @@
-import React, { Component } from 'react'
-import { View, SectionList, StyleSheet, RefreshControl, StatusBar, } from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
-import { connect } from 'react-redux'
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import  BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import { inject, observer } from 'mobx-react'
-import { NavigationScreenConfig } from 'react-navigation'
+import React, { Component } from 'react'
+import { RefreshControl, SectionList, StatusBar, StyleSheet, View, } from 'react-native'
+import {
+  heightPercentageToDP as hp
+} from 'react-native-responsive-screen'
+import { connect } from 'react-redux'
+import Colors from '../../common/Colors'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
 // import { NavigationStackOptions } from 'react-navigation-stack'
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import NavHeader from '../../components/account-details/AccountDetailsNavHeader'
-import TransactionList from './components/TransactionsList'
-import InvoicesList from './components/InvoicesList'
 import AccountCard from './components/AccountCard'
+import InvoicesList from './components/InvoicesList'
+import TransactionList from './components/TransactionsList'
 
 enum SectionKind {
   ACCOUNT_CARD,
@@ -31,6 +27,7 @@ export enum Mode {
 
 interface AccountDetailsPropsTypes {
   navigation: any;
+  route: any;
 }
 
 @inject(

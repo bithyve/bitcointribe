@@ -276,48 +276,6 @@ function BottomTab() {
   )
 }
 
-const HomeStackInit = createNativeStackNavigator()
-function HomeNavigator() {
-  return (
-    <HomeStackInit.Navigator
-      screenOptions={( { navigation, route } ) => {
-        return {
-          header: () => {
-            return <Header showContent={true} navigation={navigation} route={route}
-            />
-          },
-        }
-      }}
-    >
-      <HomeStackInit.Screen name="Landing" component={BottomTab} options={{
-      }}/>
-    </HomeStackInit.Navigator>
-  )
-}
-
-//TODO: add below default navigation options to navigator
-// const HomeNavigator = createStackNavigator(
-//   {
-//     Landing: {
-//       screen: Bottomtab
-//     },
-//   }, {
-//     defaultNavigationOptions: ( { navigation } ) => {
-//       return {
-//         header: () => {
-//           return <Header showContent={( navigation.state.routes[ 0 ] && navigation.state.routes[ 0 ].routes.length == 1 ) &&
-//             ( navigation.state.routes[ 1 ].routes.length == 1 ) &&
-//             ( navigation.state.routes[ 2 ].routes.length == 1 ) &&
-//             ( navigation.state.routes[ 3 ].routes.length == 1 )
-//           }
-//           />
-//         },
-//       }
-//     },
-//   }
-// )
-
-
 const SwitchStack = createNativeStackNavigator()
 function Navigator() {
   return (
