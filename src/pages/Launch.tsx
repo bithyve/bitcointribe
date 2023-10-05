@@ -236,6 +236,7 @@ const mapStateToProps = ( state ) => {
     walletId: idx( state, ( _ ) => _.preferences.walletId ),
     walletExists: idx( state, ( _ ) => _.storage.walletExists ),
     torEnabled: idx( state, ( _ ) => _.preferences.torEnabled ),
+    personalNodes: idx( state, ( _ ) => _.nodeSettings.personalNodes )
   }
 }
 

@@ -233,7 +233,7 @@ export default class ElectrumClient {
     else ELECTRUM_CLIENT_CONFIG.predefinedPeers = shufflePeers( defaultNodes )
 
     // set active node
-    let activeNode = currentPeerToUse || privateNodes.filter( ( node ) => node.isConnected )[ 0 ]
+    let activeNode = currentPeerToUse || privateNodes?.filter( ( node ) => node.isConnected )[ 0 ]
     if ( !activeNode && defaultNodes.length ) activeNode = ElectrumClient.getNextDefaultPeer() // pick one of the default nodes
     ELECTRUM_CLIENT.activePeer = activeNode
   }
