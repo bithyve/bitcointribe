@@ -78,7 +78,6 @@ const Stack = createNativeStackNavigator()
 const HomeStack = ( { navigation, route } ) => {
   useLayoutEffect( () => {
     const routeName = getFocusedRouteNameFromRoute( route ) ?? 'Home'
-    console.log( 'routeName', routeName )
     if ( routeName === 'Home' ){
       navigation.setOptions( {
         tabBarStyle: {
