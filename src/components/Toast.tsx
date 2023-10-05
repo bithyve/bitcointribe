@@ -5,23 +5,26 @@ import {
 } from 'react-native'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import Toast from 'react-native-root-toast'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../common/Colors'
 
-export default (  message, icon = '', toastPosition=-15 ) => {
+export default (  message, icon = false, toastPosition=-15 ) => {
   return Toast.show( <View style={{
     flexDirection:'row',
     justifyContent:'flex-start',
     alignItems:'center',
     width:300,
-    minHeight:70,
-    height:'auto'
+    minHeight:60,
+    borderRadius:50
   }}>
     {icon &&
-    <MaterialCommunityIcons
-      name="check-circle-outline"
+    <Ionicons
+      name="checkmark-circle"
       color={Colors.white}
       size={30}
+      style={{
+        marginLeft:10
+      }}
     />
     }
     <Text style={{
@@ -31,7 +34,7 @@ export default (  message, icon = '', toastPosition=-15 ) => {
       flex:1,
       flexWrap:'wrap'
     }}>
-      {message}
+      {message.length > 100  ? `${message.substring( 0, 100 )}...` : message}
     </Text>
   </View>, {
     duration: Toast.durations.LONG,
