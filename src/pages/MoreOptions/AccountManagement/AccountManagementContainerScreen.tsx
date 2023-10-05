@@ -186,7 +186,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
                   routes: [
                     {
                       name: 'Home',
-                      key: 'HomeKey'
+                      key: 'HomeKey2'
                     },
                     {
                       name: 'LNAccountDetails',
@@ -215,7 +215,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
                   routes: [
                     {
                       name: 'Home',
-                      key: 'HomeKey'
+                      key: 'HomeKey2'
                     },
                     {
                       name: 'AccountDetails',
