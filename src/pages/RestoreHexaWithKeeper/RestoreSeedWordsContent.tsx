@@ -1,26 +1,27 @@
 
-import React, { useState, useEffect } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { CommonActions } from '@react-navigation/native'
+import * as bip39 from 'bip39'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
+  ActivityIndicator,
   SafeAreaView,
   StatusBar,
-  ActivityIndicator,
+  View,
 } from 'react-native'
-import Colors from '../../common/Colors'
-import ModalContainer from '../../components/home/ModalContainer'
-import RestoreSeedPageComponent from './RestoreSeedPageComponent'
-import RestoreSeedHeaderComponent from './RestoreSeedHeaderComponent'
-import * as bip39 from 'bip39'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
-import { recoverWalletUsingMnemonic, restoreSeedWordFailed } from '../../store/actions/BHR'
-import { completedWalletSetup } from '../../store/actions/setupAndAuth'
-import { setVersion } from '../../store/actions/versionHistory'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Wallet } from '../../bitcoin/utilities/Interface'
-import LoaderModal from '../../components/LoaderModal'
+import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
 import AlertModalContents from '../../components/AlertModalContents'
 import ErrorModalContents from '../../components/ErrorModalContents'
+import LoaderModal from '../../components/LoaderModal'
+import ModalContainer from '../../components/home/ModalContainer'
+import { recoverWalletUsingMnemonic, restoreSeedWordFailed } from '../../store/actions/BHR'
+import { completedWalletSetup } from '../../store/actions/setupAndAuth'
+import { setVersion } from '../../store/actions/versionHistory'
+import RestoreSeedHeaderComponent from './RestoreSeedHeaderComponent'
+import RestoreSeedPageComponent from './RestoreSeedPageComponent'
 
 const RestoreSeedWordsContent = ( props ) => {
   const [ showSeedError, setShowSeedError ] = useState( false )
@@ -58,7 +59,13 @@ const RestoreSeedWordsContent = ( props ) => {
       dispatch( completedWalletSetup() )
       AsyncStorage.setItem( 'walletRecovered', 'true' )
       dispatch( setVersion( 'Restored' ) )
-      props.navigation.navigate( 'HomeNav' )
+      props.navigation.dispatch( CommonActions.reset( {
+        index: 0,
+        routes: [ {
+          name: 'HomeNav',
+          key: 'HomeKey'
+        } ],
+      } ) )
     }
   }, [ wallet ] )
 

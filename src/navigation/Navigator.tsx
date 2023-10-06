@@ -48,6 +48,7 @@ import ConfirmDownload from '../pages/borderwallet/ConfirmDownload'
 import CreatePassPhrase from '../pages/borderwallet/CreatePassPhrase'
 import CreateWithBorderWallet from '../pages/borderwallet/CreateWithBorderWallet'
 import DownloadEncryptGrid from '../pages/borderwallet/DownloadEncryptGrid'
+import ImportWalletPassphrase from '../pages/borderwallet/ImportWalletPassphrase'
 import PreviewPattern from '../pages/borderwallet/PreviewPattern'
 import RecoverBorderWallet from '../pages/borderwallet/RecoverBorderWallet'
 import RegenerateEntropyGrid from '../pages/borderwallet/RegenerateEntropyGrid'
@@ -90,6 +91,9 @@ function SetupNavigator() {
       <SetupStack.Screen name="SelectChecksumWord" component={SelectChecksumWord} />
       <SetupStack.Screen name="CreatePassPhrase" component={CreatePassPhrase} />
       <SetupStack.Screen name="ConfirmDownload" component={ConfirmDownload} />
+      <SetupStack.Screen name="ImportWalletPassphrase" component={ImportWalletPassphrase} options={{
+        headerShown: false
+      }} />
       <SetupStack.Screen name="PreviewPattern" component={PreviewPattern} />
       <SetupStack.Screen name="RecoverBorderWallet" component={RecoverBorderWallet} />
       <SetupStack.Screen name="RegenerateEntropyGrid" component={RegenerateEntropyGrid} />
@@ -160,8 +164,9 @@ function BottomTab() {
     <Tab.Navigator
       initialRouteName="Home"
       tabBar={GradientTab}
+      backBehavior='none'
       screenOptions={() => {
-        const homeNavRoutes = useNavigationState( ( state ) => state.routes[ 1 ].state?.routes )
+        const homeNavRoutes = useNavigationState( ( state ) => state.routes[ 0 ].state?.routes )
         let showContent = true
         for( const route of homeNavRoutes || [] ) {
           if ( route.state?.routes?.length > 1 ) showContent = false

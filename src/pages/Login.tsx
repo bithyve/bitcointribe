@@ -1,5 +1,6 @@
 import firebase from '@react-native-firebase/app'
 import messaging from '@react-native-firebase/messaging'
+import { CommonActions, useFocusEffect } from '@react-navigation/native'
 import JailMonkey from 'jail-monkey'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import {
@@ -127,14 +128,20 @@ export default function Login( props ) {
     return true
   }, [] )
 
+  useFocusEffect(
+    useCallback( () => {
+      BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
+      return () => {
+        BackHandler.removeEventListener( 'hardwareBackPress', hardwareBackPressCustom )}
+    }, [] )
+  )
+
   useEffect( () => {
     dispatch( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     dispatch( setOpenToApproval( false, [], null ) )
     const subscription = Linking.addEventListener( 'url', handleDeepLinkEvent )
     //Linking.getInitialURL().then( handleDeepLinking )
-    BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
     return () => {
-      BackHandler.removeEventListener( 'hardwareBackPress', hardwareBackPressCustom )
       subscription.remove()
     }
 
@@ -236,18 +243,26 @@ export default function Login( props ) {
       } else {
         setloaderModal( false )
         if( !creationFlag ) {
-          props.navigation.navigate( 'HomeNav', {
-            screen: 'Home'
-          } )
+          props.navigation.dispatch( CommonActions.reset( {
+            index: 0,
+            routes: [ {
+              name: 'HomeNav',
+              key: 'HomeKey'
+            } ],
+          } ) )
         } else if( processedLink ){
-          props.navigation.navigate( 'HomeNav', {
-            screen: 'Home',
-            params: {
-              trustedContactRequest: processedLink.trustedContactRequest,
-              giftRequest: processedLink.giftRequest,
-              swanRequest: processedLink.swanRequest,
-            }
-          } )
+          props.navigation.dispatch( CommonActions.reset( {
+            index: 0,
+            routes: [ {
+              name: 'HomeNav',
+              key: 'HomeKey',
+              params: {
+                trustedContactRequest: processedLink.trustedContactRequest,
+                giftRequest: processedLink.giftRequest,
+                swanRequest: processedLink.swanRequest,
+              }
+            } ],
+          } ) )
         }
 
         bootStrapNotifications()

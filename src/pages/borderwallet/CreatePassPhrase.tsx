@@ -1,32 +1,33 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { CommonActions } from '@react-navigation/native'
 import React, { useEffect, useState } from 'react'
 import {
-  View,
+  Alert,
+  Platform,
   SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
   TextInput,
-  Platform,
-  Alert
+  TouchableOpacity,
+  View
 } from 'react-native'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
-import Fonts from '../../common/Fonts'
-import { hp, wp } from '../../common/data/responsiveness/responsive'
-import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
-import Toast from '../../components/Toast'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
 import { Wallet } from '../../bitcoin/utilities/Interface'
-import { recoverWalletUsingMnemonic, restoreSeedWordFailed, setBorderWalletBackup } from '../../store/actions/BHR'
-import ModalContainer from '../../components/home/ModalContainer'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { translations } from '../../common/content/LocContext'
+import { hp, wp } from '../../common/data/responsiveness/responsive'
 import LoaderModal from '../../components/LoaderModal'
+import Toast from '../../components/Toast'
+import ModalContainer from '../../components/home/ModalContainer'
+import { recoverWalletUsingMnemonic, restoreSeedWordFailed, setBorderWalletBackup } from '../../store/actions/BHR'
 import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
-import { translations } from '../../common/content/LocContext'
+import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 
 const CreatePassPhrase = ( props ) => {
   const loaderMessage = {
@@ -82,7 +83,13 @@ const CreatePassPhrase = ( props ) => {
       dispatch( completedWalletSetup() )
       AsyncStorage.setItem( 'walletRecovered', 'true' )
       dispatch( setVersion( 'Restored' ) )
-      props.navigation.navigate( 'HomeNav' )
+      props.navigation.dispatch( CommonActions.reset( {
+        index: 0,
+        routes: [ {
+          name: 'HomeNav',
+          key: 'HomeKey'
+        } ],
+      } ) )
     }
   }, [ wallet, isAccountCreation ] )
 

@@ -1,32 +1,31 @@
 import React, { useContext, useState } from 'react'
 import {
-  StyleSheet,
-  View,
-  SafeAreaView,
-  TouchableOpacity,
   Image,
-  StatusBar,
-  Text,
-  Linking,
+  SafeAreaView,
   ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import Fonts from '../common/Fonts'
-import Colors from '../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import BottomInfoBox from '../components/BottomInfoBox'
-import openLink from '../utils/OpenLink'
-import { LocalizationContext } from '../common/content/LocContext'
 import { useDispatch } from 'react-redux'
-import { setCloudDataRecovery, setIsFileReading } from '../store/actions/cloud'
-import { setDownloadedBackupData } from '../store/actions/BHR'
-import { hp } from '../common/data/responsiveness/responsive'
 import BorderWallet from '../assets/images/svgs/borderWallet.svg'
-import ModalContainer from '../components/home/ModalContainer'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import { LocalizationContext } from '../common/content/LocContext'
+import { hp } from '../common/data/responsiveness/responsive'
+import BottomInfoBox from '../components/BottomInfoBox'
 import GenerateEntropyGridModal from '../components/border-wallet/GenerateEntropyGridModal'
+import ModalContainer from '../components/home/ModalContainer'
+import { setDownloadedBackupData } from '../store/actions/BHR'
+import { setCloudDataRecovery, setIsFileReading } from '../store/actions/cloud'
+import openLink from '../utils/OpenLink'
 
 const WalletInitializationScreen = props => {
   const { translations } = useContext( LocalizationContext )
@@ -231,59 +230,6 @@ const WalletInitializationScreen = props => {
               />
             </View>
           </TouchableOpacity>
-          {/* <View style={{
-          marginLeft: wp( '3%' ), marginRight: wp( '3%' )
-        }}>
-          <Text
-            onPress={()=>  Linking.openURL( 'https://hexawallet.io/faq/' )
-              .then( ( _data ) => { } )
-              .catch( ( _error ) => {
-              } )}
-            style={styles.headerInfoText}>{strings.restoreNoteV1}<Text style={{
-              color: Colors.blue
-              , textDecorationLine:'underline'
-            }}>{'\nhttps://hexawallet.io/faq/'}</Text></Text>
-        </View> */}
-          {/* <TouchableOpacity
-          onPress={async () => {
-            // props.navigation.navigate( 'RestoreWithICloud' )
-          }}
-          style={{
-            ...styles.NewWalletTouchableView,
-            marginBottom: wp( '5%' )
-          }}
-        >
-          <Image
-            style={{
-              ...styles.iconImage, width: wp( 8 ),
-              height: wp( 8 ), marginLeft: wp( 1 ),
-            }}
-            source={require( '../assets/images/icons/seedwords.png' )}
-          />
-          <View style={styles.textView}>
-            <Text style={styles.touchableText}>Using Backup Phrase</Text>
-          </View>
-          <View style={styles.arrowIconView}>
-            <MaterialIcons
-              name="arrow-forward-ios"
-              color={Colors.borderColor}
-              size={15}
-              style={{
-                alignSelf: 'center'
-              }}
-            />
-          </View>
-        </TouchableOpacity> */}
-
-          {/* <View style={{
-            flex: 1,
-          }}>
-            <View style={{
-              marginTop: 'auto'
-            }}>
-
-            </View>
-          </View> */}
         </View>
       </ScrollView>
       <BottomInfoBox

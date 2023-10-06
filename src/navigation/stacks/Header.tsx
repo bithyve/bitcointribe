@@ -970,8 +970,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if ( typeof this.appStateListener === 'function' ) {
       this.appStateListener.remove()
     }
-
-    this.linkStateListener.remove()
+    if ( typeof this.linkStateListener === 'function' ) {
+      this.linkStateListener.remove()
+    }
     clearTimeout( this.openBottomSheetOnLaunchTimeout )
     if ( this.firebaseNotificationListener ) {
       this.firebaseNotificationListener()
