@@ -380,4 +380,13 @@ import BitcoinDevKit
     }catch{
       print(error)
     }}
+  
+  @objc func backup(path: String, password: String,callback: @escaping ((String) -> Void)) -> Void{
+    do{
+      let response = try self.rgbManager.rgbWallet?.backup(backupPath: path, password: password)
+      print(response)
+      callback("response")
+    }catch{
+      print(error)
+    }}
 }

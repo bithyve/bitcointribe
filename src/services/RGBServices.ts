@@ -130,4 +130,9 @@ export default class RGBServices{
     const data = await RGB.getUnspents()
     return JSON.parse( data )
   }
+
+  static backup = async ( path: string, password: string ): Promise<{}> => {
+    const data = await RGB.backup( path, password )
+    return data
+  }
 }

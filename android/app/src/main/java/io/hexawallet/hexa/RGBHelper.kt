@@ -48,24 +48,17 @@ object RGBHelper {
     }
 
     private fun startRGBReceiving(): String {
-        try {
+
             val filter = listOf(
                 RefreshFilter(RefreshTransferStatus.WAITING_COUNTERPARTY, true),
                 RefreshFilter(RefreshTransferStatus.WAITING_COUNTERPARTY, false)
             )
             val refresh = RGBWalletRepository.wallet.refresh(RGBWalletRepository.online, null, filter)
-            Log.d(TAG, "startRGBReceiving:asset ")
             val blindedData = getBlindedUTXO(null, AppConstants.rgbBlindDuration)
-            Log.d(TAG, "startRGBReceiving: "+blindedData)
             val gson = Gson()
             val json = gson.toJson(blindedData)
             return json.toString()
-        }catch (e: Exception) {
-            val message = e.message
-            val jsonObject = JsonObject()
-            jsonObject.addProperty("error", message)
-            return jsonObject.toString()
-        }
+
     }
 
     fun receiveAsset(): String {
@@ -117,7 +110,8 @@ object RGBHelper {
     }
 
     fun getAssetTransfers(assetID: String): String {
-        return Gson().toJson(RGBWalletRepository.wallet.listTransfers(assetID)).toString()
+        val refresh = RGBWalletRepository.wallet.refresh(RGBWalletRepository.online, assetID, listOf())
+        return Gson().toJson(RGBWalletRepository.wallet.listTransfers(assetID).reversed()).toString()
     }
 
     fun getTransactions(): String {
@@ -258,6 +252,10 @@ object RGBHelper {
 
     fun refreshAsset(assetID: String) {
         //return RGBWalletRepository.wallet.refresh(assetID, )
+    }
+
+    fun backup(backupPath: String, password: String) {
+        return RGBWalletRepository.wallet.backup(backupPath, password)
     }
 
 }

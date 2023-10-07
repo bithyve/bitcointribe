@@ -2,7 +2,10 @@ import React from 'react'
 import { StatusBar, StyleSheet, Text, View } from 'react-native'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import ArrowRight from '../../assets/images/svgs/icon_arrow_right.svg'
 import Colors from '../../common/Colors'
@@ -11,30 +14,33 @@ import CommonStyles from '../../common/Styles/Styles'
 import { translations } from '../../common/content/LocContext'
 import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
 
-export default function RGBSendWithQR ( props ) {
-  const common  = translations[ 'common' ]
-  const handleQRScanned = ( scannedData ) => {
+export default function RGBSendWithQR( props ) {
+  const common = translations[ 'common' ]
+  const asset = props.route.params.asset
+
+  const handleQRScanned = scannedData => {
     const validAddress = true //TODO: check if scanned data is valid address
     if ( validAddress ) {
-      props.navigation.navigate( 'RGBSendManually', {
-        address: scannedData.data
+      props.navigation.replace( 'SendAsset', {
+        invoice: scannedData.data, asset
       } )
     } else {
       props.navigation.goBack( null )
     }
   }
   return (
-    <ScrollView style={{
-      flex: 1, backgroundColor: Colors.backgroundColor
-    }}>
+    <ScrollView
+      style={{
+        flex: 1,
+        backgroundColor: Colors.backgroundColor,
+      }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={CommonStyles.headerContainer}>
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
             props.navigation.goBack()
-          }}
-        >
+          }}>
           <View style={CommonStyles.headerLeftIconInnerContainer}>
             <FontAwesome
               name="long-arrow-left"
@@ -46,18 +52,26 @@ export default function RGBSendWithQR ( props ) {
       </View>
       <Text style={styles.headerMainText}>{common.send}</Text>
       <Text style={styles.headerTitleText}>Scan QR</Text>
-      <Text style={styles.headerSubTitleText}>{'Scan a Bitcoin address'}</Text>
+      <Text style={styles.headerSubTitleText}>{'Scan a RGB invoice'}</Text>
 
-      <CoveredQRCodeScanner
-        onCodeScanned={handleQRScanned}
-      />
+      <CoveredQRCodeScanner onCodeScanned={handleQRScanned} />
 
-      <TouchableOpacity onPress={() => props.navigation.navigate( 'RGBSendManually' )} style={styles.manualDetailsContainer}>
-        <View style={{
-          flex:1, paddingLeft: 10
-        }}>
+      <TouchableOpacity
+        onPress={() =>
+          props.navigation.replace( 'SendAsset', {
+            invoice: '', asset
+          } )
+        }
+        style={styles.manualDetailsContainer}>
+        <View
+          style={{
+            flex: 1,
+            paddingLeft: 10,
+          }}>
           <Text style={styles.manualDeailsText}>or Enter details manually</Text>
-          <Text numberOfLines={2} style={styles.manualDetailsSubText}>Enter Bitcoin address manually</Text>
+          <Text numberOfLines={2} style={styles.manualDetailsSubText}>
+            Enter RGB invoice manually
+          </Text>
         </View>
         <ArrowRight />
       </TouchableOpacity>
@@ -71,7 +85,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     marginLeft: 20,
     fontFamily: Fonts.Regular,
-    marginTop: hp( 4 )
+    marginTop: hp( 4 ),
   },
   headerTitleText: {
     color: Colors.blue,
@@ -85,31 +99,31 @@ const styles = StyleSheet.create( {
     color: Colors.THEAM_INFO_TEXT_COLOR,
     fontFamily: Fonts.Regular,
     marginLeft: 20,
-    marginTop:3,
-    marginBottom: hp( 8 )
+    marginTop: 3,
+    marginBottom: hp( 8 ),
   },
-  manualDetailsContainer:{
+  manualDetailsContainer: {
     width: '90%',
     backgroundColor: Colors.gray7,
     alignSelf: 'center',
     borderRadius: wp( 2 ),
     paddingHorizontal: wp( 2 ),
     paddingVertical: hp( 3 ),
-    justifyContent:'center',
-    flexDirection:'row',
-    alignItems:'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: hp( 10 ),
-    marginBottom: hp( 2 )
+    marginBottom: hp( 2 ),
   },
-  manualDeailsText:{
+  manualDeailsText: {
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.Medium,
-    color: Colors.THEAM_TEXT_COLOR
+    color: Colors.THEAM_TEXT_COLOR,
   },
   manualDetailsSubText: {
     fontSize: RFValue( 10 ),
     fontFamily: Fonts.Regular,
     color: Colors.THEAM_INFO_TEXT_COLOR,
-    marginTop: 4
-  }
+    marginTop: 4,
+  },
 } )
