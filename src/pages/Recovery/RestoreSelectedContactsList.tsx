@@ -39,6 +39,7 @@ import {
 } from '../../store/actions/BHR'
 import RestoreByCloudQRCodeContents from './RestoreByCloudQRCodeContents'
 
+import { CommonActions } from '@react-navigation/native'
 import { MetaShare } from '../../bitcoin/utilities/Interface'
 import LoaderModal from '../../components/LoaderModal'
 import { completedWalletSetup } from '../../store/actions/setupAndAuth'
@@ -209,7 +210,13 @@ export default function RestoreSelectedContactsList( props ) {
         walletAmount={'2,065,000'}
         walletUnit={'sats'}
         onPressGoToWallet={() => {
-          props.navigation.navigate( 'Home' )
+          props.navigation.dispatch( CommonActions.reset( {
+            index: 0,
+            routes: [ {
+              name: 'HomeNav',
+              key: 'HomeKey'
+            } ],
+          } ) )
         }}
       />
     )
@@ -311,7 +318,13 @@ export default function RestoreSelectedContactsList( props ) {
         AsyncStorage.setItem( 'walletRecovered', 'true' )
 
         dispatch( walletCheckIn() )
-        props.navigation.navigate( 'Home' )
+        props.navigation.dispatch( CommonActions.reset( {
+          index: 0,
+          routes: [ {
+            name: 'HomeNav',
+            key: 'HomeKey'
+          } ],
+        } ) )
       }
     } )()
   }, [ SERVICES, walletImageChecked ] )
@@ -319,9 +332,16 @@ export default function RestoreSelectedContactsList( props ) {
   useEffect( () => {
     if ( accounts.accountsSynched ) {
       ( loaderBottomSheet as any ).current.snapTo( 0 )
-      props.navigation.navigate( 'Home', {
-        exchangeRates,
-      } )
+      props.navigation.dispatch( CommonActions.reset( {
+        index: 0,
+        routes: [ {
+          name: 'HomeNav',
+          key: 'HomeKey',
+          params: {
+            exchangeRates,
+          }
+        } ],
+      } ) )
     }
   }, [ accounts.accountsSynched ] )
 

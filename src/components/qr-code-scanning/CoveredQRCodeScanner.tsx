@@ -37,10 +37,10 @@ const CoveredQRCodeScanner: React.FC<Props> = ( {
   onCodeScanned,
 }: Props ) => {
   const [ isCameraOpen, setIsCameraOpen ] = useState( true )
+  const cameraRef = useRef<RNCamera>()
+  const dispatch = useDispatch()
 
   if ( isCameraOpen ) {
-    const cameraRef = useRef<RNCamera>()
-
     return <View style={{
       ...styles.rootContainer, ...containerStyle
     }}>
@@ -60,8 +60,6 @@ const CoveredQRCodeScanner: React.FC<Props> = ( {
       </RNCamera>
     </View >
   } else {
-    const dispatch = useDispatch()
-
     return <AppBottomSheetTouchableWrapper onPress={() => {
       setIsCameraOpen( true )
       dispatch( setIsPermissionGiven( true ) )

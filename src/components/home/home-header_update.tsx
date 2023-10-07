@@ -175,7 +175,7 @@ const HomeHeader = ( {
 
 
   const walletNameLength = walletName?.split( '' ).length
-  const walletNameNew = walletName.split( '' )[ walletNameLength - 1 ].toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`
+  const walletNameNew = walletName.split( '' )[ walletNameLength - 1 ]?.toLowerCase() === 's' ? `${walletName}’ Wallet` : `${walletName}’s Wallet`
 
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
