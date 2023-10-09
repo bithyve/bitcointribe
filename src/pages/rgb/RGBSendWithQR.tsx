@@ -16,7 +16,7 @@ import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCod
 
 export default function RGBSendWithQR( props ) {
   const common = translations[ 'common' ]
-  const asset = props.route.params.asset
+  const asset = props.route.params?.asset
 
   const handleQRScanned = scannedData => {
     const validAddress = true //TODO: check if scanned data is valid address
