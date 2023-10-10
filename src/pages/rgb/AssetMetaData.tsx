@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
+import RNFS from 'react-native-fs'
 import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -20,6 +21,7 @@ import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
 import { wp } from '../../common/data/responsiveness/responsive'
 import HeaderTitle from '../../components/HeaderTitle'
+import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
 
 const styles = StyleSheet.create( {
@@ -84,6 +86,7 @@ export const DetailsItem = ( { name, value } ) => {
 
 const AssetMetaData = ( props ) => {
   const [ loading, setLoading ] = useState( true )
+  const [ downloading, setDownloading ] = useState( false )
   const asset = props.route.params.asset
   const [ metaData, setMetaData ] = useState( {
   } )
@@ -161,9 +164,28 @@ const AssetMetaData = ( props ) => {
                       } )
                     }}
                   />
-                  <TouchableOpacity onPress={() => {
+                  <TouchableOpacity disabled={downloading ? true : false} onPress={() => {
+                    setDownloading( true )
+                    const localFilePath = Platform.select( {
+                      android: `file://${asset.dataPaths[ 0 ].filePath}`,
+                      ios: asset.dataPaths[ 0 ].filePath
+                    } )
+                    const mime = asset.dataPaths[ 0 ].mime || 'application/octet-stream'
+                    const extension = mime.split( '/' )[ 1 ]
+                    const destinationPath = `${RNFS.DownloadDirectoryPath}/${asset.name || 'asset'}.${extension}`
+
+                    RNFS.copyFile( localFilePath, destinationPath )
+                      .then( () => {
+                        Toast( `Downloaded to: ${destinationPath}` )
+                        setDownloading( false )
+                      } )
+                      .catch( ( error ) => {
+                        console.error( 'Error downloading file:', error )
+                        Toast( 'Failed to download the file.' )
+                        setDownloading( false )
+                      } )
                   }}>
-                    <LinearGradient colors={[ Colors.blue, Colors.blue ]}
+                    <LinearGradient colors={[ downloading ? Colors.textColorGrey : Colors.blue, downloading ? Colors.textColorGrey : Colors.blue ]}
                       start={{
                         x: 0, y: 0
                       }} end={{
@@ -174,7 +196,9 @@ const AssetMetaData = ( props ) => {
                         ...styles.selectedContactsView, backgroundColor: Colors.lightBlue,
                       }}
                     >
-                      <Text style={styles.addNewText}>Download</Text>
+                      {downloading ? ( <ActivityIndicator size="small" style={{
+                        height: '70%'
+                      }}/> ) : ( <Text style={styles.addNewText}>Download</Text> )}
                     </LinearGradient>
                   </TouchableOpacity>
                 </View>
