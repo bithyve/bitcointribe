@@ -172,7 +172,7 @@ const AssetMetaData = ( props ) => {
                     } )
                     const mime = asset.dataPaths[ 0 ].mime || 'application/octet-stream'
                     const extension = mime.split( '/' )[ 1 ]
-                    const destinationPath = `${RNFS.DownloadDirectoryPath}/downloaded_asset.${extension}`
+                    const destinationPath = `${RNFS.DownloadDirectoryPath}/${asset.name || 'asset'}.${extension}`
 
                     RNFS.copyFile( localFilePath, destinationPath )
                       .then( () => {
