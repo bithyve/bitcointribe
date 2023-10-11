@@ -1,18 +1,18 @@
 import React, { useMemo } from 'react'
-import { StyleSheet, FlatList, Dimensions } from 'react-native'
-import { TEST_ACCOUNT } from '../../../common/constants/wallet-service-types'
+import { Dimensions, FlatList, StyleSheet } from 'react-native'
 import CurrencyKind from '../../../common/data/enums/CurrencyKind'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 import SelectedRecipientCarouselItem from '../../../components/send/SelectedRecipientCarouselItem'
 import useCurrencyKind from '../../../utils/hooks/state-selectors/UseCurrencyKind'
 
-const {height} = Dimensions.get('window')
+const { height } = Dimensions.get( 'window' )
 
 export type Props = {
   recipients: RecipientDescribing[];
   subAccountKind: SubAccountKind;
   onRemoveSelected?: ( recipient: RecipientDescribing ) => void;
+  showRemoveButton?: boolean;
 };
 
 
@@ -20,6 +20,7 @@ const SelectedRecipientsCarousel: React.FC<Props> = ( {
   recipients,
   subAccountKind,
   onRemoveSelected = () => {},
+  showRemoveButton
 }: Props ) => {
   const currencyKind = useCurrencyKind()
 
@@ -54,6 +55,7 @@ const SelectedRecipientsCarousel: React.FC<Props> = ( {
                 : ''
             }
             onRemove={() => onRemoveSelected( recipient )}
+            showRemoveButton={showRemoveButton}
           />
         )
       }}
