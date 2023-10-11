@@ -214,7 +214,7 @@ dependencies {
     // implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
 
     // For animated GIF support
-    implementation 'com.facebook.fresco:animated-gif:2.0.0'
+    implementation 'com.facebook.fresco:animated-gif:2.6.0'
 
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
     implementation 'com.google.http-client:google-http-client-gson:1.26.0'

@@ -538,7 +538,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         >
           {this.renderBottomSheetContent()}
         </ModalContainer>
-        <HomeContainer lnAcc={this.props.accountShells.filter( shell=>shell.primarySubAccount.type===AccountType.LIGHTNING_ACCOUNT )} containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} swanDeepLinkContent={this.state.swanDeepLinkContent} />
+        <HomeContainer navigation={this.props.navigation} lnAcc={this.props.accountShells.filter( shell=>shell.primarySubAccount.type===AccountType.LIGHTNING_ACCOUNT )} containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} swanDeepLinkContent={this.state.swanDeepLinkContent} />
 
       </View>
     )
