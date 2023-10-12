@@ -1,7 +1,7 @@
 import BottomSheet from '@gorhom/bottom-sheet'
 import PushNotificationIOS from '@react-native-community/push-notification-ios'
 import messaging from '@react-native-firebase/messaging'
-import { CommonActions, useIsFocused, useNavigation, useRoute } from '@react-navigation/native'
+import { CommonActions } from '@react-navigation/native'
 import idx from 'idx'
 import moment from 'moment'
 import React, { PureComponent, createRef } from 'react'
@@ -114,7 +114,6 @@ import {
 import { setVersion } from '../../store/actions/versionHistory'
 import { AccountsState } from '../../store/reducers/accounts'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
-import { resetToHomeAction } from '../actions/NavigationActions'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -699,13 +698,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   handleDeepLinkEvent = async ( { url } ) => {
     const { navigation } = this.props
-    const isFocused = useIsFocused()
+    const isFocused = navigation.isFocused()
     // If the user is on one of Home's nested routes, and a
     // deep link is opened, we will navigate back to Home first.
     if ( !isFocused )
       navigation.dispatch(
-        resetToHomeAction( {
-          unhandledDeepLinkURL: url,
+        CommonActions.reset( {
+          index: 0,
+          routes: [ {
+            name: 'Home',
+            key: 'HomeKey',
+            params: {
+              unhandledDeepLinkURL: url
+            }
+          } ],
         } )
       )
     else this.handleDeepLinking( url )
@@ -1216,6 +1222,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   onGiftRequestRejected = ( ) => {
     try {
       this.closeBottomSheet()
+      this.props.navigation.setParams( {
+        unhandledDeepLinkURL: null,
+      } )
       const { giftRequest } = this.state
       this.props.rejectGift( giftRequest.channelAddress )
     } catch ( error ) {
@@ -1829,6 +1838,6 @@ export default (
     rejectedExistingContactRequest,
     notificationPressed,
     recomputeNetBalance
-  } )( ( props: any ) => <Home {...props} navigation={useNavigation()} route={useRoute()}/> )
+  } )( Home )
 )
 

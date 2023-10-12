@@ -165,7 +165,7 @@ function BottomTab() {
       initialRouteName="Home"
       tabBar={GradientTab}
       backBehavior='none'
-      screenOptions={() => {
+      screenOptions={( { route, navigation } ) => {
         const homeNavRoutes = useNavigationState( ( state ) => state.routes[ 0 ].state?.routes )
         let showContent = true
         for( const route of homeNavRoutes || [] ) {
@@ -173,7 +173,7 @@ function BottomTab() {
         }
         return ( {
           header: () => {
-            return <Header showContent={showContent} />
+            return <Header showContent={showContent} route={route} navigation={navigation} />
           },
           tabBarShowLabel: false,
           tabBarStyle:{

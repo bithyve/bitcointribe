@@ -1,45 +1,35 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  ImageBackground,
-  Image,
   Dimensions,
-  ImageSourcePropType,
-  AppState,
-  Animated,
-  FlatList
+  Image,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  View
 } from 'react-native'
-import SubAccountKind from '../../../common/data/enums/SubAccountKind'
-import Fonts from '../../../common/Fonts'
-import Colors from '../../../common/Colors'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { RFValue } from 'react-native-responsive-fontsize'
-import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
 import { Button } from 'react-native-elements'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import AccountShell from '../../../common/data/models/AccountShell'
-import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
-import { AccountType } from '../../../bitcoin/utilities/Interface'
-import { useSelector } from 'react-redux'
-import { useDispatch } from 'react-redux'
-import { useNavigation } from '@react-navigation/native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import { translations } from '../../../common/content/LocContext'
-import { Mode } from '../AccountDetails'
-import  BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
-import Icon from '../../../assets/images/svgs/onchain_icon.svg'
+import { useDispatch } from 'react-redux'
 import LightningIcon from '../../../assets/images/svgs/ligntning_icon.svg'
+import Icon from '../../../assets/images/svgs/onchain_icon.svg'
+import Colors from '../../../common/Colors'
+import Fonts from '../../../common/Fonts'
+import ButtonStyles from '../../../common/Styles/ButtonStyles'
+import { translations } from '../../../common/content/LocContext'
+import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
+import AccountShell from '../../../common/data/models/AccountShell'
+import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
+import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import { Mode } from '../AccountDetails'
 
 const windowHeight = Dimensions.get( 'window' ).height
 
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
 import { inject, observer } from 'mobx-react'
+import {
+  heightPercentageToDP as hp
+} from 'react-native-responsive-screen'
 export type Props = {
   accountShell: AccountShell;
   onKnowMorePressed: () => void;
@@ -227,7 +217,7 @@ const AccountDetailsCard : React.FC<Props> = inject(
       >
         <Image
           source={require( '../../../assets/images/icons/icon_settings.png' )}
-          style={[ styles.settingsButtonImage, , {
+          style={[ styles.settingsButtonImage, {
             tintColor: Colors.white
           } ]}
         />
