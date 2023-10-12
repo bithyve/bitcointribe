@@ -20,8 +20,8 @@ import RGBServices from '../../services/RGBServices'
 export default function RGBSend ( props ) {
   const strings  = translations[ 'settings' ]
   const common  = translations[ 'common' ]
-  const asset = props.route.params.asset
-  const [ payTo, setPayTo ] = useState( '' )
+  const asset = props.route.params?.asset
+  const [ payTo, setPayTo ] = useState( props.route.params?.invoice || '' )
   const [ amount, setamount ] = useState( '' )
   const [ fee, setfee ] = useState( '' )
   const [ Sending, setSending ] = useState( false )
