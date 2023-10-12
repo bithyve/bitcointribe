@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useNavigation } from '@react-navigation/native'
 import idx from 'idx'
 import React, { PureComponent } from 'react'
 import {
+  ActivityIndicator,
   Platform,
   StyleProp,
   StyleSheet,
@@ -29,7 +31,7 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
 import ModalContainer from '../../components/home/ModalContainer'
 import dbManager from '../../storage/realm/dbManager'
-import { markAccountChecked, setShowAllAccount, updateAccountSettings } from '../../store/actions/accounts'
+import { markAccountChecked, setRefreshAccounts, setShowAllAccount, updateAccountSettings } from '../../store/actions/accounts'
 import Fonts from './../../common/Fonts'
 import HomeAccountCardsList from './HomeAccountCardsList'
 import HomeBuyCard from './HomeBuyCard'
@@ -62,8 +64,10 @@ interface HomePropsTypes {
   markAccountChecked: any;
   updateAccountSettings: any,
   exchangeRates?: any[];
-  lnAcc?: AccountShell[],
-  accountShells?:any
+  lnAcc?: AccountShell[];
+  accountShells?:any;
+  refreshAccounts?:boolean;
+  setRefreshAccounts:any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -81,6 +85,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   }
   componentDidMount() {
+    this.getData()
+  }
+
+  getData=()=>{
     setTimeout( () => {
       const dbWallet =  dbManager.getWallet()
       if( dbWallet!=undefined && dbWallet!=null ){
@@ -100,9 +108,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         else ranNums = tempNumber
         const asyncSeedData=seedData[ ranNums ]
         AsyncStorage.setItem( 'randomSeedWord', JSON.stringify( asyncSeedData ) )
+        this.props.setRefreshAccounts( true )
       }
     }, 2000 )
   }
+
+  componentDidUpdate( prevProps, prevState ) {
+    if( prevProps.refreshAccounts !== this.props.refreshAccounts ){
+      this.getData()
+    }
+  }
+
   navigateToAddNewAccountScreen = () => {
     //BW-TO-DO
     this.setState( {
@@ -142,7 +158,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       currentLevel,
       containerView,
       exchangeRates,
-      currencyCode
+      currencyCode,
+      refreshAccounts
     } = this.props
 
     return (
@@ -167,6 +184,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           </Text>
           <ToggleContainer />
         </View>
+
+        {refreshAccounts && (
+          <View style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 15,
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10
+          }}>
+            <ActivityIndicator size="large" color={Colors.darkBlue} />
+          </View>
+        )}
 
         <View style={{
           marginBottom: 0, flex:1,
@@ -357,6 +388,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 const mapStateToProps = ( state ) => {
   return {
+    refreshAccounts: state.accounts.refreshAccounts,
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
     currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
     startRegistration: idx( state, ( _ ) => _.swanIntegration.startRegistration ),
@@ -412,6 +444,7 @@ export default (
   connect( mapStateToProps, {
     setShowAllAccount,
     markAccountChecked,
-    updateAccountSettings
-  } )( Home )
+    updateAccountSettings,
+    setRefreshAccounts,
+  } )( ( props: any ) => <Home {...props} navigation={useNavigation()}/> )
 )

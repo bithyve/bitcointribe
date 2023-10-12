@@ -33,6 +33,7 @@ import {
   READ_TRANSACTION,
   REASSIGN_TRANSACTIONS,
   RECOMPUTE_NET_BALANCE,
+  REFRESH_ACCOUNT,
   REMAP_ACCOUNT_SHELLS,
   RESET_ACCOUNT_UPDATE_FLAG,
   RESET_TWO_FA,
@@ -102,6 +103,7 @@ export type AccountsState = {
   hasReceiveAddressSucceeded: boolean | null;
   showAllAccount: boolean | null;
   resetTwoFALoader: boolean;
+  refreshAccounts:boolean;
 };
 
 export const initialState: AccountsState = {
@@ -156,6 +158,7 @@ export const initialState: AccountsState = {
   hasReceiveAddressSucceeded: false,
   showAllAccount: false,
   resetTwoFALoader: false,
+  refreshAccounts: false,
 }
 
 export default ( state: AccountsState = initialState, action ): AccountsState => {
@@ -617,6 +620,12 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         return {
           ...state,
           gifts: action.payload.gifts,
+        }
+
+      case REFRESH_ACCOUNT:
+        return {
+          ...state,
+          refreshAccounts: action.payload.refreshAccounts,
         }
 
       default:

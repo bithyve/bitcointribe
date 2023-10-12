@@ -118,6 +118,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
         contentContainerStyle={contentContainerStyle}
         showsHorizontalScrollIndicator={false}
         data={columnData}
+        extraData={columnData}
         keyExtractor={keyExtractor}
         renderItem={( { item, index }: RenderItemProps ) => {
           return <AccountCardColumn
