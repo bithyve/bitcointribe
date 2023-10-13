@@ -279,11 +279,11 @@ import BitcoinDevKit
     }
   }
   
-  @objc func sendBtc(btcNetwotk: String, mnemonic: String, address: String, amount: String, callback: @escaping ((String) -> Void)) {
+  @objc func sendBtc(btcNetwotk: String, mnemonic: String, address: String, amount: String, feeRate: Float, callback: @escaping ((String) -> Void)) {
     do{
       let wallet = try BDKHelper.getWallet(mnemonic: mnemonic, network: btcNetwotk)
-      let txid = BDKHelper.sendToAddress(address: address, amount: UInt64(amount)!, fee: 3.0, wallet: wallet!)
-      callback("{txid: \(txid)")
+      let txid = BDKHelper.sendToAddress(address: address, amount: UInt64(amount)!, fee: feeRate, wallet: wallet!)
+      callback("{txid: \(txid)}")
     } catch {
       print(error)
       callback("{txid: null}")

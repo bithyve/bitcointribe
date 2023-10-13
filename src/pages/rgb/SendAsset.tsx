@@ -9,6 +9,8 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { useSelector } from 'react-redux'
+import { RGBConfig } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import FormStyles from '../../common/Styles/FormStyles'
@@ -25,13 +27,27 @@ export default function RGBSend ( props ) {
   const [ amount, setamount ] = useState( '' )
   const [ fee, setfee ] = useState( '' )
   const [ Sending, setSending ] = useState( false )
+  const { mnemonic } : RGBConfig = useSelector( state => state.rgb.config )
 
   async function SendButtonClick() {
     try {
-      const utxo = payTo.match( /~\/~\/([^?]+)\?/ )[ 1 ]
-      const endpoint = payTo.match( /endpoints=([^&]+)/ )[ 1 ]
-      const response = await RGBServices.sendAsset( asset.assetId, utxo, amount, endpoint )
-      if( response.txid ) {
+      let response: any = null
+      if ( asset ) {
+        if ( !payTo || !amount ) {
+          Toast( 'Please fill Pay to and amount details!' )
+          return
+        }
+        const utxo = payTo.match( /~\/~\/([^?]+)\?/ )[ 1 ]
+        const endpoint = payTo.match( /endpoints=([^&]+)/ )[ 1 ]
+        response = await RGBServices.sendAsset( asset.assetId, utxo, amount, endpoint )
+      } else {
+        if ( !fee || !payTo || !amount ) {
+          Toast( 'Please fill all details!' )
+          return
+        }
+        response = await RGBServices.sendBtc( mnemonic, payTo, amount, Number( fee ) )
+      }
+      if( response?.txid ) {
         Toast( 'Sent Successfully' )
         props.navigation.goBack()
       } else {
@@ -69,7 +85,7 @@ export default function RGBSend ( props ) {
         </TouchableOpacity>
       </View>
       <Text style={styles.headerTitleText}>{common.send}</Text>
-      <Text style={styles.headerSubTitleText}>{`Send ${asset.name}`}</Text>
+      <Text style={styles.headerSubTitleText}>{`Send ${asset?.name || 'BTC'}`}</Text>
 
       {/* <View style={[ ListStyles.infoHeaderSection, {
         height: '20%', flexDirection: 'row'

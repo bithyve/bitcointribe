@@ -52,7 +52,7 @@ export default function RGBSendWithQR( props ) {
       </View>
       <Text style={styles.headerMainText}>{common.send}</Text>
       <Text style={styles.headerTitleText}>Scan QR</Text>
-      <Text style={styles.headerSubTitleText}>{'Scan a RGB invoice'}</Text>
+      <Text style={styles.headerSubTitleText}>{`Scan a ${ asset ? 'RGB invoice' : 'BTC address'}`}</Text>
 
       <CoveredQRCodeScanner onCodeScanned={handleQRScanned} />
 
@@ -70,7 +70,7 @@ export default function RGBSendWithQR( props ) {
           }}>
           <Text style={styles.manualDeailsText}>or Enter details manually</Text>
           <Text numberOfLines={2} style={styles.manualDetailsSubText}>
-            Enter RGB invoice manually
+            Enter { asset ? 'RGB invoice' : 'BTC address'} manually
           </Text>
         </View>
         <ArrowRight />

@@ -35,7 +35,7 @@ import { receiveRgbAsset } from '../../store/actions/rgb'
 export default function RGBReceive( props ) {
   const strings = translations[ 'accounts' ]
   const common = translations[ 'common' ]
-  const assetType: RGB_ASSET_TYPE = props.route.params.assetType || RGB_ASSET_TYPE.BITCOIN
+  const assetType: RGB_ASSET_TYPE = props.route.params?.assetType || RGB_ASSET_TYPE.BITCOIN
   const dispatch = useDispatch()
   const [ receivingAddress, setReceivingAddress ] = useState( null )
   const [ paymentURI, setPaymentURI ] = useState( null )

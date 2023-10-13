@@ -67,14 +67,15 @@ export default class RGBServices{
     return JSON.parse( assets )
   }
 
-  static sendBtc = async ( mnemonic: string, address: string, amount: Number ): Promise<string> => {
+  static sendBtc = async ( mnemonic: string, address: string, amount: string, feeRate: Number ): Promise<string> => {
     const txid = await RGB.sendBtc(
       mnemonic,
       NETWORK,
       address,
-      `${amount}`
+      amount,
+      feeRate
     )
-    return txid
+    return JSON.parse( txid )
   }
 
   static receiveAsset = async ( mnemonic: string ): Promise<string> => {

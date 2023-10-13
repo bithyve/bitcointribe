@@ -57,6 +57,21 @@ class RGBModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
     }
 
     @ReactMethod
+    fun sendBtc( mnemonic: String, network: String, address: String, amount: String, feeRate: Float, promise: Promise){
+        try {
+            val txid = BdkHelper.sendToAddress(address, amount.toULong(), feeRate)
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("txid", txid)
+            promise.resolve(jsonObject.toString())
+        }catch (e: Exception) {
+            val message = e.message
+            val jsonObject = JsonObject()
+            jsonObject.addProperty("error", message)
+            promise.resolve(jsonObject.toString())
+        }
+    }
+
+    @ReactMethod
     fun syncRgbAssets( mnemonic:String, pubKey:String, network: String, promise: Promise){
         promise.resolve(RGBHelper.syncRgbAssets())
     }
