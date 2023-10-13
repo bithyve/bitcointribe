@@ -107,7 +107,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         else ranNums = tempNumber
         const asyncSeedData=seedData[ ranNums ]
         AsyncStorage.setItem( 'randomSeedWord', JSON.stringify( asyncSeedData ) )
-        this.props.setRefreshAccounts( true )
+        this.props.setRefreshAccounts( false )
       }
     }, 2000 )
   }
