@@ -1,0 +1,71 @@
+diff --git a/node_modules/react-native-root-toast/Example/package.json b/node_modules/react-native-root-toast/Example/package.json
+index c23afbf..747012f 100644
+--- a/node_modules/react-native-root-toast/Example/package.json
++++ b/node_modules/react-native-root-toast/Example/package.json
+@@ -1,13 +1,33 @@
+ {
+-    "name": "ReactNativeRootToast",
+-    "version": "0.0.1",
+-    "private": true,
+-    "scripts": {
+-        "start": "react-native start"
+-    },
+-    "dependencies": {
+-        "react-native": "^0.20.0",
+-        "react-native-root-toast": "../",
+-        "react-native-root-modal": "1.0.3"
+-    }
++  "name": "ReactNativeRootToast",
++  "version": "0.0.1",
++  "private": true,
++  "scripts": {
++    "start": "react-native start"
++  },
++  "dependencies": {
++    "react-native": "^0.20.0",
++    "react-native-root-toast": "../",
++    "react-native-root-modal": "1.0.3"
++  },
++  "react-native": {
++    "crypto": "react-native-crypto",
++    "path": "path-browserify",
++    "_stream_transform": "readable-stream/transform",
++    "_stream_readable": "readable-stream/readable",
++    "_stream_writable": "readable-stream/writable",
++    "_stream_duplex": "readable-stream/duplex",
++    "_stream_passthrough": "readable-stream/passthrough",
++    "stream": "stream-browserify"
++  },
++  "browser": {
++    "crypto": "react-native-crypto",
++    "path": "path-browserify",
++    "_stream_transform": "readable-stream/transform",
++    "_stream_readable": "readable-stream/readable",
++    "_stream_writable": "readable-stream/writable",
++    "_stream_duplex": "readable-stream/duplex",
++    "_stream_passthrough": "readable-stream/passthrough",
++    "stream": "stream-browserify"
++  }
+ }
+diff --git a/node_modules/react-native-root-toast/index.d.ts b/node_modules/react-native-root-toast/index.d.ts
+index 7c93779..9b0af93 100644
+--- a/node_modules/react-native-root-toast/index.d.ts
++++ b/node_modules/react-native-root-toast/index.d.ts
+@@ -5,7 +5,7 @@
+ declare module "react-native-root-toast"{
+     import * as React from 'react';
+     import * as ReactNative from "react-native";
+-    import {TextStyle,StyleProp,ViewStyle} from "react-native";
++    import { StyleProp, TextStyle, ViewStyle } from "react-native";
+     export interface ToastOptions {
+         containerStyle?:StyleProp<ViewStyle>
+         duration?:number
+@@ -45,7 +45,7 @@ declare module "react-native-root-toast"{
+         CENTER:number,
+     }
+     export default class Toast extends React.Component<ToastProps>{
+-        static show:(message:string,options?:ToastOptions)=>any;
++        static show:(message:React.ReactNode,options?:ToastOptions)=>any;
+         static hide:(toast:any)=>void;
+         static durations:Durations;
+         static positions:Positions;

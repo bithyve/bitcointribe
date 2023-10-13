@@ -1,56 +1,55 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react'
+import firebase from '@react-native-firebase/app'
+import messaging from '@react-native-firebase/messaging'
+import { CommonActions, useFocusEffect } from '@react-navigation/native'
+import JailMonkey from 'jail-monkey'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import {
+  BackHandler,
+  Keyboard,
+  Linking,
+  Platform,
+  StatusBar,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
-  StatusBar,
-  Platform,
-  BackHandler,
-  Linking,
-  Keyboard,
-  Alert
+  View
 } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { credsAuth } from '../store/actions/setupAndAuth'
-import BottomSheet from 'reanimated-bottom-sheet'
-import LoaderModal from '../components/LoaderModal'
-import JailMonkey from 'jail-monkey'
 import DeviceInfo from 'react-native-device-info'
-import ErrorModalContents from '../components/ErrorModalContents'
-import { processDeepLink } from '../common/CommonFunctions'
-import ModalContainer from '../components/home/ModalContainer'
-import firebase from '@react-native-firebase/app'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  setIsPermissionGiven,
-  setFCMToken
-} from '../store/actions/preferences'
-import messaging from '@react-native-firebase/messaging'
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
+import Relay from '../bitcoin/utilities/Relay'
+import Colors from '../common/Colors'
+import { processDeepLink } from '../common/CommonFunctions'
+import Fonts from '../common/Fonts'
+import { LocalizationContext } from '../common/content/LocContext'
+import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
+import AlertModalContents from '../components/AlertModalContents'
+import ErrorModalContents from '../components/ErrorModalContents'
+import LoaderModal from '../components/LoaderModal'
+import Toast from '../components/Toast'
+import BottomInputModalContainer from '../components/home/BottomInputModalContainer'
+import ModalContainer from '../components/home/ModalContainer'
+import { setOpenToApproval } from '../store/actions/BHR'
+import { setCloudBackupStatus } from '../store/actions/cloud'
 import {
   updateFCMTokens,
 } from '../store/actions/notifications'
-import Relay from '../bitcoin/utilities/Relay'
-import { LocalizationContext } from '../common/content/LocContext'
-import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
-import { setCloudBackupStatus } from '../store/actions/cloud'
-import { setOpenToApproval } from '../store/actions/BHR'
-import SecurityQuestion from './NewBHR/SecurityQuestion'
-import Toast from '../components/Toast'
-import SecuritySeedWord from './NewBHR/SecuritySeedWord'
-import AlertModalContents from '../components/AlertModalContents'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import BottomInputModalContainer from '../components/home/BottomInputModalContainer'
+import {
+  setFCMToken,
+  setIsPermissionGiven
+} from '../store/actions/preferences'
+import { credsAuth } from '../store/actions/setupAndAuth'
 import ConfirmSeedWordsModal from './NewBHR/ConfirmSeedWordsModal'
-import LinearGradient from 'react-native-linear-gradient'
+import SecurityQuestion from './NewBHR/SecurityQuestion'
+import SecuritySeedWord from './NewBHR/SecuritySeedWord'
 
 export default function Login( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -87,6 +86,7 @@ export default function Login( props ) {
   // const [ loaderBottomSheet ] = useState(
   //   React.createRef<BottomSheet>(),
   // )
+  const [ showPasscodeErrorModal, setPasscodeErrorModal ] = useState( false )
   const [ loaderModal, setloaderModal ] = useState( false )
   const [ errorModal, setErrorModal ] = useState( false )
   const [ showAlertModal, setShowAlertModal ]=useState( false )
@@ -128,14 +128,20 @@ export default function Login( props ) {
     return true
   }, [] )
 
+  useFocusEffect(
+    useCallback( () => {
+      BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
+      return () => {
+        BackHandler.removeEventListener( 'hardwareBackPress', hardwareBackPressCustom )}
+    }, [] )
+  )
+
   useEffect( () => {
     dispatch( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     dispatch( setOpenToApproval( false, [], null ) )
     const subscription = Linking.addEventListener( 'url', handleDeepLinkEvent )
     //Linking.getInitialURL().then( handleDeepLinking )
-    BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
     return () => {
-      BackHandler.removeEventListener( 'hardwareBackPress', hardwareBackPressCustom )
       subscription.remove()
     }
 
@@ -237,18 +243,26 @@ export default function Login( props ) {
       } else {
         setloaderModal( false )
         if( !creationFlag ) {
-          props.navigation.navigate( 'HomeNav', {
-            screen: 'Home'
-          } )
+          props.navigation.dispatch( CommonActions.reset( {
+            index: 0,
+            routes: [ {
+              name: 'HomeNav',
+              key: 'HomeKey'
+            } ],
+          } ) )
         } else if( processedLink ){
-          props.navigation.navigate( 'HomeNav', {
-            screen: 'Home',
-            params: {
-              trustedContactRequest: processedLink.trustedContactRequest,
-              giftRequest: processedLink.giftRequest,
-              swanRequest: processedLink.swanRequest,
-            }
-          } )
+          props.navigation.dispatch( CommonActions.reset( {
+            index: 0,
+            routes: [ {
+              name: 'HomeNav',
+              key: 'HomeKey',
+              params: {
+                trustedContactRequest: processedLink.trustedContactRequest,
+                giftRequest: processedLink.giftRequest,
+                swanRequest: processedLink.swanRequest,
+              }
+            } ],
+          } ) )
         }
 
         bootStrapNotifications()
@@ -339,15 +353,13 @@ export default function Login( props ) {
       setTimeout( () => {
         // loaderBottomSheet.current.snapTo( 0 )
         setloaderModal( false )
-      }, 300 )
-
-      return (
-        <View style={{
-          marginLeft: 'auto'
-        }}>
-          <Text style={styles.errorText}>{strings.Incorrect}</Text>
-        </View>
-      )
+      }, 100 )
+    }
+    if( !checkAuth ){
+      setTimeout( () => setloaderModal( false ), 800 )
+      setTimeout( ()=>{
+        setPasscodeErrorModal( true )
+      }, 1000 )
     }
   }
 
@@ -589,7 +601,7 @@ export default function Login( props ) {
                   </Text>
                 </View>
               </View>
-              {checkPasscode()}
+              {/* {checkPasscode()} */}
             </View>
           </View>
 
@@ -598,7 +610,7 @@ export default function Login( props ) {
             alignItems: 'center',
             justifyContent: 'flex-end'
           }}>
-            {
+            {/* {
               attempts >= 3&&(
                 <TouchableOpacity
                   style={{
@@ -607,12 +619,12 @@ export default function Login( props ) {
                     marginHorizontal: 15,
                   }}
                   onPress={()=> {
-                    // if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
-                    //   setJailBrokenTitle( strings.EncryptionKeyNotSet )
-                    //   setJailBrokenInfo( strings.Youcanreset )
-                    //   setErrorModal( true )
-                    //   return
-                    // }
+                    if( ( currentLevel == 0 && levelHealth.length == 0 ) || ( currentLevel == 0 && levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) ) {
+                      setJailBrokenTitle( strings.EncryptionKeyNotSet )
+                      setJailBrokenInfo( strings.Youcanreset )
+                      setErrorModal( true )
+                      return
+                    }
                     if ( levelHealth.length && levelHealth[ 0 ].levelInfo.length && levelHealth[ 0 ].levelInfo[ 0 ].shareType == 'seed' ) {
                       // showSecuiritySeedWordModal( true )
                       // Alert.alert( 'In case you have forgotten passcode, please setup the wallet again and restore it' )
@@ -635,7 +647,7 @@ export default function Login( props ) {
                   }}>{strings.ForgotPasscode}</Text>
                 </TouchableOpacity>
               )
-            }
+            } */}
             <TouchableOpacity
               disabled={passcode.length !==4}
               activeOpacity={0.7}
@@ -882,6 +894,17 @@ export default function Login( props ) {
           proceedButtonText={'Okay'}
           onPressProceed={() => {
             setShowAlertModal( false )
+          }}
+          isBottomImage={false}
+          // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        />
+      </ModalContainer>
+      <ModalContainer onBackground={()=>{setPasscodeErrorModal( false )}} visible={showPasscodeErrorModal} closeBottomSheet={() => { }}>
+        <AlertModalContents
+          info={'You have entered an incorrect passcode. Pls, try again. If you don’t remember your passcode, you will have to recover your wallet through the recovery flow'}
+          proceedButtonText={'Okay'}
+          onPressProceed={() => {
+            setPasscodeErrorModal( false )
           }}
           isBottomImage={false}
           // bottomImage={require( '../../assets/images/icons/errorImage.png' )}

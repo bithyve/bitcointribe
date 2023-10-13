@@ -1,19 +1,20 @@
-import React, {  } from 'react'
+import moment from 'moment'
+import React from 'react'
 import {
-  StyleSheet,
-  View,
+  Linking,
   SafeAreaView,
-  TouchableOpacity,
   ScrollView,
-  Text
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
-import CommonStyles from '../../common/Styles/Styles'
 import ListStyles from '../../common/Styles/ListStyles'
-import moment from 'moment'
+import CommonStyles from '../../common/Styles/Styles'
 import HeaderTitle from '../../components/HeaderTitle'
-import { RFValue } from 'react-native-responsive-fontsize'
 
 const styles = StyleSheet.create( {
   lineItem: {
@@ -26,16 +27,27 @@ const styles = StyleSheet.create( {
   },
 } )
 
-const DetailsItem = ( { name, value } ) => {
+const DetailsItem = ( { name, value, subDetailPressable = false } ) => {
   return(
     <View style={styles.lineItem}>
       <Text style={ListStyles.listItemTitleTransaction}>{name}</Text>
       <Text
+        onPress={() => {
+          if ( subDetailPressable ) {
+            Linking.canOpenURL( `https://blockstream.info/testnet/tx/${value}` ).then( supported => {
+              if( supported ) {
+                Linking.openURL( `https://blockstream.info/testnet/tx/${value}` )
+              }
+            } )
+          }
+        }}
         selectable
         numberOfLines={1}
         ellipsizeMode="middle"
         style={[ ListStyles.listItemSubtitle, {
-          marginBottom: 3
+          marginBottom: 3,
+          textDecorationLine: subDetailPressable ? 'underline' : 'none',
+          color: subDetailPressable ? Colors.primaryAccent : Colors.greyTextColor
         } ]}
       >
         {value}
@@ -45,8 +57,8 @@ const DetailsItem = ( { name, value } ) => {
 }
 
 const AssetTransferDetails = ( props ) => {
-  const asset = props.navigation.getParam( 'asset' )
-  const item = props.navigation.getParam( 'item' )
+  const asset = props.route.params.asset
+  const item = props.route.params.item
 
   return (
     <SafeAreaView style={{
@@ -83,13 +95,23 @@ const AssetTransferDetails = ( props ) => {
           name="Amount"
           value={item.amount}
         />
-        <DetailsItem
-          name="Transaction ID"
-          value={item.txid}
-        />
+        {item.kind !== 'ISSUANCE' && (
+          <DetailsItem
+            name="Transaction ID"
+            value={item.txid}
+            subDetailPressable
+          />
+        )}
+        {item.kind !== 'ISSUANCE' && item.changeUtxo?.txid && (
+          <DetailsItem
+            name="Change UTXO"
+            value={item.changeUtxo.txid}
+            subDetailPressable
+          />
+        )}
         <DetailsItem
           name="Date"
-          value={moment.unix( item.createdAt ).format( 'DD/MM/YY • hh:MMa' )}
+          value={moment.unix( item.updatedAt ).format( 'DD/MM/YY • hh:MM' )}
         />
         <DetailsItem
           name="Status"

@@ -1,43 +1,32 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
-import ListStyles from '../../common/Styles/ListStyles'
-import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
-import RecipientAddressTextInputSection from '../../components/send/RecipientAddressTextInputSection'
-import { REGULAR_ACCOUNT, TEST_ACCOUNT } from '../../common/constants/wallet-service-types'
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import { useDispatch, useSelector } from 'react-redux'
-import { clearTransfer } from '../../store/actions/accounts'
-import { resetStackToSend } from '../../navigation/actions/NavigationActions'
+import React from 'react'
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Button } from 'react-native-elements'
-import ButtonStyles from '../../common/Styles/ButtonStyles'
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
-import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting, sourceAccountSelectedForSending } from '../../store/actions/sending'
-import { Satoshis } from '../../common/data/enums/UnitAliases'
-import { AccountType, DeepLinkEncryptionType, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
+import { AccountType, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import { AccountsState } from '../../store/reducers/accounts'
-import { translations } from '../../common/content/LocContext'
-import ModalContainer from '../../components/home/ModalContainer'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import CheckingAccount from '../../assets/images/accIcons/icon_checking.svg'
-import GiftCard from '../../assets/images/svgs/icon_gift.svg'
-import DashedContainer from '../FriendsAndFamily/DashedContainer'
-import Illustration from '../../assets/images/svgs/illustration.svg'
-import AcceptGift from '../FriendsAndFamily/AcceptGift'
-import { launchImageLibrary } from 'react-native-image-picker'
+import ButtonStyles from '../../common/Styles/ButtonStyles'
+import ListStyles from '../../common/Styles/ListStyles'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import { translations } from '../../common/content/LocContext'
+import { Satoshis } from '../../common/data/enums/UnitAliases'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
+import RecipientAddressTextInputSection from '../../components/send/RecipientAddressTextInputSection'
+import { resetStackToSend } from '../../navigation/actions/NavigationActions'
+import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting, sourceAccountSelectedForSending } from '../../store/actions/sending'
+import { AccountsState } from '../../store/reducers/accounts'
+import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
+import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
 // import LocalQRCode from '@remobile/react-native-qrcode-local-image'
-import Toast from '../../components/Toast'
 
 export type Props = {
   navigation: any;
+  route: any;
 };
 
 const HeaderSection: React.FC = ( { title } ) => {
@@ -50,7 +39,7 @@ const HeaderSection: React.FC = ( { title } ) => {
   )
 }
 
-const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const HomeQRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
   const dispatch = useDispatch()
   const accountsState: AccountsState = useSelector( ( state ) => state.accounts, )
   const defaultSourceAccount = accountsState.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && !shell.primarySubAccount.instanceNumber )
@@ -73,7 +62,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
       return
     }
 
-    const onCodeScanned = this.props.route.params.onCodeScanned
+    const onCodeScanned = route.params?.onCodeScanned
     try {
       if ( typeof onCodeScanned === 'function' ) onCodeScanned( getFormattedStringFromQRString( scannedData ) )
     } catch ( error ) {
@@ -101,32 +90,6 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
       resetStackToSend( {
         selectedRecipientID: recipient.id,
       } )
-    )
-  }
-
-
-  function importImage() {
-    launchImageLibrary(
-      {
-        title: null,
-        mediaType: 'photo',
-        takePhotoButtonTitle: null,
-        selectionLimit: 1,
-      },
-      response => {
-        if ( response.assets ) {
-          const uri = response.assets[ 0 ].uri.toString().replace( 'file://', '' )
-          // LocalQRCode.decode( uri, ( error, result ) => {
-          //   if ( !error ) {
-          //     handleBarcodeRecognized( {
-          //       data: result
-          //     } )
-          //   } else {
-          //     Toast( 'No QR code found in the selected image' )
-          //   }
-          // } )
-        }
-      },
     )
   }
 
@@ -177,14 +140,6 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           <View
             style={styles.floatingActionButtonContainer}
           >
-            {/* <TouchableOpacity onPress={importImage} style={styles.btnImport}>
-              <Ionicons
-                name="image"
-                size={22}
-                color="gray"
-              />
-              <Text style={styles.textImport}>Import From Gallery</Text>
-            </TouchableOpacity> */}
 
             <Button
               raised

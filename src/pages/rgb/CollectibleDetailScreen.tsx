@@ -1,32 +1,28 @@
-import React, { useContext, useState, useEffect, useMemo } from 'react'
+import React, { useContext, useState } from 'react'
 import {
-  StyleSheet,
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  StatusBar,
-  Text,
-  Image,
   FlatList,
-  ActivityIndicator
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Fonts from '../../common/Fonts'
-import Colors from '../../common/Colors'
-import CommonStyles from '../../common/Styles/Styles'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { LocalizationContext } from '../../common/content/LocContext'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch } from 'react-redux'
-import LinearGradient from 'react-native-linear-gradient'
-import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
+import { LocalizationContext } from '../../common/content/LocContext'
 import NetworkKind from '../../common/data/enums/NetworkKind'
-import ArrowRight from '../../assets/images/svgs/icon_arrow_right.svg'
-import IconSent from '../../assets/images/icons/icon_sent.svg'
 import RgbAccountDetailsCard from '../../components/rgbAccountDetail/RgbAccountDetailsCard'
 import RgbTransactionCard from '../../components/rgbAccountDetail/RgbTransactionCard'
+import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
 
 
 
@@ -43,7 +39,7 @@ export default function CollectibleDetailScreen( props ) {
         <View style={styles.footerSection}>
           <SendAndReceiveButtonsFooter
             onSendPressed={() => {
-              props.navigation.navigate( 'RGBSend' )
+              props.navigation.navigate( 'RGBSendWithQR' )
             }}
             onReceivePressed={() => {
 

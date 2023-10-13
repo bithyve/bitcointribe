@@ -1,39 +1,41 @@
-import React, { useContext, useState, useEffect } from 'react'
+import moment from 'moment'
+import React, { useContext, useEffect, useState } from 'react'
 import {
-  StyleSheet,
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  StatusBar,
-  Text,
   FlatList,
-  ActivityIndicator,
-  Image
+  Image,
+  Platform,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Fonts from '../../common/Fonts'
-import Colors from '../../common/Colors'
-import CommonStyles from '../../common/Styles/Styles'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { LocalizationContext } from '../../common/content/LocContext'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch } from 'react-redux'
-import LinearGradient from 'react-native-linear-gradient'
-import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
+import { LocalizationContext } from '../../common/content/LocContext'
 import NetworkKind from '../../common/data/enums/NetworkKind'
-import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
-import { fetchExchangeRates, fetchFeeRates } from '../../store/actions/accounts'
 import RGBServices from '../../services/RGBServices'
-import moment from 'moment'
+import { fetchExchangeRates, fetchFeeRates } from '../../store/actions/accounts'
+import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
+import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
 import DetailsCard from './DetailsCard'
 
 export default function RGB121TxDetail( props ) {
   const dispatch = useDispatch()
   const { translations } = useContext( LocalizationContext )
   const accountStr = translations[ 'accounts' ]
-  const asset = props.navigation.getParam( 'asset' )
+  const asset = props.route.params.asset
   const accountsState = useAccountsState()
   const { averageTxFees, exchangeRates } = accountsState
   const [ loading, setLoading ] = useState( true )
@@ -45,15 +47,16 @@ export default function RGB121TxDetail( props ) {
 
   const getTransfers = async () => {
     try {
+      setLoading( true )
       const txns = await RGBServices.getRgbAssetTransactions( asset.assetId )
-      console.log( 'txns', JSON.stringify( txns ) )
+      setLoading( false )
       if ( txns ) {
         setTransactionData( txns )
-        setLoading( false )
       } else {
         props.navigation.goBack()
       }
     } catch ( error ) {
+      setLoading( false )
       console.log( error )
       props.navigation.goBack()
     }
@@ -78,7 +81,9 @@ export default function RGB121TxDetail( props ) {
         <View style={styles.footerSection}>
           <SendAndReceiveButtonsFooter
             onSendPressed={() => {
-              props.navigation.navigate( 'RGBSend' )
+              props.navigation.navigate( 'RGBSendWithQR', {
+                asset
+              } )
             }}
             onReceivePressed={() => {
               props.navigation.navigate( 'RGBReceive', {
@@ -113,10 +118,10 @@ export default function RGB121TxDetail( props ) {
           <Text
             numberOfLines={1}
             style={[ styles.amountText, {
-              color: item.kind === 'receive' || item.kind ==='issuance' ? '#04A777' : '#FD746C'
+              color: ( item.kind === 'RECEIVE' || item.kind ==='ISSUANCE' ) ? '#04A777' : '#FD746C'
             } ]}
           >
-            {item.amount.toLocaleString()}
+            {item.amount}
           </Text>
         </View>
       </TouchableOpacity>
@@ -132,86 +137,96 @@ export default function RGB121TxDetail( props ) {
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      <View style={CommonStyles.headerContainer}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            props.navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
-      <View style={{
-        paddingHorizontal: 20, marginBottom: 20,
-      }}>
-        <DetailsCard
-          onKnowMorePressed={() => {
-            props.navigation.navigate( 'AssetMetaData', {
-              asset
-            } )
-          }}
-          showKnowMore
-          onSettingsPressed={() => { }}
-          balance={asset.futureBalance}
-          cardColor={'#B7B7B7'}
-          title={asset.name}
-          description={asset.description}
-          assetId={asset.assetId}
-          renderIcon={() => <View style={[ styles.labelContainer, {
-            backgroundColor: '#B7B7B7'
-          } ]}>
-            <Image style={{
-              height: 50, width: 50, borderRadius: 30
-            }} source={{
-              uri: asset.dataPaths[ 0 ].filePath
-            }}/>
-          </View>}
-          isBitcoin={false}
-        />
-      </View>
-
-
-      <View style={{
-        flex: 1,
-      }}>
-        <View style={styles.viewMoreLinkRow}>
-          <Text style={styles.headerDateText}>{accountStr.RecentTransactions}</Text>
+      <ScrollView
+        scrollEnabled={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={getTransfers}
+          />
+        }
+      >
+        <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
-            onPress={onViewMorePressed}
+            style={CommonStyles.headerLeftIconContainer}
+            onPress={() => {
+              props.navigation.goBack()
+            }}
           >
-            <LinearGradient
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              colors={[ Colors.skyBlue, Colors.darkBlue ]}
-              style={styles.viewMoreWrapper}
-            >
-              <Text style={styles.headerTouchableText}>
-                {accountStr.ViewMore}
-              </Text>
-            </LinearGradient>
+            <View style={CommonStyles.headerLeftIconInnerContainer}>
+              <FontAwesome
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
+                size={17}
+              />
+            </View>
           </TouchableOpacity>
         </View>
-        {
-          loading ? <ActivityIndicator /> :
-            <FlatList
-              data={transactionData}
-              renderItem={renderItem}
-              keyExtractor={( item, index ) => index.toString()}
-            />
-        }
-        {renderFooter()}
+        <View style={{
+          paddingHorizontal: 20, marginBottom: 20,
+        }}>
+          <DetailsCard
+            onKnowMorePressed={() => {
+              props.navigation.navigate( 'AssetMetaData', {
+                asset
+              } )
+            }}
+            showKnowMore
+            onSettingsPressed={() => { }}
+            balance={asset.balance.spendable}
+            cardColor={'#B7B7B7'}
+            title={asset.name}
+            description={asset.description}
+            assetId={asset.assetId}
+            renderIcon={() => <View style={[ styles.labelContainer, {
+              backgroundColor: '#B7B7B7'
+            } ]}>
+              <Image style={{
+                height: 50, width: 50, borderRadius: 30
+              }} source={{
+                uri: Platform.select( {
+                  android: `file://${asset.dataPaths[ 0 ].filePath}`,
+                  ios: asset.dataPaths[ 0 ].filePath
+                } )
+              }}/>
+            </View>}
+            isBitcoin={false}
+          />
+        </View>
 
-      </View>
+
+        <View style={{
+          flex: 1,
+        }}>
+          <View style={styles.viewMoreLinkRow}>
+            <Text style={styles.headerDateText}>{accountStr.RecentTransactions}</Text>
+            <TouchableOpacity
+              onPress={onViewMorePressed}
+            >
+              <LinearGradient
+                start={{
+                  x: 0, y: 0
+                }} end={{
+                  x: 1, y: 0
+                }}
+                colors={[ Colors.skyBlue, Colors.darkBlue ]}
+                style={styles.viewMoreWrapper}
+              >
+                <Text style={styles.headerTouchableText}>
+                  {accountStr.ViewMore}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            data={transactionData}
+            renderItem={renderItem}
+            keyExtractor={( item, index ) => index.toString()}
+          />
+          {renderFooter()}
+
+        </View>
+      </ScrollView>
     </SafeAreaView>
   )
 }

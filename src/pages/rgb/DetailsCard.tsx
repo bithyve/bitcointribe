@@ -1,19 +1,19 @@
+import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import React, { useMemo } from 'react'
 import {
-  View,
-  Text,
   StyleSheet,
+  Text,
+  View,
 } from 'react-native'
-import Fonts from '../../common/Fonts'
-import Colors from '../../common/Colors'
-import ButtonStyles from '../../common/Styles/ButtonStyles'
-import { RFValue } from 'react-native-responsive-fontsize'
 import { Button } from 'react-native-elements'
+import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import ButtonStyles from '../../common/Styles/ButtonStyles'
 import { translations } from '../../common/content/LocContext'
-import LabeledBalanceDisplay from '../../components/LabeledBalanceDisplay'
 import { wp } from '../../common/data/responsiveness/responsive'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
+import LabeledBalanceDisplay from '../../components/LabeledBalanceDisplay'
 
 export type Props = {
   onKnowMorePressed: () => void;
@@ -23,6 +23,7 @@ export type Props = {
   description: string;
   cardColor: string;
   showKnowMore: boolean;
+  knowMoreText?: string;
   renderIcon: () => React.ReactNode;
   isBitcoin: boolean;
   assetId?: string
@@ -35,6 +36,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
   description,
   cardColor,
   showKnowMore,
+  knowMoreText,
   renderIcon,
   isBitcoin,
   assetId
@@ -118,16 +120,16 @@ const AccountDetailsCard: React.FC<Props> = ( {
         }
 
         {
-          showKnowMore && ( <KnowMoreButton /> )
+          showKnowMore && ( <KnowMoreButton knowMoreText={knowMoreText} /> )
         }
       </View>
     )
   }
 
-  const KnowMoreButton: React.FC = () => {
+  const KnowMoreButton: React.FC<{knowMoreText: string}> = ( props ) => {
     return (
       <Button
-        title={common.knowMore}
+        title={ props.knowMoreText ?? common.knowMore}
         type="outline"
         buttonStyle={{
           borderRadius: 5,

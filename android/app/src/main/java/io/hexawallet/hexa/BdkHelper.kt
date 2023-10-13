@@ -1,22 +1,15 @@
 package io.hexawallet.hexa
 
-import android.util.Log
 import com.google.gson.Gson
 import org.bitcoindevkit.Address
 import org.bitcoindevkit.AddressIndex
 import org.bitcoindevkit.BdkException
 import org.bitcoindevkit.Blockchain
 import org.bitcoindevkit.BlockchainConfig
-import org.bitcoindevkit.DatabaseConfig
-import org.bitcoindevkit.DerivationPath
-import org.bitcoindevkit.DescriptorSecretKey
 import org.bitcoindevkit.ElectrumConfig
-import org.bitcoindevkit.Mnemonic
-import org.bitcoindevkit.Network
+import org.bitcoindevkit.LocalUtxo
 import org.bitcoindevkit.Progress
-import org.bitcoindevkit.SqliteDbConfiguration
 import org.bitcoindevkit.TxBuilder
-import org.bitcoindevkit.Wallet
 
 object BdkHelper {
 
@@ -76,5 +69,9 @@ object BdkHelper {
         } catch (e: BdkException.InsufficientFunds) {
             throw Exception("Insufficient sats")
         }
+    }
+
+    fun getUnspents(): List<LocalUtxo> {
+        return BDKWalletRepository.wallet.listUnspent()
     }
 }

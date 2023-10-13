@@ -48,6 +48,7 @@ import ConfirmDownload from '../pages/borderwallet/ConfirmDownload'
 import CreatePassPhrase from '../pages/borderwallet/CreatePassPhrase'
 import CreateWithBorderWallet from '../pages/borderwallet/CreateWithBorderWallet'
 import DownloadEncryptGrid from '../pages/borderwallet/DownloadEncryptGrid'
+import ImportWalletPassphrase from '../pages/borderwallet/ImportWalletPassphrase'
 import PreviewPattern from '../pages/borderwallet/PreviewPattern'
 import RecoverBorderWallet from '../pages/borderwallet/RecoverBorderWallet'
 import RegenerateEntropyGrid from '../pages/borderwallet/RegenerateEntropyGrid'
@@ -90,6 +91,9 @@ function SetupNavigator() {
       <SetupStack.Screen name="SelectChecksumWord" component={SelectChecksumWord} />
       <SetupStack.Screen name="CreatePassPhrase" component={CreatePassPhrase} />
       <SetupStack.Screen name="ConfirmDownload" component={ConfirmDownload} />
+      <SetupStack.Screen name="ImportWalletPassphrase" component={ImportWalletPassphrase} options={{
+        headerShown: false
+      }} />
       <SetupStack.Screen name="PreviewPattern" component={PreviewPattern} />
       <SetupStack.Screen name="RecoverBorderWallet" component={RecoverBorderWallet} />
       <SetupStack.Screen name="RegenerateEntropyGrid" component={RegenerateEntropyGrid} />
@@ -160,15 +164,16 @@ function BottomTab() {
     <Tab.Navigator
       initialRouteName="Home"
       tabBar={GradientTab}
-      screenOptions={() => {
-        const homeNavRoutes = useNavigationState( ( state ) => state.routes[ 1 ].state?.routes )
+      backBehavior='none'
+      screenOptions={( { route, navigation } ) => {
+        const homeNavRoutes = useNavigationState( ( state ) => state.routes[ 0 ].state?.routes )
         let showContent = true
         for( const route of homeNavRoutes || [] ) {
           if ( route.state?.routes?.length > 1 ) showContent = false
         }
         return ( {
           header: () => {
-            return <Header showContent={showContent} />
+            return <Header showContent={showContent} route={route} navigation={navigation} />
           },
           tabBarShowLabel: false,
           tabBarStyle:{
@@ -276,48 +281,6 @@ function BottomTab() {
   )
 }
 
-const HomeStackInit = createNativeStackNavigator()
-function HomeNavigator() {
-  return (
-    <HomeStackInit.Navigator
-      screenOptions={( { navigation, route } ) => {
-        return {
-          header: () => {
-            return <Header showContent={true} navigation={navigation} route={route}
-            />
-          },
-        }
-      }}
-    >
-      <HomeStackInit.Screen name="Landing" component={BottomTab} options={{
-      }}/>
-    </HomeStackInit.Navigator>
-  )
-}
-
-//TODO: add below default navigation options to navigator
-// const HomeNavigator = createStackNavigator(
-//   {
-//     Landing: {
-//       screen: Bottomtab
-//     },
-//   }, {
-//     defaultNavigationOptions: ( { navigation } ) => {
-//       return {
-//         header: () => {
-//           return <Header showContent={( navigation.state.routes[ 0 ] && navigation.state.routes[ 0 ].routes.length == 1 ) &&
-//             ( navigation.state.routes[ 1 ].routes.length == 1 ) &&
-//             ( navigation.state.routes[ 2 ].routes.length == 1 ) &&
-//             ( navigation.state.routes[ 3 ].routes.length == 1 )
-//           }
-//           />
-//         },
-//       }
-//     },
-//   }
-// )
-
-
 const SwitchStack = createNativeStackNavigator()
 function Navigator() {
   return (
@@ -335,11 +298,6 @@ function Navigator() {
     </SafeAreaProvider>
   )
 }
-// const Navigator = createSwitchNavigator( {
-//   SetupNav: SetupNavigator,
-//   HomeNav: HomeNavigator,
-// } )
-
 
 export type BaseNavigationProp = {
   getParam: ( param: string ) => any;

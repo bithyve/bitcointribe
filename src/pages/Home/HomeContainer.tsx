@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useNavigation } from '@react-navigation/native'
 import idx from 'idx'
 import React, { PureComponent } from 'react'
 import {
@@ -296,8 +295,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     },
                   }
                 )
-                this.props.navigation.navigate( 'AccountDetails', {
-                  accountShellID: accountShell[ 0 ].primarySubAccount.accountShellID,
+                this.props.navigation.navigate( {
+                  name: 'AccountDetails',
+                  params: {
+                    screen: 'AccountDetailsRoot',
+                    params:{
+                      accountShellID: accountShell[ 0 ].primarySubAccount.accountShellID,
+                    }
+                  }
                 } )
               }}>
               <View style={styles.iconWrapper}>
@@ -323,7 +328,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           } )}
         >
           <BorderWalletSuccessModal
-            title={'Border Wallet creation success!'}
+            title={'Border wallet created successfully.'}
             info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit,'}
             otherText={'Your Border Wallet has been added and is now ready for you to start using.'}
             proceedButtonText={'Continue'}
@@ -408,5 +413,5 @@ export default (
     setShowAllAccount,
     markAccountChecked,
     updateAccountSettings
-  } )( ( props: any ) => <Home {...props} navigation={useNavigation()}/> )
+  } )( Home )
 )

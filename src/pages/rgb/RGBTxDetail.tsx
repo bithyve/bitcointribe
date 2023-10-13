@@ -77,7 +77,9 @@ export default function RGBTxDetail( props ) {
         <View style={styles.footerSection}>
           <SendAndReceiveButtonsFooter
             onSendPressed={() => {
-              props.navigation.navigate( 'RGBSend' )
+              props.navigation.navigate( 'RGBSendWithQR', {
+                asset
+              } )
             }}
             onReceivePressed={() => {
               props.navigation.navigate( 'RGBReceive', {
@@ -112,7 +114,7 @@ export default function RGBTxDetail( props ) {
           <Text
             numberOfLines={1}
             style={[ styles.amountText, {
-              color: item.kind === 'receive' || item.kind ==='issuance' ? '#04A777' : '#FD746C'
+              color: ( item.kind === 'RECEIVE' || item.kind ==='ISSUANCE' ) ? '#04A777' : '#FD746C'
             } ]}
           >
             {item.amount}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Keyboard, SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { Input } from 'react-native-elements'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { launchImageLibrary } from 'react-native-image-picker'
@@ -28,34 +28,50 @@ export default function IssueScreen( props ) {
   const [ ticker, setTicker ] = useState( '' )
   const [ attachedfile, setAttachedFile ] = useState( 'Attach File' )
   const [ requesting, setRequesting ] = useState( false )
+  const [ loading, setLoading ] = useState( false )
 
   async function IssueAssetClick() {
+    setLoading( true )
+    Keyboard.dismiss()
     try {
       if( issueType === 'collectible' ) {
-        setRequesting( true )
-        const newAsset = await RGBServices.issueRgb121Asset( name, description, totalAmount, attachedfile )
-        setRequesting( false )
-        if( newAsset.assetId ) {
-          props.navigation.goBack()
-          dispatch( syncRgb() )
-          Toast( 'Asset created' )
+        if ( !name || !description || !totalAmount || !attachedfile ) {
+          Toast( 'Please enter all details.' )
+          setLoading( false )
         } else {
-          Toast( `Failed ${newAsset.error}` )
+          setRequesting( true )
+          const newAsset = await RGBServices.issueRgb25Asset( name, description, totalAmount, attachedfile )
+          setRequesting( false )
+          if( newAsset.assetId ) {
+            props.navigation.goBack()
+            dispatch( syncRgb() )
+            Toast( 'Asset created' )
+          } else {
+            setLoading( false )
+            Toast( `Failed ${newAsset.error}` )
+          }
         }
       } else {
-        setRequesting( true )
-        const newAsset = await RGBServices.issueRgb20Asset( ticker, name, totalAmount )
-        setRequesting( false )
-        if( newAsset.assetId ) {
-          props.navigation.goBack()
-          dispatch( syncRgb() )
-          Toast( 'Asset created' )
+        if ( !ticker || !name || !totalAmount ) {
+          Toast( 'Please enter all details.' )
+          setLoading( false )
         } else {
-          Toast( `Failed ${newAsset.error}` )
+          setRequesting( true )
+          const newAsset = await RGBServices.issueRgb20Asset( ticker, name, totalAmount )
+          setRequesting( false )
+          if( newAsset.assetId ) {
+            props.navigation.goBack()
+            dispatch( syncRgb() )
+            Toast( 'Asset created' )
+          } else {
+            setLoading( false )
+            Toast( `Failed ${newAsset.error}` )
+          }
         }
       }
     } catch ( error ) {
       setRequesting( false )
+      setLoading( false )
       Toast( `Failed ${error}` )
       console.log( 'error', error )
     }
@@ -83,6 +99,20 @@ export default function IssueScreen( props ) {
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
+      {
+        loading &&
+        <View style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 15,
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10
+        }}>
+          <ActivityIndicator size="large" color={Colors.darkBlue} />
+        </View>
+      }
       <SafeAreaView style={{
         flex: 0
       }} />
@@ -104,7 +134,7 @@ export default function IssueScreen( props ) {
         </TouchableOpacity>
       </View>
       <Text style={styles.headerTitleText}>{'Issue ' + issueType}</Text>
-      <Text style={styles.headerSubTitleText}>{'Lorem ipsum dolor sit amet, consec tetur'}</Text>
+      {/* <Text style={styles.headerSubTitleText}>{'Lorem ipsum dolor sit amet, consec tetur'}</Text> */}
 
       <View style={styles.bodySection}>
         <Input
@@ -239,15 +269,16 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 20 ),
     marginLeft: 20,
     fontFamily: Fonts.Regular,
+    marginBottom: 22
   },
-  headerSubTitleText: {
-    fontSize: RFValue( 12 ),
-    color: Colors.THEAM_INFO_TEXT_COLOR,
-    fontFamily: Fonts.Regular,
-    marginLeft: 20,
-    marginTop: 6,
-    marginBottom: 20
-  },
+  // headerSubTitleText: {
+  //   fontSize: RFValue( 12 ),
+  //   color: Colors.THEAM_INFO_TEXT_COLOR,
+  //   fontFamily: Fonts.Regular,
+  //   marginLeft: 20,
+  //   marginTop: 6,
+  //   marginBottom: 20
+  // },
   attachPlaceholderText: {
     flex: 1,
     paddingHorizontal: 20,

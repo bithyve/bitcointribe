@@ -1,22 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
-  View,
   Image,
-  Text,
   StyleSheet,
-  TouchableOpacity
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
-import ListStyles from '../../../common/Styles/ListStyles'
-import ImageStyles from '../../../common/Styles/ImageStyles'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { translations } from '../../../common/content/LocContext'
-import Close from '../../../assets/images/svgs/close.svg'
-import LinearGradient from 'react-native-linear-gradient'
 
 type Props = {
   onRGBWalletClick: ()=>any;
@@ -61,8 +56,8 @@ const BottomSheetAddWalletInfo: React.FC<Props> = ( { onRGBWalletClick, onLighte
   return ( <View style={{
     ...styles.modalContentContainer
   }}>
-    {renderWallet( onRGBWalletClick, title1, 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry' )}
-    {renderWallet( onLighteningWalletClick, title2, 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry' )}
+    {renderWallet( onRGBWalletClick, title1, 'Issue new coins or collectibles on RGB. Set limit and send it around your Tribe' )}
+    {renderWallet( onLighteningWalletClick, title2, 'You can also add an asset to your Tribe wallet by receiving it from someone' )}
   </View>
   )
 }

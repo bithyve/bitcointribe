@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import {
   FlatList,
   Image,
+  Platform,
   RefreshControl,
   ScrollView,
   StatusBar,
@@ -36,7 +37,7 @@ export enum BottomSheetState {
   Open,
 }
 export default function AssetsScreen( props ) {
-  const { syncing, balances, rgb20Assets, rgb121Assets } = useSelector( state => state.rgb )
+  const { syncing, balances, rgb20Assets, rgb25Assets } = useSelector( state => state.rgb )
   const dispatch = useDispatch()
   const strings = translations[ 'f&f' ]
   const [ selectedTab, setSelectedTab ] = useState( 0 )
@@ -134,12 +135,15 @@ export default function AssetsScreen( props ) {
         <View style={index == 7 ? styles.randomImageContainer : styles.imageContainer}>
           <Image style={styles.image}
             source={{
-              uri: item.dataPaths[ 0 ].filePath
+              uri: Platform.select( {
+                android: `file://${item.dataPaths[ 0 ].filePath}`,
+                ios: item.dataPaths[ 0 ].filePath
+              } )
             }}
           />
         </View>
         <Text style={styles.collectibleOuterText}>{item.name}</Text>
-        <Text style={styles.collectibleAmountText}>{item.spendableBalance.toLocaleString()}</Text>
+        <Text style={styles.collectibleAmountText}>{item.balance? item.balance.spendable:item.spendableBalance}</Text>
       </TouchableOpacity>
     )
   }
@@ -178,7 +182,7 @@ export default function AssetsScreen( props ) {
 
   return (
     <View style={{
-      backgroundColor: Colors.darkBlue
+      backgroundColor: Colors.blue
     }}>
       <ScrollView
         refreshControl={
@@ -238,7 +242,7 @@ export default function AssetsScreen( props ) {
               numColumns={3}
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
-              data={rgb121Assets}
+              data={rgb25Assets}
               animationType={'NONE'}
               style={{
                 marginVertical: 10
@@ -327,11 +331,6 @@ const styles = StyleSheet.create( {
   tabContainer: {
     height: 45, borderRadius: 10, backgroundColor: Colors.white,
     flexDirection: 'row',
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 2, height: 2
-    },
     marginHorizontal: wp( 6 ),
     marginTop: hp( 2 )
   },
@@ -395,7 +394,7 @@ const styles = StyleSheet.create( {
   },
   image: {
     width: '100%',
-    borderRadius: 4,
+    borderRadius: 10,
     aspectRatio: 1
   },
 

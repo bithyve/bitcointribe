@@ -21,8 +21,6 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { connect } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
-import GiftIcon from '../../assets/images/svgs/gift_icon.svg'
-import ArrowRight from '../../assets/images/svgs/icon_arrow_right.svg'
 import { KeeperInfoInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
@@ -491,7 +489,7 @@ class FriendsAndFamilyScreen extends React.Component<
     } = this.state
     return (
       <View style={{
-        backgroundColor: Colors.darkBlue
+        backgroundColor: Colors.blue
       }}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         <View style={styles.accountCardsSectionContainer}>
@@ -521,18 +519,18 @@ class FriendsAndFamilyScreen extends React.Component<
               </Text>
               <ToggleContainer />
             </View> */}
-          <TouchableOpacity onPress={this.onAllGiftClick} style={styles.giftContainer}>
-            {/* <Image style={styles.giftImage}
-            source={require( '../../assets/images/svgs/icon_gift.svg' )} /> */}
+          {/* <TouchableOpacity onPress={this.onAllGiftClick} style={styles.giftContainer}>
+            <Image style={styles.giftImage}
+            source={require( '../../assets/images/svgs/icon_gift.svg' )} />
             <GiftIcon/>
             <View style={{
               flex:1, paddingLeft: 10
             }}>
               <Text style={styles.giftText}>All Gifts</Text>
-              <Text numberOfLines={2} style={styles.giftDescText}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</Text>
+              <Text numberOfLines={2} style={styles.giftDescText}>All the gifts you have created, not sent, and gifts you have received</Text>
             </View>
             <ArrowRight />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <View style={{
             flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: hp( 3.5 ), marginRight: wp( 6 )
           }}>

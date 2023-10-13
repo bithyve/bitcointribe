@@ -1,3 +1,4 @@
+import { CommonActions } from '@react-navigation/native'
 import React, { useContext, useState } from 'react'
 import {
   FlatList,
@@ -48,7 +49,13 @@ const ConfirmDownload = ( props ) => {
       // } ] )
       setSuccessModal( true )
       setTimeout( ()=>{
-        props.navigation.navigate( 'Home' )
+        props.navigation.dispatch( CommonActions.reset( {
+          index: 0,
+          routes: [ {
+            name: 'HomeNav',
+            key: 'HomeKey'
+          } ],
+        } ) )
       }, 3000 )
     }
     else{
@@ -90,11 +97,10 @@ const ConfirmDownload = ( props ) => {
             bounces={false}
             data={grid}
             renderItem={( { item, index } )=>(
-              <View style={pattern.includes( index ) ?  styles.patternPreviewStyle : styles.previewStyle}/>
+              <View key={`${item}_${index}`} style={pattern.includes( index ) ?  styles.patternPreviewStyle : styles.previewStyle}/>
             )}
             initialNumToRender={1000}
             numColumns={16}
-            keyExtractor={item => item.id}
           />
           <TouchableOpacity onPress={()=> props.navigation.navigate( 'PreviewPattern', {
             pattern

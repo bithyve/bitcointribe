@@ -1,26 +1,27 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  View,
-  Text,
+  Animated, Dimensions,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
+  Text,
+  TextInput,
   TouchableOpacity,
-  ScrollView,
-  TextInput, FlatList, Animated, Dimensions, Alert, Platform, KeyboardAvoidingView
+  View
 } from 'react-native'
-import Fonts from '../../common/Fonts'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import { translations } from '../../common/content/LocContext'
 import PagerView, { PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEventData } from 'react-native-pager-view'
-import ModalContainer from '../../components/home/ModalContainer'
-import AlertModalContents from '../../components/AlertModalContents'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
 import Icon from 'react-native-vector-icons/dist/MaterialCommunityIcons'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { translations } from '../../common/content/LocContext'
+import AlertModalContents from '../../components/AlertModalContents'
+import ModalContainer from '../../components/home/ModalContainer'
 
 const AnimatedPagerView = Animated.createAnimatedComponent( PagerView )
 
@@ -306,6 +307,7 @@ const RestoreSeedPageComponent = ( props ) => {
                       >
                         <Text style={styles.numberText}>{getFormattedNumber( getIndex( index, seedIndex ) )}</Text>
                         <TextInput
+                          ref={input => {inputRefs.current[ getIndex( index, seedIndex ) - 1 ] = input}}
                           style={[ styles.modalInputBox,
                             partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name.length > 0 ? styles.selectedInput : null,
                           // value?.name.length > 0 ? styles.selectedInput : null,
@@ -314,6 +316,7 @@ const RestoreSeedPageComponent = ( props ) => {
                           placeholderTextColor={Colors.borderColor}
                           value={partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name}
                           // value={value}
+                          blurOnSubmit={false}
                           // autoCompleteType="off"
                           keyboardType='ascii-capable'
                           textContentType="none"
@@ -323,6 +326,11 @@ const RestoreSeedPageComponent = ( props ) => {
                           autoCapitalize="none"
                           onSubmitEditing={() => {
                             setSuggestedWords( [] )
+                            const pos = getIndex( index, seedIndex )
+                            if ( pos < inputRefs.current.length ) {
+                              if ( pos % 6 === 0 ) onNextClick()
+                              inputRefs.current[ pos ].focus()
+                            }
                           }}
                           onFocus={() => {
                             setSuggestedWords( [] )

@@ -383,7 +383,6 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       backgroundColor: Colors.blue
     }}>
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-      {/* <Header from={'More'} /> */}
       <ModalContainer visible={modalVisible} closeBottomSheet={() => setModalVisible( false )}>
         {ReadClipboardModal()}
       </ModalContainer>

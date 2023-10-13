@@ -117,6 +117,7 @@ export default function RGBReceive( props ) {
                   <CopyThisText
                     backgroundColor={Colors.white}
                     text={paymentURI ? paymentURI : receivingAddress}
+                    toastText='Address copied successfully'
                   />
 
                 </ScrollView>

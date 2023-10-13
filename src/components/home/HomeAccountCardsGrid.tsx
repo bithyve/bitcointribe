@@ -39,17 +39,6 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
       return []
     }
 
-    // if ( accountShells.length == 1 ) {
-    //   return [ accountShells ]
-    // }
-
-    ///////////////////
-    // Even though we're rendering the list as horizontally scrolling set of
-    // 2-row columns, we want the appearance to be such that every group of four
-    // is ordered row-wise. The logic below is for formatting the data in such
-    // away that this will happen. (See: https://github.com/bithyve/hexa/issues/2250)
-    ///////////////////
-
     const oddIndexedShells = Array.from( accountShells ).reduce( ( accumulated, current, index ) => {
       if ( index % 2 == 0 && ( current.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true && current.primarySubAccount.visibility !== AccountVisibility.ARCHIVED ) ) {
         accumulated.push( current )
@@ -105,7 +94,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
       }
       // }
     } )
-    if( columns[ columns.length - 1 ].length === 1 && columns.length !== 1 ) {
+    if( columns[ columns.length - 1 ]?.length === 1 && columns.length !== 1 ) {
       columns[ columns.length - 1 ].push( 'add new' )
     } else {
       columns.push( [ 'add new' ] )

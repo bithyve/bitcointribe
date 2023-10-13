@@ -1,10 +1,11 @@
-import React, { useState, useRef } from 'react'
-import { View, StyleSheet, ImageBackground, ImageSourcePropType } from 'react-native'
+import React, { useRef, useState } from 'react'
+import { ImageBackground, ImageSourcePropType, StyleSheet, View } from 'react-native'
+import { BarCodeReadEvent, RNCamera } from 'react-native-camera'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import { RNCamera, BarCodeReadEvent } from 'react-native-camera'
-import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
+import { useDispatch } from 'react-redux'
 import { setIsPermissionGiven } from '../../store/actions/preferences'
-import { useSelector, useDispatch } from 'react-redux'
+import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
+import CameraUnauthorized from '../CameraUnauthorized'
 
 export type Props = {
   containerStyle?: Record<string, unknown>;
@@ -36,61 +37,42 @@ const CoveredQRCodeScanner: React.FC<Props> = ( {
   onCodeScanned,
 }: Props ) => {
   const [ isCameraOpen, setIsCameraOpen ] = useState( true )
+  const cameraRef = useRef<RNCamera>()
   const dispatch = useDispatch()
 
-  const CameraCover: React.FC = () => {
-    return (
-      <AppBottomSheetTouchableWrapper onPress={() => {
-        setIsCameraOpen( true )
-        dispatch( setIsPermissionGiven( true ) )
-        // let data ={
-        //   key: "a9a1a6b7f20c58a55f83c949",
-        //   name: 'primaryk'
-        // }
-        // onCodeScanned(data)
-      }} >
-        <ImageBackground
-          source={coverImageSource}
-          style={{
-            ...styles.rootContainer, ...containerStyle
-          }}
-        >
-          <CameraFrameIndicators />
-        </ImageBackground>
-      </AppBottomSheetTouchableWrapper>
-    )
-  }
-
-  // TODO: It would probably be good to abstract this into its own component file
-  // so we can use it independently of the toggleable cover overlay.
-  const Scanner: React.FC = () => {
-    const cameraRef = useRef<RNCamera>()
-
-    return (
-      <View style={{
-        ...styles.rootContainer, ...containerStyle
-      }}>
-        <RNCamera
-          ref={cameraRef}
-          style={{
-            flex: 1,
-          }}
-          onBarCodeRead={( event: BarCodeReadEvent ) => {
-            onCodeScanned( event )
-            setIsCameraOpen( false )
-          }}
-          captureAudio={false}
-        >
-          <CameraFrameIndicators />
-        </RNCamera>
-      </View >
-    )
-  }
-
   if ( isCameraOpen ) {
-    return <Scanner />
+    return <View style={{
+      ...styles.rootContainer, ...containerStyle
+    }}>
+      <RNCamera
+        ref={cameraRef}
+        style={{
+          flex: 1,
+        }}
+        onBarCodeRead={( event: BarCodeReadEvent ) => {
+          onCodeScanned( event )
+          setIsCameraOpen( false )
+        }}
+        captureAudio={false}
+        notAuthorizedView={<CameraUnauthorized/>}
+      >
+        <CameraFrameIndicators />
+      </RNCamera>
+    </View >
   } else {
-    return <CameraCover />
+    return <AppBottomSheetTouchableWrapper onPress={() => {
+      setIsCameraOpen( true )
+      dispatch( setIsPermissionGiven( true ) )
+    }} >
+      <ImageBackground
+        source={coverImageSource}
+        style={{
+          ...styles.rootContainer, ...containerStyle
+        }}
+      >
+        <CameraFrameIndicators />
+      </ImageBackground>
+    </AppBottomSheetTouchableWrapper>
   }
 }
 
