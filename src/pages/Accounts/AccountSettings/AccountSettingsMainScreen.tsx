@@ -168,7 +168,10 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
     }
     return (
       <ListItem
-        bottomDivider
+        containerStyle={{
+          backgroundColor:'transparent'
+        }}
+        // bottomDivider
         onPress={() => { handleListItemPress( listItem ) }}
         // disabled={listItem.title === 'Archive Account' && primarySubAccount.type === AccountType.CHECKING_ACCOUNT}
       >
@@ -259,7 +262,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
       <FlatList
         style={styles.rootContainer}
         contentContainerStyle={{
-          paddingHorizontal: 14
+          paddingHorizontal: 14,
         }}
         extraData={accountShell}
         data={listItems}
@@ -279,7 +282,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    paddingTop: 10,
+    // paddingTop: 10,
   },
 } )
 
