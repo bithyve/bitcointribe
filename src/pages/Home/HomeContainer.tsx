@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useNavigation } from '@react-navigation/native'
 import idx from 'idx'
 import React, { PureComponent } from 'react'
 import {
@@ -446,5 +445,5 @@ export default (
     markAccountChecked,
     updateAccountSettings,
     setRefreshAccounts,
-  } )( ( props: any ) => <Home {...props} navigation={useNavigation()}/> )
+  } )( Home )
 )
