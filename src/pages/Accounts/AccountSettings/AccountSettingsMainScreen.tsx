@@ -1,24 +1,22 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { StyleSheet, FlatList, ImageSourcePropType, Image, Alert, View } from 'react-native'
+import { FlatList, StyleSheet, View } from 'react-native'
 import { ListItem } from 'react-native-elements'
+import { useDispatch } from 'react-redux'
+import Archive from '../../../assets/images/svgs/icon_archive.svg'
+import Visibilty from '../../../assets/images/svgs/icon_visibility.svg'
+import NameNDesc from '../../../assets/images/svgs/name_desc.svg'
+import Xpub from '../../../assets/images/svgs/xpub.svg'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
+import { translations } from '../../../common/content/LocContext'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import ListStyles from '../../../common/Styles/ListStyles'
-import AccountShellRescanningBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningBottomSheet'
-import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningPromptBottomSheet'
+import ModalContainer from '../../../components/home/ModalContainer'
+import { updateAccountSettings } from '../../../store/actions/accounts'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 import AccountArchiveModal from './AccountArchiveModal'
-import AccountVisibility from '../../../common/data/enums/AccountVisibility'
-import { useDispatch, useSelector } from 'react-redux'
-import { updateAccountSettings } from '../../../store/actions/accounts'
-import ModalContainer from '../../../components/home/ModalContainer'
-import { Account, AccountType } from '../../../bitcoin/utilities/Interface'
-import { translations } from '../../../common/content/LocContext'
-import NameNDesc from '../../../assets/images/svgs/name_desc.svg'
-import Archive from '../../../assets/images/svgs/icon_archive.svg'
-import Xpub from '../../../assets/images/svgs/xpub.svg'
-import Visibilty from '../../../assets/images/svgs/icon_visibility.svg'
-import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.ARCHIVED,
@@ -43,7 +41,7 @@ const listItemKeyExtractor = ( item: SettingsListItem ) => item.title
 
 
 const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
-  const accountShellID = route.params?.accountShellID;
+  const accountShellID = route.params?.accountShellID
   const dispatch = useDispatch()
   const strings  = translations[ 'accounts' ]
   const [ showRescanning, setShowRescanning ] = useState( false )
@@ -170,7 +168,10 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
     }
     return (
       <ListItem
-        bottomDivider
+        containerStyle={{
+          backgroundColor:'transparent'
+        }}
+        // bottomDivider
         onPress={() => { handleListItemPress( listItem ) }}
         // disabled={listItem.title === 'Archive Account' && primarySubAccount.type === AccountType.CHECKING_ACCOUNT}
       >
@@ -261,7 +262,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
       <FlatList
         style={styles.rootContainer}
         contentContainerStyle={{
-          paddingHorizontal: 14
+          paddingHorizontal: 14,
         }}
         extraData={accountShell}
         data={listItems}
@@ -281,7 +282,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    paddingHorizontal: 10,
+    // paddingTop: 10,
   },
 } )
 
