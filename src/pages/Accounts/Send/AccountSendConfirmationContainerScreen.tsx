@@ -265,6 +265,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation, 
         <SelectedRecipientsCarousel
           recipients={selectedRecipients}
           subAccountKind={sourcePrimarySubAccount.kind}
+          showRemoveButton={false}
         />
       </View>
       <SendConfirmationCurrentTotalHeader
