@@ -136,11 +136,12 @@ RCT_EXPORT_METHOD(sendBtc:(NSString*)mnemonic
                   network:(NSString *)network
                   address:(NSString *)address
                   amount:(NSString *)amount
+                  feeRate:(Float *)feeRate
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject){
   RGBHelper *helper = [[RGBHelper alloc]init];
   [
-    helper sendBtcWithBtcNetwotk:network mnemonic:mnemonic address:address amount:amount callback:^(NSString * _Nonnull response) {
+    helper sendBtcWithBtcNetwotk:network mnemonic:mnemonic address:address amount:amount feeRate:feeRate callback:^(NSString * _Nonnull response) {
       resolve(response);
     }
    ];
