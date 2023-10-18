@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
+  BackHandler,
   FlatList,
   Keyboard,
   Platform,
@@ -40,6 +41,7 @@ import ThemeList from './Theme'
 
 import { translations } from '../../common/content/LocContext'
 
+import { CommonActions, useFocusEffect } from '@react-navigation/native'
 import Feather from 'react-native-vector-icons/Feather'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import BottomInfoBox from '../../components/BottomInfoBox'
@@ -200,6 +202,27 @@ const GiftDetails = ( { navigation, route } ) => {
     setName( wallet.userName ? wallet.userName : wallet.walletName )
   }, [ wallet.walletName, wallet.userName ] )
 
+  const hardwareBackPressCustom = useCallback( () => {
+    if ( route.params?.fromScreen === 'CreateGift' ) {
+      navigation.dispatch( state => {
+        return CommonActions.reset( {
+          ...state,
+          index: 0,
+          routes: state.routes.filter( route => route.name === 'GiftScreen' )
+        } )
+      } )
+      return true
+    }
+    return false
+  }, [] )
+
+  useFocusEffect(
+    useCallback( () => {
+      BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
+      return () => {
+        BackHandler.removeEventListener( 'hardwareBackPress', hardwareBackPressCustom )}
+    }, [] )
+  )
   // const { title, walletName, gift, avatar }: { title: string, walletName: string, gift: Gift, avatar: boolean } = navigation.state.params
 
   const IdentificationCard = ( { type, title, subtitle } ) => {
@@ -664,7 +687,16 @@ const GiftDetails = ( { navigation, route } ) => {
             <TouchableOpacity
               style={CommonStyles.headerLeftIconContainer}
               onPress={() => {
-                navigation.goBack()
+                if ( route.params?.fromScreen === 'CreateGift' ) {
+                  navigation.dispatch( state => {
+                    return CommonActions.reset( {
+                      ...state,
+                      index: 0,
+                      routes: state.routes.filter( route => route.name === 'GiftScreen' )
+                    } )
+                  } )
+                } else
+                  navigation.goBack()
               }}
             >
               <View style={styles.headerLeftIconInnerContainer}>
