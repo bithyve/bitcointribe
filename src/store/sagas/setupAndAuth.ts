@@ -5,7 +5,7 @@ import DeviceInfo from 'react-native-device-info'
 import { call, put, select } from 'redux-saga/effects'
 import semverLte from 'semver/functions/lte'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
-import { AccountType, Accounts, ContactInfo, KeeperInfoInterface, LevelData, MetaShare, RGBConfig, Trusted_Contacts, UnecryptedStreamData, Wallet } from '../../bitcoin/utilities/Interface'
+import { AccountType, Accounts, ContactInfo, GridType, KeeperInfoInterface, LevelData, MetaShare, RGBConfig, Trusted_Contacts, UnecryptedStreamData, Wallet } from '../../bitcoin/utilities/Interface'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import AccountShell from '../../common/data/models/AccountShell'
 import * as Cipher from '../../common/encryption'
@@ -99,7 +99,15 @@ function* setupWalletWorker( { payload } ) {
   accountArray.forEach( ( accountType ) => {
 
     const accountInfo: newAccountsInfo = {
-      accountType
+      accountType,
+      ...( gridType && {
+        borderWalletAccountInfo: {
+          generatedSeed: primarySeed,
+          gridMnemonic: initialMnemonic,
+          primaryMnemonic,
+          gridType: gridType as GridType
+        }
+      } )
     }
     accountsInfo.push( accountInfo )
   } )

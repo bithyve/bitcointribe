@@ -1,23 +1,21 @@
 import React, { useMemo } from 'react'
-import { View, Text, StyleSheet, Image, ImageSourcePropType } from 'react-native'
+import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import { useSelector } from 'react-redux'
+import { AccountType } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import LabeledBalanceDisplay from '../LabeledBalanceDisplay'
-import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
+import { translations } from '../../common/content/LocContext'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
+import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import AccountShell from '../../common/data/models/AccountShell'
+import getAccountSyncIcon from '../../utils/accounts/GetAccountSyncIcon'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useSecondarySubAccountsForShell from '../../utils/hooks/account-utils/UseSecondarySubAccountForShell'
-import useTotalBalanceForAccountShell from '../../utils/hooks/state-selectors/accounts/UseTotalBalanceForAccountShell'
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
-import getAccountSyncIcon from '../../utils/accounts/GetAccountSyncIcon'
-import AccountVisibility from '../../common/data/enums/AccountVisibility'
-import { useDispatch, useSelector } from 'react-redux'
-import { AccountType } from '../../bitcoin/utilities/Interface'
-import { translations } from '../../common/content/LocContext'
-import { Shadow } from 'react-native-shadow-2'
+import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
+import LabeledBalanceDisplay from '../LabeledBalanceDisplay'
 
 export type Props = {
   accountShell: AccountShell;
@@ -51,7 +49,7 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
         source={getAccountSyncIcon( accountShell.syncStatus )}
       />
       <View style={styles.headerAccountImage} >
-        {getAvatarForSubAccount( primarySubAccount, false, true, null , isBorderWallet  )}
+        {getAvatarForSubAccount( primarySubAccount, false, true, null, isBorderWallet  )}
       </View>
       {
         accountShell.primarySubAccount.hasNewTxn || ( primarySubAccount.type === AccountType.SWAN_ACCOUNT && !isVisited && !primarySubAccount.isUsable )  && (

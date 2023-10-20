@@ -1,123 +1,121 @@
-import { all, call, delay, put, select } from 'redux-saga/effects'
-import { createWatcher } from '../utils/utilities'
-import {
-  GET_TESTCOINS,
-  GENERATE_SECONDARY_XPRIV,
-  RESET_TWO_FA,
-  twoFAResetted,
-  UPDATE_DONATION_PREFERENCES,
-  secondaryXprivGenerated,
-  ADD_NEW_ACCOUNT_SHELLS,
-  newAccountShellsAdded,
-  ReassignTransactionsActionPayload,
-  REASSIGN_TRANSACTIONS,
-  transactionReassignmentSucceeded,
-  transactionReassignmentFailed,
-  MergeAccountShellsActionPayload,
-  MERGE_ACCOUNT_SHELLS,
-  accountShellMergeSucceeded,
-  accountShellMergeFailed,
-  REFRESH_ACCOUNT_SHELLS,
-  AUTO_SYNC_SHELLS,
-  accountShellRefreshCompleted,
-  accountShellRefreshStarted,
-  exchangeRatesCalculated,
-  setAverageTxFee,
-  VALIDATE_TWO_FA,
-  twoFAValid,
-  CREATE_SM_N_RESETTFA_OR_XPRIV,
-  resetTwoFA,
-  generateSecondaryXpriv,
-  SYNC_ACCOUNTS,
-  MARK_ACCOUNT_CHECKED,
-  MARK_READ_TRANSACTION,
-  updateAccountShells,
-  getTestcoins,
-  refreshAccountShells,
-  UPDATE_ACCOUNT_SETTINGS,
-  accountSettingsUpdated,
-  accountSettingsUpdateFailed,
-  updateAccounts,
-  RESTORE_ACCOUNT_SHELLS,
-  readTxn,
-  accountChecked,
-  autoSyncShells,
-  setResetTwoFALoader,
-  recomputeNetBalance,
-  updateGift,
-  GENERATE_GIFTS,
-  giftCreationSuccess,
-  updateAccountSettings,
-  FETCH_FEE_RATES,
-  FETCH_EXCHANGE_RATES,
-  CREATE_BORDER_WALLET,
-} from '../actions/accounts'
-import {
-  setAllowSecureAccount,
-  updateWalletImageHealth
-} from '../actions/BHR'
+import * as bip39 from 'bip39'
+import * as bitcoinJS from 'bitcoinjs-lib'
+import { call, put, select } from 'redux-saga/effects'
+import config from '../../bitcoin/HexaConfig'
 import {
   Account,
-  Accounts,
   AccountType,
+  Accounts,
   ActiveAddressAssignee,
   ActiveAddresses,
   ContactInfo,
   DeepLinkEncryptionType,
   DeepLinkKind,
+  DerivationPurpose,
   DonationAccount,
   Gift,
   GiftMetaData,
   GiftStatus,
   GiftThemeId,
   GiftType,
+  GridType,
+  LNNode,
   MultiSigAccount,
   NetworkType,
   TrustedContact,
   Trusted_Contacts,
   UnecryptedStreamData,
-  Wallet,
-  LNNode,
-  DerivationPurpose,
-  GridType
+  Wallet
 } from '../../bitcoin/utilities/Interface'
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
-import AccountShell from '../../common/data/models/AccountShell'
+import { generateAccount, generateDonationAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
+import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SyncStatus from '../../common/data/enums/SyncStatus'
-import config from '../../bitcoin/HexaConfig'
-import { AccountsState } from '../reducers/accounts'
-import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
-import * as bitcoinJS from 'bitcoinjs-lib'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import { generateAccount, generateDonationAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
-import { updateWallet } from '../actions/storage'
-import { APP_STAGE } from '../../common/interfaces/Interfaces'
-import * as bip39 from 'bip39'
-import crypto from 'crypto'
-import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo'
-import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
-import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
+import AccountShell from '../../common/data/models/AccountShell'
 import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
 import LightningSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/LightningSubAccountInfo'
+import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
+import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo'
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import { APP_STAGE } from '../../common/interfaces/Interfaces'
+import {
+  setAllowSecureAccount,
+  updateWalletImageHealth
+} from '../actions/BHR'
+import {
+  ADD_NEW_ACCOUNT_SHELLS,
+  AUTO_SYNC_SHELLS,
+  CREATE_BORDER_WALLET,
+  CREATE_SM_N_RESETTFA_OR_XPRIV,
+  FETCH_EXCHANGE_RATES,
+  FETCH_FEE_RATES,
+  GENERATE_GIFTS,
+  GENERATE_SECONDARY_XPRIV,
+  GET_TESTCOINS,
+  MARK_ACCOUNT_CHECKED,
+  MARK_READ_TRANSACTION,
+  MERGE_ACCOUNT_SHELLS,
+  MergeAccountShellsActionPayload,
+  REASSIGN_TRANSACTIONS,
+  REFRESH_ACCOUNT_SHELLS,
+  RESET_TWO_FA,
+  RESTORE_ACCOUNT_SHELLS,
+  ReassignTransactionsActionPayload,
+  SYNC_ACCOUNTS,
+  UPDATE_ACCOUNT_SETTINGS,
+  UPDATE_DONATION_PREFERENCES,
+  VALIDATE_TWO_FA,
+  accountChecked,
+  accountSettingsUpdateFailed,
+  accountSettingsUpdated,
+  accountShellMergeFailed,
+  accountShellMergeSucceeded,
+  accountShellRefreshCompleted,
+  accountShellRefreshStarted,
+  autoSyncShells,
+  exchangeRatesCalculated,
+  generateSecondaryXpriv,
+  getTestcoins,
+  giftCreationSuccess,
+  newAccountShellsAdded,
+  readTxn,
+  recomputeNetBalance,
+  refreshAccountShells,
+  resetTwoFA,
+  secondaryXprivGenerated,
+  setAverageTxFee,
+  setResetTwoFALoader,
+  transactionReassignmentFailed,
+  transactionReassignmentSucceeded,
+  twoFAResetted,
+  twoFAValid,
+  updateAccountShells,
+  updateAccounts,
+  updateGift
+} from '../actions/accounts'
+import { updateWallet } from '../actions/storage'
+import { AccountsState } from '../reducers/accounts'
+import { createWatcher } from '../utils/utilities'
 
-import dbManager from '../../storage/realm/dbManager'
 import _ from 'lodash'
-import Relay from '../../bitcoin/utilities/Relay'
-import AccountVisibility from '../../common/data/enums/AccountVisibility'
-import { syncPermanentChannelsWorker } from './trustedContacts'
-import { PermanentChannelsSyncKind } from '../actions/trustedContacts'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
-import BHROperations from '../../bitcoin/utilities/BHROperations'
-import { generateDeepLink } from '../../common/CommonFunctions'
-import Toast from '../../components/Toast'
-import RESTUtils from '../../utils/ln/RESTUtils'
 import { Alert } from 'react-native'
 import { ELECTRUM_NOT_CONNECTED_ERR } from '../../bitcoin/electrum/client'
-import { setElectrumNotConnectedErr } from '../actions/nodeSettings'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
+import Relay from '../../bitcoin/utilities/Relay'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import { generateDeepLink } from '../../common/CommonFunctions'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import BorderWalletSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/BorderWalletSubAccount'
+import Toast from '../../components/Toast'
+import dbManager from '../../storage/realm/dbManager'
+import RESTUtils from '../../utils/ln/RESTUtils'
+import { setElectrumNotConnectedErr } from '../actions/nodeSettings'
+import { PermanentChannelsSyncKind } from '../actions/trustedContacts'
+import { syncPermanentChannelsWorker } from './trustedContacts'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -957,7 +955,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           type: AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT,
           instanceNum: checkingNativeSegwitInstanceCount,
           accountName: accountName? accountName: 'Checking Account',
-          accountDescription: accountDescription? accountDescription: 'Bitcoin Wallet - Native SegWit',
+          accountDescription: accountDescription? accountDescription: `Bitcoin Wallet - Native SegWit${borderWalletAccountInfo ? ' (BW)' : ''}`,
           primarySeed,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT, checkingNativeSegwitInstanceCount, null, DerivationPurpose.BIP84 ),
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
