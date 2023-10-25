@@ -27,7 +27,7 @@ import Fonts from '../../common/Fonts'
 import FormStyles from '../../common/Styles/FormStyles'
 import CommonStyles from '../../common/Styles/Styles'
 import { translations } from '../../common/content/LocContext'
-import HeaderTitle from '../../components/HeaderTitle'
+import HeaderTitle1 from '../../components/HeaderTitle1'
 import Toast from '../../components/Toast'
 import SettingsStore from '../../mobxstore/SettingsStore'
 import { goHomeAction } from '../../navigation/actions/NavigationActions'
@@ -45,9 +45,9 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    backgroundColor: Colors.lightBlue,
+    backgroundColor: Colors.blue,
     borderRadius: wp( 2 ),
-    height: hp( 3.6 ),
+    height: wp( '10%' ),
     paddingHorizontal: wp( 2 ),
     marginTop: wp( 2.7 ),
     alignSelf: 'flex-start'
@@ -610,13 +610,15 @@ render() {
 
   )
 
-
   return (
     <SafeAreaView style={styles.viewContainer}>
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
       <View style={[ CommonStyles.headerContainer, {
         backgroundColor: Colors.backgroundColor,
-        marginRight: wp( 4 )
+        marginRight: wp( 4 ),
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
       } ]}>
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
@@ -632,10 +634,7 @@ render() {
             />
           </View>
         </TouchableOpacity>
-        <View style={{
-          flex: 1
-        }}/>
-        {/* <TouchableOpacity
+        <TouchableOpacity
           activeOpacity={0.6}
           onPress={() => {}}
           style={{
@@ -643,22 +642,23 @@ render() {
           }}
         >
           <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       </View>
       <KeyboardAwareScrollView
         contentContainerStyle={{
           flexGrow: 1,
           padding: 10,
-          backgroundColor: Colors.backgroundColor
+          backgroundColor: Colors.backgroundColor,
+          marginTop:20
         }}
         showsVerticalScrollIndicator={false}
         overScrollMode="never"
         bounces={false}
         keyboardShouldPersistTaps='handled'>
 
-        <HeaderTitle
-          firstLineTitle={strings.Connectyournode}
-          secondLineTitle={strings.Enternode}
+        <HeaderTitle1
+          firstLineTitle={'Set up Lighting Account'}
+          secondLineTitle={strings.Connectyournode}
           infoTextNormal={''}
           infoTextBold={''}
           infoTextNormal1={''}
@@ -686,7 +686,7 @@ render() {
             </Text>
           )}
 
-          <NodeInterface />
+          {/* <NodeInterface /> */}
 
           {( implementation === 'spark' ||
                         implementation == 'eclair' ) && (
@@ -918,7 +918,7 @@ render() {
 
               <Input
                 keyboardType="numeric"
-                placeholder={'Port'}
+                placeholder={'Enter Credentials'}
                 value={port}
                 onChangeText={( text: string ) =>
                   this.setState( {
@@ -933,7 +933,7 @@ render() {
                 editable={!loading}
               />
               <Input
-                placeholder={'Macaroon Hex'}
+                placeholder={'Enter Address'}
                 value={macaroonHex}
                 onChangeText={( text: string ) =>
                   this.setState( {
