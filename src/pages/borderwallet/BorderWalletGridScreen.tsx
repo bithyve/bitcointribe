@@ -1,5 +1,5 @@
 import * as bip39 from 'bip39'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator,
   FlatList,
@@ -184,9 +184,7 @@ const styles = StyleSheet.create( {
   }
 } )
 
-export const Ceil = ( { onPress, text, index, selected } ) => {
-  const isSelected = selected.includes( index )
-  const sequence = isSelected ? selected.findIndex( ( i ) => i === index ) + 1 : -1
+const Cell = React.memo<any>( ( { onPress, text, index, isSelected, sequence } ) => {
   return (
     <TouchableOpacity
       activeOpacity={0.6}
@@ -202,7 +200,9 @@ export const Ceil = ( { onPress, text, index, selected } ) => {
       } ]}>{text}</Text>
     </TouchableOpacity>
   )
-}
+}, ( prevProps, nextProps ) => {
+  return prevProps.isSelected === nextProps.isSelected && prevProps.sequence === nextProps.sequence
+} )
 
 const BorderWalletGridScreen = ( { route, navigation } ) => {
   const mnemonic =  route.params?.mnemonic
@@ -277,17 +277,11 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
             return ' '
       }
     } )
-    const g = []
-    Array.from( {
-      length: 128
-    }, ( _, rowIndex ) => {
-      g.push( cells.slice( rowIndex * 16, ( rowIndex + 1 ) * 16 ) )
-    } )
-    setGrid( g )
+    setGrid( cells )
     setLoading( false )
   }
 
-  const onCeilPress = ( index ) => {
+  const onCellPress = useCallback( ( index ) => {
     const isSelected = selected.includes( index )
     if ( isSelected ) {
       const i = selected.findIndex( ( i ) => i === index )
@@ -299,7 +293,7 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
     }else{
       Toast( 'Pattern selection limit reached. You have selected 23 words' )
     }
-  }
+  }, [ selected ] )
 
   const onPressNext = () => {
     const words = [ ...wordlists ]
@@ -326,6 +320,19 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
         isImportAccount,
       } )
   }
+
+  const renderCell = useCallback( ( { item, index } ) => {
+    const isSelected = selected.includes( index )
+    return (
+      <Cell
+        key={index}
+        onPress={onCellPress}
+        text={item}
+        index={index}
+        isSelected={isSelected}
+        sequence={isSelected ? selected.findIndex( ( i ) => i === index ) + 1 : -1}
+      />
+    )}, [ selected ] )
 
   return (
     <SafeAreaView style={styles.viewContainer}>
@@ -481,26 +488,15 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
                   } )
                 }}
               >
-                {grid.map( ( rowData, index ) => (
-                  <FlatList
-                    key={index}
-                    data={rowData}
-                    horizontal
-                    overScrollMode="never"
-                    bounces={false}
-                    scrollEnabled={false}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={( { item, index: i } ) => (
-                      <Ceil
-                        onPress={( i ) => onCeilPress( i )}
-                        text={item}
-                        index={index * 16 + i}
-                        selected={selected}
-                      />
-                    )}
-                    // keyExtractor={( item ) => item}
-                  />
-                ) )}
+                <FlatList
+                  data={grid}
+                  overScrollMode="never"
+                  bounces={false}
+                  scrollEnabled={false}
+                  showsHorizontalScrollIndicator={false}
+                  numColumns={16}
+                  renderItem={renderCell}
+                />
               </ScrollView>
             </ScrollView>
           </View>
