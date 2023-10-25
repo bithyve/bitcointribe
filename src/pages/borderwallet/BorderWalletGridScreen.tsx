@@ -284,16 +284,13 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
   const onCellPress = useCallback( ( index ) => {
     const isSelected = selected.includes( index )
     if ( isSelected ) {
-      const i = selected.findIndex( ( i ) => i === index )
-      selected.splice( i, 1 )
-      setSelected( [ ...selected ] )
+      setSelected( prevSelected => ( prevSelected.filter( i => i !== index ) ) )
     } else if ( selected.length < 23 ) {
-      selected.push( index )
-      setSelected( [ ...selected ] )
+      setSelected( prevSelected => ( [ ...prevSelected, index ] ) )
     }else{
       Toast( 'Pattern selection limit reached. You have selected 23 words' )
     }
-  }, [ selected ] )
+  }, [ selected, setSelected ] )
 
   const onPressNext = () => {
     const words = [ ...wordlists ]
@@ -332,7 +329,7 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
         isSelected={isSelected}
         sequence={isSelected ? selected.findIndex( ( i ) => i === index ) + 1 : -1}
       />
-    )}, [ selected ] )
+    )}, [ selected, onCellPress ] )
 
   return (
     <SafeAreaView style={styles.viewContainer}>
