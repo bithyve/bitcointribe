@@ -25,7 +25,6 @@ import { createBorderWallet } from '../../store/actions/accounts'
 import useAccountShellCreationCompletionEffect from '../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
 
 const ConfirmDownload = ( props ) => {
-  console.log( 'windowHeight', windowHeight )
   const { translations } = useContext( LocalizationContext )
   const common = translations[ 'common' ]
   const [ headerTitle, setHeaderTitle ]=useState( 'Summary for Border Wallet' )
