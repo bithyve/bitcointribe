@@ -173,7 +173,7 @@ export default function RGB121TxDetail( props ) {
             }}
             showKnowMore
             onSettingsPressed={() => { }}
-            balance={asset.balance.spendable}
+            balance={asset.balance.settled}
             cardColor={'#B7B7B7'}
             title={asset.name}
             description={asset.description}

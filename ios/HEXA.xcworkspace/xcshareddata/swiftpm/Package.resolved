@@ -5,7 +5,6 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/bitcoindevkit/bdk-swift",
       "state" : {
-        "branch" : "master",
         "revision" : "9c69d6255c251ba606e7aad94969c8d24b0ea344"
       }
     },
@@ -14,7 +13,6 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/RGB-Tools/rgb-lib-swift",
       "state" : {
-        "branch" : "master",
         "revision" : "d4c157cd9d421deba80b1a6991d8e38c41c19ef9"
       }
     }

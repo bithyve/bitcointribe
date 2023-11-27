@@ -116,7 +116,7 @@ export default function AssetsScreen( props ) {
         </View>
         <Text numberOfLines={1} style={styles.nameText}>{item.name}</Text>
         <Text style={styles.labelOuterText}>{item.ticker}</Text>
-        <Text style={styles.amountText}>{item.balance? item.balance.spendable:item.amount}</Text>
+        <Text style={styles.amountText}>{item.balance? item.balance.settled:item.amount}</Text>
       </TouchableOpacity>
     )
   }
