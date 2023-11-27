@@ -139,27 +139,28 @@ const ConfirmDownload = ( props ) => {
               </View>
             )
           }
+          <View style={styles.bottomButtonView}>
+            <View>
+              <TouchableOpacity
+                onPress={onPressContinue}
+              >
+                <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                  start={{
+                    x: 0, y: 0
+                  }} end={{
+                    x: 1, y: 0
+                  }}
+                  locations={[ 0.2, 1 ]}
+                  style={styles.buttonView}
+                >
+                  <Text style={styles.buttonText}>Continue</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </View>
-      <View style={styles.bottomButtonView}>
-        <View>
-          <TouchableOpacity
-            onPress={onPressContinue}
-          >
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
-              style={styles.buttonView}
-            >
-              <Text style={styles.buttonText}>Continue</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-      </View>
+
       <ModalContainer
         onBackground={()=> setSuccessModal( false )}
         visible={successModal}
@@ -211,7 +212,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     width: '100%',
     marginHorizontal: 20,
-    height: Platform.OS==='android'?'55%': '64%'
+    height: Platform.OS==='android'? '55%': '70%'
 
   },
   patternWrapper: {
@@ -245,12 +246,11 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.light,
   },
   bottomButtonView: {
-    flexDirection: 'row',
     width: '100%',
     paddingHorizontal: hp( 6 ),
+    marginVertical: hp( 6 ),
     justifyContent: 'flex-end',
     alignItems: 'center',
-    right: 20,
   },
   passPhraseWrapper:{
     width: '80%',
@@ -268,13 +268,13 @@ const styles = StyleSheet.create( {
   },
   previewStyle:{
     backgroundColor: '#B5B5B5',
-    height: 2,
+    height: windowHeight < 700? 1 : 1.5,
     width: 6,
     margin: 1,
   },
   patternPreviewStyle: {
     backgroundColor: '#304E55',
-    height: 2,
+    height: windowHeight < 700? 1 : 1.5,
     width: 6,
     margin: 1,
   }
