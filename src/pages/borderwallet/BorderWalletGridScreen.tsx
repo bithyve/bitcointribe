@@ -209,6 +209,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
   const isNewWallet = navigation.getParam( 'isNewWallet' )
   const isAccountCreation = navigation.getParam( 'isAccountCreation' )
   const gridType = navigation.getParam( 'gridType' ) || GridType.WORDS
+  const isImportAccount = navigation.getParam( 'gridType' ) || false
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
   const columnHeaderRef = useRef()
