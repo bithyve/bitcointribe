@@ -212,7 +212,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     width: '100%',
     marginHorizontal: 20,
-    height: Platform.OS==='android'? '55%': '70%'
+    height: Platform.OS === 'ios' ? '70%' : '62%'
 
   },
   patternWrapper: {
@@ -220,6 +220,7 @@ const styles = StyleSheet.create( {
   },
   mnemonicWrapper: {
     width: '60%',
+    height: Platform.OS === 'ios' ? '60%' : '43%'
   },
   previewTitle: {
     color: Colors.blue,
@@ -268,13 +269,13 @@ const styles = StyleSheet.create( {
   },
   previewStyle:{
     backgroundColor: '#B5B5B5',
-    height: windowHeight < 700? 1 : 1.5,
+    height: windowHeight < 700 ? 1 : 1.4,
     width: 6,
     margin: 1,
   },
   patternPreviewStyle: {
     backgroundColor: '#304E55',
-    height: windowHeight < 700? 1 : 1.5,
+    height: windowHeight < 700 ? 1 : 1.4,
     width: 6,
     margin: 1,
   }
