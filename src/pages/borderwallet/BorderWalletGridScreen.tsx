@@ -385,7 +385,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
             />
           </View>
           <View>
-            <Text style={styles.headerText}>{isNewWallet ? 'Step 4: Create a Pattern0' : 'Select your Pattern'}</Text>
+            <Text style={styles.headerText}>{isNewWallet ? 'Step 4: Create a Pattern' : 'Select your Pattern'}</Text>
           </View>
           {
             isNewWallet && (
