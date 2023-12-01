@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react'
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import {
   View,
   Text,
@@ -24,8 +24,7 @@ import IconRight from '../../assets/images/svgs/icon_right.svg'
 import Fonts from '../../common/Fonts'
 import Toast from '../../components/Toast'
 import StartAgain from '../../assets/images/svgs/startagain.svg'
-import dbManager from '../../storage/realm/dbManager'
-import { GridType, Wallet } from '../../bitcoin/utilities/Interface'
+import { GridType } from '../../bitcoin/utilities/Interface'
 import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
 
 const wordlists = bip39.wordlists.english
@@ -181,9 +180,7 @@ const styles = StyleSheet.create( {
   }
 } )
 
-export const Ceil = ( { onPress, text, index, selected } ) => {
-  const isSelected = selected.includes( index )
-  const sequence = isSelected ? selected.findIndex( ( i ) => i === index ) + 1 : -1
+const Cell = React.memo<any>( ( { onPress, text, index, isSelected, sequence } ) => {
   return (
     <TouchableOpacity
       activeOpacity={0.6}
@@ -199,10 +196,11 @@ export const Ceil = ( { onPress, text, index, selected } ) => {
       } ]}>{text}</Text>
     </TouchableOpacity>
   )
-}
+}, ( prevProps, nextProps ) => {
+  return prevProps.isSelected === nextProps.isSelected && prevProps.sequence === nextProps.sequence
+} )
 
 const ValidateBorderWalletPattern = ( { navigation } ) => {
-  const wallet: Wallet =  dbManager.getWallet()
   const gridType = navigation.getParam( 'borderWalletGridType' )
   const mnemonic = navigation.getParam( 'borderWalletMnemonic' )
   const gridMnemonic = navigation.getParam( 'borderWalletGridMnemonic' )
@@ -256,7 +254,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
 
   const generateGrid = ()=>{
     const words = [ ...wordlists ]
-    shuffle( words, gridMnemonic )
+    shuffle( words, mnemonic )
     const cells = words.map( ( word ) => {
       switch ( gridType ) {
           case GridType.WORDS:
@@ -269,29 +267,34 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
             return ' '
       }
     } )
-    const g = []
-    Array.from( {
-      length: 128
-    }, ( _, rowIndex ) => {
-      g.push( cells.slice( rowIndex * 16, ( rowIndex + 1 ) * 16 ) )
-    } )
-    setGrid( g )
+    setGrid( cells )
     setLoading( false )
   }
 
-  const onCeilPress = ( index ) => {
+  const onCeilPress = useCallback( ( index ) => {
     const isSelected = selected.includes( index )
     if ( isSelected ) {
-      const i = selected.findIndex( ( i ) => i === index )
-      selected.splice( i, 1 )
-      setSelected( [ ...selected ] )
+      setSelected( prevSelected => ( prevSelected.filter( i => i !== index ) ) )
     } else if ( selected.length < 23 ) {
-      selected.push( index )
-      setSelected( [ ...selected ] )
-    }else{
+      setSelected( prevSelected => ( [ ...prevSelected, index ] ) )
+    } else{
       Toast( 'Pattern selection limit reached. You have selected 23 words' )
     }
-  }
+  }, [ selected, setSelected ] )
+
+  const renderCell = useCallback( ( { item, index } ) => {
+    const isSelected = selected.includes( index )
+    return (
+      <Cell
+        key={index}
+        onPress={onCeilPress}
+        text={item}
+        index={index}
+        isSelected={isSelected}
+        sequence={isSelected ? selected.findIndex( ( i ) => i === index ) + 1 : -1}
+      />
+    )}, [ selected, onCeilPress ] )
+
   const onPressForgot = () => {
     const selected = []
     const words = mnemonic.split( ' ' )
@@ -441,7 +444,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
               overScrollMode="never"
               bounces={false}
               scrollEnabled={false}
-              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
               renderItem={( { item } ) => (
                 <View style={styles.cell}>
                   <Text style={styles.ceilText}>{( '000' + ( item + 1 ) ).substr( -3 )}</Text>
@@ -484,25 +487,15 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
                   } )
                 }}
               >
-                {grid.map( ( rowData, index ) => (
-                  <FlatList
-                    data={rowData}
-                    horizontal
-                    overScrollMode="never"
-                    bounces={false}
-                    scrollEnabled={false}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={( { item, index: i } ) => (
-                      <Ceil
-                        onPress={( i ) => onCeilPress( i )}
-                        text={item}
-                        index={index * 16 + i}
-                        selected={selected}
-                      />
-                    )}
-                    // keyExtractor={( item ) => item}
-                  />
-                ) )}
+                <FlatList
+                  data={grid}
+                  overScrollMode="never"
+                  bounces={false}
+                  scrollEnabled={false}
+                  showsHorizontalScrollIndicator={false}
+                  numColumns={16}
+                  renderItem={renderCell}
+                />
               </ScrollView>
             </ScrollView>
           </View>
