@@ -67,6 +67,7 @@ export const RESET_TWO_FA_LOADER = 'RESET_TWO_FA_LOADER'
 export const CREATE_BORDER_WALLET = 'CREATE_BORDER_WALLET'
 
 export const GENERATE_GIFTS = 'GENERATE_GIFTS'
+export const REFRESH_ACCOUNT = 'REFRESH_ACCOUNT'
 
 export const getAllAccountsData = () => {
   return {
@@ -757,6 +758,14 @@ export const blindRefreshStarted = ( refreshed ) => {
   return {
     type: BLIND_REFRESH_STARTED, payload: {
       refreshed
+    }
+  }
+}
+
+export const setRefreshAccounts = ( refreshAccounts ) => {
+  return {
+    type: REFRESH_ACCOUNT, payload: {
+      refreshAccounts
     }
   }
 }

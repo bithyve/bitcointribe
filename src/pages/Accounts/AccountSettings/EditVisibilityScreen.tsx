@@ -12,7 +12,7 @@ import { translations } from '../../../common/content/LocContext'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import VisibilityOptionsList from '../../../components/account-settings/visibility/VisibilityOptionsList'
-import { recomputeNetBalance, updateAccountSettings } from '../../../store/actions/accounts'
+import { recomputeNetBalance, refreshAccountShells, setRefreshAccounts, updateAccountSettings } from '../../../store/actions/accounts'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 
@@ -53,6 +53,10 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { route, navigati
     dispatch( updateAccountSettings( {
       accountShell, settings
     } ) )
+    dispatch( refreshAccountShells( [ accountShell ], {
+      hardRefresh: true,
+    } ) )
+    dispatch( setRefreshAccounts( true ) )
     dispatch( recomputeNetBalance() )
     // navigation.navigate( 'Home' )
     const resetAction = CommonActions.reset( {
