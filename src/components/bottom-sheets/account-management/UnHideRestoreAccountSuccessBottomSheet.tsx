@@ -22,26 +22,12 @@ export type Props = {
 
 const renderAccount = ( accountInfo, accountVisibility ) => {
   return (
-    <View style={{
-      flexDirection: 'row',
-      borderRadius: 8,
-      marginBottom: wp( 5 ),
-      padding: 10,
-      backgroundColor: Colors.backgroundColor1,
-      height: hp( 14 ),
-      alignItems: 'center',
-      width: '100%'
-    }}>
-      <View style={{
-        width: '20%',
-        alignItems: 'center'
-      }}>
+    <View style={styles.destinationWrapper}>
+      <View style={styles.avatarWrapper}>
         {getAvatarForSubAccount( accountInfo, false, true )}
       </View>
 
-      <View style={{
-        width: '70%',
-      }}>
+      <View style={styles.destinationInfoWrapper}>
         <ListItem.Content style={{
           flex: 1,
         }}>
@@ -156,6 +142,23 @@ const styles = StyleSheet.create( {
     ...ImageStyles.circledAvatarContainer,
     ...ImageStyles.thumbnailImageLarge,
     borderRadius: wp( 14 )/2,
+  },
+  destinationWrapper: {
+    flexDirection: 'row',
+    borderRadius: 8,
+    marginBottom: wp( 5 ),
+    padding: 10,
+    backgroundColor: Colors.backgroundColor1,
+    height: hp( 14 ),
+    alignItems: 'center',
+    width: '100%'
+  },
+  avatarWrapper: {
+    width: '20%',
+    alignItems: 'center'
+  },
+  destinationInfoWrapper: {
+    width: '80%',
   },
   destinationTitleText: {
     fontFamily: Fonts.Regular,
