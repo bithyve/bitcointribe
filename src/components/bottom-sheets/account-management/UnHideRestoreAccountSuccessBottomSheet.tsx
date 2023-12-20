@@ -1,16 +1,16 @@
-import React, {  } from 'react'
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import React from 'react'
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ListItem } from 'react-native-elements'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import Colors from '../../../common/Colors'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+import Fonts from '../../../common/Fonts'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { ListItem } from 'react-native-elements'
-import Fonts from '../../../common/Fonts'
-import ListStyles from '../../../common/Styles/ListStyles'
 import ImageStyles from '../../../common/Styles/ImageStyles'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import ListStyles from '../../../common/Styles/ListStyles'
 import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
-import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 // import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export type Props = {
@@ -28,25 +28,28 @@ const renderAccount = ( accountInfo, accountVisibility ) => {
       marginBottom: wp( 5 ),
       padding: 10,
       backgroundColor: Colors.backgroundColor1,
-      height: hp( 10 ),
-      alignItems: 'center'
+      height: hp( 14 ),
+      alignItems: 'center',
+      width: '100%'
     }}>
-      <View>
+      <View style={{
+        width: '20%',
+        alignItems: 'center'
+      }}>
         {getAvatarForSubAccount( accountInfo, false, true )}
       </View>
 
       <View style={{
-        marginLeft: 14
+        width: '70%',
       }}>
-        <Text style={{
-          ...ListStyles.infoHeaderSubtitleText,
-        }}>
-          {accountVisibility === AccountVisibility.HIDDEN ? 'Unhide Account' : 'Restore Account'}
-        </Text>
-
         <ListItem.Content style={{
           flex: 1,
         }}>
+          <Text style={{
+            ...ListStyles.infoHeaderSubtitleText,
+          }}>
+            {accountVisibility === AccountVisibility.HIDDEN ? 'Unhide Account' : 'Restore Account'}
+          </Text>
           <ListItem.Title
             style={styles.destinationTitleText}
             numberOfLines={1}
