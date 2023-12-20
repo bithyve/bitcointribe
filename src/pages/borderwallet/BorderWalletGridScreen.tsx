@@ -10,11 +10,11 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import IconRight from '../../assets/images/svgs/icon_right.svg'
@@ -23,9 +23,9 @@ import { GridType } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
-import Toast from '../../components/Toast'
 import CreateMemorablePattern from '../../components/border-wallet/CreateMemorablePattern'
 import ModalContainer from '../../components/home/ModalContainer'
+import Toast from '../../components/Toast'
 import uheprng from '../../utils/uheprng'
 
 const wordlists = bip39.wordlists.english
@@ -381,7 +381,7 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
             />
           </View>
           <View>
-            <Text style={styles.headerText}>{isNewWallet ? 'Step 4: Create a Pattern0' : 'Select your Pattern'}</Text>
+            <Text style={styles.headerText}>{isNewWallet ? 'Step 4: Create a Pattern' : 'Select your Pattern'}</Text>
           </View>
           {
             isNewWallet && (
