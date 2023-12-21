@@ -14,12 +14,12 @@ import PagerView, { PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEvent
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import Icon from 'react-native-vector-icons/dist/MaterialCommunityIcons'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { translations } from '../../common/content/LocContext'
+import Fonts from '../../common/Fonts'
 import AlertModalContents from '../../components/AlertModalContents'
 import ModalContainer from '../../components/home/ModalContainer'
 
@@ -390,9 +390,13 @@ const RestoreSeedPageComponent = ( props ) => {
                           }} onPress={() => {
                             const data = [ ...partialSeedData ]
                             data[ currentPosition ][ getTextIndex( onChangeIndex ) ].name = word
-                            console.log( 'skk seed data', JSON.stringify( data ) )
                             setPartialSeedData( data )
                             setSuggestedWords( [] )
+                            const position =  onChangeIndex + 1
+                            if ( position % 6 === 0 ) {
+                              onNextClick()
+                            }
+                            if ( onChangeIndex !== 11 ) inputRefs.current[ onChangeIndex + 1 ].focus()
                           }}>
                             <Text style={{
                               color: Colors.white
