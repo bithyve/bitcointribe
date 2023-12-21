@@ -1,9 +1,9 @@
 import React from 'react'
-import { StyleSheet, Image, FlatList, ImageSourcePropType } from 'react-native'
+import { FlatList, Image, ImageSourcePropType, StyleSheet } from 'react-native'
 import { ListItem } from 'react-native-elements'
-import ListStyles from '../../../../common/Styles/ListStyles'
-import ImageStyles from '../../../../common/Styles/ImageStyles'
 import { translations } from '../../../../common/content/LocContext'
+import ImageStyles from '../../../../common/Styles/ImageStyles'
+import ListStyles from '../../../../common/Styles/ListStyles'
 
 export type Props = {
   navigation: any;
