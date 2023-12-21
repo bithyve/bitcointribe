@@ -123,11 +123,6 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     marginLeft: wp( '8%' ),
