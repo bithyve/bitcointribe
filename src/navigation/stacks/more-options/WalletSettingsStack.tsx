@@ -17,11 +17,9 @@ const WalletSettingsStack = createStackNavigator(
   {
     WalletSettingsRoot: {
       screen: WalletSettingsContainerScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          title: 'Wallet Settings',
-        }
-      },
+      navigationOptions:{
+        header:null
+      }
     },
     ManagePasscode: {
       screen: ManagePasscodeScreen,
