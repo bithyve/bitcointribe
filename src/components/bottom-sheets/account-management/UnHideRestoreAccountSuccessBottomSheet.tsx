@@ -26,25 +26,33 @@ const renderAccount = ( accountInfo, accountVisibility ) => {
       flexDirection: 'row',
       borderRadius: 8,
       marginBottom: wp( 5 ),
+      height: hp( 12 ),
       padding: 10,
       backgroundColor: Colors.backgroundColor1,
+      width: '100%'
     }}>
-      <View>
+      <View style={{
+        width: '20%',
+        alignItems: 'center',
+        justifyContent: 'center'
+
+      }}>
         {getAvatarForSubAccount( accountInfo, false, true )}
       </View>
 
       <View style={{
-        marginLeft: 14
+        width: '80%',
       }}>
-        <Text style={{
-          ...ListStyles.infoHeaderSubtitleText,
-        }}>
-          {accountVisibility === AccountVisibility.HIDDEN ? 'Unhide Account' : 'Restore Account'}
-        </Text>
+
 
         <ListItem.Content style={{
           flex: 1,
         }}>
+          <Text style={{
+            ...ListStyles.infoHeaderSubtitleText,
+          }}>
+            {accountVisibility === AccountVisibility.HIDDEN ? 'Unhide Account' : 'Restore Account'}
+          </Text>
           <ListItem.Title
             style={styles.destinationTitleText}
             numberOfLines={1}
