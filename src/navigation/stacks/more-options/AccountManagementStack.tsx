@@ -31,14 +31,17 @@ const PanAccountSettingsStack = createStackNavigator(
     },
     EnterPasscode: {
       screen: EnterPasscodeScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          title: strings[ 'ShowAllAccounts' ],
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-          },
-        }
-      },
+      navigationOptions:{
+        headerShown: false
+      }
+      // navigationOptions: ( { navigation } ) => {
+      //   return {
+      //     title: strings[ 'ShowAllAccounts' ],
+      //     headerLeft: () => {
+      //       return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+      //     },
+      //   }
+      // },
     },
     SecurityQuestion: {
       screen: SecurityQuestionScreen,

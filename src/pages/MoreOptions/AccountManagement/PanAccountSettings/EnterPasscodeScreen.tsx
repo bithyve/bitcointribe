@@ -18,6 +18,9 @@ import { credsAuth, credsAuthenticated, switchReLogin } from '../../../../store/
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { translations } from '../../../../common/content/LocContext'
 import LinearGradient from 'react-native-linear-gradient'
+import HeaderTitle from '../../../../components/HeaderTitle'
+import { hp } from '../../../../common/data/responsiveness/responsive'
+import CommonStyles from '../../../../common/Styles/Styles'
 
 export default function EnterPasscodeScreen( props ) {
   const common  = translations[ 'common' ]
@@ -76,6 +79,32 @@ export default function EnterPasscodeScreen( props ) {
     <SafeAreaView style={{
       flex: 1
     }}>
+      <View style={CommonStyles.headerContainer}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.pop()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.headerWrapper}>
+        <HeaderTitle
+          firstLineTitle={'Show All Account'}
+          secondLineTitle={''}
+          infoTextNormal={''}
+          infoTextBold={''}
+          infoTextNormal1={''}
+          step={''}
+        />
+      </View>
       <View style={{
         alignSelf: 'baseline'
       }}>
@@ -509,4 +538,7 @@ const styles = StyleSheet.create( {
     marginLeft: 20,
     fontFamily: Fonts.Regular,
   },
+  headerWrapper:{
+    marginBottom: hp( 20 )
+  }
 } )
