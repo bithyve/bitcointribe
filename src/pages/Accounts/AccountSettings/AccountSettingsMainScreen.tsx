@@ -1,7 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { StyleSheet, FlatList, ImageSourcePropType, Image, Alert, View } from 'react-native'
+import { StyleSheet, FlatList, ImageSourcePropType, Image, Alert, View, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native'
 import { ListItem } from 'react-native-elements'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+
 import ListStyles from '../../../common/Styles/ListStyles'
+import Colors from '../../../common/Colors'
 import AccountShellRescanningBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningBottomSheet'
 import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningPromptBottomSheet'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
@@ -19,6 +22,9 @@ import Archive from '../../../assets/images/svgs/icon_archive.svg'
 import Xpub from '../../../assets/images/svgs/xpub.svg'
 import Visibilty from '../../../assets/images/svgs/icon_visibility.svg'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import CommonStyles from '../../../common/Styles/Styles'
+import HeaderTitle from '../../../components/HeaderTitle'
+import { hp } from '../../../common/data/responsiveness/responsive'
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.ARCHIVED,
@@ -47,6 +53,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }, [ navigation ] )
   const dispatch = useDispatch()
   const strings  = translations[ 'accounts' ]
+  const setting  = translations[ 'stackTitle' ]
   const [ showRescanning, setShowRescanning ] = useState( false )
   const [ showRescanningPrompt, setShowRescanningPrompt ] = useState( false )
   const [ showAccountArchiveModal, setShowAccountArchiveModal ] = useState( false )
@@ -288,7 +295,34 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
 
 
   return (
-    <>
+    <SafeAreaView>
+      <StatusBar barStyle="dark-content" />
+      <View style={CommonStyles.headerContainer}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            navigation.pop()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.headerWrapper}>
+        <HeaderTitle
+          firstLineTitle={setting[ 'AccountSettings' ]}
+          secondLineTitle={''}
+          infoTextNormal={''}
+          infoTextBold={''}
+          infoTextNormal1={''}
+          step={''}
+        />
+      </View>
       <FlatList
         style={styles.rootContainer}
         contentContainerStyle={{
@@ -306,15 +340,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       <ModalContainer onBackground={()=>setCheckAccountModal( false )} visible={checkAccountModal} closeBottomSheet={() => {}}>
         {checkAccountBalance()}
       </ModalContainer>
-
-      {/* <ModalContainer onBackground={()=>setShowRescanningPrompt( false )} visible={showRescanningPrompt} closeBottomSheet={() => {}}>
-        {showRescanningPromptBottomSheet()}
-      </ModalContainer>
-
-      <ModalContainer onBackground={()=>setShowRescanning( false )} visible={showRescanning} closeBottomSheet={() => {}}>
-        {showRescanningBottomSheet()}
-      </ModalContainer> */}
-    </>
+    </SafeAreaView>
   )
 }
 
@@ -322,6 +348,9 @@ const styles = StyleSheet.create( {
   rootContainer: {
     paddingHorizontal: 10,
   },
+  headerWrapper:{
+    marginBottom: hp( 20 )
+  }
 } )
 
 export default AccountSettingsMainScreen

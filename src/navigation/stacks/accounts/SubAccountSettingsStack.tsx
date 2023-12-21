@@ -27,14 +27,17 @@ const SubAccountSettingsStack = createStackNavigator(
   {
     AccountSettingsMain: {
       screen: AccountSettingsMainScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          title: strings[ 'AccountSettings' ],
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-          },
-        }
-      },
+      navigationOptions:{
+        headerShown: false
+      }
+      // navigationOptions: ( { navigation } ) => {
+      //   return {
+      //     title: strings[ 'AccountSettings' ],
+      //     headerLeft: () => {
+      //       return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+      //     },
+      //   }
+      // },
     },
     EditDisplayProperties: {
       screen: AccountSettingsEditDisplayPropertiesScreen,
