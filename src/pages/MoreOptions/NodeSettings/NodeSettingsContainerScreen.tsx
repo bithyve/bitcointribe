@@ -34,13 +34,13 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) 
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
   } = useBottomSheetModal()
-  
+
   // const { connectToMyNodeEnabled, nodeDetails } = useAppSelector((state) => state.settings);
-  const [nodeList, setNodeList] = useState(nodeSettingsState.personalNodes || []);
-  const [ConnectToNode, setConnectToNode] = useState(nodeSettingsState.isConnectionActive);
-  const [visible, setVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [selectedNodeItem, setSelectedNodeItem] = useState(null);
+  const [ nodeList, setNodeList ] = useState( nodeSettingsState.personalNodes || [] )
+  const [ ConnectToNode, setConnectToNode ] = useState( nodeSettingsState.isConnectionActive )
+  const [ visible, setVisible ] = useState( false )
+  const [ loading, setLoading ] = useState( false )
+  const [ selectedNodeItem, setSelectedNodeItem ] = useState( null )
 
   // const isPersonalNodeConnectionEnabled = useMemo( () => {
   //   return nodeSettingsState.prefersPersonalNodeConnection
@@ -120,32 +120,32 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) 
   // )
 
   const handleSettingsSubmission = async ( nodeDetail: PersonalNode ) => {
-    setLoading(true);
-    await onCloseClick();
-    const { nodes, node } = await Node.save(nodeDetail, nodeList);
-    if (nodes === null || node === null) {
-      console.log('node not saved');
-      setLoading(false);
-      return;
+    setLoading( true )
+    await onCloseClick()
+    const { nodes, node } = await Node.save( nodeDetail, nodeList )
+    if ( nodes === null || node === null ) {
+      console.log( 'node not saved' )
+      setLoading( false )
+      return
     }
 
-    setNodeList(nodes);
-    dispatch(setAllNodes(nodes));
-    setSelectedNodeItem(node);
-    setLoading(false);
+    setNodeList( nodes )
+    dispatch( setAllNodes( nodes ) )
+    setSelectedNodeItem( node )
+    setLoading( false )
   }
 
-  const handleConnectionToggle = async (value: boolean) => {
-    setConnectToNode(value);
-    dispatch(setIsConnectionActive(value));
-    if (value) {
-      setSelectedNodeItem(Node.getModalParams(null));
-      setVisible(true)
+  const handleConnectionToggle = async ( value: boolean ) => {
+    setConnectToNode( value )
+    dispatch( setIsConnectionActive( value ) )
+    if ( value ) {
+      setSelectedNodeItem( Node.getModalParams( null ) )
+      setVisible( true )
     } else {
-      setLoading(true);
-      updateNode(null);
-      await Node.connectToDefaultNode();
-      setLoading(false);
+      setLoading( true )
+      updateNode( null )
+      await Node.connectToDefaultNode()
+      setLoading( false )
     }
   }
 
@@ -186,87 +186,91 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) 
   // }, [] )
 
   const onCloseClick = async()=> {
-    if (nodeList.length == 0 || nodeList.filter((item) => item.isConnected == true).length == 0) {
-      await onChangeConnectToMyNode(false);
+    if ( nodeList.length == 0 || nodeList.filter( ( item ) => item.isConnected == true ).length == 0 ) {
+      await onChangeConnectToMyNode( false )
     }
-    setVisible(false);
+    setVisible( false )
   }
 
-  async function onChangeConnectToMyNode(value) {
-    setConnectToNode(value);
-    dispatch(setIsConnectionActive(value));
-    if (value) {
-      setSelectedNodeItem(Node.getModalParams(null));
+  async function onChangeConnectToMyNode( value ) {
+    setConnectToNode( value )
+    dispatch( setIsConnectionActive( value ) )
+    if ( value ) {
+      setSelectedNodeItem( Node.getModalParams( null ) )
       setVisible( true )
     } else {
-      setLoading(true);
-      updateNode(null);
-      await Node.connectToDefaultNode();
-      setLoading(false);
+      setLoading( true )
+      updateNode( null )
+      await Node.connectToDefaultNode()
+      setLoading( false )
     }
   }
 
-  const updateNode = (selectedItem) => {
-    const nodes = [...nodeList];
-    const updatedNodes = nodes.map((item) => {
-      const node = { ...item };
-      node.isConnected = item.id === selectedItem?.id ? selectedItem.isConnected : false;
-      return node;
-    });
+  const updateNode = ( selectedItem ) => {
+    const nodes = [ ...nodeList ]
+    const updatedNodes = nodes.map( ( item ) => {
+      const node = {
+        ...item
+      }
+      node.isConnected = item.id === selectedItem?.id ? selectedItem.isConnected : false
+      return node
+    } )
 
-    setNodeList(updatedNodes);
-    dispatch(setAllNodes(updatedNodes));
-  };
+    setNodeList( updatedNodes )
+    dispatch( setAllNodes( updatedNodes ) )
+  }
 
   function onAddButtonPressed() {
-    setSelectedNodeItem(null);
+    setSelectedNodeItem( null )
     setVisible( true )
   }
 
-  const onSelectedNodeitem = (selectedItem: PersonalNode) => {
-    setSelectedNodeItem(selectedItem);
-  };
+  const onSelectedNodeitem = ( selectedItem: PersonalNode ) => {
+    setSelectedNodeItem( selectedItem )
+  }
 
-  const onEdit = async (selectedItem: PersonalNode) => {
-    setSelectedNodeItem(selectedItem);
-    setVisible(true)
-  };
+  const onEdit = async ( selectedItem: PersonalNode ) => {
+    setSelectedNodeItem( selectedItem )
+    setVisible( true )
+  }
 
-  const onDelete = async (selectedItem: PersonalNode) => {
-    const filteredNodes = nodeList?.filter((item) => item.id !== selectedItem.id);
-    setNodeList(filteredNodes);
-    dispatch(setAllNodes(filteredNodes));
-    setSelectedNodeItem(null);
+  const onDelete = async ( selectedItem: PersonalNode ) => {
+    const filteredNodes = nodeList?.filter( ( item ) => item.id !== selectedItem.id )
+    setNodeList( filteredNodes )
+    dispatch( setAllNodes( filteredNodes ) )
+    setSelectedNodeItem( null )
 
-    if (filteredNodes?.length === 0 || selectedItem.isConnected) {
-      console.log('defaut node')
-      setConnectToNode(false);
-      dispatch(setIsConnectionActive(false));
-      setLoading(true);
-      await Node.connectToDefaultNode();
-      setLoading(false);
+    if ( filteredNodes?.length === 0 || selectedItem.isConnected ) {
+      console.log( 'defaut node' )
+      setConnectToNode( false )
+      dispatch( setIsConnectionActive( false ) )
+      setLoading( true )
+      await Node.connectToDefaultNode()
+      setLoading( false )
     }
-  };
+  }
 
-  const onConnectNode = async (selectedItem) => {
-    setLoading(true);
-    setSelectedNodeItem(selectedItem);
-    let node = { ...selectedItem };
+  const onConnectNode = async ( selectedItem ) => {
+    setLoading( true )
+    setSelectedNodeItem( selectedItem )
+    let node = {
+      ...selectedItem
+    }
 
-    if (!selectedItem.isConnected) {
-      node = await Node.connect(selectedItem, nodeList);
+    if ( !selectedItem.isConnected ) {
+      node = await Node.connect( selectedItem, nodeList )
     }
     else {
-      await disconnectNode(node);
-      setLoading(false);
-      return;
+      await disconnectNode( node )
+      setLoading( false )
+      return
     }
 
-    setConnectToNode(node?.isConnected);
-    dispatch(setIsConnectionActive(node?.isConnected));
-    updateNode(node);
+    setConnectToNode( node?.isConnected )
+    dispatch( setIsConnectionActive( node?.isConnected ) )
+    updateNode( node )
 
-    if (node.isConnected) {
+    if ( node.isConnected ) {
       Toast( 'Node connected successfully' )
       // showToast(`${settings.nodeConnectionSuccess}`, <TickIcon />);
     }
@@ -275,15 +279,15 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) 
       // showToast(`${settings.nodeConnectionFailure}`, <ToastErrorIcon />, 1000, true);
     }
 
-    setLoading(false);
-  };
+    setLoading( false )
+  }
 
-  const disconnectNode = async (node) => {
-    node.isConnected = false;
-    await Node.connectToDefaultNode();
-    setConnectToNode(node?.isConnected);
-    dispatch(setIsConnectionActive(node?.isConnected));
-    updateNode(node);
+  const disconnectNode = async ( node ) => {
+    node.isConnected = false
+    await Node.connectToDefaultNode()
+    setConnectToNode( node?.isConnected )
+    dispatch( setIsConnectionActive( node?.isConnected ) )
+    updateNode( node )
   }
 
   return (
@@ -303,13 +307,14 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) 
               }}
               isConnectionEnabled={ConnectToNode}
               onToggle={handleConnectionToggle}
+              navigation={navigation}
             />
 
             {visible ? (
               <PersonalNodeConnectionForm
                 onCloseClick={() => onCloseClick() }
                 onSubmit={handleSettingsSubmission}
-                params={Node.getModalParams(selectedNodeItem)}
+                params={Node.getModalParams( selectedNodeItem )}
               />
             ): (
               <PersonalNodeDetailsSection

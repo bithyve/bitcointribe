@@ -128,20 +128,8 @@ const MoreOptionsStack = createStackNavigator(
     },
     NodeSettings: {
       screen: NodeSettingsContainerScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          title: 'Node Settings',
-          headerTitleStyle:{
-            color: Colors.blue,
-            fontSize: RFValue( 18 ),
-            fontFamily: Fonts.Medium,
-            textAlign: 'left',
-            marginHorizontal: 0
-          },
-          headerLeft: () => {
-            return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-          },
-        }
+      navigationOptions: {
+        header: null,
       },
     },
     FundingSources: {
