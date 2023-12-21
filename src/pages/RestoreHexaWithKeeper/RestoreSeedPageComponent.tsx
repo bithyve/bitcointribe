@@ -77,6 +77,8 @@ const RestoreSeedPageComponent = ( props ) => {
   const positionAnimatedValue = React.useRef( new Animated.Value( 0 ) ).current
   const onPageSelectedPosition = useRef( new Animated.Value( 0 ) ).current
   const inputRange = [ 0, partialSeedData.length ]
+  const inputRefs = useRef<Array<TextInput | null>>( [] )
+
   const scrollX = Animated.add(
     scrollOffsetAnimatedValue,
     positionAnimatedValue
@@ -303,6 +305,7 @@ const RestoreSeedPageComponent = ( props ) => {
                       >
                         <Text style={styles.numberText}>{getFormattedNumber( getIndex( index, seedIndex ) )}</Text>
                         <TextInput
+                          ref={input => {inputRefs.current[ getIndex( index, seedIndex ) - 1 ] = input}}
                           style={[ styles.modalInputBox,
                             partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name.length > 0 ? styles.selectedInput : null,
                           // value?.name.length > 0 ? styles.selectedInput : null,
@@ -320,6 +323,11 @@ const RestoreSeedPageComponent = ( props ) => {
                           autoCapitalize="none"
                           onSubmitEditing={() => {
                             setSuggestedWords( [] )
+                            const pos = getIndex( index, seedIndex )
+                            if ( pos < inputRefs.current.length ) {
+                              if ( pos % 6 === 0 ) onNextClick()
+                              inputRefs.current[ pos ].focus()
+                            }
                           }}
                           onFocus={() => {
                             setSuggestedWords( [] )
@@ -379,9 +387,13 @@ const RestoreSeedPageComponent = ( props ) => {
                           }} onPress={() => {
                             const data = [ ...partialSeedData ]
                             data[ currentPosition ][ getTextIndex( onChangeIndex ) ].name = word
-                            console.log( 'skk seed data', JSON.stringify( data ) )
                             setPartialSeedData( data )
                             setSuggestedWords( [] )
+                            // const position =  onChangeIndex + 1
+                            // if ( position % 6 === 0 ) {
+                            //   onNextClick()
+                            // }
+                            // if ( onChangeIndex !== 11 ) inputRefs.current[ onChangeIndex + 1 ].focus()
                           }}>
                             <Text style={{
                               color: Colors.white
