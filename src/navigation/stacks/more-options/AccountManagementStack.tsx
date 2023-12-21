@@ -16,14 +16,18 @@ const PanAccountSettingsStack = createStackNavigator(
   {
     PanAccountSettingsRoot: {
       screen: PanAccountSettingsContainerScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          title: strings[ 'AccountSettings' ],
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-          },
-        }
-      },
+      navigationOptions:{
+        headerShown: false
+      }
+      // navigationOptions: ( { navigation } ) => {
+      //   return {
+      //     title: strings[ 'AccountSettings' ],
+      //     headerLeft: () => {
+      //       return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+      //     },
+      //   }
+      // },
+
     },
     EnterPasscode: {
       screen: EnterPasscodeScreen,

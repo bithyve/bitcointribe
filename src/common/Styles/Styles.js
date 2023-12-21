@@ -10,7 +10,7 @@ export default StyleSheet.create( {
     marginTop: 10,
     alignItems: 'center',
     height: 54,
-    backgroundColor: Colors.backgroundColor,
+    // backgroundColor: Colors.backgroundColor,
     // borderBottomColor: Colors.white,
     // borderBottomWidth: 0.5,
   },
