@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import Colors from '../Colors'
 import Fonts from '../Fonts'
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
 
 export default StyleSheet.create( {
   headerContainer: {
@@ -10,7 +10,7 @@ export default StyleSheet.create( {
     marginTop: 10,
     alignItems: 'center',
     height: 54,
-    backgroundColor: Colors.backgroundColor,
+    // backgroundColor: Colors.backgroundColor,
     // borderBottomColor: Colors.white,
     // borderBottomWidth: 0.5,
   },
