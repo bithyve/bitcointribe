@@ -76,6 +76,7 @@ import PreviewPattern from '../../../pages/borderwallet/PreviewPattern'
 import ImportBorderWallet from '../../../pages/borderwallet/ImportBorderWallet'
 import RecoverBorderWallet from '../../../pages/borderwallet/RecoverBorderWallet'
 import ImportBWGrid from '../../../pages/borderwallet/ImportBWGrid'
+import CheckPasscodeComponent from '../../../pages/NewBHR/CheckPasscodeComponent'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -319,12 +320,12 @@ const HomeStack = createStackNavigator(
     //     header: null,
     //   },
     // },
-    // SeedBackupHistory: {
-    //   screen: SeedBackupHistory,
-    //   navigationOptions: {
-    //     header: null,
-    //   },
-    // },
+    SeedBackupHistory: {
+      screen: SeedBackupHistory,
+      navigationOptions: {
+        header: null,
+      },
+    },
     NewOwnQuestions,
     RestoreWithICloud,
     RestoreWithoutICloud,
@@ -337,13 +338,19 @@ const HomeStack = createStackNavigator(
     UpgradeBackup,
     ConfirmKeys,
     TwoFAValidation,
-    // BackupSeedWordsContent: {
-    //   screen: BackupSeedWordsContent,
-    //   navigationOptions: {
-    //     header: null,
-    //   },
-    // },
-    // RestoreSeedWordsContent,
+    BackupSeedWordsContent: {
+      screen: BackupSeedWordsContent,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    CheckPasscode:{
+      screen: CheckPasscodeComponent,
+      navigationOptions:{
+        header:null
+      }
+    },
+    RestoreSeedWordsContent,
     TwoFASetup: {
       screen: TwoFASetup,
       navigationOptions: {

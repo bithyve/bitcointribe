@@ -810,11 +810,11 @@ const WalletBackup = ( props, navigation ) => {
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
-            {/* <FontAwesome
+            <FontAwesome
               name="long-arrow-left"
               color={Colors.homepageButtonColor}
               size={17}
-            /> */}
+            />
           </View>
         </TouchableOpacity>
       </View>
