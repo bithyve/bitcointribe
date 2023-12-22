@@ -229,7 +229,7 @@ export default function Login( props ) {
                   </Text>
                 </View>
               </View>
-              {checkAuth ? (
+              {passcode.length > 4 && checkAuth ? (
                 <View style={{
                   marginLeft: 'auto'
                 }}>
@@ -244,7 +244,7 @@ export default function Login( props ) {
             <View>
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
-                onPress={() => isValidate? checkReloginNext() : loginNext()}
+                onPress={() => isValidate && checkAuth ? checkReloginNext() : loginNext()}
                 style={{
                   ...styles.proceedButtonView,
                   backgroundColor:
