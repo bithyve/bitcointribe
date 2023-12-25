@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import { useDispatch } from 'react-redux'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
@@ -15,6 +16,8 @@ import BottomInfoBox from '../../../components/BottomInfoBox'
 import { translations } from '../../../common/content/LocContext'
 import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
+import HeaderTitle from '../../../components/HeaderTitle'
+import CommonStyles from '../../../common/Styles/Styles'
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.DEFAULT,
@@ -60,7 +63,31 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
   }
 
   return (
-    <View style={styles.rootContainer}>
+    <SafeAreaView style={styles.rootContainer}>
+      <View style={CommonStyles.headerContainer}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            navigation.goBack()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <HeaderTitle
+        firstLineTitle={'Account Visibility'}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
       <HeaderSection title={strings.Choosewhen}/>
 
       <View style={{
@@ -114,7 +141,7 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
         </View>
       </View>
 
-    </View>
+    </SafeAreaView>
   )
 }
 

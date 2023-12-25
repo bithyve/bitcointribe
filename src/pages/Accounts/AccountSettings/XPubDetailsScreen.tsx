@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView, SafeAreaView, StatusBar } from 'react-native'
 import QRCode from '../../../components/QRCode'
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import BottomInfoBox from '../../../components/BottomInfoBox'
@@ -17,6 +17,8 @@ import AccountOperations from '../../../bitcoin/utilities/accounts/AccountOperat
 import _ from 'lodash'
 import { RootStateOrAny, useSelector } from 'react-redux'
 import { ActivityIndicator } from 'react-native-paper'
+import HeaderTitle from '../../../components/HeaderTitle'
+import CommonStyles from '../../../common/Styles/Styles'
 
 enum XpubTypes {
   PRIMARY = 'PRIMARY',
@@ -183,7 +185,33 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
   }
 
   return (
-    <>
+    <SafeAreaView style={{
+      flex: 1,
+    }}>
+      <View style={CommonStyles.headerContainer}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            navigation.goBack()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <HeaderTitle
+        firstLineTitle={`${debugAccount && debugAccount.accountName } xPub`}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
       <View style={styles.rootContainer} >
         <View style={styles.headerSectionContainer}>
           <Text style={HeadingStyles.sectionSubHeadingText}>
@@ -242,7 +270,7 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
           <RenderDebugModal/>
         </View>
       </ModalContainer>
-    </>
+    </SafeAreaView>
   )
 }
 
@@ -253,7 +281,7 @@ const styles = StyleSheet.create( {
   },
 
   headerSectionContainer: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 20,
     paddingVertical: 36,
   },
 

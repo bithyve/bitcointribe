@@ -42,7 +42,7 @@ const SubAccountSettingsStack = createStackNavigator(
     EditDisplayProperties: {
       screen: AccountSettingsEditDisplayPropertiesScreen,
       navigationOptions: {
-        title: strings[ 'NameDescription' ],
+        header: null
       },
     },
     ReassignTransactionsMainOptions: {
@@ -76,19 +76,14 @@ const SubAccountSettingsStack = createStackNavigator(
     },
     EditVisibility: {
       screen: AccountSettingsEditVisibilityScreen,
-      navigationOptions: {
-        title: 'Account Visibility',
-      },
+      navigationOptions:{
+        headerShown: false
+      }
     },
     ShowXPub: {
       screen: XPubDetailsScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          ...defaultStackScreenNavigationOptions,
-          headerLeft: () => {
-            return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-          },
-        }
+      navigationOptions: {
+        header:null
       },
     },
     MergeAccounts: {
