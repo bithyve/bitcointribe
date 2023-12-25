@@ -26,7 +26,7 @@ const AccountDetailsStack = createStackNavigator(
     TransactionsList: {
       screen: TransactionsListContainerScreen,
       navigationOptions: {
-        title: 'All Transactions',
+        header: null
       },
     },
     TransactionDetails: {
