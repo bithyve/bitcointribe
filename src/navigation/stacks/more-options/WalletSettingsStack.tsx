@@ -24,13 +24,13 @@ const WalletSettingsStack = createStackNavigator(
     ManagePasscode: {
       screen: ManagePasscodeScreen,
       navigationOptions: {
-        title: 'Manage Passcode',
+        header:null
       },
     },
     ChangeCurrency: {
       screen: ChangeCurrencyScreen,
       navigationOptions: {
-        title: '',
+        header:null
       },
     },
     ReLogin: {

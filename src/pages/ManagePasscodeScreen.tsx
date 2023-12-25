@@ -17,6 +17,8 @@ import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { translations } from '../common/content/LocContext'
 import LinearGradient from 'react-native-linear-gradient'
+import HeaderTitle from '../components/HeaderTitle'
+import CommonStyles from '../common/Styles/Styles'
 
 export default function ManagePasscodeScreen( props ) {
   const strings  = translations[ 'login' ]
@@ -69,6 +71,30 @@ export default function ManagePasscodeScreen( props ) {
     <SafeAreaView style={{
       flex: 1
     }}>
+      <View style={CommonStyles.headerContainer}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <HeaderTitle
+        firstLineTitle={'Manage Passcode'}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
       <View style={{
         alignSelf: 'baseline'
       }}>
