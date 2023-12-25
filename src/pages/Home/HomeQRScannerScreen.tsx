@@ -161,7 +161,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         infoTextNormal1={''}
         step={''}
       />
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <KeyboardAwareScrollView
           resetScrollToCoords={{
             x: 0, y: 0
