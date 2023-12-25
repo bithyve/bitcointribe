@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
 import ListStyles from '../../common/Styles/ListStyles'
@@ -8,6 +8,7 @@ import RecipientAddressTextInputSection from '../../components/send/RecipientAdd
 import { REGULAR_ACCOUNT, TEST_ACCOUNT } from '../../common/constants/wallet-service-types'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { useDispatch, useSelector } from 'react-redux'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { clearTransfer } from '../../store/actions/accounts'
 import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 import { Button } from 'react-native-elements'
@@ -36,6 +37,8 @@ import AcceptGift from '../FriendsAndFamily/AcceptGift'
 import { launchImageLibrary } from 'react-native-image-picker'
 import LocalQRCode from '@remobile/react-native-qrcode-local-image'
 import Toast from '../../components/Toast'
+import HeaderTitle from '../../components/HeaderTitle'
+import CommonStyles from '../../common/Styles/Styles'
 
 export type Props = {
   navigation: any;
@@ -132,14 +135,39 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   }
 
   return (
-    <View style={styles.rootContainer}>
+    <SafeAreaView style={styles.rootContainer}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={CommonStyles.headerContainer}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            navigation.goBack()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <HeaderTitle
+        firstLineTitle={'QR'}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
       <ScrollView>
         <KeyboardAwareScrollView
           resetScrollToCoords={{
             x: 0, y: 0
           }}
           scrollEnabled={false}
-          style={styles.rootContainer}
+          // style={styles.rootContainer}
         >
           <HeaderSection title={strings.ScanaBitcoinaddress} />
 
@@ -239,7 +267,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           </View>
         </KeyboardAwareScrollView>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -303,7 +331,7 @@ const styles = StyleSheet.create( {
     paddingVertical: 24,
   },
   floatingActionButtonContainer: {
-    bottom: heightPercentageToDP( 1.5 ),
+    bottom: heightPercentageToDP( 2 ),
     right: 0,
     marginLeft: 'auto',
     padding: heightPercentageToDP( 1.5 ),
