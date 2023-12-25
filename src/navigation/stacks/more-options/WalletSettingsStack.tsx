@@ -54,7 +54,7 @@ const WalletSettingsStack = createStackNavigator(
     SettingGetNewPin: {
       screen: SettingGetNewPin,
       navigationOptions: {
-        title: 'Manage Passcode',
+        header: null
       },
     },
   },
