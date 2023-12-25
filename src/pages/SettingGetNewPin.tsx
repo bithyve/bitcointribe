@@ -12,6 +12,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
+import CommonStyles from '../common/Styles/Styles'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -30,6 +31,7 @@ import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../components/ErrorModalContents'
 import ModalHeader from '../components/ModalHeader'
 import LinearGradient from 'react-native-linear-gradient'
+import HeaderTitle from '../components/HeaderTitle'
 
 export default function SettingGetNewPin( props ) {
   const [ passcode, setPasscode ] = useState( '' )
@@ -181,6 +183,30 @@ export default function SettingGetNewPin( props ) {
       flex: 1
     }}>
       <StatusBar />
+      <View style={CommonStyles.headerContainer}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <HeaderTitle
+        firstLineTitle={'Manage Passcode'}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
       <View style={{
         flex: 1
       }}>
