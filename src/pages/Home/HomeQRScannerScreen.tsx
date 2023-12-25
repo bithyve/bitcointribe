@@ -141,7 +141,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            navigation.goBack()
+            navigation.pop()
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
