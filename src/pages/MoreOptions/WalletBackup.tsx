@@ -1009,7 +1009,9 @@ const WalletBackup = ( props, navigation ) => {
           cancelButtonText={'Cancel'}
           onPressProceed={() => {
             setSeedBackupModal( false )
-            props.navigation.navigate( 'BackupSeedWordsContent' )
+            props.navigation.navigate( 'BackupSeedWordsContent', {
+              from: props.navigation.getParam( 'from', '' )
+            } )
           }}
           onPressIgnore={() => setSeedBackupModal( false )}
           isIgnoreButton={true}

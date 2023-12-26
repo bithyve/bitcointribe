@@ -196,10 +196,12 @@ const BackupSeedWordsContent = ( props ) => {
               props.navigation.navigate( 'SeedBackupHistory', {
                 navigationParams,
                 isChangeKeeperType: true,
+                from: props.navigation.getParam( 'from', '' )
               } )
             } else {
               props.navigation.navigate( 'SeedBackupHistory', {
                 navigationParams,
+                from: props.navigation.getParam( 'from', '' )
                 // isChangeKeeperType: true,
               } )
             }

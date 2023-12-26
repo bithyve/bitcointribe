@@ -361,7 +361,7 @@ const SeedBackupHistory = ( props ) => {
           }}
           data={seedBackupHistory.length ? sortedHistory( seedBackupHistory ) : []}
           confirmButtonText={'Confirm'}
-          disableChange={false}
+          disableChange={props.navigation.getParam( 'from', '' ) === 'receive'}
           onPressReshare={() => {
             // ( cloudBackupBottomSheet as any ).current.snapTo( 1 )
           }}

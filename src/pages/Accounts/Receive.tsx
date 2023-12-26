@@ -413,7 +413,9 @@ export default function Receive( props ) {
                 dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
                 setOnKeeperButtonClick( true )
               }
-            } else props.navigation.navigate( 'WalletBackupAlert' )
+            } else props.navigation.navigate( 'WalletBackupAlert', {
+              from: 'receive'
+            } )
           }}
           onPressIgnore={() => setTimeout( () => { setBackupReminder( false ) }, 500 )}
           proceedButtonText={'Backup now'}
