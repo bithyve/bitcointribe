@@ -490,7 +490,7 @@ const SeedBackupHistory = ( props ) => {
         closeBottomSheet={() => setSeedBackupModal( false )}>
         <SeedBacupModalContents
           // title={'Backup using \nSeed Words'}
-          title={'Backup Phrase (Seed Words0)'}
+          title={'Backup Phrase (Seed Words)'}
           // info={'You will be shown 12 English words that you need to write down privately\n\nMake sure you keep them safe'}
           info={'Make sure you note down the twelve-word phrase in private and keep it secure.\n'}
           note={'If someone gets access to these, they can withdraw all the funds. If you lose them, you will not be able to restore the wallet.'}
