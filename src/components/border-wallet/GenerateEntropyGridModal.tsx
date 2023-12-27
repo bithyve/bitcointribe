@@ -102,7 +102,7 @@ export default function GenerateEntropyGridModal( props ) {
             }}
             style={{
               alignSelf: 'flex-end',
-              margin: 5
+              margin: 10
             }}
           >
             <LinearGradient colors={[ Colors.white, Colors.white ]}
@@ -201,8 +201,8 @@ const styles = StyleSheet.create( {
     fontWeight: 'bold'
   },
   buttonView: {
-    padding: 15,
-    width: 120,
+    padding: 10,
+    width: 100,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
