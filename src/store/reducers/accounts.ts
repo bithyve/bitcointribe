@@ -53,6 +53,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 import SyncStatus from '../../common/data/enums/SyncStatus'
 import { Account, Accounts, Gift } from '../../bitcoin/utilities/Interface'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
 
 export type AccountsState = {
   accountsSynched: boolean;
@@ -359,7 +360,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         state.accountShells.forEach( ( accountShell: AccountShell ) => {
           if (
             accountShell.primarySubAccount.sourceKind !==
-          SourceAccountKind.TEST_ACCOUNT
+          SourceAccountKind.TEST_ACCOUNT && accountShell.primarySubAccount.visibility !== AccountVisibility.HIDDEN
           )
             netBalance += AccountShell.getTotalBalance( accountShell )
         } )

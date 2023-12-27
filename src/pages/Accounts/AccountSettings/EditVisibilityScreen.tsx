@@ -8,7 +8,7 @@ import ListStyles from '../../../common/Styles/ListStyles'
 
 import VisibilityOptionsList from '../../../components/account-settings/visibility/VisibilityOptionsList'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
-import { updateAccountSettings } from '../../../store/actions/accounts'
+import { recomputeNetBalance, updateAccountSettings } from '../../../store/actions/accounts'
 import Fonts from '../../../common/Fonts'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import Colors from '../../../common/Colors'
@@ -55,6 +55,7 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
     dispatch( updateAccountSettings( {
       accountShell, settings
     } ) )
+    dispatch( recomputeNetBalance() )
     navigation.navigate( 'Home' )
   }
 
