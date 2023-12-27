@@ -7,6 +7,7 @@ import {
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
+import LinearGradient from 'react-native-linear-gradient'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { ScrollView } from 'react-native-gesture-handler'
@@ -22,7 +23,7 @@ export default function GenerateEntropyGridModal( props ) {
       ...styles.modalContainer, ...props.containerStyle
     }}>
       <View style={{
-        height: hp( 78 )
+        height: hp( 82 )
       }}>
         <TouchableOpacity
           activeOpacity={1}
@@ -94,6 +95,29 @@ export default function GenerateEntropyGridModal( props ) {
             </Text>
           </View>
         </ScrollView>
+        <View>
+          <TouchableOpacity
+            onPress={() => {
+              props.closeModal()
+            }}
+            style={{
+              alignSelf: 'flex-end',
+              margin: 5
+            }}
+          >
+            <LinearGradient colors={[ Colors.white, Colors.white ]}
+              start={{
+                x: 0, y: 0
+              }} end={{
+                x: 1, y: 0
+              }}
+              locations={[ 0.2, 1 ]}
+              style={styles.buttonView}
+            >
+              <Text style={styles.buttonText}>Next</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   )
@@ -175,5 +199,17 @@ const styles = StyleSheet.create( {
   },
   boldText:{
     fontWeight: 'bold'
-  }
+  },
+  buttonView: {
+    padding: 15,
+    width: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  buttonText: {
+    color: Colors.blue,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.Medium,
+  },
 } )

@@ -87,10 +87,10 @@ const CreateWithBorderWallet = ( props ) => {
                 mnemonic,
                 isAccountCreation,
               } ):
-              props.navigation.navigate( 'SelectEntropyGridType', {
-                mnemonic,
-                isAccountCreation,
-              } )
+                props.navigation.navigate( 'SelectEntropyGridType', {
+                  mnemonic,
+                  isAccountCreation,
+                } )
             }}
           >
             <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
