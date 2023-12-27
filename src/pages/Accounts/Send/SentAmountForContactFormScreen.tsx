@@ -266,11 +266,12 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
             ...ButtonStyles.primaryActionButton,
             marginRight: 8,
             backgroundColor: 'transparent',
+            opacity: !!sendingState.sendMaxFee || !selectedAmount ? 0.5 : 1
           }}
         >
           <Text style={{
             ...ButtonStyles.actionButtonText,
-            color: sendingState.sendMaxFee || !selectedAmount ? Colors.lightBlue: Colors.blue,
+            color: Colors.blue,
           }}>
             {strings.AddRecipient}
           </Text>
