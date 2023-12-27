@@ -761,9 +761,10 @@ const GiftDetails = ( { navigation } ) => {
         >
           <Text
             style={{
-              fontSize: RFValue( 14 ),
+              fontSize: RFValue( 12 ),
               color: Colors.black,
-              fontWeight: '400',
+              fontWeight: '300',
+              fontFamily: Fonts.Regular,
             }}
           >
             You have received gift from{' '}
