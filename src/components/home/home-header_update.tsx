@@ -58,6 +58,7 @@ import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
 import dbManager from '../../storage/realm/dbManager'
+import { windowHeight } from '../../common/data/responsiveness/responsive'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -295,7 +296,6 @@ const HomeHeader = ( {
         }}>{messageTwo}</Text></Text>} */}
     </TouchableOpacity>
   }
-
   useEffect( () => {
     const focusListener = navigation.addListener( 'didFocus', () => {
       getMessageToShow()
@@ -529,7 +529,7 @@ export default HomeHeader
 
 const styles = StyleSheet.create( {
   headerViewContainer: {
-    marginTop: hp( '3.6%' ),
+    marginTop: windowHeight<650 ? hp( '3.6%' ) : hp( '2.5%' ),
     marginLeft: wp( 3 ),
     marginRight: wp( 3 ),
   },
