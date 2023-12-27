@@ -129,7 +129,7 @@ const MoreOptionsStack = createStackNavigator(
     NodeSettings: {
       screen: NodeSettingsContainerScreen,
       navigationOptions: {
-        header: null,
+        title: 'Node Settings',
       },
     },
     FundingSources: {

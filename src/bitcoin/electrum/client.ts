@@ -49,11 +49,8 @@ let ELECTRUM_CLIENT: {
 export const ELECTRUM_NOT_CONNECTED_ERR =
   'Network Error: The current electrum node is not reachable, please try again with a different node'
 
-export const ELECTRUM_NOT_CONNECTED_ERR_TOR =
-  'Network Error: Connection currently failing over Tor, please disable Tor or try again using a different node'
 
 export default class ElectrumClient {
-  public static connectOverTor = false;
 
   public static async connect() {
     let timeoutId = null
@@ -68,6 +65,7 @@ export default class ElectrumClient {
           error: 'Unable to connect to any electrum server. Please switch network and try again!',
         }
       }
+
 
       ELECTRUM_CLIENT.electrumClient = new ElectrumCli(
         ( global as any ).net,
@@ -181,9 +179,7 @@ export default class ElectrumClient {
 
   public static checkConnection() {
     if ( !ELECTRUM_CLIENT.isClientConnected ) {
-      const connectionError = ElectrumClient.connectOverTor
-        ? ELECTRUM_NOT_CONNECTED_ERR_TOR
-        : ELECTRUM_NOT_CONNECTED_ERR
+      const connectionError = ELECTRUM_NOT_CONNECTED_ERR
       throw new Error( connectionError )
     }
   }

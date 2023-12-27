@@ -8,6 +8,7 @@ export const predefinedTestnetNodes: NodeDetail[] = [
     isConnected: false,
     useKeeperNode: false,
     useSSL: true,
+    isDefault: true,
   },
 ]
 
@@ -19,6 +20,7 @@ export const predefinedMainnetNodes: NodeDetail[] = [
     isConnected: false,
     useKeeperNode: false,
     useSSL: true,
+    isDefault: true,
   },
   {
     id: 445,
@@ -27,6 +29,7 @@ export const predefinedMainnetNodes: NodeDetail[] = [
     isConnected: false,
     useKeeperNode: false,
     useSSL: true,
+    isDefault: true,
   },
   {
     id: 446,
@@ -35,6 +38,7 @@ export const predefinedMainnetNodes: NodeDetail[] = [
     isConnected: false,
     useKeeperNode: false,
     useSSL: true,
+    isDefault: true,
   },
   {
     id: 447,
@@ -43,5 +47,6 @@ export const predefinedMainnetNodes: NodeDetail[] = [
     isConnected: false,
     useKeeperNode: false,
     useSSL: true,
+    isDefault: true,
   },
 ]
