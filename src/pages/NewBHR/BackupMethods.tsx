@@ -109,7 +109,7 @@ export default function BackupMethods( { navigation } ) {
       </View>
       <HeaderTitle
         firstLineTitle={strings.WalletBackup}
-        secondLineTitle={ backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus )}
+        secondLineTitle={ backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus, borderWalletBackup, wallet && wallet.borderWalletMnemonic !=='' )}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}

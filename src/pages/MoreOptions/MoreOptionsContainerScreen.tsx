@@ -9,13 +9,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ScrollView } from 'react-native-gesture-handler'
 import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
 import Node from '../../assets/images/svgs/node.svg'
-import Wallet from '../../assets/images/svgs/icon_settings.svg'
+import WalletIcon from '../../assets/images/svgs/icon_settings.svg'
 import AppInfo from '../../assets/images/svgs/icon_info.svg'
 import DocumentPad from '../../assets/images/svgs/icons_document_copy.svg'
 import QueActive from '../../assets/images/svgs/question_inactive.svg'
 import Telegram from '../../assets/images/svgs/icon_telegram.svg'
 import { LocalizationContext } from '../../common/content/LocContext'
-import { LevelData, LevelHealthInterface, KeeperType } from '../../bitcoin/utilities/Interface'
+import { LevelData, LevelHealthInterface, KeeperType, Wallet } from '../../bitcoin/utilities/Interface'
 import ModalContainer from '../../components/home/ModalContainer'
 import CrossButton from '../../assets/images/svgs/icons_close.svg'
 import { toggleClipboardAccess } from '../../store/actions/misc'
@@ -25,6 +25,7 @@ import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState
 import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import moment from 'moment'
+import dbManager from '../../storage/realm/dbManager'
 
 export type Props = {
   navigation: any;
@@ -53,6 +54,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
   const createWithKeeperStatus: CreateWithKeeperState  = useSelector( ( state ) => state.bhr.createWithKeeperStatus )
   const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
+  const borderWalletBackup  = useSelector( ( state ) => state.bhr.borderWalletBackup )
+  const wallet: Wallet =  dbManager.getWallet()
   const [ days, setDays ] = useState( 0 )
 
   const navigationObj: any = useSelector( ( state ) => state.bhr.navigationObj )
@@ -81,7 +84,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     // },
     {
       imageSource: require( '../../assets/images/icons/icon_info.png' ),
-      subtitle:  backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus ),
+      subtitle:  backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus, borderWalletBackup, wallet && wallet.borderWalletMnemonic !=='' ),
       title: bhrStrings[ 'WalletBackup' ],
       // screenName: 'WalletBackup',
       screenName: 'BackupMethods',
@@ -258,7 +261,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         case strings.node:
           return ( <Node /> )
         case strings.walletSettings:
-          return ( <Wallet /> )
+          return ( <WalletIcon /> )
         case strings.AppInfo:
           return ( <AppInfo /> )
         case bhrStrings[ 'WalletBackup' ]:
