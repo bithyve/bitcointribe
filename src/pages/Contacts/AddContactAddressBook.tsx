@@ -613,9 +613,9 @@ export default function AddContactAddressBook( props ) {
                       activeOpacity={0.1}
                     >
                       <RadioButton
-                        size={15}
-                        color={Colors.lightBlue}
-                        borderColor={Colors.white}
+                        size={selected ? 15 : 20}
+                        color={selected ? Colors.blue : Colors.gray1}
+                        borderColor={selected ? Colors.white :  Colors.backgroundColor}
                         isChecked={item.checked}
                         onpress={() => onContactSelect( index )}
                       />
