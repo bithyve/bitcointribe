@@ -19,7 +19,7 @@ export function backUpMessage( days, levelData, createWithKeeperStatus,
   // if( levelData[ 0 ].keeper1.shareType == '' )
   //   return 'Confirm Backup Phrase'
   if( borderWalletBackupStatus && borderWalletBackupStatus.status && borderWalletMnemonic  )
-    return 'Border Wallet backup confirmed'
+    return 'Border Wallet backed-up successfully'
   if ( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed' &&
     levelData[ 0 ].keeper1.status != 'notSetup' )
     return 'Wallet backup confirmed'
