@@ -22,8 +22,8 @@ const SendStack = createStackNavigator(
     SendConfirmation: {
       screen: AccountSendConfirmationContainerScreen,
       navigationOptions: {
-        title: 'Send Confirmation',
-
+        // title: 'Send Confirmation',
+        header: null
       },
     },
     OTPAuthentication: {

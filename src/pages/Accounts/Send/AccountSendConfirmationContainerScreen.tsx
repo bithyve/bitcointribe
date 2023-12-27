@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Dimensions } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Dimensions, SafeAreaView } from 'react-native'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -34,6 +35,8 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import HeadingAndSubHeading from '../../../components/HeadingAndSubHeading'
 import { AccountsState } from '../../../store/reducers/accounts'
 import LoaderModal from '../../../components/LoaderModal'
+import HeaderTitle from '../../../components/HeaderTitle'
+import CommonStyles from '../../../common/Styles/Styles'
 
 export type NavigationParams = {
 };
@@ -225,57 +228,84 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
 
   return (
-    <KeyboardAwareScrollView
-      resetScrollToCoords={{
-        x: 0, y: 0
-      }}
-      style={styles.rootContainer}
-    >
-      <ModalContainer onBackground={()=>setSuccess( false )} visible={sendSuccessModal} closeBottomSheet={() => {}} >
-        {showSendSuccessBottomSheet()}
-      </ModalContainer>
-      <ModalContainer onBackground={()=>setFailure( false )} visible={sendFailureModal} closeBottomSheet={() => {}} >
-        {showSendFailureBottomSheet()}
-      </ModalContainer>
-      <View style={{
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 24,
-        marginBottom: height > 720 ? heightPercentageToDP( '1%' ) : 0,
-        marginTop: height > 720 ? heightPercentageToDP( '2%' ) : 5,
-        flexWrap:'wrap'
-      }}>
-        <Text style={{
-          marginRight: RFValue( 4 )
+    <SafeAreaView style={{
+      flex: 1
+    }}>
+      <View style={CommonStyles.headerContainer}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            navigation.goBack()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <HeaderTitle
+        firstLineTitle={'Send Confirmation'}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{
+          x: 0, y: 0
+        }}
+        style={styles.rootContainer}
+      >
+        <ModalContainer onBackground={()=>setSuccess( false )} visible={sendSuccessModal} closeBottomSheet={() => {}} >
+          {showSendSuccessBottomSheet()}
+        </ModalContainer>
+        <ModalContainer onBackground={()=>setFailure( false )} visible={sendFailureModal} closeBottomSheet={() => {}} >
+          {showSendFailureBottomSheet()}
+        </ModalContainer>
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingHorizontal: 24,
+          marginBottom: height > 720 ? heightPercentageToDP( '1%' ) : 0,
+          marginTop: height > 720 ? heightPercentageToDP( '2%' ) : 5,
+          flexWrap:'wrap'
         }}>
-          {`${strings.SendingFrom}: `}
           <Text style={{
-            fontFamily: Fonts.Regular,
-            fontSize: RFValue( 11 ),
-            fontStyle: 'italic',
-            color: Colors.blue,
+            marginRight: RFValue( 4 )
           }}>
-            {sourceAccountHeadlineText}
+            {`${strings.SendingFrom}: `}
+            <Text style={{
+              fontFamily: Fonts.Regular,
+              fontSize: RFValue( 11 ),
+              fontStyle: 'italic',
+              color: Colors.blue,
+            }}>
+              {sourceAccountHeadlineText}
+            </Text>
           </Text>
-        </Text>
-      </View>
-      <View style={styles.headerSection}>
-        <SelectedRecipientsCarousel
-          recipients={selectedRecipients}
-          subAccountKind={sourcePrimarySubAccount.kind}
+        </View>
+        <View style={styles.headerSection}>
+          <SelectedRecipientsCarousel
+            recipients={selectedRecipients}
+            subAccountKind={sourcePrimarySubAccount.kind}
+          />
+        </View>
+        <SendConfirmationCurrentTotalHeader
+          Unit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
         />
-      </View>
-      <SendConfirmationCurrentTotalHeader
-        Unit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
-      />
 
-      <TransactionPriorityMenu
-        accountShell={sourceAccountShell}
-        bitcoinDisplayUnit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
-        onTransactionPriorityChanged={setTransactionPriority}
-      />
-      {selectedRecipients.length === 1 &&
+        <TransactionPriorityMenu
+          accountShell={sourceAccountShell}
+          bitcoinDisplayUnit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
+          onTransactionPriorityChanged={setTransactionPriority}
+        />
+        {selectedRecipients.length === 1 &&
       <>
         <HeadingAndSubHeading
           heading={common.addNote}
@@ -308,37 +338,38 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           />
         </View>
       </>
-      }
-      <View style={styles.footerSection}>
-        <TouchableOpacity
-          onPress={handleConfirmationButtonPress}
-          style={handleButton ? ButtonStyles.primaryActionButton : ButtonStyles.disabledNewPrimaryActionButton}
-        >
-          <Text style={ButtonStyles.actionButtonText}>{strings.ConfirmSend}</Text>
-        </TouchableOpacity>
+        }
+        <View style={styles.footerSection}>
+          <TouchableOpacity
+            onPress={handleConfirmationButtonPress}
+            style={handleButton ? ButtonStyles.primaryActionButton : ButtonStyles.disabledNewPrimaryActionButton}
+          >
+            <Text style={ButtonStyles.actionButtonText}>{strings.ConfirmSend}</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={handleBackButtonPress}
-          style={{
-            ...ButtonStyles.primaryActionButton,
-            marginRight: 8,
-            backgroundColor: 'transparent',
-          }}
-        >
-          <Text style={{
-            ...ButtonStyles.actionButtonText,
-            color: Colors.blue,
-          }}>
-            {common.back}
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <ModalContainer visible={!handleButton} closeBottomSheet = {()=>{}} onBackground = {()=>{}}>
-        <LoaderModal
-          headerText={'Sending...'}
-        />
-      </ModalContainer>
-    </KeyboardAwareScrollView>
+          <TouchableOpacity
+            onPress={handleBackButtonPress}
+            style={{
+              ...ButtonStyles.primaryActionButton,
+              marginRight: 8,
+              backgroundColor: 'transparent',
+            }}
+          >
+            <Text style={{
+              ...ButtonStyles.actionButtonText,
+              color: Colors.blue,
+            }}>
+              {common.back}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <ModalContainer visible={!handleButton} closeBottomSheet = {()=>{}} onBackground = {()=>{}}>
+          <LoaderModal
+            headerText={'Sending...'}
+          />
+        </ModalContainer>
+      </KeyboardAwareScrollView>
+    </SafeAreaView>
   )
 }
 
