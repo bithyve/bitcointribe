@@ -484,7 +484,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                     {findImage( menuOption.title )}
                   </View>
                   <View style={{
-                    justifyContent: 'center', marginLeft: 10
+                    justifyContent: 'center', marginLeft: 10,
+                    width: '90%'
                   }}>
                     <Text style={styles.addModalTitleText}>{menuOption.title}</Text>
                     <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
@@ -757,7 +758,7 @@ const styles = StyleSheet.create( {
     color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
     fontSize: RFValue( 11 ),
     marginTop: 5,
-    fontFamily: Fonts.Regular
+    fontFamily: Fonts.Regular,
   },
 
   modalElementInfoView: {
