@@ -25,7 +25,7 @@ import { APP_STAGE } from '../common/interfaces/Interfaces'
 
 class HexaConfig {
   //RAMP details
-  public RAMP_BASE_URL: string = Config.RAMP_BASE_URL ? Config.RAMP_BASE_URL.trim() : 'https://buy.ramp.network/'
+  public RAMP_BASE_URL: string = Config.RAMP_BASE_URL ? Config.RAMP_BASE_URL.trim() : 'https://app.ramp.network/'
   public RAMP_REFERRAL_CODE: string = Config.RAMP_REFERRAL_CODE ? Config.RAMP_REFERRAL_CODE.trim() : 'ku67r7oh5juc27bmb3h5pek8y5heyb5bdtfa66pr'
   //SWAN details
   public SWAN_CLIENT_ID:string = Config.SWAN_CLIENT_ID || 'hexa'
