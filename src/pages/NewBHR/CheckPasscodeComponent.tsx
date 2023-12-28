@@ -336,6 +336,7 @@ export default function CheckPasscodeComponent( props ) {
           }}>
             <TouchableOpacity
               disabled={passcode.length !==4}
+              activeOpacity={0.6}
               onPress={() => {
                 setCheckAuth( false )
                 setTimeout( () => {

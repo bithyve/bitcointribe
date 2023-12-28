@@ -672,7 +672,9 @@ render() {
           step={''}
         />
 
-        <View>
+        <View style={{
+          marginTop: 20
+        }}>
           {!!createAccountError &&
                         implementation === 'lndhub' &&
                         !loading && (

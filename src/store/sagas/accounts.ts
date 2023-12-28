@@ -117,6 +117,7 @@ import RESTUtils from '../../utils/ln/RESTUtils'
 import { Alert } from 'react-native'
 import { ELECTRUM_NOT_CONNECTED_ERR } from '../../bitcoin/electrum/client'
 import { setElectrumNotConnectedErr } from '../actions/nodeSettings'
+import BorderWalletSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/BorderWalletSubAccount'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {

@@ -84,6 +84,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
 
   const [ showMore, setShowMore ] = useState( false )
   const [ bwShowMore, setBWShowMore ] = useState( false )
+  const isBorderWallet = primarySubAccount.type === AccountType.BORDER_WALLET
 
   const isRefreshing = useMemo( () => {
     return ( accountShell.syncStatus===SyncStatus.IN_PROGRESS )
