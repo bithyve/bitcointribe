@@ -357,7 +357,7 @@ const SeedBackupHistory = ( props ) => {
 
             setTimeout( () => {
               setConfirmSeedWordModal( true )
-            }, 500 )
+            }, 1000 )
           }}
           data={seedBackupHistory.length ? sortedHistory( seedBackupHistory ) : []}
           confirmButtonText={'Confirm'}
