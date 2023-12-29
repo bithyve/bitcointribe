@@ -461,7 +461,6 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
     marginBottom: heightPercentageToDP( '5%' ),
   },
   proceedButtonText: {
