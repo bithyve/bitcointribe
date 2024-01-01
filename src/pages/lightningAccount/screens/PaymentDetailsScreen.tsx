@@ -18,7 +18,7 @@ export default class PaymentDetailsScreen extends Component {
   constructor( props ) {
     super( props )
     this.state = {
-      payment: this.props.navigation.getParam( 'payment' ),
+      payment: props.route.params?.payment,
     }
   }
 

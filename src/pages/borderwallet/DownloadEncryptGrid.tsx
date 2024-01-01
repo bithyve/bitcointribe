@@ -29,9 +29,10 @@ import { hp, wp } from '../../common/data/responsiveness/responsive'
 
 
 const DownloadEncryptGrid = ( props ) => {
-  const mnemonic = props.navigation.getParam( 'mnemonic' )
-  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
-  const gridType = props.navigation.getParam( 'gridType' ) || GridType.WORDS
+  const mnemonic = props.route.params?.mnemonic
+  const isAccountCreation = props.route.params?.isAccountCreation
+  const gridType = props.route.params?.gridType || GridType.WORDS
+
   const [ headerTitle ] = useState( 'Download grid (optional)' )
 
   useEffect( () => {

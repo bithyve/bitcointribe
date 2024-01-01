@@ -1,33 +1,32 @@
-import React, { useState, useEffect } from 'react'
-import {
-  View,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  SafeAreaView,
-  StatusBar,
-  Platform
-} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import Colors from '../../common/Colors'
-import QuestionList from '../../common/QuestionList'
-import Fonts from '../../common/Fonts'
+import React, { useEffect, useState } from 'react'
+import {
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import KnowMoreButton from '../../components/KnowMoreButton'
-import { useDispatch, useSelector } from 'react-redux'
-import { initializeRecovery } from '../../store/actions/setupAndAuth'
-import commonStyle from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import QuestionList from '../../common/QuestionList'
+import commonStyle from '../../common/Styles/Styles'
+import { initializeRecovery } from '../../store/actions/setupAndAuth'
 
 export default function RecoveryQuestionScreen( props ) {
-  const walletName = props.navigation.getParam( 'walletName' )
+  const walletName = props.route.params?.walletName
   const dispatch = useDispatch()
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
@@ -142,6 +141,7 @@ export default function RecoveryQuestionScreen( props ) {
                   <ScrollView>
                     {dropdownBoxList.map( ( value, index ) => (
                       <TouchableOpacity
+                        key={value.id}
                         onPress={() => {
                           setDropdownBoxValue( value )
                           setDropdownBoxOpenClose( false )

@@ -48,12 +48,17 @@ import ToggleContainer from './CurrencyToggle'
 
 const listItemKeyExtractor = ( item ) => item.id
 
+export type Props = {
+    route:any;
+    navigation: any;
+  };
+
 const ManageGifts = ( props ) => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
   const { navigation } = props
-  const giftScreenNav = navigation.getParam( 'giftType' )
+  const giftScreenNav = props.route.params?.giftType
   const [ timer, setTimer ] = useState( true )
   // const [ giftDetails, showGiftDetails ] = useState( false )
   // const [ giftInfo, setGiftInfo ] = useState( null )
@@ -255,8 +260,8 @@ const ManageGifts = ( props ) => {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>

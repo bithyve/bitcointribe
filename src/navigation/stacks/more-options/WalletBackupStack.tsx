@@ -1,5 +1,5 @@
 import React from 'react'
-import { createStackNavigator } from 'react-navigation-stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { translations } from '../../../common/content/LocContext'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
@@ -23,101 +23,64 @@ import AccountSendConfirmationContainerScreen from '../../../pages/Accounts/Send
 import OTPAuthenticationScreen from '../../../pages/Accounts/Send/OTPAuthentication'
 import CheckPasscodeComponent from '../../../pages/NewBHR/CheckPasscodeComponent'
 
-const strings  = translations[ 'stackTitle' ]
-
-const WalletBackupStack = createStackNavigator(
-  {
-    SeedBackupHistory: {
-      screen: SeedBackupHistory,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    WalletBackup: {
-      screen: WalletBackup,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    SecondaryDeviceHistoryNewBHR,
-    TrustedContactHistoryNewBHR,
-    RestoreSeedWordsContent,
-    BackupSeedWordsContent: {
-      screen: BackupSeedWordsContent,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    TrustedContactNewBHR,
-    SetNewPassword: {
-      screen: SetNewPassword,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    CloudBackupHistory: {
-      screen: CloudBackupHistory,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    PersonalCopyHistoryNewBHR,
-    SecurityQuestionHistoryNewBHR,
-    AccountSend: {
-      screen: AccountSendContainerScreen,
-    },
-    TwoFAValidation,
-    TwoFASetup: {
-      screen: TwoFASetup,
-      navigationOptions: {
-        gesturesEnabled: false,
-        header: null
-      },
-    },
-    AccountDetails: {
-      screen: AccountDetailsStack,
-      navigationOptions: {
-        header: null,
-        // tabBarVisibl
-      },
-    },
-    SentAmountForContactForm: {
-      screen: SentAmountForContactFormScreen,
-      navigationOptions: {
+const Stack = createNativeStackNavigator()
+const WalletBackupStack = () => {
+  return (
+    <Stack.Navigator
+      initialRouteName='SeedBackupHistory'
+      screenOptions={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerLeft: () => {
+            return <SmallNavHeaderBackButton onPress={() => { navigation.goBack() }} />
+          },
+        }
+      }}
+    >
+      <Stack.Screen name="SeedBackupHistory" component={SeedBackupHistory} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="WalletBackup" component={WalletBackup} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="SecondaryDeviceHistoryNewBHR" component={SecondaryDeviceHistoryNewBHR} />
+      <Stack.Screen name="TrustedContactHistoryNewBHR" component={TrustedContactHistoryNewBHR} />
+      <Stack.Screen name="RestoreSeedWordsContent" component={RestoreSeedWordsContent} />
+      <Stack.Screen name="BackupSeedWordsContent" component={BackupSeedWordsContent} options={{
+        headerShown: false
+      }}/>
+      <Stack.Screen name="TrustedContactNewBHR" component={TrustedContactNewBHR} />
+      <Stack.Screen name="SetNewPassword" component={SetNewPassword} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="CloudBackupHistory" component={CloudBackupHistory} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="PersonalCopyHistoryNewBHR" component={PersonalCopyHistoryNewBHR}  />
+      <Stack.Screen name="SecurityQuestionHistoryNewBHR" component={SecurityQuestionHistoryNewBHR}  />
+      <Stack.Screen name="AccountSend" component={AccountSendContainerScreen}  />
+      <Stack.Screen name="TwoFAValidation" component={TwoFAValidation}  />
+      <Stack.Screen name="TwoFASetup" component={TwoFASetup} options={{
+        headerShown: false,
+        gestureEnabled:false
+      }} />
+      <Stack.Screen name="AccountDetails" component={AccountDetailsStack} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="SentAmountForContactForm" component={SentAmountForContactFormScreen} options={{
         title: 'Send To'
-      },
-    },
-    SendConfirmation: {
-      screen: AccountSendConfirmationContainerScreen,
-      navigationOptions: {
+      }} />
+      <Stack.Screen name="SendConfirmation" component={AccountSendConfirmationContainerScreen} options={{
         title: 'Send Confirmation',
-
-      },
-    },
-    OTPAuthentication: {
-      screen: OTPAuthenticationScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    CheckPasscode:{
-      screen: CheckPasscodeComponent,
-      navigationOptions:{
-        header:null
-      }
-    }
-  },
-  {
-    initialRouteName: 'SeedBackupHistory',
-    defaultNavigationOptions: ( { navigation } ) => {
-      return {
-        ...defaultStackScreenNavigationOptions,
-        headerLeft: () => {
-          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-        },
-      }
-    },
-  },
-)
+      }} />
+      <Stack.Screen name="OTPAuthentication" component={OTPAuthenticationScreen} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="CheckPasscode" component={CheckPasscodeComponent} options={{
+        headerShown: false,
+      }} />
+    </Stack.Navigator>
+  )
+}
 
 export default WalletBackupStack

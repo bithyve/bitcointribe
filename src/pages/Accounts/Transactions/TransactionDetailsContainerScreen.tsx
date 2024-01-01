@@ -1,42 +1,35 @@
-import React, { useMemo, useEffect, useCallback, useState } from 'react'
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import React, { useCallback, useEffect } from 'react'
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
 
+import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
+import { Account, AccountType, TransactionType } from '../../../bitcoin/utilities/Interface'
+import Colors from '../../../common/Colors'
+import { translations } from '../../../common/content/LocContext'
 import { displayNameForBitcoinUnit } from '../../../common/data/enums/BitcoinUnit'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import TransactionKind from '../../../common/data/enums/TransactionKind'
 import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces'
 import ListStyles from '../../../common/Styles/ListStyles'
 import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
+import { markReadTx } from '../../../store/actions/accounts'
+import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForTransaction'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
-import TransactionDetailsHeader from './TransactionDetailsHeader'
 import openLink from '../../../utils/OpenLink'
-import config from '../../../bitcoin/HexaConfig'
-import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
-import Colors from '../../../common/Colors'
-import Fonts from '../../../common/Fonts'
-import { useSelector, useDispatch } from 'react-redux'
-import { markReadTx } from '../../../store/actions/accounts'
-import { update } from '../../../storage/database'
-import { Account, AccountType, TransactionType } from '../../../bitcoin/utilities/Interface'
-import { translations } from '../../../common/content/LocContext'
-import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForTransaction'
-import { widthPercentageToDP } from 'react-native-responsive-screen'
-import HeaderTitle from '../../../components/HeaderTitle'
-import CommonStyles from '../../../common/Styles/Styles'
+import TransactionDetailsHeader from './TransactionDetailsHeader'
 
 export type Props = {
   navigation: any;
+  route: any;
 };
 
 
-const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
   const dispatch = useDispatch()
-  const transaction: TransactionDescribing = navigation.getParam( 'transaction' )
-  const accountShellID: SubAccountKind = navigation.getParam( 'accountShellID' )
+  const transaction: TransactionDescribing = route.params?.transaction
+  const accountShellID: SubAccountKind = route.params?.accountShellID
   const accountShell = useAccountShellForID( accountShellID )
   const common = translations[ 'common' ]
   const strings = translations[ 'stackTitle' ]
@@ -92,33 +85,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
   }, [ transaction.transactionType ] )
 
   return (
-    <SafeAreaView style={{
-      flex: 1
-    }}>
-      <View style={CommonStyles.headerContainer}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
-      <HeaderTitle
-        firstLineTitle={strings[ 'Transaction Details' ]}
-        secondLineTitle={''}
-        infoTextNormal={''}
-        infoTextBold={''}
-        infoTextNormal1={''}
-        step={''}
-      />
+    <SafeAreaView>
       <ScrollView contentContainerStyle={styles.rootContainer} overScrollMode="never" bounces={false}>
         <View style={{
           marginVertical: 10
@@ -128,7 +95,9 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
             accountShellID={accountShellID}
           />
         </View>
+
         <View style={styles.bodySection}>
+
           <View style={styles.lineItem}>
             <Text style={ListStyles.listItemTitleTransaction}>{common.amount}</Text>
 
@@ -149,6 +118,94 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
               }}
             />
           </View>
+
+          {
+            ( transaction.receivers &&
+            transaction.receivers.length > 1
+            ) && (
+              <View style={styles.lineItem}>
+                <Text style={ListStyles.listItemTitleTransaction}>{common.recipients}</Text>
+                {
+                  transaction.receivers.map( ( rec, index ) => (
+                    <View key={index} style={styles.containerRec}>
+                      {
+                        getAvatarForSubAccount( primarySubAccount, false, true, true, transaction )
+                      }
+                      <Text style={[ ListStyles.listItemSubtitle, {
+                        flex: 1,
+                        marginLeft: widthPercentageToDP( 2 )
+                      } ]}>
+                        {`${rec.name ? rec.name : transaction.recipientAddresses[ index ]}`}</Text>
+                      <LabeledBalanceDisplay
+                        balance={rec.amount}
+                        isTestAccount={primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT}
+                        unitTextStyle={{
+                          ...ListStyles.listItemSubtitle,
+                        // marginBottom: 3
+                        }}
+                        amountTextStyle={{
+                          ...ListStyles.listItemSubtitle,
+                          // marginBottom: -3,
+                          marginLeft: 2,
+
+                        }}
+                        currencyImageStyle={{
+                        // marginBottom: -3
+                        }}
+                      />
+                    </View>
+                  ) )
+                }
+
+              </View>
+            )
+          }
+
+          <View style={styles.lineItem}>
+            <Text style={ListStyles.listItemTitleTransaction}>{common.TransactionID}</Text>
+            <Text style={ListStyles.listItemSubtitle} onPress={() =>
+              openLink(
+                `https://blockstream.info${transaction.accountType === AccountType.TEST_ACCOUNT ? '/testnet' : ''
+                }/tx/${transaction.txid}`,
+              )}>{transaction.txid}</Text>
+          </View>
+
+          <View style={styles.lineItem}>
+            <Text style={ListStyles.listItemTitleTransaction}>{destinationHeadingText()}</Text>
+            <Text style={ListStyles.listItemSubtitle}>{destinationAddressText()}</Text>
+          </View>
+
+          <View style={styles.lineItem}>
+            <Text style={ListStyles.listItemTitleTransaction}>{common.fees}</Text>
+            {/* <Text style={ListStyles.listItemSubtitle}>{feeText()}</Text> */}
+            <LabeledBalanceDisplay
+              balance={Number( transaction.fee )}
+              isTestAccount={primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT}
+              unitTextStyle={{
+                ...ListStyles.listItemSubtitle,
+              // marginBottom: 1
+              }}
+              amountTextStyle={{
+                ...ListStyles.listItemSubtitle,
+                // marginBottom: -3,
+                marginLeft: 2
+              }}
+              currencyImageStyle={{
+              // marginBottom: -3
+              }}
+            />
+          </View>
+
+          <View style={styles.lineItem}>
+            <Text style={ListStyles.listItemTitleTransaction}>{common.confirmations}</Text>
+            <Text style={ListStyles.listItemSubtitle}>{confirmationsText()}</Text>
+          </View>
+
+          {/* {transaction.notes ?
+          <View style={styles.lineItem}>
+            <Text style={ListStyles.listItemTitleTransaction}>{common.note}</Text>
+            <Text style={ListStyles.listItemSubtitle}>{transaction.notes}</Text>
+          </View> */}
 
           {
             ( transaction.receivers &&

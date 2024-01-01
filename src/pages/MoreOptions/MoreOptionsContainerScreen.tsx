@@ -1,31 +1,30 @@
-import React, { useState, useContext, useEffect } from 'react'
-import { View, Text, StyleSheet, Linking, FlatList, Image, TouchableOpacity, StatusBar, ImageSourcePropType, Dimensions, Switch } from 'react-native'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import { useDispatch, useSelector } from 'react-redux'
-import { ScrollView } from 'react-native-gesture-handler'
-import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
-import Node from '../../assets/images/svgs/node.svg'
-import WalletIcon from '../../assets/images/svgs/icon_settings.svg'
-import AppInfo from '../../assets/images/svgs/icon_info.svg'
-import DocumentPad from '../../assets/images/svgs/icons_document_copy.svg'
-import QueActive from '../../assets/images/svgs/question_inactive.svg'
-import Telegram from '../../assets/images/svgs/icon_telegram.svg'
-import { LocalizationContext } from '../../common/content/LocContext'
-import { LevelData, LevelHealthInterface, KeeperType, Wallet } from '../../bitcoin/utilities/Interface'
-import ModalContainer from '../../components/home/ModalContainer'
-import CrossButton from '../../assets/images/svgs/icons_close.svg'
-import { toggleClipboardAccess } from '../../store/actions/misc'
-import { onPressKeeper } from '../../store/actions/BHR'
-import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
-import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
-import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import moment from 'moment'
+import React, { useContext, useEffect, useState } from 'react'
+import { Dimensions, FlatList, Image, ImageSourcePropType, Linking, StatusBar, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
+import CrossButton from '../../assets/images/svgs/icons_close.svg'
+import DocumentPad from '../../assets/images/svgs/icons_document_copy.svg'
+import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
+import AppInfo from '../../assets/images/svgs/icon_info.svg'
+import WalletIcon from '../../assets/images/svgs/icon_settings.svg'
+import Telegram from '../../assets/images/svgs/icon_telegram.svg'
+import Node from '../../assets/images/svgs/node.svg'
+import QueActive from '../../assets/images/svgs/question_inactive.svg'
+import { LevelData, LevelHealthInterface, Wallet } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
+import { LocalizationContext } from '../../common/content/LocContext'
+import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
+import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
+import Fonts from '../../common/Fonts'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import ModalContainer from '../../components/home/ModalContainer'
 import dbManager from '../../storage/realm/dbManager'
+import { toggleClipboardAccess } from '../../store/actions/misc'
 
 export type Props = {
   navigation: any;
@@ -384,10 +383,9 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   return (
     <View style={{
-      backgroundColor: Colors.darkBlue
+      backgroundColor: Colors.blue
     }}>
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-      {/* <Header from={'More'} /> */}
       <ModalContainer visible={modalVisible} closeBottomSheet={() => setModalVisible( false )}>
         {ReadClipboardModal()}
       </ModalContainer>
@@ -554,7 +552,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              Linking.openURL( 'https://t.me/bitcoinTribe_' )
+              Linking.openURL( 'https://t.me/BitcoinTribeSupport' )
                 .then( ( _data ) => { } )
                 .catch( ( _error ) => {
                   alert( 'Make sure Telegram installed on your device' )
@@ -605,7 +603,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           />
 
           <AppBottomSheetTouchableWrapper
-            onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
+            onPress={() => openLink( 'https://bitcointribe.app/terms-of-service/' )}
           >
             <Text style={styles.addModalTitleText}>Terms of Service</Text>
           </AppBottomSheetTouchableWrapper>

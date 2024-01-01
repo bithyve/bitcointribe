@@ -1,27 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as bitcoinJS from 'bitcoinjs-lib'
-import {
-  DerivativeAccount,
-  DerivativeAccounts,
-  TrustedContactDerivativeAccount,
-  DonationDerivativeAccount,
-  SwanDerivativeAccount,
-  RampDerivativeAccount,
-  WyreDerivativeAccount,
-  AccountType,
-  NetworkType,
-} from './utilities/Interface'
+import _ from 'lodash'
 import Config from 'react-native-config'
 import {
   DONATION_ACCOUNT,
-  SUB_PRIMARY_ACCOUNT,
-  WYRE,
   RAMP,
-  SWAN
+  SUB_PRIMARY_ACCOUNT,
+  SWAN,
+  WYRE
 } from '../common/constants/wallet-service-types'
 import PersonalNode from '../common/data/models/PersonalNode'
-import _ from 'lodash'
 import { APP_STAGE } from '../common/interfaces/Interfaces'
+import {
+  AccountType,
+  DerivativeAccount,
+  DerivativeAccounts,
+  DonationDerivativeAccount,
+  NetworkType,
+  RampDerivativeAccount,
+  SwanDerivativeAccount,
+  TrustedContactDerivativeAccount,
+  WyreDerivativeAccount,
+} from './utilities/Interface'
 
 class HexaConfig {
   //RAMP details

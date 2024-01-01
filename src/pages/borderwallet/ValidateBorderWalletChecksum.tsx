@@ -29,8 +29,8 @@ import ModalContainer from '../../components/home/ModalContainer'
 const wordlists = bip39.wordlists.english
 
 const ValidateBorderWalletChecksum = ( props ) => {
-  const words = props.navigation.getParam( 'words' )
-  const mnemonic = props.navigation.getParam( 'mnemonic' )
+  const words = props.route.params?.words
+  const mnemonic = props.route.params?.mnemonic
   const [ checksums, setChecksums ] = useState( [] )
   const [ headerTitle ] = useState( 'Select Checksum Word' )
   const [ checksumWord, setChecksumWord ] = useState( 'Select checksum word' )

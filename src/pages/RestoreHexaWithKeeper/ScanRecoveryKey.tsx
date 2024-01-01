@@ -20,7 +20,6 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import {
   fetchEphemeralChannel,
@@ -36,6 +35,7 @@ interface ScanRecoveryKeyStateTypes {
 
 interface ScanRecoveryKeyPropsTypes {
   navigation: any;
+  route: any;
   walletName: any;
 }
 
@@ -53,7 +53,7 @@ class ScanRecoveryKey extends Component<
   barcodeRecognized = async ( barcodes ) => {
     const barcode = getFormattedStringFromQRString( barcodes.data )
     //console.log("barcodes1", barcode);
-    this.props.navigation.state.params.scannedData( JSON.parse( barcode ) )
+    this.props.route.params?.scannedData( JSON.parse( barcode ) )
     this.props.navigation.goBack()
     if ( barcode ) {
       this.setState( {
@@ -84,8 +84,8 @@ class ScanRecoveryKey extends Component<
               style={styles.headerBackArrowView}
             >
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </TouchableOpacity>
@@ -125,7 +125,7 @@ class ScanRecoveryKey extends Component<
               }}>
                 Recovering Wallet
               </Text>
-              { this.props.walletName || this.props.navigation.state.params.walletName ? <Text style={styles.greyBoxText}>{`${this.props.walletName ? this.props.walletName : this.props.navigation.state.params.walletName ? this.props.navigation.state.params.walletName : ''}` + '’s Wallet'}</Text> : null }
+              { this.props.walletName || this.props.route.params?.walletName ? <Text style={styles.greyBoxText}>{`${this.props.walletName ? this.props.walletName : this.props.route.params?.walletName ? this.props.route.params.walletName : ''}` + '’s Wallet'}</Text> : null }
 
             </View>
           </View>
@@ -323,11 +323,10 @@ const mapStateToProps = ( state ) => {
   }
 }
 
-export default withNavigationFocus(
-  connect( mapStateToProps, {
-    fetchEphemeralChannel,
-  } )( ScanRecoveryKey ),
-)
+export default
+connect( mapStateToProps, {
+  fetchEphemeralChannel,
+} )( ScanRecoveryKey )
 
 const styles = StyleSheet.create( {
   modalHeaderTitleView: {

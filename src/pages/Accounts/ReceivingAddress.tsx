@@ -39,10 +39,10 @@ import idx from 'idx'
 
 const ReceivingAddress = ( props ) => {
   const [ AsTrustedContact, setAsTrustedContact ] = useState( false )
-  const getServiceType = props.navigation.state.params.getServiceType
-    ? props.navigation.state.params.getServiceType
+  const getServiceType = props.route.params?.getServiceType
+    ? props.route.params?.getServiceType
     : null
-  const serviceType = props.navigation.getParam( 'serviceType' )
+  const serviceType = props.route.params?.serviceType
   const [ ReceiveHelperBottomSheet ] = useState(
     React.createRef(),
   )
@@ -103,7 +103,7 @@ const ReceivingAddress = ( props ) => {
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
-          if ( props.navigation.getParam( 'serviceType' ) == TEST_ACCOUNT ) {
+          if ( props.route.params?.serviceType == TEST_ACCOUNT ) {
             if ( ReceiveHelperBottomSheet.current )
               ( ReceiveHelperBottomSheet as any ).current.snapTo( 0 )
             props.navigation.navigate( 'ReceivingAddress', {
@@ -287,8 +287,8 @@ const ReceivingAddress = ( props ) => {
                 }}
               >
                 <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                  name="long-arrow-left"
+                  color={Colors.homepageButtonColor}
                   size={17}
                 />
               </TouchableOpacity>

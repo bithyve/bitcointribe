@@ -1,79 +1,114 @@
-import { NavigationActions, StackActions } from 'react-navigation'
-
-
+import { CommonActions } from '@react-navigation/native'
 
 export const goHomeAction = ( ) => {
-  const resetAction = StackActions.reset( {
+  return CommonActions.reset( {
     index: 0,
-    actions: [
-      NavigationActions.navigate( {
-        routeName: 'Landing'
-      } )
-    ],
+    routes: [ {
+      name: 'Home',
+      key: 'HomeKey'
+    } ],
   } )
-
-  return resetAction
 }
-
 
 export const resetToHomeAction = ( params = {
 } ) => {
-  return  NavigationActions.navigate( {
-    routeName: 'Home',
+  return CommonActions.navigate( {
+    name: 'Home',
     params,
   } )
 }
 
 export const resetStackToAccountDetails = ( params ) => {
-  return StackActions.reset( {
+  return CommonActions.reset( {
     index: 0,
-    actions: [
-      NavigationActions.navigate( {
-        routeName: 'Landing',
-        action: NavigationActions.navigate( {
-          routeName: 'AccountDetails',
-          params,
-        } ),
-      } ),
-    ],
+    routes: [ {
+      name: 'Home',
+      key: 'HomeKey',
+      state: {
+        index: 1,
+        routes: [
+          {
+            name: 'Home',
+            key: 'HomeKey2'
+          },
+          {
+            name: 'AccountDetails',
+            key: 'AccountDetailsKey',
+            params
+          }
+        ]
+      }
+    } ],
   } )
 }
 
 export const resetStackToAccountDetailsSendScreen = ( params ) => {
-  return StackActions.reset( {
+  return CommonActions.reset( {
     index: 0,
-    actions: [
-      NavigationActions.navigate( {
-        routeName: 'Landing',
-        action: NavigationActions.navigate( {
-          routeName: 'AccountDetails',
-          action: NavigationActions.navigate( {
-            routeName: 'Send',
-            params,
-          } ),
-        } ),
-      } ),
-    ],
+    routes: [ {
+      name: 'Home',
+      key: 'HomeKey',
+      state: {
+        index: 1,
+        routes: [
+          {
+            name: 'Home',
+            key: 'HomeKey2'
+          },
+          {
+            name: 'AccountDetails',
+            key: 'AccountDetailsKey',
+            state: {
+              routes: [
+                {
+                  name: 'Send',
+                  key: 'SendKey',
+                  params
+                }
+              ]
+            }
+          }
+        ]
+      }
+    } ],
   } )
 }
 
 export const resetStackToSend = ( params ) => {
-  return StackActions.reset( {
+  return CommonActions.reset( {
     index: 0,
-    actions: [
-      NavigationActions.navigate( {
-        routeName: 'Landing',
-        action:NavigationActions.navigate( {
-          routeName: 'AccountDetails',
-          action: NavigationActions.navigate( {
-            routeName: 'Send',
-            action: NavigationActions.navigate( {
-              routeName: 'SentAmountForContactForm',
-              params,
-            } ),
-          } ),
-        } ),
-      } )
-    ]
+    routes: [ {
+      name: 'Home',
+      key: 'HomeKey',
+      state: {
+        index: 1,
+        routes: [
+          {
+            name: 'Home',
+            key: 'HomeKey2'
+          },
+          {
+            name: 'AccountDetails',
+            key: 'AccountDetailsKey',
+            state: {
+              routes: [
+                {
+                  name: 'Send',
+                  key: 'SendKey',
+                  state: {
+                    routes: [
+                      {
+                        name: 'SentAmountForContactForm',
+                        params,
+                      },
+                    ],
+                  },
+                }
+              ]
+            }
+          }
+        ]
+      }
+    } ],
   } )
 }

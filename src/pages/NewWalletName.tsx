@@ -1,50 +1,40 @@
-import React, { useContext, useState, createRef, useEffect, useCallback } from 'react'
+import BottomSheet from '@gorhom/bottom-sheet'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { CommonActions } from '@react-navigation/native'
+import React, { createRef, useCallback, useContext, useEffect, useState } from 'react'
 import {
-  StyleSheet,
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  ScrollView,
-  StatusBar,
-  Text,
-  Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
   TextInput,
-  InteractionManager,
-  Keyboard,
+  TouchableOpacity,
+  View
 } from 'react-native'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Fonts from '../common/Fonts'
-import Colors from '../common/Colors'
-import CommonStyles from '../common/Styles/Styles'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
 import DeviceInfo from 'react-native-device-info'
-import HeaderTitle1 from '../components/HeaderTitle1'
-import BottomInfoBox from '../components/BottomInfoBox'
-import Entypo from 'react-native-vector-icons/Entypo'
-import { updateCloudPermission } from '../store/actions/BHR'
-import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
-import BottomSheet from '@gorhom/bottom-sheet'
-import { BottomSheetView } from '@gorhom/bottom-sheet'
-import defaultBottomSheetConfigs from '../common/configs/BottomSheetConfigs'
-import { Easing } from 'react-native-reanimated'
-import BottomSheetBackground from '../components/bottom-sheets/BottomSheetBackground'
-import ModalContainer from '../components/home/ModalContainer'
-import { LocalizationContext } from '../common/content/LocContext'
-import { useDispatch, useSelector } from 'react-redux'
-import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAuth'
-import { setVersion } from '../store/actions/versionHistory'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { initNewBHRFlow } from '../store/actions/BHR'
-import LoaderModal from '../components/LoaderModal'
 import LinearGradient from 'react-native-linear-gradient'
-import BorderWalletSuccessModal from '../components/border-wallet/BorderWalletSuccessModal'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { useDispatch, useSelector } from 'react-redux'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import CommonStyles from '../common/Styles/Styles'
+import { LocalizationContext } from '../common/content/LocContext'
+import BottomInfoBox from '../components/BottomInfoBox'
+import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
+import HeaderTitle1 from '../components/HeaderTitle1'
+import LoaderModal from '../components/LoaderModal'
+import ModalContainer from '../components/home/ModalContainer'
+import { initNewBHRFlow, updateCloudPermission } from '../store/actions/BHR'
+import { setupWallet } from '../store/actions/setupAndAuth'
+import { setVersion } from '../store/actions/versionHistory'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -55,7 +45,12 @@ export enum BottomSheetState {
   Open,
 }
 
-export default function NewWalletName( props ) {
+export type Props = {
+  route: any;
+  navigation: any;
+};
+
+const NewWalletName: React.FC<Props> = ( { route, navigation }: Props ) => {
   // const [ timerArray, setTimerArray ] = useState( [ 1, 1, 1 ] )
   // const [ timeLeft, setTimeLeft ] = useState( null )
   // const [ intervalRef, setIntervalRef ] = useState( null )
@@ -80,17 +75,24 @@ export default function NewWalletName( props ) {
   const subPoints = [ strings.multi, strings.creatingbackup, strings.preloading ]
   const [ message, setMessage ] = useState( strings.Creatingyourwallet )
   const [ signUpStarted, setSignUpStarted ] = useState( false )
-  const mnemonic = props.navigation.getParam( 'mnemonic' ) || null
-  const initialMnemonic = props.navigation.getParam( 'initialMnemonic' ) || ''
-  const gridType = props.navigation.getParam( 'gridType' ) || ''
-  const passphrase = props.navigation.getParam( 'passphrase' ) || ''
+  const mnemonic = route.params?.mnemonic || null
+  const initialMnemonic =  route.params?.initialMnemonic || ''
+  const gridType = route.params?.gridType|| ''
+  const passphrase =  route.params?.passphrase|| ''
 
   useEffect( () => {
     if ( walletSetupCompleted ) {
       setLoaderModal( false )
-      props.navigation.navigate( 'HomeNav', {
-        walletName,
-      } )
+      navigation.dispatch( CommonActions.reset( {
+        index: 0,
+        routes: [ {
+          name: 'HomeNav',
+          key: 'HomeKey',
+          params: {
+            walletName
+          }
+        } ]
+      } ) )
     }
   }, [ walletSetupCompleted, cloudBackupStatus ] )
 
@@ -118,7 +120,7 @@ export default function NewWalletName( props ) {
                 closeBottomSheet()
                 console.log( 'updateCloudPermission', flag )
                 dispatch( updateCloudPermission( flag ) )
-                props.navigation.navigate( 'NewWalletQuestion', {
+                navigation.navigate( 'NewWalletQuestion', {
                   walletName,
                 } )
               }}
@@ -126,7 +128,7 @@ export default function NewWalletName( props ) {
                 closeBottomSheet()
                 console.log( 'updateCloudPermission', flag )
                 dispatch( updateCloudPermission( flag ) )
-                props.navigation.navigate( 'NewWalletQuestion', {
+                navigation.navigate( 'NewWalletQuestion', {
                   walletName,
                 } )
               }}
@@ -134,7 +136,7 @@ export default function NewWalletName( props ) {
                 closeBottomSheet()
                 console.log( 'updateCloudPermission', true )
                 // dispatch( updateCloudPermission( true ) )
-                props.navigation.navigate( 'NewWalletQuestion', {
+                navigation.navigate( 'NewWalletQuestion', {
                   walletName,
                 } )
               }}
@@ -198,7 +200,7 @@ export default function NewWalletName( props ) {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.navigate( 'WalletInitialization' )
+              navigation.navigate( 'WalletInitialization' )
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -282,7 +284,7 @@ export default function NewWalletName( props ) {
                   onPress={() => {
                     setLoaderModal( true )
                     Keyboard.dismiss()
-                    // props.navigation.navigate( 'NewWalletQuestion', {
+                    // navigation.navigate( 'NewWalletQuestion', {
                     //   walletName,
                     // } )
                     setTimeout( () => {
@@ -471,3 +473,5 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Regular,
   },
 } )
+
+export default NewWalletName

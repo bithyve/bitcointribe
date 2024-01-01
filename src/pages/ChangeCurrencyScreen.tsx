@@ -1,35 +1,33 @@
 /* eslint-disable react/jsx-key */
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
-  View,
+  Linking,
+  SafeAreaView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  SafeAreaView,
-  Linking,
-  StyleSheet
+  View
 } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-  widthPercentageToDP,
   heightPercentageToDP,
+  widthPercentageToDP,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-
-import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
-import FiatCurrencies from '../common/FiatCurrencies'
-import { RFValue } from 'react-native-responsive-fontsize'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { ScrollView } from 'react-native-gesture-handler'
 import { useDispatch, useSelector } from 'react-redux'
-import { setCurrencyCode } from '../store/actions/preferences'
-import { translations, LocalizationContext } from '../common/content/LocContext'
 import ChangeCurrency from '../assets/images/icon_currency.svg'
 import IconLanguage from '../assets/images/icon_language.svg'
+import Colors from '../common/Colors'
 import Languages from '../common/content/availableLanguages'
+import { LocalizationContext, translations } from '../common/content/LocContext'
+import FiatCurrencies from '../common/FiatCurrencies'
+import Fonts from '../common/Fonts'
 import CommonStyles from '../common/Styles/Styles'
 import HeaderTitle from '../components/HeaderTitle'
+import { setCurrencyCode } from '../store/actions/preferences'
 
 const styles = StyleSheet.create( {
   container: {
@@ -285,9 +283,10 @@ export default function ChangeCurrencyScreen( props ) {
               }}
             >
               <ScrollView>
-                {currencyList.map( ( item ) => {
+                {currencyList.map( ( item, index ) => {
                   return (
                     <TouchableOpacity
+                      key={`${JSON.stringify( item )}_${index}`}
                       onPress={() => {
                         setCurrency( item )
                         setIsVisible( false )
@@ -377,6 +376,7 @@ export default function ChangeCurrencyScreen( props ) {
               {Languages.map( ( item ) => {
                 return (
                   <TouchableOpacity
+                    key={item.iso}
                     onPress={() => {
                       setAppLanguage( item.iso )
                       setShowLanguages( false )

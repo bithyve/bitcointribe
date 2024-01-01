@@ -1,16 +1,16 @@
-import React, {  } from 'react'
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import React from 'react'
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ListItem } from 'react-native-elements'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import Colors from '../../../common/Colors'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+import Fonts from '../../../common/Fonts'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { ListItem } from 'react-native-elements'
-import Fonts from '../../../common/Fonts'
-import ListStyles from '../../../common/Styles/ListStyles'
 import ImageStyles from '../../../common/Styles/ImageStyles'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import ListStyles from '../../../common/Styles/ListStyles'
 import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
-import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 // import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export type Props = {
@@ -29,7 +29,7 @@ const renderAccount = ( accountInfo, accountVisibility ) => {
       height: hp( 12 ),
       padding: 10,
       backgroundColor: Colors.backgroundColor1,
-      width: '100%'
+      alignItems: 'center'
     }}>
       <View style={{
         width: '20%',

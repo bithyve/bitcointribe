@@ -103,8 +103,8 @@ export function generateAccount(
     return account
 
   } catch ( error ) {
+    return null
   }
-
 }
 
 export function generateMultiSigAccount(

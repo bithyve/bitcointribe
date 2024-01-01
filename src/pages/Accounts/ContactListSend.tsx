@@ -1,18 +1,18 @@
-import React, { memo } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import Colors from '../../common/Colors';
-import { RFValue } from 'react-native-responsive-fontsize';
-import Fonts from './../../common/Fonts';
+import React, { memo } from 'react'
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import { nameToInitials } from '../../common/CommonFunctions';
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import { nameToInitials } from '../../common/CommonFunctions'
+import Fonts from './../../common/Fonts'
 
-function getImageIcon(item) {
-  if (item) {
-    if (item.image) {
-      return <Image source={item.image} style={styles.circleShapeView} />;
+function getImageIcon( item ) {
+  if ( item ) {
+    if ( item.image ) {
+      return <Image source={item.image} style={styles.circleShapeView} />
     } else {
       return (
         <View
@@ -32,45 +32,48 @@ function getImageIcon(item) {
           >
             {item
               ? nameToInitials(
-                  item.firstName === 'F&F request' &&
+                item.firstName === 'F&F request' &&
                     item.contactsWalletName !== undefined &&
                     item.contactsWalletName !== ''
-                    ? `${item.contactsWalletName}'s wallet`
-                    : item.firstName && item.lastName
+                  ? `${item.contactsWalletName}'s wallet`
+                  : item.firstName && item.lastName
                     ? item.firstName + ' ' + item.lastName
                     : item.firstName && !item.lastName
-                    ? item.firstName
-                    : !item.firstName && item.lastName
-                    ? item.lastName
-                    : '',
-                )
+                      ? item.firstName
+                      : !item.firstName && item.lastName
+                        ? item.lastName
+                        : '',
+              )
               : ''}
           </Text>
         </View>
-      );
+      )
     }
   }
 }
 
-const ContactListSend = ({ transfer, Items, onSelectContact }) => {
+const ContactListSend = ( { transfer, Items, onSelectContact } ) => {
   //console.log("Items,", Items);
   return (
-    <TouchableOpacity onPress={() => onSelectContact(Items)}>
-      <View style={{ justifyContent: 'center', marginRight: hp('4%') }}>
+    <TouchableOpacity onPress={() => onSelectContact( Items )}>
+      <View style={{
+        justifyContent: 'center', marginRight: hp( '4%' )
+      }}>
         {transfer.details &&
           transfer.details.length > 0 &&
-          transfer.details.map((contact) => {
-            if (contact.selectedContact.id === Items.id) {
+          transfer.details.map( ( contact, index ) => {
+            if ( contact.selectedContact.id === Items.id ) {
               return (
                 <Image
+                  key={`${JSON.stringify( contact )}_${index}`}
                   style={styles.checkmarkStyle}
-                  source={require('../../assets/images/icons/checkmark.png')}
+                  source={require( '../../assets/images/icons/checkmark.png' )}
                   resizeMode="contain"
                 />
-              );
+              )
             }
-          })}
-        {getImageIcon(Items)}
+          } )}
+        {getImageIcon( Items )}
         <Text numberOfLines={1} style={styles.contactName}>
           {Items.firstName === 'F&F request' &&
           Items.contactsWalletName !== undefined &&
@@ -80,14 +83,14 @@ const ContactListSend = ({ transfer, Items, onSelectContact }) => {
         </Text>
       </View>
     </TouchableOpacity>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   circleShapeView: {
-    width: wp('14%'),
-    height: wp('14%'),
-    borderRadius: wp('14%') / 2,
+    width: wp( '14%' ),
+    height: wp( '14%' ),
+    borderRadius: wp( '14%' ) / 2,
     borderColor: Colors.white,
     borderWidth: 2,
     alignItems: 'center',
@@ -102,21 +105,21 @@ const styles = StyleSheet.create({
   },
   checkmarkStyle: {
     position: 'absolute',
-    width: wp('5%'),
-    height: wp('5%'),
+    width: wp( '5%' ),
+    height: wp( '5%' ),
     top: 0,
     right: 0,
     zIndex: 999,
     elevation: 10,
   },
   contactName: {
-    width: wp('14%'),
+    width: wp( '14%' ),
     color: Colors.black,
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     fontFamily: Fonts.Regular,
     textAlign: 'center',
     marginTop: 5,
   },
-});
+} )
 
-export default memo(ContactListSend);
+export default memo( ContactListSend )

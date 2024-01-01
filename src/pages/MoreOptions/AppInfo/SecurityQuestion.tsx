@@ -20,7 +20,7 @@ import {
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
 import { useSelector } from 'react-redux'
 import { ScrollView } from 'react-native-gesture-handler'
-import { withNavigation } from 'react-navigation'
+import { useNavigation } from '@react-navigation/native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import { translations } from '../../../common/content/LocContext'
@@ -37,6 +37,7 @@ function SecurityQuestion( props ) {
   const { security }: Wallet = useSelector(
     ( state ) => state.storage.wallet,
   )
+  const navigation: any = useNavigation()
   const strings  = translations[ 'settings' ]
   const common  = translations[ 'common' ]
   const login = translations[ 'login' ]
@@ -59,7 +60,7 @@ function SecurityQuestion( props ) {
           AnswerCounter++
           setAnswerCounter( AnswerCounter )
         } else {
-          props.navigation.navigate( 'ReLogin', {
+          navigation.navigate( 'ReLogin', {
             isPasscodeCheck: true,
           } )
           props.onClose()
@@ -291,7 +292,7 @@ function SecurityQuestion( props ) {
   )
 }
 
-export default withNavigation( SecurityQuestion )
+export default SecurityQuestion
 
 const styles = StyleSheet.create( {
   statusIndicatorView: {

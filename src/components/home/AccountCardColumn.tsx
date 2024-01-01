@@ -1,15 +1,14 @@
 import React, { memo } from 'react'
 import {
-  View,
-  TouchableOpacity,
   StyleSheet,
+  TouchableOpacity,
+  View,
 } from 'react-native'
 
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import AccountShell from '../../common/data/models/AccountShell'
 import AddNewAccountCard from '../../pages/Home/AddNewAccountCard'
 import HomeAccountsListCard from './HomeAccountsListCard'
-import AccountShell from '../../common/data/models/AccountShell'
-import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 
 export type Props = {
   index: number;
@@ -17,7 +16,6 @@ export type Props = {
   prependsAddButton: boolean;
   onAccountCardSelected: ( accountShell: AccountShell ) => void;
   onAddNewAccountPressed: () => void;
-  currentLevel: number;
   onCardLongPressed: ( accountShell: AccountShell ) => void;
 };
 
@@ -27,18 +25,17 @@ const AccountCardColumn: React.FC<Props> = ( {
   prependsAddButton,
   onAccountCardSelected,
   onAddNewAccountPressed,
-  onCardLongPressed,
-  currentLevel
+  onCardLongPressed
 }: Props ) => {
   return (
     <View style={styles.rootContainer} key={index}>
 
       {( index%2 != 0 ? cardData.reverse() : cardData ).map( ( accountShell ) => {
         const disabled = false
-        // if(currentLevel < 2 && accountShell.primarySubAccount.kind === SECURE_ACCOUNT) disabled = true;
         return typeof accountShell === 'string' ?
           (
             <AddNewAccountCard
+              key={accountShell}
               containerStyle={styles.cardContainer}
               onPress={onAddNewAccountPressed}
             />

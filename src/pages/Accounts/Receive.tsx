@@ -1,61 +1,58 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
-  View,
   Image,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  TextInput,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
-  TouchableWithoutFeedback,
   SafeAreaView,
-  StatusBar
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { RFValue } from 'react-native-responsive-fontsize'
-import NavStyles from '../../common/Styles/NavStyles'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import NavStyles from '../../common/Styles/NavStyles'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import BottomSheet from 'reanimated-bottom-sheet'
+import BottomInfoBox from '../../components/BottomInfoBox'
 
+import { useBottomSheetModal } from '@gorhom/bottom-sheet'
+import idx from 'idx'
+import DeviceInfo from 'react-native-device-info'
+import { Account, AccountType, LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import { translations } from '../../common/content/LocContext'
+import AccountShell from '../../common/data/models/AccountShell'
+import CopyThisText from '../../components/CopyThisText'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents'
+import KnowMoreButton from '../../components/KnowMoreButton'
+import QRCode from '../../components/QRCode'
+import SmallHeaderModal from '../../components/SmallHeaderModal'
+import ModalContainer from '../../components/home/ModalContainer'
+import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
+import { onPressKeeper } from '../../store/actions/BHR'
 import {
   setReceiveHelper,
   setSavingWarning,
 } from '../../store/actions/preferences'
-import { getAccountIconByShell, getAccountTitleByShell } from './Send/utils'
-import KnowMoreButton from '../../components/KnowMoreButton'
-import QRCode from '../../components/QRCode'
-import CopyThisText from '../../components/CopyThisText'
-import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
-import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
-import { useBottomSheetModal } from '@gorhom/bottom-sheet'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
-import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents'
-import idx from 'idx'
-import TwoFASetupWarningModal from './TwoFASetupWarningModal'
-import DeviceInfo from 'react-native-device-info'
-import AccountShell from '../../common/data/models/AccountShell'
-import { Account, AccountType, LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import ModalContainer from '../../components/home/ModalContainer'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { getNextFreeAddress } from '../../store/sagas/accounts'
-import { translations } from '../../common/content/LocContext'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import { onPressKeeper } from '../../store/actions/BHR'
+import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import { getAccountIconByShell, getAccountTitleByShell } from './Send/utils'
+import TwoFASetupWarningModal from './TwoFASetupWarningModal'
 
 export default function Receive( props ) {
   const dispatch = useDispatch()
@@ -74,7 +71,7 @@ export default function Receive( props ) {
   const common = translations[ 'common' ]
   const [ SecureReceiveWarningBottomSheet ] = useState( React.createRef() )
   const [ amount, setAmount ] = useState( '' )
-  const accountShell: AccountShell = props.navigation.getParam( 'accountShell' )
+  const accountShell: AccountShell = props.route.params?.accountShell
   const account: Account = useAccountByAccountShell( accountShell )
   const [ receivingAddress, setReceivingAddress ] = useState( null )
   const [ paymentURI, setPaymentURI ] = useState( null )
@@ -246,7 +243,7 @@ export default function Receive( props ) {
       <SafeAreaView style={{
         flex: 0
       }} />
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.LIGHT_BACKGROUND} barStyle="dark-content" />
       <TouchableWithoutFeedback onPress={() => onPressTouchableWrapper()}>
         <KeyboardAvoidingView
           style={{
@@ -318,6 +315,7 @@ export default function Receive( props ) {
               <CopyThisText
                 backgroundColor={Colors.white}
                 text={paymentURI ? paymentURI : receivingAddress}
+                toastText='Address copied successfully'
               />
 
               <AppBottomSheetTouchableWrapper

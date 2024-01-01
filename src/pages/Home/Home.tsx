@@ -1,92 +1,90 @@
+import PushNotificationIOS from '@react-native-community/push-notification-ios'
 import React, { createRef, PureComponent } from 'react'
 import {
-  StyleSheet,
-  StatusBar,
-  View,
   Platform,
-  SafeAreaView
+  StatusBar,
+  StyleSheet,
+  View,
 } from 'react-native'
 import {
   heightPercentageToDP,
-  widthPercentageToDP,
-} from 'react-native-responsive-screen'
-import PushNotificationIOS from '@react-native-community/push-notification-ios'
-import Colors from '../../common/Colors'
-import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
+import { connect } from 'react-redux'
+import Colors from '../../common/Colors'
 import {
   SECURE_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import {
+  acceptExistingContactRequest,
   initializeHealthSetup,
-  updateCloudPermission,
-  acceptExistingContactRequest
+  updateCloudPermission
 } from '../../store/actions/BHR'
-import { connect } from 'react-redux'
+import {
+  getMessages,
+  notificationsUpdated,
+  setupNotificationList,
+  updateFCMTokens,
+  updateMessageStatus,
+  updateMessageStatusInApp,
+  updateNotificationList,
+} from '../../store/actions/notifications'
+import {
+  setCardData,
+  setCurrencyCode,
+  setIsPermissionGiven,
+} from '../../store/actions/preferences'
 import {
   rejectTrustedContact,
   syncPermanentChannels,
 } from '../../store/actions/trustedContacts'
-import {
-  updateFCMTokens,
-  notificationsUpdated,
-  setupNotificationList,
-  updateNotificationList,
-  updateMessageStatusInApp,
-  updateMessageStatus,
-  getMessages,
-} from '../../store/actions/notifications'
-import {
-  setCurrencyCode,
-  setCardData,
-  setIsPermissionGiven,
-} from '../../store/actions/preferences'
 //import HomeHeader from '../../components/home/home-header'
+import BottomSheet from '@gorhom/bottom-sheet'
 import idx from 'idx'
-import {
-  BottomTab,
-} from '../../components/home/custom-bottom-tabs'
+import moment from 'moment'
+import LinearGradient from 'react-native-linear-gradient'
 import * as RNLocalize from 'react-native-localize'
-import {
-  addTransferDetails,
-  fetchExchangeRates,
-  fetchFeeRates,
-} from '../../store/actions/accounts'
 import {
   AccountType,
   LevelHealthInterface,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
-import moment from 'moment'
-import { withNavigationFocus } from 'react-navigation'
-import {
-  updatePreference,
-  setFCMToken,
-  setSecondaryDeviceAddress,
-} from '../../store/actions/preferences'
-import BottomSheetHeader from '../Accounts/BottomSheetHeader'
-import BottomSheet from '@gorhom/bottom-sheet'
-import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
-import { AccountsState } from '../../store/reducers/accounts'
-import AccountShell from '../../common/data/models/AccountShell'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
-import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
-import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
+import AccountShell from '../../common/data/models/AccountShell'
+import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
+import BottomSheetAddWalletInfo from '../../components/bottom-sheets/add-wallet/BottomSheetAddWalletInfo'
 import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
 import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
-import { setVersion } from '../../store/actions/versionHistory'
-import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../../store/actions/SwanIntegration'
-import { clearRampCache } from '../../store/actions/RampIntegration'
-import { clearWyreCache } from '../../store/actions/WyreIntegration'
-import { setCloudData } from '../../store/actions/cloud'
-import { credsAuthenticated } from '../../store/actions/setupAndAuth'
-import { setShowAllAccount } from '../../store/actions/accounts'
-import HomeContainer from './HomeContainer'
+import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
+import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
+import {
+  BottomTab,
+} from '../../components/home/custom-bottom-tabs'
 import ModalContainer from '../../components/home/ModalContainer'
-import LinearGradient from 'react-native-linear-gradient'
+import {
+  addTransferDetails,
+  fetchExchangeRates,
+  fetchFeeRates,
+  setShowAllAccount,
+} from '../../store/actions/accounts'
+import { setCloudData } from '../../store/actions/cloud'
+import {
+  setFCMToken,
+  setSecondaryDeviceAddress,
+  updatePreference,
+} from '../../store/actions/preferences'
+import { clearRampCache } from '../../store/actions/RampIntegration'
+import { credsAuthenticated } from '../../store/actions/setupAndAuth'
+import { clearSwanCache, createTempSwanAccountInfo, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import { setVersion } from '../../store/actions/versionHistory'
+import { clearWyreCache } from '../../store/actions/WyreIntegration'
+import { AccountsState } from '../../store/reducers/accounts'
+import BottomSheetHeader from '../Accounts/BottomSheetHeader'
+import BottomSheetWalletHeader from '../Accounts/BottomSheetWalletHeader'
+import HomeContainer from './HomeContainer'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -97,6 +95,7 @@ export enum BottomSheetKind {
   TAB_BAR_BUY_MENU,
   TRUSTED_CONTACT_REQUEST,
   ADD_CONTACT_FROM_ADDRESS_BOOK,
+  ADD_A_WALLET_INFO,
   NOTIFICATIONS_LIST,
   SWAN_STATUS_INFO,
   WYRE_STATUS_INFO,
@@ -359,36 +358,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   }
 
-  // notificationCheck = () =>{
-  //   const { messages } = this.props
-  //   if( messages && messages.length ){
-  //     this.updateBadgeCounter()
-  //     messages.sort( function ( left, right ) {
-  //       return moment.utc( right.timeStamp ).unix() - moment.utc( left.timeStamp ).unix()
-  //     } )
-  //     this.setState( {
-  //       notificationData: messages,
-  //       notificationDataChange: !this.state.notificationDataChange,
-  //     } )
-  //     if( this.currentNotificationId !== '' ) {
-  //       const message = messages.find( message => message.notificationId === this.currentNotificationId )
-  //       if( message ){
-  //         this.handleNotificationBottomSheetSelection( message )
-  //       }
-  //       this.currentNotificationId = ''
-  //     } else {
-  //       const message = messages.find( message => message.status === 'unread' )
-  //       if( message ){
-  //         this.handleNotificationBottomSheetSelection( message )
-  //       }
-  //     }
-  //   }
-  // }
-
   setUpFocusListener = () => {
     const { navigation } = this.props
 
-    this.focusListener = navigation.addListener( 'didFocus', () => {
+    this.focusListener = navigation.addListener( 'focus', () => {
 
       this.setCurrencyCodeFromAsync()
       this.props.fetchExchangeRates( this.props.currencyCode )
@@ -405,9 +378,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   cleanupListeners() {
-    if ( typeof this.focusListener === 'function' ) {
-      this.props.navigation.removeListener( 'didFocus', this.focusListener )
-    }
+    this.focusListener?.()
   }
 
   openBottomSheet = (
@@ -515,6 +486,30 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             </>
           )
 
+        case BottomSheetKind.ADD_A_WALLET_INFO:
+          return (
+            <>
+              <BottomSheetWalletHeader title="Add a wallet" onPress={this.closeBottomSheet} />
+              <BottomSheetAddWalletInfo
+                onRGBWalletClick={() => {
+                  this.closeBottomSheet()
+                  const accountShell = this.props.accountShells[ 1 ]
+                  this.props.navigation.navigate( 'NewRGBWallet', {
+                    accountShellID: accountShell.id,
+                  } )
+                }}
+                onLighteningWalletClick={() => {
+                  this.closeBottomSheet()
+                  this.props.navigation.navigate( 'ScanNodeConfig', {
+                    currentSubAccount: null,
+                  } )
+                }}
+                title1='RGB Wallet'
+                title2='Lightening Wallet'
+              />
+            </>
+          )
+
         default:
           break
     }
@@ -523,9 +518,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   render() {
     return (
       <View style={{
-        backgroundColor: Colors.darkBlue
+        backgroundColor: Colors.blue
       }}>
-        <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+        <LinearGradient colors={[ Colors.blue, Colors.blue ]}
           start={{
             x: 0, y: 0
           }} end={{
@@ -543,33 +538,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         >
           {this.renderBottomSheetContent()}
         </ModalContainer>
-        {/* <Header fromScreen={'Home'} /> */}
-        {/* <View
-          style={{
-            flex: 3.8,
-            paddingTop:
-              Platform.OS == 'ios' && DeviceInfo.hasNotch
-                ? heightPercentageToDP( '5%' )
-                : 0,
-          }}
-        >
-          <HomeHeader
-            onPressNotifications={this.onPressNotifications}
-            notificationData={notificationData}
-            walletName={wallet.walletName}
-            getCurrencyImageByRegion={getCurrencyImageByRegion}
-            netBalance={netBalance}
-            exchangeRates={exchangeRates}
-            CurrencyCode={currencyCode}
-            navigation={navigation}
-            currentLevel={currentLevel}
-            //  onSwitchToggle={this.onSwitchToggle}
-            // setCurrencyToggleValue={this.setCurrencyToggleValue}
-            // navigation={this.props.navigation}
-            // overallHealth={overallHealth}
-          />
-        </View> */}
-        <HomeContainer lnAcc={this.props.accountShells.filter( shell=>shell.primarySubAccount.type===AccountType.LIGHTNING_ACCOUNT )} containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} swanDeepLinkContent={this.state.swanDeepLinkContent} />
+        <HomeContainer navigation={this.props.navigation} lnAcc={this.props.accountShells.filter( shell=>shell.primarySubAccount.type===AccountType.LIGHTNING_ACCOUNT )} containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} swanDeepLinkContent={this.state.swanDeepLinkContent} />
 
       </View>
     )
@@ -617,40 +586,39 @@ const mapStateToProps = ( state ) => {
   }
 }
 
-export default withNavigationFocus(
-  connect( mapStateToProps, {
-    updateFCMTokens,
-    acceptExistingContactRequest,
-    rejectTrustedContact,
-    initializeHealthSetup,
-    clearWyreCache,
-    clearRampCache,
-    clearSwanCache,
-    updateSwanStatus,
-    fetchFeeRates,
-    fetchExchangeRates,
-    createTempSwanAccountInfo,
-    addTransferDetails,
-    notificationsUpdated,
-    setCurrencyCode,
-    updatePreference,
-    setFCMToken,
-    setSecondaryDeviceAddress,
-    setCardData,
-    setVersion,
-    setCloudData,
-    updateCloudPermission,
-    credsAuthenticated,
-    setShowAllAccount,
-    setIsPermissionGiven,
-    setupNotificationList,
-    updateNotificationList,
-    updateMessageStatusInApp,
-    updateMessageStatus,
-    getMessages,
-    syncPermanentChannels,
-  } )( Home )
-)
+export default
+connect( mapStateToProps, {
+  updateFCMTokens,
+  acceptExistingContactRequest,
+  rejectTrustedContact,
+  initializeHealthSetup,
+  clearWyreCache,
+  clearRampCache,
+  clearSwanCache,
+  updateSwanStatus,
+  fetchFeeRates,
+  fetchExchangeRates,
+  createTempSwanAccountInfo,
+  addTransferDetails,
+  notificationsUpdated,
+  setCurrencyCode,
+  updatePreference,
+  setFCMToken,
+  setSecondaryDeviceAddress,
+  setCardData,
+  setVersion,
+  setCloudData,
+  updateCloudPermission,
+  credsAuthenticated,
+  setShowAllAccount,
+  setIsPermissionGiven,
+  setupNotificationList,
+  updateNotificationList,
+  updateMessageStatusInApp,
+  updateMessageStatus,
+  getMessages,
+  syncPermanentChannels,
+} )( Home )
 
 const styles = StyleSheet.create( {
   cardContainer: {

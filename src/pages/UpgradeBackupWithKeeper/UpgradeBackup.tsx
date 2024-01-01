@@ -25,7 +25,6 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import idx from 'idx'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
@@ -1086,8 +1085,8 @@ class UpgradeBackup extends Component<
               style={styles.headerBackArrowView}
             >
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </TouchableOpacity>
@@ -1521,32 +1520,31 @@ const mapStateToProps = ( state ) => {
   }
 }
 
-export default withNavigationFocus(
-  connect( mapStateToProps, {
-    initializeHealthSetup,
-    updateHealthForCloud,
-    updateMSharesHealth,
-    initNewBHRFlow,
-    setCloudData,
-    generateMetaShare,
-    initLevelTwo,
-    setCloudDataForLevel,
-    addNewSecondarySubAccount,
-    keeperProcessStatus,
-    updatedKeeperInfo,
-    generateSMMetaShares,
-    autoUploadSecondaryShare,
-    autoShareContactKeeper,
-    setUpgradeProcessStatus,
-    setAvailableKeeperData,
-    updateLevelToSetup,
-    updateAvailableKeeperData,
-    confirmPDFSharedFromUpgrade,
-    getPDFData,
-    checkMSharesHealth,
-    setIsPermissionGiven
-  } )( UpgradeBackup )
-)
+export default
+connect( mapStateToProps, {
+  initializeHealthSetup,
+  updateHealthForCloud,
+  updateMSharesHealth,
+  initNewBHRFlow,
+  setCloudData,
+  generateMetaShare,
+  initLevelTwo,
+  setCloudDataForLevel,
+  addNewSecondarySubAccount,
+  keeperProcessStatus,
+  updatedKeeperInfo,
+  generateSMMetaShares,
+  autoUploadSecondaryShare,
+  autoShareContactKeeper,
+  setUpgradeProcessStatus,
+  setAvailableKeeperData,
+  updateLevelToSetup,
+  updateAvailableKeeperData,
+  confirmPDFSharedFromUpgrade,
+  getPDFData,
+  checkMSharesHealth,
+  setIsPermissionGiven
+} )( UpgradeBackup )
 
 const styles = StyleSheet.create( {
   accountCardsSectionContainer: {

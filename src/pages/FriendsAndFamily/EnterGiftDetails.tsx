@@ -1,55 +1,52 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  TextInput,
-  Text,
-  StatusBar,
-  ScrollView,
-  Platform,
+  BackHandler,
   FlatList,
+  Keyboard,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
   TouchableWithoutFeedback,
-  Keyboard
+  View
 } from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { useDispatch, useSelector } from 'react-redux'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import DeviceInfo from 'react-native-device-info'
 import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import HeaderTitle from '../../components/HeaderTitle'
-import CommonStyles from '../../common/Styles/Styles'
-import { Gift, GiftThemeId, Wallet, DeepLinkEncryptionType } from '../../bitcoin/utilities/Interface'
-import idx from 'idx'
+import { useDispatch, useSelector } from 'react-redux'
 import CheckMark from '../../assets/images/svgs/checkmark.svg'
-import AccountShell from '../../common/data/models/AccountShell'
-import ImageStyles from '../../common/Styles/ImageStyles'
 import GiftCard from '../../assets/images/svgs/gift_icon_new.svg'
-import LeftArrow from '../../assets/images/svgs/Left_arrow_new.svg'
-import More from '../../assets/images/svgs/icon_more_gray.svg'
 import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
-import Halloween from '../../assets/images/svgs/halloween.svg'
-import Birthday from '../../assets/images/svgs/birthday.svg'
-import Setting from '../../assets/images/svgs/setting_icon.svg'
+import LeftArrow from '../../assets/images/svgs/Left_arrow_new.svg'
 import Menu from '../../assets/images/svgs/menu_dots_icon.svg'
-import ThemeList from './Theme'
-import { updateUserName } from '../../store/actions/storage'
+import Setting from '../../assets/images/svgs/setting_icon.svg'
+import { DeepLinkEncryptionType, GiftThemeId, Wallet } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import CommonStyles from '../../common/Styles/Styles'
+import HeaderTitle from '../../components/HeaderTitle'
 import Toast from '../../components/Toast'
-import DeviceInfo from 'react-native-device-info'
+import { updateUserName } from '../../store/actions/storage'
+import ThemeList from './Theme'
 
 import { translations } from '../../common/content/LocContext'
 
-import RadioButton from '../../components/RadioButton'
+import { CommonActions, useFocusEffect } from '@react-navigation/native'
 import Feather from 'react-native-vector-icons/Feather'
-import ModalContainer from '../../components/home/ModalContainer'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import ModalContainer from '../../components/home/ModalContainer'
+import RadioButton from '../../components/RadioButton'
 
 enum AdvancedSetting {
   FNF_IDENTIFICATION = 'FNF_IDENTIFICATION',
@@ -112,7 +109,7 @@ const FNFIDENTIFICATIONDATA = [
   },
 ]
 
-const GiftDetails = ( { navigation } ) => {
+const GiftDetails = ( { navigation, route } ) => {
 
 
   const renderItem = ( { item } ) => {
@@ -131,17 +128,17 @@ const GiftDetails = ( { navigation } ) => {
   )
 
   const dispatch = useDispatch()
-  const { giftId, contact } = navigation.state.params
+  const { giftId, contact } = route.params
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const strings = translations[ 'f&f' ]
   // const login = translations[ 'login' ]
   const common = translations[ 'common' ]
   const [ note, setNote ] = useState(
-    navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
+    route.params?.giftMsg != undefined ? route.params.giftMsg :
       'Bitcoin is a new type of money that is not controlled by any government or company' )
   const [ encryptionType, setEncryptionType ] = useState( DeepLinkEncryptionType.OTP )
   const [ bottomNote, setbottomNote ] = useState(
-    navigation.state.params.giftMsg != undefined ? navigation.state.params.giftMsg :
+    route.params?.giftMsg != undefined ? route.params?.giftMsg :
       '' )
   const [ name, setName ] = useState( '' )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
@@ -205,8 +202,28 @@ const GiftDetails = ( { navigation } ) => {
     setName( wallet.userName ? wallet.userName : wallet.walletName )
   }, [ wallet.walletName, wallet.userName ] )
 
-  const { title, walletName, gift, avatar }: { title: string, walletName: string, gift: Gift, avatar: boolean } = navigation.state.params
+  const hardwareBackPressCustom = useCallback( () => {
+    if ( route.params?.fromScreen === 'CreateGift' ) {
+      navigation.dispatch( state => {
+        return CommonActions.reset( {
+          ...state,
+          index: 0,
+          routes: state.routes.filter( route => route.name === 'GiftScreen' )
+        } )
+      } )
+      return true
+    }
+    return false
+  }, [] )
 
+  useFocusEffect(
+    useCallback( () => {
+      BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
+      return () => {
+        BackHandler.removeEventListener( 'hardwareBackPress', hardwareBackPressCustom )}
+    }, [] )
+  )
+  // const { title, walletName, gift, avatar }: { title: string, walletName: string, gift: Gift, avatar: boolean } = navigation.state.params
 
   const IdentificationCard = ( { type, title, subtitle } ) => {
     return (
@@ -571,7 +588,7 @@ const GiftDetails = ( { navigation } ) => {
                 contact,
                 senderName: name,
                 themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
-                setActiveTab: navigation.state.params.setActiveTab
+                setActiveTab: route.params?.setActiveTab
               } )
             }}
           >
@@ -603,7 +620,7 @@ const GiftDetails = ( { navigation } ) => {
               showDone: true,
               themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
               senderName: name,
-              setActiveTab: navigation.state.params.setActiveTab
+              setActiveTab: route.params?.setActiveTab
             } )
           } else if ( condn === 'Add F&F and Send' ) {
             navigation.navigate( 'AddContact', {
@@ -611,7 +628,7 @@ const GiftDetails = ( { navigation } ) => {
               giftId,
               note,
               senderName: name,
-              setActiveTab: navigation.state.params.setActiveTab
+              setActiveTab: route.params?.setActiveTab
             } )
           } else {
             if ( encryptionType === DeepLinkEncryptionType.SECRET_PHRASE ) {
@@ -628,7 +645,7 @@ const GiftDetails = ( { navigation } ) => {
               contact,
               senderName: name,
               themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
-              setActiveTab: navigation.state.params.setActiveTab
+              setActiveTab: route.params?.setActiveTab
             } )
           }
 
@@ -670,7 +687,16 @@ const GiftDetails = ( { navigation } ) => {
             <TouchableOpacity
               style={CommonStyles.headerLeftIconContainer}
               onPress={() => {
-                navigation.goBack()
+                if ( route.params?.fromScreen === 'CreateGift' ) {
+                  navigation.dispatch( state => {
+                    return CommonActions.reset( {
+                      ...state,
+                      index: 0,
+                      routes: state.routes.filter( route => route.name === 'GiftScreen' )
+                    } )
+                  } )
+                } else
+                  navigation.goBack()
               }}
             >
               <View style={styles.headerLeftIconInnerContainer}>
@@ -761,7 +787,7 @@ const GiftDetails = ( { navigation } ) => {
         >
           <Text
             style={{
-              fontSize: RFValue( 12 ),
+              fontSize: RFValue( 14 ),
               color: Colors.black,
               fontWeight: '300',
               fontFamily: Fonts.Regular,
@@ -1372,6 +1398,7 @@ const styles = StyleSheet.create( {
     marginVertical: 10,
   },
   identificationHeading: {
+    color: Colors.blue,
     fontSize: 13,
     fontWeight: '400',
     fontFamily: Fonts.Regular,

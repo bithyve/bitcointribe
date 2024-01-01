@@ -382,7 +382,6 @@ function* syncTxAfterRestore( restoredAccounts ) {
           accountShells[ shellIndex ].primarySubAccount.transactions.splice( i, 1 )
         }
       } )
-      console.log( 'AFTER', accountShells )
     }
   }
 
@@ -644,6 +643,8 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
   }
 }
 
+
+
 function* refreshLNShellsWorker( { payload }: { payload: {
   shells: AccountShell[],
 }} ){
@@ -696,7 +697,6 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
   const shells: AccountShell[] = yield select(
     ( state ) => state.accounts.accountShells
   )
-
   const shellsToSync: AccountShell[] = []
   const testShellsToSync: AccountShell[] = [] // Note: should be synched separately due to network difference(testnet)
   const donationShellsToSync: AccountShell[] = []
@@ -717,13 +717,11 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
           case AccountType.LIGHTNING_ACCOUNT:
             lnShellsToSync.push( shell )
             break
-
           default:
             shellsToSync.push( shell )
       }
     }
   }
-
   if( shellsToSync.length ) yield call( refreshAccountShellsWorker, {
     payload: {
       shells: shellsToSync,
@@ -747,6 +745,9 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
       shells: lnShellsToSync,
     }
   } )
+
+
+
 }
 
 export const autoSyncShellsWatcher = createWatcher(
@@ -1067,6 +1068,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           node
         } )
         return lnAccount
+
   }
 }
 export interface newAccountDetails {
@@ -1074,8 +1076,8 @@ export interface newAccountDetails {
   description?: string,
   is2FAEnabled?: boolean,
   doneeName?: string,
-  youtubeURL: string,
-  imageURL: any,
+  youtubeURL?: string,
+  imageURL?: any,
   node?: LNNode
 }
 
@@ -1164,7 +1166,6 @@ function* updateAccountSettingsWorker( { payload }: {
       visibility?: AccountVisibility,
     },
 }} ) {
-
   const { accountShell, settings } = payload
   const { accountName, accountDescription, visibility } = settings
 
@@ -1173,7 +1174,6 @@ function* updateAccountSettingsWorker( { payload }: {
     if( accountName ) account.accountName = accountName
     if( accountDescription ) account.accountDescription = accountDescription
     if( visibility ) account.accountVisibility = visibility
-
     yield put( updateAccountShells( {
       accounts: {
         [ account.id ]: account
@@ -1296,7 +1296,6 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
   } catch ( error ) {
     yield put( setResetTwoFALoader( false ) )
     Alert.alert( 'Invalid Wallet 2FA' )
-    console.log( 'error CREATE_SM_N_RESETTFA_OR_XPRIV', error )
   }
 }
 
@@ -1425,7 +1424,6 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
       yield put( refreshAccountShells( [ shellToSync ], {
       } ) )
     } else {
-      console.log( 'Gifts generation failed' )
       yield put( giftCreationSuccess( false ) )
     }
 

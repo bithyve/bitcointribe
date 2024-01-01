@@ -18,15 +18,16 @@ import { RFValue } from 'react-native-responsive-fontsize'
 
 export type Props = {
   navigation: any;
+  route: any;
 };
 
-const RampOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const RampOrderFormScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
   const dispatch = useDispatch()
   const { rampHostedUrl, rampReceiveAddress } = useRampIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   const currentSubAccount: ExternalServiceSubAccountInfo = useMemo( () => {
-    return navigation.getParam( 'currentSubAccount' )
-  }, [ navigation.state.params ] )
+    return route.params?.currentSubAccount
+  }, [ route.params ] )
 
   const rampAccountShell = useAccountShellForID( currentSubAccount.accountShellID )
 

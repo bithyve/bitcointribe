@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { View, StyleSheet } from 'react-native'
 import TransactionDescribing from '../../../../common/data/models/Transactions/Interfaces'
-import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import useAccountShellFromRoute from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import sampleTransactions from '../../Details/SampleTransactions'
 import CurrentTotalHeader from '../../../../components/account-settings/transaction-reassignment/CurrentTotalHeader'
 import TransactionsList from '../../../../components/account-settings/transaction-reassignment/TransactionsList'
@@ -14,7 +14,7 @@ export type Props = {
 };
 
 const SelectReassignableTransactionsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-  const accountShell = useAccountShellFromNavigation( navigation )
+  const accountShell = useAccountShellFromRoute( navigation )
   const [ selectedTransactionIDs, setSelectedTransactionIDs ] = useState<Set<string>>( new Set() )
   const [ selectableTransactions, setSelectableTransactions ] = useState<TransactionDescribing[]>( [] )
 

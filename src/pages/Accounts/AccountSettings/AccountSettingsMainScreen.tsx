@@ -1,30 +1,24 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { StyleSheet, FlatList, ImageSourcePropType, Image, Alert, View, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native'
+import { FlatList, SafeAreaView, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-
+import { useDispatch } from 'react-redux'
+import Archive from '../../../assets/images/svgs/icon_archive.svg'
+import Visibilty from '../../../assets/images/svgs/icon_visibility.svg'
+import NameNDesc from '../../../assets/images/svgs/name_desc.svg'
+import Xpub from '../../../assets/images/svgs/xpub.svg'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
+import { translations } from '../../../common/content/LocContext'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import ListStyles from '../../../common/Styles/ListStyles'
-import Colors from '../../../common/Colors'
-import AccountShellRescanningBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningBottomSheet'
-import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningPromptBottomSheet'
+import CommonStyles from '../../../common/Styles/Styles'
+import ModalContainer from '../../../components/home/ModalContainer'
+import { updateAccountSettings } from '../../../store/actions/accounts'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 import AccountArchiveModal from './AccountArchiveModal'
-import AccountVisibility from '../../../common/data/enums/AccountVisibility'
-import { useDispatch, useSelector } from 'react-redux'
-import { updateAccountSettings } from '../../../store/actions/accounts'
-import ModalContainer from '../../../components/home/ModalContainer'
-import { Account, AccountType } from '../../../bitcoin/utilities/Interface'
-import { translations } from '../../../common/content/LocContext'
-import NameNDesc from '../../../assets/images/svgs/name_desc.svg'
-import Archive from '../../../assets/images/svgs/icon_archive.svg'
-import Xpub from '../../../assets/images/svgs/xpub.svg'
-import Visibilty from '../../../assets/images/svgs/icon_visibility.svg'
-import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import CommonStyles from '../../../common/Styles/Styles'
-import HeaderTitle from '../../../components/HeaderTitle'
-import { hp } from '../../../common/data/responsiveness/responsive'
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.ARCHIVED,
@@ -33,6 +27,7 @@ const SELECTABLE_VISIBILITY_OPTIONS = [
 
 export type Props = {
   navigation: any;
+  route: any;
 };
 
 export type SettingsListItem = {
@@ -47,10 +42,8 @@ export type SettingsListItem = {
 const listItemKeyExtractor = ( item: SettingsListItem ) => item.title
 
 
-const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-  const accountShellID = useMemo( () => {
-    return navigation.getParam( 'accountShellID' )
-  }, [ navigation ] )
+const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
+  const accountShellID = route.params?.accountShellID
   const dispatch = useDispatch()
   const strings  = translations[ 'accounts' ]
   const setting  = translations[ 'stackTitle' ]
@@ -178,7 +171,10 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
     }
     return (
       <ListItem
-        bottomDivider
+        containerStyle={{
+          backgroundColor:'transparent'
+        }}
+        // bottomDivider
         onPress={() => { handleListItemPress( listItem ) }}
         // disabled={listItem.title === 'Archive Account' && primarySubAccount.type === AccountType.CHECKING_ACCOUNT}
       >
@@ -239,7 +235,6 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
         isError={false}
         onProceed={() => {
           handleAccountArchive()
-          // closeArchiveModal()
           setShowAccountArchiveModal( false )
         }}
         onBack={() => setShowAccountArchiveModal( false )}
@@ -253,46 +248,17 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
     if ( primarySubAccount.balances.confirmed + primarySubAccount.balances.unconfirmed === 0 ) {
       setShowAccountArchiveModal( true )
     } else {
-      // checkAccountBalance()
       setCheckAccountModal( true )
     }
   }
 
   function handleTransactionDataSelectionFromRescan( transactionData: RescannedTransactionData ) {
-    // dismissBottomSheet()
     setShowRescanning( false )
     navigation.navigate( 'TransactionDetails', {
       transaction: transactionData.details,
       accountShellID: accountShell.id,
     } )
   }
-
-  // const showRescanningPromptBottomSheet = () => {
-  //   return (
-  //     <AccountShellRescanningPromptBottomSheet
-  //       onContinue={() => {
-  //         setShowRescanningPrompt( false )
-  //         setTimeout( () => {
-  //           // showRescanningBottomSheet()
-  //           setShowRescanning( true )
-  //         }, 800 )
-  //       }}
-  //       onDismiss={() => setShowRescanningPrompt( false )}
-  //     />
-  //   )
-  // }
-
-
-  // const showRescanningBottomSheet = () => {
-  //   return (
-  //     <AccountShellRescanningBottomSheet
-  //       accountShell={accountShell}
-  //       onDismiss={() => setShowRescanning( false )}
-  //       onTransactionDataSelected={handleTransactionDataSelectionFromRescan}
-  //     />
-  //   )
-  // }
-
 
   return (
     <SafeAreaView>
@@ -326,7 +292,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       <FlatList
         style={styles.rootContainer}
         contentContainerStyle={{
-          paddingHorizontal: 14
+          paddingHorizontal: 14,
         }}
         extraData={accountShell}
         data={listItems}
@@ -340,13 +306,17 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       <ModalContainer onBackground={()=>setCheckAccountModal( false )} visible={checkAccountModal} closeBottomSheet={() => {}}>
         {checkAccountBalance()}
       </ModalContainer>
+<<<<<<< HEAD
     </SafeAreaView>
+=======
+    </>
+>>>>>>> 141c7ac0863339de4bd260a7148d4d29259962b2
   )
 }
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    paddingHorizontal: 10,
+    // paddingTop: 10,
   },
   headerWrapper:{
     marginBottom: hp( 20 )

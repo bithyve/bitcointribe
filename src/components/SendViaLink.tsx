@@ -1,32 +1,31 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
-  Image,
-  Text,
-  StyleSheet,
-  Linking,
   Clipboard,
+  Image,
+  Linking,
   NativeModules,
-  Platform
+  Platform,
+  StyleSheet,
+  Text,
+  View
 } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import BottomInfoBox from './BottomInfoBox'
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import { APP_LIST, nameToInitials } from '../common/CommonFunctions'
-import { ScrollView } from 'react-native-gesture-handler'
-import Toast from '../components/Toast'
+import Fonts from '../common/Fonts'
 import {
   REGULAR_ACCOUNT,
-  TEST_ACCOUNT,
   SECURE_ACCOUNT,
+  TEST_ACCOUNT,
 } from '../common/constants/wallet-service-types'
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import Toast from '../components/Toast'
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
+import BottomInfoBox from './BottomInfoBox'
 //var isPackageInstalled = require('NativeModules').CheckPackageInstallation.isPackageInstalled;
 
 export default function SendViaLink( props ) {
@@ -589,10 +588,11 @@ export default function SendViaLink( props ) {
             }}
           >
             <ScrollView horizontal={true}>
-              {shareApps.map( ( item ) => {
+              {shareApps.map( ( item, index ) => {
                 if ( item.isAvailable ) {
                   return (
                     <AppBottomSheetTouchableWrapper
+                      key={`${JSON.stringify( item )}_${index}`}
                       onPress={() => {
                         if (
                           item.title == 'Copy Link' ||

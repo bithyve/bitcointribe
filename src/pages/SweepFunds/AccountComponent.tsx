@@ -1,31 +1,29 @@
-import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
+import React, { memo } from 'react'
 import {
-  View,
   Image,
-  TouchableOpacity,
-  Text,
   StyleSheet,
-  
-} from 'react-native';
-import { useSelector } from 'react-redux';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 
-function AccountComponent(props) {
+function AccountComponent( props ) {
   return (
     <TouchableOpacity
       activeOpacity={10}
       style={{
-        marginRight: wp('6%'),
-        marginLeft: wp('6%'),
+        marginRight: wp( '6%' ),
+        marginLeft: wp( '6%' ),
         borderRadius: 10,
-        marginTop: hp('1.7%'),
-        height: wp('25%'),
+        marginTop: hp( '1.7%' ),
+        height: wp( '25%' ),
         backgroundColor: Colors.backgroundColor1,
       }}
     >
@@ -33,21 +31,25 @@ function AccountComponent(props) {
         style={{
           flexDirection: 'row',
           alignItems: 'center',
-          height: wp('25%'),
+          height: wp( '25%' ),
         }}
       >
-        <View style={{ marginLeft: 10 }}>
-        <Image
-              source={props.item.image}
-              style={styles.circleShapeView}
-            />
+        <View style={{
+          marginLeft: 10
+        }}>
+          <Image
+            source={props.item.image}
+            style={styles.circleShapeView}
+          />
         </View>
-        <View style={{ marginLeft: 10, marginRight: 20 }}>
+        <View style={{
+          marginLeft: 10, marginRight: 20
+        }}>
           <Text
             style={{
               color: Colors.textColorGrey,
               fontFamily: Fonts.Regular,
-              fontSize: RFValue(11),
+              fontSize: RFValue( 11 ),
               paddingTop: 5,
               paddingBottom: 3,
             }}
@@ -57,31 +59,31 @@ function AccountComponent(props) {
           <Text style={styles.contactNameText} numberOfLines={1}>
             {props.item.account_name}
           </Text>
-          {props.item.hasOwnProperty('balance') ? (
+          {props.item.hasOwnProperty( 'balance' ) ? (
             <Text
               style={{
                 color: Colors.blue,
                 fontFamily: Fonts.MediumItalic,
-                fontSize: RFValue(10),
+                fontSize: RFValue( 10 ),
                 paddingTop: 3,
               }}
             >
-             {props.item.balance + ' sats'}
+              {props.item.balance + ' sats'}
             </Text>
           ) : null}
         </View>
-       
+
       </View>
 
     </TouchableOpacity>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   circleShapeView: {
-    width: wp('20%'),
-    height: wp('20%'),
-    borderRadius: wp('20%') / 2,
+    width: wp( '20%' ),
+    height: wp( '20%' ),
+    borderRadius: wp( '20%' ) / 2,
     borderColor: Colors.white,
     borderWidth: 2,
     alignItems: 'center',
@@ -96,14 +98,14 @@ const styles = StyleSheet.create({
   },
   contactNameText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(20),
+    fontSize: RFValue( 20 ),
     fontFamily: Fonts.Regular,
-    width: wp('50%'),
+    width: wp( '50%' ),
   },
   contactIconImage: {
     width: 20,
     height: 20,
     resizeMode: 'cover',
   },
-});
-export default memo(AccountComponent);
+} )
+export default memo( AccountComponent )

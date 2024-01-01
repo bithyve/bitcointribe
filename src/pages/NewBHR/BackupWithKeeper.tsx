@@ -111,7 +111,7 @@ export default function BackupWithKeeper( { navigation } ) {
     setSeed( primaryMnemonic )
     const path = checkingAccount[ 0 ].derivationPath
     setPath( path )
-    const url = `${HexaConfig.APP_STAGE === APP_STAGE.DEVELOPMENT ? 'keeperdev': 'keeper'}://backup/${Buffer.from( `&seed=${primaryMnemonic.replace( / /g, ',' )}&path=${path}&purpose=${'P2SH-P2WPKH: Wrapped segwit'}&name=tribe&appId=${HexaConfig.APP_STAGE === APP_STAGE.DEVELOPMENT ? 'hexadev': 'hexa'}`, 'utf8' ).toString(
+    const url = `${HexaConfig.APP_STAGE === APP_STAGE.DEVELOPMENT ? 'keeperdev': 'keeper'}://backup/${Buffer.from( `&seed=${primaryMnemonic.replace( / /g, ',' )}&path=${path}&purpose=${'P2SH-P2WPKH: Wrapped segwit'}&name=Tribe&appId=${HexaConfig.APP_STAGE === APP_STAGE.DEVELOPMENT ? 'hexadev': 'hexa'}`, 'utf8' ).toString(
       'base64',
     )}`
     setDeeplinkUrl( url )

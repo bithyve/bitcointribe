@@ -1,5 +1,5 @@
 import * as bip39 from 'bip39'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator,
   FlatList,
@@ -10,11 +10,11 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import IconRight from '../../assets/images/svgs/icon_right.svg'
@@ -23,9 +23,9 @@ import { GridType } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
-import Toast from '../../components/Toast'
 import CreateMemorablePattern from '../../components/border-wallet/CreateMemorablePattern'
 import ModalContainer from '../../components/home/ModalContainer'
+import Toast from '../../components/Toast'
 import uheprng from '../../utils/uheprng'
 
 const wordlists = bip39.wordlists.english
@@ -204,12 +204,12 @@ const Cell = React.memo<any>( ( { onPress, text, index, isSelected, sequence } )
   return prevProps.isSelected === nextProps.isSelected && prevProps.sequence === nextProps.sequence
 } )
 
-const BorderWalletGridScreen = ( { navigation } ) => {
-  const mnemonic = navigation.getParam( 'mnemonic' )
-  const isNewWallet = navigation.getParam( 'isNewWallet' )
-  const isAccountCreation = navigation.getParam( 'isAccountCreation' )
-  const gridType = navigation.getParam( 'gridType' ) || GridType.WORDS
-  const isImportAccount = navigation.getParam( 'gridType' ) || false
+const BorderWalletGridScreen = ( { route, navigation } ) => {
+  const mnemonic =  route.params?.mnemonic
+  const isNewWallet = route.params?.isNewWallet
+  const isAccountCreation =  route.params?.isAccountCreation
+  const isImportAccount = route.params?.isImportAccount
+  const gridType =  route.params?.gridType || GridType.WORDS
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
   const columnHeaderRef = useRef()
@@ -385,7 +385,7 @@ const BorderWalletGridScreen = ( { navigation } ) => {
             />
           </View>
           <View>
-            <Text style={styles.headerText}>{isNewWallet ? 'Step 4: Create a Pattern' : 'Select your Pattern'}</Text>
+            <Text style={styles.headerText}>{isNewWallet ? 'Step 4: Create a Pattern0' : 'Select your Pattern'}</Text>
           </View>
           {
             isNewWallet && (
@@ -485,15 +485,26 @@ const BorderWalletGridScreen = ( { navigation } ) => {
                   } )
                 }}
               >
-                <FlatList
-                  data={grid}
-                  overScrollMode="never"
-                  bounces={false}
-                  scrollEnabled={false}
-                  showsHorizontalScrollIndicator={false}
-                  numColumns={16}
-                  renderItem={renderCell}
-                />
+                {grid.map( ( rowData, index ) => (
+                  <FlatList
+                    key={index}
+                    data={rowData}
+                    horizontal
+                    overScrollMode="never"
+                    bounces={false}
+                    scrollEnabled={false}
+                    showsHorizontalScrollIndicator={false}
+                    renderItem={( { item, index: i } ) => (
+                      <Ceil
+                        onPress={( i ) => onCeilPress( i )}
+                        text={item}
+                        index={index * 16 + i}
+                        selected={selected}
+                      />
+                    )}
+                    // keyExtractor={( item ) => item}
+                  />
+                ) )}
               </ScrollView>
             </ScrollView>
           </View>

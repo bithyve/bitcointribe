@@ -1,26 +1,27 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  View,
-  Text,
+  Animated, Dimensions,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
+  Text,
+  TextInput,
   TouchableOpacity,
-  ScrollView,
-  TextInput, FlatList, Animated, Dimensions, Alert, Platform, KeyboardAvoidingView
+  View
 } from 'react-native'
-import Fonts from '../../common/Fonts'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
+import PagerView, { PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEventData } from 'react-native-pager-view'
 import { RFValue } from 'react-native-responsive-fontsize'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import { translations } from '../../common/content/LocContext'
-import { PagerView, PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEventData } from 'react-native-pager-view'
-import ModalContainer from '../../components/home/ModalContainer'
-import AlertModalContents from '../../components/AlertModalContents'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
 import Icon from 'react-native-vector-icons/dist/MaterialCommunityIcons'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { translations } from '../../common/content/LocContext'
+import AlertModalContents from '../../components/AlertModalContents'
+import ModalContainer from '../../components/home/ModalContainer'
 
 const AnimatedPagerView = Animated.createAnimatedComponent( PagerView )
 
@@ -30,7 +31,6 @@ const RestoreSeedPageComponent = ( props ) => {
   const [ SelectedOption, setSelectedOption ] = useState( 0 )
   const SelectOption = ( Id ) => {
   }
-
   const [ seedData, setSeedData ] = useState( [
     {
       id: 1, name: ''
@@ -177,35 +177,37 @@ const RestoreSeedPageComponent = ( props ) => {
   }
 
   const getIndex = ( index, seedIndex ) => {
-    let newIndex = index + 1 + ( seedIndex * 6 )
-    let isAdd = false
-    if ( index % 2 == 0 ) isAdd = true
+    const newIndex = index + 1 + ( seedIndex * 6 )
 
-    let tempNumber = 0
-    if ( index == 0 || index == 5 ) tempNumber = 0
-    else if ( index == 1 || index == 4 ) tempNumber = 2
-    else tempNumber = 1
+    // let newIndex = index + 1 + ( seedIndex * 6 )
+    // let isAdd = false
+    // if ( index % 2 == 0 ) isAdd = true
 
-    if ( isAdd )
-      newIndex -= tempNumber
-    else newIndex += tempNumber
+    // let tempNumber = 0
+    // if ( index == 0 || index == 5 ) tempNumber = 0
+    // else if ( index == 1 || index == 4 ) tempNumber = 2
+    // else tempNumber = 1
+
+    // if ( isAdd )
+    //   newIndex -= tempNumber
+    // else newIndex += tempNumber
 
     return newIndex
   }
 
   const getTextIndex = ( index ) => {
-    let newIndex = index
-    let isAdd = false
-    if ( index % 2 == 0 ) isAdd = true
+    const newIndex = index
+    // let isAdd = false
+    // if ( index % 2 == 0 ) isAdd = true
 
-    let tempNumber = 0
-    if ( index == 0 || index == 5 ) tempNumber = 0
-    else if ( index == 1 || index == 4 ) tempNumber = 2
-    else tempNumber = 1
+    // let tempNumber = 0
+    // if ( index == 0 || index == 5 ) tempNumber = 0
+    // else if ( index == 1 || index == 4 ) tempNumber = 2
+    // else tempNumber = 1
 
-    if ( isAdd )
-      newIndex -= tempNumber
-    else newIndex += tempNumber
+    // if ( isAdd )
+    //   newIndex -= tempNumber
+    // else newIndex += tempNumber
 
     return newIndex
   }
@@ -314,6 +316,7 @@ const RestoreSeedPageComponent = ( props ) => {
                           placeholderTextColor={Colors.borderColor}
                           value={partialSeedData[ currentPosition ][ getTextIndex( index ) ]?.name}
                           // value={value}
+                          blurOnSubmit={false}
                           // autoCompleteType="off"
                           keyboardType='ascii-capable'
                           textContentType="none"

@@ -9,7 +9,7 @@ import FormStyles from '../../../common/Styles/FormStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { updateAccountSettings } from '../../../store/actions/accounts'
 import useAccountSettingsUpdatedEffect from '../../../utils/hooks/account-effects/UseAccountSettingsUpdatedEffect'
-import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import { useDispatch } from 'react-redux'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import { translations } from '../../../common/content/LocContext'
@@ -18,11 +18,12 @@ import HeaderTitle from '../../../components/HeaderTitle'
 import CommonStyles from '../../../common/Styles/Styles'
 
 export type Props = {
+  route: any;
   navigation: any;
 };
 
-const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-  const accountShell = useAccountShellFromNavigation( navigation )
+const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { route, navigation }: Props ) => {
+  const accountShell = useAccountShellFromRoute( route )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const dispatch = useDispatch()
   const nameInputRef = useRef<Input>( null )

@@ -38,7 +38,7 @@ export default function SettingGetNewPin( props ) {
   const [ confirmPasscode, setConfirmPasscode ] = useState( '' )
   const [ passcodeFlag, setPasscodeFlag ] = useState( true )
   const [ confirmPasscodeFlag, setConfirmPasscodeFlag ] = useState( 0 )
-  const oldPasscode = props.navigation.getParam( 'oldPasscode' )
+  const oldPasscode = props.route.params?.oldPasscode
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
@@ -124,8 +124,8 @@ export default function SettingGetNewPin( props ) {
       if( oldPasscode === '' ) {
         dispatch( switchCredsChanged() )
         props.navigation.goBack()
-        if ( props.navigation.state.params.onPasscodeReset ) {
-          props.navigation.state.params.onPasscodeReset(  )
+        if ( props.route.params?.onPasscodeReset ) {
+          props.route.params?.onPasscodeReset(  )
         }
       } else {
         props.navigation.navigate( 'PasscodeChangeSuccessPage' )

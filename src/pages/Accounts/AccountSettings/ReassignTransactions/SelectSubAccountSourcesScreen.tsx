@@ -4,7 +4,7 @@ import { Button } from 'react-native-elements'
 import ButtonStyles from '../../../../common/Styles/ButtonStyles'
 import XPubSourceKind from '../../../../common/data/enums/XPubSourceKind'
 import SubAccountDescribing from '../../../../common/data/models/SubAccountInfo/Interfaces'
-import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import useAccountShellFromRoute from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import CurrentTotalHeader from '../../../../components/account-settings/source-reassignment/CurrentTotalHeader'
 import CheckingSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
 import SubAccountSourcesList from '../../../../components/account-settings/source-reassignment/SubAccountSourcesList'
@@ -34,7 +34,7 @@ export type Props = {
 };
 
 const SelectSubAccountSourcesScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-  const accountShell = useAccountShellFromNavigation( navigation )
+  const accountShell = useAccountShellFromRoute( navigation )
   const [ selectedSourceIDs, setSelectedSourceIDs ] = useState<Set<string>>( new Set() )
   // const selectableSources = useReassignableSourcesForAccountShell(accountShell);
   const selectableSources = sampleSources

@@ -1,41 +1,34 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import {
+  Image,
+  SafeAreaView,
+  StatusBar,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
-  StatusBar,
-  Platform,
-  BackHandler,
-  Linking,
-  Keyboard,
-  Alert,
-  Image,
-  SafeAreaView
+  View
 } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { credsAuth } from '../../store/actions/setupAndAuth'
-import BottomSheet from 'reanimated-bottom-sheet'
-import ModalContainer from '../../components/home/ModalContainer'
 import { LocalizationContext } from '../../common/content/LocContext'
-import Toast from '../../components/Toast'
-import AlertModalContents from '../../components/AlertModalContents'
-import { setCloudBackupStatus } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import Toast from '../../components/Toast'
 import { setOpenToApproval } from '../../store/actions/BHR'
-import LinearGradient from 'react-native-linear-gradient'
+import { setCloudBackupStatus } from '../../store/actions/cloud'
+import { credsAuth } from '../../store/actions/setupAndAuth'
 
 export default function CheckPasscodeComponent( props ) {
-  const backupType = props.navigation.getParam( 'backupType' )
+  const backupType = props.route.params?.backupType
   console.log( 'backupType', backupType )
   const dispatch = useDispatch()
   const { translations } = useContext( LocalizationContext )
@@ -62,14 +55,6 @@ export default function CheckPasscodeComponent( props ) {
   useEffect( () => {
     dispatch( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     dispatch( setOpenToApproval( false, [], null ) )
-    // Linking.addEventListener( 'url', handleDeepLinkEvent )
-    // //Linking.getInitialURL().then( handleDeepLinking )
-    // BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
-    // return () => {
-    //   BackHandler.removeEventListener( 'hardwareBackPress', hardwareBackPressCustom )
-    //   Linking.removeEventListener( 'url', handleDeepLinkEvent )
-    // }
-
   }, [] )
 
   const onPressNumber = useCallback(

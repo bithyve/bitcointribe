@@ -1,74 +1,44 @@
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
-import { createStackNavigator } from 'react-navigation-stack'
-import WalletSettingsContainerScreen from '../../../pages/MoreOptions/WalletSettings/WalletSettingsContainerScreen'
-import ManagePasscodeScreen from '../../../pages/ManagePasscodeScreen'
-import ChangeCurrencyScreen from '../../../pages/ChangeCurrencyScreen'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
-import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
-import VersionHistoryScreen from '../../../pages/VersionHistoryScreen'
 import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
+import ChangeCurrencyScreen from '../../../pages/ChangeCurrencyScreen'
+import ManagePasscodeScreen from '../../../pages/ManagePasscodeScreen'
+import WalletSettingsContainerScreen from '../../../pages/MoreOptions/WalletSettings/WalletSettingsContainerScreen'
 import ReLogin from '../../../pages/ReLogin'
 import SettingGetNewPin from '../../../pages/SettingGetNewPin'
-import { translations } from '../../../common/content/LocContext'
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 
-const strings  = translations[ 'stackTitle' ]
-
-const WalletSettingsStack = createStackNavigator(
-  {
-    WalletSettingsRoot: {
-      screen: WalletSettingsContainerScreen,
-      navigationOptions:{
-        header:null
-      }
-    },
-    ManagePasscode: {
-      screen: ManagePasscodeScreen,
-      navigationOptions: {
-        header:null
-      },
-    },
-    ChangeCurrency: {
-      screen: ChangeCurrencyScreen,
-      navigationOptions: {
-        header:null
-      },
-    },
-    ReLogin: {
-      screen: ReLogin,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
-    // VersionHistory: {
-    //   screen: VersionHistoryScreen,
-    //   navigationOptions: {
-    //     title: 'Version History',
-    //   },
-    // },
-    TransactionDetails: {
-      screen: TransactionDetailsContainerScreen,
-      navigationOptions: {
-        title: 'Transaction Details',
-      },
-    },
-    SettingGetNewPin: {
-      screen: SettingGetNewPin,
-      navigationOptions: {
-        header: null
-      },
-    },
-  },
-  {
-    defaultNavigationOptions: ( { navigation } ) => {
-      return {
+const Stack = createNativeStackNavigator()
+export default function WalletSettingsStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={( { navigation } ) => ( {
         ...defaultStackScreenNavigationOptions,
         headerLeft: () => {
           return <SmallNavHeaderBackButton onPress={() => {
             navigation.popToTop() }} />
         },
-      }
-    },
-  },
-)
-
-export default WalletSettingsStack
+      } )}
+    >
+      <Stack.Screen name="WalletSettingsRoot" component={WalletSettingsContainerScreen} options={{
+        title: 'Wallet Settings'
+      }} />
+      <Stack.Screen name="ManagePasscode" component={ManagePasscodeScreen} options={{
+        title: 'Manage Passcode'
+      }} />
+      <Stack.Screen name="ChangeCurrency" component={ChangeCurrencyScreen} options={{
+        title: ''
+      }} />
+      <Stack.Screen name="ReLogin" component={ReLogin} options={{
+        gestureEnabled: false
+      }} />
+      <Stack.Screen name="TransactionDetails" component={TransactionDetailsContainerScreen} options={{
+        title: 'Transaction Details'
+      }} />
+      <Stack.Screen name="SettingGetNewPin" component={SettingGetNewPin} options={{
+        title: 'Manage Passcode'
+      }} />
+    </Stack.Navigator>
+  )
+}

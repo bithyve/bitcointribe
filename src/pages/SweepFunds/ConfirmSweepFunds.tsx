@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import AccountComponent from './AccountComponent'
-import { ScrollView } from 'react-native-gesture-handler'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import AccountComponent from './AccountComponent'
 
 export default function ConfirmSweepFunds( props ) {
   const [ SelectedContactId, setSelectedContactId ] = useState( 0 )
@@ -39,6 +39,7 @@ export default function ConfirmSweepFunds( props ) {
           accountInfo.map( ( item, index ) => {
             return (
               <AccountComponent
+                key={`${JSON.stringify( item )}_${index}`}
                 item={item}
                 textHeading={'Sweeping funds from'}
                 SelectedContactId={SelectedContactId}
