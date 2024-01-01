@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
@@ -10,6 +11,7 @@ import { displayNameForBitcoinUnit } from '../../../common/data/enums/BitcoinUni
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import TransactionKind from '../../../common/data/enums/TransactionKind'
 import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces'
+import Fonts from '../../../common/Fonts'
 import ListStyles from '../../../common/Styles/ListStyles'
 import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
 import { markReadTx } from '../../../store/actions/accounts'
