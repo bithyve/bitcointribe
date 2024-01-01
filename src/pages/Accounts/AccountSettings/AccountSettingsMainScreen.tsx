@@ -8,10 +8,12 @@ import Visibilty from '../../../assets/images/svgs/icon_visibility.svg'
 import NameNDesc from '../../../assets/images/svgs/name_desc.svg'
 import Xpub from '../../../assets/images/svgs/xpub.svg'
 import { AccountType } from '../../../bitcoin/utilities/Interface'
+import Colors from '../../../common/Colors'
 import { translations } from '../../../common/content/LocContext'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import ListStyles from '../../../common/Styles/ListStyles'
 import CommonStyles from '../../../common/Styles/Styles'
+import HeaderTitle from '../../../components/HeaderTitle'
 import ModalContainer from '../../../components/home/ModalContainer'
 import { updateAccountSettings } from '../../../store/actions/accounts'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
@@ -306,11 +308,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
       <ModalContainer onBackground={()=>setCheckAccountModal( false )} visible={checkAccountModal} closeBottomSheet={() => {}}>
         {checkAccountBalance()}
       </ModalContainer>
-<<<<<<< HEAD
     </SafeAreaView>
-=======
-    </>
->>>>>>> 141c7ac0863339de4bd260a7148d4d29259962b2
   )
 }
 
