@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, SafeAreaView } from 'react-native'
+import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, SafeAreaView, TouchableOpacity, StatusBar } from 'react-native'
 import { useDispatch } from 'react-redux'
 import PersonalNodeConnectionForm from './PersonalNodeConnectionForm'
 import PersonalNodeDetailsSection from './PersonalNodeDetailsSection'
@@ -11,6 +11,10 @@ import Loader from '../../../components/loader'
 import { NodeDetail } from '../../../bitcoin/electrum/interface'
 import { setPersonalNodes, setDefaultNodes } from '../../../store/actions/nodeSettings'
 import { NodeStateOperations } from '../../../store/reducers/nodeSettings'
+import HeaderTitle from '../../../components/HeaderTitle'
+import CommonStyles from '../../../common/Styles/Styles'
+import Colors from '../../../common/Colors'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export type Props = {
   navigation: any;
@@ -128,6 +132,33 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) 
 
   return (
     <SafeAreaView style={styles.rootContainer}>
+      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
+      <View style={[ CommonStyles.headerContainer, {
+        // backgroundColor: Colors.backgroundColor
+      } ]}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            navigation.pop()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <HeaderTitle
+        firstLineTitle={'Node Settings'}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
       <KeyboardAvoidingView
         style={styles.rootContainer}
         behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
