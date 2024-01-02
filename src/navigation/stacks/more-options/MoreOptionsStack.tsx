@@ -1,9 +1,7 @@
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React, { useLayoutEffect } from 'react'
-import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
-import Fonts from '../../../common/Fonts'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 import BackupGridMnemonic from '../../../pages/borderwallet/BackupGridMnemonic'
@@ -113,20 +111,8 @@ const MoreOptionsStack = ( { navigation, route } ) => {
         headerShown: false,
       }} />
       <Stack.Screen name="NodeSettings" component={NodeSettingsContainerScreen}
-        options={( { navigation } ) => {
-          return {
-            title: 'Node Settings',
-            headerTitleStyle:{
-              color: Colors.blue,
-              fontSize: RFValue( 18 ),
-              fontFamily: Fonts.Medium,
-              textAlign: 'left',
-              marginHorizontal: 0
-            },
-            headerLeft: () => {
-              return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-            },
-          }
+        options={{
+          headerShown: false,
         }}
       />
       <Stack.Screen name="FundingSources" component={FundingSourcesScreen} options={{
