@@ -134,8 +134,6 @@ export default function IssueScreen( props ) {
           </View>
         </TouchableOpacity>
       </View>
-      {/* <Text style={styles.headerTitleText}>{'Issue ' + issueType}</Text> */}
-      {/* <Text style={styles.headerSubTitleText}>{'Lorem ipsum dolor sit amet, consec tetur'}</Text> */}
       <HeaderTitle
         firstLineTitle={'Issue ' + issueType}
         secondLineTitle={issueType=== 'collectible' ? 'Enter collectible asset details' : 'Enter coin asset details'}
@@ -274,21 +272,6 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.Medium
   },
-  // headerTitleText: {
-  //   color: Colors.blue,
-  //   fontSize: RFValue( 20 ),
-  //   marginLeft: 20,
-  //   fontFamily: Fonts.Regular,
-  //   marginBottom: 22
-  // },
-  // headerSubTitleText: {
-  //   fontSize: RFValue( 12 ),
-  //   color: Colors.THEAM_INFO_TEXT_COLOR,
-  //   fontFamily: Fonts.Regular,
-  //   marginLeft: 20,
-  //   // marginTop: 6,
-  //   marginBottom: 20
-  // },
   attachPlaceholderText: {
     flex: 1,
     paddingHorizontal: 20,
