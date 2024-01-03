@@ -25,10 +25,10 @@ export default function AccountDetailsStack() {
         headerShown: false
       }} />
       <Stack.Screen name="TransactionsList" component={TransactionsListContainerScreen} options={{
-        title: 'All Transactions'
+        headerShown: false
       }} />
       <Stack.Screen name="TransactionDetails" component={TransactionDetailsContainerScreen} options={{
-        title: 'TransactionDetails'
+        headerShown: false
       }} />
       <Stack.Screen name="DonationAccountWebViewSettings" component={DonationAccountWebViewSettingsScreen} options={{
         headerShown: false
