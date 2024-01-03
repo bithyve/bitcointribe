@@ -1,5 +1,5 @@
 import * as bip39 from 'bip39'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator,
   FlatList,
@@ -498,15 +498,7 @@ const ValidateBorderWalletPattern = ( { route, navigation } ) => {
                     bounces={false}
                     scrollEnabled={false}
                     showsHorizontalScrollIndicator={false}
-                    renderItem={( { item, index: i } ) => (
-                      <Ceil
-                        key={`${item}_${index}`}
-                        onPress={( i ) => onCeilPress( i )}
-                        text={item}
-                        index={index * 16 + i}
-                        selected={selected}
-                      />
-                    )}
+                    renderItem={renderCell}
                     // keyExtractor={( item ) => item}
                   />
                 ) )}
