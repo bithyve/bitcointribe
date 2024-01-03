@@ -1,42 +1,36 @@
-import React, { useState, useEffect, useCallback, createRef } from 'react'
-import {
-  View,
-  SafeAreaView,
-  StatusBar,
-  Platform,
-  Alert,
-} from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { useDispatch } from 'react-redux'
-import Colors from '../../common/Colors'
 import moment from 'moment'
-import _ from 'underscore'
-import HistoryPageComponent from './HistoryPageComponent'
-import ModalHeader from '../../components/ModalHeader'
-import { updateCloudPermission, updateSeedHealth } from '../../store/actions/BHR'
+import React, { createRef, useCallback, useEffect, useState } from 'react'
+import {
+  Platform, SafeAreaView,
+  StatusBar, View
+} from 'react-native'
 import DeviceInfo from 'react-native-device-info'
-import { useSelector } from 'react-redux'
-import HistoryHeaderComponent from './HistoryHeaderComponent'
-import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { updateCloudData, setCloudErrorMessage } from '../../store/actions/cloud'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
-import ModalContainer from '../../components/home/ModalContainer'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import { translations } from '../../common/content/LocContext'
+import _ from 'underscore'
 import { KeeperType, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
-import KeeperTypeModalContents from './KeeperTypeModalContent'
-import { getIndex } from '../../common/utilities'
+import Colors from '../../common/Colors'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
-import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
-import SeedBacupModalContents from './SeedBacupModalContents'
-import dbManager from '../../storage/realm/dbManager'
+import { translations } from '../../common/content/LocContext'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import { getIndex } from '../../common/utilities'
 import AlertModalContents from '../../components/AlertModalContents'
+import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
+import ErrorModalContents from '../../components/ErrorModalContents'
 import BottomInputModalContainer from '../../components/home/BottomInputModalContainer'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import ModalContainer from '../../components/home/ModalContainer'
+import ModalHeader from '../../components/ModalHeader'
+import dbManager from '../../storage/realm/dbManager'
+import { updateCloudPermission, updateSeedHealth } from '../../store/actions/BHR'
+import { setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
+import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
+import HistoryHeaderComponent from './HistoryHeaderComponent'
+import HistoryPageComponent from './HistoryPageComponent'
+import KeeperTypeModalContents from './KeeperTypeModalContent'
+import SeedBacupModalContents from './SeedBacupModalContents'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -361,7 +355,7 @@ const SeedBackupHistory = ( props ) => {
           }}
           data={seedBackupHistory.length ? sortedHistory( seedBackupHistory ) : []}
           confirmButtonText={'Confirm'}
-          disableChange={props.navigation.getParam( 'from', '' ) === 'receive'}
+          disableChange={props.route.params?.from === 'receive'}
           onPressReshare={() => {
             // ( cloudBackupBottomSheet as any ).current.snapTo( 1 )
           }}
