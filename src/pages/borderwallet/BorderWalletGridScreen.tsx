@@ -1,5 +1,5 @@
 import * as bip39 from 'bip39'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator,
   FlatList,
@@ -385,7 +385,7 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
             />
           </View>
           <View>
-            <Text style={styles.headerText}>{isNewWallet ? 'Step 4: Create a Pattern0' : 'Select your Pattern'}</Text>
+            <Text style={styles.headerText}>{isNewWallet ? 'Step 4: Create a Pattern' : 'Select your Pattern'}</Text>
           </View>
           {
             isNewWallet && (
@@ -485,26 +485,15 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
                   } )
                 }}
               >
-                {grid.map( ( rowData, index ) => (
-                  <FlatList
-                    key={index}
-                    data={rowData}
-                    horizontal
-                    overScrollMode="never"
-                    bounces={false}
-                    scrollEnabled={false}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={( { item, index: i } ) => (
-                      <Ceil
-                        onPress={( i ) => onCeilPress( i )}
-                        text={item}
-                        index={index * 16 + i}
-                        selected={selected}
-                      />
-                    )}
-                    // keyExtractor={( item ) => item}
-                  />
-                ) )}
+                <FlatList
+                  data={grid}
+                  overScrollMode="never"
+                  bounces={false}
+                  scrollEnabled={false}
+                  showsHorizontalScrollIndicator={false}
+                  numColumns={16}
+                  renderItem={renderCell}
+                />
               </ScrollView>
             </ScrollView>
           </View>
