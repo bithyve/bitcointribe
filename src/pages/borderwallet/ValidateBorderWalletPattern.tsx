@@ -1,16 +1,8 @@
 import * as bip39 from 'bip39'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ActivityIndicator,
-  FlatList,
-  InteractionManager,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+  ActivityIndicator, FlatList,
+  InteractionManager, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
@@ -19,12 +11,11 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import IconRight from '../../assets/images/svgs/icon_right.svg'
 import StartAgain from '../../assets/images/svgs/startagain.svg'
-import { GridType, Wallet } from '../../bitcoin/utilities/Interface'
+import { GridType } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
 import Toast from '../../components/Toast'
-import dbManager from '../../storage/realm/dbManager'
 import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
 import uheprng from '../../utils/uheprng'
 
@@ -202,7 +193,7 @@ const Cell = React.memo<any>( ( { onPress, text, index, isSelected, sequence } )
 } )
 
 const ValidateBorderWalletPattern = ( { route, navigation } ) => {
-  const wallet: Wallet =  dbManager.getWallet()
+  // const wallet: Wallet =  dbManager.getWallet()
   const gridType = route.params?.borderWalletGridType
   const mnemonic = route.params?.borderWalletMnemonic
   const gridMnemonic = route.params?.borderWalletGridMnemonic
@@ -489,19 +480,15 @@ const ValidateBorderWalletPattern = ( { route, navigation } ) => {
                   } )
                 }}
               >
-                {grid.map( ( rowData, index ) => (
-                  <FlatList
-                    key={index}
-                    data={rowData}
-                    horizontal
-                    overScrollMode="never"
-                    bounces={false}
-                    scrollEnabled={false}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={renderCell}
-                    // keyExtractor={( item ) => item}
-                  />
-                ) )}
+                <FlatList
+                  data={grid}
+                  overScrollMode="never"
+                  bounces={false}
+                  scrollEnabled={false}
+                  showsHorizontalScrollIndicator={false}
+                  numColumns={16}
+                  renderItem={renderCell}
+                />
               </ScrollView>
             </ScrollView>
           </View>
