@@ -1,30 +1,24 @@
-import React, { useState, useEffect } from 'react'
-import {
-  View,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  FlatList,
-  Text,
-  TouchableOpacity,
-} from 'react-native'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
-import Fonts from '../../common/Fonts'
-import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsive'
-import LinearGradient from 'react-native-linear-gradient'
-import deviceInfoModule from 'react-native-device-info'
-import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import * as bip39 from 'bip39'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import dbManager from '../../storage/realm/dbManager'
-import { Wallet } from '../../bitcoin/utilities/Interface'
-import Toast from '../../components/Toast'
+import React, { useEffect, useState } from 'react'
+import {
+  FlatList, SafeAreaView,
+  StatusBar,
+  StyleSheet, Text,
+  TouchableOpacity, View
+} from 'react-native'
+import deviceInfoModule from 'react-native-device-info'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
 import { useDispatch } from 'react-redux'
+import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
+import Colors from '../../common/Colors'
+import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsive'
+import Fonts from '../../common/Fonts'
+import ModalContainer from '../../components/home/ModalContainer'
+import Toast from '../../components/Toast'
 import { setBorderWalletBackup } from '../../store/actions/BHR'
 import SeedBacupModalContents from '../NewBHR/SeedBacupModalContents'
-import ModalContainer from '../../components/home/ModalContainer'
+import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 
 const wordlists = bip39.wordlists.english
 

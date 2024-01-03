@@ -7,15 +7,15 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import deviceInfoModule from 'react-native-device-info'
 import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsive'
+import Fonts from '../../common/Fonts'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 
