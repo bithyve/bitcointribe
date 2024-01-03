@@ -159,74 +159,167 @@ export default function BackupMethods( { navigation } ) {
         marginTop: 25
       }}>
         <View style={styles.body}>
-
-          <View style={styles.body}>
-            <TouchableOpacity
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row',
+            }}
+            //TODO: check
+            onPress={() =>
+              navigation.navigate( 'SeedBackup', {
+                screen: 'SeedBackupHistory',
+              } )
+            }>
+            <View
               style={{
-                flexDirection: 'row',
-              }}
-              //TODO: check
-              onPress={() =>
-                navigation.navigate( 'SeedBackup', {
-                  screen: 'SeedBackupHistory',
-                } )
-              }>
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: Colors.white,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  // , elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
-                  //   width: 15, height: 15
-                  // }
-                }}>
-                {levelData[ 0 ].keeper1.status == 'accessible' && (
-                  <View
-                    style={{
-                      left: -10,
-                      height: 12,
-                      width: 12,
-                      borderRadius: 6,
-                      backgroundColor: Colors.green,
-                      top: 0,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <FontAwesome name={'check'} color={Colors.white} size={7} />
-                  </View>
-                )}
-                <Image
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: Colors.white,
+                justifyContent: 'center',
+                alignItems: 'center',
+                // , elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
+                //   width: 15, height: 15
+                // }
+              }}>
+              {levelData[ 0 ].keeper1.status == 'accessible' && (
+                <View
                   style={{
-                    height: 20,
-                    width: 20,
-                    tintColor: Colors.blue,
-                  }}
-                  resizeMode={'contain'}
-                  source={require( '../../assets/images/icons/seedwords.png' )}
-                />
-              </View>
-              <Text
+                    left: -10,
+                    height: 12,
+                    width: 12,
+                    borderRadius: 6,
+                    backgroundColor: Colors.green,
+                    top: 0,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <FontAwesome name={'check'} color={Colors.white} size={7} />
+                </View>
+              )}
+              <Image
                 style={{
-                  fontSize: RFValue( 11 ),
-                  fontFamily: Fonts.Regular,
-                  color: Colors.black,
-                  margin: 10,
-                  textAlign: 'center',
-                }}>
-                {levelData[ 0 ].keeper1ButtonText}
-              </Text>
-            </TouchableOpacity>
-          </View>
+                  height: 20,
+                  width: 20,
+                  tintColor: Colors.blue,
+                }}
+                resizeMode={'contain'}
+                source={require( '../../assets/images/icons/seedwords.png' )}
+              />
+            </View>
+            <Text
+              style={{
+                fontSize: RFValue( 11 ),
+                fontFamily: Fonts.Regular,
+                color: Colors.black,
+                margin: 10,
+                textAlign: 'center',
+              }}>
+              {levelData[ 0 ].keeper1ButtonText}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
+        <View style={styles.body}>
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row',
+            }}
+            onPress={onPressBackupWithKeeper}>
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: Colors.white,
+                justifyContent: 'center',
+                alignItems: 'center',
+                //   elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
+                //   width: 15, height: 15
+                // }
+              }}>
+              {backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP && (
+                <View
+                  style={{
+                    left: -4,
+                    height: 12,
+                    width: 12,
+                    borderRadius: 6,
+                    backgroundColor: Colors.green,
+                    top: 0,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <FontAwesome name={'check'} color={Colors.white} size={10} />
+                </View>
+              )}
+              <Image
+                style={{
+                  height: 20,
+                  width: 20,
+                  // , tintColor: Colors.blue
+                }}
+                resizeMode={'contain'}
+                source={require( '../../assets/images/icons/keeper.png' )}
+              />
+            </View>
+            <Text
+              style={{
+                fontSize: RFValue( 11 ),
+                fontFamily: Fonts.Regular,
+                color: Colors.black,
+                margin: 10,
+                textAlign: 'center',
+              }}>
+            Backup with Keeper
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.body}>
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row',
+            }}
+            onPress={onPressBackupRGB}>
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: Colors.white,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Image
+                style={{
+                  height: 20,
+                  width: 20,
+                }}
+                resizeMode={'contain'}
+                source={require( '../../assets/images/icons/rgb_logo_round.png' )}
+              />
+            </View>
+            <Text
+              style={{
+                fontSize: RFValue( 11 ),
+                fontFamily: Fonts.Regular,
+                color: Colors.black,
+                margin: 10,
+                textAlign: 'center',
+              }}>
+            Backup RGB
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {wallet.borderWalletMnemonic !== '' && (
           <View style={styles.body}>
             <TouchableOpacity
+              onPress={() => {
+                navigation.navigate( 'BackupGridMnemonic' )
+              }}
               style={{
                 flexDirection: 'row',
-              }}
-              onPress={onPressBackupWithKeeper}>
+              }}>
               <View
                 style={{
                   width: 40,
@@ -239,31 +332,24 @@ export default function BackupMethods( { navigation } ) {
                   //   width: 15, height: 15
                   // }
                 }}>
-                {backupWithKeeperStatus === BackupWithKeeperState.BACKEDUP && (
+                {borderWalletBackup && borderWalletBackup.status && (
                   <View
                     style={{
-                      left: -4,
+                      left: -10,
                       height: 12,
                       width: 12,
                       borderRadius: 6,
                       backgroundColor: Colors.green,
-                      top: 0,
+                      top: -1,
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
                     <FontAwesome name={'check'} color={Colors.white} size={10} />
                   </View>
                 )}
-                <Image
-                  style={{
-                    height: 20,
-                    width: 20,
-                    // , tintColor: Colors.blue
-                  }}
-                  resizeMode={'contain'}
-                  source={require( '../../assets/images/icons/keeper.png' )}
-                />
+                <BorderWalletIcon />
               </View>
+
               <Text
                 style={{
                   fontSize: RFValue( 11 ),
@@ -272,100 +358,11 @@ export default function BackupMethods( { navigation } ) {
                   margin: 10,
                   textAlign: 'center',
                 }}>
-            Backup with Keeper
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.body}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-              }}
-              onPress={onPressBackupRGB}>
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: Colors.white,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Image
-                  style={{
-                    height: 20,
-                    width: 20,
-                  }}
-                  resizeMode={'contain'}
-                  source={require( '../../assets/images/icons/rgb_logo_round.png' )}
-                />
-              </View>
-              <Text
-                style={{
-                  fontSize: RFValue( 11 ),
-                  fontFamily: Fonts.Regular,
-                  color: Colors.black,
-                  margin: 10,
-                  textAlign: 'center',
-                }}>
-            Backup RGB
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {wallet.borderWalletMnemonic !== '' && (
-            <View style={styles.body}>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate( 'BackupGridMnemonic' )
-                }}
-                style={{
-                  flexDirection: 'row',
-                }}>
-                <View
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    backgroundColor: Colors.white,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    //   elevation: 10, shadowColor: Colors.shadowColor, shadowOpacity: 2, shadowOffset: {
-                    //   width: 15, height: 15
-                    // }
-                  }}>
-                  {borderWalletBackup && borderWalletBackup.status && (
-                    <View
-                      style={{
-                        left: -10,
-                        height: 12,
-                        width: 12,
-                        borderRadius: 6,
-                        backgroundColor: Colors.green,
-                        top: -1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <FontAwesome name={'check'} color={Colors.white} size={10} />
-                    </View>
-                  )}
-                  <BorderWalletIcon />
-                </View>
-
-                <Text
-                  style={{
-                    fontSize: RFValue( 11 ),
-                    fontFamily: Fonts.Regular,
-                    color: Colors.black,
-                    margin: 10,
-                    textAlign: 'center',
-                  }}>
               Backup with Border wallet
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   )
