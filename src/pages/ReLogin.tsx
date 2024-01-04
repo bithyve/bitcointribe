@@ -258,7 +258,7 @@ export default function Login( props ) {
             <View>
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
-                onPress={() => isValidate && checkAuth ? checkReloginNext() : loginNext()}
+                onPress={() => isValidate  ? checkReloginNext() : loginNext()}
                 style={{
                   ...styles.proceedButtonView,
                   backgroundColor:
