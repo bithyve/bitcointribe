@@ -21,6 +21,7 @@ import {
   widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { Shadow } from 'react-native-shadow-2'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
 import { AccountType, KeeperType, LevelData, LevelHealthInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
