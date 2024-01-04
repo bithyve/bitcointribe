@@ -22,22 +22,22 @@ export default function WalletSettingsStack() {
       } )}
     >
       <Stack.Screen name="WalletSettingsRoot" component={WalletSettingsContainerScreen} options={{
-        title: 'Wallet Settings'
+        headerShown: false
       }} />
       <Stack.Screen name="ManagePasscode" component={ManagePasscodeScreen} options={{
-        title: 'Manage Passcode'
+        headerShown: false
       }} />
       <Stack.Screen name="ChangeCurrency" component={ChangeCurrencyScreen} options={{
-        title: ''
+        headerShown: false
       }} />
       <Stack.Screen name="ReLogin" component={ReLogin} options={{
         gestureEnabled: false
       }} />
       <Stack.Screen name="TransactionDetails" component={TransactionDetailsContainerScreen} options={{
-        title: 'Transaction Details'
+        headerShown: false
       }} />
       <Stack.Screen name="SettingGetNewPin" component={SettingGetNewPin} options={{
-        title: 'Manage Passcode'
+        headerShown: false
       }} />
     </Stack.Navigator>
   )

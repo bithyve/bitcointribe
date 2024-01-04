@@ -1,23 +1,17 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import {
-  View,
-  Image,
-  Text,
-  SafeAreaView,
-  StyleSheet,
-  StatusBar
+  Image, SafeAreaView, StatusBar, StyleSheet, Text, View
 } from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
+import { useDispatch } from 'react-redux'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper'
-import { useDispatch, useSelector } from 'react-redux'
 import {
-  changeAuthCred,
-  switchCredsChanged,
+  switchCredsChanged
 } from '../store/actions/setupAndAuth'
-import LinearGradient from 'react-native-linear-gradient'
 export default function PasscodeChangeSuccessPage( props ) {
   const dispatch = useDispatch()
   return (
@@ -107,7 +101,6 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     marginLeft: wp( '8%' ),

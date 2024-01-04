@@ -46,7 +46,7 @@ const SubAccountSettingsStack = () => {
         name="EditDisplayProperties"
         component={AccountSettingsEditDisplayPropertiesScreen}
         options={{
-          title: strings[ 'NameDescription' ],
+          headerShown: false
         }}
       />
       <Stack.Screen
@@ -127,19 +127,14 @@ const SubAccountSettingsStack = () => {
         name="EditVisibility"
         component={AccountSettingsEditVisibilityScreen}
         options={{
-          title: 'Account Visibility'
+          headerShown: false
         }}
       />
       <Stack.Screen
         name="ShowXPub"
         component={XPubDetailsScreen}
-        options={( { navigation } ) => {
-          return {
-            ...defaultStackScreenNavigationOptions,
-            headerLeft: () => {
-              return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-            },
-          }
+        options={{
+          headerShown: false
         }}
       />
     </Stack.Navigator>
