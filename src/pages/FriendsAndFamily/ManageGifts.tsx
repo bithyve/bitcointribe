@@ -7,7 +7,7 @@ import {
   SafeAreaView,
   Text,
   ScrollView,
-  FlatList, Image, RefreshControl
+  FlatList, Image, RefreshControl, Alert
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -26,9 +26,9 @@ import { LocalizationContext } from '../../common/content/LocContext'
 import Gifts from '../../assets/images/satCards/gifts.svg'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import idx from 'idx'
-import { Gift, GiftStatus, GiftType, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, Gift, GiftStatus, GiftType, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import ModalContainer from '../../components/home/ModalContainer'
-import { syncGiftsStatus } from '../../store/actions/trustedContacts'
+import { InitTrustedContactFlowKind, fetchGiftFromTemporaryChannel, initializeTrustedContact, rejectGift, rejectTrustedContact, syncGiftsStatus } from '../../store/actions/trustedContacts'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
 import ManageGiftsList from './ManageGiftsList'
@@ -45,6 +45,13 @@ import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import ToggleContainer from './CurrencyToggle'
+import { processRequestQR } from '../../common/CommonFunctions'
+import AcceptGift from './AcceptGift'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import Toast from '../../components/Toast'
+import { acceptExistingContactRequest } from '../../store/actions/BHR'
+
+const QRScanner = require( '../../assets/images/icons/qr.png' )
 
 const listItemKeyExtractor = ( item ) => item.id
 
@@ -55,6 +62,8 @@ const ManageGifts = ( props ) => {
   const { navigation } = props
   const giftScreenNav = navigation.getParam( 'giftType' )
   const [ timer, setTimer ] = useState( true )
+  const [ giftData, setGiftData ] = useState<any | undefined>( undefined )
+  const [ trustedContactRequest, setTrustedContactRequest ] = useState<any| undefined>( undefined )
   // const [ giftDetails, showGiftDetails ] = useState( false )
   // const [ giftInfo, setGiftInfo ] = useState( null )
   const gifts = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.gifts ) )
@@ -94,6 +103,7 @@ const ManageGifts = ( props ) => {
       }, 2000 )
     }
   }, [] )
+
 
   useEffect( () => {
     const availableGifts = []
@@ -142,6 +152,8 @@ const ManageGifts = ( props ) => {
       AsyncStorage.setItem( 'GiftVisited', 'true' )
     }
   }
+
+
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
@@ -219,6 +231,140 @@ const ManageGifts = ( props ) => {
     }
   }
 
+  const handleGiftData=( data:any|undefined )=>{
+    setGiftData( data )
+  }
+
+
+  const onCodeScanned = async ( qrData ) => {
+    const {  giftRequest } = await processRequestQR( qrData )
+    handleGiftData( giftRequest )
+  }
+
+  const openQrscanner=()=>{
+    navigation.navigate( 'GiftQRScannerScreen', {
+      onCodeScanned:  onCodeScanned,
+    } )
+  }
+
+  const onGiftRequestAccepted = ( key? ) => {
+    try {
+      // this.closeBottomSheet()
+      let decryptionKey: string
+      try{
+        switch( giftData.encryptionType ){
+            case DeepLinkEncryptionType.DEFAULT:
+              decryptionKey = giftData.encryptedChannelKeys
+              break
+
+            case DeepLinkEncryptionType.OTP:
+            case DeepLinkEncryptionType.LONG_OTP:
+            case DeepLinkEncryptionType.SECRET_PHRASE:
+              decryptionKey = TrustedContactsOperations.decryptViaPsuedoKey( giftData.encryptedChannelKeys, key )
+              break
+        }
+      } catch( err ){
+        Toast( 'Invalid key' )
+        return
+      }
+
+      dispatch( fetchGiftFromTemporaryChannel( giftData.channelAddress, decryptionKey ) )
+    } catch ( error ) {
+      Alert.alert( 'Incompatible request, updating your app might help' )
+    }
+  }
+
+  const onGiftRequestRejected = ( ) => {
+    try {
+      const giftRequest = {
+        ...giftData
+      }
+      dispatch( rejectGift( giftRequest.channelAddress ) )
+      handleGiftData( undefined )
+    } catch ( error ) {
+      Alert.alert( 'Incompatible request, updating your app might help' )
+    }
+  }
+  const onTrustedContactRequestAccepted = ( key ) => {
+    setGiftData( undefined )
+    try {
+      let channelKeys: string[]
+      try{
+        switch( trustedContactRequest.encryptionType ){
+            case DeepLinkEncryptionType.DEFAULT:
+              channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
+              break
+            case DeepLinkEncryptionType.NUMBER:
+            case DeepLinkEncryptionType.EMAIL:
+            case DeepLinkEncryptionType.OTP:
+              const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
+              channelKeys = decryptedKeys.split( '-' )
+              break
+        }
+
+        trustedContactRequest.channelKey = channelKeys[ 0 ]
+        trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
+      } catch( err ){
+        Toast( 'Invalid key' )
+        return
+      }
+
+      if( trustedContactRequest.isExistingContact ){
+        dispatch( acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey ) )
+      } else {
+        navigation.navigate( 'ContactsListForAssociateContact', {
+          postAssociation: ( contact ) => {
+            dispatch( initializeTrustedContact( {
+              contact,
+              flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
+              channelKey: trustedContactRequest.channelKey,
+              contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
+              isPrimaryKeeper: trustedContactRequest.isPrimaryKeeper,
+              isKeeper: trustedContactRequest.isKeeper,
+              isCurrentLevel0:false
+            } ) )
+            // TODO: navigate post approval (from within saga)
+            navigation.navigate( 'Home' )
+          }
+        } )
+      }
+    } catch ( error ) {
+      Alert.alert( 'Incompatible request, updating your app might help' )
+    }
+  }
+
+  const onTrustedContactRejected = () => {
+    try {
+      let channelKeys: string[]
+      try{
+        switch( trustedContactRequest.encryptionType ){
+            case DeepLinkEncryptionType.DEFAULT:
+              channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
+              break
+
+            case DeepLinkEncryptionType.NUMBER:
+            case DeepLinkEncryptionType.EMAIL:
+            case DeepLinkEncryptionType.OTP:
+              const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
+              channelKeys = decryptedKeys.split( '-' )
+              break
+        }
+
+        trustedContactRequest.channelKey = channelKeys[ 0 ]
+        trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
+      } catch( err ){
+        Toast( 'Invalid key' )
+        return
+      }
+      dispatch( rejectTrustedContact( {
+        channelKey: trustedContactRequest.channelKey, isExistingContact: trustedContactRequest.isExistingContact
+      } ) )
+    } catch ( error ) {
+      Alert.alert( 'Incompatible request, updating your app might help' )
+    }
+  }
+
+
   return (
     <View style={{
       // height: '50%',
@@ -228,6 +374,26 @@ const ManageGifts = ( props ) => {
       <ModalContainer onBackground={()=>setKnowMore( false )} visible={knowMore} closeBottomSheet={() => setKnowMore( false )}>
         <GiftKnowMore closeModal={() => setKnowMore( false )} />
       </ModalContainer>
+      {giftData? <ModalContainer onBackground={()=>handleGiftData( undefined )} visible={giftData?true:false} closeBottomSheet={() => handleGiftData( undefined )}>
+        <AcceptGift
+          navigation={navigation}
+          closeModal={() => handleGiftData( undefined )}
+          onGiftRequestAccepted={onGiftRequestAccepted}
+          onGiftRequestRejected={onGiftRequestRejected}
+          walletName={giftData.walletName}
+          giftAmount={giftData.amount}
+          inputType={giftData.encryptionType}
+          hint={giftData.encryptionHint}
+          note={giftData.note}
+          themeId={giftData.themeId}
+          giftId={giftData.channelAddress}
+          isGiftWithFnF={giftData.isContactGift}
+          isContactAssociated={giftData.isAssociated}
+          onPressAccept={onTrustedContactRequestAccepted}
+          onPressReject={onTrustedContactRejected}
+          version={giftData.version}
+        />
+      </ModalContainer>:null}
       <View style={{
         height: 'auto',
         backgroundColor: Colors.backgroundColor,
@@ -255,11 +421,14 @@ const ManageGifts = ( props ) => {
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.qrWrapper} onPress={openQrscanner}>
+            <Image source={QRScanner} style={styles.qrIcon}/>
           </TouchableOpacity>
           {/* <ToggleContainer /> */}
         </View>
@@ -649,6 +818,15 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     marginHorizontal: wp( 4 ),
   },
+  qrWrapper:{
+    tintColor:Colors.black,
+    width:35
+  },
+  qrIcon:{
+    width:20,
+    tintColor:Colors.black,
+    height:20,
+  }
 } )
 
 export default ManageGifts

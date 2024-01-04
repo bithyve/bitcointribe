@@ -39,6 +39,7 @@ import SetUpSatCardScreen from '../../../pages/Gift/SetUpSatCardScreen'
 import SetUpSatNextCardScreen from '../../../pages/Gift/SetUpSatNextCardScreen'
 import GiftCreatedScreen from '../../../pages/Gift/GiftCreatedScreen'
 import ClaimSatsScreen from '../../../pages/Gift/ClaimSatsScreen'
+import GiftQRScannerScreen from '../../../pages/FriendsAndFamily/GiftQrScanner'
 // const strings  = translations[ 'stackTitle' ]
 
 // const MODAL_ROUTES = [
@@ -60,6 +61,7 @@ const GiftStack = createStackNavigator(
       },
     },
     ManageGifts,
+    GiftQRScannerScreen,
     EnterGiftDetails,
     GiftDetails,
     SendViaLinkAndQR,
