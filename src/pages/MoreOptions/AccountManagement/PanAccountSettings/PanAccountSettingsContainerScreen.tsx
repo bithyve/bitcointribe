@@ -1,16 +1,16 @@
 import React from 'react'
-import { StyleSheet, Image, FlatList, ImageSourcePropType,  SafeAreaView, StatusBar, View, TouchableOpacity } from 'react-native'
+import { FlatList, ImageSourcePropType, SafeAreaView, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 import Colors from '../../../../common/Colors'
 import ListStyles from '../../../../common/Styles/ListStyles'
 // import ImageStyles from '../../../../common/Styles/ImageStyles'
+import IconSettings from '../../../../assets/images/svgs/icon_accntSettings.svg'
 import { translations } from '../../../../common/content/LocContext'
-import HeaderTitle from '../../../../components/HeaderTitle'
 import { hp } from '../../../../common/data/responsiveness/responsive'
 import CommonStyles from '../../../../common/Styles/Styles'
-import IconSettings from '../../../../assets/images/svgs/icon_accntSettings.svg'
+import HeaderTitle from '../../../../components/HeaderTitle'
 
 
 export type Props = {

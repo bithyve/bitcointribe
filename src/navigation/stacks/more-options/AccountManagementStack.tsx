@@ -18,22 +18,16 @@ function PanAccountSettings() {
         ...defaultStackScreenNavigationOptions,
       }}
     >
-      <PanAccountSettingsStack.Screen name="PanAccountSettingsRoot" component={PanAccountSettingsContainerScreen} options={( { navigation } ) => {
-        return {
-          title: strings[ 'AccountSettings' ],
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.goBack() }} />
-          },
-        }
-      }} />
-      <PanAccountSettingsStack.Screen name="EnterPasscode" component={EnterPasscodeScreen} options={( { navigation } ) => {
-        return {
-          title: strings[ 'ShowAllAccounts' ],
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.goBack() }} />
-          },
-        }
-      }} />
+      <PanAccountSettingsStack.Screen name="PanAccountSettingsRoot" component={PanAccountSettingsContainerScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <PanAccountSettingsStack.Screen name="EnterPasscode" component={EnterPasscodeScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
       <PanAccountSettingsStack.Screen name="SecurityQuestion" component={SecurityQuestionScreen} options={( { navigation } ) => {
         return {
           title: strings[ 'ShowAllAccounts' ],
