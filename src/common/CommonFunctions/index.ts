@@ -432,10 +432,10 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
 
   if( deepLinkKind === DeepLinkKind.GIFT || deepLinkKind === DeepLinkKind.CONTACT_GIFT ){
     deepLink =
-    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/${extraData.themeId}/v${appVersion}`
+    `https://bitcointribe.app/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/${extraData.themeId}/v${appVersion}`
   } else {
     deepLink =
-    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}${currentLevel != undefined ? '/'+ currentLevel: ''}`
+    `https://bitcointribe.app/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}${currentLevel != undefined ? '/'+ currentLevel: ''}`
   }
 
   let shortLink = ''
