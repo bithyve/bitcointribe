@@ -46,58 +46,60 @@ const GiftQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
       flex: 1
     }}>
       <StatusBar barStyle="dark-content" />
+      <View
+        style={{
+          borderBottomWidth: 1,
+          borderColor: Colors.borderColor,
+          alignItems: 'center',
+          flexDirection: 'row',
+          paddingRight: 10,
+          paddingBottom: 15,
+          paddingTop: 10,
+          marginLeft: 20,
+          marginBottom: 15,
+        }}
+      >
 
-      <View style={{
-        flex: 1
-      }}>
-        <View
-          style={{
-            borderBottomWidth: 1,
-            borderColor: Colors.borderColor,
-            alignItems: 'center',
-            flexDirection: 'row',
-            paddingRight: 10,
-            paddingBottom: 15,
-            paddingTop: 10,
-            marginLeft: 20,
-            marginBottom: 15,
-          }}
-        >
+        <View style={{
+          flexDirection: 'row', alignItems: 'center'
+        }}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            hitSlop={{
+              top: 20, left: 20, bottom: 20, right: 20
+            }}
+            style={{
+              height: 30, width: 30, justifyContent: 'center'
+            }}
+          >
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
+          </TouchableOpacity>
 
-          <View style={{
-            flexDirection: 'row', alignItems: 'center'
-          }}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              hitSlop={{
-                top: 20, left: 20, bottom: 20, right: 20
-              }}
-              style={{
-                height: 30, width: 30, justifyContent: 'center'
-              }}
-            >
-              <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
-            </TouchableOpacity>
-
-            <Text
-              style={{
-                color: Colors.blue,
-                fontSize: RFValue( 18 ),
-                fontFamily: Fonts.Medium,
-              }}
-            >
-              {title ? title : 'Scan QR code'}
-            </Text>
-          </View>
+          <Text
+            style={{
+              color: Colors.blue,
+              fontSize: RFValue( 18 ),
+              fontFamily: Fonts.Medium,
+            }}
+          >
+            {title ? title : 'Scan QR code'}
+          </Text>
         </View>
+      </View>
+      <View style={{
+        flex: 1,
+        justifyContent:'center',
+        alignItems:'center'
+      }}>
+
 
         <View
           style={{
             width: wp( '100%' ),
             height: wp( '100%' ),
             overflow: 'hidden',
-            borderRadius: 20,
-            marginTop: hp( '3%' ),
+            borderRadius: 0,
+            marginTop: hp( '5%' ),
           }}
         >
           {isCameraOpen && (
