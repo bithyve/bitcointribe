@@ -16,7 +16,7 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -31,23 +31,23 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import idx from 'idx'
 import DeviceInfo from 'react-native-device-info'
-import { Account, AccountType, LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import { Account, AccountType, LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { translations } from '../../common/content/LocContext'
 import AccountShell from '../../common/data/models/AccountShell'
 import CopyThisText from '../../components/CopyThisText'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents'
+import ModalContainer from '../../components/home/ModalContainer'
+import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
 import KnowMoreButton from '../../components/KnowMoreButton'
 import QRCode from '../../components/QRCode'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
-import ModalContainer from '../../components/home/ModalContainer'
-import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
 import { onPressKeeper } from '../../store/actions/BHR'
 import {
   setReceiveHelper,
-  setSavingWarning,
+  setSavingWarning
 } from '../../store/actions/preferences'
 import { getNextFreeAddress } from '../../store/sagas/accounts'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
