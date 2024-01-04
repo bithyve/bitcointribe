@@ -40,11 +40,13 @@ import EnterNodeConfig from '../../../pages/lightningAccount/EnterNodeConfigScre
 import ScanNodeConfig from '../../../pages/lightningAccount/ScanNodeConfigScreen'
 import Login from '../../../pages/Login'
 import WalletBackup from '../../../pages/MoreOptions/WalletBackup'
+import BackupSeedWordsContent from '../../../pages/NewBHR/BackupSeedWordsContent'
 import ManageBackupNewBHR from '../../../pages/NewBHR/ManageBackup'
 import PersonalCopyHistoryNewBHR from '../../../pages/NewBHR/PersonalCopyHistory'
 import QrAndLink from '../../../pages/NewBHR/QrAndLink'
 import SecondaryDeviceHistoryNewBHR from '../../../pages/NewBHR/SecondaryDeviceHistoryNewBHR'
 import SecurityQuestionHistoryNewBHR from '../../../pages/NewBHR/SecurityQuestionHistory'
+import SeedBackupHistory from '../../../pages/NewBHR/SeedBackupHistory'
 import TrustedContactHistoryNewBHR from '../../../pages/NewBHR/TrustedContactHistoryKeeper'
 import NewOwnQuestions from '../../../pages/NewOwnQuestions'
 import RampOrderFormScreen from '../../../pages/RampIntegration/RampOrderFormScreen'
@@ -188,6 +190,12 @@ const HomeStack = ( { navigation, route } ) => {
         headerShown: false
       }} />
       <Stack.Screen name="WalletBackupAlert" component={WalletBackup} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="BackupSeedWordsContent" component={BackupSeedWordsContent} options={{
+        headerShown: false
+      }}/>
+      <Stack.Screen name="SeedBackupHistory" component={SeedBackupHistory} options={{
         headerShown: false
       }} />
       <Stack.Screen name="TwoFASetup" component={TwoFASetup} options={{

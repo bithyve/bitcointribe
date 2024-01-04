@@ -799,8 +799,8 @@ const WalletBackup = ( props, navigation ) => {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            // props.navigation.pop()
-            props.navigation.navigate( 'MoreOptionsContainerScreen' )
+            props.navigation.pop()
+            // props.navigation.navigate( 'MoreOptionsContainerScreen' )
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>

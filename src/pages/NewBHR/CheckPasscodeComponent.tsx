@@ -12,16 +12,16 @@ import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { LocalizationContext } from '../../common/content/LocContext'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import Fonts from '../../common/Fonts'
 import Toast from '../../components/Toast'
 import { setOpenToApproval } from '../../store/actions/BHR'
 import { setCloudBackupStatus } from '../../store/actions/cloud'
@@ -344,7 +344,6 @@ export default function CheckPasscodeComponent( props ) {
                 locations={[ 0.2, 1 ]}
                 style={{
                   ...styles.proceedButtonView,
-                  elevation: Elevation,
                   backgroundColor: isDisabledProceed
                     ? Colors.lightBlue
                     : Colors.blue,
