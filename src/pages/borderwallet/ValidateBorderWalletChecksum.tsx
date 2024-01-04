@@ -1,3 +1,4 @@
+import { CommonActions } from '@react-navigation/native'
 import * as bip39 from 'bip39'
 import React, { useEffect, useState } from 'react'
 import {
@@ -95,7 +96,14 @@ const ValidateBorderWalletChecksum = ( props ) => {
       Toast( 'Border Wallet backed-up successfully' )
       dispatch( setBorderWalletBackup( true ) )
       //TO-DO-BW
-      props.navigation.navigate( 'Home' )
+      props.navigation.dispatch( CommonActions.reset( {
+        index: 0,
+        routes: [ {
+          name: 'HomeNav',
+          key: 'HomeKey'
+        } ]
+      } ) )
+      // props.navigation.navigate( 'Home' )
     } else {
       Toast( 'Invalid checksum' )
     }
