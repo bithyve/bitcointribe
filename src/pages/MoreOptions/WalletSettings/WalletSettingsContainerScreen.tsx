@@ -1,20 +1,21 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { View, Text, StyleSheet, ScrollView, Image, ImageSourcePropType, Alert, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { Image, ImageSourcePropType, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Colors from '../../../common/Colors'
-import Fonts from '../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
-import WalletRescanningBottomSheet from '../../../components/bottom-sheets/wallet-rescanning-bottom-sheet/WalletRescanningBottomSheet'
-import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningPromptBottomSheet'
-import ModalContainer from '../../../components/home/ModalContainer'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import Colors from '../../../common/Colors'
 import { translations } from '../../../common/content/LocContext'
-import HeaderTitle from '../../../components/HeaderTitle'
+import { hp } from '../../../common/data/responsiveness/responsive'
+import Fonts from '../../../common/Fonts'
 import CommonStyles from '../../../common/Styles/Styles'
+import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
+import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningPromptBottomSheet'
+import WalletRescanningBottomSheet from '../../../components/bottom-sheets/wallet-rescanning-bottom-sheet/WalletRescanningBottomSheet'
+import HeaderTitle from '../../../components/HeaderTitle'
+import ModalContainer from '../../../components/home/ModalContainer'
+import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 
 export type Props = {
   navigation: any;
@@ -212,7 +213,8 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
 const styles = StyleSheet.create( {
   modalContainer: {
     height: '100%',
-    backgroundColor: Colors.white,
+    // backgroundColor: Colors.white,
+    marginTop: hp( 15 ),
     alignSelf: 'center',
     width: '100%',
   },

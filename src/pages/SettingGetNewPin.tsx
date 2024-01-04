@@ -1,37 +1,30 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
-  StyleSheet,
-  Text,
-  View,
-  SafeAreaView,
-  TouchableWithoutFeedback,
-  TouchableOpacity,
-  StatusBar,
-  Platform,
+  Platform, SafeAreaView, StatusBar, StyleSheet,
+  Text, TouchableOpacity, View
 } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import CommonStyles from '../common/Styles/Styles'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { useDispatch, useSelector } from 'react-redux'
+import ErrorModalContents from '../components/ErrorModalContents'
+import HeaderTitle from '../components/HeaderTitle'
+import ModalHeader from '../components/ModalHeader'
 import {
   changeAuthCred,
   pinChangedFailed,
   resetPin,
   switchCredsChanged
 } from '../store/actions/setupAndAuth'
-import BottomSheet from 'reanimated-bottom-sheet'
-import DeviceInfo from 'react-native-device-info'
-import ErrorModalContents from '../components/ErrorModalContents'
-import ModalHeader from '../components/ModalHeader'
-import LinearGradient from 'react-native-linear-gradient'
-import HeaderTitle from '../components/HeaderTitle'
 
 export default function SettingGetNewPin( props ) {
   const [ passcode, setPasscode ] = useState( '' )
@@ -829,7 +822,6 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
   },
   proceedButtonText: {
     color: Colors.white,

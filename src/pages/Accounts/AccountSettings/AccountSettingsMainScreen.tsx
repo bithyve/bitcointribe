@@ -174,6 +174,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
     }
     return (
       <ListItem
+        underlayColor='none'
         containerStyle={{
           backgroundColor:'transparent'
         }}
