@@ -430,63 +430,38 @@ const ManageGifts = ( props ) => {
           <TouchableOpacity style={styles.qrWrapper} onPress={openQrscanner}>
             <Image source={QRScanner} style={styles.qrIcon}/>
           </TouchableOpacity>
-          {/* <ToggleContainer /> */}
-        </View>
-
-        <View style={{
-          flexDirection: 'row', marginHorizontal: 15, marginTop: 6, alignItems: 'flex-end'
-        }}>
-          <AccountCheckingHome height={57} width={53} />
-          <Text style={[ styles.pageTitle, {
-            fontSize: RFValue( 24 ),
-            marginStart: 13,
-            marginBottom: 5,
-          } ]}>
-            {strings[ 'giftsats' ]}
-          </Text>
           <ToggleContainer />
         </View>
-        <Text style={{
-          marginHorizontal: 15, fontSize: RFValue( 11 ), color: '#525252', fontFamily: Fonts.Light, marginTop: 18
-        }}>{'Give sats as gifts to your friends and family, view and manage created gifts. '}
-          <Text onPress={() => setKnowMore( true )} style={{
-            color:'#A36363'
-          }}>{common[ 'knowMore' ]}</Text>
-        </Text>
-        <ScrollView
-          contentContainerStyle={{
-            flexDirection: 'row', alignItems: 'center', marginVertical: RFValue( 20 ), marginHorizontal: RFValue( 15 ),
-            flex:1
-          }}
-          horizontal>
-          {
-            Object.keys( giftsArr ?? {
-            } ).map( ( item ) => {
-              return (
-                <TouchableOpacity
-                  key={item}
-                  activeOpacity={0.6}
-                  style={{
-                    justifyContent: 'space-between', alignItems: 'center', flex: 1
-                  }}
-                  onPress={() => buttonPress( item )}
-                >
-                  <Text style={{
-                    color: Colors.blue, fontSize: RFValue( 14 ), fontFamily: Fonts.Medium
-                  }} >
-                    {item === GiftStatus.CREATED && 'Available'}
-                    {item === GiftStatus.EXPIRED && 'Expired'}
-                    {item === GiftStatus.SENT && 'Sent'}
-                  </Text>
-                  <View style={{
-                    height: RFValue( 4 ), backgroundColor: Colors.blue, marginTop: RFValue( 7 ), width: '100%',
-                    opacity:active === item ? 1:0.3
-                  }} />
-                </TouchableOpacity>
-              )
-            } )
-          }
-        </ScrollView>
+        <View style={styles.tabWrapper}>
+          <ScrollView
+            contentContainerStyle={[ {
+              flexDirection: 'row', alignItems: 'center', marginVertical: RFValue( 2 ), marginHorizontal: RFValue( 5 ),
+              flex:1
+            } ]}
+            horizontal>
+            {
+              Object.keys( giftsArr ?? {
+              } ).map( ( item ) => {
+                return (
+                  <TouchableOpacity
+                    key={item}
+                    style={styles.itemWrapper}
+                    activeOpacity={0.6}
+                    onPress={() => buttonPress( item )}
+                  >
+                    <View style={active===item?styles.activeItem:styles.inactiveItem}>
+                      <Text style={active===item?styles.activeItemFont:styles.inactiveItemFont} >
+                        {item === GiftStatus.CREATED && 'AVAILABLE'}
+                        {item === GiftStatus.EXPIRED && 'EXPIRED'}
+                        {item === GiftStatus.SENT && 'SENT'}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                )
+              } )
+            }
+          </ScrollView>
+        </View>
         {/* <View style={{
           height: 'auto'
         }}> */}
@@ -820,13 +795,63 @@ const styles = StyleSheet.create( {
   },
   qrWrapper:{
     tintColor:Colors.black,
-    width:35
+    flex: 8,
+    alignItems:'flex-end',
+    justifyContent:'center'
   },
   qrIcon:{
-    width:20,
-    tintColor:Colors.black,
-    height:20,
-  }
+    width:24,
+    tintColor:Colors.blue,
+    height:24,
+    marginBottom:2
+  },
+  tabWrapper:{
+    overflow:'hidden',
+    borderRadius:12,
+    backgroundColor:Colors.white,
+    height:50,
+    marginLeft:15,
+    marginRight:15,
+    marginBottom:10,
+    marginTop:10,
+    shadowColor: Colors.borderColor,
+    shadowOffset: {
+      width: 0, height: 2
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  activeItem:{
+    height:40,
+    borderRadius:12,
+    justifyContent:'center',
+    alignItems:'center',
+    backgroundColor:Colors.testAccCard,
+  },
+  inactiveItem:{
+    height:40,
+    borderRadius:12,
+    justifyContent:'center',
+    alignItems:'center',
+    backgroundColor:Colors.white,
+  },
+  activeItemFont:{
+    color: Colors.white,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.Medium
+  },
+  inactiveItemFont:{
+    color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.Medium
+  },
+  itemWrapper:{
+    flex:1,
+    height:50,
+    justifyContent:'center',
+    backgroundColor:Colors.white,
+  },
 } )
 
 export default ManageGifts
