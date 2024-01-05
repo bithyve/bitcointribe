@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useCallback, useEffect, useState } from 'react'
 import {
-  Image, KeyboardAvoidingView,
+  KeyboardAvoidingView,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -31,6 +31,7 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import idx from 'idx'
 import DeviceInfo from 'react-native-device-info'
 import AmountBTC from '../../assets/images/svgs/amount_btc.svg'
+import BWDetailsIcon from '../../assets/images/svgs/bwdetailsIcon.svg'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import { Account, AccountType, LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
@@ -52,8 +53,10 @@ import {
   setSavingWarning
 } from '../../store/actions/preferences'
 import { getNextFreeAddress } from '../../store/sagas/accounts'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import { getAccountIconByShell, getAccountTitleByShell } from './Send/utils'
+import { getAccountTitleByShell } from './Send/utils'
 import TwoFASetupWarningModal from './TwoFASetupWarningModal'
 
 export default function Receive( props ) {
@@ -74,6 +77,8 @@ export default function Receive( props ) {
   const [ SecureReceiveWarningBottomSheet ] = useState( React.createRef() )
   const [ amount, setAmount ] = useState( '' )
   const accountShell: AccountShell = props.route.params?.accountShell
+  const primarySubAccount = usePrimarySubAccountForShell( accountShell )
+  const isBorderWallet = primarySubAccount.type === AccountType.BORDER_WALLET
   const account: Account = useAccountByAccountShell( accountShell )
   const [ receivingAddress, setReceivingAddress ] = useState( null )
   const [ paymentURI, setPaymentURI ] = useState( null )
@@ -371,14 +376,15 @@ export default function Receive( props ) {
                   width: '15%',
                   alignItems: 'center'
                 }}>
-                  <Image
-                    source={
-                      getAccountIconByShell( accountShell )
-                    }
-                    style={{
-                      width: wp( '8%' ), height: wp( '8%' )
-                    }}
-                  />
+                  { accountShell.primarySubAccount.type === AccountType.BORDER_WALLET?
+                    <BWDetailsIcon/>
+                    :getAvatarForSubAccount(
+                      primarySubAccount,
+                      false,
+                      false,
+                      true,
+                      isBorderWallet
+                    )}
                 </View>
                 <View style={{
                   width: '75%',
