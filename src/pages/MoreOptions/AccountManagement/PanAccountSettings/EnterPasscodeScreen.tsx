@@ -1,26 +1,22 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
-  TouchableOpacity,
-  Text,
   SafeAreaView,
-  StyleSheet,
+  StyleSheet, Text, TouchableOpacity, View
 } from 'react-native'
-import Colors from '../../../../common/Colors'
-import Fonts from '../../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import Colors from '../../../../common/Colors'
+import Fonts from '../../../../common/Fonts'
 import { setShowAllAccount } from '../../../../store/actions/accounts'
 
-import { useDispatch, useSelector } from 'react-redux'
-import { credsAuth, credsAuthenticated, switchReLogin } from '../../../../store/actions/setupAndAuth'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
 import { translations } from '../../../../common/content/LocContext'
-import LinearGradient from 'react-native-linear-gradient'
-import HeaderTitle from '../../../../components/HeaderTitle'
 import { hp } from '../../../../common/data/responsiveness/responsive'
 import CommonStyles from '../../../../common/Styles/Styles'
+import HeaderTitle from '../../../../components/HeaderTitle'
+import { credsAuth, credsAuthenticated, switchReLogin } from '../../../../store/actions/setupAndAuth'
 
 export default function EnterPasscodeScreen( props ) {
   const common  = translations[ 'common' ]
@@ -261,13 +257,7 @@ export default function EnterPasscodeScreen( props ) {
               //PinChangeSuccessBottomSheet.current.snapTo(1);
             }}
           >
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
+            <View
               style={{
                 ...styles.proceedButtonView,
                 backgroundColor:
@@ -275,7 +265,7 @@ export default function EnterPasscodeScreen( props ) {
               }}
             >
               <Text style={styles.proceedButtonText}>{common.proceed}</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         </View>
       ) : (

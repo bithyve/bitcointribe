@@ -1,16 +1,13 @@
 import React, { useMemo, useState } from 'react'
-import { View, StyleSheet } from 'react-native'
-import { Button } from 'react-native-elements'
-import ButtonStyles from '../../../../common/Styles/ButtonStyles'
+import { StyleSheet, View } from 'react-native'
 import XPubSourceKind from '../../../../common/data/enums/XPubSourceKind'
-import SubAccountDescribing from '../../../../common/data/models/SubAccountInfo/Interfaces'
-import useAccountShellFromRoute from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
-import CurrentTotalHeader from '../../../../components/account-settings/source-reassignment/CurrentTotalHeader'
 import CheckingSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
-import SubAccountSourcesList from '../../../../components/account-settings/source-reassignment/SubAccountSourcesList'
 import SavingsSubAccountInfo from '../../../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
-import Colors from '../../../../common/Colors';
+import SubAccountDescribing from '../../../../common/data/models/SubAccountInfo/Interfaces'
+import CurrentTotalHeader from '../../../../components/account-settings/source-reassignment/CurrentTotalHeader'
+import SubAccountSourcesList from '../../../../components/account-settings/source-reassignment/SubAccountSourcesList'
 import ButtonBlue from '../../../../components/ButtonBlue'
+import useAccountShellFromRoute from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 
 // TODO: Remove these after testing UI.
 const sampleSources: SubAccountDescribing[] = [
