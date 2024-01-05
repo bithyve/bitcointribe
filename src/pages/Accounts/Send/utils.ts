@@ -109,7 +109,7 @@ export const getAccountIconByShell = ( accountShell: AccountShell ) => {
         accountImageSource = require( '../../../assets/images/icons/icon_swan.png' )
         break
       case AccountType.BORDER_WALLET:
-        accountImageSource = require( '../../../assets/images/icons/icon_swan.png' )
+        accountImageSource = require( '../../../assets/images/icons/icon_bw.png' )
         break
   }
 

@@ -376,7 +376,7 @@ export default function Receive( props ) {
                       getAccountIconByShell( accountShell )
                     }
                     style={{
-                      width: wp( '10%' ), height: wp( '10%' )
+                      width: wp( '8%' ), height: wp( '8%' )
                     }}
                   />
                 </View>
