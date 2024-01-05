@@ -125,7 +125,7 @@ const MoreOptionsStack = ( { navigation, route } ) => {
         headerShown: false,
       }} />
       <Stack.Screen name="VersionHistory" component={VersionHistoryScreen} options={{
-        title: 'Version History',
+        headerShown: false,
       }} />
       <Stack.Screen name="AccountDetails" component={AccountDetailsStack} options={{
         headerShown: false,
