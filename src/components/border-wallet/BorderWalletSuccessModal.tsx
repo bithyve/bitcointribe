@@ -1,17 +1,15 @@
 import React, { useContext } from 'react'
-import { View, Image, Text, StyleSheet } from 'react-native'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import { LocalizationContext } from '../../common/content/LocContext'
-import LinearGradient from 'react-native-linear-gradient'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import SuccessBWIllustration from '../../assets/images/svgs/successBWIllustration.svg'
+import Colors from '../../common/Colors'
+import { LocalizationContext } from '../../common/content/LocContext'
+import Fonts from '../../common/Fonts'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 
 export default function BorderWalletSuccessModal( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -164,13 +162,7 @@ export default function BorderWalletSuccessModal( props ) {
             }
             style={styles.successModalImage}
           /> */}
-          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-            start={{
-              x: 0, y: 0
-            }} end={{
-              x: 1, y: 0
-            }}
-            locations={[ 0.2, 1 ]}
+          <View
             style={{
               ...styles.successModalButtonView,
               backgroundColor: props.buttonColor
@@ -199,7 +191,7 @@ export default function BorderWalletSuccessModal( props ) {
                 {props.proceedButtonText}
               </Text>
             </AppBottomSheetTouchableWrapper>
-          </LinearGradient>
+          </View>
 
           {props.isIgnoreButton && (
             <AppBottomSheetTouchableWrapper
