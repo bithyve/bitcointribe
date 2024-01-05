@@ -131,6 +131,7 @@ import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Relay from '../../bitcoin/utilities/Relay'
 import ClipboardAutoRead from '../../components/ClipboardAutoRead'
 import LinearGradient from 'react-native-linear-gradient'
+import { updateLinkingURL } from '../../store/actions/doNotStore'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -279,6 +280,8 @@ interface HomePropsTypes {
   notificationPressed: any;
   clipboardAccess: boolean;
   recomputeNetBalance: any;
+  updateLinkingURL:( s:string )=>void;
+  linkingURL: string;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -738,6 +741,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   handleDeepLinking = async ( url ) => {
     if ( url === null ) return
+    if( this.props.linkingURL.trim() === url.trim() ) return
+    this.props.updateLinkingURL( url )
     const { trustedContactRequest, swanRequest, giftRequest, campaignId } = await processDeepLink( url )
     if( trustedContactRequest ){
       this.setState( {
@@ -1892,6 +1897,7 @@ const mapStateToProps = ( state ) => {
     IsCurrentLevel0: idx( state, ( _ ) => _.bhr.IsCurrentLevel0 ),
     walletId: idx( state, ( _ ) => _.storage.wallet.walletId ),
     clipboardAccess: idx( state, ( _ ) => _.misc.clipboardAccess ),
+    linkingURL: state.doNotStore.linkingURL,
   }
 }
 
@@ -1934,7 +1940,8 @@ export default withNavigationFocus(
     updateSecondaryShard,
     rejectedExistingContactRequest,
     notificationPressed,
-    recomputeNetBalance
+    recomputeNetBalance,
+    updateLinkingURL
   } )( Home )
 )
 
