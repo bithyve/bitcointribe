@@ -4,7 +4,6 @@ import {
   Text, TouchableOpacity, View
 } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp, widthPercentageToDP as wp
@@ -583,20 +582,14 @@ export default function SettingGetNewPin( props ) {
                   }, 2 )
                 }}
               >
-                <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-                  start={{
-                    x: 0, y: 0
-                  }} end={{
-                    x: 1, y: 0
-                  }}
-                  locations={[ 0.2, 1 ]}
+                <View
                   style={{
                     ...styles.proceedButtonView,
                     backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
                   }}
                 >
                   <Text style={styles.proceedButtonText}>Proceed</Text>
-                </LinearGradient>
+                </View>
               </TouchableOpacity>
             </View>
           ) : null}
