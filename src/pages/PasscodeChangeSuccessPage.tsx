@@ -2,7 +2,6 @@ import React from 'react'
 import {
   Image, SafeAreaView, StatusBar, StyleSheet, Text, View
 } from 'react-native'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import { useDispatch } from 'react-redux'
@@ -46,19 +45,13 @@ export default function PasscodeChangeSuccessPage( props ) {
                   props.navigation.popToTop()
                 }}
               >
-                <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-                  start={{
-                    x: 0, y: 0
-                  }} end={{
-                    x: 1, y: 0
-                  }}
-                  locations={[ 0.2, 1 ]}
+                <View
                   style={{
                     ...styles.successModalButtonView
                   }}
                 >
                   <Text style={styles.proceedButtonText}>View Settings</Text>
-                </LinearGradient>
+                </View>
               </AppBottomSheetTouchableWrapper>
               <Image source={require( '../assets/images/icons/noInternet.png' ) } style={styles.successModalImage} />
             </View>
