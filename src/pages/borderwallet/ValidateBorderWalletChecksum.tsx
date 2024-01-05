@@ -8,7 +8,6 @@ import {
   TouchableOpacity, View
 } from 'react-native'
 import deviceInfoModule from 'react-native-device-info'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { useDispatch } from 'react-redux'
 import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
@@ -160,21 +159,11 @@ const ValidateBorderWalletChecksum = ( props ) => {
           disabled={checksumWord === 'Select checksum word'}
           onPress={onPressVerify}
         >
-          <LinearGradient
-            colors={[ Colors.blue, Colors.darkBlue ]}
-            start={{
-              x: 0,
-              y: 0,
-            }}
-            end={{
-              x: 1,
-              y: 0,
-            }}
-            locations={[ 0.2, 1 ]}
+          <View
             style={styles.buttonView}
           >
             <Text style={styles.buttonText}>Verify</Text>
-          </LinearGradient>
+          </View>
         </TouchableOpacity>
       </View>
       <ModalContainer onBackground={() => setBWSuccessModal( false )} visible={BWSuccessModal}

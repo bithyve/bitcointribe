@@ -7,7 +7,6 @@ import {
   TouchableOpacity, View
 } from 'react-native'
 import deviceInfoModule from 'react-native-device-info'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../common/Colors'
 import { hp, wp } from '../../common/data/responsiveness/responsive'
@@ -91,17 +90,11 @@ const CreateWithBorderWallet = ( props ) => {
                 } )
             }}
           >
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
+            <View
               style={styles.buttonView}
             >
               <Text style={styles.buttonText}>Next</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         </View>
       </View>

@@ -1,31 +1,24 @@
 import React, { useEffect, useState } from 'react'
 import {
-  View,
-  SafeAreaView,
+  Alert,
+  Platform, SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  Alert,
-  Platform,
-  AppState,
+  TouchableOpacity, View
 } from 'react-native'
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
-import Fonts from '../../common/Fonts'
-import { GridType } from '../../bitcoin/utilities/Interface'
-import Toast from '../../components/Toast'
 import RNHTMLtoPDF from 'react-native-html-to-pdf'
+import { RFValue } from 'react-native-responsive-fontsize'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import RNFetchBlob from 'rn-fetch-blob'
-import { generateGridHtmlString } from './gridToHtml'
-import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
-import ModalContainer from '../../components/home/ModalContainer'
-import FileSavedModal from '../../components/border-wallet/FileSavedModal'
-import LinearGradient from 'react-native-linear-gradient'
+import { GridType } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import { hp, wp } from '../../common/data/responsiveness/responsive'
+import Toast from '../../components/Toast'
+import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
+import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
+import { generateGridHtmlString } from './gridToHtml'
 
 
 const DownloadEncryptGrid = ( props ) => {
@@ -176,13 +169,7 @@ const DownloadEncryptGrid = ( props ) => {
           <View style={styles.statusIndicatorInactiveView} />
           <View style={styles.statusIndicatorInactiveView} />
         </View>
-        <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-          start={{
-            x: 0, y: 0
-          }} end={{
-            x: 1, y: 0
-          }}
-          locations={[ 0.2, 1 ]}
+        <View
           style={{
             ...styles.proceedButtonView,
             backgroundColor: Colors.blue,
@@ -207,7 +194,7 @@ const DownloadEncryptGrid = ( props ) => {
             Continue
             </Text>
           </AppBottomSheetTouchableWrapper>
-        </LinearGradient>
+        </View>
       </View>
       {/* <ModalContainer
         onBackground={()=> setFileSavedModal( false )}

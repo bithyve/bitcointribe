@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { useDispatch } from 'react-redux'
 import Colors from '../../common/Colors'
@@ -148,17 +147,11 @@ const ConfirmDownload = ( props ) => {
               <TouchableOpacity
                 onPress={onPressContinue}
               >
-                <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-                  start={{
-                    x: 0, y: 0
-                  }} end={{
-                    x: 1, y: 0
-                  }}
-                  locations={[ 0.2, 1 ]}
+                <View
                   style={styles.buttonView}
                 >
                   <Text style={styles.buttonText}>Continue</Text>
-                </LinearGradient>
+                </View>
               </TouchableOpacity>
             </View>
           </View>
