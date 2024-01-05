@@ -1,8 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useCallback, useEffect, useState } from 'react'
 import {
-  Image,
-  KeyboardAvoidingView,
+  Image, KeyboardAvoidingView,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -31,17 +30,20 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import idx from 'idx'
 import DeviceInfo from 'react-native-device-info'
+import AmountBTC from '../../assets/images/svgs/amount_btc.svg'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import { Account, AccountType, LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { translations } from '../../common/content/LocContext'
 import AccountShell from '../../common/data/models/AccountShell'
+import CommonStyles from '../../common/Styles/Styles'
+import { UsNumberFormat } from '../../common/utilities'
 import CopyThisText from '../../components/CopyThisText'
 import ErrorModalContents from '../../components/ErrorModalContents'
+import HeaderTitle from '../../components/HeaderTitle'
 import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents'
 import ModalContainer from '../../components/home/ModalContainer'
 import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
-import KnowMoreButton from '../../components/KnowMoreButton'
 import QRCode from '../../components/QRCode'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import { onPressKeeper } from '../../store/actions/BHR'
@@ -249,60 +251,76 @@ export default function Receive( props ) {
           enabled
         >
           <View style={NavStyles.modalContainer}>
-            <View style={NavStyles.modalHeaderTitleView}>
-              <View
+            {/* <View style={NavStyles.modalHeaderTitleView}> */}
+            {/* <View
                 style={{
                   flex: 1, flexDirection: 'row', alignItems: 'stretch'
                 }}
+              > */}
+            <View style={[ CommonStyles.headerContainer, {
+              backgroundColor: Colors.backgroundColor
+            } ]}>
+              <TouchableOpacity
+                style={CommonStyles.headerLeftIconContainer}
+                onPress={() => {
+                  props.navigation.goBack()
+                }}
               >
-                <TouchableOpacity
-                  onPress={() => onPressBack()}
-                  style={{
-                    height: 30, width: 30, justifyContent: 'center'
-                  }}
-                >
+                <View style={CommonStyles.headerLeftIconInnerContainer}>
                   <FontAwesome
                     name="long-arrow-left"
                     color={Colors.homepageButtonColor}
                     size={17}
                   />
-                </TouchableOpacity>
-                <Image
-                  source={
-                    getAccountIconByShell( accountShell )
-                  }
-                  style={{
-                    width: wp( '10%' ), height: wp( '10%' )
-                  }}
-                />
-                <View style={{
-                  marginLeft: wp( '2.5%' )
-                }}>
-                  <Text style={NavStyles.modalHeaderTitleText}>{common.receive}</Text>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.Regular,
-                      fontSize: RFValue( 12 ),
-                    }}
-                  >
-                    {
-                      getAccountTitleByShell( accountShell )
-                    }
-                  </Text>
                 </View>
-              </View>
-              {accountShell.primarySubAccount.type == AccountType.TEST_ACCOUNT ? (
-                <KnowMoreButton
-                  onpress={() => onPressKnowMore()}
-                  containerStyle={{
-                    marginTop: 'auto',
-                    marginBottom: 'auto',
-                    marginRight: 10,
-                  }}
-                />
-              ) : null}
+              </TouchableOpacity>
             </View>
+            <View>
+              <HeaderTitle
+                firstLineTitle={'Receive'}
+                secondLineTitle={'Make sure you keep them safe'}
+                infoTextNormal={''}
+                infoTextBold={''}
+                infoTextNormal1={''}
+                step={''}
+              />
+            </View>
+            {/* <Image
+                source={
+                  getAccountIconByShell( accountShell )
+                }
+                style={{
+                  width: wp( '10%' ), height: wp( '10%' )
+                }}
+              />
+              <View style={{
+                marginLeft: wp( '2.5%' )
+              }}>
+                <Text style={NavStyles.modalHeaderTitleText}>{common.receive}</Text>
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.Regular,
+                    fontSize: RFValue( 12 ),
+                  }}
+                >
+                  {
+                    getAccountTitleByShell( accountShell )
+                  }
+                </Text>
+              </View>
+            </View>
+            {accountShell.primarySubAccount.type == AccountType.TEST_ACCOUNT ? (
+              <KnowMoreButton
+                onpress={() => onPressKnowMore()}
+                containerStyle={{
+                  marginTop: 'auto',
+                  marginBottom: 'auto',
+                  marginRight: 10,
+                }}
+              />
+            ) : null} */}
+            {/* </View> */}
             <ScrollView>
               <View style={styles.QRView}>
                 <QRCode title={getAccountTitleByShell( accountShell ) === 'Test Account' ? 'Testnet address' : 'Bitcoin address'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp( '27%' )} />
@@ -318,18 +336,67 @@ export default function Receive( props ) {
                 onPress={() => { setReceiveModal( true ) }}
                 style={styles.selectedView}
               >
-                <View
-                  style={styles.text}
-                >
-                  <Text style={styles.titleText}>{amount ? amount : strings.Enteramount}</Text>
+                <View style={{
+                  width: '15%',
+                  alignItems: 'center'
+                }}>
+                  <AmountBTC/>
+                </View>
+                <View style={{
+                  width: '75%',
+                  justifyContent: 'center'
+                }}>
+                  <Text style={styles.titleText}>Add amount</Text>
+                  <Text style={styles.subTitle}>SubTitle Lorem ipsum dolor sit ame</Text>
                 </View>
 
                 <View style={{
-                  marginLeft: 'auto'
+                  width: '5%'
                 }}>
                   <Ionicons
                     name="chevron-forward"
-                    color={Colors.textColorGrey}
+                    color={Colors.Black}
+                    size={15}
+                    style={styles.forwardIcon}
+                  />
+                </View>
+              </AppBottomSheetTouchableWrapper>
+              <AppBottomSheetTouchableWrapper
+                onPress={() => { setReceiveModal( true ) }}
+                style={[ styles.selectedView, {
+                  marginTop: 10
+                } ]}
+              >
+                <View style={{
+                  width: '15%',
+                  alignItems: 'center'
+                }}>
+                  <Image
+                    source={
+                      getAccountIconByShell( accountShell )
+                    }
+                    style={{
+                      width: wp( '10%' ), height: wp( '10%' )
+                    }}
+                  />
+                </View>
+                <View style={{
+                  width: '75%',
+                  justifyContent: 'center'
+                }}>
+                  <Text style={styles.subTitle}>Receiving To:</Text>
+                  <Text style={styles.titleText}>{getAccountTitleByShell( accountShell )}</Text>
+                  <Text style={styles.balanceText}>Balance {UsNumberFormat(
+                    accountShell.primarySubAccount?.balances?.confirmed
+                  )} stats</Text>
+                </View>
+
+                <View style={{
+                  width: '5%'
+                }}>
+                  <Ionicons
+                    name="chevron-forward"
+                    color={Colors.Black}
                     size={15}
                     style={styles.forwardIcon}
                   />
@@ -468,9 +535,19 @@ const styles = StyleSheet.create( {
     marginTop: hp( '3%' )
   },
   titleText: {
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.Regular,
+    color: Colors.blue,
+  },
+  subTitle: {
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
+  },
+  balanceText: {
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.Regular,
+    color: Colors.CLOSE_ICON_COLOR,
   },
   text: {
     justifyContent: 'center', marginRight: 10, marginLeft: 10, flex: 1
@@ -481,20 +558,15 @@ const styles = StyleSheet.create( {
     marginLeft: 'auto',
   },
   selectedView: {
-    marginLeft: wp( '5%' ),
-    marginRight: wp( '5%' ),
-    marginBottom: hp( 4 ),
-    marginTop: hp( 2 ),
+    width: wp( '82%' ),
+    height: hp( '9%' ),
+    marginHorizontal: wp( '10%' ),
+    borderRadius: 5,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 15,
-    paddingBottom: 20,
-    borderBottomColor: Colors.borderColor,
-    borderBottomWidth: 1,
+    backgroundColor: Colors.white
   },
   forwardIcon: {
-    marginLeft: wp( '3%' ),
-    marginRight: wp( '3%' ),
     alignSelf: 'center',
   },
   text1: {
