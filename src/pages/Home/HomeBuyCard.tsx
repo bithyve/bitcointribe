@@ -135,12 +135,6 @@ const HomeBuyCard = ( {
           paddingVertical: wp( 2.5 ),
           paddingHorizontal: wp( 4 ),
           backgroundColor: Colors.blue,
-          // shadowColor: Colors.shadowBlue,
-          // shadowOpacity: 1,
-          // shadowOffset: {
-          //   width: 9, height: 10
-          // },
-          // elevation: 15
         }}>
         <TouchableOpacity
         // icon={
