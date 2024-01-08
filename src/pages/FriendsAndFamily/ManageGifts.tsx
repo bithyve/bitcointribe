@@ -473,7 +473,7 @@ const ManageGifts = ( props ) => {
             infoText={getSectionDescription()}
           />
         } */}
-        { active === GiftStatus.CREATED &&
+        {/* { active === GiftStatus.CREATED &&
         <TouchableOpacity
           onPress={() => navigation.navigate( 'CreateGift', {
             setActiveTab: buttonPress
@@ -492,8 +492,11 @@ const ManageGifts = ( props ) => {
           Create New Gift
           </Text>
         </TouchableOpacity>
-        }
-
+        } */}
+        <Text style={styles.flatlistHeader}>
+          {active === GiftStatus.CREATED && 'Available Gifts'}
+          {active === GiftStatus.SENT && 'Sent Gifts'}
+        </Text>
         <FlatList
           // extraData={selectedDestinationID}
           refreshControl={
@@ -576,8 +579,6 @@ const ManageGifts = ( props ) => {
                         backgroundColor: Colors.backgroundColor1,
                         borderRadius: wp( 2 ),
                         padding: wp( 3 ),
-                        borderColor: Colors.blue,
-                        borderWidth: 1
                       }}
                     >
                       <View style={{
@@ -627,7 +628,7 @@ const ManageGifts = ( props ) => {
                           marginRight: wp( 2 ),
                         }}>
                           <Text style={{
-                            color: Colors.gray13,
+                            color: Colors.blue,
                             fontSize: RFValue( 16 ),
                             fontFamily: Fonts.SemiBold,
                           }}>
@@ -852,6 +853,20 @@ const styles = StyleSheet.create( {
     justifyContent:'center',
     backgroundColor:Colors.white,
   },
+  flatlistHeader:{
+    fontSize: RFValue( 16 ),
+    color:Colors.blue,
+    marginTop:10,
+    marginLeft:20,
+    fontFamily:Fonts.Medium
+  },
+  flatlistHeaderNote:{
+    fontSize: RFValue( 12 ),
+    color:Colors.textColorGrey,
+    marginBottom:10,
+    marginLeft:20,
+    fontFamily:Fonts.Medium
+  }
 } )
 
 export default ManageGifts

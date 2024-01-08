@@ -70,7 +70,7 @@ const ManageGiftsList = ( props ) => {
           }
         </View>
         <View style={{
-          flexDirection: 'row', justifyContent: 'space-between', paddingTop: RFValue( 4 ),
+          flexDirection: 'row', justifyContent: 'space-between', paddingTop: RFValue( 10 ),
           // backgroundColor:'red'
         }}>
           {/* <View> */}

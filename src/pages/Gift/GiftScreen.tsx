@@ -745,7 +745,7 @@ class GiftScreen extends React.Component<
               image={<Add />}
             />
             <GiftBoxComponent
-              titleText={'Available Gifts'}
+              titleText={'All Gifts'}
               subTitleText={'All the gifts you have created, not sent, \nand gifts you have received are shown here'}
               onPress={() => this.props.navigation.navigate( 'ManageGifts', {
                 giftType : '0'
@@ -958,7 +958,7 @@ const styles = StyleSheet.create( {
   accountCardsSectionContainer: {
     height: hp( '71.46%' ),
     // marginTop: 30,
-    backgroundColor: Colors.backgroundColor1,
+    backgroundColor: Colors.backgroundColor,
     opacity: 1,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
