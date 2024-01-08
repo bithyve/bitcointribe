@@ -109,7 +109,6 @@ const SelectChecksumWord = ( props ) => {
       isNewWallet
     } )
   }
-  console.log( windowHeight )
   return (
     <SafeAreaView
       style={{
