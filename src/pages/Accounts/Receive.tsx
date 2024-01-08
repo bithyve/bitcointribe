@@ -352,7 +352,7 @@ export default function Receive( props ) {
                   justifyContent: 'center'
                 }}>
                   <Text style={styles.titleText}>Add amount</Text>
-                  <Text style={styles.subTitle}>SubTitle Lorem ipsum dolor sit ame</Text>
+                  <Text style={styles.subTitle}>Add a specific invoice amount</Text>
                 </View>
 
                 <View style={{
