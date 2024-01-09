@@ -23,7 +23,7 @@ import {
 } from 'react-native-responsive-screen'
 
 import Add_gifts from '../../assets/images/satCards/Add_gifts.svg'
-import Add from '../../assets/images/svgs/add.svg'
+import Add from '../../assets/images/svgs/add_brown.svg'
 
 import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
 import AlertModalContents from '../../components/AlertModalContents'
@@ -63,7 +63,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import React from 'react'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
-import Sat_card from '../../assets/images/satCards/sats_card.svg'
+import Sat_card from '../../assets/images/svgs/satscard.svg'
 import SeedBacupModalContents from '../NewBHR/SeedBacupModalContents'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import ToggleContainer from '../FriendsAndFamily/CurrencyToggle'
@@ -735,7 +735,7 @@ class GiftScreen extends React.Component<
             }}
           >
             <GiftBoxComponent
-              titleText={'Create New Gift'}
+              titleText={'Create a new gift'}
               subTitleText={this.strings[ 'giftSubTextF&F' ]}
               onPress={() => {
 
@@ -753,7 +753,7 @@ class GiftScreen extends React.Component<
               image={<Gifts />}
             />
             <GiftBoxComponent
-              titleText={'Claim SATSCARD'}
+              titleText={'Claim you Satscard'}
               scTitleText={'TM'}
               subTitleText={'Move sats from your SATSCARD™'}
               scSubText={'TM'}
@@ -791,7 +791,7 @@ class GiftScreen extends React.Component<
             proceedButtonText={'Detect SATSCARD'}
             proceedButtonSubText={'TM'}
             subPoints={'Touch your SATSCARD™ on your phone after clicking \'Detect SATSCARD™'}
-            bottomImage={require( '../../assets/images/satCards/illustration.png' )}
+            bottomImage={require( '../../assets/images/svgs/tapSat.png' )}
             onCloseClick={this.onCloseClick}
             onPressProceed={this.onViewHealthClick}
             closeModal
