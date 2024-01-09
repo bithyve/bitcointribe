@@ -26,7 +26,9 @@ import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
 import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
+import BWHealthCheckModal from '../../components/border-wallet/BWHealthCheckModal'
 import HeaderTitle from '../../components/HeaderTitle'
+import ModalContainer from '../../components/home/ModalContainer'
 import RGBServices from '../../services/RGBServices'
 import dbManager from '../../storage/realm/dbManager'
 
@@ -67,6 +69,7 @@ export default function BackupMethods( { navigation } ) {
   const [ days, setDays ] = useState( 0 )
   const wallet: Wallet = dbManager.getWallet()
   const dispatch = useDispatch()
+  const [ visibleModal, setVisibleModal ] = useState( false )
 
   useEffect( () => {
     async function fetchWalletDays() {
@@ -316,6 +319,7 @@ export default function BackupMethods( { navigation } ) {
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate( 'BackupGridMnemonic' )
+                // setVisibleModal( true )
               }}
               style={{
                 flexDirection: 'row',
@@ -364,6 +368,18 @@ export default function BackupMethods( { navigation } ) {
           </View>
         )}
       </View>
+      <ModalContainer
+        onBackground={()=> setVisibleModal( false )}
+        visible={visibleModal }
+        closeBottomSheet={() => setVisibleModal( false )}
+      >
+        <BWHealthCheckModal
+          title={'Backup wallet using BW'}
+          onPressClose={()=> setVisibleModal( false )}
+          proceedButtonText={'Backup Now'}
+          cancelButtonText={'Skip'}
+        />
+      </ModalContainer>
     </View>
   )
 }
