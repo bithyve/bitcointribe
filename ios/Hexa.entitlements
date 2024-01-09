@@ -6,7 +6,7 @@
 	<string>development</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:hexawallet.io</string>
+		<string>applinks:bitcointribe.app</string>
 	</array>
 	<array>
 		<string>applinks:bitcointribe.app</string>

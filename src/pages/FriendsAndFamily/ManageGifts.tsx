@@ -1,42 +1,59 @@
-import moment from 'moment'
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useContext, useEffect, useState, } from 'react'
 import {
-  FlatList, Image, RefreshControl, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  StatusBar,
+  SafeAreaView,
+  Text,
+  ScrollView,
+  FlatList, Image, RefreshControl, Alert
 } from 'react-native'
-import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  heightPercentageToDP as hp, widthPercentageToDP as wp
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
+import moment from 'moment'
 import Colors from '../../common/Colors'
-import { LocalizationContext } from '../../common/content/LocContext'
 import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import HeaderTitle from '../../components/HeaderTitle'
 import CommonStyles from '../../common/Styles/Styles'
+import { LocalizationContext } from '../../common/content/LocContext'
 // import GiftCard from '../../assets/images/svgs/icon_gift.svg'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import idx from 'idx'
-import AccountCheckingHome from '../../assets/images/accIcons/icon_checking.svg'
 import Gifts from '../../assets/images/satCards/gifts.svg'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import idx from 'idx'
+import { DeepLinkEncryptionType, Gift, GiftStatus, GiftType, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import ModalContainer from '../../components/home/ModalContainer'
+import { InitTrustedContactFlowKind, fetchGiftFromTemporaryChannel, initializeTrustedContact, rejectGift, rejectTrustedContact, syncGiftsStatus } from '../../store/actions/trustedContacts'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
+import ManageGiftsList from './ManageGiftsList'
+import IconAdd from '../../assets/images/svgs/icon_add.svg'
+import IconAddLight from '../../assets/images/svgs/icon_add_dark.svg'
 import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
-import { Gift, GiftStatus, GiftType, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import AccountCheckingHome from '../../assets/images/accIcons/icon_checking.svg'
+import GiftKnowMore from '../../components/know-more-sheets/GiftKnowMoreModel'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import RecipientAvatar from '../../components/RecipientAvatar'
+import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
-import ImageStyles from '../../common/Styles/ImageStyles'
-import ModalContainer from '../../components/home/ModalContainer'
-import GiftKnowMore from '../../components/know-more-sheets/GiftKnowMoreModel'
-import RecipientAvatar from '../../components/RecipientAvatar'
-import { syncGiftsStatus } from '../../store/actions/trustedContacts'
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import ToggleContainer from './CurrencyToggle'
-import ManageGiftsList from './ManageGiftsList'
+import { processRequestQR } from '../../common/CommonFunctions'
+import AcceptGift from './AcceptGift'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import Toast from '../../components/Toast'
+import { acceptExistingContactRequest } from '../../store/actions/BHR'
+
+const QRScanner = require( '../../assets/images/icons/qr.png' )
 
 const listItemKeyExtractor = ( item ) => item.id
-
-export type Props = {
-    route:any;
-    navigation: any;
-  };
 
 const ManageGifts = ( props ) => {
   const { translations } = useContext( LocalizationContext )
@@ -45,6 +62,8 @@ const ManageGifts = ( props ) => {
   const { navigation } = props
   const giftScreenNav = props.route.params?.giftType
   const [ timer, setTimer ] = useState( true )
+  const [ giftData, setGiftData ] = useState<any | undefined>( undefined )
+  const [ trustedContactRequest, setTrustedContactRequest ] = useState<any| undefined>( undefined )
   // const [ giftDetails, showGiftDetails ] = useState( false )
   // const [ giftInfo, setGiftInfo ] = useState( null )
   const gifts = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.gifts ) )
@@ -84,6 +103,7 @@ const ManageGifts = ( props ) => {
       }, 2000 )
     }
   }, [] )
+
 
   useEffect( () => {
     const availableGifts = []
@@ -132,6 +152,8 @@ const ManageGifts = ( props ) => {
       AsyncStorage.setItem( 'GiftVisited', 'true' )
     }
   }
+
+
   const numberWithCommas = ( x ) => {
     return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
   }
@@ -209,6 +231,140 @@ const ManageGifts = ( props ) => {
     }
   }
 
+  const handleGiftData=( data:any|undefined )=>{
+    setGiftData( data )
+  }
+
+
+  const onCodeScanned = async ( qrData ) => {
+    const {  giftRequest } = await processRequestQR( qrData )
+    handleGiftData( giftRequest )
+  }
+
+  const openQrscanner=()=>{
+    navigation.navigate( 'GiftQRScannerScreen', {
+      onCodeScanned:  onCodeScanned,
+    } )
+  }
+
+  const onGiftRequestAccepted = ( key? ) => {
+    try {
+      // this.closeBottomSheet()
+      let decryptionKey: string
+      try{
+        switch( giftData.encryptionType ){
+            case DeepLinkEncryptionType.DEFAULT:
+              decryptionKey = giftData.encryptedChannelKeys
+              break
+
+            case DeepLinkEncryptionType.OTP:
+            case DeepLinkEncryptionType.LONG_OTP:
+            case DeepLinkEncryptionType.SECRET_PHRASE:
+              decryptionKey = TrustedContactsOperations.decryptViaPsuedoKey( giftData.encryptedChannelKeys, key )
+              break
+        }
+      } catch( err ){
+        Toast( 'Invalid key' )
+        return
+      }
+
+      dispatch( fetchGiftFromTemporaryChannel( giftData.channelAddress, decryptionKey ) )
+    } catch ( error ) {
+      Alert.alert( 'Incompatible request, updating your app might help' )
+    }
+  }
+
+  const onGiftRequestRejected = ( ) => {
+    try {
+      const giftRequest = {
+        ...giftData
+      }
+      dispatch( rejectGift( giftRequest.channelAddress ) )
+      handleGiftData( undefined )
+    } catch ( error ) {
+      Alert.alert( 'Incompatible request, updating your app might help' )
+    }
+  }
+  const onTrustedContactRequestAccepted = ( key ) => {
+    setGiftData( undefined )
+    try {
+      let channelKeys: string[]
+      try{
+        switch( trustedContactRequest.encryptionType ){
+            case DeepLinkEncryptionType.DEFAULT:
+              channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
+              break
+            case DeepLinkEncryptionType.NUMBER:
+            case DeepLinkEncryptionType.EMAIL:
+            case DeepLinkEncryptionType.OTP:
+              const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
+              channelKeys = decryptedKeys.split( '-' )
+              break
+        }
+
+        trustedContactRequest.channelKey = channelKeys[ 0 ]
+        trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
+      } catch( err ){
+        Toast( 'Invalid key' )
+        return
+      }
+
+      if( trustedContactRequest.isExistingContact ){
+        dispatch( acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey ) )
+      } else {
+        navigation.navigate( 'ContactsListForAssociateContact', {
+          postAssociation: ( contact ) => {
+            dispatch( initializeTrustedContact( {
+              contact,
+              flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
+              channelKey: trustedContactRequest.channelKey,
+              contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
+              isPrimaryKeeper: trustedContactRequest.isPrimaryKeeper,
+              isKeeper: trustedContactRequest.isKeeper,
+              isCurrentLevel0:false
+            } ) )
+            // TODO: navigate post approval (from within saga)
+            navigation.navigate( 'Home' )
+          }
+        } )
+      }
+    } catch ( error ) {
+      Alert.alert( 'Incompatible request, updating your app might help' )
+    }
+  }
+
+  const onTrustedContactRejected = () => {
+    try {
+      let channelKeys: string[]
+      try{
+        switch( trustedContactRequest.encryptionType ){
+            case DeepLinkEncryptionType.DEFAULT:
+              channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
+              break
+
+            case DeepLinkEncryptionType.NUMBER:
+            case DeepLinkEncryptionType.EMAIL:
+            case DeepLinkEncryptionType.OTP:
+              const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
+              channelKeys = decryptedKeys.split( '-' )
+              break
+        }
+
+        trustedContactRequest.channelKey = channelKeys[ 0 ]
+        trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
+      } catch( err ){
+        Toast( 'Invalid key' )
+        return
+      }
+      dispatch( rejectTrustedContact( {
+        channelKey: trustedContactRequest.channelKey, isExistingContact: trustedContactRequest.isExistingContact
+      } ) )
+    } catch ( error ) {
+      Alert.alert( 'Incompatible request, updating your app might help' )
+    }
+  }
+
+
   return (
     <View style={{
       // height: '50%',
@@ -218,6 +374,26 @@ const ManageGifts = ( props ) => {
       <ModalContainer onBackground={()=>setKnowMore( false )} visible={knowMore} closeBottomSheet={() => setKnowMore( false )}>
         <GiftKnowMore closeModal={() => setKnowMore( false )} />
       </ModalContainer>
+      {giftData? <ModalContainer onBackground={()=>handleGiftData( undefined )} visible={giftData?true:false} closeBottomSheet={() => handleGiftData( undefined )}>
+        <AcceptGift
+          navigation={navigation}
+          closeModal={() => handleGiftData( undefined )}
+          onGiftRequestAccepted={onGiftRequestAccepted}
+          onGiftRequestRejected={onGiftRequestRejected}
+          walletName={giftData.walletName}
+          giftAmount={giftData.amount}
+          inputType={giftData.encryptionType}
+          hint={giftData.encryptionHint}
+          note={giftData.note}
+          themeId={giftData.themeId}
+          giftId={giftData.channelAddress}
+          isGiftWithFnF={giftData.isContactGift}
+          isContactAssociated={giftData.isAssociated}
+          onPressAccept={onTrustedContactRequestAccepted}
+          onPressReject={onTrustedContactRejected}
+          version={giftData.version}
+        />
+      </ModalContainer>:null}
       <View style={{
         height: 'auto',
         backgroundColor: Colors.backgroundColor,
@@ -251,63 +427,41 @@ const ManageGifts = ( props ) => {
               />
             </View>
           </TouchableOpacity>
-          {/* <ToggleContainer /> */}
-        </View>
-
-        <View style={{
-          flexDirection: 'row', marginHorizontal: 15, marginTop: 6, alignItems: 'flex-end'
-        }}>
-          <AccountCheckingHome height={57} width={53} />
-          <Text style={[ styles.pageTitle, {
-            fontSize: RFValue( 24 ),
-            marginStart: 13,
-            marginBottom: 5,
-          } ]}>
-            {strings[ 'giftsats' ]}
-          </Text>
+          <TouchableOpacity style={styles.qrWrapper} onPress={openQrscanner}>
+            <Image source={QRScanner} style={styles.qrIcon}/>
+          </TouchableOpacity>
           <ToggleContainer />
         </View>
-        <Text style={{
-          marginHorizontal: 15, fontSize: RFValue( 11 ), color: '#525252', fontFamily: Fonts.Light, marginTop: 18
-        }}>{'Give sats as gifts to your friends and family, view and manage created gifts. '}
-          <Text onPress={() => setKnowMore( true )} style={{
-            color:'#A36363'
-          }}>{common[ 'knowMore' ]}</Text>
-        </Text>
-        <ScrollView
-          contentContainerStyle={{
-            flexDirection: 'row', alignItems: 'center', marginVertical: RFValue( 20 ), marginHorizontal: RFValue( 15 ),
-            flex:1
-          }}
-          horizontal>
-          {
-            Object.keys( giftsArr ?? {
-            } ).map( ( item ) => {
-              return (
-                <TouchableOpacity
-                  key={item}
-                  activeOpacity={0.6}
-                  style={{
-                    justifyContent: 'space-between', alignItems: 'center', flex: 1
-                  }}
-                  onPress={() => buttonPress( item )}
-                >
-                  <Text style={{
-                    color: Colors.blue, fontSize: RFValue( 14 ), fontFamily: Fonts.Medium
-                  }} >
-                    {item === GiftStatus.CREATED && 'Available'}
-                    {item === GiftStatus.EXPIRED && 'Expired'}
-                    {item === GiftStatus.SENT && 'Sent'}
-                  </Text>
-                  <View style={{
-                    height: RFValue( 4 ), backgroundColor: Colors.blue, marginTop: RFValue( 7 ), width: '100%',
-                    opacity:active === item ? 1:0.3
-                  }} />
-                </TouchableOpacity>
-              )
-            } )
-          }
-        </ScrollView>
+        <View style={styles.tabWrapper}>
+          <ScrollView
+            contentContainerStyle={[ {
+              flexDirection: 'row', alignItems: 'center', marginVertical: RFValue( 2 ), marginHorizontal: RFValue( 5 ),
+              flex:1
+            } ]}
+            horizontal>
+            {
+              Object.keys( giftsArr ?? {
+              } ).map( ( item ) => {
+                return (
+                  <TouchableOpacity
+                    key={item}
+                    style={styles.itemWrapper}
+                    activeOpacity={0.6}
+                    onPress={() => buttonPress( item )}
+                  >
+                    <View style={active===item?styles.activeItem:styles.inactiveItem}>
+                      <Text style={active===item?styles.activeItemFont:styles.inactiveItemFont} >
+                        {item === GiftStatus.CREATED && 'AVAILABLE'}
+                        {item === GiftStatus.EXPIRED && 'EXPIRED'}
+                        {item === GiftStatus.SENT && 'SENT'}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                )
+              } )
+            }
+          </ScrollView>
+        </View>
         {/* <View style={{
           height: 'auto'
         }}> */}
@@ -319,7 +473,7 @@ const ManageGifts = ( props ) => {
             infoText={getSectionDescription()}
           />
         } */}
-        { active === GiftStatus.CREATED &&
+        {/* { active === GiftStatus.CREATED &&
         <TouchableOpacity
           onPress={() => navigation.navigate( 'CreateGift', {
             setActiveTab: buttonPress
@@ -338,8 +492,11 @@ const ManageGifts = ( props ) => {
           Create New Gift
           </Text>
         </TouchableOpacity>
-        }
-
+        } */}
+        <Text style={styles.flatlistHeader}>
+          {active === GiftStatus.CREATED && 'Available Gifts'}
+          {active === GiftStatus.SENT && 'Sent Gifts'}
+        </Text>
         <FlatList
           // extraData={selectedDestinationID}
           refreshControl={
@@ -422,8 +579,6 @@ const ManageGifts = ( props ) => {
                         backgroundColor: Colors.backgroundColor1,
                         borderRadius: wp( 2 ),
                         padding: wp( 3 ),
-                        borderColor: Colors.blue,
-                        borderWidth: 1
                       }}
                     >
                       <View style={{
@@ -473,7 +628,7 @@ const ManageGifts = ( props ) => {
                           marginRight: wp( 2 ),
                         }}>
                           <Text style={{
-                            color: Colors.gray13,
+                            color: Colors.blue,
                             fontSize: RFValue( 16 ),
                             fontFamily: Fonts.SemiBold,
                           }}>
@@ -639,7 +794,79 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     marginHorizontal: wp( 4 ),
   },
+  qrWrapper:{
+    tintColor:Colors.black,
+    flex: 8,
+    alignItems:'flex-end',
+    justifyContent:'center'
+  },
+  qrIcon:{
+    width:24,
+    tintColor:Colors.blue,
+    height:24,
+    marginBottom:2
+  },
+  tabWrapper:{
+    overflow:'hidden',
+    borderRadius:12,
+    backgroundColor:Colors.white,
+    height:50,
+    marginLeft:15,
+    marginRight:15,
+    marginBottom:10,
+    marginTop:10,
+    shadowColor: Colors.borderColor,
+    shadowOffset: {
+      width: 0, height: 2
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  activeItem:{
+    height:40,
+    borderRadius:12,
+    justifyContent:'center',
+    alignItems:'center',
+    backgroundColor:Colors.testAccCard,
+  },
+  inactiveItem:{
+    height:40,
+    borderRadius:12,
+    justifyContent:'center',
+    alignItems:'center',
+    backgroundColor:Colors.white,
+  },
+  activeItemFont:{
+    color: Colors.white,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.Medium
+  },
+  inactiveItemFont:{
+    color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.Medium
+  },
+  itemWrapper:{
+    flex:1,
+    height:50,
+    justifyContent:'center',
+    backgroundColor:Colors.white,
+  },
+  flatlistHeader:{
+    fontSize: RFValue( 16 ),
+    color:Colors.blue,
+    marginTop:10,
+    marginLeft:20,
+    fontFamily:Fonts.Medium
+  },
+  flatlistHeaderNote:{
+    fontSize: RFValue( 12 ),
+    color:Colors.textColorGrey,
+    marginBottom:10,
+    marginLeft:20,
+    fontFamily:Fonts.Medium
+  }
 } )
 
 export default ManageGifts
-

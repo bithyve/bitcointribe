@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as ExpoContacts from 'expo-contacts'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import {
   PermissionsAndroid,
   Platform,
@@ -35,6 +35,11 @@ import ModalContainer from '../../components/home/ModalContainer'
 import RadioButton from '../../components/RadioButton'
 import { setContactPermissionAsked, setIsPermissionGiven } from '../../store/actions/preferences'
 import { editTrustedContact } from '../../store/actions/trustedContacts'
+import AlphabeticList from './AlphabeticList'
+
+const viewabilityConfig = {
+  itemVisiblePercentThreshold: 50 // Adjust as needed
+}
 
 export default function AddContactAddressBook( props ) {
   let [ selectedContacts, setSelectedContacts ] = useState( [] )
@@ -43,6 +48,7 @@ export default function AddContactAddressBook( props ) {
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ filterContactData, setFilterContactData ] = useState( [] )
   const [ radioOnOff, setRadioOnOff ] = useState( false )
+  const [ currentLetter, setCurrentLetter ] = useState( '#' )
   const [ contactPermissionAndroid, setContactPermissionAndroid ] = useState(
     false,
   )
@@ -50,6 +56,7 @@ export default function AddContactAddressBook( props ) {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
+  const flatListRef =  React.useRef( null )
   const [ permissionModal, setModal ] = useState( false )
   const [ permissionErrModal, setErrModal ] = useState( false )
   const [ createFNFInvite, setCreateFNFInvite ] = useState( false )
@@ -86,6 +93,20 @@ export default function AddContactAddressBook( props ) {
     // }
   }, [] )
 
+  const onViewableItemsChanged = useCallback( ( { viewableItems } ) => {
+    if ( viewableItems.length > 0 ) {
+      const firstItem = viewableItems[ 0 ].item
+      let firstLetter = firstItem.name.trim()[ 0 ]
+      if ( firstLetter.match( /[^A-Za-z]/ ) ) {
+        firstLetter = '#'
+      } else {
+        firstLetter = firstLetter.toUpperCase() // Ensure it's uppercase
+      }
+      if( currentLetter !== firstLetter ){
+        setCurrentLetter( firstLetter )
+      }
+    }
+  }, [] )
 
   const getContact = () => {
     // if ( props.isLoadContacts ) {
@@ -245,6 +266,16 @@ export default function AddContactAddressBook( props ) {
   //   [ trustedContacts ],
   // )
 
+  const findIndexOfLetter = ( letter ) => {
+    return filterContactData.findIndex( ( contact ) => {
+      let firstCharacter = contact.name.trim()[ 0 ].toUpperCase()
+      if ( firstCharacter.match( /[^A-Za-z]/ ) ) {
+        firstCharacter = '#'
+      }
+      return firstCharacter === letter
+    } )
+  }
+
   async function onContactSelect( index ) {
     const contacts = filterContactData
     if ( contacts[ index ].checked ) {
@@ -358,6 +389,17 @@ export default function AddContactAddressBook( props ) {
     props.navigation.goBack()
   }
 
+  const scrollToChar=( char:string )=>{
+    const index = findIndexOfLetter( char )
+    if ( index !== -1 ) {
+      flatListRef.current.scrollToIndex( {
+        animated: false, index: index
+      } )
+    } else {
+      console.log( 'No contact starting with this letter' )
+    }
+  }
+
   const onSkipContinue = () => {
     const skippedContact = {
       id: uuid(),
@@ -375,40 +417,47 @@ export default function AddContactAddressBook( props ) {
     } )
   }
 
-  return (
-    <View style={styles.modalContentContainer}>
-      <SafeAreaView />
-      <StatusBar barStyle="dark-content" />
-      {/* <View style={styles.modalHeaderTitleView}> */}
-      <View style={[ CommonStyles.headerContainer, {
-        backgroundColor: Colors.backgroundColor
-      } ]}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            props.navigation.pop( props.route.params?.fromScreen === 'Gift' ? 2 : 1 )
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
-      <HeaderTitle1
-        // firstLineTitle={props.modalTitle ? props.modalTitle : 'Send Gift'}
-        secondLineTitle={strings.Associate}
-        infoTextNormal={''}
-        infoTextBold={''}
-        infoTextNormal1={''}
-        step={''}
-      />
-      {/* <Text style={styles.addressBook}>from your address book</Text> */}
+  const getItemLayout = ( _data: any, index: number ) => ( {
+    length: 45,
+    offset: 45 * index,
+    index,
+  } )
 
-      {selectedContacts.length !== 0 &&
+
+  return (
+    <SafeAreaView style={styles.modalContentContainer}>
+      <View style={styles.modalContentContainer}>
+        <StatusBar barStyle="dark-content" />
+        {/* <View style={styles.modalHeaderTitleView}> */}
+        <View style={[ CommonStyles.headerContainer, {
+          backgroundColor: Colors.backgroundColor
+        } ]}>
+          <TouchableOpacity
+            style={CommonStyles.headerLeftIconContainer}
+            onPress={() => {
+              props.navigation.pop( props.route.params?.fromScreen === 'Gift' ? 2 : 1 )
+            }}
+          >
+            <View style={CommonStyles.headerLeftIconInnerContainer}>
+              <FontAwesome
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
+                size={17}
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
+        <HeaderTitle1
+        // firstLineTitle={props.modalTitle ? props.modalTitle : 'Send Gift'}
+          secondLineTitle={strings.Associate}
+          infoTextNormal={''}
+          infoTextBold={''}
+          infoTextNormal1={''}
+          step={''}
+        />
+        {/* <Text style={styles.addressBook}>from your address book</Text> */}
+
+        {selectedContacts.length !== 0 &&
         <View style={styles.selectedContactContent}>
           <View style={styles.selectedContact}>
             <Text style={styles.selectedContactText}><Text style={styles.firstName}>{selectedContacts[ 0 ].firstName}</Text> {selectedContacts[ 0 ].lastName}</Text>
@@ -420,8 +469,8 @@ export default function AddContactAddressBook( props ) {
             </TouchableOpacity>
           </View>
         </View>
-      }
-      {/* <View style={{
+        }
+        {/* <View style={{
           flexDirection: 'row'
         }}>
           <AppBottomSheetTouchableWrapper
@@ -469,12 +518,12 @@ export default function AddContactAddressBook( props ) {
           </AppBottomSheetTouchableWrapper>
         </View> */}
 
-      {/* </View> */}
+        {/* </View> */}
 
-      <View style={{
-        flex: 1
-      }}>
-        {/* <View
+        <View style={{
+          flex: 1
+        }}>
+          {/* <View
           style={{
             paddingLeft: wp( '5%' ),
             paddingRight: wp( '5%' ),
@@ -485,10 +534,10 @@ export default function AddContactAddressBook( props ) {
             {'Add contacts from your Address Book, or add a new contact'}
           </Text>
         </View> */}
-        <View style={{
-          height: '95%', ...props.style
-        }}>
-          {/* <View style={styles.selectedContactContainer}>
+          <View style={{
+            height: '95%', ...props.style
+          }}>
+            {/* <View style={styles.selectedContactContainer}>
             {selectedContacts.length > 0
               ? selectedContacts.map( ( value, index ) => {
                 return (
@@ -515,59 +564,64 @@ export default function AddContactAddressBook( props ) {
               } )
               : null}
           </View> */}
-          <View style={[ styles.searchBoxContainer ]}>
-            <View style={styles.searchBoxIcon}>
-              <Icon
-                name="search"
-                size={20}
-                color={Colors.blue}
-              />
+            <View style={[ styles.searchBoxContainer ]}>
+              <View style={styles.searchBoxIcon}>
+                <Icon
+                  name="search"
+                  size={20}
+                  color={Colors.blue}
+                />
 
+              </View>
+              <TextInput
+                style={styles.searchBoxInput}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
+                autoCorrect={false}
+                autoFocus={false}
+                placeholder='Search from address book'
+                placeholderTextColor={Colors.babyGray}
+                onChangeText={( nameKeyword ) => {
+                  nameKeyword = nameKeyword.replace( /[^A-Za-z0-9 ]/g, '' )
+                  setSearchName( nameKeyword )
+                  filterContacts( nameKeyword )
+                }
+                }
+                value={searchName}
+              />
             </View>
-            <TextInput
-              style={styles.searchBoxInput}
-              keyboardType={
-                Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
-              }
-              autoCorrect={false}
-              autoFocus={false}
-              placeholder='Search from address book'
-              placeholderTextColor={Colors.babyGray}
-              onChangeText={( nameKeyword ) => {
-                nameKeyword = nameKeyword.replace( /[^A-Za-z0-9 ]/g, '' )
-                setSearchName( nameKeyword )
-                filterContacts( nameKeyword )
-              }
-              }
-              value={searchName}
-            />
-          </View>
-          <View style={{
-            height: '95%', flexDirection: 'row', position: 'relative'
-          }}>
-            {filterContactData ? (
-              <FlatList
-                keyExtractor={( item, index ) => item.id}
-                data={filterContactData}
-                extraData={radioOnOff}
-                showsVerticalScrollIndicator={false}
-                contentInset={{
-                  right: 0, top: 0, left: 0, bottom: hp( 24 )
-                }}
-                ListEmptyComponent={() =>
-                  <View style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    padding: wp( '8%' ),
-                  }}>
-                    <Text
-                      style={{
-                        fontFamily: Fonts.Regular,
-                        color: Colors.secondaryText,
-                        textAlign: 'center'
-                      }}
-                    >{strings.cannotSelect}</Text>
-                    {/* <AppBottomSheetTouchableWrapper
+            <View style={{
+              height: '95%', flexDirection: 'row', position: 'relative'
+            }}>
+              <AlphabeticList selected={currentLetter} onPress={scrollToChar}/>
+              {filterContactData ? (
+                <FlatList
+                  keyExtractor={( item, index ) => item.id}
+                  data={filterContactData}
+                  extraData={radioOnOff}
+                  ref={flatListRef}
+                  showsVerticalScrollIndicator={false}
+                  onViewableItemsChanged={onViewableItemsChanged}
+                  viewabilityConfig={viewabilityConfig}
+                  contentInset={{
+                    right: 0, top: 0, left: 0, bottom: hp( 24 )
+                  }}
+                  // getItemLayout={getItemLayout}
+                  ListEmptyComponent={() =>
+                    <View style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      padding: wp( '8%' ),
+                    }}>
+                      <Text
+                        style={{
+                          fontFamily: Fonts.Regular,
+                          color: Colors.secondaryText,
+                          textAlign: 'center'
+                        }}
+                      >{strings.cannotSelect}</Text>
+                      {/* <AppBottomSheetTouchableWrapper
                       onPress={() => getContactPermission()}
                       style={{
                         // height: wp( '8%' ),
@@ -583,36 +637,36 @@ export default function AddContactAddressBook( props ) {
                         Grant Permission
                       </Text>
                     </AppBottomSheetTouchableWrapper> */}
-                  </View>
-                }
-                renderItem={( { item, index } ) => {
-                  let selected = false
-                  if (
-                    selectedContacts.findIndex( ( temp ) => temp.id == item.id ) >
-                    -1
-                  ) {
-                    selected = true
+                    </View>
                   }
-                  // if (item.phoneNumbers || item.emails) {
-                  return (
-                    <AppBottomSheetTouchableWrapper
-                      onPress={() => onContactSelect( index )}
-                      style={{
-                        ...styles.contactView,
-                        backgroundColor: selected ? 'rgba(105, 162, 176, 0.4)' : null,
-                      }}
-                      key={index}
-                      activeOpacity={0.1}
-                    >
-                      <RadioButton
-                        size={selected ? 15 : 20}
-                        color={selected ? Colors.blue : Colors.gray1}
-                        borderColor={selected ? Colors.white :  Colors.backgroundColor}
-                        isChecked={item.checked}
-                        onpress={() => onContactSelect( index )}
-                      />
-                      <Text style={styles.contactText}>
-                        {/* {item.name && item.name.split( ' ' )[ 0 ]
+                  renderItem={( { item, index } ) => {
+                    let selected = false
+                    if (
+                      selectedContacts.findIndex( ( temp ) => temp.id == item.id ) >
+                    -1
+                    ) {
+                      selected = true
+                    }
+                    // if (item.phoneNumbers || item.emails) {
+                    return (
+                      <AppBottomSheetTouchableWrapper
+                        onPress={() => onContactSelect( index )}
+                        style={{
+                          ...styles.contactView,
+                          backgroundColor: selected ? 'rgba(105, 162, 176, 0.4)' : null,
+                        }}
+                        key={index}
+                        activeOpacity={0.1}
+                      >
+                        <RadioButton
+                          size={selected ? 15 : 20}
+                          color={selected ? Colors.blue : Colors.gray1}
+                          borderColor={selected ? Colors.white :  Colors.backgroundColor}
+                          isChecked={item.checked}
+                          onpress={() => onContactSelect( index )}
+                        />
+                        <Text style={styles.contactText}>
+                          {/* {item.name && item.name.split( ' ' )[ 0 ]
                           ? item.name.split( ' ' )[ 0 ]
                           : ''}{' '}
                         <Text style={{
@@ -623,87 +677,90 @@ export default function AddContactAddressBook( props ) {
                             : ''}
                         </Text> */}
 
-                        {item.name && item.name.split( ' ' ).map( ( x, index ) => {
-                          const i = item.name.split( ' ' ).length
-                          return (
-                            <Text key={`${x}_${index}`} style={{
-                              color: selected ? Colors.white : Colors.black
-                            }}>
-                              {index !== i - 1 ? `${x} ` :
-                                <Text style={{
-                                  fontFamily: Fonts.Medium
-                                }}>
-                                  {x}
-                                </Text>
-                              }
-                            </Text>
-                          )
-                        } )}
-                      </Text>
-                    </AppBottomSheetTouchableWrapper>
-                  )
+                          {item.name && item.name.split( ' ' ).map( ( x, index ) => {
+                            const i = item.name.split( ' ' ).length
+                            return (
+                              <Text key={`${x}_${index}`} style={{
+                                color: selected ? Colors.white : Colors.black
+                              }}>
+                                {index !== i - 1 ? `${x} ` :
+                                  <Text style={{
+                                    fontFamily: Fonts.Medium
+                                  }}>
+                                    {x}
+                                  </Text>
+                                }
+                              </Text>
+                            )
+                          } )}
+                        </Text>
+                      </AppBottomSheetTouchableWrapper>
+                    )
                   // } else {
                   //   return null;
                   // }
-                }}
-              />
-            ) : null}
-          </View>
-          {/* {selectedContacts.length >= 1 && ( */}
-          <View
-            style={{
-              position: 'absolute',
-              bottom: hp( -4 ),
-              // left: hp(1),
-              width: wp( '100%' ),
-              // alignSelf: 'center',
-              flexDirection: 'row-reverse',
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              backgroundColor: Colors.backgroundColor
-            }}
-          >
-            {
-              filterContactData.length > 0 && (
-                <AppBottomSheetTouchableWrapper
-                  disabled={isTC || selectedContacts.length == 0}
-                  onPress={() => onPressContinue()}
+                  }}
+                  ListFooterComponent={()=><View style={{
+                    height:100, width:'100%'
+                  }}/>}
+                />
+              ) : null}
+            </View>
+            {/* {selectedContacts.length >= 1 && ( */}
+            <View
+              style={{
+                position: 'absolute',
+                bottom: hp( -4 ),
+                // left: hp(1),
+                width: wp( '100%' ),
+                // alignSelf: 'center',
+                flexDirection: 'row-reverse',
+                justifyContent: 'flex-start',
+                alignItems:'center',
+              }}
+            >
+              <View style={styles.opacityPlaceholder}/>
+              {
+                filterContactData.length > 0 && (
+                  <AppBottomSheetTouchableWrapper
+                    disabled={isTC || selectedContacts.length == 0}
+                    onPress={() => onPressContinue()}
 
-                >
-                  <View
-                    style={selectedContacts.length ? styles.bottomButtonView : [ styles.bottomButtonView, {
-                      backgroundColor: Colors.lightBlue
-                    } ]}
                   >
-                    <Text style={styles.buttonText}>{common.confirmProceed}</Text>
-                  </View>
-                </AppBottomSheetTouchableWrapper>
-              )
-            }
-            {props.route.params?.fromScreen === 'Edit' ?
-              null :
-              <AppBottomSheetTouchableWrapper
-                onPress={() => onSkipContinue()}
-                style={{
-                  // height: wp( '8%' ),
-                  marginTop: hp( 1.8 ),
-                  width: wp( '28%' ),
-                  alignSelf: 'flex-start',
-                  paddingLeft: wp( '9%' ),
-                }}
-              >
-                <Text
+                    <View
+                      style={selectedContacts.length ? styles.bottomButtonView : [ styles.bottomButtonView, {
+                        backgroundColor: Colors.lightBlue
+                      } ]}
+                    >
+                      <Text style={styles.buttonText}>{common.confirmProceed}</Text>
+                    </View>
+                  </AppBottomSheetTouchableWrapper>
+
+                )
+              }
+              {props.route.params?.fromScreen === 'Edit' ?
+                null :
+                <AppBottomSheetTouchableWrapper
+                  onPress={() => onSkipContinue()}
                   style={{
-                    ...styles.proceedButtonText,
+                  // height: wp( '8%' ),
+                    marginTop: hp( 1.8 ),
+                    width: wp( '28%' ),
+                    alignSelf: 'flex-start',
                   }}
                 >
-                  {filterContactData.length > 0 ? common.skip : common.continue}
-                </Text>
+                  <Text
+                    style={{
+                      ...styles.proceedButtonText,
+                    }}
+                  >
+                    {filterContactData.length > 0 ? common.skip : common.continue}
+                  </Text>
 
-              </AppBottomSheetTouchableWrapper>
-            }
+                </AppBottomSheetTouchableWrapper>
+              }
 
-            {/* {
+              {/* {
               <View style={styles.statusIndicatorView}>
 
                 <View style={styles.statusIndicatorActiveView} />
@@ -713,9 +770,9 @@ export default function AddContactAddressBook( props ) {
 
             } */}
 
-          </View>
-          {/* )} */}
-          {/* <ModalContainer onBackground={()=>setErrModal( false )} visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
+            </View>
+            {/* )} */}
+            {/* <ModalContainer onBackground={()=>setErrModal( false )} visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
             <ErrorModalContents
               title={strings.erroraAccessing}
               info={errorMessage}
@@ -733,38 +790,39 @@ export default function AddContactAddressBook( props ) {
               bottomImage={require( '../../assets/images/icons/errorImage.png' )}
             />
           </ModalContainer> */}
-          <ModalContainer onBackground={() => setModal( false )} visible={permissionModal} closeBottomSheet={() => { }}>
-            <ErrorModalContents
+            <ModalContainer onBackground={() => setModal( false )} visible={permissionModal} closeBottomSheet={() => { }}>
+              <ErrorModalContents
               // modalRef={contactPermissionBottomSheet}
-              title={strings.why}
-              info={strings.info}
-              otherText={strings.otherText}
-              proceedButtonText={common.continue}
-              isIgnoreButton={false}
-              onPressProceed={() => {
-                getContactPermission()
+                title={strings.why}
+                info={strings.info}
+                otherText={strings.otherText}
+                proceedButtonText={common.continue}
+                isIgnoreButton={false}
+                onPressProceed={() => {
+                  getContactPermission()
+                  // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
+                  setModal( false )
+                }}
+                onPressIgnore={() => {
                 // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
-                setModal( false )
-              }}
-              onPressIgnore={() => {
-                // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
-                setModal( false )
-              }}
-              isBottomImage={true}
-              bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
-            />
-          </ModalContainer>
-          {/* create FNF Invite */}
-          <ModalContainer onBackground={() => setCreateFNFInvite( false )} visible={createFNFInvite} closeBottomSheet={() => { }}>
-            <CreateFNFInvite
-              closeModal={()=> setCreateFNFInvite( false )}
-              sendRequestToContact={()=> sendRequestToContact()}
-              createGifts={()=> goCreateGifts()}
-            />
-          </ModalContainer>
+                  setModal( false )
+                }}
+                isBottomImage={true}
+                bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
+              />
+            </ModalContainer>
+            {/* create FNF Invite */}
+            <ModalContainer onBackground={() => setCreateFNFInvite( false )} visible={createFNFInvite} closeBottomSheet={() => { }}>
+              <CreateFNFInvite
+                closeModal={()=> setCreateFNFInvite( false )}
+                sendRequestToContact={()=> sendRequestToContact()}
+                createGifts={()=> goCreateGifts()}
+              />
+            </ModalContainer>
+          </View>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -838,7 +896,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     // elevation: 10,
     marginBottom: 20,
-    marginLeft: wp( 9 ),
+    marginRight:10
   },
   selectedContactView: {
     width: wp( '42%' ),
@@ -925,5 +983,13 @@ const styles = StyleSheet.create( {
   },
   firstName: {
     fontWeight: '400'
+  },
+  opacityPlaceholder:{
+    opacity:0.7,
+    backgroundColor:Colors.backgroundColor,
+    width:'100%',
+    height:'100%',
+    position:'absolute',
+    zIndex:0
   }
 } )
