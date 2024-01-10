@@ -721,7 +721,7 @@ export default function AddContactAddressBook( props ) {
             >
               <View style={styles.opacityPlaceholder}/>
               {
-                filterContactData.length > 0 && (
+                selectedContacts.length > 0 && (
                   <AppBottomSheetTouchableWrapper
                     disabled={isTC || selectedContacts.length == 0}
                     onPress={() => onPressContinue()}
@@ -850,7 +850,9 @@ const styles = StyleSheet.create( {
   proceedButtonText: {
     color: Colors.blue,
     fontSize: RFValue( 12 ),
-    fontFamily: Fonts.Medium
+    fontFamily: Fonts.Medium,
+    marginRight:20,
+    marginBottom: 20,
   },
   modalContentContainer: {
     height: '100%',
