@@ -1,21 +1,20 @@
-import React, { useMemo, useRef, useState, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Input } from 'react-native-elements'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
+import { RFValue } from 'react-native-responsive-fontsize'
+import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
+import { translations } from '../../../common/content/LocContext'
 import Fonts from '../../../common/Fonts'
 import FormStyles from '../../../common/Styles/FormStyles'
-import { RFValue } from 'react-native-responsive-fontsize'
+import CommonStyles from '../../../common/Styles/Styles'
+import HeaderTitle from '../../../components/HeaderTitle'
 import { updateAccountSettings } from '../../../store/actions/accounts'
 import useAccountSettingsUpdatedEffect from '../../../utils/hooks/account-effects/UseAccountSettingsUpdatedEffect'
-import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
-import { useDispatch } from 'react-redux'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import { translations } from '../../../common/content/LocContext'
-import LinearGradient from 'react-native-linear-gradient'
-import HeaderTitle from '../../../components/HeaderTitle'
-import CommonStyles from '../../../common/Styles/Styles'
+import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 
 export type Props = {
   route: any;
@@ -140,17 +139,11 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { route, n
 
         <View style={styles.listFooterSection}>
           <TouchableOpacity onPress={handleSaveButtonPress} disabled={canSaveChanges === false}>
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
+            <View
               style={styles.confirmButtonView}
             >
               <Text style={styles.confirmButtonText}>{common.confirmProceed}</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         </View>
       </View>
@@ -192,7 +185,8 @@ const styles = StyleSheet.create( {
     borderRadius: 8,
     alignSelf: 'center',
     marginLeft: 15,
-    padding: 15
+    padding: 15,
+    backgroundColor: Colors.blue
   },
   confirmButtonText: {
     color: Colors.white,
