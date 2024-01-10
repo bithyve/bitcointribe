@@ -17,26 +17,31 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
+import { useNavigation, useRoute } from '@react-navigation/native'
 
 export type Props = {
   navigation: any;
 };
 
-const GiftQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const GiftQRScannerScreen: React.FC<Props> = ( ) => {
   const title = ''
   const cameraRef = createRef<RNCamera>()
   const [ isCameraOpen, setIsCameraOpen ] = useState( true )
   const [ scanQRFlag, setScanQRFlag ] = useState( [ RNCamera.Constants.BarCodeType.qr ] )
+  const navigation: any = useNavigation()
+  const route = useRoute()
+  const onCodeScanned = route.params?.onCodeScanned
 
   const barcodeRecognized = async barcodes => {
     if ( barcodes.data ) {
       setScanQRFlag( [] )
       setIsCameraOpen( false )
 
-      navigation.state.params.onCodeScanned(
-        getFormattedStringFromQRString( barcodes.data ),
-      )
-
+      if( onCodeScanned ){
+        onCodeScanned(
+          getFormattedStringFromQRString( barcodes.data ),
+        )
+      }
       navigation.goBack()
     }
   }
