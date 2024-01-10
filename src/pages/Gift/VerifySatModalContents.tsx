@@ -108,10 +108,6 @@ export default function VerifySatModalContents( props ) {
               }
             </View>
           ) : null}
-          <Image source={props.bottomImage}
-            resizeMode='contain' style={{
-              width: RFValue( 203 ), height: RFValue( 136 ), marginTop:RFValue( 27 )
-            }}/>
           <View style={{
             flexDirection:'row', marginTop: RFValue( 25 )
             // , alignItems:'flex-start',
@@ -120,7 +116,7 @@ export default function VerifySatModalContents( props ) {
               width:RFValue( 5 ), height:RFValue( 5 ), borderRadius: RFValue( 5 ), backgroundColor: Colors.blue, marginTop: RFValue( 5 )
             }}/> */}
             <Text style={{
-              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.Regular, marginStart: RFValue( 5 ), textAlign: 'center'
+              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.Regular, marginStart: RFValue( 5 ), textAlign: 'center',marginTop:20
             }}>
               {props.subPoints}
             </Text>
@@ -147,16 +143,10 @@ export default function VerifySatModalContents( props ) {
           </View>
         </View>
         <View
-          style={{
-            height: hp( '12%' ),
-            flexDirection: 'row',
-            marginTop: 'auto',
-            alignItems: 'flex-end',
-            // backgroundColor: 'red',
-            justifyContent: 'flex-end',
-            marginEnd: RFValue( 20 )
-          }}
+          style={styles.footerWrapper}
         >
+          <Image source={props.bottomImage}
+            resizeMode='contain'/>
           <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
             start={{
               x: 0, y: 0
@@ -169,6 +159,7 @@ export default function VerifySatModalContents( props ) {
               backgroundColor: props.buttonColor
                 ? props.buttonColor
                 : Colors.blue,
+              marginTop:20
             }}
           >
             <AppBottomSheetTouchableWrapper
@@ -287,4 +278,10 @@ const styles = StyleSheet.create( {
     letterSpacing: 0.6,
     lineHeight: 8
   },
+  footerWrapper:{
+    flexDirection:'row',
+    alignItems:'flex-end',
+    width:'100%',
+    marginTop:10,
+  }
 } )

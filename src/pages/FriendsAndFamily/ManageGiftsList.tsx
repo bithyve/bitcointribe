@@ -39,7 +39,7 @@ const ManageGiftsList = ( props ) => {
         marginBottom: hp( 0.5 ),
         paddingVertical: wp( 1 ),
         paddingHorizontal: wp( 1 ),
-        borderColor: Colors.darkBlue,
+        borderColor: Colors.blue,
         borderWidth: 1,
       }}>
       <View style={{
@@ -70,18 +70,17 @@ const ManageGiftsList = ( props ) => {
           }
         </View>
         <View style={{
-          flexDirection: 'row', justifyContent: 'space-between', paddingTop: RFValue( 4 ),
+          flexDirection: 'row', justifyContent: 'space-between', paddingTop: RFValue( 10 ),
           // backgroundColor:'red'
         }}>
           {/* <View> */}
           <Text style={{
-            color: Colors.blue,
-            fontSize: RFValue( 10 ),
+            color: Colors.greyTextColor,
+            fontSize: RFValue( 14 ),
             fontFamily: Fonts.Medium,
             // fontWeight: '700',
             letterSpacing: 0.3,
             marginTop:RFValue( 6 ),
-            lineHeight:12
           }}>
             {props.titleText}
           </Text>
@@ -98,15 +97,15 @@ const ManageGiftsList = ( props ) => {
             flexDirection: 'row', alignItems: 'flex-end',
           }}>
             <Text style={{
-              color: Colors.gray13,
-              fontSize: RFValue( 16 ),
+              color: Colors.blue,
+              fontSize: RFValue( 20 ),
               fontFamily: Fonts.SemiBold,
-              letterSpacing:0.48
+              letterSpacing:0.48,
             }}>
               {props.amt}
               <Text style={{
                 color: Colors.gray13,
-                fontSize: RFValue( 8 ),
+                fontSize: RFValue( 12 ),
                 fontFamily: Fonts.Regular,
                 letterSpacing:0.24
               }}> {props.currency? props.currency: 'sats'}
@@ -119,7 +118,7 @@ const ManageGiftsList = ( props ) => {
                 resizeMode: 'contain',
                 // marginBottom: hp( 0.7 ),
                 // marginLeft: wp( 3 )
-                marginStart:RFValue( 24 )
+                marginStart:RFValue( 15 )
               }}
             />
           </View>
