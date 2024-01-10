@@ -41,6 +41,10 @@
 		<string>https://request.bitcointribe.app</string>
 		<string>https://bitcointribe.app</string>
 		<string>https://donation.bitcointribe.app</string>
+		<string>https://gift.hexawallet.io</string>
+		<string>https://request.hexawallet.io</string>
+		<string>https://app.hexawallet.io</string>
+		<string>https://donation.hexawallet.io</string>
 	</array>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
