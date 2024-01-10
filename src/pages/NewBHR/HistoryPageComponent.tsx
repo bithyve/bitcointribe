@@ -243,6 +243,7 @@ const HistoryPageComponent = ( props ) => {
                   style={{
                     ...styles.proceedButtonText,
                     color: props.disableChange ? Colors.lightBlue : Colors.blue,
+                    opacity: props.disableChange ? 0 : 1
                   }}
                 >
                   {props.changeButtonText}

@@ -1,22 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import {
-  View,
-  SafeAreaView,
+  FlatList, SafeAreaView,
   StatusBar,
-  StyleSheet,
-  FlatList,
-  Text,
-  TouchableOpacity,
+  StyleSheet, Text,
+  TouchableOpacity, View
 } from 'react-native'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
-import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { GridType, Wallet } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
 import { hp, wp } from '../../common/data/responsiveness/responsive'
 import Fonts from '../../common/Fonts'
-import { GridType, Wallet } from '../../bitcoin/utilities/Interface'
 import dbManager from '../../storage/realm/dbManager'
+import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 
 const BackupGridMnemonic = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'Regenerate Entropy Grid' )
@@ -101,17 +97,11 @@ const BackupGridMnemonic = ( props ) => {
               borderWalletMnemonic, borderWalletGridType, borderWalletGridMnemonic
             } )}
           >
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
+            <View
               style={styles.buttonView}
             >
               <Text style={styles.buttonText}>Generate Grid</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         </View>
       </View>

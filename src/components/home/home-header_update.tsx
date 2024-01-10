@@ -9,24 +9,25 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
 import { LevelData, LevelHealthInterface, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
-import CommonStyles from '../../common/Styles/Styles'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { LocalizationContext } from '../../common/content/LocContext'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import { windowHeight } from '../../common/data/responsiveness/responsive'
+import CommonStyles from '../../common/Styles/Styles'
 import { UsNumberFormat } from '../../common/utilities'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import ModalContainer from '../../components/home/ModalContainer'
@@ -35,7 +36,7 @@ import { setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import MaterialCurrencyCodeIcon, {
-  materialIconCurrencyCodes,
+  materialIconCurrencyCodes
 } from '../MaterialCurrencyCodeIcon'
 import Fonts from './../../common/Fonts'
 
@@ -273,7 +274,6 @@ const HomeHeader = ( {
         }}>{messageTwo}</Text></Text>} */}
     </TouchableOpacity>
   }
-
   useEffect( () => {
     const unsubscribe = navigation.addListener( 'focus', () => {
       getMessageToShow()
@@ -505,7 +505,7 @@ export default HomeHeader
 
 const styles = StyleSheet.create( {
   headerViewContainer: {
-    marginTop: hp( '3.6%' ),
+    marginTop: windowHeight<650 ? hp( '3.6%' ) : hp( '2.5%' ),
     marginLeft: wp( 3 ),
     marginRight: wp( 3 ),
   },

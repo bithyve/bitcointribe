@@ -1,50 +1,35 @@
-import React, { useMemo, useContext, useEffect, useState, } from 'react'
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  StatusBar,
-  SafeAreaView,
-  Text,
-  ScrollView,
-  FlatList, Image, RefreshControl
-} from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { useDispatch, useSelector } from 'react-redux'
 import moment from 'moment'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
+import {
+  FlatList, Image, RefreshControl, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View
+} from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import HeaderTitle from '../../components/HeaderTitle'
-import CommonStyles from '../../common/Styles/Styles'
+import { useDispatch, useSelector } from 'react-redux'
+import Colors from '../../common/Colors'
 import { LocalizationContext } from '../../common/content/LocContext'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
 // import GiftCard from '../../assets/images/svgs/icon_gift.svg'
-import Gifts from '../../assets/images/satCards/gifts.svg'
-import ImageStyles from '../../common/Styles/ImageStyles'
-import idx from 'idx'
-import { Gift, GiftStatus, GiftType, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
-import ModalContainer from '../../components/home/ModalContainer'
-import { syncGiftsStatus } from '../../store/actions/trustedContacts'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
-import ManageGiftsList from './ManageGiftsList'
-import IconAdd from '../../assets/images/svgs/icon_add.svg'
-import IconAddLight from '../../assets/images/svgs/icon_add_dark.svg'
-import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
-import AccountCheckingHome from '../../assets/images/accIcons/icon_checking.svg'
-import GiftKnowMore from '../../components/know-more-sheets/GiftKnowMoreModel'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import RecipientAvatar from '../../components/RecipientAvatar'
-import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import idx from 'idx'
+import AccountCheckingHome from '../../assets/images/accIcons/icon_checking.svg'
+import Gifts from '../../assets/images/satCards/gifts.svg'
+import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
+import { Gift, GiftStatus, GiftType, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import ModalContainer from '../../components/home/ModalContainer'
+import GiftKnowMore from '../../components/know-more-sheets/GiftKnowMoreModel'
+import RecipientAvatar from '../../components/RecipientAvatar'
+import { syncGiftsStatus } from '../../store/actions/trustedContacts'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import ToggleContainer from './CurrencyToggle'
+import ManageGiftsList from './ManageGiftsList'
 
 const listItemKeyExtractor = ( item ) => item.id
 

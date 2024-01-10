@@ -12,12 +12,12 @@ import {
 } from 'react-native'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { KeeperInfoInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import {
   PermanentChannelsSyncKind,
-  syncPermanentChannels,
+  syncPermanentChannels
 } from '../../store/actions/trustedContacts'
 
 import Add from '../../assets/images/svgs/add.svg'
@@ -34,21 +34,21 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import Gifts from '../../assets/images/satCards/gifts.svg'
 import Sat_card from '../../assets/images/satCards/sats_card.svg'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import ImageStyles from '../../common/Styles/ImageStyles'
 import { LocalizationContext } from '../../common/content/LocContext'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import {
-  ContactRecipientDescribing,
+  ContactRecipientDescribing
 } from '../../common/data/models/interfaces/RecipientDescribing'
+import Fonts from '../../common/Fonts'
+import ImageStyles from '../../common/Styles/ImageStyles'
 import AlertModalContents from '../../components/AlertModalContents'
+import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
 import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
+import ModalContainer from '../../components/home/ModalContainer'
+import Loader from '../../components/loader'
 import ModalHeader from '../../components/ModalHeader'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
-import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
-import ModalContainer from '../../components/home/ModalContainer'
-import Loader from '../../components/loader'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ToggleContainer from '../FriendsAndFamily/CurrencyToggle'
 import ClaimSatComponent from './ClaimSatComponent'

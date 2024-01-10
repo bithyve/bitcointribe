@@ -1,20 +1,24 @@
 import { CommonActions } from '@react-navigation/native'
 import React, { useState } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
+import { translations } from '../../../common/content/LocContext'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import Fonts from '../../../common/Fonts'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
-import { translations } from '../../../common/content/LocContext'
-import AccountVisibility from '../../../common/data/enums/AccountVisibility'
-import BottomInfoBox from '../../../components/BottomInfoBox'
+import CommonStyles from '../../../common/Styles/Styles'
 import VisibilityOptionsList from '../../../components/account-settings/visibility/VisibilityOptionsList'
+import BottomInfoBox from '../../../components/BottomInfoBox'
+import HeaderTitle from '../../../components/HeaderTitle'
 import { recomputeNetBalance, updateAccountSettings } from '../../../store/actions/accounts'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.DEFAULT,
@@ -72,7 +76,31 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { route, navigati
   }
 
   return (
-    <View style={styles.rootContainer}>
+    <SafeAreaView style={styles.rootContainer}>
+      <View style={CommonStyles.headerContainer}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            navigation.goBack()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <HeaderTitle
+        firstLineTitle={'Account Visibility'}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
       <HeaderSection title={strings.Choosewhen}/>
 
       <View style={{
@@ -126,7 +154,7 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { route, navigati
         </View>
       </View>
 
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -152,7 +180,6 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
     alignSelf: 'center',
     marginLeft: 15,
     padding: 15

@@ -10,11 +10,11 @@ import CrossButton from '../../assets/images/svgs/icons_close.svg'
 import DocumentPad from '../../assets/images/svgs/icons_document_copy.svg'
 import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
 import AppInfo from '../../assets/images/svgs/icon_info.svg'
-import Wallet from '../../assets/images/svgs/icon_settings.svg'
+import WalletIcon from '../../assets/images/svgs/icon_settings.svg'
 import Telegram from '../../assets/images/svgs/icon_telegram.svg'
 import Node from '../../assets/images/svgs/node.svg'
 import QueActive from '../../assets/images/svgs/question_inactive.svg'
-import { LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { LevelData, LevelHealthInterface, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
 import { LocalizationContext } from '../../common/content/LocContext'
@@ -23,6 +23,7 @@ import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState
 import Fonts from '../../common/Fonts'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import ModalContainer from '../../components/home/ModalContainer'
+import dbManager from '../../storage/realm/dbManager'
 import { toggleClipboardAccess } from '../../store/actions/misc'
 
 export type Props = {
@@ -52,6 +53,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
   const createWithKeeperStatus: CreateWithKeeperState  = useSelector( ( state ) => state.bhr.createWithKeeperStatus )
   const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
+  const borderWalletBackup  = useSelector( ( state ) => state.bhr.borderWalletBackup )
+  const wallet: Wallet =  dbManager.getWallet()
   const [ days, setDays ] = useState( 0 )
 
   const navigationObj: any = useSelector( ( state ) => state.bhr.navigationObj )
@@ -80,7 +83,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     // },
     {
       imageSource: require( '../../assets/images/icons/icon_info.png' ),
-      subtitle:  backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus ),
+      subtitle:  backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus, borderWalletBackup, wallet && wallet.borderWalletMnemonic !=='' ),
       title: bhrStrings[ 'WalletBackup' ],
       // screenName: 'WalletBackup',
       screenName: 'BackupMethods',
@@ -257,7 +260,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         case strings.node:
           return ( <Node /> )
         case strings.walletSettings:
-          return ( <Wallet /> )
+          return ( <WalletIcon /> )
         case strings.AppInfo:
           return ( <AppInfo /> )
         case bhrStrings[ 'WalletBackup' ]:
@@ -479,7 +482,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                     {findImage( menuOption.title )}
                   </View>
                   <View style={{
-                    justifyContent: 'center', marginLeft: 10
+                    justifyContent: 'center', marginLeft: 10,
+                    width: '90%'
                   }}>
                     <Text style={styles.addModalTitleText}>{menuOption.title}</Text>
                     <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
@@ -752,7 +756,7 @@ const styles = StyleSheet.create( {
     color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
     fontSize: RFValue( 11 ),
     marginTop: 5,
-    fontFamily: Fonts.Regular
+    fontFamily: Fonts.Regular,
   },
 
   modalElementInfoView: {

@@ -13,11 +13,10 @@ import {
   View
 } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Icon from 'react-native-vector-icons/MaterialIcons'
@@ -25,15 +24,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { v4 as uuid } from 'uuid'
 import { Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
+import { LocalizationContext } from '../../common/content/LocContext'
 import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
-import { LocalizationContext } from '../../common/content/LocContext'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import HeaderTitle1 from '../../components/HeaderTitle1'
-import RadioButton from '../../components/RadioButton'
 import CreateFNFInvite from '../../components/friends-and-family/CreateFNFInvite'
+import HeaderTitle1 from '../../components/HeaderTitle1'
 import ModalContainer from '../../components/home/ModalContainer'
+import RadioButton from '../../components/RadioButton'
 import { setContactPermissionAsked, setIsPermissionGiven } from '../../store/actions/preferences'
 import { editTrustedContact } from '../../store/actions/trustedContacts'
 
@@ -606,9 +605,9 @@ export default function AddContactAddressBook( props ) {
                       activeOpacity={0.1}
                     >
                       <RadioButton
-                        size={15}
-                        color={Colors.lightBlue}
-                        borderColor={Colors.white}
+                        size={selected ? 15 : 20}
+                        color={selected ? Colors.blue : Colors.gray1}
+                        borderColor={selected ? Colors.white :  Colors.backgroundColor}
                         isChecked={item.checked}
                         onpress={() => onContactSelect( index )}
                       />
@@ -671,19 +670,13 @@ export default function AddContactAddressBook( props ) {
                   onPress={() => onPressContinue()}
 
                 >
-                  <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-                    start={{
-                      x: 0, y: 0
-                    }} end={{
-                      x: 1, y: 0
-                    }}
-                    locations={[ 0.2, 1 ]}
+                  <View
                     style={selectedContacts.length ? styles.bottomButtonView : [ styles.bottomButtonView, {
                       backgroundColor: Colors.lightBlue
                     } ]}
                   >
                     <Text style={styles.buttonText}>{common.confirmProceed}</Text>
-                  </LinearGradient>
+                  </View>
                 </AppBottomSheetTouchableWrapper>
               )
             }

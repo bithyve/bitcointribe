@@ -10,13 +10,12 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { useDispatch } from 'react-redux'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { LocalizationContext } from '../../common/content/LocContext'
-import { hp } from '../../common/data/responsiveness/responsive'
+import { hp, windowHeight } from '../../common/data/responsiveness/responsive'
+import Fonts from '../../common/Fonts'
 import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
 import ModalContainer from '../../components/home/ModalContainer'
 import { createBorderWallet } from '../../store/actions/accounts'
@@ -143,27 +142,22 @@ const ConfirmDownload = ( props ) => {
               </View>
             )
           }
+          <View style={styles.bottomButtonView}>
+            <View>
+              <TouchableOpacity
+                onPress={onPressContinue}
+              >
+                <View
+                  style={styles.buttonView}
+                >
+                  <Text style={styles.buttonText}>Continue</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </View>
-      <View style={styles.bottomButtonView}>
-        <View>
-          <TouchableOpacity
-            onPress={onPressContinue}
-          >
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
-              style={styles.buttonView}
-            >
-              <Text style={styles.buttonText}>Continue</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-      </View>
+
       <ModalContainer
         onBackground={()=> setSuccessModal( false )}
         visible={successModal}
@@ -215,7 +209,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     width: '100%',
     marginHorizontal: 20,
-    height: Platform.OS==='android'?'55%': '64%'
+    height: Platform.OS === 'ios' ? '70%' : '62%'
 
   },
   patternWrapper: {
@@ -223,6 +217,7 @@ const styles = StyleSheet.create( {
   },
   mnemonicWrapper: {
     width: '60%',
+    height: Platform.OS === 'ios' ? '60%' : '43%'
   },
   previewTitle: {
     color: Colors.blue,
@@ -249,12 +244,11 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.light,
   },
   bottomButtonView: {
-    flexDirection: 'row',
     width: '100%',
     paddingHorizontal: hp( 6 ),
+    marginVertical: hp( 6 ),
     justifyContent: 'flex-end',
     alignItems: 'center',
-    right: 20,
   },
   passPhraseWrapper:{
     width: '80%',
@@ -272,13 +266,13 @@ const styles = StyleSheet.create( {
   },
   previewStyle:{
     backgroundColor: '#B5B5B5',
-    height: 2,
+    height: windowHeight < 700 ? 1 : 1.4,
     width: 6,
     margin: 1,
   },
   patternPreviewStyle: {
     backgroundColor: '#304E55',
-    height: 2,
+    height: windowHeight < 700 ? 1 : 1.4,
     width: 6,
     margin: 1,
   }

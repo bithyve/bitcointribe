@@ -1,5 +1,5 @@
 import * as bip39 from 'bip39'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator,
   FlatList,
@@ -10,11 +10,11 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import IconRight from '../../assets/images/svgs/icon_right.svg'
@@ -23,9 +23,9 @@ import { GridType } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
-import Toast from '../../components/Toast'
 import CreateMemorablePattern from '../../components/border-wallet/CreateMemorablePattern'
 import ModalContainer from '../../components/home/ModalContainer'
+import Toast from '../../components/Toast'
 import uheprng from '../../utils/uheprng'
 
 const wordlists = bip39.wordlists.english
@@ -184,9 +184,7 @@ const styles = StyleSheet.create( {
   }
 } )
 
-export const Ceil = ( { onPress, text, index, selected } ) => {
-  const isSelected = selected.includes( index )
-  const sequence = isSelected ? selected.findIndex( ( i ) => i === index ) + 1 : -1
+const Cell = React.memo<any>( ( { onPress, text, index, isSelected, sequence } ) => {
   return (
     <TouchableOpacity
       activeOpacity={0.6}
@@ -202,7 +200,9 @@ export const Ceil = ( { onPress, text, index, selected } ) => {
       } ]}>{text}</Text>
     </TouchableOpacity>
   )
-}
+}, ( prevProps, nextProps ) => {
+  return prevProps.isSelected === nextProps.isSelected && prevProps.sequence === nextProps.sequence
+} )
 
 const BorderWalletGridScreen = ( { route, navigation } ) => {
   const mnemonic =  route.params?.mnemonic
@@ -277,29 +277,20 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
             return ' '
       }
     } )
-    const g = []
-    Array.from( {
-      length: 128
-    }, ( _, rowIndex ) => {
-      g.push( cells.slice( rowIndex * 16, ( rowIndex + 1 ) * 16 ) )
-    } )
-    setGrid( g )
+    setGrid( cells )
     setLoading( false )
   }
 
-  const onCeilPress = ( index ) => {
+  const onCellPress = useCallback( ( index ) => {
     const isSelected = selected.includes( index )
     if ( isSelected ) {
-      const i = selected.findIndex( ( i ) => i === index )
-      selected.splice( i, 1 )
-      setSelected( [ ...selected ] )
+      setSelected( prevSelected => ( prevSelected.filter( i => i !== index ) ) )
     } else if ( selected.length < 23 ) {
-      selected.push( index )
-      setSelected( [ ...selected ] )
+      setSelected( prevSelected => ( [ ...prevSelected, index ] ) )
     }else{
       Toast( 'Pattern selection limit reached. You have selected 23 words' )
     }
-  }
+  }, [ selected, setSelected ] )
 
   const onPressNext = () => {
     const words = [ ...wordlists ]
@@ -326,6 +317,19 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
         isImportAccount,
       } )
   }
+
+  const renderCell = useCallback( ( { item, index } ) => {
+    const isSelected = selected.includes( index )
+    return (
+      <Cell
+        key={index}
+        onPress={onCellPress}
+        text={item}
+        index={index}
+        isSelected={isSelected}
+        sequence={isSelected ? selected.findIndex( ( i ) => i === index ) + 1 : -1}
+      />
+    )}, [ selected, onCellPress ] )
 
   return (
     <SafeAreaView style={styles.viewContainer}>
@@ -381,7 +385,7 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
             />
           </View>
           <View>
-            <Text style={styles.headerText}>{isNewWallet ? 'Step 4: Create a Pattern0' : 'Select your Pattern'}</Text>
+            <Text style={styles.headerText}>{isNewWallet ? 'Step 4: Create a Pattern' : 'Select your Pattern'}</Text>
           </View>
           {
             isNewWallet && (
@@ -481,26 +485,15 @@ const BorderWalletGridScreen = ( { route, navigation } ) => {
                   } )
                 }}
               >
-                {grid.map( ( rowData, index ) => (
-                  <FlatList
-                    key={index}
-                    data={rowData}
-                    horizontal
-                    overScrollMode="never"
-                    bounces={false}
-                    scrollEnabled={false}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={( { item, index: i } ) => (
-                      <Ceil
-                        onPress={( i ) => onCeilPress( i )}
-                        text={item}
-                        index={index * 16 + i}
-                        selected={selected}
-                      />
-                    )}
-                    // keyExtractor={( item ) => item}
-                  />
-                ) )}
+                <FlatList
+                  data={grid}
+                  overScrollMode="never"
+                  bounces={false}
+                  scrollEnabled={false}
+                  showsHorizontalScrollIndicator={false}
+                  numColumns={16}
+                  renderItem={renderCell}
+                />
               </ScrollView>
             </ScrollView>
           </View>

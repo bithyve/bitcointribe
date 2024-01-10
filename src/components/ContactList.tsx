@@ -10,19 +10,19 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  View,
+  View
 } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import EvilIcons from 'react-native-vector-icons/EvilIcons'
 import { useDispatch, useSelector } from 'react-redux'
 import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
 import { LocalizationContext } from '../common/content/LocContext'
+import Fonts from '../common/Fonts'
 import ErrorModalContents from '../components/ErrorModalContents'
 import ModalHeader from '../components/ModalHeader'
 import RadioButton from '../components/RadioButton'

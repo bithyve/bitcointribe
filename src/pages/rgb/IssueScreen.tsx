@@ -6,7 +6,7 @@ import { launchImageLibrary } from 'react-native-image-picker'
 import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch } from 'react-redux'
@@ -14,6 +14,7 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import FormStyles from '../../common/Styles/FormStyles'
 import CommonStyles from '../../common/Styles/Styles'
+import HeaderTitle from '../../components/HeaderTitle'
 import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
 import { syncRgb } from '../../store/actions/rgb'
@@ -133,8 +134,14 @@ export default function IssueScreen( props ) {
           </View>
         </TouchableOpacity>
       </View>
-      <Text style={styles.headerTitleText}>{'Issue ' + issueType}</Text>
-      {/* <Text style={styles.headerSubTitleText}>{'Lorem ipsum dolor sit amet, consec tetur'}</Text> */}
+      <HeaderTitle
+        firstLineTitle={'Issue ' + issueType}
+        secondLineTitle={issueType=== 'collectible' ? 'Enter collectible asset details' : 'Enter coin asset details'}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
 
       <View style={styles.bodySection}>
         <Input
@@ -239,6 +246,7 @@ const styles = StyleSheet.create( {
   bodySection: {
     paddingHorizontal: 16,
     flex: 1,
+    marginTop: 20
   },
 
   textInputContainer: {
@@ -264,21 +272,6 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.Medium
   },
-  headerTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 20 ),
-    marginLeft: 20,
-    fontFamily: Fonts.Regular,
-    marginBottom: 22
-  },
-  // headerSubTitleText: {
-  //   fontSize: RFValue( 12 ),
-  //   color: Colors.THEAM_INFO_TEXT_COLOR,
-  //   fontFamily: Fonts.Regular,
-  //   marginLeft: 20,
-  //   marginTop: 6,
-  //   marginBottom: 20
-  // },
   attachPlaceholderText: {
     flex: 1,
     paddingHorizontal: 20,

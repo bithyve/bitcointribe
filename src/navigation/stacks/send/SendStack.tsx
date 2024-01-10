@@ -29,7 +29,7 @@ export default function SendStack() {
         title: 'Send To'
       }} />
       <Stack.Screen name="SendConfirmation" component={AccountSendConfirmationContainerScreen} options={{
-        title: 'Send Confirmation'
+        headerShown: false
       }} />
       <Stack.Screen name="OTPAuthentication" component={OTPAuthenticationScreen} options={{
         headerShown:false

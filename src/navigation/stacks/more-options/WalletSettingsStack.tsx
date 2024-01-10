@@ -1,13 +1,13 @@
-import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import WalletSettingsContainerScreen from '../../../pages/MoreOptions/WalletSettings/WalletSettingsContainerScreen'
-import ManagePasscodeScreen from '../../../pages/ManagePasscodeScreen'
-import ChangeCurrencyScreen from '../../../pages/ChangeCurrencyScreen'
+import React from 'react'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
-import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
+import ChangeCurrencyScreen from '../../../pages/ChangeCurrencyScreen'
+import ManagePasscodeScreen from '../../../pages/ManagePasscodeScreen'
+import WalletSettingsContainerScreen from '../../../pages/MoreOptions/WalletSettings/WalletSettingsContainerScreen'
 import ReLogin from '../../../pages/ReLogin'
 import SettingGetNewPin from '../../../pages/SettingGetNewPin'
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 
 const Stack = createNativeStackNavigator()
 export default function WalletSettingsStack() {
@@ -22,22 +22,22 @@ export default function WalletSettingsStack() {
       } )}
     >
       <Stack.Screen name="WalletSettingsRoot" component={WalletSettingsContainerScreen} options={{
-        title: 'Wallet Settings'
+        headerShown: false
       }} />
       <Stack.Screen name="ManagePasscode" component={ManagePasscodeScreen} options={{
-        title: 'Manage Passcode'
+        headerShown: false
       }} />
       <Stack.Screen name="ChangeCurrency" component={ChangeCurrencyScreen} options={{
-        title: ''
+        headerShown: false
       }} />
       <Stack.Screen name="ReLogin" component={ReLogin} options={{
         gestureEnabled: false
       }} />
       <Stack.Screen name="TransactionDetails" component={TransactionDetailsContainerScreen} options={{
-        title: 'Transaction Details'
+        headerShown: false
       }} />
       <Stack.Screen name="SettingGetNewPin" component={SettingGetNewPin} options={{
-        title: 'Manage Passcode'
+        headerShown: false
       }} />
     </Stack.Navigator>
   )

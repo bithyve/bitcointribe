@@ -1,12 +1,12 @@
-import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import React from 'react'
+import { translations } from '../../../common/content/LocContext'
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
 import AccountManagementContainerScreen from '../../../pages/MoreOptions/AccountManagement/AccountManagementContainerScreen'
-import PanAccountSettingsContainerScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/PanAccountSettingsContainerScreen'
-import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import EnterPasscodeScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/EnterPasscodeScreen'
+import PanAccountSettingsContainerScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/PanAccountSettingsContainerScreen'
 import SecurityQuestionScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/SecurityQuestionScreen'
-import { translations } from '../../../common/content/LocContext'
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 
 const strings  = translations[ 'stackTitle' ]
 
@@ -18,22 +18,16 @@ function PanAccountSettings() {
         ...defaultStackScreenNavigationOptions,
       }}
     >
-      <PanAccountSettingsStack.Screen name="PanAccountSettingsRoot" component={PanAccountSettingsContainerScreen} options={( { navigation } ) => {
-        return {
-          title: strings[ 'AccountSettings' ],
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.goBack() }} />
-          },
-        }
-      }} />
-      <PanAccountSettingsStack.Screen name="EnterPasscode" component={EnterPasscodeScreen} options={( { navigation } ) => {
-        return {
-          title: strings[ 'ShowAllAccounts' ],
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.goBack() }} />
-          },
-        }
-      }} />
+      <PanAccountSettingsStack.Screen name="PanAccountSettingsRoot" component={PanAccountSettingsContainerScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <PanAccountSettingsStack.Screen name="EnterPasscode" component={EnterPasscodeScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
       <PanAccountSettingsStack.Screen name="SecurityQuestion" component={SecurityQuestionScreen} options={( { navigation } ) => {
         return {
           title: strings[ 'ShowAllAccounts' ],

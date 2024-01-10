@@ -8,15 +8,15 @@ import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { useDispatch } from 'react-redux'
 import { NetworkType } from '../../../bitcoin/utilities/Interface'
 import Colors from '../../../common/Colors'
-import Fonts from '../../../common/Fonts'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import FormStyles from '../../../common/Styles/FormStyles'
 import { translations } from '../../../common/content/LocContext'
 import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import RecipientKind from '../../../common/data/enums/RecipientKind'
 import AccountShell from '../../../common/data/models/AccountShell'
 import { ContactRecipientDescribing, RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
+import Fonts from '../../../common/Fonts'
+import ButtonStyles from '../../../common/Styles/ButtonStyles'
+import FormStyles from '../../../common/Styles/FormStyles'
 import ModalContainer from '../../../components/home/ModalContainer'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import { clearTransfer } from '../../../store/actions/accounts'
@@ -258,6 +258,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation, route }:
             ...ButtonStyles.primaryActionButton,
             marginRight: 8,
             backgroundColor: 'transparent',
+            opacity: !!sendingState.sendMaxFee || !selectedAmount ? 0.5 : 1
           }}
         >
           <Text style={{

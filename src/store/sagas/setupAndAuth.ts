@@ -5,33 +5,27 @@ import DeviceInfo from 'react-native-device-info'
 import { call, put, select } from 'redux-saga/effects'
 import semverLte from 'semver/functions/lte'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
-import { AccountType, Accounts, ContactInfo, KeeperInfoInterface, LevelData, MetaShare, RGBConfig, Trusted_Contacts, UnecryptedStreamData, Wallet } from '../../bitcoin/utilities/Interface'
+import { Accounts, AccountType, ContactInfo, KeeperInfoInterface, LevelData, MetaShare, RGBConfig, Trusted_Contacts, UnecryptedStreamData, Wallet } from '../../bitcoin/utilities/Interface'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import AccountShell from '../../common/data/models/AccountShell'
 import * as Cipher from '../../common/encryption'
 import RGBServices from '../../services/RGBServices'
 import dbManager from '../../storage/realm/dbManager'
 import * as SecureStore from '../../storage/secure-store'
-import { initializeHealthSetup, resetLevelsAfterPasswordChange, setPasswordResetState, updateMetaSharesKeeper, updateOldMetaSharesKeeper, updateWalletImageHealth, upgradePDF } from '../actions/BHR'
 import { newAccountShellCreationCompleted } from '../actions/accounts'
+import { initializeHealthSetup, resetLevelsAfterPasswordChange, setPasswordResetState, updateMetaSharesKeeper, updateOldMetaSharesKeeper, updateWalletImageHealth, upgradePDF } from '../actions/BHR'
 import { connectToNode } from '../actions/nodeSettings'
 import { setWalletId } from '../actions/preferences'
 import { setRgbConfig, syncRgb } from '../actions/rgb'
 import {
-  CHANGE_AUTH_CRED,
-  CREDS_AUTH,
-  RESET_PIN,
-  SETUP_WALLET,
-  STORE_CREDS,
-  UPDATE_APPLICATION,
-  completedWalletSetup,
+  CHANGE_AUTH_CRED, completedWalletSetup,
   credsAuthenticated,
   credsChanged,
-  credsStored,
-  pinChangedFailed,
-  switchReLogin,
+  credsStored, CREDS_AUTH, pinChangedFailed, RESET_PIN,
+  SETUP_WALLET,
+  STORE_CREDS, switchReLogin,
   switchSetupLoader,
-  updateApplication,
+  updateApplication, UPDATE_APPLICATION
 } from '../actions/setupAndAuth'
 import { keyFetched, updateWallet } from '../actions/storage'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'

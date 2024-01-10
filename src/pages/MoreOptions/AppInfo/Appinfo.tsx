@@ -245,6 +245,9 @@ const AppInfo = ( props ) => {
         height:20
       }}/>
       <FlatList
+        style={{
+          marginTop: hp( 5 )
+        }}
         data={menuOptions}
         keyExtractor={listItemKeyExtractor}
         renderItem={( { item: menuOption }: { item: MenuOption } ) => {

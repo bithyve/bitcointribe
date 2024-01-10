@@ -18,15 +18,15 @@ import DeviceInfo from 'react-native-device-info'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
-import LeftArrow from '../../assets/images/svgs/Left_arrow_new.svg'
 import CheckMark from '../../assets/images/svgs/checkmark.svg'
 import GiftCard from '../../assets/images/svgs/gift_icon_new.svg'
 import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
+import LeftArrow from '../../assets/images/svgs/Left_arrow_new.svg'
 import Menu from '../../assets/images/svgs/menu_dots_icon.svg'
 import Setting from '../../assets/images/svgs/setting_icon.svg'
 import { DeepLinkEncryptionType, GiftThemeId, Wallet } from '../../bitcoin/utilities/Interface'
@@ -45,8 +45,8 @@ import { CommonActions, useFocusEffect } from '@react-navigation/native'
 import Feather from 'react-native-vector-icons/Feather'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import RadioButton from '../../components/RadioButton'
 import ModalContainer from '../../components/home/ModalContainer'
+import RadioButton from '../../components/RadioButton'
 
 enum AdvancedSetting {
   FNF_IDENTIFICATION = 'FNF_IDENTIFICATION',
@@ -789,7 +789,8 @@ const GiftDetails = ( { navigation, route } ) => {
             style={{
               fontSize: RFValue( 14 ),
               color: Colors.black,
-              fontWeight: '400',
+              fontWeight: '300',
+              fontFamily: Fonts.Regular,
             }}
           >
             You have received gift from{' '}
@@ -1401,6 +1402,7 @@ const styles = StyleSheet.create( {
     fontSize: 13,
     fontWeight: '400',
     fontFamily: Fonts.Regular,
+    color: Colors.blue,
 
   },
   identificationDescription: {

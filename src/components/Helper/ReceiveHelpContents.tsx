@@ -190,7 +190,7 @@ const ReceiveHelpContents: React.FC<{titleClicked: () => void}> = ( props ) => {
                   }}
                   onPress={() =>
                     openLink(
-                      'https://github.com/6102bitcoin/bitcoin-intro#step-12-buying-privately',
+                      'https://bitcointribe.app/faq/'
                     )
                   }
                 >

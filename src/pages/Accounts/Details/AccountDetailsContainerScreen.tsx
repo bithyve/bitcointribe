@@ -5,7 +5,7 @@ import {
   RefreshControl,
   SectionList,
   StyleSheet,
-  View,
+  View
 } from 'react-native'
 import { RootSiblingParent } from 'react-native-root-siblings'
 import { useDispatch, useSelector } from 'react-redux'
@@ -20,19 +20,21 @@ import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import SyncStatus from '../../../common/data/enums/SyncStatus'
 import AccountShell from '../../../common/data/models/AccountShell'
 import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces'
-import ButtonBlue from '../../../components/ButtonBlue'
-import ErrorModalContents from '../../../components/ErrorModalContents'
 import AccountDetailsCard from '../../../components/account-details/AccountDetailsCard'
 import KnowMoreBottomSheet from '../../../components/account-details/AccountDetailsKnowMoreBottomSheet'
 import NavHeader from '../../../components/account-details/AccountDetailsNavHeader'
-import DonationWebPageBottomSheet from '../../../components/bottom-sheets/DonationWebPageBottomSheet'
 import AccountShellMergeSuccessBottomSheet from '../../../components/bottom-sheets/account-management/AccountShellMergeSuccessBottomSheet'
 import TransactionReassignmentSuccessBottomSheet from '../../../components/bottom-sheets/account-management/TransactionReassignmentSuccessBottomSheet'
+import DonationWebPageBottomSheet from '../../../components/bottom-sheets/DonationWebPageBottomSheet'
+import ButtonBlue from '../../../components/ButtonBlue'
+import ErrorModalContents from '../../../components/ErrorModalContents'
 import ModalContainer from '../../../components/home/ModalContainer'
 import BorderWalletKnowMore from '../../../components/know-more-sheets/BorderWalletKnowMore'
 import SavingAccountAlertBeforeLevel2 from '../../../components/know-more-sheets/SavingAccountAlertBeforeLevel2'
+import Toast from '../../../components/Toast'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import { fetchExchangeRates, fetchFeeRates, markReadTx, refreshAccountShells } from '../../../store/actions/accounts'
+import { resetElectrumNotConnectedErr } from '../../../store/actions/nodeSettings'
 import { sourceAccountSelectedForSending } from '../../../store/actions/sending'
 import useAccountShellMergeCompletionEffect from '../../../utils/hooks/account-effects/UseAccountShellMergeCompletionEffect'
 import useTransactionReassignmentCompletedEffect from '../../../utils/hooks/account-effects/UseTransactionReassignmentCompletedEffect'
@@ -83,6 +85,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { route, navigation } )
 
   const [ showMore, setShowMore ] = useState( false )
   const [ bwShowMore, setBWShowMore ] = useState( false )
+  const isBorderWallet = primarySubAccount.type === AccountType.BORDER_WALLET
 
   const isRefreshing = useMemo( () => {
     return ( accountShell.syncStatus===SyncStatus.IN_PROGRESS )
@@ -97,7 +100,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { route, navigation } )
   const AllowSecureAccount = useSelector(
     ( state ) => state.bhr.AllowSecureAccount,
   )
-  const isBorderWallet = primarySubAccount.type === AccountType.BORDER_WALLET
+  const electrumClientConnectionStatus = useSelector(
+    ( state ) => state.nodeSettings.electrumClientConnectionStatus
+  )
+
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
@@ -149,6 +155,15 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { route, navigation } )
       hardRefresh: true,
     } ) )
   }
+
+
+  useEffect( () => {
+    if ( electrumClientConnectionStatus?.setElectrumNotConnectedErr ) {
+      Toast( `${electrumClientConnectionStatus.setElectrumNotConnectedErr}` )
+      dispatch( resetElectrumNotConnectedErr() )
+    }
+  }, [ electrumClientConnectionStatus?.setElectrumNotConnectedErr ] )
+
 
   useEffect( () => {
     return () => {

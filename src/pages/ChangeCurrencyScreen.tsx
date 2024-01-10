@@ -15,15 +15,18 @@ import {
   widthPercentageToDP,
   widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { useDispatch, useSelector } from 'react-redux'
 import ChangeCurrency from '../assets/images/icon_currency.svg'
 import IconLanguage from '../assets/images/icon_language.svg'
 import Colors from '../common/Colors'
+import Languages from '../common/content/availableLanguages'
+import { LocalizationContext, translations } from '../common/content/LocContext'
 import FiatCurrencies from '../common/FiatCurrencies'
 import Fonts from '../common/Fonts'
-import { LocalizationContext, translations } from '../common/content/LocContext'
-import Languages from '../common/content/availableLanguages'
+import CommonStyles from '../common/Styles/Styles'
+import HeaderTitle from '../components/HeaderTitle'
 import { setCurrencyCode } from '../store/actions/preferences'
 
 const styles = StyleSheet.create( {
@@ -224,8 +227,32 @@ export default function ChangeCurrencyScreen( props ) {
     <SafeAreaView style={{
       flex: 1
     }}>
+      <View style={CommonStyles.headerContainer}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <HeaderTitle
+        firstLineTitle={strings.ChangeCurrency}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
       <ScrollView contentContainerStyle={styles.container} overScrollMode="never" showsVerticalScrollIndicator={false}>
-        <Text style={styles.textHeading}>{strings.ChangeCurrency}</Text>
+        {/* <Text style={styles.textHeading}>{strings.ChangeCurrency}</Text> */}
         <MenuHeading
           title={strings.AlternateCurrency}
           subtitle={strings.Selectyourlocalcurrency}

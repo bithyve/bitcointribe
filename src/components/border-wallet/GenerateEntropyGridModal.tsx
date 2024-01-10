@@ -1,17 +1,16 @@
 import React, { useRef } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
-import { translations } from '../../common/content/LocContext'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import EntropyGridIllustration from '../../assets/images/svgs/generateGridEntropyIllustration.svg'
+import Colors from '../../common/Colors'
+import { translations } from '../../common/content/LocContext'
+import Fonts from '../../common/Fonts'
+import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 
 export default function GenerateEntropyGridModal( props ) {
   const scrollViewRef = useRef<ScrollView>()
@@ -22,7 +21,7 @@ export default function GenerateEntropyGridModal( props ) {
       ...styles.modalContainer, ...props.containerStyle
     }}>
       <View style={{
-        height: hp( 78 )
+        height: hp( 82 )
       }}>
         <TouchableOpacity
           activeOpacity={1}
@@ -94,6 +93,23 @@ export default function GenerateEntropyGridModal( props ) {
             </Text>
           </View>
         </ScrollView>
+        <View>
+          <TouchableOpacity
+            onPress={() => {
+              props.closeModal()
+            }}
+            style={{
+              alignSelf: 'flex-end',
+              margin: 10
+            }}
+          >
+            <View
+              style={styles.buttonView}
+            >
+              <Text style={styles.buttonText}>Next</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   )
@@ -175,5 +191,18 @@ const styles = StyleSheet.create( {
   },
   boldText:{
     fontWeight: 'bold'
-  }
+  },
+  buttonView: {
+    padding: 10,
+    width: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    backgroundColor: Colors.white
+  },
+  buttonText: {
+    color: Colors.blue,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.Medium,
+  },
 } )

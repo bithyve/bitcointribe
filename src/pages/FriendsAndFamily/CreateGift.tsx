@@ -10,11 +10,11 @@ import {
   Switch,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -24,22 +24,21 @@ import {
   Gift,
   GiftThemeId,
   TxPriority,
-  Wallet,
+  Wallet
 } from '../../bitcoin/utilities/Interface'
 import {
   getCurrencyImageByRegion
 } from '../../common/CommonFunctions/index'
 import MaterialCurrencyCodeIcon, {
-  materialIconCurrencyCodes,
+  materialIconCurrencyCodes
 } from '../../components/MaterialCurrencyCodeIcon'
 import {
   generateGifts,
-  giftCreationSuccess,
+  giftCreationSuccess
 } from '../../store/actions/accounts'
 import { calculateSendMaxFee, sourceAccountSelectedForSending } from '../../store/actions/sending'
 
 import idx from 'idx'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -49,23 +48,23 @@ import CheckMark from '../../assets/images/svgs/checkmark.svg'
 import GiftCard from '../../assets/images/svgs/gift_icon_new.svg'
 import Illustration from '../../assets/images/svgs/illustration.svg'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import FormStyles from '../../common/Styles/FormStyles'
-import CommonStyles from '../../common/Styles/Styles'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { translations } from '../../common/content/LocContext'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import AccountShell from '../../common/data/models/AccountShell'
+import Fonts from '../../common/Fonts'
+import FormStyles from '../../common/Styles/FormStyles'
+import CommonStyles from '../../common/Styles/Styles'
 import { UsNumberFormat } from '../../common/utilities'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import LoaderModal from '../../components/LoaderModal'
 import ModalContainer from '../../components/home/ModalContainer'
+import LoaderModal from '../../components/LoaderModal'
 import { AccountsState } from '../../store/reducers/accounts'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import VerifySatModalContents from '../Gift/VerifySatModalContents'
 import ToggleContainer from './CurrencyToggle'
 import DashedContainer from './DashedContainer'
@@ -418,25 +417,21 @@ const CreateGift = ( { route, navigation }: Props ) => {
         }}
 
       >
-        <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-          start={{
-            x: 0, y: 0
-          }} end={{
-            x: 1, y: 0
-          }}
-          locations={[ 0.2, 1 ]}
+        <View
           style={
             isDisabled
               ? {
                 ...styles.disabledButtonView,
+                backgroundColor: Colors.blue
               }
               : {
                 ...styles.buttonView,
+                backgroundColor: Colors.blue
               }
           }
         >
           <Text style={styles.buttonText}>{text}</Text>
-        </LinearGradient>
+        </View>
       </TouchableOpacity>
     )
   }
