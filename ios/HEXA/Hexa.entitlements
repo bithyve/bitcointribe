@@ -8,9 +8,6 @@
 	<array>
 		<string>applinks:bitcointribe.app</string>
 	</array>
-	<array>
-		<string>applinks:bitcointribe.app</string>
-	</array>
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>
 		<string>iCloud.io.hexawallet.hexa</string>

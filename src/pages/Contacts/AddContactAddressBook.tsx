@@ -896,7 +896,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     // elevation: 10,
     marginBottom: 20,
-    marginRight:10
+    marginRight:30
   },
   selectedContactView: {
     width: wp( '42%' ),
