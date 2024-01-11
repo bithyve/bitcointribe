@@ -3,7 +3,6 @@ import { ActivityIndicator, Keyboard, SafeAreaView, StatusBar, StyleSheet, Text,
 import { Input } from 'react-native-elements'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { launchImageLibrary } from 'react-native-image-picker'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp
@@ -222,17 +221,11 @@ export default function IssueScreen( props ) {
         }
         <View style={styles.footerSection}>
           <TouchableOpacity disabled={requesting} activeOpacity={0.6} onPress={IssueAssetClick}>
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
+            <View
               style={styles.IssueAssetWrapper}
             >
               <Text style={styles.IssueAssetText}>{'Issue Asset'}</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         </View>
       </View>
@@ -265,7 +258,8 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 30
+    marginTop: 30,
+    backgroundColor: Colors.blue
   },
   IssueAssetText: {
     color: Colors.white,

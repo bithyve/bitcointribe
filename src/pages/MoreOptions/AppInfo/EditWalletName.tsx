@@ -1,21 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
-  View,
-  TouchableOpacity,
-  Text,
-  SafeAreaView,
-  StyleSheet,
-  TextInput,
-  Platform
+  Platform, SafeAreaView,
+  StyleSheet, Text, TextInput, TouchableOpacity, View
 } from 'react-native'
-import Colors from '../../../common/Colors'
-import Fonts from '../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
-import BottomInfoBox from '../../../components/BottomInfoBox'
-import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Colors from '../../../common/Colors'
 import { translations } from '../../../common/content/LocContext'
+import Fonts from '../../../common/Fonts'
+import BottomInfoBox from '../../../components/BottomInfoBox'
 
 const ALLOWED_CHARACTERS_REGEXP = /^[A-Za-z]+$/
 

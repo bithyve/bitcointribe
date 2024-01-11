@@ -334,7 +334,7 @@ export default function Receive( props ) {
               <CopyThisText
                 backgroundColor={Colors.white}
                 text={paymentURI ? paymentURI : receivingAddress}
-                toastText='Address copied successfully'
+                toastText='Address Copied Successfully'
               />
 
               <AppBottomSheetTouchableWrapper

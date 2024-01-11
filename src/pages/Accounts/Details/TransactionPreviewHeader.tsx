@@ -1,6 +1,5 @@
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
 import { translations } from '../../../common/content/LocContext'
@@ -58,19 +57,13 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
         <TouchableOpacity
           onPress={onViewMorePressed}
         >
-          <LinearGradient
-            start={{
-              x: 0, y: 0
-            }} end={{
-              x: 1, y: 0
-            }}
-            colors={[ Colors.skyBlue, Colors.darkBlue ]}
+          <View
             style={styles.viewMoreWrapper}
           >
             <Text style={styles.headerTouchableText}>
               {strings.ViewMore}
             </Text>
-          </LinearGradient>
+          </View>
         </TouchableOpacity>
       </View>
     </View>
@@ -104,7 +97,8 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'center',
     padding: 3,
-    borderRadius: 5
+    borderRadius: 5,
+    backgroundColor: Colors.blue
   }
 } )
 

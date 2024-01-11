@@ -40,12 +40,13 @@ export type Props = {
   giftId: string; //NOTE: here gift id stands for channelAddress of the gift(we should use more consistent naming to avoid confusion)
   isGiftWithFnF: boolean;
   isContactAssociated: boolean;
-  version?: string
+  version?: string;
+  stopReset?:boolean;
 };
 
 const NUMBER_OF_INPUTS = 6
 
-export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject, version }: Props ) {
+export default function AcceptGift( { stopReset, navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject, version }: Props ) {
   const dispatch = useDispatch()
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
@@ -77,6 +78,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const addedGiftId = useSelector( ( state ) => state.accounts.addedGift )
   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == accType && shell.primarySubAccount.instanceNumber === 0 )
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
+
 
   useEffect( () => {
     setAccId( sourcePrimarySubAccount.id )
@@ -190,6 +192,37 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     if ( lastInput ) {
       lastInput.focus()
       // otpCodeChanged(code);
+    }
+  }
+
+  const handleClose=()=>{
+    setAcceptGiftModal( false )
+    closeModal()
+    dispatch( giftAccepted( '' ) )
+    if( !stopReset ){
+      navigation.dispatch( state => {
+        return CommonActions.reset( {
+          ...state,
+          index: 3,
+          routes: state.routes.map( route => {
+            if ( route.name === 'GiftStack' ) {
+              return {
+                ...route,
+                state: {
+                  index: 1,
+                  routes: [ {
+                    name: 'GiftScreen', key: 'GiftScreenKey'
+                  }, {
+                    name: 'ManageGifts', key: 'ManageGiftsKey', params: {
+                      giftType: '0'
+                    }
+                  } ]
+                }
+              }
+            } else return route
+          } )
+        } )
+      } )
     }
   }
 
@@ -529,36 +562,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       <>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => {
-            setAcceptGiftModal( false )
-            closeModal()
-            dispatch( giftAccepted( '' ) )
-            navigation.dispatch( state => {
-              return CommonActions.reset( {
-                ...state,
-                index: 3,
-                routes: state.routes.map( route => {
-                  if ( route.name === 'GiftStack' ) {
-                    return {
-                      ...route,
-                      state: {
-                        index: 1,
-                        routes: [ {
-                          name: 'GiftScreen', key: 'GiftScreenKey'
-                        }, {
-                          name: 'ManageGifts', key: 'ManageGiftsKey', params: {
-                            giftType: '0'
-                          }
-                        } ]
-                      }
-                    }
-                  } else return route
-                } )
-              } )
-            } )
-          }
-
-          }
+          onPress={handleClose}
           style={{
             width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
             alignSelf: 'flex-end',

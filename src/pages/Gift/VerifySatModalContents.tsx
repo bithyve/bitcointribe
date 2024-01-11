@@ -1,16 +1,14 @@
 import React, { useContext } from 'react'
-import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Colors from '../../common/Colors'
 import { LocalizationContext } from '../../common/content/LocContext'
-import LinearGradient from 'react-native-linear-gradient'
+import Fonts from '../../common/Fonts'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 
 export default function VerifySatModalContents( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -75,7 +73,9 @@ export default function VerifySatModalContents( props ) {
           </View>
           {props.info ? (
             <View style={{
-              flexDirection:'row', alignItems:'flex-start',
+              flexDirection:'row',
+              alignItems:'flex-start',
+              width: '100%'
             }}>
               <Text
                 style={{
@@ -108,10 +108,6 @@ export default function VerifySatModalContents( props ) {
               }
             </View>
           ) : null}
-          <Image source={props.bottomImage}
-            resizeMode='contain' style={{
-              width: RFValue( 203 ), height: RFValue( 136 ), marginTop:RFValue( 27 )
-            }}/>
           <View style={{
             flexDirection:'row', marginTop: RFValue( 25 )
             // , alignItems:'flex-start',
@@ -120,7 +116,7 @@ export default function VerifySatModalContents( props ) {
               width:RFValue( 5 ), height:RFValue( 5 ), borderRadius: RFValue( 5 ), backgroundColor: Colors.blue, marginTop: RFValue( 5 )
             }}/> */}
             <Text style={{
-              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.Regular, marginStart: RFValue( 5 ), textAlign: 'center'
+              fontSize: RFValue( 12 ), color:Colors.textColorGrey, fontFamily: Fonts.Regular, marginStart: RFValue( 5 ), textAlign: 'center', marginTop:20
             }}>
               {props.subPoints}
             </Text>
@@ -147,28 +143,17 @@ export default function VerifySatModalContents( props ) {
           </View>
         </View>
         <View
-          style={{
-            height: hp( '12%' ),
-            flexDirection: 'row',
-            marginTop: 'auto',
-            alignItems: 'flex-end',
-            // backgroundColor: 'red',
-            justifyContent: 'flex-end',
-            marginEnd: RFValue( 20 )
-          }}
+          style={styles.footerWrapper}
         >
-          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-            start={{
-              x: 0, y: 0
-            }} end={{
-              x: 1, y: 0
-            }}
-            locations={[ 0.2, 1 ]}
+          <Image source={props.bottomImage}
+            resizeMode='contain'/>
+          <View
             style={{
               ...styles.successModalButtonView,
               backgroundColor: props.buttonColor
                 ? props.buttonColor
                 : Colors.blue,
+              marginTop:20
             }}
           >
             <AppBottomSheetTouchableWrapper
@@ -209,7 +194,7 @@ export default function VerifySatModalContents( props ) {
                 }
               </View>
             </AppBottomSheetTouchableWrapper>
-          </LinearGradient>
+          </View>
         </View>
       </View>
     </View>
@@ -232,7 +217,7 @@ const styles = StyleSheet.create( {
     // opacity: 1,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.Regular,
-    letterSpacing: 0.6
+    letterSpacing: 0.6,
   },
   successModalAmountView: {
     justifyContent: 'center',
@@ -287,4 +272,10 @@ const styles = StyleSheet.create( {
     letterSpacing: 0.6,
     lineHeight: 8
   },
+  footerWrapper:{
+    flexDirection:'row',
+    alignItems:'flex-end',
+    width:'100%',
+    marginTop:10,
+  }
 } )

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -15,22 +15,18 @@ const GiftBoxComponent = ( props ) => {
   return (
     <TouchableOpacity onPress={props.onPress} style={styles.container}>
       {/* <Gift /> */}
-      <View
-        style={{
-          height: RFValue( 26 ),
-          width: RFValue( 26 ),
-          
-        }}
-      >
-        {props.image}
-        {/* <CheckingAcc /> */}
-      </View>
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-around'
-      }}>
-        <View>
+      <View style={styles.wrapper}>
+        <View style={{
+        }}>
+          <View
+            style={{
+              height: RFValue( 26 ),
+              width: RFValue( 26 ),
+            }}
+          >
+            {props.image}
+            {/* <CheckingAcc /> */}
+          </View>
           <View
             style={{
               flexDirection: 'row',
@@ -60,14 +56,18 @@ const GiftBoxComponent = ( props ) => {
             {/* {props.pendingSubText && (
             <Text style={styles.subText}>{props.pendingSubText}</Text>
           )} */}
-
           </View>
         </View>
-        <View style={{
-          paddingHorizontal: 10,
-        }}>
-          {props.rightArrow && props.rightArrow}
-        </View>
+        <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
+          style={{
+            width: RFValue( 14 ),
+            height: RFValue( 14 ),
+            resizeMode: 'contain',
+            // marginBottom: hp( 0.7 ),
+            // marginLeft: wp( 3 )
+            marginStart:RFValue( 15 )
+          }}
+        />
       </View>
     </TouchableOpacity>
   )
@@ -94,13 +94,20 @@ const styles = StyleSheet.create( {
     paddingVertical: wp( 2.5 ),
     justifyContent:'center',
   },
+  wrapper:{
+    flex:1,
+    flexDirection:'row',
+    justifyContent:'center',
+    alignItems:'center',
+    paddingHorizontal:5
+  },
   pageTitle: {
     color: Colors.THEAM_TEXT_COLOR,
     letterSpacing: 0.7,
     fontFamily: Fonts.Medium,
     alignItems: 'center',
     fontSize: RFValue( 13 ),
-    paddingBottom:8
+    marginVertical:3,
   },
   subText:{
     color: Colors.THEAM_INFO_TEXT_COLOR,
@@ -108,8 +115,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Regular,
     // marginTop: RFValue( 4 ),
     letterSpacing: .75,
-    lineHeight: RFValue( 11 ),
-    paddingBottom:15
+    lineHeight: RFValue( 11 )
   },
   scSubText:{
     color: Colors.textColorGrey,

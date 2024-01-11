@@ -1,7 +1,6 @@
 import { CommonActions } from '@react-navigation/native'
 import React, { useState } from 'react'
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch } from 'react-redux'
@@ -124,17 +123,11 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { route, navigati
         />
         <View style={styles.actionButtonContainer}>
           <TouchableOpacity onPress={handleSaveButtonPress}>
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
+            <View
               style={styles.confirmButtonView}
             >
               <Text style={styles.confirmButtonText}>{common.confirm}</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={onDismiss}
@@ -182,7 +175,8 @@ const styles = StyleSheet.create( {
     borderRadius: 8,
     alignSelf: 'center',
     marginLeft: 15,
-    padding: 15
+    padding: 15,
+    backgroundColor: Colors.blue
   },
   confirmButtonText: {
     color: Colors.white,
