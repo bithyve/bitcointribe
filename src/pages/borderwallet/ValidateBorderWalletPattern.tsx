@@ -197,7 +197,6 @@ const ValidateBorderWalletPattern = ( { route, navigation } ) => {
   const gridType = route.params?.borderWalletGridType
   const mnemonic = route.params?.borderWalletMnemonic
   const gridMnemonic = route.params?.borderWalletGridMnemonic
-
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
   const columnHeaderRef = useRef()
@@ -239,7 +238,7 @@ const ValidateBorderWalletPattern = ( { route, navigation } ) => {
       }, 500 )
     } )
     return () => clearTimeout( listener )
-  }, [ gridType ] )
+  }, [] )
 
   const isNext = useMemo( () => {
     return selected.length === 11 || selected.length === 23
@@ -299,11 +298,17 @@ const ValidateBorderWalletPattern = ( { route, navigation } ) => {
       } )
       selected.push( index )
     } )
+    clearSelection()
     navigation.navigate( 'ReLogin', {
       pattern: selected,
-      isValidate: true
+      isValidate: true,
+      viewPattern: true,
+      payload:{
+        borderWalletGridType: gridType,
+        borderWalletMnemonic:mnemonic,
+        borderWalletGridMnemonic:gridMnemonic
+      }
     } )
-    clearSelection()
   }
   const onPressVerify = () => {
     const words = [ ...wordlists ]
