@@ -464,7 +464,7 @@ export default function Login( props ) {
           <Text style={styles.headerTitleText}>{strings.welcome}</Text>
           <View>
             <Text style={styles.headerInfoText}>
-              {strings.enter_your}{' '}
+              {strings.enter_your}
               <Text style={styles.boldItalicText}>{strings.passcode}</Text>
             </Text>
             <View style={{
@@ -603,12 +603,15 @@ export default function Login( props ) {
               </View>
               {/* {checkPasscode()} */}
             </View>
+            {showPasscodeErrorModal &&<View style={styles.errorInfoTextWrapper}>
+              <Text style={styles.errorInfoText}>Incorrect Passcode, Try Again!</Text>
+            </View>}
           </View>
 
           <View style={{
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'flex-end'
+            justifyContent: 'flex-end',
           }}>
             {/* {
               attempts >= 3&&(
@@ -955,7 +958,7 @@ const styles = StyleSheet.create( {
   },
   keyPadRow: {
     flexDirection: 'row',
-    height: hp( '8%' ),
+    height: hp( '9%' ),
   },
   keyPadElementTouchable: {
     flex: 1,
@@ -967,12 +970,12 @@ const styles = StyleSheet.create( {
   keyPadElementText: {
     color: Colors.blue,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.Regular,
+    fontFamily: Fonts.Medium,
     fontStyle: 'normal',
   },
   proceedButtonView: {
     marginRight: 20,
-    marginTop: hp( '15%' ),
+    marginTop: hp( '20%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',
@@ -985,9 +988,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Medium,
   },
   boldItalicText: {
-    fontFamily: Fonts.MediumItalic,
-    fontWeight: 'bold',
-    fontStyle: 'italic',
+    fontFamily: Fonts.Medium,
   },
   errorText: {
     fontFamily: Fonts.MediumItalic,
@@ -1001,14 +1002,14 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 22 ),
     marginLeft: 30,
     marginTop: hp( '10%' ),
-    fontFamily: Fonts.Regular,
+    fontFamily: Fonts.Medium,
   },
   headerInfoText: {
     color: Colors.THEAM_INFO_TEXT_COLOR,
     fontSize: RFValue( 12 ),
     marginLeft: 30,
     marginTop: hp( '1%' ),
-    fontFamily: Fonts.Regular,
+    fontFamily: Fonts.Medium,
   },
   passcodeTextInputText: {
     color: Colors.blue,
@@ -1021,4 +1022,16 @@ const styles = StyleSheet.create( {
     marginBottom: hp( '1.5%' ),
     width: 'auto',
   },
+  errorInfoTextWrapper:{
+    width:'76%',
+    flexDirection:'row',
+    alignItems:'flex-end',
+    justifyContent:'flex-end'
+  },
+  errorInfoText:{
+    fontStyle: 'italic',
+    color:Colors.lightBlue,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.Regular
+  }
 } )

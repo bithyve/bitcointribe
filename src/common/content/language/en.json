@@ -62,7 +62,7 @@
     "contact": "contact requests"
   },
   "login": {
-    "welcome": "Welcome back!",
+    "welcome": "Welcome Back!",
     "enter_your": "Please enter your ",
     "ForgotPasscode": "Forgot passcode?",
     "EncryptionKeyNotSet": "Encryption Key not set",
