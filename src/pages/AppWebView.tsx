@@ -25,7 +25,7 @@ const AppWebView = () => {
 
   const errorMessage=()=>{
     setLoading( false )
-    Toast( 'Error occured loading website' )
+    Toast( 'Error loading page!' )
   }
 
   const errorView=()=>{
