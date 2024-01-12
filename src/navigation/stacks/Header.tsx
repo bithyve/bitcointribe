@@ -555,6 +555,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   onAppStateChange = async ( nextAppState ) => {
     const { appState } = this.state
     const { isPermissionSet, setIsPermissionGiven } = this.props
+    if( this.props.linkingURL && this.props.linkingURL.trim() !=='' ){
+      this.props.updateLinkingURL( '' )
+    }
     try {
       if ( appState === nextAppState ) return
       if ( isPermissionSet ) {
