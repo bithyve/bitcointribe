@@ -9,6 +9,7 @@ import { Accounts, DeepLinkEncryptionType, DeepLinkKind, LevelHealthInterface, L
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import { encrypt } from '../encryption'
 import { getVersions } from '../utilities'
+import Toast from '../../components/Toast'
 
 export const nameToInitials = fullName => {
   if( !fullName ) return
@@ -592,10 +593,9 @@ export const processDeepLink = ( deepLink: string ) => {
         // console.log('WhatsApp Opened');
       } )
       .catch( () => {
-        //
+        Toast( 'Error in Scanning QR Code' )
       } )
     return
-
   }
 }
 
