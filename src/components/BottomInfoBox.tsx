@@ -75,8 +75,9 @@ export default function BottomInfoBox( props ) {
                 textDecorationLine: 'underline',
                 fontSize: RFValue( 13 ),
                 letterSpacing:0.5,
-                color:'#2C3E51'
+                color:'#2C3E51',
               }}
+              onPress={props.onPress ? props.onPress : () => {}}
             >
               {props.italicTextTC}
             </Text>
