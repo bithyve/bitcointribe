@@ -25,13 +25,17 @@ import GenerateEntropyGridModal from '../components/border-wallet/GenerateEntrop
 import ModalContainer from '../components/home/ModalContainer'
 import { setDownloadedBackupData } from '../store/actions/BHR'
 import { setCloudDataRecovery, setIsFileReading } from '../store/actions/cloud'
-import openLink from '../utils/OpenLink'
 
 const WalletInitializationScreen = props => {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
   const dispatch = useDispatch()
   const [ generateEntropyGrid, setGenerateEntropyGrid ] = useState( false )
+  const openWebLink=( u:string )=>{
+    props.navigation.navigate( 'AppWebView', {
+      url:u || ''
+    } )
+  }
   return (
     <SafeAreaView style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -239,7 +243,7 @@ const WalletInitializationScreen = props => {
           `${strings.proceeding} `
         }
         linkText={strings.TermsService}
-        onPress={() => openLink( 'https://bitcointribe.app/terms-of-service/' )}
+        onPress={() => openWebLink( 'https://bitcointribe.app/terms-of-service/' )}
       />
       <ModalContainer onBackground={() =>setGenerateEntropyGrid( false )}
         visible={generateEntropyGrid}

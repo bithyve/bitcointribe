@@ -61,6 +61,7 @@ import AssetsStack from './stacks/assets/AssetsStack'
 import GiftStack from './stacks/gift/GiftStack'
 import HomeStack from './stacks/home/HomeStack'
 import MoreOptionsStack from './stacks/more-options/MoreOptionsStack'
+import AppWebView from '../pages/AppWebView'
 
 const SetupStack = createNativeStackNavigator()
 function SetupNavigator() {
@@ -116,6 +117,9 @@ function SetupNavigator() {
       <SetupStack.Screen name="UpdateApp" component={UpdateApp} options={{
         gestureEnabled: false
       }} />
+      <SetupStack.Screen name='AppWebView' component={AppWebView} options={{
+        headerShown: false
+      }}/>
     </SetupStack.Navigator>
   )
 }
