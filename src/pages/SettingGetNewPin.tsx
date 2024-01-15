@@ -14,7 +14,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
-import CommonStyles from '../common/Styles/Styles'
 import ErrorModalContents from '../components/ErrorModalContents'
 import HeaderTitle from '../components/HeaderTitle'
 import ModalHeader from '../components/ModalHeader'
@@ -175,23 +174,9 @@ export default function SettingGetNewPin( props ) {
       flex: 1
     }}>
       <StatusBar />
-      <View style={CommonStyles.headerContainer}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            props.navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
       <HeaderTitle
+        navigation={props.navigation}
+        backButton={true}
         firstLineTitle={'Manage Passcode'}
         secondLineTitle={''}
         infoTextNormal={''}

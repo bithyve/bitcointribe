@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { Image, ImageSourcePropType, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, ImageSourcePropType, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../../../common/Colors'
 import { translations } from '../../../common/content/LocContext'
 import { hp } from '../../../common/data/responsiveness/responsive'
 import Fonts from '../../../common/Fonts'
-import CommonStyles from '../../../common/Styles/Styles'
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
 import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningPromptBottomSheet'
 import WalletRescanningBottomSheet from '../../../components/bottom-sheets/wallet-rescanning-bottom-sheet/WalletRescanningBottomSheet'
@@ -124,25 +122,9 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
       flex: 1
     }}>
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      <View style={[ CommonStyles.headerContainer, {
-        // backgroundColor: Colors.backgroundColor
-      } ]}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            navigation.pop()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
       <HeaderTitle
+        navigation={navigation}
+        backButton={true}
         firstLineTitle={'Wallet Settings'}
         secondLineTitle={''}
         infoTextNormal={''}

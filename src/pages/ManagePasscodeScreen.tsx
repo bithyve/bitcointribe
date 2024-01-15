@@ -12,7 +12,6 @@ import Fonts from '../common/Fonts'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
 import { translations } from '../common/content/LocContext'
-import CommonStyles from '../common/Styles/Styles'
 import HeaderTitle from '../components/HeaderTitle'
 import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth'
 
@@ -67,23 +66,9 @@ export default function ManagePasscodeScreen( props ) {
     <SafeAreaView style={{
       flex: 1
     }}>
-      <View style={CommonStyles.headerContainer}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            props.navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
       <HeaderTitle
+        navigation={props.navigation}
+        backButton={true}
         firstLineTitle={'Manage Passcode'}
         secondLineTitle={''}
         infoTextNormal={''}
