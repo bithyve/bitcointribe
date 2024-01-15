@@ -723,7 +723,7 @@ const styles = StyleSheet.create( {
   },
   proceedButtonView: {
     marginRight: 20,
-    marginTop: hp( '19%' ),
+    marginTop: hp( '14%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',

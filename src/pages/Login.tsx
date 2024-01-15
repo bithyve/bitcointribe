@@ -975,7 +975,7 @@ const styles = StyleSheet.create( {
   },
   proceedButtonView: {
     marginRight: 20,
-    marginTop: hp( '20%' ),
+    marginTop: hp( '17%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',
