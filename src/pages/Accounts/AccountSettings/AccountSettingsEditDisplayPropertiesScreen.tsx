@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Input } from 'react-native-elements'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 import { RFValue } from 'react-native-responsive-fontsize'
 import { useDispatch } from 'react-redux'
@@ -9,7 +8,6 @@ import Colors from '../../../common/Colors'
 import { translations } from '../../../common/content/LocContext'
 import Fonts from '../../../common/Fonts'
 import FormStyles from '../../../common/Styles/FormStyles'
-import CommonStyles from '../../../common/Styles/Styles'
 import HeaderTitle from '../../../components/HeaderTitle'
 import { updateAccountSettings } from '../../../store/actions/accounts'
 import useAccountSettingsUpdatedEffect from '../../../utils/hooks/account-effects/UseAccountSettingsUpdatedEffect'
@@ -73,23 +71,9 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { route, n
     <SafeAreaView style={{
       flex: 1
     }}>
-      <View style={CommonStyles.headerContainer}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
       <HeaderTitle
+        navigation={navigation}
+        backButton={true}
         firstLineTitle={'Name and Description'}
         secondLineTitle={''}
         infoTextNormal={''}

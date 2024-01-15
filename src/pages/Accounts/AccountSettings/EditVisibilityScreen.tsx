@@ -2,7 +2,6 @@ import { CommonActions } from '@react-navigation/native'
 import React, { useState } from 'react'
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
 import { translations } from '../../../common/content/LocContext'
@@ -10,7 +9,6 @@ import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import Fonts from '../../../common/Fonts'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
-import CommonStyles from '../../../common/Styles/Styles'
 import VisibilityOptionsList from '../../../components/account-settings/visibility/VisibilityOptionsList'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import HeaderTitle from '../../../components/HeaderTitle'
@@ -76,23 +74,9 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { route, navigati
 
   return (
     <SafeAreaView style={styles.rootContainer}>
-      <View style={CommonStyles.headerContainer}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
       <HeaderTitle
+        navigation={navigation}
+        backButton={true}
         firstLineTitle={'Account Visibility'}
         secondLineTitle={''}
         infoTextNormal={''}
