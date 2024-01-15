@@ -1,16 +1,10 @@
-import React, { Component } from 'react'
+import React from 'react'
 import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text
+  Text, View
 } from 'react-native'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
-import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import CommonStyles from '../common/Styles/Styles'
 import KnowMoreButton from './KnowMoreButton'
-import { RFValue } from 'react-native-responsive-fontsize'
 
 export default function HeaderTitle1( props ) {
 
