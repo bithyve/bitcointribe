@@ -1,15 +1,12 @@
-import React, { Component } from 'react'
+import React from 'react'
 import {
-  TouchableOpacity,
-  Text,
-  StyleSheet
+  StyleSheet, Text, TouchableOpacity, View
 } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
 import { translations } from '../common/content/LocContext'
-import LinearGradient from 'react-native-linear-gradient'
+import Fonts from '../common/Fonts'
 
 export default function KnowMoreButton( props ) {
   const strings  = translations[ 'common' ]
@@ -17,13 +14,7 @@ export default function KnowMoreButton( props ) {
     <TouchableOpacity
       onPress={props.onpress}
     >
-      <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-        start={{
-          x: 0, y: 0
-        }} end={{
-          x: 1, y: 0
-        }}
-        locations={[ 0.2, 1 ]}
+      <View
         style={{
           ...styles.knowMoreButton, ...props.containerStyle
         }}
@@ -31,7 +22,7 @@ export default function KnowMoreButton( props ) {
         <Text style={{
           ...styles.knowMoreButtonText, ...props.textStyle
         }}>{strings.knowMore}</Text>
-      </LinearGradient>
+      </View>
     </TouchableOpacity>
   )
 }
@@ -42,7 +33,7 @@ const styles = StyleSheet.create( {
     // width: wp( '20%' ),
     paddingHorizontal: wp( 2 ),
     paddingVertical: wp( 1.5 ),
-    backgroundColor: Colors.lightBlue,
+    backgroundColor: Colors.blue,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 5
