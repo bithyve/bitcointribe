@@ -12,7 +12,6 @@ import { AccountType, DeepLinkEncryptionType, Gift } from '../../bitcoin/utiliti
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import BottomInfoBox from '../../components/BottomInfoBox'
-
 import { CommonActions } from '@react-navigation/native'
 import idx from 'idx'
 import { RootSiblingParent } from 'react-native-root-siblings'
@@ -22,6 +21,8 @@ import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePri
 import AddGiftToAccount from './AddGiftToAccount'
 import DashedLargeContainer from './DahsedLargeContainer'
 import ThemeList from './Theme'
+import ModalContainer from '../../components/home/ModalContainer'
+import LoaderModal from '../../components/LoaderModal'
 
 
 export type Props = {
@@ -42,17 +43,19 @@ export type Props = {
   isContactAssociated: boolean;
   version?: string;
   stopReset?:boolean;
+  giftLoading:boolean;
 };
 
 const NUMBER_OF_INPUTS = 6
 
-export default function AcceptGift( { stopReset, navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject, version }: Props ) {
+export default function AcceptGift( { giftLoading, stopReset, navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject, version }: Props ) {
   const dispatch = useDispatch()
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
   const [ PhoneNumber, setPhoneNumber ] = useState( '' )
   const [ EmailId, setEmailId ] = useState( '' )
   const [ onBlurFocus, setOnBlurFocus ] = useState( false )
+  const [ loading, setLoading ] = useState( false )
   const [ passcode, setPasscode ] = useState( '' )
   const [ passcodeArray, setPasscodeArray ] = useState( [
     '',
@@ -79,11 +82,23 @@ export default function AcceptGift( { stopReset, navigation, closeModal, onGiftR
   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == accType && shell.primarySubAccount.instanceNumber === 0 )
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
 
+  const handleGiftAccept=( key )=>{
+    setLoading( true )
+    setTimeout( ()=>{
+      onGiftRequestAccepted( key )
+    }, 2000 )
+  }
+
+  useEffect( () => {
+    setLoading( false )
+    setIsDisabled( false )
+  }, [ giftLoading ] )
+
 
   useEffect( () => {
     setAccId( sourcePrimarySubAccount.id )
     // return `${title} (${strings.availableToSpend}: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
-
+    setLoading( false )
   }, [ sourcePrimarySubAccount ] )
 
   useEffect( ()=> {
@@ -91,11 +106,13 @@ export default function AcceptGift( { stopReset, navigation, closeModal, onGiftR
       if( gift.channelAddress === acceptedGiftId )
         setAcceptedGift( gift )
     } )
+    setLoading( false )
   }, [ acceptedGiftId ] )
 
   useEffect( () => {
     if ( !inputType || inputType === DeepLinkEncryptionType.DEFAULT ) setIsDisabled( false )
     else setIsDisabled( true )
+    setLoading( false )
   }, [ inputType ] )
 
   useEffect( () => {
@@ -107,7 +124,7 @@ export default function AcceptGift( { stopReset, navigation, closeModal, onGiftR
       setGiftAcceptedModel( true )
       setIsDisabled( false )
     }
-
+    setLoading( false )
   }, [ acceptedGiftId ] )
 
   useEffect( () => {
@@ -116,6 +133,7 @@ export default function AcceptGift( { stopReset, navigation, closeModal, onGiftR
       setGiftAddedModel( true )
       setIsDisabled( false )
     }
+    setLoading( false )
   }, [ addedGiftId ] )
 
   const getStyle = ( i ) => {
@@ -445,8 +463,8 @@ export default function AcceptGift( { stopReset, navigation, closeModal, onGiftR
                 passcodeArray.map( ( item )=> {
                   data+=item
                 } )
-                onGiftRequestAccepted( data )
-              } else onGiftRequestAccepted( passcode )
+                handleGiftAccept( data )
+              } else handleGiftAccept( passcode )
             }
           }
         }}
@@ -677,6 +695,22 @@ export default function AcceptGift( { stopReset, navigation, closeModal, onGiftR
 
   return (
     <RootSiblingParent>
+      {loading && <View style={styles.modalContentContainer}>
+        <ModalContainer
+          onBackground={() => {}}
+          visible={true}
+          closeBottomSheet={() => {}}
+        >
+          <LoaderModal
+            headerText={'Unpacking Your Gift'}
+            messageText={
+              'Your gift is currently being unpacked. Once this process is complete, you will be able to claim it in the gift section.'
+            }
+            messageText2={''}
+            source={require( '../../assets/images/gift.gif' )}
+          />
+        </ModalContainer>
+      </View>}
       {acceptGift &&
         <View style={styles.modalContentContainer}>
           {renderAcceptModal()}

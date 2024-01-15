@@ -175,9 +175,10 @@ function BottomTab() {
         for( const route of homeNavRoutes || [] ) {
           if ( route.state?.routes?.length > 1 ) showContent = false
         }
+        const shouldListen = route.name === 'Home'
         return ( {
           header: () => {
-            return <Header showContent={showContent} route={route} navigation={navigation} />
+            return <Header showContent={showContent} route={route} navigation={navigation} shouldListen={shouldListen}/>
           },
           tabBarShowLabel: false,
           tabBarStyle:{

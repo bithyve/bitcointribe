@@ -176,6 +176,7 @@ interface HomeStateTypes {
   wyreFromBuyMenu: boolean | null;
   wyreFromDeepLink: boolean | null;
   releaseNotes: string;
+  giftLoading: boolean;
 }
 
 interface HomePropsTypes {
@@ -265,6 +266,7 @@ interface HomePropsTypes {
   recomputeNetBalance: any;
   updateLinkingURL:( s:string )=>void;
   linkingURL: string;
+  shouldListen:boolean;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -309,7 +311,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationIgnoreText:null,
       isIgnoreButton: false,
       currentMessage: null,
-
+      giftLoading: false,
       errorMessageHeader: '',
       errorMessage: '',
       selectedContact: [],
@@ -782,6 +784,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   componentDidMount = async() => {
+    if( !this.props.shouldListen ){
+      return
+    }
     const {
       navigation,
       initializeHealthSetup,
@@ -1127,7 +1132,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         trustedContactRequest.channelKey = channelKeys[ 0 ]
         trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
       } catch( err ){
-        Toast( 'Invalid key' )
+        Toast( '  Invalid key' )
+        this.onToogleGiftLoading()
         return
       }
 
@@ -1162,6 +1168,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         } )
       }
     } catch ( error ) {
+      this.onToogleGiftLoading()
       Alert.alert( 'Incompatible request, updating your app might help' )
     }
   };
@@ -1188,7 +1195,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         trustedContactRequest.channelKey = channelKeys[ 0 ]
         trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
       } catch( err ){
-        Toast( 'Invalid key' )
+        Toast( '  Invalid key' )
+        this.onToogleGiftLoading()
         return
       }
       this.props.rejectTrustedContact( {
@@ -1199,9 +1207,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
+  onToogleGiftLoading=()=>{
+    this.setState( ( prevState )=>{
+      return {
+        ...prevState,
+        giftLoading:!prevState.giftLoading
+      }
+    } )
+  }
+
   onGiftRequestAccepted = ( key? ) => {
     try {
-      // this.closeBottomSheet()
       const { giftRequest } = this.state
       let decryptionKey: string
       try{
@@ -1217,12 +1233,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               break
         }
       } catch( err ){
-        Toast( 'Invalid key' )
+        Toast( '  Invalid key' )
+        this.onToogleGiftLoading()
         return
       }
-
       this.props.fetchGiftFromTemporaryChannel( giftRequest.channelAddress, decryptionKey )
     } catch ( error ) {
+      this.onToogleGiftLoading()
       Alert.alert( 'Incompatible request, updating your app might help' )
     }
   };
@@ -1613,6 +1630,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               onPressAccept={this.onTrustedContactRequestAccepted}
               onPressReject={this.onTrustedContactRejected}
               version={giftRequest.version}
+              giftLoading={this.state.giftLoading}
             />
           )
 
