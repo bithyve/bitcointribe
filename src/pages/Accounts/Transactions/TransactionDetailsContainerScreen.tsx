@@ -263,15 +263,6 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, route
             )
           }
 
-          {/* <View style={styles.lineItem}>
-            <Text style={ListStyles.listItemTitleTransaction}>{common.TransactionID}</Text>
-            <Text style={ListStyles.listItemSubtitle} onPress={() =>
-              openLink(
-                `https://blockstream.info${transaction.accountType === AccountType.TEST_ACCOUNT ? '/testnet' : ''
-                }/tx/${transaction.txid}`,
-              )}>{transaction.txid}</Text>
-          </View> */}
-
           <View style={styles.lineItem}>
             <Text style={ListStyles.listItemTitleTransaction}>{destinationHeadingText()}</Text>
             <Text style={ListStyles.listItemSubtitle}>{destinationAddressText()}</Text>
