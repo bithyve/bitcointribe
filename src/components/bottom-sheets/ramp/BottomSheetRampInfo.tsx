@@ -59,10 +59,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
 
   useRampReservationFetchEffect( {
     onSuccess: () => {
-      navigation.navigate( 'AppWebView', {
-        url:rampHostedUrl
-      } )
-      // openLink( rampHostedUrl )
+      openLink( rampHostedUrl )
       onClickSetting()
     },
     onFailure: () => {
