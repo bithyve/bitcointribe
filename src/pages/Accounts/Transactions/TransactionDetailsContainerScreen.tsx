@@ -40,7 +40,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, route
 
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const account: Account = useSelector( state => state.accounts.accounts[ primarySubAccount.id ] )
-  console.log( 'account', account.networkType )
+
   useEffect( () => {
     if ( transaction.isNew ) dispatch( markReadTx( [ transaction.txid ], accountShellID ) )
   }, [ transaction.isNew ] )
