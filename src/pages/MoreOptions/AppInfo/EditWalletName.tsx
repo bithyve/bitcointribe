@@ -68,7 +68,7 @@ export default function EditWalletName( props ) {
           style={{
             ...styles.buttonView, backgroundColor: !(
               answer.trim() && answerError.length === 0
-            ) ? Colors.lightBlue : Colors.blue, elevation: Elevation
+            ) ? Colors.lightBlue : Colors.blue
           }}
         >
           <Text style={styles.buttonText}>{common.save}</Text>
@@ -299,28 +299,11 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    // shadowColor: Colors.shadowBlue,
-    // shadowOpacity: 1,
-    // shadowOffset: {
-    //   width: 15, height: 15
-    // },
   },
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.Medium,
-  },
-  bottomButtonView: {
-    flexDirection: 'row',
-    paddingLeft: 30,
-    paddingRight: 30,
-    paddingBottom: hp( 2 ),
-    alignItems: 'center',
-  },
-  bottomButtonView1: {
-    flexDirection: 'row',
-    marginTop: 5,
-    alignItems: 'center',
   },
   inputBox: {
     borderWidth: 0.5,
