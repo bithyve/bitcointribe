@@ -11,7 +11,6 @@ import {
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  heightPercentageToDP as hp,
   widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -25,7 +24,6 @@ import { translations } from '../../common/content/LocContext'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
 import Fonts from '../../common/Fonts'
-import CommonStyles from '../../common/Styles/Styles'
 import BWHealthCheckModal from '../../components/border-wallet/BWHealthCheckModal'
 import HeaderTitle from '../../components/HeaderTitle'
 import ModalContainer from '../../components/home/ModalContainer'
@@ -116,34 +114,10 @@ export default function BackupMethods( { navigation } ) {
         backgroundColor: Colors.backgroundColor,
       }}>
       <StatusBar backgroundColor={Colors.blue} barStyle="dark-content" />
-      <View
-        style={[
-          CommonStyles.headerContainer,
-          {
-            backgroundColor: Colors.backgroundColor,
-            marginTop: hp( 5 ),
-          },
-        ]}>
-        <TouchableOpacity
-          style={[
-            CommonStyles.headerLeftIconContainer,
-            {
-              marginTop: 20,
-            },
-          ]}
-          onPress={() => {
-            navigation.goBack()
-          }}>
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
+
       <HeaderTitle
+        navigation={navigation}
+        backButton={true}
         firstLineTitle={strings.WalletBackup}
         secondLineTitle={backUpMessage(
           days,

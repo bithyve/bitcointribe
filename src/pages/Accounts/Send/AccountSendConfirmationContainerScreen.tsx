@@ -4,7 +4,6 @@ import { Dimensions, Platform, SafeAreaView, StyleSheet, Text, TextInput, Toucha
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
 import { MultiSigAccount, NetworkType, TxPriority } from '../../../bitcoin/utilities/Interface'
 import Colors from '../../../common/Colors'
@@ -13,7 +12,6 @@ import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import AccountShell from '../../../common/data/models/AccountShell'
 import Fonts from '../../../common/Fonts'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import CommonStyles from '../../../common/Styles/Styles'
 import HeaderTitle from '../../../components/HeaderTitle'
 import HeadingAndSubHeading from '../../../components/HeadingAndSubHeading'
 import ModalContainer from '../../../components/home/ModalContainer'
@@ -231,23 +229,9 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation, 
     <SafeAreaView style={{
       flex: 1
     }}>
-      <View style={CommonStyles.headerContainer}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
       <HeaderTitle
+        navigation={navigation}
+        backButton={true}
         firstLineTitle={'Send Confirmation'}
         secondLineTitle={''}
         infoTextNormal={''}

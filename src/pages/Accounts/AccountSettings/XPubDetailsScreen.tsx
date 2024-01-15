@@ -10,7 +10,6 @@ import AccountUtilities from '../../../bitcoin/utilities/accounts/AccountUtiliti
 import { Account, AccountType, MultiSigAccount, NetworkType, Wallet } from '../../../bitcoin/utilities/Interface'
 import Colors from '../../../common/Colors'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
-import CommonStyles from '../../../common/Styles/Styles'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import CopyThisText from '../../../components/CopyThisText'
 import HeaderTitle from '../../../components/HeaderTitle'
@@ -196,23 +195,9 @@ const XPubDetailsScreen: React.FC<Props> = ( { route, navigation }: Props ) => {
     <SafeAreaView style={{
       flex: 1,
     }}>
-      <View style={CommonStyles.headerContainer}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
       <HeaderTitle
+        navigation={navigation}
+        backButton={true}
         firstLineTitle={`${debugAccount && debugAccount.accountName } xPub`}
         secondLineTitle={''}
         infoTextNormal={''}

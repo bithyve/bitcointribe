@@ -75,6 +75,7 @@ import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import AddNewAccountStack from '../accounts/AddNewAccountStack'
 import LnAccountStack from '../accounts/LnAccountStack'
 import QRStack from '../home/QRStack'
+import AppWebView from '../../../pages/AppWebView'
 
 const Stack = createNativeStackNavigator()
 const HomeStack = ( { navigation, route } ) => {
@@ -247,6 +248,9 @@ const HomeStack = ( { navigation, route } ) => {
       <Stack.Screen name="UpgradeBackup" component={UpgradeBackup} />
       <Stack.Screen name="ConfirmKeys" component={ConfirmKeys} />
       <Stack.Screen name="TwoFAValidation" component={TwoFAValidation} />
+      <Stack.Screen name='AppWebView' component={AppWebView} options={{
+        headerShown: false
+      }}/>
     </Stack.Navigator>
   )
 }

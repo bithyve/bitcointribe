@@ -7,9 +7,7 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
+  Text, TouchableWithoutFeedback,
   View
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -17,7 +15,6 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
@@ -37,7 +34,6 @@ import { Account, AccountType, LevelData, LevelHealthInterface } from '../../bit
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { translations } from '../../common/content/LocContext'
 import AccountShell from '../../common/data/models/AccountShell'
-import CommonStyles from '../../common/Styles/Styles'
 import { UsNumberFormat } from '../../common/utilities'
 import CopyThisText from '../../components/CopyThisText'
 import ErrorModalContents from '../../components/ErrorModalContents'
@@ -256,32 +252,10 @@ export default function Receive( props ) {
           enabled
         >
           <View style={NavStyles.modalContainer}>
-            {/* <View style={NavStyles.modalHeaderTitleView}> */}
-            {/* <View
-                style={{
-                  flex: 1, flexDirection: 'row', alignItems: 'stretch'
-                }}
-              > */}
-            <View style={[ CommonStyles.headerContainer, {
-              backgroundColor: Colors.backgroundColor
-            } ]}>
-              <TouchableOpacity
-                style={CommonStyles.headerLeftIconContainer}
-                onPress={() => {
-                  props.navigation.goBack()
-                }}
-              >
-                <View style={CommonStyles.headerLeftIconInnerContainer}>
-                  <FontAwesome
-                    name="long-arrow-left"
-                    color={Colors.homepageButtonColor}
-                    size={17}
-                  />
-                </View>
-              </TouchableOpacity>
-            </View>
             <View>
               <HeaderTitle
+                navigation={props.navigation}
+                backButton={true}
                 firstLineTitle={'Receive'}
                 secondLineTitle={'Make sure you keep them safe'}
                 infoTextNormal={''}
@@ -290,42 +264,6 @@ export default function Receive( props ) {
                 step={''}
               />
             </View>
-            {/* <Image
-                source={
-                  getAccountIconByShell( accountShell )
-                }
-                style={{
-                  width: wp( '10%' ), height: wp( '10%' )
-                }}
-              />
-              <View style={{
-                marginLeft: wp( '2.5%' )
-              }}>
-                <Text style={NavStyles.modalHeaderTitleText}>{common.receive}</Text>
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.Regular,
-                    fontSize: RFValue( 12 ),
-                  }}
-                >
-                  {
-                    getAccountTitleByShell( accountShell )
-                  }
-                </Text>
-              </View>
-            </View>
-            {accountShell.primarySubAccount.type == AccountType.TEST_ACCOUNT ? (
-              <KnowMoreButton
-                onpress={() => onPressKnowMore()}
-                containerStyle={{
-                  marginTop: 'auto',
-                  marginBottom: 'auto',
-                  marginRight: 10,
-                }}
-              />
-            ) : null} */}
-            {/* </View> */}
             <ScrollView>
               <View style={styles.QRView}>
                 <QRCode title={getAccountTitleByShell( accountShell ) === 'Test Account' ? 'Testnet address' : 'Bitcoin address'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp( '27%' )} />

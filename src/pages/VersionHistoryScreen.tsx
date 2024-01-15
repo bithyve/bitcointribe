@@ -10,11 +10,9 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useSelector } from 'react-redux'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
-import CommonStyles from '../common/Styles/Styles'
 import { getVersions } from '../common/utilities'
 import HeaderTitle from '../components/HeaderTitle'
 
@@ -50,23 +48,9 @@ export default function VersionHistoryScreen( props ) {
     <SafeAreaView style={{
       flex: 1
     }}>
-      <View style={CommonStyles.headerContainer}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            props.navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
       <HeaderTitle
+        navigation={props.navigation}
+        backButton={true}
         firstLineTitle={'Version History'}
         secondLineTitle={''}
         infoTextNormal={''}

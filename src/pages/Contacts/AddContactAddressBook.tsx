@@ -18,7 +18,6 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import { useDispatch, useSelector } from 'react-redux'
 import { v4 as uuid } from 'uuid'
@@ -26,11 +25,10 @@ import { Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { LocalizationContext } from '../../common/content/LocContext'
 import Fonts from '../../common/Fonts'
-import CommonStyles from '../../common/Styles/Styles'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import CreateFNFInvite from '../../components/friends-and-family/CreateFNFInvite'
-import HeaderTitle1 from '../../components/HeaderTitle1'
+import HeaderTitle from '../../components/HeaderTitle'
 import ModalContainer from '../../components/home/ModalContainer'
 import RadioButton from '../../components/RadioButton'
 import { setContactPermissionAsked, setIsPermissionGiven } from '../../store/actions/preferences'
@@ -429,26 +427,10 @@ export default function AddContactAddressBook( props ) {
       <View style={styles.modalContentContainer}>
         <StatusBar barStyle="dark-content" />
         {/* <View style={styles.modalHeaderTitleView}> */}
-        <View style={[ CommonStyles.headerContainer, {
-          backgroundColor: Colors.backgroundColor
-        } ]}>
-          <TouchableOpacity
-            style={CommonStyles.headerLeftIconContainer}
-            onPress={() => {
-              props.navigation.pop( props.route.params?.fromScreen === 'Gift' ? 2 : 1 )
-            }}
-          >
-            <View style={CommonStyles.headerLeftIconInnerContainer}>
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.homepageButtonColor}
-                size={17}
-              />
-            </View>
-          </TouchableOpacity>
-        </View>
-        <HeaderTitle1
-        // firstLineTitle={props.modalTitle ? props.modalTitle : 'Send Gift'}
+        <HeaderTitle
+          navigation={props.navigation}
+          backButton={true}
+          // firstLineTitle={props.modalTitle ? props.modalTitle : 'Send Gift'}
           secondLineTitle={strings.Associate}
           infoTextNormal={''}
           infoTextBold={''}
