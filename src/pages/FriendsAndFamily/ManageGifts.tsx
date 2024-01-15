@@ -82,6 +82,7 @@ const ManageGifts = ( props ) => {
     statusGift = GiftStatus.SENT
   }
   const [ active, setActive ] = useState( statusGift )
+  const [ giftLoading, setGiftLoading ] = useState( false )
   const [ knowMore, setKnowMore ] = useState( false )
   // const [ sentGifts, setSentClaimedGifts ] = useState( [] )
   // const [ receivedGifts, setReceicedGifts ] = useState( [] )
@@ -103,6 +104,10 @@ const ManageGifts = ( props ) => {
       }, 2000 )
     }
   }, [] )
+
+  const onToogleGiftLoading=()=>{
+    setGiftLoading( ()=>!giftLoading )
+  }
 
 
   useEffect( () => {
@@ -264,12 +269,14 @@ const ManageGifts = ( props ) => {
               break
         }
       } catch( err ){
-        Toast( 'Invalid key' )
+        onToogleGiftLoading()
+        Toast( '  Invalid key' )
         return
       }
 
       dispatch( fetchGiftFromTemporaryChannel( giftData.channelAddress, decryptionKey ) )
     } catch ( error ) {
+      onToogleGiftLoading()
       Alert.alert( 'Incompatible request, updating your app might help' )
     }
   }
@@ -305,7 +312,8 @@ const ManageGifts = ( props ) => {
         trustedContactRequest.channelKey = channelKeys[ 0 ]
         trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
       } catch( err ){
-        Toast( 'Invalid key' )
+        onToogleGiftLoading()
+        Toast( '  Invalid key' )
         return
       }
 
@@ -329,6 +337,7 @@ const ManageGifts = ( props ) => {
         } )
       }
     } catch ( error ) {
+      onToogleGiftLoading()
       Alert.alert( 'Incompatible request, updating your app might help' )
     }
   }
@@ -353,7 +362,8 @@ const ManageGifts = ( props ) => {
         trustedContactRequest.channelKey = channelKeys[ 0 ]
         trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
       } catch( err ){
-        Toast( 'Invalid key' )
+        onToogleGiftLoading()
+        Toast( '  Invalid key' )
         return
       }
       dispatch( rejectTrustedContact( {
@@ -393,7 +403,7 @@ const ManageGifts = ( props ) => {
           onPressReject={onTrustedContactRejected}
           version={giftData.version}
           stopReset={true}
-        />
+          giftLoading={giftLoading}/>
       </ModalContainer>:null}
       <View style={{
         height: 'auto',
