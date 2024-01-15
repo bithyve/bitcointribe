@@ -1,13 +1,11 @@
-import React, { useMemo } from 'react'
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, StatusBar } from 'react-native'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import React from 'react'
+import { SafeAreaView, StatusBar, StyleSheet } from 'react-native'
+import Colors from '../../../common/Colors'
 import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces'
 import AccountDetailsTransactionsList from '../../../components/account-details/AccountDetailsTransactionsList'
+import HeaderTitle from '../../../components/HeaderTitle'
 import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import useTransactionsForAccountShell from '../../../utils/hooks/state-selectors/accounts/UseTransactionsForAccountShell'
-import Colors from '../../../common/Colors'
-import HeaderTitle from '../../../components/HeaderTitle'
-import CommonStyles from '../../../common/Styles/Styles'
 export type Props = {
   navigation: any;
   route: any;
@@ -28,23 +26,9 @@ const TransactionsListContainerScreen: React.FC<Props> = ( { navigation, route }
   return (
     <SafeAreaView style={styles.rootContainer}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={CommonStyles.headerContainer}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
       <HeaderTitle
+        navigation={navigation}
+        backButton={true}
         firstLineTitle={'All Transactions'}
         secondLineTitle={''}
         infoTextNormal={''}

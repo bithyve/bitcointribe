@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
@@ -14,7 +13,6 @@ import TransactionKind from '../../../common/data/enums/TransactionKind'
 import TransactionDescribing from '../../../common/data/models/Transactions/Interfaces'
 import Fonts from '../../../common/Fonts'
 import ListStyles from '../../../common/Styles/ListStyles'
-import CommonStyles from '../../../common/Styles/Styles'
 import HeaderTitle from '../../../components/HeaderTitle'
 import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
 import { markReadTx } from '../../../store/actions/accounts'
@@ -91,23 +89,9 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, route
 
   return (
     <SafeAreaView>
-      <View style={CommonStyles.headerContainer}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
       <HeaderTitle
+        navigation={navigation}
+        backButton={true}
         firstLineTitle={strings[ 'Transaction Details' ]}
         secondLineTitle={''}
         infoTextNormal={''}
