@@ -4,18 +4,18 @@ import {
   Platform,
   StatusBar,
   StyleSheet,
-  View,
+  View
 } from 'react-native'
 import {
   heightPercentageToDP,
   heightPercentageToDP as hp,
   widthPercentageToDP,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { connect } from 'react-redux'
 import Colors from '../../common/Colors'
 import {
-  SECURE_ACCOUNT,
+  SECURE_ACCOUNT
 } from '../../common/constants/wallet-service-types'
 import {
   acceptExistingContactRequest,
@@ -29,16 +29,16 @@ import {
   updateFCMTokens,
   updateMessageStatus,
   updateMessageStatusInApp,
-  updateNotificationList,
+  updateNotificationList
 } from '../../store/actions/notifications'
 import {
   setCardData,
   setCurrencyCode,
-  setIsPermissionGiven,
+  setIsPermissionGiven
 } from '../../store/actions/preferences'
 import {
   rejectTrustedContact,
-  syncPermanentChannels,
+  syncPermanentChannels
 } from '../../store/actions/trustedContacts'
 //import HomeHeader from '../../components/home/home-header'
 import BottomSheet from '@gorhom/bottom-sheet'
@@ -49,7 +49,7 @@ import * as RNLocalize from 'react-native-localize'
 import {
   AccountType,
   LevelHealthInterface,
-  Wallet,
+  Wallet
 } from '../../bitcoin/utilities/Interface'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
@@ -61,20 +61,20 @@ import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheet
 import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
 import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
 import {
-  BottomTab,
+  BottomTab
 } from '../../components/home/custom-bottom-tabs'
 import ModalContainer from '../../components/home/ModalContainer'
 import {
   addTransferDetails,
   fetchExchangeRates,
   fetchFeeRates,
-  setShowAllAccount,
+  setShowAllAccount
 } from '../../store/actions/accounts'
 import { setCloudData } from '../../store/actions/cloud'
 import {
   setFCMToken,
   setSecondaryDeviceAddress,
-  updatePreference,
+  updatePreference
 } from '../../store/actions/preferences'
 import { clearRampCache } from '../../store/actions/RampIntegration'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
@@ -639,7 +639,7 @@ const styles = StyleSheet.create( {
   accountCardsSectionContainer: {
     height: hp( '71.46%' ),
     // marginTop: 30,
-    backgroundColor: Colors.backgroundColor1,
+    backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,

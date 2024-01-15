@@ -185,7 +185,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }}>
             <HomeBuyCard
               cardContainer={{
-                backgroundColor: 'white',
+                backgroundColor: Colors.white,
                 marginRight: wp( 2 ),
                 height: hp( Platform.OS == 'ios' ? '13%' : '15%' ),
                 width:wp( '91%' ),
