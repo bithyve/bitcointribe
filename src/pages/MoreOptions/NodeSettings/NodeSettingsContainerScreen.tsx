@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, View } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { NodeDetail } from '../../../bitcoin/electrum/interface'
 import Node from '../../../bitcoin/electrum/node'
 import Colors from '../../../common/Colors'
 import PersonalNode from '../../../common/data/models/PersonalNode'
-import CommonStyles from '../../../common/Styles/Styles'
 import HeaderTitle from '../../../components/HeaderTitle'
 import Loader from '../../../components/loader'
 import Toast from '../../../components/Toast'
@@ -133,25 +131,9 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) 
   return (
     <SafeAreaView style={styles.rootContainer}>
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      <View style={[ CommonStyles.headerContainer, {
-        // backgroundColor: Colors.backgroundColor
-      } ]}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            navigation.pop()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
       <HeaderTitle
+        navigation={navigation}
+        backButton={true}
         firstLineTitle={'Node Settings'}
         secondLineTitle={''}
         infoTextNormal={''}
