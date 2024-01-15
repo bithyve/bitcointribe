@@ -8,7 +8,7 @@ import Toast from 'react-native-root-toast'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../common/Colors'
 
-export default (  message, icon = false, toastPosition=-15 ) => {
+export default (  message, icon = false, error= false, toastPosition=-15 ) => {
   return Toast.show( <View style={{
     flexDirection:'row',
     justifyContent:'flex-start',
@@ -19,8 +19,8 @@ export default (  message, icon = false, toastPosition=-15 ) => {
   }}>
     {icon &&
     <Ionicons
-      name="checkmark-circle"
-      color={Colors.white}
+      name={!error ? 'checkmark-circle' : 'alert-circle'}
+      color={!error ? Colors.white : Colors.red}
       size={30}
       style={{
         marginLeft:10

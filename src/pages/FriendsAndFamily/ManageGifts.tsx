@@ -1,55 +1,37 @@
-import React, { useMemo, useContext, useEffect, useState, } from 'react'
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  StatusBar,
-  SafeAreaView,
-  Text,
-  ScrollView,
-  FlatList, Image, RefreshControl, Alert
-} from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { useDispatch, useSelector } from 'react-redux'
 import moment from 'moment'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
+import { Alert, FlatList, Image, RefreshControl, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import HeaderTitle from '../../components/HeaderTitle'
-import CommonStyles from '../../common/Styles/Styles'
+import { useDispatch, useSelector } from 'react-redux'
+import Colors from '../../common/Colors'
 import { LocalizationContext } from '../../common/content/LocContext'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
 // import GiftCard from '../../assets/images/svgs/icon_gift.svg'
-import Gifts from '../../assets/images/svgs/gift_card_2.svg'
-import ImageStyles from '../../common/Styles/ImageStyles'
-import idx from 'idx'
-import { DeepLinkEncryptionType, Gift, GiftStatus, GiftType, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
-import ModalContainer from '../../components/home/ModalContainer'
-import { InitTrustedContactFlowKind, fetchGiftFromTemporaryChannel, initializeTrustedContact, rejectGift, rejectTrustedContact, syncGiftsStatus } from '../../store/actions/trustedContacts'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
-import ManageGiftsList from './ManageGiftsList'
-import IconAdd from '../../assets/images/svgs/icon_add.svg'
-import IconAddLight from '../../assets/images/svgs/icon_add_dark.svg'
-import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
-import AccountCheckingHome from '../../assets/images/accIcons/icon_checking.svg'
-import GiftKnowMore from '../../components/know-more-sheets/GiftKnowMoreModel'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import RecipientAvatar from '../../components/RecipientAvatar'
-import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import idx from 'idx'
+import Gifts from '../../assets/images/svgs/gift_card_2.svg'
+import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
+import { DeepLinkEncryptionType, Gift, GiftStatus, GiftType, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import { processRequestQR } from '../../common/CommonFunctions'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
-import ToggleContainer from './CurrencyToggle'
-import { processRequestQR } from '../../common/CommonFunctions'
-import AcceptGift from './AcceptGift'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import ModalContainer from '../../components/home/ModalContainer'
+import GiftKnowMore from '../../components/know-more-sheets/GiftKnowMoreModel'
+import RecipientAvatar from '../../components/RecipientAvatar'
 import Toast from '../../components/Toast'
 import { acceptExistingContactRequest } from '../../store/actions/BHR'
+import { fetchGiftFromTemporaryChannel, initializeTrustedContact, InitTrustedContactFlowKind, rejectGift, rejectTrustedContact, syncGiftsStatus } from '../../store/actions/trustedContacts'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import AcceptGift from './AcceptGift'
+import ToggleContainer from './CurrencyToggle'
+import ManageGiftsList from './ManageGiftsList'
 
 const QRScanner = require( '../../assets/images/icons/qr.png' )
 
@@ -270,7 +252,7 @@ const ManageGifts = ( props ) => {
         }
       } catch( err ){
         onToogleGiftLoading()
-        Toast( '  Invalid key' )
+        Toast( 'Invalid key', true, true )
         return
       }
 
@@ -313,7 +295,7 @@ const ManageGifts = ( props ) => {
         trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
       } catch( err ){
         onToogleGiftLoading()
-        Toast( '  Invalid key' )
+        Toast( 'Invalid key', true, true  )
         return
       }
 
@@ -363,7 +345,7 @@ const ManageGifts = ( props ) => {
         trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
       } catch( err ){
         onToogleGiftLoading()
-        Toast( '  Invalid key' )
+        Toast( 'Invalid key', true, true  )
         return
       }
       dispatch( rejectTrustedContact( {
