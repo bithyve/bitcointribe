@@ -252,12 +252,6 @@ export default function Receive( props ) {
           enabled
         >
           <View style={NavStyles.modalContainer}>
-            {/* <View style={NavStyles.modalHeaderTitleView}> */}
-            {/* <View
-                style={{
-                  flex: 1, flexDirection: 'row', alignItems: 'stretch'
-                }}
-              > */}
             <View>
               <HeaderTitle
                 navigation={props.navigation}
@@ -270,42 +264,6 @@ export default function Receive( props ) {
                 step={''}
               />
             </View>
-            {/* <Image
-                source={
-                  getAccountIconByShell( accountShell )
-                }
-                style={{
-                  width: wp( '10%' ), height: wp( '10%' )
-                }}
-              />
-              <View style={{
-                marginLeft: wp( '2.5%' )
-              }}>
-                <Text style={NavStyles.modalHeaderTitleText}>{common.receive}</Text>
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.Regular,
-                    fontSize: RFValue( 12 ),
-                  }}
-                >
-                  {
-                    getAccountTitleByShell( accountShell )
-                  }
-                </Text>
-              </View>
-            </View>
-            {accountShell.primarySubAccount.type == AccountType.TEST_ACCOUNT ? (
-              <KnowMoreButton
-                onpress={() => onPressKnowMore()}
-                containerStyle={{
-                  marginTop: 'auto',
-                  marginBottom: 'auto',
-                  marginRight: 10,
-                }}
-              />
-            ) : null} */}
-            {/* </View> */}
             <ScrollView>
               <View style={styles.QRView}>
                 <QRCode title={getAccountTitleByShell( accountShell ) === 'Test Account' ? 'Testnet address' : 'Bitcoin address'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp( '27%' )} />
