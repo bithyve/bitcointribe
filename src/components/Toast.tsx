@@ -23,7 +23,7 @@ export default (  message, icon = false, error= false, toastPosition=-15 ) => {
       color={!error ? Colors.white : Colors.red}
       size={30}
       style={{
-        marginLeft:10
+        marginLeft:20
       }}
     />
     }

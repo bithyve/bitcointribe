@@ -29,6 +29,7 @@ import HeaderTitle from '../../components/HeaderTitle'
 import ModalContainer from '../../components/home/ModalContainer'
 import RGBServices from '../../services/RGBServices'
 import dbManager from '../../storage/realm/dbManager'
+import { onPressKeeper } from '../../store/actions/BHR'
 
 const styles = StyleSheet.create( {
   body: {
@@ -56,6 +57,8 @@ const styles = StyleSheet.create( {
 export default function BackupMethods( { navigation } ) {
   const strings = translations[ 'bhr' ]
   const levelData: LevelData[] = useSelector( state => state.bhr.levelData )
+  const navigationObj: LevelData[] = useSelector( state => state.bhr.navigationObj )
+  const [ btnPress, setBtnPress ] = useState( false )
   const backupWithKeeperStatus: BackupWithKeeperState = useSelector(
     state => state.bhr.backupWithKeeperStatus,
   )
@@ -84,10 +87,24 @@ export default function BackupMethods( { navigation } ) {
   }, [] )
 
   function onKeeperButtonPress() {
-    navigation.navigate( 'SeedBackup', {
-      screen: 'SeedBackupHistory',
-    } )
+    setBtnPress( true )
+    if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed' ){
+      dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
+    }
   }
+
+  useEffect( () => {
+    if ( navigationObj.selectedKeeper && btnPress ) {
+      const navigationParams = {
+        selectedTitle: navigationObj.selectedKeeper.name,
+        SelectedRecoveryKeyNumber: 1,
+        selectedKeeper: navigationObj.selectedKeeper,
+        selectedLevelId: levelData[ 0 ].id
+      }
+      navigation.navigate( 'SeedBackupHistory', navigationParams )
+    }
+  }, [ navigationObj ] )
+
 
   function onPressBackupWithKeeper() {
     // if( backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP ) {
@@ -141,11 +158,7 @@ export default function BackupMethods( { navigation } ) {
               flexDirection: 'row',
             }}
             //TODO: check
-            onPress={() =>
-              navigation.navigate( 'SeedBackup', {
-                screen: 'SeedBackupHistory',
-              } )
-            }>
+            onPress={onKeeperButtonPress}>
             <View
               style={{
                 width: 40,
