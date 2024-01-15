@@ -4,7 +4,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
-import { Account, AccountType, TransactionType } from '../../../bitcoin/utilities/Interface'
+import { Account, NetworkType, TransactionType } from '../../../bitcoin/utilities/Interface'
 import Colors from '../../../common/Colors'
 import { translations } from '../../../common/content/LocContext'
 import { displayNameForBitcoinUnit } from '../../../common/data/enums/BitcoinUnit'
@@ -34,12 +34,13 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, route
   const transaction: TransactionDescribing = route.params?.transaction
   const accountShellID: SubAccountKind = route.params?.accountShellID
   const accountShell = useAccountShellForID( accountShellID )
+
   const common = translations[ 'common' ]
   const strings = translations[ 'stackTitle' ]
 
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const account: Account = useSelector( state => state.accounts.accounts[ primarySubAccount.id ] )
-
+  console.log( 'account', account.networkType )
   useEffect( () => {
     if ( transaction.isNew ) dispatch( markReadTx( [ transaction.txid ], accountShellID ) )
   }, [ transaction.isNew ] )
@@ -178,7 +179,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, route
             <Text style={ListStyles.listItemTitleTransaction}>{common.TransactionID}</Text>
             <Text style={ListStyles.listItemSubtitle} onPress={() =>
               openLink(
-                `https://blockstream.info${transaction.accountType === AccountType.TEST_ACCOUNT ? '/testnet' : ''
+                `https://blockstream.info${account.networkType === NetworkType.TESTNET ? '/testnet' : ''
                 }/tx/${transaction.txid}`,
               )}>{transaction.txid}</Text>
           </View>
@@ -262,14 +263,14 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, route
             )
           }
 
-          <View style={styles.lineItem}>
+          {/* <View style={styles.lineItem}>
             <Text style={ListStyles.listItemTitleTransaction}>{common.TransactionID}</Text>
             <Text style={ListStyles.listItemSubtitle} onPress={() =>
               openLink(
                 `https://blockstream.info${transaction.accountType === AccountType.TEST_ACCOUNT ? '/testnet' : ''
                 }/tx/${transaction.txid}`,
               )}>{transaction.txid}</Text>
-          </View>
+          </View> */}
 
           <View style={styles.lineItem}>
             <Text style={ListStyles.listItemTitleTransaction}>{destinationHeadingText()}</Text>
