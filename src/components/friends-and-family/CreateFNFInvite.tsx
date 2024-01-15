@@ -57,9 +57,6 @@ const CreateFNFInvite = ( props: Props ) => {
           <Text
             style={[
               styles.titleText,
-              {
-                fontSize: RFValue( 16 ), marginBottom: 20, color: Colors.blue
-              },
             ]}
           >
             Create an F{'&'}F invite
@@ -77,9 +74,7 @@ const CreateFNFInvite = ( props: Props ) => {
           <View style={{
             flex:1
           }}>
-            <Text style={[ styles.titleText, {
-              fontSize: RFValue( 12 )
-            } ]}>
+            <Text style={styles.subtitleText}>
               Create Invitation link
             </Text>
             <Text style={styles.paragraphTitleText}>
@@ -110,10 +105,8 @@ const CreateFNFInvite = ( props: Props ) => {
           <View style={{
             flex:1
           }}>
-            <Text style={[ styles.titleText, {
-              fontSize: RFValue( 12 )
-            } ]}>
-              Create Invitation link with gift
+            <Text style={styles.subtitleText}>
+              Create Invitation link with Gift
             </Text>
             <Text style={styles.paragraphTitleText}>
               Add gifts when sending an invite link to any of your family and
@@ -142,12 +135,16 @@ const styles = StyleSheet.create( {
     paddingBottom:70
   },
   titleText: {
-    color: Colors.greyTextColor,
+    color: Colors.blue,
     fontWeight: '600',
-    marginBottom: 5,
+    marginBottom: 20,
+    fontFamily: Fonts.Medium,
+    letterSpacing:1,
+    fontSize: RFValue( 17 ),
+    marginLeft:10
   },
   subtitleText: {
-    color: Colors.THEAM_INFO_TEXT_COLOR,
+    color: Colors.black,
     marginBottom: 5,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.Regular

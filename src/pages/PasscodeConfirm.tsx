@@ -96,7 +96,7 @@ export default function PasscodeConfirm( props ) {
   return (
     <SafeAreaView style={ {
       flex: 1,
-      backgroundColor:'#F5F5F5'
+      backgroundColor:Colors.LIGHT_BACKGROUND
     } }>
       <StatusBar />
       <View style={ {
@@ -493,26 +493,32 @@ export default function PasscodeConfirm( props ) {
             </View>
           }
           {passcode.length == 4 ? (
-            <TouchableOpacity
-              disabled={passcode == confirmPasscode ? false : true}
-              onPress={() => dispatch( storeCreds( passcode ) ) }
-            >
-              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-                start={{
-                  x: 0, y: 0
-                }} end={{
-                  x: 1, y: 0
-                }}
-                locations={[ 0.2, 1 ]}
-                style={{
-                  ...styles.proceedButtonView,
-                  backgroundColor:
-                  passcode == confirmPasscode ? Colors.blue : Colors.lightBlue,
-                }}
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+            }}>
+              <TouchableOpacity
+                disabled={passcode == confirmPasscode ? false : true}
+                onPress={() => dispatch( storeCreds( passcode ) ) }
               >
-                <Text style={styles.proceedButtonText}>{common.proceed}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+                <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                  start={{
+                    x: 0, y: 0
+                  }} end={{
+                    x: 1, y: 0
+                  }}
+                  locations={[ 0.2, 1 ]}
+                  style={{
+                    ...styles.proceedButtonView,
+                    backgroundColor:
+                  passcode == confirmPasscode ? Colors.blue : Colors.lightBlue,
+                  }}
+                >
+                  <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
           ) : null}
 
         </View>
@@ -700,7 +706,7 @@ const styles = StyleSheet.create( {
   },
   keyPadRow: {
     flexDirection: 'row',
-    height: hp( '8%' )
+    height: hp( '9%' )
   },
   keyPadElementTouchable: {
     flex: 1,
@@ -712,18 +718,17 @@ const styles = StyleSheet.create( {
   keyPadElementText: {
     color: Colors.blue,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.Regular,
+    fontFamily: Fonts.Medium,
     fontStyle: 'normal'
   },
   proceedButtonView: {
-    marginLeft: 20,
-    marginTop: hp( '3%' ),
+    marginRight: 20,
+    marginTop: hp( '19%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    // elevation: 10,
   },
   proceedButtonText: {
     color: Colors.white,
@@ -731,9 +736,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Medium
   },
   boldItalicText: {
-    fontFamily: Fonts.MediumItalic,
-    fontWeight: 'bold',
-    fontStyle: 'italic',
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
   },
   headerTitleText: {
@@ -741,7 +744,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 22 ),
     marginLeft: 20,
     marginTop: hp( '4%' ),
-    fontFamily: Fonts.Regular
+    fontFamily: Fonts.Medium
   },
   headerInfoText: {
     color: Colors.THEAM_INFO_TEXT_COLOR,

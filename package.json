@@ -149,6 +149,7 @@
     "react-native-vector-icons": "^7.0.0",
     "react-native-video": "5.2.1",
     "react-native-view-shot": "^3.1.2",
+    "react-native-webview": "^13.6.4",
     "react-redux": "^7.2.1",
     "readable-stream": "^1.0.33",
     "realm": "11.10.2",

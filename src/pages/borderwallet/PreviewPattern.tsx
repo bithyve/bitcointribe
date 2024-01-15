@@ -137,6 +137,15 @@ const PreviewPattern = ( { route, navigation } ) => {
   const columnHeaderRef = useRef()
   const rowHeaderRef = useRef()
   const [ loading, setLoading ] = useState( false )
+  const handleNav=()=>{
+    const payload = route.params?.payload
+    isValidate ? navigation.replace( 'ValidateBorderWalletPattern', {
+      ...payload,
+    } ): navigation.goBack()
+  }
+
+
+
 
 
   return (
@@ -149,9 +158,7 @@ const PreviewPattern = ( { route, navigation } ) => {
         <TouchableOpacity
           style={[ CommonStyles.headerLeftIconContainer, styles.headerWrapper, {
           } ]}
-          onPress={() => {
-            isValidate ? navigation.navigate( 'ValidateBorderWalletPattern' ) : navigation.goBack()
-          }}
+          onPress={handleNav}
         >
           <View style={{
             flexDirection: 'row',
@@ -168,9 +175,7 @@ const PreviewPattern = ( { route, navigation } ) => {
               <Text style={styles.headerText}>Preview Pattern</Text>
             </View>
           </View>
-          <TouchableOpacity style={styles.doneBtnWrapper} onPress={() => {
-            isValidate ? navigation.navigate( 'ValidateBorderWalletPattern' ): navigation.goBack()
-          }}>
+          <TouchableOpacity style={styles.doneBtnWrapper} onPress={handleNav}>
             <Text style={styles.doneBtnText}>Done</Text>
           </TouchableOpacity>
         </TouchableOpacity>

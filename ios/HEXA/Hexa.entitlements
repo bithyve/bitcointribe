@@ -7,7 +7,6 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:bitcointribe.app</string>
-		<string>applinks:hexawallet.io</string>
 	</array>
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>

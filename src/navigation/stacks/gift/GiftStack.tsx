@@ -26,6 +26,7 @@ import ReLogin from '../../../pages/ReLogin'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import QRStack from '../home/QRStack'
 import GiftQRScannerScreen from '../../../pages/FriendsAndFamily/GiftQrScanner'
+import AppWebView from '../../../pages/AppWebView'
 
 
 const Stack = createNativeStackNavigator()
@@ -81,6 +82,9 @@ const GiftStack = ( { navigation, route } ) => {
       <Stack.Screen name="GiftCreated" component={GiftCreatedScreen} />
       <Stack.Screen name="ClaimSats" component={ClaimSatsScreen} />
       <Stack.Screen name="GiftQRScannerScreen" component={GiftQRScannerScreen}/>
+      <Stack.Screen name='AppWebView' component={AppWebView} options={{
+        headerShown: false
+      }}/>
     </Stack.Navigator>
   )
 }
