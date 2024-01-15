@@ -14,12 +14,12 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import ListStyles from '../../../common/Styles/ListStyles'
-import HeaderTitle1 from '../../../components/HeaderTitle1'
+import HeaderTitle from '../../../components/HeaderTitle'
 import QRCode from '../../../components/QRCode'
 import Toast from '../../../components/Toast'
 @inject(
@@ -82,7 +82,7 @@ export default class NodeInfoScreen extends Component {
         <View style={{
           paddingTop:hp( 3.5 )
         }}>
-          <HeaderTitle1
+          <HeaderTitle
             firstLineTitle={'Settings'}
             secondLineTitle={'Node Information'}
             infoTextNormal={''}
