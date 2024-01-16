@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
-import { View, StyleSheet, Button } from 'react-native'
-import { useDispatch } from 'react-redux'
-import ActionMenuListItem from './ActionMenuListItem'
+import { Button, StyleSheet, View } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler'
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import { useDispatch } from 'react-redux'
 import useRampIntegrationState from '../../utils/hooks/state-selectors/accounts/UseRampIntegrationState'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import ActionMenuListItem from './ActionMenuListItem'
 
-import { clearRampCache, fetchRampReservation,  RampActionKind } from '../../store/actions/RampIntegration'
+import { clearRampCache, fetchRampReservation, RampActionKind } from '../../store/actions/RampIntegration'
 import openLink from '../../utils/OpenLink'
 
 export type Props = {
@@ -64,10 +64,7 @@ const RampIntegrationScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           // } ) )
           break
         case RampActionKind.FETCH_RAMP_RESERVATION:
-          console.log( {
-            itemKind
-          } )
-          dispatch( fetchRampReservation( 
+          dispatch( fetchRampReservation(
             100,
             currencyCode
           ) )

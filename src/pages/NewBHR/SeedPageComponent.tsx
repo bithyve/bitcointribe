@@ -1,31 +1,19 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useSelector, RootStateOrAny } from 'react-redux'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Dimensions,
-  Animated,
-  Alert,
-  FlatList,
-  TextInput,
-  Keyboard,
+  Alert, Animated, Dimensions, FlatList, Keyboard, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native'
-import Fonts from '../../common/Fonts'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import { translations } from '../../common/content/LocContext'
-import { Wallet } from '../../bitcoin/utilities/Interface'
-import PagerView, { PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEventData } from 'react-native-pager-view'
-import dbManager from '../../storage/realm/dbManager'
 import LinearGradient from 'react-native-linear-gradient'
+import PagerView, { PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEventData } from 'react-native-pager-view'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import { RootStateOrAny, useSelector } from 'react-redux'
+import { Wallet } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import { translations } from '../../common/content/LocContext'
+import Fonts from '../../common/Fonts'
+import dbManager from '../../storage/realm/dbManager'
 
 const AnimatedPagerView = Animated.createAnimatedComponent( PagerView )
 
@@ -67,7 +55,6 @@ const SeedPageComponent = ( props ) => {
   } )
 
   useEffect( () => {
-    console.log( 'skk primaryMnemonic'+ primaryMnemonic )
     const tempData = []
     let innerTempData = []
     let initPosition = 0

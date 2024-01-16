@@ -1205,9 +1205,6 @@ export function* restoreTrustedContactsWorker( { payload }: { payload: { walletI
   //     retrieveBackupData: true,
   //   }
   // } )
-  // if( res.backupData && res.backupData.primaryMnemonicShard ) {
-  //   console.log( 'res.backupData.primaryMnemonicShard', res.backupData.primaryMnemonicShard )
-  // }
 }
 
 export const restoreTrustedContactsWatcher = createWatcher(

@@ -12,7 +12,6 @@ export const setVersion = ( versionType ) => {
 }
 
 export const setVersionHistory = ( versions ) => {
-  console.log( 'versions', versions )
   return {
     type: SET_VERSIONS_HISTORY,
     payload: {

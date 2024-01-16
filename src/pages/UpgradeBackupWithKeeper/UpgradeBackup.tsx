@@ -806,9 +806,6 @@ class UpgradeBackup extends Component<
           //     } )
           //   }
           // } catch ( err ) {
-          //   console.log( {
-          //     err
-          //   } )
           // }
         }}
       />

@@ -352,7 +352,7 @@ const rootSaga = function* () {
             yield call( saga )
             break
           } catch ( e ) {
-            console.log( e )
+            // error
           }
         }
       } )

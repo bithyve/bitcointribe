@@ -1,61 +1,10 @@
-import { all, call, delay, put, select } from 'redux-saga/effects'
-import { createWatcher } from '../utils/utilities'
-import {
-  GET_TESTCOINS,
-  GENERATE_SECONDARY_XPRIV,
-  RESET_TWO_FA,
-  twoFAResetted,
-  UPDATE_DONATION_PREFERENCES,
-  secondaryXprivGenerated,
-  ADD_NEW_ACCOUNT_SHELLS,
-  newAccountShellsAdded,
-  ReassignTransactionsActionPayload,
-  REASSIGN_TRANSACTIONS,
-  transactionReassignmentSucceeded,
-  transactionReassignmentFailed,
-  MergeAccountShellsActionPayload,
-  MERGE_ACCOUNT_SHELLS,
-  accountShellMergeSucceeded,
-  accountShellMergeFailed,
-  REFRESH_ACCOUNT_SHELLS,
-  AUTO_SYNC_SHELLS,
-  accountShellRefreshCompleted,
-  accountShellRefreshStarted,
-  exchangeRatesCalculated,
-  setAverageTxFee,
-  VALIDATE_TWO_FA,
-  twoFAValid,
-  CREATE_SM_N_RESETTFA_OR_XPRIV,
-  resetTwoFA,
-  generateSecondaryXpriv,
-  SYNC_ACCOUNTS,
-  MARK_ACCOUNT_CHECKED,
-  MARK_READ_TRANSACTION,
-  updateAccountShells,
-  getTestcoins,
-  refreshAccountShells,
-  UPDATE_ACCOUNT_SETTINGS,
-  accountSettingsUpdated,
-  accountSettingsUpdateFailed,
-  updateAccounts,
-  RESTORE_ACCOUNT_SHELLS,
-  readTxn,
-  accountChecked,
-  autoSyncShells,
-  setResetTwoFALoader,
-  recomputeNetBalance,
-  updateGift,
-  GENERATE_GIFTS,
-  giftCreationSuccess,
-  updateAccountSettings,
-  FETCH_FEE_RATES,
-  FETCH_EXCHANGE_RATES,
-  CREATE_BORDER_WALLET,
-} from '../actions/accounts'
-import {
-  setAllowSecureAccount,
-  updateWalletImageHealth
-} from '../actions/BHR'
+import * as bip39 from 'bip39'
+import * as bitcoinJS from 'bitcoinjs-lib'
+import { call, put, select } from 'redux-saga/effects'
+import config from '../../bitcoin/HexaConfig'
+import { generateAccount, generateDonationAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
+import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import {
   Account,
   Accounts,
@@ -64,60 +13,61 @@ import {
   ActiveAddresses,
   ContactInfo,
   DeepLinkEncryptionType,
-  DeepLinkKind,
-  DonationAccount,
+  DeepLinkKind, DerivationPurpose, DonationAccount,
   Gift,
   GiftMetaData,
   GiftStatus,
   GiftThemeId,
-  GiftType,
-  MultiSigAccount,
+  GiftType, GridType, LNNode, MultiSigAccount,
   NetworkType,
   TrustedContact,
   Trusted_Contacts,
   UnecryptedStreamData,
-  Wallet,
-  LNNode,
-  DerivationPurpose,
-  GridType
+  Wallet
 } from '../../bitcoin/utilities/Interface'
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
-import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SyncStatus from '../../common/data/enums/SyncStatus'
-import config from '../../bitcoin/HexaConfig'
-import { AccountsState } from '../reducers/accounts'
-import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
-import * as bitcoinJS from 'bitcoinjs-lib'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import { generateAccount, generateDonationAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
-import { updateWallet } from '../actions/storage'
-import { APP_STAGE } from '../../common/interfaces/Interfaces'
-import * as bip39 from 'bip39'
-import crypto from 'crypto'
-import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo'
-import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
-import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
+import AccountShell from '../../common/data/models/AccountShell'
 import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
 import LightningSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/LightningSubAccountInfo'
+import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
+import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo'
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import { APP_STAGE } from '../../common/interfaces/Interfaces'
+import {
+  accountChecked, accountSettingsUpdated,
+  accountSettingsUpdateFailed, accountShellMergeFailed, accountShellMergeSucceeded, accountShellRefreshCompleted,
+  accountShellRefreshStarted, ADD_NEW_ACCOUNT_SHELLS, autoSyncShells, AUTO_SYNC_SHELLS, CREATE_BORDER_WALLET, CREATE_SM_N_RESETTFA_OR_XPRIV, exchangeRatesCalculated, FETCH_EXCHANGE_RATES, FETCH_FEE_RATES, generateSecondaryXpriv, GENERATE_GIFTS, GENERATE_SECONDARY_XPRIV, getTestcoins, GET_TESTCOINS, giftCreationSuccess, MARK_ACCOUNT_CHECKED,
+  MARK_READ_TRANSACTION, MergeAccountShellsActionPayload,
+  MERGE_ACCOUNT_SHELLS, newAccountShellsAdded, readTxn, ReassignTransactionsActionPayload,
+  REASSIGN_TRANSACTIONS, recomputeNetBalance, refreshAccountShells, REFRESH_ACCOUNT_SHELLS, resetTwoFA, RESET_TWO_FA, RESTORE_ACCOUNT_SHELLS, secondaryXprivGenerated, setAverageTxFee, setResetTwoFALoader, SYNC_ACCOUNTS, transactionReassignmentFailed, transactionReassignmentSucceeded, twoFAResetted, twoFAValid, updateAccounts, updateAccountShells, updateGift, UPDATE_ACCOUNT_SETTINGS, UPDATE_DONATION_PREFERENCES, VALIDATE_TWO_FA
+} from '../actions/accounts'
+import {
+  setAllowSecureAccount,
+  updateWalletImageHealth
+} from '../actions/BHR'
+import { updateWallet } from '../actions/storage'
+import { AccountsState } from '../reducers/accounts'
+import { createWatcher } from '../utils/utilities'
 
-import dbManager from '../../storage/realm/dbManager'
 import _ from 'lodash'
-import Relay from '../../bitcoin/utilities/Relay'
-import AccountVisibility from '../../common/data/enums/AccountVisibility'
-import { syncPermanentChannelsWorker } from './trustedContacts'
-import { PermanentChannelsSyncKind } from '../actions/trustedContacts'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
-import BHROperations from '../../bitcoin/utilities/BHROperations'
-import { generateDeepLink } from '../../common/CommonFunctions'
-import Toast from '../../components/Toast'
-import RESTUtils from '../../utils/ln/RESTUtils'
 import { Alert } from 'react-native'
 import { ELECTRUM_NOT_CONNECTED_ERR } from '../../bitcoin/electrum/client'
-import { setElectrumNotConnectedErr } from '../actions/nodeSettings'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
+import Relay from '../../bitcoin/utilities/Relay'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import { generateDeepLink } from '../../common/CommonFunctions'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import BorderWalletSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/BorderWalletSubAccount'
+import Toast from '../../components/Toast'
+import dbManager from '../../storage/realm/dbManager'
+import RESTUtils from '../../utils/ln/RESTUtils'
+import { setElectrumNotConnectedErr } from '../actions/nodeSettings'
+import { PermanentChannelsSyncKind } from '../actions/trustedContacts'
+import { syncPermanentChannelsWorker } from './trustedContacts'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -239,7 +189,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
       updatedGift: giftToSend, deepLink, encryptedChannelKeys, encryptionType: deepLinkEncryptionType, encryptionHint, deepLinkEncryptionOTP: deepLinkEncryptionKey, channelAddress: giftToSend.channelAddress, shortLink, encryptionKey
     }
   } catch( err ){
-    console.log( 'An error occured while generating gift: ', err )
+    // error
   }
 }
 
@@ -473,9 +423,7 @@ function* fetchFeeRatesWorker() {
     if ( !averageTxFeeByNetwork ) console.log( 'Failed to calculate fee rates' )
     else yield put( setAverageTxFee( averageTxFeeByNetwork ) )
   } catch ( err ) {
-    console.log( 'Failed to calculate fee rates', {
-      err
-    } )
+    // error
   }
 }
 
@@ -490,9 +438,7 @@ function* fetchExchangeRatesWorker() {
     if ( !exchangeRates ) console.log( 'Failed to fetch exchange rates' )
     else yield put( exchangeRatesCalculated( exchangeRates ) )
   } catch ( err ) {
-    console.log( 'Failed to fetch fee and exchange rates', {
-      err
-    } )
+  //  error
   }
 }
 

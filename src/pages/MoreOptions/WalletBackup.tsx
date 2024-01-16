@@ -960,7 +960,7 @@ const WalletBackup = ( props, navigation ) => {
                 goToHistory( obj, 'TYPE' )
               }
             } catch ( err ) {
-              console.log( 'err', err )
+              // error
             }
           }}
           onPressBack={() => {

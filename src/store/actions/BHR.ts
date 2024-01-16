@@ -527,14 +527,12 @@ export const pdfSuccessfullyCreated = ( status ) =>{
 }
 
 export const setLevelToNotSetupStatus = ( ) => {
-  console.log( 'SET_LEVEL_TO_NOT_SETUP' )
   return {
     type: SET_LEVEL_TO_NOT_SETUP
   }
 }
 
 export const setIsLevelToNotSetupStatus = ( status ) =>{
-  console.log( 'IS_LEVEL_TO_NOT_SETUP' )
   return {
     type: IS_LEVEL_TO_NOT_SETUP, payload: {
       status

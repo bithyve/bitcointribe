@@ -213,7 +213,6 @@ export default function PersonalCopyShareModal( props ) {
         <AppBottomSheetTouchableWrapper
           disabled={isShared? false : true}
           onPress={() => {
-            // console.log('Confirm');
             onConfirm()
           }}
           style={{

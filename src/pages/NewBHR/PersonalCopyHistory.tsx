@@ -183,7 +183,7 @@ const PersonalCopyHistory = ( props ) => {
   //       );
   //     }
   //   }catch(e){
-  //     console.log('e', e)
+  //
   //   }
   // };
 
@@ -318,7 +318,6 @@ const PersonalCopyHistory = ( props ) => {
             }
           } catch ( err ) {
             dispatch( keeperProcessStatus( '' ) )
-            // console.log( 'error', err )
           }
         }}
       />

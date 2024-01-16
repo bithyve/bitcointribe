@@ -116,11 +116,9 @@ export default function BackupMethods( { navigation } ) {
   async function onPressBackupRGB() {
     try {
       const dir = `${RNFetchBlob.fs.dirs.CacheDir}/rgb`
-      console.log( dir )
       const response = await RGBServices.backup( dir, 'abcd1234' )
-      console.log( response )
     } catch ( error ) {
-      console.log( error )
+      // error
     }
   }
 

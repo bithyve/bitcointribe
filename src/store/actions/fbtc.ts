@@ -46,7 +46,6 @@ export const accountSyncSuccess = data => {
 }
 
 export const accountSyncFail = ( data ) => {
-  console.log( 'Account sync fail', data )
   return {
     type: ACCOUNT_SYNC_FAIL,
     payload: {
@@ -56,7 +55,6 @@ export const accountSyncFail = ( data ) => {
 }
 
 export function getQuote( data ) {
-  console.log( 'data getQuote', data )
   return {
     type: GET_QUOTE,
     payload: {
@@ -94,7 +92,6 @@ export const getQuoteFail = ( data ) => {
 }
 
 export const executeOrder = ( data ) => {
-  console.log( 'data getQuote', data )
   return {
     type: EXECUTE_ORDER,
     payload: {
@@ -147,7 +144,6 @@ export const getBalancesFail = () => {
 }
 
 export const storeFbtcData = ( FBTCAccount ) => {
-  //console.log('INSIDE Action FBTC',FBTCAccount)
   return {
     type: STORE_FBTC_ACC_DATA,
     payload: {
@@ -157,7 +153,6 @@ export const storeFbtcData = ( FBTCAccount ) => {
 }
 
 export const storeFbtcVoucher = ( voucher ) => {
-  //console.log('INSIDE Action storeFbtcVoucher',voucher)
   return {
     type: FBTC_VOUCHER,
     payload: {
