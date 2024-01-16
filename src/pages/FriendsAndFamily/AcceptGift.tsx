@@ -245,6 +245,43 @@ export default function AcceptGift( { giftLoading, stopReset, navigation, closeM
     }
   }
 
+  const throttle=( func, delay )=>{
+    let lastCall = 0
+    return function( ...args ) {
+      const now = new Date().getTime()
+      if ( now - lastCall < delay ) {
+        return
+      }
+      lastCall = now
+      return func( ...args )
+    }
+  }
+
+  const handleOTPInput=throttle( ( event: any, i : number )=>{
+    const { text } = event.nativeEvent
+    if ( text.length > 1 ) {
+      applyOTPCodeToInputs( text )
+      setPasscodeArray( text.split( '' ) )
+      return
+    }
+    if ( text.length === 1 && i !== NUMBER_OF_INPUTS - 1 ) {
+      const nextInput = itemsRef.current[ i + 1 ]
+      if ( nextInput ) {
+        nextInput.focus()
+      }
+    }
+    // }
+    // determine new value
+    const newValues = [ ...passcodeArray ]
+    newValues[ i ] = text
+
+    // update state
+    setPasscodeArray( newValues )
+    // also call callback as a flat string
+    // otpCodeChanged(newValues?.join(''));
+
+  }, 300 )
+
   const getInputBox = () => {
     if ( inputType == DeepLinkEncryptionType.EMAIL ) {
       return (
@@ -337,37 +374,7 @@ export default function AcceptGift( { giftLoading, stopReset, navigation, closeM
               value={passcodeArray[ i ]}
               defaultValue=""
               // first input can have a length of 6 because they paste their code into it
-              maxLength={i === 0 ? NUMBER_OF_INPUTS : 1}
-              onChange={( event ) => {
-                const { text } = event.nativeEvent
-                // only continue one if we see a text of length 1 or 6
-                // if (text.length === 0 || text.length === 1 || text.length === 6) {
-                if ( text.length > 1 ) {
-                  applyOTPCodeToInputs( text )
-                  // determine new value
-                  const newValues = [ ...passcodeArray ]
-                  newValues[ i ] = text.charAt( 0 )
-
-                  // update state
-                  setPasscodeArray( newValues )
-                  return
-                }
-                if ( text.length === 1 && i !== NUMBER_OF_INPUTS - 1 ) {
-                  const nextInput = itemsRef.current[ i + 1 ]
-                  if ( nextInput ) {
-                    nextInput.focus()
-                  }
-                }
-                // }
-                // determine new value
-                const newValues = [ ...passcodeArray ]
-                newValues[ i ] = text
-
-                // update state
-                setPasscodeArray( newValues )
-                // also call callback as a flat string
-                // otpCodeChanged(newValues?.join(''));
-              }}
+              onChange={( event ) => {handleOTPInput( event, i )}}
               onKeyPress={( event ) => {
                 if ( event.nativeEvent.key === 'Backspace' ) {
                   // going backward:
