@@ -1,234 +1,203 @@
-import React from 'react'
-import { Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { Button } from 'react-native-elements'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { useNavigation, useRoute } from '@react-navigation/native'
+import React, { createRef, useState } from 'react'
+import {
+  SafeAreaView,
+  StatusBar, Text, TouchableOpacity, View
+} from 'react-native'
+import { RNCamera } from 'react-native-camera'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { useDispatch, useSelector } from 'react-redux'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import { AccountType, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import { translations } from '../../common/content/LocContext'
-import { Satoshis } from '../../common/data/enums/UnitAliases'
 import Fonts from '../../common/Fonts'
-import ButtonStyles from '../../common/Styles/ButtonStyles'
-import ListStyles from '../../common/Styles/ListStyles'
-import CommonStyles from '../../common/Styles/Styles'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import HeaderTitle from '../../components/HeaderTitle'
-import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
-import RecipientAddressTextInputSection from '../../components/send/RecipientAddressTextInputSection'
-import { resetStackToSend } from '../../navigation/actions/NavigationActions'
-import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting, sourceAccountSelectedForSending } from '../../store/actions/sending'
-import { AccountsState } from '../../store/reducers/accounts'
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
-import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
-// import LocalQRCode from '@remobile/react-native-qrcode-local-image'
 
 export type Props = {
   navigation: any;
-  route: any;
 };
 
-const HeaderSection: React.FC = ( { title } ) => {
-  return (
-    <View style={styles.infoHeaderSection}>
-      <Text style={ListStyles.infoHeaderSubtitleText}>
-        {title}
-      </Text>
-    </View>
-  )
-}
+const GiftQRScannerScreen: React.FC<Props> = ( ) => {
+  const title = ''
+  const cameraRef = createRef<RNCamera>()
+  const [ isCameraOpen, setIsCameraOpen ] = useState( true )
+  const [ scanQRFlag, setScanQRFlag ] = useState( [ RNCamera.Constants.BarCodeType.qr ] )
+  const navigation: any = useNavigation()
+  const route = useRoute()
+  const onCodeScanned = route.params?.onCodeScanned
 
-const HomeQRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
-  const dispatch = useDispatch()
-  const accountsState: AccountsState = useSelector( ( state ) => state.accounts, )
-  const defaultSourceAccount = accountsState.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && !shell.primarySubAccount.instanceNumber )
-  const common = translations[ 'common' ]
-  const strings = translations[ 'accounts' ]
-  function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
-    const networkType: NetworkType = AccountUtilities.networkType( scannedData )
-    if ( networkType ) {
-      const network = AccountUtilities.getNetworkByType( networkType )
-      const { type } = AccountUtilities.addressDiff( scannedData, network )
-      if ( type === ScannedAddressKind.ADDRESS ) {
-        onSend( scannedData, 0 )
-      } else if ( type === ScannedAddressKind.PAYMENT_URI ) {
-        const res = AccountUtilities.decodePaymentURI( scannedData )
-        const address = res.address
-        const options = res.options
+  const barcodeRecognized = async barcodes => {
+    if ( barcodes.data ) {
+      setScanQRFlag( [] )
+      setIsCameraOpen( false )
 
-        onSend( address, options.amount )
+      if( onCodeScanned ){
+        onCodeScanned(
+          getFormattedStringFromQRString( barcodes.data ),
+        )
       }
-      return
+      navigation.goBack()
     }
-
-    const onCodeScanned = route.params?.onCodeScanned
-    try {
-      if ( typeof onCodeScanned === 'function' ) onCodeScanned( getFormattedStringFromQRString( scannedData ) )
-    } catch ( error ) {
-      //
-    }
-    navigation.goBack( null )
-  }
-
-  function onSend( address: string, amount: Satoshis ) {
-    const recipient = makeAddressRecipientDescription( {
-      address
-    } )
-
-    dispatch( sourceAccountSelectedForSending(
-      defaultSourceAccount
-    ) )
-    dispatch( addRecipientForSending( recipient ) )
-    dispatch( recipientSelectedForAmountSetting( recipient ) )
-    dispatch( amountForRecipientUpdated( {
-      recipient,
-      amount: amount < 1 ? amount * SATOSHIS_IN_BTC : amount
-    } ) )
-
-    navigation.dispatch(
-      resetStackToSend( {
-        selectedRecipientID: recipient.id,
-      } )
-    )
   }
 
   return (
-    <SafeAreaView style={styles.rootContainer}>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={CommonStyles.headerContainer}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            navigation.pop()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
-      <HeaderTitle
-        firstLineTitle={'QR'}
-        secondLineTitle={''}
-        infoTextNormal={''}
-        infoTextBold={''}
-        infoTextNormal1={''}
-        step={''}
-      />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <KeyboardAwareScrollView
-          resetScrollToCoords={{
-            x: 0, y: 0
-          }}
-          scrollEnabled={false}
-          // style={styles.rootContainer}
-        >
-          <HeaderSection title={'Scan QR code from gift card.'} />
+    <SafeAreaView style={{
+      flex: 1
+    }}>
+      <StatusBar barStyle="dark-content" />
+      <View
+        style={{
+          borderBottomWidth: 1,
+          borderColor: Colors.borderColor,
+          alignItems: 'center',
+          flexDirection: 'row',
+          paddingRight: 10,
+          paddingBottom: 15,
+          paddingTop: 10,
+          marginLeft: 20,
+          marginBottom: 15,
+        }}
+      >
 
-          <CoveredQRCodeScanner
-            onCodeScanned={handleBarcodeRecognized}
-            containerStyle={{
-              marginBottom: 16
+        <View style={{
+          flexDirection: 'row', alignItems: 'center'
+        }}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            hitSlop={{
+              top: 20, left: 20, bottom: 20, right: 20
             }}
-          />
+            style={{
+              height: 30, width: 30, justifyContent: 'center'
+            }}
+          >
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
+          </TouchableOpacity>
+
+          <Text
+            style={{
+              color: Colors.blue,
+              fontSize: RFValue( 18 ),
+              fontFamily: Fonts.Medium,
+            }}
+          >
+            {title ? title : 'Scan QR code'}
+          </Text>
+        </View>
+      </View>
+      <View style={{
+        flex: 1,
+        justifyContent:'center',
+        alignItems:'center'
+      }}>
 
 
+        <View
+          style={{
+            width: wp( '100%' ),
+            height: wp( '100%' ),
+            overflow: 'hidden',
+            borderRadius: 0,
+            marginTop: hp( '5%' ),
+          }}
+        >
+          {isCameraOpen && (
+            <RNCamera
+              ref={cameraRef}
+              barCodeTypes={scanQRFlag}
+              style={{
+                width: wp( '100%' ),
+                height: wp( '100%' ),
+              }}
+              onBarCodeRead={barcode => barcodeRecognized( barcode )}
+              captureAudio={false}
+            >
+              {/* ---- Scanner frame indicators ---- */}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  paddingTop: 12,
+                  paddingRight: 12,
+                  paddingLeft: 12,
+                  width: '100%',
+                }}
+              >
+                <View
+                  style={{
+                    borderLeftWidth: 1,
+                    borderTopColor: 'white',
+                    borderLeftColor: 'white',
+                    height: hp( '5%' ),
+                    width: hp( '5%' ),
+                    borderTopWidth: 1,
+                  }}
+                />
+                <View
+                  style={{
+                    borderTopWidth: 1,
+                    borderRightWidth: 1,
+                    borderRightColor: 'white',
+                    borderTopColor: 'white',
+                    height: hp( '5%' ),
+                    width: hp( '5%' ),
+                    marginLeft: 'auto',
+                  }}
+                />
+              </View>
+              <View
+                style={{
+                  marginTop: 'auto',
+                  flexDirection: 'row',
+                  paddingBottom: 12,
+                  paddingRight: 12,
+                  paddingLeft: 12,
+                  width: '100%',
+                }}
+              >
+                <View
+                  style={{
+                    borderLeftWidth: 1,
+                    borderBottomColor: 'white',
+                    borderLeftColor: 'white',
+                    height: hp( '5%' ),
+                    width: hp( '5%' ),
+                    borderBottomWidth: 1,
+                  }}
+                />
+                <View
+                  style={{
+                    borderBottomWidth: 1,
+                    borderRightWidth: 1,
+                    borderRightColor: 'white',
+                    borderBottomColor: 'white',
+                    height: hp( '5%' ),
+                    width: hp( '5%' ),
+                    marginLeft: 'auto',
+                  }}
+                />
+              </View>
+            </RNCamera>
+          )}
+        </View>
 
-        </KeyboardAwareScrollView>
-      </ScrollView>
+        <View style={{
+          marginTop: 'auto'
+        }} />
+
+        {/* TODO: Ideally, this shouldn't be a concern here. We should probably have a separate screen for "Scan Exit Key" that uses a QR Scanning component alongside a component for this info box */}
+        {title == 'Scan Exit Key' ?
+          <BottomInfoBox
+            title={'Note'}
+            infoText={
+              'Exit Key This can be found on page of your pdf Recovery Key. Please scan it to reset your 2FA'
+            }
+          /> : null}
+      </View>
     </SafeAreaView>
   )
 }
 
-const styles = StyleSheet.create( {
-  buttonText: {
-    color: Colors.white,
-    fontSize: RFValue( 13 ),
-    fontFamily: Fonts.Medium,
-  },
-  buttonView: {
-    height: widthPercentageToDP( '12%' ),
-    width: widthPercentageToDP( '35%' ),
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
-    backgroundColor: Colors.blue,
-  },
-  availableToSpendText: {
-    color: Colors.blue,
-    fontSize: RFValue( 10 ),
-    fontFamily: Fonts.Italic,
-    lineHeight: 15,
-  },
-  balanceText: {
-    color: Colors.blue,
-    fontSize: RFValue( 10 ),
-    fontFamily: Fonts.Italic,
-  },
-  modalTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 18 ),
-    fontFamily: Fonts.Regular,
-  },
-  modalInfoText: {
-    // marginTop: hp( '3%' ),
-    marginTop: heightPercentageToDP( 0.5 ),
-    color: Colors.textColorGrey,
-    fontSize: RFValue( 12 ),
-    fontFamily: Fonts.Regular,
-    marginRight: widthPercentageToDP( 12 ),
-    letterSpacing: 0.6
-  },
-  modalContentContainer: {
-    // height: '100%',
-    backgroundColor: Colors.backgroundColor,
-    paddingBottom: heightPercentageToDP( 4 ),
-  },
-  rootContainer: {
-    flex: 1
-  },
-  viewSectionContainer: {
-    marginBottom: 16,
-  },
-  infoHeaderSection: {
-    paddingHorizontal: 24,
-    paddingVertical: 24,
-  },
-  floatingActionButtonContainer: {
-    bottom: heightPercentageToDP( 2 ),
-    right: 0,
-    marginLeft: 'auto',
-    padding: heightPercentageToDP( 1.5 ),
-    //flexDirection: 'row'
-  },
-  btnImport: {
-    marginHorizontal: 10,
-    marginVertical: 10,
-    padding: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row'
-  },
-  textImport: {
-    fontSize: RFValue( 13 ),
-    fontFamily: Fonts.Regular,
-    marginHorizontal: 2,
-  }
-} )
 
-export default HomeQRScannerScreen
-
-
+export default GiftQRScannerScreen
