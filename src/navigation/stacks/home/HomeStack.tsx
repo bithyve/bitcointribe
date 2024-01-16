@@ -13,6 +13,7 @@ import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transacti
 import TwoFASetup from '../../../pages/Accounts/TwoFASetup'
 import TwoFASweepFunds from '../../../pages/Accounts/TwoFASweepFunds'
 import TwoFAValidation from '../../../pages/Accounts/TwoFAValidation'
+import AppWebView from '../../../pages/AppWebView'
 import BorderWalletGridScreen from '../../../pages/borderwallet/BorderWalletGridScreen'
 import ConfirmDownload from '../../../pages/borderwallet/ConfirmDownload'
 import CreatePassPhrase from '../../../pages/borderwallet/CreatePassPhrase'
@@ -31,8 +32,6 @@ import SendRequest from '../../../pages/Contacts/SendRequest'
 import ContactsListForAssociateContact from '../../../pages/CustodianRequest/ContactsListForAssociateContact'
 import CustodianRequestAccepted from '../../../pages/CustodianRequest/CustodianRequestAccepted'
 import CustodianRequestOTP from '../../../pages/CustodianRequest/CustodianRequestOTP'
-import PairNewWallet from '../../../pages/FastBitcoin/PairNewWallet'
-import VoucherScanner from '../../../pages/FastBitcoin/VoucherScanner'
 import Home from '../../../pages/Home/Home'
 import Intermediate from '../../../pages/Intermediate'
 import Launch from '../../../pages/Launch'
@@ -75,7 +74,6 @@ import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import AddNewAccountStack from '../accounts/AddNewAccountStack'
 import LnAccountStack from '../accounts/LnAccountStack'
 import QRStack from '../home/QRStack'
-import AppWebView from '../../../pages/AppWebView'
 
 const Stack = createNativeStackNavigator()
 const HomeStack = ( { navigation, route } ) => {
@@ -227,11 +225,9 @@ const HomeStack = ( { navigation, route } ) => {
       <Stack.Screen name="NewTwoFASecret" component={NewTwoFASecret} />
       <Stack.Screen name="TwoFASweepFunds" component={TwoFASweepFunds} />
       <Stack.Screen name="SendRequest" component={SendRequest} />
-      <Stack.Screen name="VoucherScanner" component={VoucherScanner} />
       <Stack.Screen name="AddContactSendRequest" component={AddContactSendRequest} />
       <Stack.Screen name="QrAndLink" component={QrAndLink} />
       <Stack.Screen name="ContactDetails" component={ContactDetails} />
-      <Stack.Screen name="PairNewWallet" component={PairNewWallet} />
       <Stack.Screen name="ManageBackupNewBHR" component={ManageBackupNewBHR} />
       <Stack.Screen name="SecurityQuestionHistoryNewBHR" component={SecurityQuestionHistoryNewBHR} />
       <Stack.Screen name="TrustedContactHistoryNewBHR" component={TrustedContactHistoryNewBHR} />

@@ -1,6 +1,6 @@
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import { ImageSourcePropType } from 'react-native'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import SubAccountKind from '../../common/data/enums/SubAccountKind'
 
 export function iconForAccountKind( kind: SubAccountKind ): ImageSourcePropType {
   switch ( kind ) {
@@ -27,8 +27,6 @@ export function iconForServiceAccountKind(
   kind: ServiceAccountKind,
 ): ImageSourcePropType {
   switch ( kind ) {
-      case ServiceAccountKind.FAST_BITCOINS:
-        return require( '../../assets/images/icons/fastbitcoin.png' )
       case ServiceAccountKind.WHIRLPOOL:
       // TODO: Figure out the right icon for this
         return require( '../../assets/images/icons/icon_wallet.png' )
