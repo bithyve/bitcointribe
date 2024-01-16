@@ -395,7 +395,7 @@ export default class ElectrumClient {
     )
 
     client.onError = ( ex ) => {
-      console.log( ex )
+      // ex
     } // mute
     let timeoutId = null
     try {
@@ -411,7 +411,7 @@ export default class ElectrumClient {
       await client.server_ping()
       return true
     } catch ( ex ) {
-      console.log( ex )
+      // ex
     } finally {
       if ( timeoutId ) clearTimeout( timeoutId )
       client.close()

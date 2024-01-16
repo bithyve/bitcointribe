@@ -42,15 +42,11 @@ export default class TestElectrumClient {
         client: 'bitcoin-keeper',
         version: '1.4',
       } )
-      console.log( 'Connection to electrum server is established', {
-        ver
-      } )
       if ( ver && ver[ 0 ] ) {
         TEST_ELECTRUM_CLIENT.isClientConnected = true
       }
     } catch ( error ) {
       TEST_ELECTRUM_CLIENT.isClientConnected = false
-      console.log( 'Bad connection:', JSON.stringify( TEST_ELECTRUM_CLIENT.activePeer ), error )
     }
 
     if ( TEST_ELECTRUM_CLIENT.isClientConnected ) return TEST_ELECTRUM_CLIENT.isClientConnected

@@ -51,7 +51,6 @@ export default class CloudBackup {
       this.share = share ? share : {
       }
 
-      console.log( 'CloudDataBackup STARTED' )
       if ( Platform.OS == 'ios' ) {
         return iCloud.downloadBackup().then( async ( backedJson ) => {
           if ( backedJson ) {
@@ -85,7 +84,6 @@ export default class CloudBackup {
       const result = await this.GoogleLogin( params )
       // await GoogleDrive.login( async ( err, data ) => {
       //   const result = err || data
-      //   console.log( 'googlePermissionCall######### GoogleDriveLogin', googlePermissionCall )
       //   if ( !googlePermissionCall ){
       //     if ( result.eventName == 'onLogin' ) {
       //       return await this.checkFileIsAvailable( {
@@ -93,16 +91,16 @@ export default class CloudBackup {
       //         share,
       //       } )
       //     } else{
-      //       console.log( 'GOOGLE SetupFail else', result )
+      //
       //       throw new Error( 'Google LoginFail' )
       //     }
       //   }
       //   else{
-      //     console.log( 'GOOGLE ReSULT GoogleDriveLogin', result )
+      //
       //     if ( result.eventName === 'onLogin' ) {
       //       return 'LoginSuccess'
       //     } else{
-      //       console.log( 'GOOGLE SetupFail else', result )
+      //
       //       throw new Error( 'Google LoginFail' )
       //     }
       //   }
@@ -381,10 +379,10 @@ export default class CloudBackup {
   //   public static returnPromise = ( promise ) : Promise<any> => {
 
 //     promise.then( ( result ) => {
-//       console.log( 'return promise success', result )
+//
 //       return result
 //     } ).catch( ( err ) => {
-//       console.log( 'return promise error', err )
+//
 //       throw new Error( err )
 //     } )
 //     return null

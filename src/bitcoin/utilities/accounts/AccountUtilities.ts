@@ -383,7 +383,6 @@ export default class AccountUtilities {
           )
 
         output.address = changeAddress
-        // console.log(`adding the change address: ${output.address}`);
       }
     }
 

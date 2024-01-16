@@ -11,7 +11,7 @@ const setDisplayLanguage = async ( language ) => {
     if( language ) content.setLanguage( language )
 
   } catch ( error ) {
-    console.log( error )
+  //  error
   }
 }
 

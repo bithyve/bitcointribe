@@ -4,7 +4,7 @@ import { ActivityIndicator, Image, Platform, StyleSheet, Text, TouchableOpacity,
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import Share from 'react-native-share'
 import { useSelector } from 'react-redux'
@@ -12,8 +12,8 @@ import GiftCard from '../assets/images/svgs/icon_gift.svg'
 import More from '../assets/images/svgs/icon_more_gray.svg'
 import Link from '../assets/images/svgs/link.svg'
 import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
 import { translations } from '../common/content/LocContext'
+import Fonts from '../common/Fonts'
 import CopyThisText from '../components/CopyThisText'
 import HeaderTitle from './HeaderTitle'
 import QRCode from './QRCode'
@@ -74,7 +74,7 @@ function RequestKeyFromContact( props ) {
         .catch( ( err ) => {
         } )
     } catch ( error ) {
-      // console.log(error);
+      // error
 
     }
   }
