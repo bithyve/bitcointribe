@@ -69,6 +69,7 @@ export default function AcceptGift( { giftLoading, stopReset, navigation, closeM
   const [ downloadedGiftid, seDownloadedGiftId ] = useState( '' )
   const [ confirmAccount, setConfirmAccount ] = useState( false )
   const [ giftAddedModal, setGiftAddedModel ] = useState( false )
+  const toogleLoading = useSelector( ( state ) => state.doNotStore.toogleGiftLoading )
   const [ accType, setAccType ] = useState( AccountType.CHECKING_ACCOUNT )
   const [ accId, setAccId ] = useState( '' )
   const [ giftAcceptedModel, setGiftAcceptedModel ] = useState( false )
@@ -92,7 +93,7 @@ export default function AcceptGift( { giftLoading, stopReset, navigation, closeM
   useEffect( () => {
     setLoading( false )
     setIsDisabled( false )
-  }, [ giftLoading ] )
+  }, [ giftLoading, toogleLoading ] )
 
 
   useEffect( () => {
