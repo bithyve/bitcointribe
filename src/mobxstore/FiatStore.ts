@@ -1,6 +1,6 @@
-import { action, observable } from 'mobx'
-import RNFetchBlob from 'rn-fetch-blob'
-import SettingsStore from './SettingsStore'
+import { action, observable } from 'mobx';
+import RNFetchBlob from 'rn-fetch-blob';
+import SettingsStore from './SettingsStore';
 
 interface CurrencyDisplayRules {
     symbol: string;
@@ -58,7 +58,6 @@ export default class FiatStore {
       if ( fiat ) {
         return this.symbolLookup( this.fiatRates[ fiat ].symbol )
       } else {
-        console.log( 'no fiat?' )
         // TODO: what do we do in this case?
         return {
           symbol: '???', space: true, rtl: true

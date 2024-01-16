@@ -1,32 +1,24 @@
 import React, { useCallback, useState } from 'react'
 import {
-  View,
-  Image,
-  Text,
-  StyleSheet,
-  Linking,
-  SafeAreaView,
-  StatusBar,
-  TouchableOpacity,
-  Platform
+  Image, Linking, Platform, SafeAreaView,
+  StatusBar, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
+import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import BottomSheet from 'reanimated-bottom-sheet'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import CurrencyKindToggleSwitch from '../components/CurrencyKindToggleSwitch'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper'
-import { ScrollView } from 'react-native-gesture-handler'
-import DeviceInfo from 'react-native-device-info'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from '../components/ModalHeader'
 import AdvanceSettings from '../components/AdvanceSettings'
+import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper'
+import CurrencyKindToggleSwitch from '../components/CurrencyKindToggleSwitch'
 import ExitKeyModal from '../components/ExitKeyModal'
+import ModalHeader from '../components/ModalHeader'
 import SweepFundsQrScanner from '../components/SweepFundsQrScanner'
 
 export default function SettingsContents( props ) {
@@ -61,7 +53,7 @@ export default function SettingsContents( props ) {
       if ( supported ) {
         Linking.openURL( url )
       } else {
-        console.log( 'Don\'t know how to open URI: ' + url )
+      //
       }
     } )
   }

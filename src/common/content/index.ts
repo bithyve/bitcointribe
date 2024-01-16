@@ -7,7 +7,6 @@ const content = new LocalizedContent( {
 } )
 
 const setDisplayLanguage = async ( language ) => {
-  console.log( language )
   try {
     if( language ) content.setLanguage( language )
 

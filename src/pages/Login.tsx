@@ -19,7 +19,7 @@ import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -28,19 +28,19 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import Relay from '../bitcoin/utilities/Relay'
 import Colors from '../common/Colors'
 import { processDeepLink } from '../common/CommonFunctions'
-import Fonts from '../common/Fonts'
 import { LocalizationContext } from '../common/content/LocContext'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
+import Fonts from '../common/Fonts'
 import AlertModalContents from '../components/AlertModalContents'
 import ErrorModalContents from '../components/ErrorModalContents'
-import LoaderModal from '../components/LoaderModal'
-import Toast from '../components/Toast'
 import BottomInputModalContainer from '../components/home/BottomInputModalContainer'
 import ModalContainer from '../components/home/ModalContainer'
+import LoaderModal from '../components/LoaderModal'
+import Toast from '../components/Toast'
 import { setOpenToApproval } from '../store/actions/BHR'
 import { setCloudBackupStatus } from '../store/actions/cloud'
 import {
-  updateFCMTokens,
+  updateFCMTokens
 } from '../store/actions/notifications'
 import {
   setFCMToken,
@@ -152,7 +152,6 @@ export default function Login( props ) {
   }
 
   const handleDeepLinking = async ( url: string | null ) => {
-    // console.log( 'Login::handleDeepLinkEvent::URL: ', url )
     if ( url == null ) {
       return
     }
@@ -210,7 +209,6 @@ export default function Login( props ) {
 
     Relay.fetchReleases( DeviceInfo.getBuildNumber() )
       .then( async ( res ) => {
-        // console.log('Release note', res.data.releases);
         const releaseCases = releaseCasesValue
 
         if (
@@ -302,7 +300,6 @@ export default function Login( props ) {
       //this.createNotificationListeners()
     }
     const t1 = performance.now()
-    console.log( 'Call bootStrapNotifications took ' + ( t1 - t0 ) + ' milliseconds.' )
   }
 
   const storeFCMToken = async () => {

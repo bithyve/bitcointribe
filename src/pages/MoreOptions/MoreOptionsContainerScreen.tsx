@@ -225,7 +225,6 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     } else if ( menuOption.screenName !== undefined ) {
       // if( menuOption.screenName == 'WalletBackup' ) {
       /* if( menuOption.screenName == 'BackupMethods' ) {
-        // console.log( 'skk leveldata===>' + JSON.stringify( levelData ) )
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
         levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup Phrase' ){
           if ( ( levelHealth.length == 0 ) ||

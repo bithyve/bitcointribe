@@ -1,50 +1,37 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import {
-  View,
-  StyleSheet,
-  SafeAreaView,
-  StatusBar,
-  Platform,
-  Keyboard,
-  TouchableWithoutFeedback,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  Image,
-  Clipboard
-} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import Fonts from '../../common/Fonts'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
 import moment from 'moment'
-import _ from 'underscore'
-import HistoryPageComponent from './HistoryPageComponent'
-import SecurityQuestion from './SecurityQuestion'
-import ErrorModalContents from '../../components/ErrorModalContents'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
-  updateMSharesHealth, changeEncryptionPassword, setPasswordResetState
-} from '../../store/actions/BHR'
-import HistoryHeaderComponent from './HistoryHeaderComponent'
-import ModalContainer from '../../components/home/ModalContainer'
-import { Wallet } from '../../bitcoin/utilities/Interface'
-import { translations } from '../../common/content/LocContext'
+  Clipboard, Image, Keyboard, Platform, SafeAreaView,
+  StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View
+} from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import Feather from 'react-native-vector-icons/Feather'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
-import LoaderModal from '../../components/LoaderModal'
-import Toast from '../../components/Toast'
+import _ from 'underscore'
+import { Wallet } from '../../bitcoin/utilities/Interface'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import Colors from '../../common/Colors'
+import { getTime } from '../../common/CommonFunctions/timeFormatter'
+import { translations } from '../../common/content/LocContext'
+import Fonts from '../../common/Fonts'
+import ButtonStyles from '../../common/Styles/ButtonStyles'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import CardWithRadioBtn from '../../components/CardWithRadioBtn'
+import ErrorModalContents from '../../components/ErrorModalContents'
 import HeaderTitle from '../../components/HeaderTitle'
-import Feather from 'react-native-vector-icons/Feather'
-import ButtonStyles from '../../common/Styles/ButtonStyles'
-import { getTime } from '../../common/CommonFunctions/timeFormatter'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import ModalContainer from '../../components/home/ModalContainer'
+import LoaderModal from '../../components/LoaderModal'
+import Toast from '../../components/Toast'
+import { changeEncryptionPassword, setPasswordResetState, updateMSharesHealth } from '../../store/actions/BHR'
+import HistoryHeaderComponent from './HistoryHeaderComponent'
+import HistoryPageComponent from './HistoryPageComponent'
+import SecurityQuestion from './SecurityQuestion'
 
 const SecurityQuestionHistory = ( props ) => {
   const strings  = translations[ 'bhr' ]
@@ -191,7 +178,6 @@ const SecurityQuestionHistory = ( props ) => {
 
   useEffect( () => {
     dispatch( setPasswordResetState( '' ) )
-    console.log( 'passwordResetState', passwordResetState )
     if( passwordResetState === 'init' ) {
       setLoading( true )
     } else if( passwordResetState === 'completed' ) {
@@ -814,9 +800,6 @@ const SecurityQuestionHistory = ( props ) => {
       const securityQuestionHistory = JSON.parse(
         await AsyncStorage.getItem( 'securityQuestionHistory' ),
       )
-      console.log( {
-        securityQuestionHistory
-      } )
       if ( securityQuestionHistory ) updateHistory( securityQuestionHistory )
     } )()
   }, [] )

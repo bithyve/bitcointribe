@@ -493,7 +493,6 @@ export default class AccountOperations {
       // sync utxos & balances
 
       const utxosByAddress = await client.syncUTXOByAddress( addresses, network )
-      console.log( 'utxosByAddress', utxosByAddress )
 
       const balances: Balances = {
         confirmed: 0,

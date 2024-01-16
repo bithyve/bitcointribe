@@ -1,7 +1,7 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { action, observable } from 'mobx'
 import RNFetchBlob from 'rn-fetch-blob'
 import RESTUtils from '../utils/ln/RESTUtils'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // lndhub
 import LoginRequest from './../models/LoginRequest'
@@ -134,10 +134,10 @@ export default class SettingsStore {
           }
           return this.settings
         } else {
-          console.log( 'No credentials stored' )
+          //
         }
       } catch ( error ) {
-        console.log( 'Keychain couldn\'t be accessed!', error )
+        //
       } finally {
         this.loading = false
       }

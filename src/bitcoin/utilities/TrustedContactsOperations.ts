@@ -1,21 +1,12 @@
-import {
-  Streams,
-  UnecryptedStreams,
-  UnecryptedStreamData,
-  StreamData,
-  TrustedContact,
-  ContactDetails,
-  SecondaryStreamData,
-  BackupStreamData,
-  PrimaryStreamData,
-  TrustedContactRelationTypes,
-  Trusted_Contacts,
-} from './Interface'
-import crypto from 'crypto'
-import config from '../HexaConfig'
-import { BH_AXIOS } from '../../services/api'
 import { AxiosResponse } from 'axios'
+import crypto from 'crypto'
 import idx from 'idx'
+import { BH_AXIOS } from '../../services/api'
+import config from '../HexaConfig'
+import {
+  BackupStreamData, ContactDetails, PrimaryStreamData, SecondaryStreamData, StreamData, Streams, TrustedContact, TrustedContactRelationTypes,
+  Trusted_Contacts, UnecryptedStreamData, UnecryptedStreams
+} from './Interface'
 const { HEXA_ID } = config
 
 export default class TrustedContactsOperations {
@@ -395,12 +386,8 @@ export default class TrustedContactsOperations {
             channelMapping[ permanentChannelAddress ]
 
           if ( !updated )
-            console.log(
-              'Failed to update permanent channel: ',
-              permanentChannelAddress
-            )
-          if ( typeof isActive === 'boolean' )
-            ( contact as TrustedContact ).isActive = isActive
+            if ( typeof isActive === 'boolean' )
+              ( contact as TrustedContact ).isActive = isActive
           if ( instream ) TrustedContactsOperations.cacheInstream( contact, channelKey, instream, outStreamId )
         }
 

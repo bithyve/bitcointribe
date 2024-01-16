@@ -287,7 +287,7 @@ export default function SetUpSatCardScreen( props ) {
                 // this.createNotificationListeners()
               } )
               .catch( () => {
-                console.log( 'Permission rejected.' )
+                //Permission rejected
               } )
           }
         } )

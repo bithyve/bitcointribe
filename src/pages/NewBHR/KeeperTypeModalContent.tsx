@@ -1,17 +1,15 @@
-import React, { useState, useEffect, useContext } from 'react'
-import { View, Image, Text, StyleSheet, Platform } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import React, { useContext, useEffect, useState } from 'react'
+import { Image, Platform, StyleSheet, Text, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import RadioButton from '../../components/RadioButton'
-import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import { useSelector } from 'react-redux'
+import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
 import { LocalizationContext } from '../../common/content/LocContext'
+import Fonts from '../../common/Fonts'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 
 export default function KeeperTypeModalContents( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -121,9 +119,7 @@ export default function KeeperTypeModalContents( props ) {
     if ( contactCount >= 2 ) completedKeeperType.push( 'contact' )
     if ( pdfCount >= 1 ) completedKeeperType.push( 'pdf' )
     if ( deviceCount >= 3 ) completedKeeperType.push( 'device' )
-    console.log( 'contactCount', contactCount )
-    console.log( 'pdfCount', pdfCount )
-    console.log( 'deviceCount', deviceCount )
+    //
 
     setCompletedKeeperType( completedKeeperType )
   }

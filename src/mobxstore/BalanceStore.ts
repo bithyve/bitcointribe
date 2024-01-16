@@ -1,6 +1,6 @@
-import { action, reaction, observable } from 'mobx'
-import SettingsStore from './SettingsStore'
-import RESTUtils from '../utils/ln/RESTUtils'
+import { action, observable, reaction } from 'mobx';
+import RESTUtils from '../utils/ln/RESTUtils';
+import SettingsStore from './SettingsStore';
 
 export default class BalanceStore {
     @observable public totalBlockchainBalance: number | string;
@@ -64,8 +64,6 @@ export default class BalanceStore {
           this.loading = false
         } )
         .catch( ( e ) => {
-          console.log( 'getBlockchainBalance', e )
-
           this.balanceError()
         } )
     };

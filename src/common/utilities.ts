@@ -57,14 +57,12 @@ export const getVersions = ( versionHistory, restoreVersions ) => {
       versionHistoryArray.push( versionHistory[ i ] )
     }
   }
-  //console.log("versionHistoryArray",versionHistoryArray);
 
   if( restoreVersions ){
     for ( let i=0; i<restoreVersions.length; i++ ) {
       restoreVersionsArray.push( restoreVersions[ i ] )
     }
   }
-  //console.log("restoreVersionsArray",restoreVersionsArray);
 
   if( versionHistoryArray.length && restoreVersionsArray.length ){
     versions = [ ...versionHistoryArray, ...restoreVersionsArray ]
@@ -73,7 +71,6 @@ export const getVersions = ( versionHistory, restoreVersions ) => {
   } else if( restoreVersionsArray.length ){
     versions = [ ...restoreVersionsArray ]
   }
-  //console.log("versions",versions);
 
   return versions
 }

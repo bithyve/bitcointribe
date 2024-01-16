@@ -6,12 +6,10 @@ import config from '../HexaConfig'
 import {
   EncDynamicNonPMDD,
   MetaShare,
-  NewWalletImage,
+  NewWalletImage
 } from './Interface'
 
 import { BH_AXIOS } from '../../services/api'
-import { generateRandomString } from '../../common/CommonFunctions'
-import moment from 'moment'
 import Relay from './Relay'
 const { HEXA_ID } = config
 
@@ -205,7 +203,7 @@ export default class BHROperations {
         .encryptedDynamicNonPMDD,
     }
 
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
       res = await BH_AXIOS.post( 'updateDynamicNonPMDD', {
         HEXA_ID,
@@ -217,7 +215,7 @@ export default class BHROperations {
       if ( err.code ) throw new Error( err.code )
     }
 
-    const { updated } = res.data;
+    const { updated } = res.data
     if ( updated ) {
       return {
         updated,
@@ -232,7 +230,7 @@ export default class BHROperations {
   ): Promise<{
     encryptedDynamicNonPMDD: EncDynamicNonPMDD;
   }> => {
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
       res = await BH_AXIOS.post( 'downloadDynamicNonPMDD', {
         HEXA_ID,
@@ -243,7 +241,7 @@ export default class BHROperations {
       if ( err.code ) throw new Error( err.code )
     }
 
-    const { encryptedDynamicNonPMDD } = res.data;
+    const { encryptedDynamicNonPMDD } = res.data
     if ( encryptedDynamicNonPMDD ) {
       return {
         encryptedDynamicNonPMDD,
@@ -285,7 +283,7 @@ export default class BHROperations {
   ): Promise<{
     deleted: boolean;
   }> => {
-    let res: AxiosResponse;
+    let res: AxiosResponse
 
     try {
       res = await BH_AXIOS.post( 'affirmDecryption', {
@@ -351,7 +349,7 @@ export default class BHROperations {
       key,
     )
 
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
       res = await BH_AXIOS.post( 'uploadShare', {
         HEXA_ID,
@@ -584,7 +582,7 @@ export default class BHROperations {
         }
         levelInfo.push( obj )
       }
-      let res: AxiosResponse;
+      let res: AxiosResponse
       try {
         res = await BH_AXIOS.post( 'initLevels', {
           HEXA_ID,
@@ -592,9 +590,7 @@ export default class BHROperations {
           level: _level,
           levelInfo,
         } )
-        console.log( 'initLevels res', res )
       } catch ( err ) {
-        console.log( 'initLevels err', err )
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }

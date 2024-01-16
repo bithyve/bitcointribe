@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   SafeAreaView,
   StatusBar,
-  View,
+  View
 } from 'react-native'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
 import { Wallet } from '../../bitcoin/utilities/Interface'
@@ -15,8 +15,8 @@ import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
 import AlertModalContents from '../../components/AlertModalContents'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import LoaderModal from '../../components/LoaderModal'
 import ModalContainer from '../../components/home/ModalContainer'
+import LoaderModal from '../../components/LoaderModal'
 import { recoverWalletUsingMnemonic, restoreSeedWordFailed } from '../../store/actions/BHR'
 import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
@@ -47,7 +47,6 @@ const RestoreSeedWordsContent = ( props ) => {
   const [ mnemonic, setMnemonic ] = useState( null )
 
   useEffect( () => {
-    // console.log( 'skk sugg words', JSON.stringify( mnemonicSuggestions ) )
     return () => {
       dispatch( restoreSeedWordFailed( false ) )
     }
@@ -111,7 +110,6 @@ const RestoreSeedWordsContent = ( props ) => {
     setLoaderModal( false )
     if ( seedRecovered )
       setTimeout( () => {
-        console.log( 'TIMEOUT' )
         setLoaderModal( true )
       }, 1000 )
   }

@@ -393,7 +393,7 @@ export default function AddContactAddressBook( props ) {
         animated: false, index: index
       } )
     } else {
-      console.log( 'No contact starting with this letter' )
+      //No contact starting with this letter
     }
   }
 

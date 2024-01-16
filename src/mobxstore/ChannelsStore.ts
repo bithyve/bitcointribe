@@ -1,10 +1,10 @@
 import { action, observable, reaction } from 'mobx'
+import { randomBytes } from 'react-native-randombytes'
 import Channel from './../models/Channel'
 import ChannelInfo from './../models/ChannelInfo'
-import OpenChannelRequest from './../models/OpenChannelRequest'
 import CloseChannelRequest from './../models/CloseChannelRequest'
+import OpenChannelRequest from './../models/OpenChannelRequest'
 import SettingsStore from './SettingsStore'
-import { randomBytes } from 'react-native-randombytes'
 
 import Base64Utils from '../utils/ln/Base64Utils'
 import RESTUtils from '../utils/ln/RESTUtils'
@@ -138,7 +138,6 @@ export default class ChannelsStore {
             ) {
               this.getNodeInfo( channel.remote_pubkey ).then(
                 ( nodeInfo: any ) => {
-                  // console.log(nodeInfo, "node information...")
                   if ( !nodeInfo ) return
 
                   this.nodes[ channel.remote_pubkey ] = nodeInfo
@@ -249,8 +248,6 @@ export default class ChannelsStore {
     };
 
     openChannelLNDCoinControl = ( request: OpenChannelRequest ) => {
-      console.log( 'calling openChannelLNDCoinControl' )
-      console.log( request )
       const { utxos } = request
       const inputs: any = []
       const outputs: any = {
@@ -274,7 +271,6 @@ export default class ChannelsStore {
       delete request.sat_per_byte
 
       const pending_chan_id = randomBytes( 32 ).toString( 'base64' )
-      console.log( pending_chan_id )
 
       const openChanRequest = {
         funding_shim: {
@@ -287,12 +283,8 @@ export default class ChannelsStore {
         ...request
       }
 
-      console.log( openChanRequest, 'openChanRequest action intro' )
-
       RESTUtils.openChannelStream( openChanRequest )
         .then( ( data: any ) => {
-          console.log( 'stream' )
-          console.log( data )
           const psbt_fund = data.psbt_fund
           const { funding_address, funding_amount } = psbt_fund
 
@@ -308,12 +300,8 @@ export default class ChannelsStore {
             sat_per_vbyte: Number( sat_per_byte )
           }
 
-          console.log( fundPsbtRequest, 'partially signed transactions' )
-
           RESTUtils.fundPsbt( fundPsbtRequest )
             .then( ( data: any ) => {
-              console.log( 'fund' )
-              console.log( data )
               const funded_psbt = data.funded_psbt
 
               const openChanRequest = {
@@ -325,16 +313,9 @@ export default class ChannelsStore {
                 ...request
               }
 
-              console.log( openChanRequest, 'open channel Request' )
-
               RESTUtils.openChannel( openChanRequest )
-                .then( ( data: any ) => {
-                  console.log( 'chan2 data' )
-                  console.log( data )
-                } )
+                .then( ( data: any ) => {} )
                 .catch( ( error: any ) => {
-                  console.log( 'chan2 err' )
-                  console.log( error.toString() )
                   this.errorMsgChannel = error.toString()
                   this.output_index = null
                   this.funding_txid_str = null
@@ -346,8 +327,6 @@ export default class ChannelsStore {
                 } )
             } )
             .catch( ( error: any ) => {
-              console.log( 'fundPsbt err' )
-              console.log( error.toString() )
               this.errorMsgChannel = error.toString()
               this.output_index = null
               this.funding_txid_str = null
@@ -359,8 +338,6 @@ export default class ChannelsStore {
             } )
         } )
         .catch( ( error: any ) => {
-          console.log( 'stream err' )
-          console.log( error.toString() )
           this.errorMsgChannel = error.toString()
           this.output_index = null
           this.funding_txid_str = null
@@ -378,13 +355,11 @@ export default class ChannelsStore {
       this.peerSuccess = false
       this.channelSuccess = false
       this.openingChannel = true
-      console.log( this.settingsStore.implementation, 'implementation', ' and', request.utxos )
       if (
         this.settingsStore.implementation === 'lnd' &&
             request.utxos &&
             request.utxos.length > 0
       ) {
-        console.log( request, 'openchannel action' )
         return this.openChannelLNDCoinControl( request )
       }
 

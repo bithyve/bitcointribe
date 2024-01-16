@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { View, Image, Text, StyleSheet, Platform } from 'react-native'
-import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
+import { Image, Platform, StyleSheet, Text, View } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
-import DeviceInfo from 'react-native-device-info'
+import Colors from '../common/Colors'
 import { translations } from '../common/content/LocContext'
+import Fonts from '../common/Fonts'
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 
 export default function CloudPermissionModalContents( props ) {
   const [ timerArray, setTimerArray ] = useState( [ 1, 1, 1 ] )
@@ -47,7 +46,6 @@ export default function CloudPermissionModalContents( props ) {
         setTimerArray( [ 0, 0, 0 ] )
       }
     }, 1000 )
-    console.log( 'timeLeft', timeLeft )
     setIntervalRef( intervalId )
     return () => { clearInterval( intervalId ) }
   }, [ timeLeft ] )

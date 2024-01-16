@@ -1,12 +1,11 @@
 import React from 'react'
-import { View, Text, StyleSheet, ActivityIndicator, Image } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 
 export default function ContactListForRestore( props ) {
@@ -19,7 +18,6 @@ export default function ContactListForRestore( props ) {
       </View>
       {contactList.map( ( contact, index ) => {
         const data = contact.data
-        console.log( 'data', data )
         return (
           <AppBottomSheetTouchableWrapper
             key={index}
