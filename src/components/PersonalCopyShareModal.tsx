@@ -1,26 +1,19 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useCallback, useState } from 'react'
 import {
-  StyleSheet,
-  View,
-  Text,
-  Image,
-  FlatList,
-  Platform,
-  TouchableOpacity,
+  FlatList, Image, Platform, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import Icons from '../common/Icons'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
-import { useDispatch } from 'react-redux'
 import BottomInfoBox from './BottomInfoBox'
-import { RFValue } from 'react-native-responsive-fontsize'
-import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from './ModalHeader'
 
 export default function PersonalCopyShareModal( props ) {
@@ -223,7 +216,6 @@ export default function PersonalCopyShareModal( props ) {
         <AppBottomSheetTouchableWrapper
           disabled={isShared? false : true}
           onPress={() => {
-            // console.log('Confirm');
             onConfirm()
           }}
           style={{

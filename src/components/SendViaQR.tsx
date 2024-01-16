@@ -1,25 +1,21 @@
-import React, { useState, useEffect } from 'react'
-import { View, Image, Text, StyleSheet, ActivityIndicator } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import BottomInfoBox from './BottomInfoBox'
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import { nameToInitials } from '../common/CommonFunctions'
-import { ScrollView } from 'react-native-gesture-handler'
-import QRCode from './QRCode'
 import {
-  REGULAR_ACCOUNT,
-  TEST_ACCOUNT,
-  SECURE_ACCOUNT,
+  REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT
 } from '../common/constants/wallet-service-types'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import { ContactRecipientDescribing } from '../common/data/models/interfaces/RecipientDescribing'
+import Fonts from '../common/Fonts'
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
+import BottomInfoBox from './BottomInfoBox'
 import CopyThisText from './CopyThisText'
+import QRCode from './QRCode'
 
 export default function SendViaQR( props ) {
   const [ contactName, setContactName ] = useState( '' )
@@ -46,7 +42,6 @@ export default function SendViaQR( props ) {
   const [ serviceType, setServiceType ] = useState(
     props.serviceType ? props.serviceType : '',
   )
-  //console.log("amountCurrency", props.amountCurrency);
   const [ Contact, setContact ] = useState( props.contact ? props.contact : {
   } )
   useEffect( () => {

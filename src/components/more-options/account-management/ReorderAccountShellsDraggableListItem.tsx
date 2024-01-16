@@ -1,14 +1,14 @@
 import React from 'react'
-import { Image, View, } from 'react-native'
-import AccountShell from '../../../common/data/models/AccountShell'
-import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import { Image, View } from 'react-native'
 import { ListItem } from 'react-native-elements'
-import Colors from '../../../common/Colors'
-import ListStyles from '../../../common/Styles/ListStyles'
-import ImageStyles from '../../../common/Styles/ImageStyles'
-import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AccountType } from '../../../bitcoin/utilities/Interface'
+import Colors from '../../../common/Colors'
+import AccountShell from '../../../common/data/models/AccountShell'
+import ImageStyles from '../../../common/Styles/ImageStyles'
+import ListStyles from '../../../common/Styles/ListStyles'
+import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
+import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 export type Props = {
   accountShell: AccountShell;
   isActive: boolean;
@@ -25,7 +25,6 @@ const ReorderAccountShellsDraggableListItem: React.FC<Props> = ( {
   setNumberOfTabs
 }: Props ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-  console.log( 'primarySubAccount.type0', primarySubAccount.type==AccountType.BORDER_WALLET )
   const isBorderWallet = primarySubAccount.type === AccountType.BORDER_WALLET
   return (
     <ListItem
