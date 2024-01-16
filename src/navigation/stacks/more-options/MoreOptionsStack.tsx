@@ -20,6 +20,7 @@ import NodeSettingsContainerScreen from '../../../pages/MoreOptions/NodeSettings
 import BackupMethods from '../../../pages/NewBHR/BackupMethods'
 import BackupWithKeeper from '../../../pages/NewBHR/BackupWithKeeper'
 import CheckPasscodeComponent from '../../../pages/NewBHR/CheckPasscodeComponent'
+import SeedBackupHistory from '../../../pages/NewBHR/SeedBackupHistory'
 import PasscodeChangeSuccessPage from '../../../pages/PasscodeChangeSuccessPage'
 import ReLogin from '../../../pages/ReLogin'
 import VersionHistoryScreen from '../../../pages/VersionHistoryScreen'
@@ -102,6 +103,9 @@ const MoreOptionsStack = ( { navigation, route } ) => {
         headerShown: false,
       }} />
       <Stack.Screen name="BackupMethods" component={BackupMethods} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="SeedBackupHistory" component={SeedBackupHistory} options={{
         headerShown: false,
       }} />
       <Stack.Screen name="AppInfo" component={AppInfo} options={{
