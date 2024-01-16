@@ -383,7 +383,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.notificationCheck()
     this.openBottomSheetOnLaunch( BottomSheetKind.NOTIFICATIONS_LIST )
     const notificationRejection = this.props.messages.find( value=>value.type == notificationType.FNF_KEEPER_REQUEST_REJECTED && value.additionalInfo && value.additionalInfo.wasExistingContactRequest && value.additionalInfo.channelKey )
-    console.log( 'notificationRejection', notificationRejection )
     if( notificationRejection ) {
       this.props.rejectedExistingContactRequest( notificationRejection.additionalInfo.channelKey )
     }
@@ -391,7 +390,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   notificationCheck = () =>{
     const { messages } = this.props
-    console.log( 'notificationCheck '+JSON.stringify( messages ) )
     if( messages && messages.length ){
       this.updateBadgeCounter()
       messages.sort( function ( left, right ) {
@@ -415,7 +413,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
     }
     const notificationRejection = messages.find( value=>value.type == notificationType.FNF_KEEPER_REQUEST_REJECTED && value.additionalInfo && value.additionalInfo.wasExistingContactRequest && value.additionalInfo.channelKey )
-    console.log( 'notificationRejection', notificationRejection )
     if( notificationRejection ) {
       this.props.rejectedExistingContactRequest( notificationRejection.additionalInfo.channelKey )
     }
@@ -636,8 +633,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
       onAction: ( notification ) => {
-        console.log( 'ACTION onAction:', notification.action )
-        console.log( 'NOTIFICATION onAction:', notification )
 
         // process the action
       },
@@ -772,7 +767,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }
       } catch ( error ) {
         Toast( error.message )
-        console.log( error )
       }
     }
   }
@@ -793,8 +787,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     )
     requestAnimationFrame( () => {
       // Keeping autoSync disabled
-      // credsAuthenticated( false )
-      //console.log( 'isAuthenticated*****', this.props.isAuthenticated )
       this.syncChannel()
       this.closeBottomSheet()
       if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
@@ -1045,9 +1037,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     Linking.canOpenURL( url ).then( ( supported ) => {
       if ( supported ) {
         Linking.openURL( url )
-      } else {
-        // console.log("Don't know how to open URI: " + url);
-      }
+      } else {}
     } )
   }
 
@@ -1095,7 +1085,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationClicked = async ( value ) => {
-    console.log( 'value', value )
     // if( value.status === 'unread' || value.type === NotificationType.FNF_TRANSACTION )
     // if( value.type !== NotificationType.FNF_KEEPER_REQUEST )
     this.handleNotificationBottomSheetSelection( value )
@@ -1684,11 +1673,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           />
           <ModalContainer
             onBackground={() => {
-              if ( this.state.currentBottomSheetKind === BottomSheetKind.GIFT_REQUEST ) {
-                console.log( 'bgState' )
-              } else if ( this.state.currentBottomSheetKind === BottomSheetKind.TRUSTED_CONTACT_REQUEST ) {
-                console.log( 'bgState' )
-              } else {
+              if ( this.state.currentBottomSheetKind === BottomSheetKind.GIFT_REQUEST ) {} else if ( this.state.currentBottomSheetKind === BottomSheetKind.TRUSTED_CONTACT_REQUEST ) {} else {
                 const perviousState = this.state.currentBottomSheetKind
                 this.setState( {
                   currentBottomSheetKind: null
