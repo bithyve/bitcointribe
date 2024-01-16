@@ -1,41 +1,31 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import idx from 'idx'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  ScrollView,
-  Platform,
-  TouchableWithoutFeedback,
+  ActivityIndicator, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View
 } from 'react-native'
-import Fonts from '../../common/Fonts'
 import DeviceInfo from 'react-native-device-info'
-import NavStyles from '../../common/Styles/NavStyles'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import CopyThisText from '../../components/CopyThisText'
+import Entypo from 'react-native-vector-icons/Entypo'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
+import Colors from '../../common/Colors'
 import {
   SECURE_ACCOUNT,
-  TEST_ACCOUNT,
+  TEST_ACCOUNT
 } from '../../common/constants/wallet-service-types'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Entypo from 'react-native-vector-icons/Entypo'
-import Colors from '../../common/Colors'
-import BottomSheet from 'reanimated-bottom-sheet'
-import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
-import { RFValue } from 'react-native-responsive-fontsize'
+import Fonts from '../../common/Fonts'
+import NavStyles from '../../common/Styles/NavStyles'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import CopyThisText from '../../components/CopyThisText'
+import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents'
 import QRCode from '../../components/QRCode'
+import SmallHeaderModal from '../../components/SmallHeaderModal'
 import { setReceiveHelper, setSavingWarning } from '../../store/actions/preferences'
-import idx from 'idx'
 
 const ReceivingAddress = ( props ) => {
   const [ AsTrustedContact, setAsTrustedContact ] = useState( false )
@@ -122,7 +112,6 @@ const ReceivingAddress = ( props ) => {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          //console.log('isReceiveHelperDone', isReceiveHelperDone);
           if ( isReceiveHelperDone ) {
             if ( ReceiveHelperBottomSheet.current )
               ( ReceiveHelperBottomSheet as any ).current.snapTo( 1 )

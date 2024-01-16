@@ -1,22 +1,18 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  ImageBackground,
+  ImageBackground, StyleSheet, Text, View
 } from 'react-native'
+import { RNCamera } from 'react-native-camera'
+import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import { RNCamera } from 'react-native-camera'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import { ScrollView } from 'react-native-gesture-handler'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
 
 export default function QRModal( props ) {
@@ -24,7 +20,6 @@ export default function QRModal( props ) {
 
   const barcodeRecognized = async ( barcodes ) => {
     if ( barcodes.data ) {
-      console.log( 'barcodes.data', barcodes.data )
       setOpenCameraFlag( false )
       props.onQrScan( getFormattedStringFromQRString( barcodes.data ) )
     }
