@@ -1,27 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  Platform,
+  BackHandler, Image, Linking, Platform,
   SafeAreaView,
-  StatusBar,
-  Linking,
-  BackHandler,
+  StatusBar, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native'
-import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
+import DeviceInfo from 'react-native-device-info'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import Octicons from 'react-native-vector-icons/Octicons'
-import DeviceInfo from 'react-native-device-info'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Octicons from 'react-native-vector-icons/Octicons'
 import { useDispatch, useSelector } from 'react-redux'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
 import { setReleaseCases } from '../store/actions/preferences'
 
 export default function UpdateApp( props ) {
@@ -88,7 +80,6 @@ export default function UpdateApp( props ) {
             return el.reminderLimit === 0
           } )
           : ''
-        // console.log('RELEASENOTE', releaseNotes);
         if (
           releaseNotes ||
           ( releaseDataObj[ 0 ] && releaseDataObj[ 0 ].reminderLimit == 0 ) ||
@@ -155,7 +146,6 @@ export default function UpdateApp( props ) {
       ignoreClick: _ignoreClick,
       remindMeLaterClick: _remindMeLaterClick,
     }
-    //console.log( 'releaseCasesData', releaseCasesData )
     dispatch( setReleaseCases( releaseCasesData ) )
 
     props.navigation.goBack()

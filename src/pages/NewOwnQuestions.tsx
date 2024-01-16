@@ -1,43 +1,33 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import {
-  StyleSheet,
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  ScrollView,
-  StatusBar,
-  Text,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
-  TouchableWithoutFeedback,
-  TextInput,
-} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Fonts from '../common/Fonts'
-import Colors from '../common/Colors'
-import CommonStyles from '../common/Styles/Styles'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  Keyboard, KeyboardAvoidingView,
+  Platform, SafeAreaView, ScrollView,
+  StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View
+} from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import Feather from 'react-native-vector-icons/Feather'
-import { RFValue } from 'react-native-responsive-fontsize'
-import HeaderTitle from '../components/HeaderTitle'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import CommonStyles from '../common/Styles/Styles'
 import BottomInfoBox from '../components/BottomInfoBox'
+import HeaderTitle from '../components/HeaderTitle'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { setupWallet } from '../store/actions/setupAndAuth'
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../components/LoaderModal'
+import { setupWallet } from '../store/actions/setupAndAuth'
 
 import DeviceInfo from 'react-native-device-info'
-import { walletCheckIn } from '../store/actions/trustedContacts'
-import { setVersion } from '../store/actions/versionHistory'
+import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import { initNewBHRFlow } from '../store/actions/BHR'
 import { setCloudData } from '../store/actions/cloud'
-import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
+import { walletCheckIn } from '../store/actions/trustedContacts'
+import { setVersion } from '../store/actions/versionHistory'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -118,15 +108,12 @@ export default function NewOwnQuestions( props ) {
 
   useEffect( () => {
     if( walletSetupCompleted ){
-      console.log( 'walletSetupCompleted****', walletSetupCompleted )
-
       dispatch( walletCheckIn() )
     }
   }, [ walletSetupCompleted ] )
 
   useEffect( () => {
     if( walletSetupCompleted && levelHealth && levelHealth.length ){
-      console.log( 'healthCheckInitializedKeeper****', levelHealth.length )
       if( cloudPermissionGranted ){
         dispatch( setCloudData() )
       } else{

@@ -37,7 +37,6 @@ export default function SettingGetNewPin( props ) {
     ( state ) => state.setupAndAuth.pinChangedFailed,
   )
   const [ isDisabled, setIsDisabled ] = useState( true )
-  // console.log('isPinChangedFailed', isPinChangedFailed);
 
   function onPressNumber( text ) {
     let tmpPasscode = passcode

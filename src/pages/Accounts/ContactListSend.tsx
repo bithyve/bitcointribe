@@ -3,7 +3,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
 import { nameToInitials } from '../../common/CommonFunctions'
@@ -53,7 +53,6 @@ function getImageIcon( item ) {
 }
 
 const ContactListSend = ( { transfer, Items, onSelectContact } ) => {
-  //console.log("Items,", Items);
   return (
     <TouchableOpacity onPress={() => onSelectContact( Items )}>
       <View style={{
