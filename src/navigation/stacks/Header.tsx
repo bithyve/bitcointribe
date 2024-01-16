@@ -48,7 +48,6 @@ import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
 import Fonts from '../../common/Fonts'
 import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
 import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
-import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
 import ClipboardAutoRead from '../../components/ClipboardAutoRead'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
@@ -108,7 +107,6 @@ import {
   syncPermanentChannels
 } from '../../store/actions/trustedContacts'
 import { setVersion } from '../../store/actions/versionHistory'
-import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { AccountsState } from '../../store/reducers/accounts'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 
@@ -205,7 +203,7 @@ interface HomePropsTypes {
   initializeHealthSetup: any;
   overallHealth: any;
   keeperInfo: any[];
-  clearWyreCache: any;
+  // clearWyreCache: any;
   clearRampCache: any;
   clearSwanCache: any;
   updateSwanStatus: any;
@@ -1287,16 +1285,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             this.openBottomSheet( BottomSheetKind.RAMP_STATUS_INFO )
           } )
           break
-        case BuyMenuItemKind.WYRE:
-          this.props.clearWyreCache()
-          this.setState( {
-            wyreDeepLinkContent: null,
-            wyreFromDeepLink: false,
-            wyreFromBuyMenu: true
-          }, () => {
-            this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
-          } )
-          break
     }
   };
 
@@ -1398,22 +1386,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
               <BottomSheetSwanInfo
                 swanDeepLinkContent={this.state.swanDeepLinkContent}
-                onClickSetting={() => {
-                  this.closeBottomSheet()
-                }}
-                // onPress={this.closeBottomSheet}
-                onPress={this.onBackPress}
-              />
-            </>
-          )
-        case BottomSheetKind.WYRE_STATUS_INFO:
-          return (
-            <>
-              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
-              <BottomSheetWyreInfo
-                wyreDeepLinkContent={this.state.wyreDeepLinkContent}
-                wyreFromBuyMenu={this.state.wyreFromBuyMenu}
-                wyreFromDeepLink={this.state.wyreFromDeepLink}
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
@@ -1830,7 +1802,7 @@ export default (
     acceptExistingContactRequest,
     rejectTrustedContact,
     initializeHealthSetup,
-    clearWyreCache,
+    // clearWyreCache,
     clearRampCache,
     clearSwanCache,
     updateSwanStatus,

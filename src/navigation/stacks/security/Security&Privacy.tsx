@@ -53,7 +53,6 @@ import SweepFundUseExitKey from '../../../pages/SweepFunds/SweepFundUseExitKey'
 import UpdateApp from '../../../pages/UpdateApp'
 import ConfirmKeys from '../../../pages/UpgradeBackupWithKeeper/ConfirmKeys'
 import UpgradeBackup from '../../../pages/UpgradeBackupWithKeeper/UpgradeBackup'
-import WyreIntegrationScreen from '../../../pages/WyreIntegration/WyreIntegrationScreen'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import QRStack from '../home/QRStack'
 
@@ -135,9 +134,6 @@ const SecurityStack = ( { navigation, route } ) => {
       }} />
       <Stack.Screen name="UpdateApp" component={UpdateApp} options={{
         gestureEnabled: false
-      }} />
-      <Stack.Screen name="WyreIntegrationScreen" component={WyreIntegrationScreen} options={{
-        title: 'Wyre Home'
       }} />
       <Stack.Screen name="RequestKeyFromContact" component={RequestKeyFromContact} />
       <Stack.Screen name="TrustedContactNewBHR" component={TrustedContactNewBHR} />

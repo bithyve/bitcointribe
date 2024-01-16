@@ -4,7 +4,7 @@ import React, { useLayoutEffect } from 'react'
 import Colors from '../../../common/Colors'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
-import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
+// import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
 import GoogleAuthenticatorOTP from '../../../pages/Accounts/GoogleAuthenticatorOTP'
 import NewTwoFASecret from '../../../pages/Accounts/NewTwoFASecret'
 import Receive from '../../../pages/Accounts/Receive'
@@ -67,8 +67,6 @@ import SweepFundUseExitKey from '../../../pages/SweepFunds/SweepFundUseExitKey'
 import UpdateApp from '../../../pages/UpdateApp'
 import ConfirmKeys from '../../../pages/UpgradeBackupWithKeeper/ConfirmKeys'
 import UpgradeBackup from '../../../pages/UpgradeBackupWithKeeper/UpgradeBackup'
-import WyreIntegrationScreen from '../../../pages/WyreIntegration/WyreIntegrationScreen'
-import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import AddNewAccountStack from '../accounts/AddNewAccountStack'
@@ -167,14 +165,11 @@ const HomeStack = ( { navigation, route } ) => {
       <Stack.Screen name="EnterNodeConfig" component={EnterNodeConfig} options={{
         headerShown: false
       }} />
-      <Stack.Screen name="NewWyreAccountDetails" component={NewWyreAccountDetailsScreen} options={{
+      {/* <Stack.Screen name="NewWyreAccountDetails" component={NewWyreAccountDetailsScreen} options={{
         title: 'Setup Wyre Account'
-      }} />
+      }} /> */}
       <Stack.Screen name="NewRampAccountDetails" component={NewRampAccountDetailsScreen} options={{
         title: 'Setup Ramp Account'
-      }} />
-      <Stack.Screen name="PlaceWyreOrder" component={WyreOrderFormScreen} options={{
-        title: 'Buy with Wyre'
       }} />
       <Stack.Screen name="PlaceRampOrder" component={RampOrderFormScreen} options={{
         title: 'Buy with Ramp'
@@ -202,9 +197,6 @@ const HomeStack = ( { navigation, route } ) => {
       }} />
       <Stack.Screen name="UpdateApp" component={UpdateApp} options={{
         gestureEnabled: false,
-      }} />
-      <Stack.Screen name="WyreIntegrationScreen" component={WyreIntegrationScreen} options={{
-        title: 'Wyre Home'
       }} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Intermediate" component={Intermediate} />
