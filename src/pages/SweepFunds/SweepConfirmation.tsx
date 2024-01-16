@@ -126,7 +126,6 @@ class SweepConfirmation extends Component<
   calculateTotalAmount = () => {
     const { accountData } = this.state
     const sum = accountData.reduce( ( a, b ) => a + ( b[ 'balance' ] || 0 ), 0 )
-    console.log( 'SUM', sum )
     return UsNumberFormat( sum )
   };
 

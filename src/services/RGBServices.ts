@@ -27,7 +27,6 @@ export default class RGBServices{
         mnemonic,
         pubKey,
       )
-      console.log( 'initiate', data )
       return JSON.parse( data )
     } catch ( error ) {
       return `${error}`
@@ -115,7 +114,6 @@ export default class RGBServices{
     const data = await RGB.issueRgb25Asset(
       description, name, supply, filePath
     )
-    console.log( data )
     return JSON.parse( data )
   }
 
@@ -123,7 +121,6 @@ export default class RGBServices{
     const data = await RGB.sendAsset(
       assetId, blindedUTXO, amount, consignmentEndpoints
     )
-    console.log( data )
     return JSON.parse( data )
   }
 

@@ -17,9 +17,9 @@ import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
+import { wp } from '../../common/data/responsiveness/responsive'
 import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
-import { wp } from '../../common/data/responsiveness/responsive'
 import HeaderTitle from '../../components/HeaderTitle'
 import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
@@ -107,7 +107,6 @@ const AssetMetaData = ( props ) => {
 
     } catch ( error ) {
       props.navigation.goBack()
-      console.log( error )
     }
   }
 

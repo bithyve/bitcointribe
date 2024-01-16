@@ -1,6 +1,6 @@
 import config from '../../src/bitcoin/HexaConfig'
-const { HEXA_ID } = config
 import { BH_AXIOS } from './api'
+const { HEXA_ID } = config
 
 export const fetchWyreReservation = ( amount, receiveAddress, currencyCode, country ) => {
   try {
@@ -17,7 +17,6 @@ export const fetchWyreReservation = ( amount, receiveAddress, currencyCode, coun
     } )
 
   } catch ( error ) {
-    console.log( 'error calling wyre ', error )
     return {
       error
     }

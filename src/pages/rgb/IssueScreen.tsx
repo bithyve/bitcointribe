@@ -73,7 +73,6 @@ export default function IssueScreen( props ) {
       setRequesting( false )
       setLoading( false )
       Toast( `Failed ${error}` )
-      console.log( 'error', error )
     }
   }
 
@@ -86,7 +85,6 @@ export default function IssueScreen( props ) {
         selectionLimit: 1,
       },
       response => {
-        console.log( response )
         if( response.assets ) {
           setAttachedFile( response.assets[ 0 ].uri.replace( 'file://', '' ) )
 

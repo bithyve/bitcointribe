@@ -6,16 +6,16 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useSelector } from 'react-redux'
 import { RGBConfig } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
+import { translations } from '../../common/content/LocContext'
 import Fonts from '../../common/Fonts'
 import FormStyles from '../../common/Styles/FormStyles'
 import CommonStyles from '../../common/Styles/Styles'
-import { translations } from '../../common/content/LocContext'
 import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
 
@@ -54,7 +54,7 @@ export default function RGBSend ( props ) {
         Toast( 'Failed' )
       }
     } catch ( error ) {
-      console.log( error )
+    //error
     }
   }
 

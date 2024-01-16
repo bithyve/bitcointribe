@@ -19,7 +19,7 @@ finalUrl=${finalURL}
     }
 
   } catch ( error ) {
-    console.log( 'error generating ramp link ', error )
+    // error
     return {
       error
     }

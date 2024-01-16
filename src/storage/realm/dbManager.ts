@@ -38,7 +38,6 @@ const createWallet = async ( wallet ) => {
     return true
   } catch ( error ) {
     return false
-    console.log( error )
   }
 }
 
@@ -48,7 +47,6 @@ const createAccounts = accounts => {
       createAccount ( account )
     }
   } catch ( error ) {
-    console.log( error )
     return false
   }
 }
@@ -63,7 +61,7 @@ const updateWallet = async ( newWalletProps ) => {
       } )
     }
   } catch ( error ) {
-    console.log( error )
+    // error
   }
 }
 
@@ -105,7 +103,7 @@ const createAccount = async ( account ) => {
       ...data
     }, true )
   } catch ( error ) {
-    console.log( error )
+    // error
   }
 }
 
