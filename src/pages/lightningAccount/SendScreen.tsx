@@ -55,11 +55,11 @@ const SendScreen = inject(
             navigation.replace( route, props )
           } )
           .catch( ( err ) => {
-            console.log( err )
+            // error
           } )
       }
     } catch ( error ) {
-      console.log( error )
+    //  error
     }
   }
 

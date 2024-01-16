@@ -439,7 +439,7 @@ const GiftDetails = ( { navigation, route } ) => {
               ...styles.btnContainer, marginTop: 30
             }}
             onPress={() => {
-              console.log( 'Proceed clicked' )
+              //Proceed clicked
             }}
           >
             <Text style={styles.btnText}>Proceed</Text>
@@ -450,7 +450,6 @@ const GiftDetails = ( { navigation, route } ) => {
               marginTop: 30, marginLeft: 40
             }}
             onPress={() => {
-              console.log( 'Back clicked' )
               // navigation.goback();
             }}
           >

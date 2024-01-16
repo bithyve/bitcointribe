@@ -1,27 +1,17 @@
-import { call, fork, put, select } from 'redux-saga/effects'
-import {
-  createWatcher,
-} from '../utils/utilities'
-import {
-  switchUpgradeLoader,
-  INIT_LEVELS,
-  AUTO_UPLOAD_SECONDARY,
-  SET_CLOUD_FOR_LEVEL,
-  AUTO_UPLOAD_CONTACT,
-  UPDATE_AVAILABLE_KEEPER_DATA,
-  setAvailableKeeperData,
-  updateAvailableKeeperData,
-  isUpgradeLevelInitializedStatus,
-  CONFIRM_PDF_SHARED_UPGRADE,
-} from '../actions/upgradeToNewBhr'
-import { healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedStatus, updatedKeeperInfo, updateMSharesHealth } from '../actions/BHR'
-import { generateRandomString } from '../../common/CommonFunctions'
 import moment from 'moment'
-import { INotification, KeeperInfoInterface, Keepers, LevelHealthInterface, MetaShare, notificationTag, notificationType, TrustedDataElements, Wallet } from '../../bitcoin/utilities/Interface'
-import { setCloudData } from '../actions/cloud'
-import Relay from '../../bitcoin/utilities/Relay'
+import { call, fork, put, select } from 'redux-saga/effects'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
-import dbManager from '../../storage/realm/dbManager'
+import { INotification, KeeperInfoInterface, Keepers, LevelHealthInterface, MetaShare, notificationTag, notificationType, TrustedDataElements, Wallet } from '../../bitcoin/utilities/Interface'
+import Relay from '../../bitcoin/utilities/Relay'
+import { generateRandomString } from '../../common/CommonFunctions'
+import { healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedStatus, updatedKeeperInfo, updateMSharesHealth } from '../actions/BHR'
+import { setCloudData } from '../actions/cloud'
+import {
+  AUTO_UPLOAD_CONTACT, AUTO_UPLOAD_SECONDARY, CONFIRM_PDF_SHARED_UPGRADE, INIT_LEVELS, isUpgradeLevelInitializedStatus, setAvailableKeeperData, SET_CLOUD_FOR_LEVEL, switchUpgradeLoader, updateAvailableKeeperData, UPDATE_AVAILABLE_KEEPER_DATA
+} from '../actions/upgradeToNewBhr'
+import {
+  createWatcher
+} from '../utils/utilities'
 
 function* initLevelsWorker( { payload } ) {
   try {
@@ -36,7 +26,6 @@ function* initLevelsWorker( { payload } ) {
       shareId: randomIdForSecurityQ,
       reshareVersion: 0,
     }
-    console.log( 'SecurityQuestionHealth', SecurityQuestionHealth )
     const res = yield call(
       s3Service.initLevels,
       SecurityQuestionHealth,
@@ -82,8 +71,6 @@ function* setCloudDataForLevelWorker( { payload } ) {
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
     const keeperInfo = yield select( ( state ) => state.bhr.keeperInfo )
     const currentLevel = yield select( ( state ) => state.bhr.currentLevel )
-    console.log( 'levelHealth', levelHealth )
-    console.log( 'level', level )
     let share: MetaShare
     if( level > 0 ){
       share = metaShares.find( value => value.shareId == levelHealth[ level-1 ].levelInfo[ 0 ].shareId )
@@ -143,7 +130,6 @@ function* autoShareSecondaryWorker( { payload } ) {
       secondaryShare: secondaryMetaShares[ 1 ]
     }
     const ress = yield call( trustedContacts.initTCFromOldTC, 'Secondary Device'.toLowerCase(), name.toLowerCase() )
-    console.log( 'autoShareSecondaryWorker trustedContacts', trustedContacts )
     const res = yield call(
       trustedContacts.updateTrustedChannel,
       'Secondary Device',
@@ -195,7 +181,6 @@ function* autoShareSecondaryWorker( { payload } ) {
     }
     yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
   } catch ( error ) {
-    console.log( 'error', error )
     yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
   }
 }
@@ -316,7 +301,6 @@ function* autoShareContactKeeperWorker( { payload } ) {
     yield put( updateAvailableKeeperData( contactListToMarkDone ) )
     yield put( switchUpgradeLoader( 'contactSetupAutoShare' ) )
   } catch ( error ) {
-    console.log( 'error', error )
     yield put( switchUpgradeLoader( 'contactSetupAutoShare' ) )
   }
 }
@@ -353,7 +337,6 @@ function* updateAvailableKeeperDataWorker( { payload } ) {
     yield put( setAvailableKeeperData( availableKeeperData ) )
     yield put( switchUpgradeLoader( 'updateAvailKeeperDataStatus' ) )
   } catch ( error ) {
-    console.log( 'error', error )
     yield put( switchUpgradeLoader( 'updateAvailKeeperDataStatus' ) )
   }
 }
@@ -401,7 +384,6 @@ function* confirmPDFSharedFromUpgradeWorker( { payload } ) {
     yield put( switchUpgradeLoader( 'pdfDataConfirm' ) )
   } catch ( error ) {
     yield put( switchUpgradeLoader( 'pdfDataConfirm' ) )
-    console.log( 'Error EF channel', error )
   }
 }
 

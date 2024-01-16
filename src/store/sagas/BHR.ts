@@ -1286,7 +1286,7 @@ function* deletePrivateDataWorker() {
   //   //   }
   //   // } )
   // } catch ( error ) {
-  //   console.log( 'RECOVERY error', error )
+  //   error
   // }
 }
 

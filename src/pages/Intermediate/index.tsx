@@ -112,7 +112,7 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
         }
 
       } catch ( err ) {
-        console.log( 'err', err )
+      //  error
       }
     };
 

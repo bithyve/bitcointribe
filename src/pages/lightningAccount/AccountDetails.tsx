@@ -1,6 +1,6 @@
 import { inject, observer } from 'mobx-react'
 import React, { Component } from 'react'
-import { RefreshControl, SectionList, StatusBar, StyleSheet, View, } from 'react-native'
+import { RefreshControl, SectionList, StatusBar, StyleSheet, View } from 'react-native'
 import {
   heightPercentageToDP as hp
 } from 'react-native-responsive-screen'
@@ -97,7 +97,7 @@ export class AccountDetails extends Component<
         this.refresh()
       } )
     } catch ( error ) {
-      console.log( error )
+    //  error
     }
   }
 
@@ -142,7 +142,7 @@ export class AccountDetails extends Component<
       //   FiatStore.getFiatRates()
       // }
     } catch ( error ) {
-      console.log( error )
+      // error
     }
   };
 

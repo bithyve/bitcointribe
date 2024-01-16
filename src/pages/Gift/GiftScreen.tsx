@@ -581,7 +581,7 @@ class GiftScreen extends React.Component<
         }
       } )
       if( error ){
-        console.log( error )
+        // error
         return
       }
       const { num_slots, active_slot,  balance } = response

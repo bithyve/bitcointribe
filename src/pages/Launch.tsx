@@ -105,7 +105,6 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
         const now: any = new Date()
         const diff = Math.abs( now - this.props.lastSeen )
         const isHomePageOpen = Number( diff ) < Number( 20000 )
-        console.log( 'diff', diff, isHomePageOpen )
         if( isHomePageOpen ){
           if ( !this.url ){
             this.props.navigation.replace( 'Home', {
@@ -138,7 +137,6 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
       }
 
     } catch ( err ) {
-      console.log( 'err', err );
       ( this.errorBottomSheet as any ).current.snapTo( 1 )
     }
   };

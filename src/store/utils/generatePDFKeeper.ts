@@ -1,4 +1,4 @@
-import { Platform, NativeModules } from 'react-native'
+import { NativeModules, Platform } from 'react-native'
 import { getFormattedString } from '../../common/CommonFunctions'
 
 let pdfFilePath = ''
@@ -39,7 +39,6 @@ const getPdfPath = async ( pdfData: any ) => {
   if( pdfData ){
     if ( Platform.OS == 'ios' ) {
       const PdfPassword = await NativeModules.PdfPassword
-      console.log( 'create pdf', pdfData )
       return await PdfPassword.createPdfKeeper( JSON.stringify( pdfData ) )
     }
   }
