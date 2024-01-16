@@ -1,20 +1,13 @@
-import React, { Component, memo } from 'react'
+import React, { memo } from 'react'
 import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  Platform
+  StyleSheet, View
 } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 
 const ModalHeader = ( props ) => {
-  //console.log("ModalHeader rendered")
   return <AppBottomSheetTouchableWrapper
     activeOpacity={10}
     onPress={() => props.onPressHeader && props.onPressHeader()}
