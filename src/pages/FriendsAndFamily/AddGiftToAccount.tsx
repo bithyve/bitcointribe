@@ -24,6 +24,7 @@ import GiftAddedModal from './GiftAddedModal'
 import { giftAccepted, refreshAccountShells } from '../../store/actions/accounts'
 // import useAccountShellFromNavigation from '../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
+import { updateTempAccID } from '../../store/actions/doNotStore'
 
 export type Props = {
   navigation: any;
@@ -74,7 +75,7 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
     return (
       <TouchableOpacity
         onPress={async() => {
-
+          dispatch( updateTempAccID( sourcePrimarySubAccount.accountShellID ) )
           if ( text === 'Confirm' ) {
             // closeModal()
             setLoader( true )
