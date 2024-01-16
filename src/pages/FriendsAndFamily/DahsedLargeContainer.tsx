@@ -8,15 +8,15 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { useSelector } from 'react-redux'
 import semver from 'semver'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { LocalizationContext } from '../../common/content/LocContext'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import Fonts from '../../common/Fonts'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 
 const DashedLargeContainer = ( props ) => {
@@ -58,7 +58,6 @@ const DashedLargeContainer = ( props ) => {
       }
 
     } catch ( error ) {
-      console.log( error )
       return text.replace( /%20/g, ' ' )
     }
   }

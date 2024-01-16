@@ -13,7 +13,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import { RNCamera } from 'react-native-camera'
 import DeviceInfo from 'react-native-device-info'
@@ -21,7 +21,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import Entypo from 'react-native-vector-icons/Entypo'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -30,37 +30,33 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import config from '../../bitcoin/HexaConfig'
 import Colors from '../../common/Colors'
 import { isEmpty } from '../../common/CommonFunctions'
-import Fonts from '../../common/Fonts'
-import NavStyles from '../../common/Styles/NavStyles'
 import {
   FAST_BITCOINS,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-  TEST_ACCOUNT,
+  TEST_ACCOUNT
 } from '../../common/constants/wallet-service-types'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import AccountShell from '../../common/data/models/AccountShell'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import Fonts from '../../common/Fonts'
+import NavStyles from '../../common/Styles/NavStyles'
 import { UsNumberFormat } from '../../common/utilities'
 import ErrorModalContents from '../../components/ErrorModalContents'
+import Loader from '../../components/loader'
 import ModalHeader from '../../components/ModalHeader'
 import Toast from '../../components/Toast'
-import Loader from '../../components/loader'
 import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 import {
-  ClearAccountSyncData,
-  ClearOrderDetails,
-  ClearQuoteDetails,
   accountSync,
-  accountSyncFail,
-  clearFbtcVoucher,
-  executeOrder,
+  accountSyncFail, ClearAccountSyncData, clearFbtcVoucher, ClearOrderDetails,
+  ClearQuoteDetails, executeOrder,
   executeOrderFail,
   getQuote,
   getQuoteFail,
-  storeFbtcData,
+  storeFbtcData
 } from '../../store/actions/fbtc'
 import AccountVerification from './AccountVerification'
 import QuoteConfirmation from './QuoteConfirmation'
@@ -163,7 +159,6 @@ const VoucherScanner = ( props ) => {
 
   useEffect( () => {
     if ( FBTCAccountData ) {
-      //console.log("FBTCAccountData-- in useEffect", FBTCAccountData);
       setFBTCAccount_Data( FBTCAccountData )
     }
   }, [ FBTCAccountData ] )
@@ -194,7 +189,6 @@ const VoucherScanner = ( props ) => {
 
   const check = async () => {
     const FBTCAccountData = FBTCAccount_Data
-    console.log( 'FBTCAccountData', FBTCAccountData )
     if ( FBTCAccountData && FBTCAccountData.user_key ) {
       setIsUserRegistered( true )
     }
@@ -294,9 +288,7 @@ const VoucherScanner = ( props ) => {
             'voucherData',
             JSON.stringify( voucherDataTemp ),
           )
-          // console.log("voucherDataAfterAdd",voucherDataAfterAdd);
         } )()
-        // console.log('voucherCode,selectedAccount', voucherCode,selectedAccount)
         if ( isUserRegistered ) {
           if ( voucherCode.length == 12 && selectedAccount ) createFBTCAccount()
         } else {
@@ -322,7 +314,6 @@ const VoucherScanner = ( props ) => {
   const saveVoucherCodeToAccount = async ( selectedAccount, voucherCode ) => {
     const fBTCAccount = FBTCAccount_Data
     if ( !isEmpty( fBTCAccount ) ) {
-      //console.log("inside if saveVoucherCodeToAccount", voucherCode,selectedAccount)
       let temp = true
       for ( let i = 0; i < fBTCAccount.test_account.voucher.length; i++ ) {
         const element = fBTCAccount.test_account.voucher[ i ]
@@ -359,7 +350,6 @@ const VoucherScanner = ( props ) => {
         }
       }
       if ( temp ) {
-        // console.log("SELCTED ACOOUNT", selectedAccount);
         let accountType = 'saving_account'
         if ( selectedAccount && selectedAccount.accountType == TEST_ACCOUNT ) {
           accountType = 'test_account'
@@ -437,7 +427,6 @@ const VoucherScanner = ( props ) => {
     dispatch( storeFbtcData( obj ) )
     await AsyncStorage.setItem( 'FBTCAccount', JSON.stringify( obj ) )
     const voucherData = JSON.parse( await AsyncStorage.getItem( 'voucherData' ) )
-    // console.log("voucherData1", voucherData)
     if ( voucherData ) {
       saveVoucherCodeToAccount(
         voucherData.selectedAccount,
@@ -502,7 +491,6 @@ const VoucherScanner = ( props ) => {
   useEffect( () => {
     ( async () => {
       if ( QuoteDetails ) {
-        console.log( 'QuoteDetails', QuoteDetails )
         setShowLoader( false )
         QuoteBottomSheet.current.snapTo( 1 )
         // if(QuoteDetails)

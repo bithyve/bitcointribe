@@ -425,7 +425,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   renderBottomSheetContent() {
-    // console.log( 'this.state.currentBottomSheetKind', this.state.currentBottomSheetKind )
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.TAB_BAR_BUY_MENU:
           return (

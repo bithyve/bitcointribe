@@ -1,4 +1,4 @@
-import { AccountType, NetworkType, TxPriority } from '../../bitcoin/utilities/Interface'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Alert,
   Dimensions,
@@ -9,33 +9,30 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { addRecipientForSending, amountForRecipientUpdated, executeSendStage1, executeSendStage2, recipientRemovedFromSending, recipientSelectedForAmountSetting, resetSendStage1, resetSendState, sendTxNotification, sourceAccountSelectedForSending } from '../../store/actions/sending'
 import { useDispatch, useSelector } from 'react-redux'
+import { TxPriority } from '../../bitcoin/utilities/Interface'
+import { addRecipientForSending, amountForRecipientUpdated, executeSendStage1, executeSendStage2, recipientRemovedFromSending, recipientSelectedForAmountSetting, resetSendState, sendTxNotification } from '../../store/actions/sending'
 
-import { AccountsState } from '../../store/reducers/accounts'
-import AlertModalContents from '../../components/AlertModalContents'
-import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
-import { CKTapCard } from 'cktap-protocol-react-native'
-import Colors from '../../common/Colors'
-import CommonStyles from '../../common/Styles/Styles'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import GiftStepperComponent from './GiftStepperComponent'
-import ModalContainer from '../../components/home/ModalContainer'
-import NfcPrompt from './NfcPromptAndroid'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import axios from 'axios'
-import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
+import { CKTapCard } from 'cktap-protocol-react-native'
 import nfcManager from 'react-native-nfc-manager'
-import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import useAccountSendST1CompletionEffect from '../../utils/sending/UseAccountSendST1CompletionEffect'
-import useAccountSendST2CompletionEffect from '../../utils/sending/UseAccountSendST2CompletionEffect'
+import { RFValue } from 'react-native-responsive-fontsize'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Colors from '../../common/Colors'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import CommonStyles from '../../common/Styles/Styles'
+import AlertModalContents from '../../components/AlertModalContents'
+import ModalContainer from '../../components/home/ModalContainer'
+import { AccountsState } from '../../store/reducers/accounts'
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useSendingState from '../../utils/hooks/state-selectors/sending/UseSendingState'
 import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
-import { weekdaysShort } from 'moment'
+import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
+import useAccountSendST1CompletionEffect from '../../utils/sending/UseAccountSendST1CompletionEffect'
+import useAccountSendST2CompletionEffect from '../../utils/sending/UseAccountSendST2CompletionEffect'
+import GiftStepperComponent from './GiftStepperComponent'
+import NfcPrompt from './NfcPromptAndroid'
 
 const { height, width } = Dimensions.get( 'window' )
 const dummySatcardAddress = '3Ax781srE163xdH9DR9JKPRWooQ3xkbM4m'
@@ -86,7 +83,6 @@ export default function SetUpSatNextCardScreen( props ) {
         return
       }
       if( error ){
-        console.log( error )
         Alert.alert( error.toString() )
         return
       }
@@ -134,7 +130,6 @@ export default function SetUpSatNextCardScreen( props ) {
         response: resp, error: null
       }
     } catch ( error: any ) {
-      console.log( error.toString() )
       setNFCModal( false )
       nfcManager.setAlertMessageIOS( error.toString() )
       setErrorMessage( error.toString() )
@@ -146,28 +141,20 @@ export default function SetUpSatNextCardScreen( props ) {
     }
   }
   async function getCardData() {
-    console.log( 'at callback' )
     const cardData = await card.first_look()
     setCardDetails( cardData )
-    console.log( 'card details===>' + JSON.stringify( cardData ) )
     if ( cardData && !cardData.is_tapsigner ) {
-      console.log( 'came in' )
       try {
         const activeSlotUsage = await card.get_slot_usage( cardData.active_slot )
         if ( activeSlotUsage.status === 'SEALED' ) {
           //For Create Flow
           const { addr: address, pubkey } = await card.address( true, true, cardData.active_slot )
-          console.log( 'getAddrees===>' + JSON.stringify( address ) )
           const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
           const { balance, unconfirmed_balance } = data
           if( unconfirmed_balance >0 ){
             throw new Error( 'Your previous gift is still being confirmed. Please wait for a while' )
           }
           setSatCardBalance( balance )
-          console.log( 'balance===>' + JSON.stringify( balance ) )
-          console.log( {
-            address
-          } )
           return {
             address, pubkey, balance
           }
@@ -208,16 +195,11 @@ export default function SetUpSatNextCardScreen( props ) {
 
     setTimeout( () => {
       if ( recipient.id != null && recipient.id != '' ) {
-        // console.log( 'skk inside recipent', JSON.stringify( recipient ) )
-        // console.log( 'skk send giftAmount', JSON.stringify( giftAmount ) )
         dispatch( amountForRecipientUpdated( {
           recipient: recipient,
           amount: giftAmount
         } ) )
         dispatch( addRecipientForSending( recipient ) )
-        console.log( {
-          sourceAccountShell, recipient
-        } )
         dispatch( executeSendStage1( {
           accountShell: sourceAccountShell
         } ) )
@@ -228,7 +210,6 @@ export default function SetUpSatNextCardScreen( props ) {
 
   useAccountSendST1CompletionEffect( {
     onSuccess: () => {
-      console.log( 'skk use acc 1 success' )
       dispatch( executeSendStage2( {
         accountShell: sourceAccountShell,
         txnPriority: TxPriority.LOW,
@@ -237,14 +218,12 @@ export default function SetUpSatNextCardScreen( props ) {
 
     },
     onFailure: ( error ) => {
-      console.log( 'skk111122', error )
       // setShowAlertModal( true )
     },
   } )
 
   useAccountSendST2CompletionEffect( {
     onSuccess: ( txid: string | null, amt: number | null ) => {
-      console.log( 'skk use acc 2 success', txid )
       if ( txid ) {
         let type
         if ( sourceAccountShell.primarySubAccount.type === undefined ) {
@@ -280,7 +259,6 @@ export default function SetUpSatNextCardScreen( props ) {
     },
     onFailure: ( errorMessage: string | null ) => {
       if ( errorMessage ) {
-        console.log( 'skk111122333', JSON.stringify( errorMessage ) )
         // setShowAlertModal( true )
 
       }

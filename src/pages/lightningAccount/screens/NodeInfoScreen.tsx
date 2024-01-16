@@ -52,7 +52,6 @@ export default class NodeInfoScreen extends Component {
     if( !this.state.showQr.includes( uri ) ){
       const { showQr } = this.state
       showQr.push( uri )
-      console.log( showQr,  )
       this.setState( {
         showQr,
       } )

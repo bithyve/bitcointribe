@@ -1,44 +1,29 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  Platform,
-  ImageBackground,
-  TextInput,
-  KeyboardAvoidingView,
-  BackHandler,
-} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import Fonts from '../../common/Fonts'
-import DeviceInfo from 'react-native-device-info'
-import NavStyles from '../../common/Styles/NavStyles'
+import moment from 'moment'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  BackHandler, ImageBackground, KeyboardAvoidingView, Platform, SafeAreaView,
+  StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View
+} from 'react-native'
+import { RNCamera } from 'react-native-camera'
+import DeviceInfo from 'react-native-device-info'
+import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Colors from '../../common/Colors'
-import BottomSheet from 'reanimated-bottom-sheet'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { RNCamera } from 'react-native-camera'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import ModalHeader from '../../components/ModalHeader'
-import { ScrollView } from 'react-native-gesture-handler'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  accountSync,
-  ClearAccountSyncData,
-  accountSyncFail,
-} from '../../store/actions/fbtc'
-import Loader from '../../components/loader'
-import moment from 'moment'
+import BottomSheet from 'reanimated-bottom-sheet'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import NavStyles from '../../common/Styles/NavStyles'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import Loader from '../../components/loader'
+import ModalHeader from '../../components/ModalHeader'
 import {
-  storeFbtcData
+  accountSync, accountSyncFail, ClearAccountSyncData, storeFbtcData
 } from '../../store/actions/fbtc'
 
 import { isEmpty } from '../../common/CommonFunctions/index'
@@ -79,7 +64,6 @@ const PairNewWallet = ( props ) => {
 
   useEffect( () => {
     if ( FBTCAccountData ) {
-      //console.log("FBTCAccountData------- in useEffect", FBTCAccountData)
       setFBTCAccount_Data( FBTCAccountData )
     }
   }, [ FBTCAccountData ] )
@@ -136,7 +120,6 @@ const PairNewWallet = ( props ) => {
 
   const createFBTCAccount = async () => {
     const FBTCAccountData = FBTCAccount_Data
-    //console.log('FBTCAccountData', FBTCAccountData);
 
     //JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
     let obj
@@ -155,10 +138,8 @@ const PairNewWallet = ( props ) => {
         },
       }
     } else {
-      //console.log('FBTCAccountData in else', FBTCAccountData);
       obj = FBTCAccountData
     }
-    //console.log('obj', obj);
     dispatch( storeFbtcData( obj ) )
     await AsyncStorage.setItem( 'FBTCAccount', JSON.stringify( obj ) )
     if (
@@ -179,12 +160,8 @@ const PairNewWallet = ( props ) => {
 
   useEffect( () => {
     if ( accountSyncDetails ) {
-      //console.log("FBTCAccount_Data accountSync", FBTCAccount_Data);
       ( async () => {
         const FBTCAccountData = FBTCAccount_Data
-        // JSON.parse(
-        //   await AsyncStorage.getItem('FBTCAccount'),
-        // );
         let obj
         if ( FBTCAccountData ) {
           obj = {

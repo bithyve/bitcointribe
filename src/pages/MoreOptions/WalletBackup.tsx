@@ -183,7 +183,6 @@ const WalletBackup = ( props, navigation ) => {
         }
       } )
     } )
-    // console.log( 'accountsState on walletbackup====>' + JSON.stringify( accountsState.accountShells ) )
 
     const unsubscribe = props.navigation.addListener( 'focus', () => {
       updateAddressBook()

@@ -188,8 +188,6 @@ const CreateGift = ( { route, navigation }: Props ) => {
 
   const isAmountInvalid = useMemo( () => {
     let giftAmount = currentSatsAmountFormValue
-    console.log( giftAmount )
-
     const numberOfGifts = numbersOfGift ? Number( numbersOfGift ) : 1
     if ( prefersBitcoin ) {
       if ( !includeFees && averageLowTxFee ) giftAmount += averageLowTxFee
@@ -343,7 +341,6 @@ const CreateGift = ( { route, navigation }: Props ) => {
           if ( satCard ) {
             setShowVerification( true )
           } else {
-            console.log( 'condn', condn )
             const giftInstances = Number( numbersOfGift )
             const giftAmountInSats = prefersBitcoin
               ? Number( amount )

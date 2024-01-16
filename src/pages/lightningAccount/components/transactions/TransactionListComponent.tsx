@@ -1,19 +1,13 @@
-import React, { Component, ReactElement } from 'react'
-import { Text, View, FlatList, StyleSheet, StatusBar } from 'react-native'
-import { Button } from 'react-native-elements/dist/buttons/Button'
-import RESTUtils from '../../../../utils/ln/RESTUtils'
-import axios from 'axios'
-import SendAndReceiveButtonsFooter from '../../../Accounts/Details/SendAndReceiveButtonsFooter'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
+import React, { Component, ReactElement } from 'react'
+import { FlatList, StatusBar, StyleSheet, View } from 'react-native'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import useAccountShellFromRoute from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import Transaction from '../../../../models/Transaction'
 import TransactionListItemComponent from './TransactionListItemComponent'
 
 export default class TransactionListComponent extends Component {
   constructor( props: any ) {
     super( props )
-    console.log( this.props.transactions, '()' )
   }
 
     uniqueKey = ( item:any, index: number ) => index.toString();
