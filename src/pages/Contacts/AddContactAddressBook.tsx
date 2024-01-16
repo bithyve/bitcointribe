@@ -135,7 +135,6 @@ export default function AddContactAddressBook( props ) {
 
     if ( Platform.OS === 'android' ) {
       const granted = await requestContactsPermission()
-      //console.log('GRANTED', granted);
       if ( granted !== PermissionsAndroid.RESULTS.GRANTED ) {
         setErrorMessage( strings.cannotSelect )
         setErrModal( true )

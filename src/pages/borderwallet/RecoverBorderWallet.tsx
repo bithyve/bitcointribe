@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   SafeAreaView,
   StatusBar,
-  View,
+  View
 } from 'react-native'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
 import { Wallet } from '../../bitcoin/utilities/Interface'
@@ -15,9 +15,9 @@ import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
 import AlertModalContents from '../../components/AlertModalContents'
 import ErrorModalContents from '../../components/ErrorModalContents'
+import ModalContainer from '../../components/home/ModalContainer'
 import LoaderModal from '../../components/LoaderModal'
 import Toast from '../../components/Toast'
-import ModalContainer from '../../components/home/ModalContainer'
 import { restoreSeedWordFailed } from '../../store/actions/BHR'
 import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
@@ -120,7 +120,6 @@ const RecoverBorderWallet = ( props ) => {
     setLoaderModal( false )
     if ( seedRecovered )
       setTimeout( () => {
-        console.log( 'TIMEOUT' )
         setLoaderModal( true )
       }, 1000 )
   }
