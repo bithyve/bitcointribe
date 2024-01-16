@@ -1,26 +1,14 @@
 import { call, put } from 'redux-saga/effects'
 
 import {
-  accountSyncSuccess,
-  accountSyncFail,
-  getQuoteSuccess,
-  getQuoteFail,
-  executeOrderSuccess,
-  executeOrderFail,
-  getBalancesSuccess,
-  getBalancesFail,
-  ACCOUNT_SYNC,
-  GET_QUOTE,
-  EXECUTE_ORDER,
-  GET_BALANCES,
+  accountSyncFail, accountSyncSuccess, ACCOUNT_SYNC, executeOrderFail, executeOrderSuccess, EXECUTE_ORDER, getBalancesFail, getBalancesSuccess, getQuoteFail, getQuoteSuccess, GET_BALANCES, GET_QUOTE
 } from '../actions/fbtc'
 
-import { accountSync, getQuote, executeOrder } from '../../services/fbtc'
+import { accountSync, executeOrder, getQuote } from '../../services/fbtc'
 
 import { createWatcher } from '../utils/utilities'
 
 export function* accountSyncWorker( { payload } ) {
-  console.log( 'payload', payload.data )
   try{
     const result = yield call( accountSync, payload.data )
     //   let result = {
@@ -30,7 +18,6 @@ export function* accountSyncWorker( { payload } ) {
     //       "sell_bitcoins": true
     //     }
     // }
-    console.log( 'result', result )
     if ( !result || result.status !== 200 ) {
       const data={
         accountSyncFail: true,
@@ -42,7 +29,6 @@ export function* accountSyncWorker( { payload } ) {
       //   // has a trailing comma.
       //   // probably a bug but for now will use a simple method to parse it
       //   // this can be removed once this is verified by fast Bitcoins
-      //   console.log("result.data", result.data);
       if ( typeof result.data == 'string' ) {
         result.data = string2Json( result.data )
       }
@@ -57,7 +43,6 @@ export function* accountSyncWorker( { payload } ) {
     }
   }
   catch( err ){
-    console.log( 'err', err )
     const data={
       accountSyncFail: true,
       accountSyncFailMessage: 'Account sync fail'
@@ -72,11 +57,9 @@ export const accountSyncWatcher = createWatcher(
 )
 
 function* getQuoteWorker( { payload } ) {
-  console.log( 'payload.data', payload.data )
   try{
     const result = yield call( getQuote, payload.data )
     result.status = 200
-    console.log( 'result getQuoteWorker', result )
     if ( !result || result.status !== 200 ) {
       const data={
         getQuoteFail: true,
@@ -109,7 +92,6 @@ function* getQuoteWorker( { payload } ) {
     }
   }
   catch( err ){
-    console.log( 'err', err )
     const data={
       getQuoteFail: true,
       getQuoteFailMessage: 'Get Quote fail'
@@ -148,7 +130,6 @@ export function* executeOrderWorker( { payload } ) {
     }
   }
   catch( err ){
-    console.log( 'err', err )
     const data={
       executeOrderFail: true,
       executeOrderFailMessage: 'Order execution fail'
@@ -179,7 +160,6 @@ export const getBalancesWatcher = createWatcher(
 // temperory utility function may be removed later
 
 const string2Json = ( string ) => {
-  console.log( ' I am being used!!!!!' )
   if ( !string ) {
     return null
   }

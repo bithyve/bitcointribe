@@ -108,7 +108,6 @@ function* setupWalletWorker( { payload } ) {
   yield put( setRgbConfig( config ) )
   const isRgbInit = yield call( RGBServices.initiate, config.mnemonic, config.xpub  )
   if( isRgbInit ) yield put( syncRgb() )
-  console.log( 'isRgbInit', isRgbInit )
 }
 
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
@@ -151,7 +150,6 @@ function* resetPasswordWorker( { payload } ) {
     const oldSecurity =  {
       ...security
     }
-    console.log( oldSecurity )
     yield put( updateWallet( {
       ...wallet,
       security: payload
@@ -179,14 +177,12 @@ function* resetPasswordWorker( { payload } ) {
     yield put ( resetLevelsAfterPasswordChange() )
     yield put( setPasswordResetState( '' ) )
   } catch ( error ) {
-    console.log( error )
+    // error
   }
 }
 
 
 function* credentialsAuthWorker( { payload } ) {
-  // let t = timer('credentialsAuthWorker')
-  console.log( 'credentialsAuthWorker', )
 
   yield put( switchSetupLoader( 'authenticating' ) )
   let key
@@ -197,7 +193,6 @@ function* credentialsAuthWorker( { payload } ) {
     const uint8array =  yield call( Cipher.stringToArrayBuffer, key )
     yield call( dbManager.initDb, uint8array )
   } catch ( err ) {
-    console.log( 'err', err )
 
     if ( payload.reLogin ) yield put( switchReLogin( false ) )
     else yield put( credsAuthenticated( false ) )
@@ -269,9 +264,6 @@ function* changeAuthCredWorker( { payload } ) {
     }
     yield put( credsChanged( 'changed' ) )
   } catch ( err ) {
-    console.log( {
-      err
-    } )
     yield put( pinChangedFailed( true ) )
     // Alert.alert('Pin change failed!', err.message);
     yield put( credsChanged( 'not-changed' ) )
@@ -292,9 +284,6 @@ function* resetPinWorker( { payload } ) {
     }
     yield put( credsChanged( 'changed' ) )
   } catch ( err ) {
-    console.log( {
-      err
-    } )
     yield put( pinChangedFailed( true ) )
     // Alert.alert('Pin change failed!', err.message);
     yield put( credsChanged( 'not-changed' ) )

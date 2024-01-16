@@ -365,7 +365,6 @@ function* updateHealthLevel2Worker( { payload } ) {
     levelHealth.push( {
       levelInfo, level
     } )
-    console.log( 'INIT_LEVEL_TWO levelHealth', JSON.stringify( levelHealth ) )
     yield put( updateHealth( levelHealth, currentLevel, 'updateHealthLevel2Watcher' ) )
     if ( level == 2 ) yield put( isLevel2InitializedStatus() )
     if ( level == 3 ) yield put( isLevel3InitializedStatus() )
@@ -398,9 +397,6 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
   } catch ( err ) {
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
-    console.log( {
-      err: err.message
-    } )
     yield put( walletRecoveryFailed( true ) )
     // Alert.alert('Wallet recovery failed!', err.message);
   }
@@ -426,7 +422,6 @@ function* recoverWalletWithoutIcloudWorker( { payload } ) {
 
     const secondaryMnemonics = ''
     const image = yield call( BHROperations.fetchWalletImage, backupData.primaryMnemonicShard.meta.walletId )
-    console.log( image )
     yield call( recoverWalletWorker, {
       payload: {
         level: selectedBackup.levelStatus, answer, selectedBackup, image: image.data.walletImage, primaryMnemonic, secondaryMnemonics, isWithoutCloud: true
@@ -435,9 +430,6 @@ function* recoverWalletWithoutIcloudWorker( { payload } ) {
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
   } catch ( err ) {
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
-    console.log( {
-      err: err.message
-    } )
     yield put( walletRecoveryFailed( true ) )
     // Alert.alert('Wallet recovery failed!', err.message);
   }
@@ -517,7 +509,6 @@ function* recoverWalletWorker( { payload } ) {
       }
 
       const getWI = yield call( BHROperations.fetchWalletImage, image.walletId )
-      console.log( 'getWI', getWI )
       if ( getWI.status == 200 ) image = idx( getWI, _ => _.data.walletImage )
     }
     const accounts = image.accounts
@@ -617,7 +608,7 @@ function* recoverWalletWorker( { payload } ) {
         yield put( setVersionHistory( versionHistory ) )
       }
     } catch( err ){
-      console.log( 'Unable to set version history' )
+      // err
     }
 
     // RESTORE: Health
@@ -666,13 +657,11 @@ function* recoverWalletWorker( { payload } ) {
         storedVersion: backupVersion, newVersion: appVersion
       } )
   } catch ( err ) {
-    console.log( 'Error', err )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
     yield put( walletRecoveryFailed( true ) )
   }
 
   // RESTORE: notifications
-  console.log()
   yield put( fetchNotificationStarted( true ) )
   const timeStamp = yield select(
     ( state ) => state.notifications.timeStamp,
@@ -699,7 +688,6 @@ export function* cloudMetaShareWorker( { payload } ) {
   )
 
   let updatedBackup
-  console.log( 'PAYLOAD', payload )
   let updatedRecoveryShares = {
   }
   const updated = false
@@ -930,12 +918,11 @@ function* recoverMnemonicHealthWorker( { payload } ) {
     securityAns,
     isPrimary
   )
-  console.log( 'RECOVER_MNEMONIC_HEALTH mnemonic', mnemonic )
   if ( mnemonic ) {
     // TODO: recreate accounts and write to database
     yield put( mnemonicRecoveredHealth( mnemonic ) ) // storing in redux state (for demo)
   } else {
-    console.log( 'ERROR' )
+    // error
   }
 }
 
@@ -1004,7 +991,6 @@ function* getPDFDataWorker( { payload } ) {
       const pdfData = {
         qrData: qrData,
       }
-      console.log( 'Scan pdf data', pdfData )
       pdfPath = yield call(
         generatePDFKeeper,
         pdfData,
@@ -1022,7 +1008,6 @@ function* getPDFDataWorker( { payload } ) {
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
     yield put( pdfSuccessfullyCreated( false ) )
-    console.log( 'Error GET_PDF_DATA', error )
   }
 }
 
@@ -1037,7 +1022,6 @@ function* sharePDFWorker( { payload } ) {
     privateKey: string;
   } = yield select( ( state ) => state.bhr.pdfInfo )
   try {
-    console.log( 'pdfInfo', pdfInfo )
     if ( !pdfInfo.filePath ) throw new Error( 'Personal copy not found/generated' )
 
     const { security, walletName } = yield select(
@@ -1063,9 +1047,6 @@ function* sharePDFWorker( { payload } ) {
                 } ],
               },
               ( err, event ) => {
-                console.log( {
-                  event, err
-                } )
               // on delayed error (rollback the changes that happened post switch case)
               }
             )
@@ -1105,17 +1086,11 @@ function* sharePDFWorker( { payload } ) {
               PdfPassword.print,
               JSON.stringify( pdfDecr ),
               ( err: any ) => {
-                console.log( {
-                  err
-                } )
               // on delayed error (rollback the changes that happened post switch case)
               },
               async ( res: any ) => {
                 await RNPrint.print( {
                   filePath: 'file://' + res,
-                } )
-                console.log( {
-                  res
                 } )
               }
             )
@@ -1125,7 +1100,6 @@ function* sharePDFWorker( { payload } ) {
                 filePath: pdfInfo.filePath,
               } )
             } catch ( err ) {
-              console.log( err )
               throw new Error( `Print failed: ${err}` )
             }
           }
@@ -1160,9 +1134,6 @@ function* sharePDFWorker( { payload } ) {
 
     yield put( switchS3LoaderKeeper( 'pdfShare' ) )
   } catch ( err ) {
-    console.log( {
-      err
-    } )
     yield put( switchS3LoaderKeeper( 'pdfShare' ) )
   }
 }
@@ -1171,7 +1142,6 @@ export const sharePDFWatcher = createWatcher( sharePDFWorker, SHARE_PDF )
 
 function* confirmPDFSharedWorker( { payload } ) {
   try {
-    console.log( 'confirmPDFSharedWorker' )
     yield put( switchS3LoaderKeeper( 'pdfDataConfirm' ) )
     const { shareId, scannedData } = payload
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
@@ -1189,7 +1159,6 @@ function* confirmPDFSharedWorker( { payload } ) {
       shareIndex = oldMetaShare.findIndex( ( value ) => value.shareId == shareId )
     }
     const keeperInfo: KeeperInfoInterface = keeperInfos.find( value=>value.shareId == shareId )
-    console.log( 'keeperInfo', keeperInfo )
     const scannedObj:  {
       type: QRCodeTypes;
       walletName: string;
@@ -1201,12 +1170,8 @@ function* confirmPDFSharedWorker( { payload } ) {
       encryptedKey: string;
       walletId: string;
     } = JSON.parse( scannedData )
-    console.log( 'scannedData', scannedData )
-
-    console.log( 'scannedObj', scannedObj )
 
     const decryptedData = BHROperations.decryptWithAnswer( scannedObj.encryptedKey, answer ).decryptedData
-    console.log( 'decryptedData', decryptedData )
 
     if( decryptedData == shareId && scannedObj.walletId == walletId ){
       const shareObj = {
@@ -1228,7 +1193,6 @@ function* confirmPDFSharedWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'pdfDataConfirm' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'pdfDataConfirm' ) )
-    console.log( 'Error CONFIRM_PDF_SHARED', error )
   }
 }
 
@@ -1265,7 +1229,7 @@ function* updatedKeeperInfoWorker( { payload } ) {
     if ( !updatedExistingKeeperInfo ) keeperInfo.push( keeperDataToUpdate )
     yield put( putKeeperInfo( keeperInfo ) )  // updates keeperInfo variable @bhr-reducer
   } catch ( error ) {
-    console.log( 'Error updatedKeeperInfoWorker', error )
+    // error
   }
 }
 
@@ -1333,7 +1297,6 @@ export const deletePrivateDataWatcher = createWatcher(
 
 function* autoShareLevel2KeepersWorker( ) {
   try {
-    console.log( 'AUTO SHARE LEVEL 2 STARTED' )
     const currentLevel = yield select( ( state ) => state.bhr.currentLevel )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
@@ -1422,7 +1385,6 @@ function* autoShareLevel2KeepersWorker( ) {
     yield put( switchS3LoaderKeeper( 'autoShareKeepersData' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'autoShareKeepersData' ) )
-    console.log( 'Error autoShareLevel2KeepersWorker', error )
   }
 }
 
@@ -1480,7 +1442,6 @@ function* setLevelToNotSetupStatusWorker( ) {
     yield put( switchS3LoaderKeeper( 'setToBaseStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'setToBaseStatus' ) )
-    console.log( 'Error SET_LEVEL_TO_NOT_SETUP', error )
   }
 }
 
@@ -1536,7 +1497,6 @@ function* setHealthStatusWorker( ) {
     yield put( switchS3LoaderKeeper( 'healthExpiryStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'healthExpiryStatus' ) )
-    console.log( 'Error SET_HEALTH_STATUS', error )
   }
 }
 
@@ -1629,7 +1589,6 @@ function* createChannelAssetsWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
-    console.log( 'Error CREATE_CHANNEL_ASSETS', error )
   }
 }
 
@@ -1664,7 +1623,6 @@ function* downloadSMShareWorker( { payload } ) {
         }, secondaryChannelKey: qrDataObj.secondaryChannelKey
       } )
       if( res.secondaryData.secondaryMnemonicShard ) {
-        console.log( 'res.secondaryData.secondaryMnemonicShard', res.secondaryData.secondaryMnemonicShard )
         yield put( secondaryShareDownloaded( res.secondaryData.secondaryMnemonicShard ) )
         yield put( setApprovalStatus( true ) )
       }
@@ -1674,7 +1632,6 @@ function* downloadSMShareWorker( { payload } ) {
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'downloadSMShareLoader' ) )
     Toast( 'Network Error' )
-    console.log( 'Error DOWNLOAD_SM_SHARE', error )
   }
 }
 
@@ -1834,9 +1791,7 @@ function* createGuardianWorker( { payload } ) {
       } ) )
     }
   } catch ( error ) {
-    console.log(  {
-      error
-    } )
+  //  error
   }
 }
 
@@ -1927,7 +1882,6 @@ function* modifyLevelDataWorker( ss?:{ payload } ) {
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
-    console.log( 'Error MODIFY_LEVELDATA', error )
   }
 }
 
@@ -1967,7 +1921,6 @@ function* downloadBackupDataWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'downloadBackupDataStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'downloadBackupDataStatus' ) )
-    console.log( 'Error DOWNLOAD_BACKUP_DATA', error )
     Alert.alert( 'Invalid Key' )
   }
 }
@@ -2035,7 +1988,6 @@ function* setupHealthWorker( { payload } ) {
     if ( !isLevelInitialized ) {
       const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
       const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-      console.log( 'INIT_LEVEL_TWO levelHealth', levelHealth )
 
       const levelInfo: LevelInfo[] = [
         {
@@ -2080,8 +2032,6 @@ function* setupHealthWorker( { payload } ) {
       levelHealth.push( {
         levelInfo, level
       } )
-
-      console.log( 'INIT_LEVEL_TWO levelHealth', levelHealth )
       yield put( updateHealth( levelHealth, level, 'setupHealthWatcher' ) )
       if ( level == 2 ) yield put( isLevel2InitializedStatus() )
       if ( level == 3 ) {
@@ -2104,7 +2054,6 @@ export const setupHealthWatcher = createWatcher(
 
 function* updateKeeperInfoToChannelWorker( ) {
   try {
-    console.log( 'UPDATE KEEPER INFO' )
     yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
     const currentLevel = yield select( ( state ) => state.bhr.currentLevel )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.bhr.keeperInfo )
@@ -2189,7 +2138,6 @@ function* updateKeeperInfoToChannelWorker( ) {
     yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
-    console.log( 'Error UPDATE_KEEPER_INFO_TO_CHANNEL', error )
   }
 }
 
@@ -2299,7 +2247,6 @@ function* acceptExistingContactRequestWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
-    console.log( 'Error ACCEPT_EC_REQUEST', error )
   }
 }
 
@@ -2340,7 +2287,6 @@ function* setupPasswordWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'setupPasswordStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'setupPasswordStatus' ) )
-    console.log( 'Error setupPasswordStatus', error )
   }
 }
 
@@ -2449,7 +2395,6 @@ function* setupLevelHealthWorker( { payload } ) {
           name: keeperInfo[ 1 ] && keeperInfo[ 1 ].name ? keeperInfo[ 1 ].name : '',
         },
       ]
-      console.log( 'SETUP_LEVEL_HEALTH levelInfo', levelInfo )
       yield put( updateHealth( [ {
         level: 1,
         levelInfo: levelInfo,
@@ -2507,7 +2452,6 @@ function* setupLevelHealthWorker( { payload } ) {
         levelHealth.push( {
           levelInfo, level
         } )
-        console.log( 'SETUP_LEVEL_HEALTH levelInfo', levelInfo )
         yield put( updateHealth( levelHealth, level, 'SETUP_LEVEL_HEALTH' ) )
         if ( level == 2 ) yield put( isLevel2InitializedStatus() )
         if ( level == 3 ) {
@@ -2518,7 +2462,6 @@ function* setupLevelHealthWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'initLoader' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'initLoader' ) )
-    console.log( 'Error setupPasswordStatus', error )
   }
 }
 
@@ -2609,7 +2552,6 @@ function* retrieveMetaSharesWorker( { payload } ) {
     yield put( switchS3LoaderKeeper( 'restoreMetaSharesStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'restoreMetaSharesStatus' ) )
-    console.log( 'RETRIEVE_METASHRES error', error )
   }
 }
 
@@ -2688,7 +2630,7 @@ function* onPressKeeperChannelWorker( { payload } ) {
       }
     }
   } catch ( error ) {
-    console.log( error )
+    // error
   }
 }
 
@@ -2700,7 +2642,6 @@ export const onPressKeeperChannelWatcher = createWatcher(
 
 function* updateSecondaryShardWorker( { payload } ) {
   try {
-    console.log( 'payload update SS', payload )
     yield put( switchS3LoaderKeeper( 'updateSecondaryShardStatus' ) )
     const { scannedData } = payload
     if( scannedData ) {
@@ -2759,7 +2700,6 @@ function* updateSecondaryShardWorker( { payload } ) {
     yield put ( setOpenToApproval( false, [], null ) )
     Toast( 'Scan correct QR or Try again in some time' )
     yield put( switchS3LoaderKeeper( 'updateSecondaryShardStatus' ) )
-    console.log( 'Error UPDATE_SECONDARY_SHARD', error )
   }
 }
 
@@ -2919,7 +2859,7 @@ function* changeEncPasswordWorker( { payload } ) {
     }
 
   } catch ( error ) {
-    console.log( 'CHANGE_QUESTION_ANSWER Error', error )
+    // error
   }
 }
 
@@ -2937,7 +2877,6 @@ function* rejectedExistingContactRequestWorker( { payload } ) {
   const KeeperInfoElement: KeeperInfoInterface = {
     ...keeperInfo.find( value=>value.channelKey == channelKey )
   }
-  console.log( 'contacts[ channelKey ]', contacts )
   if( contacts && contacts[ channelKey ] && contacts[ channelKey ].isActive && contacts[ channelKey ].unencryptedPermanentChannel && contacts[ channelKey ].unencryptedPermanentChannel[ TrustedContactsOperations.getStreamId( walletId ) ] && contacts[ channelKey ].unencryptedPermanentChannel[ TrustedContactsOperations.getStreamId( walletId ) ].primaryData.relationType == TrustedContactRelationTypes.CONTACT ) return
   if( KeeperInfoElement ){
 
@@ -3098,7 +3037,6 @@ function* changeQuestionAnswerWorker( { payload } ) {
     }
     yield put( switchS3LoaderKeeper( 'changeAnswerStatus' ) )
   } catch ( error ) {
-    console.log( 'CHANGE_QUESTION_ANSWER Error', error )
     yield put( switchS3LoaderKeeper( 'changeAnswerStatus' ) )
   }
 }
@@ -3126,7 +3064,7 @@ function* upgradePDFWorker( ) {
       yield put( updateMSharesHealth( shareObj, false ) )
     }
   } catch ( error ) {
-    console.log( 'UPGRADE_PDF Error', error )
+    // error
   }
 }
 
@@ -3226,7 +3164,7 @@ function* upgradeLevelOneKeeperWorker( ) {
       }
     }
   } catch ( error ) {
-    console.log( 'UPGRADE_PDF Error', error )
+    // error
   }
 }
 

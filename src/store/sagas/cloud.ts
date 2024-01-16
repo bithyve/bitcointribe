@@ -1,18 +1,16 @@
+import idx from 'idx'
 import moment from 'moment'
 import { NativeModules, Platform } from 'react-native'
-import { call, delay, put, select, race } from 'redux-saga/effects'
-import { WIEncryption, getLevelInfo } from '../../common/CommonFunctions'
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
-import { UPDATE_HEALTH_FOR_CLOUD, setCloudErrorMessage, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, setCloudBackupStatus, setCloudBackupHistory, UPDATE_CLOUD_BACKUP, setGoogleLoginCancelled } from '../actions/cloud'
-import { putKeeperInfo, updatedKeeperInfo, updateMSharesHealth } from '../actions/BHR'
-import { createWatcher } from '../utils/utilities'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { Accounts, KeeperInfoInterface, KeeperType, LevelHealthInterface, LevelInfo, MetaShare, ShareSplitScheme, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
-import * as bip39 from 'bip39'
-import { getiCloudErrorMessage, getGoogleDriveErrorMessage } from '../../utils/CloudErrorMessage'
+import { call, delay, put, race, select } from 'redux-saga/effects'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
+import { Accounts, KeeperInfoInterface, KeeperType, LevelHealthInterface, LevelInfo, MetaShare, ShareSplitScheme, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
+import { WIEncryption } from '../../common/CommonFunctions'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import dbManager from '../../storage/realm/dbManager'
-import idx from 'idx'
+import { getGoogleDriveErrorMessage, getiCloudErrorMessage } from '../../utils/CloudErrorMessage'
+import { putKeeperInfo, updatedKeeperInfo, updateMSharesHealth } from '../actions/BHR'
+import { CHECK_CLOUD_BACKUP, CHECK_IF_FILE_AVAILABLE, CREATE_FILE, GET_CLOUD_DATA_RECOVERY, GOOGLE_DRIVE_LOGIN, READ_FILE, setCloudBackupHistory, setCloudBackupStatus, setCloudDataRecovery, setCloudErrorMessage, setGoogleCloudLoginFailure, setGoogleCloudLoginSuccess, setGoogleLoginCancelled, setIsCloudBackupSuccess, setIsCloudBackupUpdated, setIsFileReading, SET_CLOUD_DATA, UPDATE_CLOUD_BACKUP, UPDATE_CLOUD_HEALTH, UPDATE_DATA, UPDATE_HEALTH_FOR_CLOUD, UPLOAD_FILE } from '../actions/cloud'
+import { createWatcher } from '../utils/utilities'
 const GoogleDrive = NativeModules.GoogleDrive
 const iCloud = NativeModules.iCloud
 
@@ -101,7 +99,6 @@ function* cloudWorker( { payload } ) {
         versionHistory,
         restoreVersions,
       )
-      // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
       const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
       let encryptedSeed = ''
       if( !shares ){
@@ -193,7 +190,6 @@ function* cloudWorker( { payload } ) {
   }
   catch ( error ) {
     yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
-    console.log( 'ERROR cloudWorker', error )
   }
 }
 
@@ -221,7 +217,6 @@ function* updateHealthForCloudStatusWorker( { payload } ) {
   }
   catch ( error ) {
     yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
-    console.log( 'ERRORsf', error )
   }
 }
 
@@ -280,7 +275,6 @@ function* updateHealthForCloudWorker( { payload } ) {
   }
   catch ( error ) {
     yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
-    console.log( 'ERRORsf', error )
     throw error
   }
 }
@@ -352,7 +346,6 @@ function* checkCloudBackupWorker ( { payload } ) {
         yield put( setIsCloudBackupUpdated( res.status ) )
         return res
       } else {
-        console.log( 'createFile' )
         const isCloudBackupSuccess = yield call( createFileWorker, {
           payload:{
             data, share
@@ -375,7 +368,6 @@ function* checkCloudBackupWorker ( { payload } ) {
 
     }
   } catch( error ){
-    console.log( 'CloudDataBackup error', error )
     throw new Error( error )
   }
 }
@@ -389,17 +381,13 @@ function* GoogleDriveLoginWorker ( { payload } ) {
   try {
     const { checkDataIsBackedup, share, googlePermissionCall, data } = payload
     const result = yield call ( GoogleDrive.setup )
-    console.log( 'result', result )
 
     let googleLoginResult
     if( result ){
       googleLoginResult = yield call( GoogleDrive.login )
-      console.log( 'googleLoginResult', googleLoginResult )
       if( googleLoginResult ){
         const result = googleLoginResult
         if ( !googlePermissionCall ){
-          console.log( 'eventName', result )
-
           if ( result.eventName == 'onLogin' ) {
             yield put( setGoogleCloudLoginSuccess( true ) )
             const fileAvailabelStatus =  yield call( checkFileIsAvailableWorker, {
@@ -409,24 +397,20 @@ function* GoogleDriveLoginWorker ( { payload } ) {
                 data
               }
             } )
-            console.log( 'fileAvailabelStatus', fileAvailabelStatus )
 
             return fileAvailabelStatus
           } else{
             const message = getGoogleDriveErrorMessage( result.code )
             yield put( setCloudErrorMessage( message ) )
             yield put( setGoogleLoginCancelled( true ) )
-            console.log( 'GOOGLE SetupFail else', result )
             yield put( setGoogleCloudLoginFailure( true ) )
             throw new Error( 'Google LoginFail' )
           }
         }
         else{
-          console.log( 'GOOGLE ReSULT GoogleDriveLogin', result )
           if ( result.eventName === 'onLogin' ) {
             yield put( setGoogleCloudLoginSuccess( true ) )
           } else{
-            console.log( 'GOOGLE SetupFail else', result )
             yield put( setGoogleCloudLoginFailure( true ) )
             const message = getGoogleDriveErrorMessage( result.code )
             yield put( setCloudErrorMessage( message ) )
@@ -434,10 +418,8 @@ function* GoogleDriveLoginWorker ( { payload } ) {
           }
         }
       }
-      console.log( 'googleLoginResult', googleLoginResult )
     }
   } catch ( error ) {
-    console.log( 'LOGIN error', error )
     yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     yield put( setGoogleCloudLoginFailure( true ) )
     throw new Error( error )
@@ -496,12 +478,10 @@ function* updateDataWorker( { payload } ) {
       if ( Platform.OS == 'ios' ) {
         if( newArray.length ) {
           const result = yield call( iCloud.startBackup, JSON.stringify( newArray )  )
-          console.log( 'startBackup result', result )
           return result
         }
 
       }
-      // console.log('Platform.OS share', share)
     } else {
       const metaData = {
         name: googleData.name,
@@ -510,7 +490,6 @@ function* updateDataWorker( { payload } ) {
         id: googleData.id,
       }
       const result = yield call( GoogleDrive.updateFile, JSON.stringify( metaData )  )
-      console.log( 'Google Drive.updateFile result', result )
       if ( result.eventName == 'successFullyUpdate' ) {
         return 'successFullyUpdate'
         //this.callBack( share )
@@ -520,14 +499,11 @@ function* updateDataWorker( { payload } ) {
         yield put( setCloudErrorMessage( message ) )
         throw new Error( result.eventName )
       }
-      console.log( 'Google Drive.updateFile', result )
 
     }
-    console.log( 'newArray', newArray )
   }
   catch ( error ) {
     yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
-    console.log( 'ERRORsf', error )
     throw error
   }
 }
@@ -572,7 +548,6 @@ function* createFileWorker( { payload } ) {
       }
 
       const result = yield call( GoogleDrive.uploadFile, JSON.stringify( metaData ) )
-      console.log( 'result GoogleDrive.uploadFile', result )
       if ( result && result.eventName == 'successFullyUpload' ) {
         return result.eventName
         // this.callBack( share )
@@ -608,11 +583,9 @@ function* checkFileIsAvailableWorker( { payload } ) {
     }
     const result = yield call ( GoogleDrive.checkIfFileExist, JSON.stringify( metaData ) )
 
-    console.log( 'result checkFileIsAvailableWorker', result )
     if( !result ) return null
     if ( !checkDataIsBackedup ) {
       if ( result && result.eventName == 'listEmpty' ) {
-        console.log( 'createFile' )
         const createFileStatus = yield call ( createFileWorker, {
           payload: {
             share, data
@@ -620,13 +593,11 @@ function* checkFileIsAvailableWorker( { payload } ) {
         } )
         return createFileStatus
       } else if ( result.eventName == 'failure' ) {
-        console.log( 'FAILURE' )
         const message = getGoogleDriveErrorMessage( result.code )
         yield put( setCloudErrorMessage( message ) )
         throw new Error( result.eventName )
       } else if( result.eventName === 'UseUserRecoverableAuthIOException' )
       {
-        console.log( 'UseUserRecoverableAuthIOException Failure' )
         const fileAvailabelStatus = yield call( checkFileIsAvailableWorker, {
           payload: {
             share,
@@ -668,13 +639,11 @@ function* readFileWorker( { payload } ) {
   }
   const isFileReading = yield select( ( state ) => state.cloud.isFileReading )
 
-  console.log( 'isFileReading readFile', isFileReading )
   try {
     if ( isFileReading === false ) {
       yield put( setIsFileReading( true ) )
       const result1 = yield call ( GoogleDrive.readFile, JSON.stringify( metaData )  )
       const readResult = result1.data
-      //console.log( 'readResult', readResult )
       if ( checkDataIsBackedup ) {
         yield put( setIsFileReading( false ) )
         yield put( setCloudDataRecovery( readResult ) )
@@ -690,7 +659,6 @@ function* readFileWorker( { payload } ) {
 
     }
   } catch ( error ) {
-    console.log( 'error', error )
     yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     yield put( setIsFileReading( false ) )
     throw new Error( error )
@@ -711,7 +679,6 @@ function* uplaodFileWorker( { payload } ) {
     const newArray = []
     if ( readResult ) {
       arr = JSON.parse( readResult )
-      // console.log( 'arr', arr )
       if ( arr && arr.length ) {
         for ( let i = 0; i < arr.length; i++ ) {
           newArray.push( arr[ i ] )
@@ -746,13 +713,11 @@ function* uplaodFileWorker( { payload } ) {
         newArray[ index ].secondaryShare = data.secondaryShare
         newArray[ index ].bhXpub = data.bhXpub
       }
-      console.log( 'ARR', newArray )
       if ( Platform.OS == 'ios' ) {
         if( newArray.length ) {
           const result = yield call( iCloud.startBackup, JSON.stringify( newArray ) )
           return result
         }
-        // console.log('Platform.OS share', share)
       } else {
         const metaData = {
           name: googleData.name,
@@ -770,7 +735,6 @@ function* uplaodFileWorker( { payload } ) {
           yield put( setCloudErrorMessage( message ) )
           throw new Error( result.eventName )
         }
-        console.log( 'Google Drive.updateFile', result )
       }
     }
 

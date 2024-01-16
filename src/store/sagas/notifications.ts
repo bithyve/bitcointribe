@@ -1,22 +1,9 @@
 import { call, put, select } from 'redux-saga/effects'
-import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
-import { createWatcher } from '../utils/utilities'
-import {
-  UPDATE_FCM_TOKENS,
-  SEND_NOTIFICATION,
-  FETCH_NOTIFICATIONS,
-  notificationsFetched,
-  fetchNotificationStarted,
-  GET_MESSAGES,
-  storeMessagesTimeStamp,
-  messageFetched,
-  UPDATE_MESSAGES_STATUS_INAPP,
-  UPDATE_MESSAGES_STATUS,
-  NOTIFICATION_PRESSED,
-} from '../actions/notifications'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import moment from 'moment'
 import Relay from '../../bitcoin/utilities/Relay'
+import {
+  fetchNotificationStarted, FETCH_NOTIFICATIONS, GET_MESSAGES, messageFetched, notificationsFetched, NOTIFICATION_PRESSED, storeMessagesTimeStamp, UPDATE_FCM_TOKENS, UPDATE_MESSAGES_STATUS, UPDATE_MESSAGES_STATUS_INAPP
+} from '../actions/notifications'
+import { createWatcher } from '../utils/utilities'
 
 
 function* updateFCMTokensWorker( { payload } ) {
@@ -33,9 +20,8 @@ function* updateFCMTokensWorker( { payload } ) {
       walletId,
       payload.FCMs,
     )
-    if ( !updated ) console.log( 'Failed to update FCMs on the server' )
   } catch( err ){
-    console.log( 'err', err )
+    //
   }
 }
 
@@ -97,7 +83,6 @@ export function* updateMessageStatusInAppWorker( { payload } ) {
       ...message, 'status': 'read',
     }: message
   ) )
-  console.log( 'messageArray', messageArray )
   yield put( messageFetched( messageArray ) )
 }
 
@@ -119,10 +104,9 @@ export function* updateMessageStatusWorker( { payload } ) {
       walletId,
       data,
     )
-    if ( !updated ) console.log( 'Failed to update messageStatus on the server' )
 
   } catch( err ){
-    console.log( 'err', err )
+    // error
   }
 }
 
@@ -131,19 +115,18 @@ export const updateMessageStatusWatcher = createWatcher(
   UPDATE_MESSAGES_STATUS,
 )
 
-export function* pushNotificationPressedWorker( {payload} ) {
-  console.log("PRESED_PAYLOAD", payload);
-  yield call(getMessageWorker)
-  const data = yield select((state) => state.notifications.messages)
+export function* pushNotificationPressedWorker( { payload } ) {
+  yield call( getMessageWorker )
+  const data = yield select( ( state ) => state.notifications.messages )
 
   const msg = []
-  for (const k of data) {
-    if (k.notificationId === payload.notificationId) {
-      msg.push(k)
+  for ( const k of data ) {
+    if ( k.notificationId === payload.notificationId ) {
+      msg.push( k )
     }
   }
 
-  payload.handleClick(msg[0]);
+  payload.handleClick( msg[ 0 ] )
 }
 
 export const pushNotificationPressedWatcher = createWatcher(
