@@ -75,6 +75,7 @@ import {
 import { AccountsState } from '../reducers/accounts'
 import { createWatcher } from '../utils/utilities'
 import { generateGiftLink, getNextFreeAddressWorker, setup2FADetails } from './accounts'
+import { updateGiftLoading } from '../actions/doNotStore'
 
 function* generateSecondaryAssets(){
   const secondaryMnemonic = bip39.generateMnemonic( )
@@ -182,6 +183,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
     if( channelAddress === storedGifts[ giftId ].channelAddress ) {
       if( storedGifts[ giftId ].sender.walletId == wallet.walletId ) Toast( 'You are the owner of this gift' )
       else Toast( 'Gift already exists' )
+      yield put( updateGiftLoading() )
       return
     }
   }
@@ -208,16 +210,19 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
               Toast( 'Gift already expired' )
               break
         }
+        yield put( updateGiftLoading() )
         return
       }
     }
   } catch( err ){
     Toast( 'Gift expired/unavailable' )
+    yield put( updateGiftLoading() )
     return
   }
 
   if( exclusiveGiftCodes && exclusiveGiftCodes[ giftMetaData.exclusiveGiftCode ] ){
     Toast( 'This gift is part of an exclusive giveaway. Cannot be claimed more than once' )
+    yield put( updateGiftLoading() )
     return
   }
 
@@ -264,6 +269,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
     }
   } else {
     console.log( 'Meta data update failed for gift:', gift.id )
+    yield put( updateGiftLoading() )
   }
 }
 
@@ -359,6 +365,7 @@ function* reclaimGiftWorker( { payload }: {payload: { giftId: string}} ) {
 
     if( giftMetaData.status === GiftStatus.RECLAIMED ) Toast( 'Gift reclaimed' )
     if( giftMetaData.status === GiftStatus.ACCEPTED ) Toast( 'Gift already accepted' )
+    yield put( updateGiftLoading() )
   }
 }
 

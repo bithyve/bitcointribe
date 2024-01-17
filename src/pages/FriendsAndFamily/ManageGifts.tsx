@@ -487,9 +487,11 @@ const ManageGifts = ( props ) => {
         </TouchableOpacity>
         } */}
         <Text style={styles.flatlistHeader}>
-          {active === GiftStatus.CREATED && 'Available Gifts'}
-          {active === GiftStatus.SENT && 'Sent Gifts'}
+          {active === GiftStatus.CREATED?'Available Gifts':active === GiftStatus.SENT?'Sent Gifts':'Expired Gifts'}
         </Text>
+        {giftsArr?.[ `${active}` ].length==0 && <Text style={styles.flatlistHeaderNote}>
+          {active === GiftStatus.CREATED?'No gifts are available for claiming.':active === GiftStatus.SENT?'No gifts to display. Try creating new gifts to share with your loved ones.':'All gifts that are not accepted within 7 days will be listed here.'}
+        </Text>}
         <FlatList
           // extraData={selectedDestinationID}
           refreshControl={
@@ -858,7 +860,9 @@ const styles = StyleSheet.create( {
     color:Colors.textColorGrey,
     marginBottom:10,
     marginLeft:20,
-    fontFamily:Fonts.Medium
+    marginTop:10,
+    fontFamily:Fonts.Medium,
+    lineHeight:RFValue( 17 )
   }
 } )
 
