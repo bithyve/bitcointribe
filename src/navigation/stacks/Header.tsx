@@ -361,18 +361,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   navigateToQRScreen = () => {
-    this.props.navigation.navigate( 'HomeNav', {
-      screen: this.props.route.name,
+    this.props.navigation.navigate( 'App', {
+      screen: 'QRRoot',
       params: {
-        screen: 'QRScanner',
-        params: {
-          screen: 'QRRoot',
-          params: {
-            onCodeScanned:  this.onCodeScanned,
-          }
-        }
-      }
-    } )
+        onCodeScanned:  this.onCodeScanned,
+      },
+    }
+    )
   };
 
   onPressNotifications = async () => {
@@ -1221,7 +1216,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             case DeepLinkEncryptionType.DEFAULT:
               decryptionKey = giftRequest.encryptedChannelKeys
               break
-
             case DeepLinkEncryptionType.OTP:
             case DeepLinkEncryptionType.LONG_OTP:
             case DeepLinkEncryptionType.SECRET_PHRASE:

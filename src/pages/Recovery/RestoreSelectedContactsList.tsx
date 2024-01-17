@@ -213,8 +213,7 @@ export default function RestoreSelectedContactsList( props ) {
           props.navigation.dispatch( CommonActions.reset( {
             index: 0,
             routes: [ {
-              name: 'HomeNav',
-              key: 'HomeKey'
+              name: 'App',
             } ],
           } ) )
         }}
@@ -321,8 +320,7 @@ export default function RestoreSelectedContactsList( props ) {
         props.navigation.dispatch( CommonActions.reset( {
           index: 0,
           routes: [ {
-            name: 'HomeNav',
-            key: 'HomeKey'
+            name: 'App',
           } ],
         } ) )
       }
@@ -335,8 +333,7 @@ export default function RestoreSelectedContactsList( props ) {
       props.navigation.dispatch( CommonActions.reset( {
         index: 0,
         routes: [ {
-          name: 'HomeNav',
-          key: 'HomeKey',
+          name: 'App',
           params: {
             exchangeRates,
           }

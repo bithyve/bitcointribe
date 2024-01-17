@@ -329,8 +329,7 @@ class RestoreWithICloud extends Component<
       this.props.navigation.dispatch( CommonActions.reset( {
         index: 0,
         routes: [ {
-          name: 'HomeNav',
-          key: 'HomeKey'
+          name: 'App',
         } ],
       } ) )
     }
@@ -1192,8 +1191,7 @@ class RestoreWithICloud extends Component<
               this.props.navigation.dispatch( CommonActions.reset( {
                 index: 0,
                 routes: [ {
-                  name: 'HomeNav',
-                  key: 'HomeKey'
+                  name: 'App',
                 } ],
               } ) )
             }}
@@ -1204,8 +1202,7 @@ class RestoreWithICloud extends Component<
               this.props.navigation.dispatch( CommonActions.reset( {
                 index: 0,
                 routes: [ {
-                  name: 'HomeNav',
-                  key: 'HomeKey'
+                  name: 'App',
                 } ],
               } ) )
             }}

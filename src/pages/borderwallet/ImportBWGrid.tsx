@@ -58,7 +58,7 @@ const ImportBWGrid = ( props ) => {
       dispatch( completedWalletSetup() )
       AsyncStorage.setItem( 'walletRecovered', 'true' )
       dispatch( setVersion( 'Restored' ) )
-      props.navigation.navigate( 'HomeNav' )
+      props.navigation.navigate( 'App' )
     }
   }, [ wallet ] )
 

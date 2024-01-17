@@ -246,16 +246,14 @@ export default function Login( props ) {
           props.navigation.dispatch( CommonActions.reset( {
             index: 0,
             routes: [ {
-              name: 'HomeNav',
-              key: 'HomeKey'
+              name: 'App',
             } ],
           } ) )
         } else if( processedLink ){
           props.navigation.dispatch( CommonActions.reset( {
             index: 0,
             routes: [ {
-              name: 'HomeNav',
-              key: 'HomeKey',
+              name: 'App',
               params: {
                 trustedContactRequest: processedLink.trustedContactRequest,
                 giftRequest: processedLink.giftRequest,

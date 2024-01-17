@@ -84,8 +84,7 @@ const NewWalletName: React.FC<Props> = ( { route, navigation }: Props ) => {
       navigation.dispatch( CommonActions.reset( {
         index: 0,
         routes: [ {
-          name: 'HomeNav',
-          key: 'HomeKey',
+          name: 'App',
           params: {
             walletName
           }

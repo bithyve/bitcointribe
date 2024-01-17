@@ -62,8 +62,7 @@ const RestoreSeedWordsContent = ( props ) => {
       props.navigation.dispatch( CommonActions.reset( {
         index: 0,
         routes: [ {
-          name: 'HomeNav',
-          key: 'HomeKey'
+          name: 'App',
         } ],
       } ) )
     }
