@@ -42,7 +42,8 @@ function LoginStack() {
   const Stack = createNativeStackNavigator()
   return (
     <Stack.Navigator screenOptions={{
-      headerShown: false
+      headerShown: false,
+      ...defaultStackScreenNavigationOptions,
     }}>
       <Stack.Screen name="Launch" component={Launch} />
       <Stack.Screen name="Login" component={Login} />
