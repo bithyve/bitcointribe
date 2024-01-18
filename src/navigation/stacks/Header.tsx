@@ -716,7 +716,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   handleDeepLinking = async ( url ) => {
-    console.log( 'ASkljc', url )
     if ( url === null ) return
     if( this.props.linkingURL.trim() === url.trim() ) return
     this.props.updateLinkingURL( url )
@@ -775,10 +774,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   componentDidMount = async() => {
-    console.log( 'ASkljc a',this.props.shouldListen )
-    console.log( 'ASkljc cs',this.props.route )
-    console.log( 'ASkljc sc',this.props.navigation )
-
     if( !this.props.shouldListen ){
       return
     }
