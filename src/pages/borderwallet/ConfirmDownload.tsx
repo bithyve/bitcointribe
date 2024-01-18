@@ -50,9 +50,11 @@ const ConfirmDownload = ( props ) => {
       setTimeout( ()=>{
         props.navigation.dispatch( CommonActions.reset( {
           index: 0,
-          routes: [ {
-            name: 'App',
-          } ],
+          routes: [
+            {
+              name: 'App'
+            }
+          ],
         } ) )
       }, 3000 )
     }

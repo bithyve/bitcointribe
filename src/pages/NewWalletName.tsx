@@ -82,13 +82,15 @@ const NewWalletName: React.FC<Props> = ( { route, navigation }: Props ) => {
     if ( walletSetupCompleted ) {
       setLoaderModal( false )
       navigation.dispatch( CommonActions.reset( {
-        index: 0,
-        routes: [ {
-          name: 'App',
-          params: {
-            walletName
-          }
-        } ]
+        index: 1,
+        routes: [
+          {
+            name: 'App',
+            params: {
+              walletName
+            }
+          },
+        ]
       } ) )
     }
   }, [ walletSetupCompleted, cloudBackupStatus ] )

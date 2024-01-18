@@ -243,26 +243,19 @@ export default function Login( props ) {
       } else {
         setloaderModal( false )
         if( !creationFlag ) {
-          props.navigation.dispatch( CommonActions.reset( {
-            index: 0,
-            routes: [ {
-              name: 'App',
-            } ],
-          } ) )
+          props.navigation.replace( 'App', {
+            screen:'Home'
+          } )
         } else if( processedLink ){
-          props.navigation.dispatch( CommonActions.reset( {
-            index: 0,
-            routes: [ {
-              name: 'App',
-              params: {
-                trustedContactRequest: processedLink.trustedContactRequest,
-                giftRequest: processedLink.giftRequest,
-                swanRequest: processedLink.swanRequest,
-              }
-            } ],
-          } ) )
+          props.navigation.replace( 'App', {
+            screen: 'Home',
+            params: {
+              trustedContactRequest: processedLink.trustedContactRequest,
+              giftRequest: processedLink.giftRequest,
+              swanRequest: processedLink.swanRequest,
+            }
+          } )
         }
-
         bootStrapNotifications()
       }
     }

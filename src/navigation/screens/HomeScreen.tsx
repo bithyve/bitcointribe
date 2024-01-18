@@ -50,7 +50,7 @@ function HomeScreen( { navigation } ) {
 
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName="HomeTab"
       tabBar={GradientTab}
       backBehavior='none'
       screenOptions={( { route, navigation } ) => {
@@ -59,7 +59,7 @@ function HomeScreen( { navigation } ) {
         for( const route of homeNavRoutes || [] ) {
           if ( route.state?.routes?.length > 1 ) showContent = false
         }
-        const shouldListen = route.name === 'Home'
+        const shouldListen = route.name === 'HomeTab'
         return ( {
           header: () => {
             return <Header showContent={true} route={route} navigation={navigation} shouldListen={shouldListen}/>
@@ -70,7 +70,7 @@ function HomeScreen( { navigation } ) {
           }
         } )}}
     >
-      <Tab.Screen name="Home" component={Home}
+      <Tab.Screen name="HomeTab" component={Home}
         options={{
           tabBarIcon: ( { focused } ) => (
             <View style={{

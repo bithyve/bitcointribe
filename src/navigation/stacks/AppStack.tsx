@@ -191,7 +191,7 @@ function AppStack() {
     }}>
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Launch" component={Launch} />
-      <Stack.Screen name="LNAccountDetails" component={LNAccountDetails} options={{ //look into this
+      <Stack.Screen name="LNAccountDetails" component={LNAccountDetails} options={{
         headerShown: false
       }} />
       <Stack.Screen name="ReLogin" component={ReLogin} options={{

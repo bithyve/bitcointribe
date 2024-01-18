@@ -319,9 +319,11 @@ export default function RestoreSelectedContactsList( props ) {
         dispatch( walletCheckIn() )
         props.navigation.dispatch( CommonActions.reset( {
           index: 0,
-          routes: [ {
-            name: 'App',
-          } ],
+          routes: [
+            {
+              name: 'App',
+            }
+          ],
         } ) )
       }
     } )()
@@ -332,12 +334,14 @@ export default function RestoreSelectedContactsList( props ) {
       ( loaderBottomSheet as any ).current.snapTo( 0 )
       props.navigation.dispatch( CommonActions.reset( {
         index: 0,
-        routes: [ {
-          name: 'App',
-          params: {
-            exchangeRates,
+        routes: [
+          {
+            name: 'App',
+            params: {
+              exchangeRates,
+            }
           }
-        } ],
+        ],
       } ) )
     }
   }, [ accounts.accountsSynched ] )

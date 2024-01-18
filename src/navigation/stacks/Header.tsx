@@ -699,21 +699,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // deep link is opened, we will navigate back to Home first.
     if ( !isFocused )
       navigation.dispatch(
-        CommonActions.reset( {
+        this.props.navigation.dispatch( CommonActions.reset( {
           index: 0,
-          routes: [ {
-            name: 'Home',
-            params: {
-              unhandledDeepLinkURL: url
+          routes: [
+            {
+              name: 'Home',
+              params: {
+                unhandledDeepLinkURL: url
+              }
             }
-          } ],
-        } )
+          ],
+        } ) )
       )
     else this.handleDeepLinking( url )
   };
 
 
   handleDeepLinking = async ( url ) => {
+    console.log( 'ASkljc', url )
     if ( url === null ) return
     if( this.props.linkingURL.trim() === url.trim() ) return
     this.props.updateLinkingURL( url )
@@ -772,6 +775,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   componentDidMount = async() => {
+    console.log( 'ASkljc a',this.props.shouldListen )
+    console.log( 'ASkljc cs',this.props.route )
+    console.log( 'ASkljc sc',this.props.navigation )
+
     if( !this.props.shouldListen ){
       return
     }
@@ -1140,7 +1147,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               isCurrentLevel0
             } )
             // TODO: navigate post approval (from within saga)
-            navigation.navigate( 'App' )
+            navigation.navigate( 'Home' )
             if ( trustedContactRequest.isContactGift ) {
               this.setState( {
                 trustedContactRequest: {

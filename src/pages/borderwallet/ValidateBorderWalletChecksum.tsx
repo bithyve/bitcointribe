@@ -97,9 +97,11 @@ const ValidateBorderWalletChecksum = ( props ) => {
       //TO-DO-BW
       props.navigation.dispatch( CommonActions.reset( {
         index: 0,
-        routes: [ {
-          name: 'App',
-        } ]
+        routes: [
+          {
+            name: 'Home'
+          }
+        ],
       } ) )
       // props.navigation.navigate( 'Home' )
     } else {
