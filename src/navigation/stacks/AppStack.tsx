@@ -14,6 +14,7 @@ import ConfirmDownload from '../../pages/borderwallet/ConfirmDownload'
 import ReassignTransactionsMainOptionsScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/MainOptionsScreen'
 import CreatePassPhrase from '../../pages/borderwallet/CreatePassPhrase'
 import CreateWithBorderWallet from '../../pages/borderwallet/CreateWithBorderWallet'
+import SmallNavHeaderCloseButton from '../../components/navigation/SmallNavHeaderBackButton'
 import DownloadEncryptGrid from '../../pages/borderwallet/DownloadEncryptGrid'
 import ImportWalletPassphrase from '../../pages/borderwallet/ImportWalletPassphrase'
 import PreviewPattern from '../../pages/borderwallet/PreviewPattern'
@@ -176,6 +177,7 @@ import MoreOptionsContainerScreen from '../../pages/MoreOptions/MoreOptionsConta
 import AccountManagementContainerScreen from '../../pages/MoreOptions/AccountManagement/AccountManagementContainerScreen'
 import RestoreSelectedContactsList from '../../pages/Recovery/RestoreSelectedContactsList'
 import NewRecoveryOwnQuestions from '../../pages/Recovery/NewRecoveryOwnQuestions'
+import defaultStackScreenNavigationOptions from '../options/DefaultStackScreenNavigationOptions'
 
 
 
@@ -186,13 +188,23 @@ const strings  = translations[ 'stackTitle' ]
 function AppStack() {
   const Stack = createNativeStackNavigator()
   return (
-    <Stack.Navigator screenOptions={{
+    <Stack.Navigator initialRouteName='Home' screenOptions={{
       headerShown: false
-    }}>
-      <Stack.Screen name="Home" component={HomeScreen} />
-      <Stack.Screen name="Launch" component={Launch} />
-      <Stack.Screen name="LNAccountDetails" component={LNAccountDetails} options={{
+    }} >
+      <Stack.Screen name="Home" component={HomeScreen} options={{
         headerShown: false
+      }} />
+      <Stack.Screen name="Launch" component={Launch} options={{
+        headerShown: false
+      }}/>
+      <Stack.Screen name="LNAccountDetails" component={LNAccountDetails} options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerShown: true,
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
+        }
       }} />
       <Stack.Screen name="ReLogin" component={ReLogin} options={{
         gestureEnabled: false,
@@ -261,7 +273,7 @@ function AppStack() {
         title: 'Buy with Ramp'
       }} />
       <Stack.Screen name="TransactionDetails" component={TransactionDetailsContainerScreen} options={{
-        title: 'Transaction Details', headerShown: false
+        title: 'Transaction Details'
       }} />
       <Stack.Screen name="Receive" component={Receive} options={{
         headerShown: false
@@ -287,7 +299,9 @@ function AppStack() {
       <Stack.Screen name="WyreIntegrationScreen" component={WyreIntegrationScreen} options={{
         title: 'Wyre Home'
       }} />
-      <Stack.Screen name="Intermediate" component={Intermediate} />
+      <Stack.Screen name="Intermediate" component={Intermediate} options={{
+        headerShown: false
+      }}/>
       <Stack.Screen name="CustodianRequestOTP" component={CustodianRequestOTP} />
       <Stack.Screen name="CustodianRequestAccepted" component={CustodianRequestAccepted} />
       <Stack.Screen name="SweepFundsFromExistingAccount" component={SweepFundsFromExistingAccount} />
@@ -458,8 +472,24 @@ function AppStack() {
       <Stack.Screen name="TrustedContactNewBHR" component={TrustedContactNewBHR} />
       <Stack.Screen name="SetNewPassword" component={SetNewPassword} />
       <Stack.Screen name="CloudBackupHistory" component={CloudBackupHistory} />
-      <Stack.Screen name="AccountDetails" component={AccountDetailsContainerScreen} />
-      <Stack.Screen name="AccountDetailsRoot" component={AccountDetailsContainerScreen} />
+      <Stack.Screen name="AccountDetails" component={AccountDetailsContainerScreen}
+        options={( { navigation } ) => {
+          return {
+            ...defaultStackScreenNavigationOptions,
+            headerShown: true,
+            headerLeft: () => {
+              return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+            },
+          }
+        }}/>
+      <Stack.Screen name="AccountDetailsRoot" component={AccountDetailsContainerScreen}   options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
+        }
+      }}/>
       <Stack.Screen name="TransactionsList" component={TransactionsListContainerScreen} options={{
         headerShown: false
       }} />
@@ -550,73 +580,184 @@ function AppStack() {
       <Stack.Screen name="OTPAuthentication" component={OTPAuthenticationScreen} options={{
         headerShown:false
       }} />
-      <Stack.Screen name="AllTransactionsRoot" component={AllTransactionsContainerScreen} />
-      <Stack.Screen name="ViewAll" component={ViewAllScreen}/>
-      <Stack.Screen name="ReceiveCoin" component={ReceiveCoinScreen} options={{
-        title: '',
-        headerShadowVisible: false
+      <Stack.Screen name="AllTransactionsRoot" component={AllTransactionsContainerScreen}
+        options={( { navigation } ) => {
+          return {
+            title: 'Transactions',
+            headerShown:true,
+            headerLeft: () => {
+              return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+            },
+          }
+        }}/>
+      <Stack.Screen name="ViewAll" component={ViewAllScreen} options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerShown:true,
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
+        }
+      }}/>
+      <Stack.Screen name="ReceiveCoin" component={ReceiveCoinScreen} options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerShown:true,
+          title: '',
+          headerShadowVisible: false,
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
+        }
       }}/>
       <Stack.Screen name="ScanOpenChannel" component={ScanOpenChannel} options={{
         headerShown: false
       }}/>
-      <Stack.Screen name="NodeInfoScreen" component={NodeInfoScreen} options={{
-        title: '',
-        headerShadowVisible: false,
-        headerStyle: {
-          backgroundColor: Colors.offWhite
-        }
-      }}/>
-      <Stack.Screen name="Payments" component={PaymentsScreen} options={{
-        title: '',
-        headerShadowVisible: false
-      }} />
+      <Stack.Screen name="NodeInfoScreen" component={NodeInfoScreen}
+        options={( { navigation } ) => {
+          return {
+            ...defaultStackScreenNavigationOptions,
+            headerShown:true,
+            title: '',
+            headerShadowVisible: false,
+            headerStyle: {
+              backgroundColor: Colors.offWhite
+            },
+            headerLeft: () => {
+              return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+            },
+          }
+        }}
+      />
+      <Stack.Screen name="Payments" component={PaymentsScreen}
+        options={( { navigation } ) => {
+          return {
+            ...defaultStackScreenNavigationOptions,
+            title: '',
+            headerShadowVisible: false,
+            headerShown:true,
+            headerLeft: () => {
+              return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+            },
+          }
+        }} />
       <Stack.Screen name="AccountSettings" component={AccountSettingsMainScreen} options={{
         headerShown: false
       }}/>
-      <Stack.Screen name="OnChainSend" component={OnChainSendScreen} options={{
-        title: 'Send To',
-        headerShadowVisible: false
-      }}/>
-      <Stack.Screen name="PaymentDetailsScreen" component={PaymentDetailsScreen} options={{
-        title: '',
-        headerShadowVisible: false
-      }}/>
-      <Stack.Screen name="PayInvoice" component={PayInvoiceScreen} options={{
-        title: '',
-        headerShadowVisible: false
-      }}/>
-      <Stack.Screen name="SendScreen" component={SendScreen} options={{
-        title: '',
-        headerShadowVisible: false
-      }}/>
-      <Stack.Screen name="SettingsScreen" component={SettingsScreen} options={{
-        title: '',
-        headerShadowVisible: false,
-        headerStyle: {
-          backgroundColor: Colors.offWhite
+      <Stack.Screen name="OnChainSend" component={OnChainSendScreen}
+        options={( { navigation } ) => {
+          return {
+            ...defaultStackScreenNavigationOptions,
+            title: 'Send To',
+            headerShadowVisible: false,
+            headerShown:true,
+            headerLeft: () => {
+              return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+            },
+          }
+        }}/>
+      <Stack.Screen name="PaymentDetailsScreen" component={PaymentDetailsScreen}  options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          title: '',
+          headerShadowVisible: false,
+          headerShown:true,
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
         }
       }}/>
-      <Stack.Screen name="ChannelsListScreen" component={ChannelsListScreen} options={{
-        title: '',
-        headerShadowVisible: false,
-        headerStyle: {
-          backgroundColor: Colors.backgroundColor
+      <Stack.Screen name="PayInvoice" component={PayInvoiceScreen} options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          title: '',
+          headerShadowVisible: false,
+          headerShown:true,
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
         }
       }}/>
-      <Stack.Screen name="ChannelInfoScreen" component={ChannelInfoScreen} options={{
-        title: '',
-        headerShadowVisible: false,
-        headerStyle: {
-          backgroundColor: Colors.backgroundColor
+      <Stack.Screen name="SendScreen" component={SendScreen} options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          title: '',
+          headerShadowVisible: false,
+          headerShown:true,
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
         }
       }}/>
-      <Stack.Screen name="InvoiceDetailsScreen" component={InvoiceDetailsScreen} options={{
-        title: '',
-        headerShadowVisible: false
+      <Stack.Screen name="SettingsScreen" component={SettingsScreen} options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          title: '',
+          headerShadowVisible: false,
+          headerShown:true,
+          headerStyle: {
+            backgroundColor: Colors.offWhite
+          },
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
+        }
       }}/>
-      <Stack.Screen name="TransactionDetailsScreen" component={TransactionDetailsScreen} options={{
-        title: '',
-        headerShadowVisible: false
+      <Stack.Screen name="ChannelsListScreen" component={ChannelsListScreen} options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          title: '',
+          headerShadowVisible: false,
+          headerShown:true,
+          headerStyle: {
+            backgroundColor: Colors.offWhite
+          },
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
+        }
+      }}/>
+      <Stack.Screen name="ChannelInfoScreen" component={ChannelInfoScreen} options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          title: '',
+          headerShadowVisible: false,
+          headerShown:true,
+          headerStyle: {
+            backgroundColor: Colors.offWhite
+          },
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
+        }
+      }}/>
+      <Stack.Screen name="InvoiceDetailsScreen" component={InvoiceDetailsScreen} options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          title: '',
+          headerShadowVisible: false,
+          headerShown:true,
+          headerStyle: {
+            backgroundColor: Colors.offWhite
+          },
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
+        }
+      }}/>
+      <Stack.Screen name="TransactionDetailsScreen" component={TransactionDetailsScreen} options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          title: '',
+          headerShadowVisible: false,
+          headerShown:true,
+          headerStyle: {
+            backgroundColor: Colors.offWhite
+          },
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
+        }
       }}/>
       <Stack.Screen name="ChannelOpenScreen" component={ChannelOpenScreen} options={{
         headerShown: false
@@ -667,12 +808,13 @@ function AppStack() {
       />
       <Stack.Screen name="SecurityQuestion" component={SecurityQuestionScreen} options={( { navigation } ) => {
         return {
+          headerShown:true,
           title: strings[ 'ShowAllAccounts' ],
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.goBack() }} />
+          },
         }
       }} />
-
-
-
 
     </Stack.Navigator>
   )
