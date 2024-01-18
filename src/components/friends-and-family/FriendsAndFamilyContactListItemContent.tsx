@@ -59,14 +59,6 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, ind
         flex: 1
       }}>
 
-
-        <ListItem.Title
-          style={styles.listItemTitle}
-          numberOfLines={1}
-        >
-          <Text>{firstNamePieceText}</Text>
-          <Text style={styles.secondNamePieceText}>{secondNamePieceText}</Text>
-        </ListItem.Title>
         <ListItem.Subtitle
           style={styles.lastSeenText}
           numberOfLines={1}
@@ -75,18 +67,27 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, ind
           {Number.isFinite( contact.lastSeenActive ) ? (
 
             <Text style={{
-              fontFamily: Fonts.MediumItalic
+              fontFamily: Fonts.Medium,
+              fontWeight:'bold'
             }}>
               {lastSeenDays === 'today'? common.today : lastSeenDays}
             </Text>
           ) : (
             <Text style={{
-              fontFamily: Fonts.MediumItalic
+              fontFamily: Fonts.Medium
             }}>
               {common.unknown}
             </Text>
           )}
         </ListItem.Subtitle>
+        <ListItem.Title
+          style={styles.listItemTitle}
+          numberOfLines={1}
+        >
+          <Text>{firstNamePieceText}</Text>
+          <Text style={styles.secondNamePieceText}>{secondNamePieceText}</Text>
+        </ListItem.Title>
+
 
         {/*
           📝 TODO: Show this when the F&F list is refactored to a

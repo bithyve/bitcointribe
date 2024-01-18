@@ -90,6 +90,10 @@ export default function BackupMethods( { navigation } ) {
     setBtnPress( true )
     if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed' ){
       dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
+    }else{
+      navigation.navigate( 'SeedBackup', {
+        screen: 'SeedBackupHistory',
+      } )
     }
   }
 

@@ -43,6 +43,7 @@ import dbManager from '../../storage/realm/dbManager'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import { exchangeRatesCalculated, giftAccepted, giftAddedToAccount, setAverageTxFee, updateAccountShells, updateGift } from '../actions/accounts'
 import { getApprovalFromKeepers, updateWalletImageHealth } from '../actions/BHR'
+import { updateGiftLoading } from '../actions/doNotStore'
 import { updateWallet } from '../actions/storage'
 import {
   ASSOCIATE_GIFT,
@@ -171,6 +172,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
     if( channelAddress === storedGifts[ giftId ].channelAddress ) {
       if( storedGifts[ giftId ].sender.walletId == wallet.walletId ) Toast( 'You are the owner of this gift' )
       else Toast( 'Gift already exists' )
+      yield put( updateGiftLoading() )
       return
     }
   }
@@ -197,16 +199,19 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
               Toast( 'Gift already expired' )
               break
         }
+        yield put( updateGiftLoading() )
         return
       }
     }
   } catch( err ){
     Toast( 'Gift expired/unavailable' )
+    yield put( updateGiftLoading() )
     return
   }
 
   if( exclusiveGiftCodes && exclusiveGiftCodes[ giftMetaData.exclusiveGiftCode ] ){
     Toast( 'This gift is part of an exclusive giveaway. Cannot be claimed more than once' )
+    yield put( updateGiftLoading() )
     return
   }
 
@@ -252,7 +257,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
       } ], notification )
     }
   } else {
-    //
+    yield put( updateGiftLoading() )
   }
 }
 
@@ -348,6 +353,7 @@ function* reclaimGiftWorker( { payload }: {payload: { giftId: string}} ) {
 
     if( giftMetaData.status === GiftStatus.RECLAIMED ) Toast( 'Gift reclaimed' )
     if( giftMetaData.status === GiftStatus.ACCEPTED ) Toast( 'Gift already accepted' )
+    yield put( updateGiftLoading() )
   }
 }
 

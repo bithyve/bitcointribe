@@ -1135,7 +1135,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               isCurrentLevel0
             } )
             // TODO: navigate post approval (from within saga)
-            navigation.navigate( 'Home' )
             if ( trustedContactRequest.isContactGift ) {
               this.setState( {
                 trustedContactRequest: {
@@ -1147,6 +1146,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 1
               )
             }
+            navigation.goBack()
           }
         } )
       }
