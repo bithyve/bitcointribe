@@ -71,7 +71,6 @@ import WyreOrderFormScreen from '../../pages/WyreIntegration/WyreOrderFormScreen
 import ImportBWGrid from '../../pages/borderwallet/ImportBWGrid'
 import ImportBorderWallet from '../../pages/borderwallet/ImportBorderWallet'
 import ScanNodeConfig from '../../pages/lightningAccount/ScanNodeConfigScreen'
-import AccountDetailsStack from '../stacks/accounts/AccountDetailsStack'
 import AddNewAccountStack from '../stacks/accounts/AddNewAccountStack'
 import LnAccountStack from '../stacks/accounts/LnAccountStack'
 import ManageBackupNewBHR from '../../pages/NewBHR/ManageBackup'
@@ -129,7 +128,6 @@ import AccountDetailsContainerScreen from '../../pages/Accounts/Details/AccountD
 import SubAccountTFAHelpScreen from '../../pages/Accounts/SubAccountTFAHelpScreen'
 import TransactionsListContainerScreen from '../../pages/Accounts/Transactions/TransactionsListContainerScreen'
 import SubAccountSettingsStack from './accounts/SubAccountSettingsStack'
-import SendStack from './send/SendStack'
 import AccountSettingsEditDisplayPropertiesScreen from '../../pages/Accounts/AccountSettings/AccountSettingsEditDisplayPropertiesScreen'
 import AccountSettingsMainScreen from '../../pages/Accounts/AccountSettings/AccountSettingsMainScreen'
 import AccountSettingsEditVisibilityScreen from '../../pages/Accounts/AccountSettings/EditVisibilityScreen'
@@ -170,6 +168,14 @@ import ManagePasscodeScreen from '../../pages/ManagePasscodeScreen'
 import PanAccountSettingsContainerScreen from '../../pages/MoreOptions/AccountManagement/PanAccountSettings/PanAccountSettingsContainerScreen'
 import SecurityQuestionScreen from '../../pages/MoreOptions/AccountManagement/PanAccountSettings/SecurityQuestionScreen'
 import EnterPasscodeScreen from '../../pages/MoreOptions/AppInfo/EnterPasscodeScreen'
+import AllTransactionsContainerScreen from '../../pages/Transactions/AllTransactionsContainerScreen'
+import NewWalletQuestion from '../../pages/NewWalletQuestion'
+import NewWalletName from '../../pages/NewWalletName'
+import CreateKeeperScreen from '../../pages/CreateKeeperScreen'
+import MoreOptionsContainerScreen from '../../pages/MoreOptions/MoreOptionsContainerScreen'
+import AccountManagementContainerScreen from '../../pages/MoreOptions/AccountManagement/AccountManagementContainerScreen'
+import RestoreSelectedContactsList from '../../pages/Recovery/RestoreSelectedContactsList'
+import NewRecoveryOwnQuestions from '../../pages/Recovery/NewRecoveryOwnQuestions'
 
 
 
@@ -185,7 +191,7 @@ function AppStack() {
     }}>
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Launch" component={Launch} />
-      <Stack.Screen name="LNAccountDetails" component={LnAccountStack} options={{
+      <Stack.Screen name="LNAccountDetails" component={LNAccountDetails} options={{ //look into this
         headerShown: false
       }} />
       <Stack.Screen name="ReLogin" component={ReLogin} options={{
@@ -207,6 +213,9 @@ function AppStack() {
       <Stack.Screen name="SelectEntropyGridTypeAccount" component={SelectEntropyGridType} options={{
         headerShown: false
       }} />
+      <Stack.Screen name="SelectEntropyGridType" component={SelectEntropyGridType} options={{
+        headerShown: false
+      }} />
       <Stack.Screen name="DownloadEncryptGrid" component={DownloadEncryptGrid} options={{
         headerShown: false
       }} />
@@ -216,6 +225,7 @@ function AppStack() {
       <Stack.Screen name="SelectChecksumWordAccount" component={SelectChecksumWord} options={{
         headerShown: false
       }} />
+      <Stack.Screen name="SelectChecksumWord" component={SelectChecksumWord} />
       <Stack.Screen name="CreatePassPhraseAccount" component={CreatePassPhrase} options={{
         headerShown: false
       }} />
@@ -240,6 +250,9 @@ function AppStack() {
       <Stack.Screen name="EnterNodeConfig" component={EnterNodeConfig} options={{
         headerShown: false
       }} />
+      <Stack.Screen name="MoreOptionsContainerScreen" component={MoreOptionsContainerScreen} options={{
+        headerShown: false,
+      }} />
 
       <Stack.Screen name="PlaceWyreOrder" component={WyreOrderFormScreen} options={{
         title: 'Buy with Wyre'
@@ -248,12 +261,15 @@ function AppStack() {
         title: 'Buy with Ramp'
       }} />
       <Stack.Screen name="TransactionDetails" component={TransactionDetailsContainerScreen} options={{
-        title: 'Transaction Details',
+        title: 'Transaction Details', headerShown: false
       }} />
       <Stack.Screen name="Receive" component={Receive} options={{
         headerShown: false
       }} />
       <Stack.Screen name="WalletBackupAlert" component={WalletBackup} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="WalletBackup" component={WalletBackup} options={{
         headerShown: false
       }} />
       <Stack.Screen name="BackupSeedWordsContent" component={BackupSeedWordsContent} options={{
@@ -276,6 +292,7 @@ function AppStack() {
       <Stack.Screen name="CustodianRequestAccepted" component={CustodianRequestAccepted} />
       <Stack.Screen name="SweepFundsFromExistingAccount" component={SweepFundsFromExistingAccount} />
       <Stack.Screen name="NewWalletNameRegenerateShare" component={NewWalletNameRegenerateShare} />
+      <Stack.Screen name="NewWalletName" component={NewWalletName} />
       <Stack.Screen name="NewWalletQuestionRegenerateShare" component={NewWalletQuestionRegenerateShare} />
       <Stack.Screen name="NewWalletGenerationOTP" component={NewWalletGenerationOTP} />
       <Stack.Screen name="WalletCreationSuccess" component={WalletCreationSuccess} />
@@ -423,6 +440,7 @@ function AppStack() {
           headerShown: false,
         }}
       />
+      <Stack.Screen name="CreateKeeperScreen" component={CreateKeeperScreen} />
       <Stack.Screen name="FundingSources" component={FundingSourcesScreen} options={{
         headerShown: false,
       }} />
@@ -432,7 +450,7 @@ function AppStack() {
       <Stack.Screen name="VersionHistory" component={VersionHistoryScreen} options={{
         headerShown: false,
       }} />
-      <Stack.Screen name="SeedBackup" component={WalletBackupStack} options={{
+      <Stack.Screen name="SeedBackup" component={SeedBackupHistory} options={{
         headerShown: false,
       }} />
       <Stack.Screen name="FNFToKeeper" component={FNFToKeeper} />
@@ -440,30 +458,24 @@ function AppStack() {
       <Stack.Screen name="TrustedContactNewBHR" component={TrustedContactNewBHR} />
       <Stack.Screen name="SetNewPassword" component={SetNewPassword} />
       <Stack.Screen name="CloudBackupHistory" component={CloudBackupHistory} />
+      <Stack.Screen name="AccountDetails" component={AccountDetailsContainerScreen} />
       <Stack.Screen name="AccountDetailsRoot" component={AccountDetailsContainerScreen} />
-      <Stack.Screen name="Send" component={SendStack} options={{
-        headerShown: false
-      }} />
       <Stack.Screen name="TransactionsList" component={TransactionsListContainerScreen} options={{
         headerShown: false
       }} />
-
+      <Stack.Screen name="RestoreSelectedContactsList" component={RestoreSelectedContactsList} />
       <Stack.Screen name="DonationAccountWebViewSettings" component={DonationAccountWebViewSettingsScreen} options={{
         headerShown: false
       }} />
-      <Stack.Screen name="SubAccountSettings" component={SubAccountSettingsStack} options={{
+      <Stack.Screen name="SubAccountSettings" component={AccountSettingsMainScreen} options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="AccountSettingsMain" component={AccountSettingsMainScreen} options={{
         headerShown: false
       }} />
       <Stack.Screen name="SubAccountTFAHelp" component={SubAccountTFAHelpScreen} options={{
         headerShown: false
       }} />
-      <Stack.Screen
-        name="AccountSettingsMain"
-        component={AccountSettingsMainScreen}
-        options={{
-          headerShown: false
-        }}
-      />
       <Stack.Screen
         name="EditDisplayProperties"
         component={AccountSettingsEditDisplayPropertiesScreen}
@@ -492,6 +504,7 @@ function AppStack() {
           title: strings[ 'ReassignSources' ],
         }}
       />
+      <Stack.Screen name="NewRecoveryOwnQuestions" component={NewRecoveryOwnQuestions} />
       <Stack.Screen
         name="MergeAccounts"
         component={AccountSettingsMergeAccountShellsScreen}
@@ -523,6 +536,11 @@ function AppStack() {
         options={{
           title: 'Send'
         }}/>
+      <Stack.Screen name="Send" component={AccountSendContainerScreen}
+        options={{
+          title: 'Send'
+        }}/>
+      <Stack.Screen name="AccountSend" component={AccountSendContainerScreen}  />
       <Stack.Screen name="SentAmountForContactForm" component={SentAmountForContactFormScreen} options={{
         title: 'Send To'
       }} />
@@ -532,7 +550,7 @@ function AppStack() {
       <Stack.Screen name="OTPAuthentication" component={OTPAuthenticationScreen} options={{
         headerShown:false
       }} />
-      {/* <Stack.Screen name="AccountDetailsRoot" component={LNAccountDetails}/> */}
+      <Stack.Screen name="AllTransactionsRoot" component={AllTransactionsContainerScreen} />
       <Stack.Screen name="ViewAll" component={ViewAllScreen}/>
       <Stack.Screen name="ReceiveCoin" component={ReceiveCoinScreen} options={{
         title: '',
@@ -552,7 +570,7 @@ function AppStack() {
         title: '',
         headerShadowVisible: false
       }} />
-      <Stack.Screen name="AccountSettings" component={SubAccountSettingsStack} options={{
+      <Stack.Screen name="AccountSettings" component={AccountSettingsMainScreen} options={{
         headerShown: false
       }}/>
       <Stack.Screen name="OnChainSend" component={OnChainSendScreen} options={{
@@ -612,9 +630,6 @@ function AppStack() {
       <Stack.Screen name="NewWyreAccountDetails" component={NewWyreAccountDetailsScreen} options={{
         title: 'Setup Wyre Account'
       }} />
-      <Stack.Screen name="AccountDetails" component={AccountDetailsStack} options={{
-        header: null
-      }} />
       <Stack.Screen name="NewRampAccountDetails" component={NewRampAccountDetailsScreen} options={{
         title: 'Setup Ramp Account'
       }} />
@@ -627,6 +642,7 @@ function AppStack() {
       <Stack.Screen name="WalletSettingsRoot" component={WalletSettingsContainerScreen} options={{
         headerShown: false
       }} />
+      <Stack.Screen name="NewWalletQuestion" component={NewWalletQuestion} />
       <Stack.Screen name="ManagePasscode" component={ManagePasscodeScreen} options={{
         headerShown: false
       }} />
@@ -638,6 +654,12 @@ function AppStack() {
           headerShown: false,
         }}
       />
+      <Stack.Screen name="AccountManagementRoot" component={AccountManagementContainerScreen} options={{
+        headerShown: false,
+      }} />
+      <Stack.Screen name="PanAccountSettings" component={PanAccountSettingsContainerScreen} options={{
+        headerShown: false,
+      }} />
       <Stack.Screen name="EnterPasscode" component={EnterPasscodeScreen}
         options={{
           headerShown: false,

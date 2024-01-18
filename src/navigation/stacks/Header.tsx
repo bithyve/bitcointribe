@@ -111,6 +111,7 @@ import { setVersion } from '../../store/actions/versionHistory'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { AccountsState } from '../../store/reducers/accounts'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import { resetToHomeAction } from '../actions/NavigationActions'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -361,14 +362,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   navigateToQRScreen = () => {
-    this.props.navigation.navigate( 'App', {
-      screen: 'QRRoot',
-      params: {
-        onCodeScanned:  this.onCodeScanned,
-      },
-    }
-    )
-  };
+    this.props.navigation.navigate( 'QRRoot', {
+      onCodeScanned:  this.onCodeScanned,
+    } )
+  }
+
 
   onPressNotifications = async () => {
     this.readAllNotifications()
@@ -570,8 +568,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             this.props.updateLastSeen( new Date() )
             CommonActions.navigate( {
               name: 'Intermediate'
-            } )
-          }
+            } )          }
         }
       )
     } catch ( error ) {
@@ -706,7 +703,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           index: 0,
           routes: [ {
             name: 'Home',
-            key: 'HomeKey',
             params: {
               unhandledDeepLinkURL: url
             }
@@ -715,6 +711,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       )
     else this.handleDeepLinking( url )
   };
+
 
   handleDeepLinking = async ( url ) => {
     if ( url === null ) return
@@ -1143,7 +1140,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               isCurrentLevel0
             } )
             // TODO: navigate post approval (from within saga)
-            navigation.navigate( 'Home' )
+            navigation.navigate( 'App' )
             if ( trustedContactRequest.isContactGift ) {
               this.setState( {
                 trustedContactRequest: {

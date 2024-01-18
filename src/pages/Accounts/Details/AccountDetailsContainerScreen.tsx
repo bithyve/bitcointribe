@@ -136,11 +136,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { route, navigation } )
   }
 
   function navigateToAccountSettings() {
-    navigation.navigate( 'SubAccountSettings', {
-      screen: 'AccountSettingsMain',
-      params: {
-        accountShellID
-      }
+    navigation.navigate( 'AccountSettingsMain', {
+      accountShellID
     } )
   }
 
@@ -311,11 +308,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { route, navigation } )
   const onSendBittonPress = () => {
     dispatch( sourceAccountSelectedForSending( accountShell ) )
 
-    navigation.navigate( 'Send', {
-      screen: 'SendRoot',
-      params: {
-        subAccountKind: primarySubAccount.kind,
-      }
+    navigation.navigate( 'SendRoot', {
+      subAccountKind: primarySubAccount.kind,
     } )
   }
 

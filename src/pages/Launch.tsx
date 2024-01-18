@@ -118,12 +118,12 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
         console.log( 'diff', diff, isHomePageOpen )
         if( isHomePageOpen ){
           if ( !this.url ){
-            this.props.navigation.replace( 'Home', {
+            this.props.navigation.replace( 'App', {
               screen: 'Home',
             } )
           } else {
             const processedLink = await processDeepLink( this.url )
-            this.props.navigation.replace( 'Home', {
+            this.props.navigation.replace( 'App', {
               screen: 'Home',
               params: {
                 trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,

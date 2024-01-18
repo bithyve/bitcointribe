@@ -4,16 +4,15 @@ export const goHomeAction = ( ) => {
   return CommonActions.reset( {
     index: 0,
     routes: [ {
-      name: 'Home',
-      key: 'HomeKey'
-    } ],
+      name: 'App',
+    } ]
   } )
 }
 
 export const resetToHomeAction = ( params = {
 } ) => {
   return CommonActions.navigate( {
-    name: 'Home',
+    name: 'App',
     params,
   } )
 }

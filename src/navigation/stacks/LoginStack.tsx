@@ -35,6 +35,8 @@ import RegenerateEntropyGrid from '../../pages/borderwallet/RegenerateEntropyGri
 import SelectChecksumWord from '../../pages/borderwallet/SelectChecksumWord'
 import SelectEntropyGridType from '../../pages/borderwallet/SelectEntropyGridType'
 import defaultStackScreenNavigationOptions from '../options/DefaultStackScreenNavigationOptions'
+import PreviewPattern from '../../pages/borderwallet/PreviewPattern'
+import WalletCreationSuccess from '../../pages/RegenerateShare/WalletCreationSuccess'
 
 function LoginStack() {
   const Stack = createNativeStackNavigator()
@@ -44,17 +46,7 @@ function LoginStack() {
     }}>
       <Stack.Screen name="Launch" component={Launch} />
       <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="SettingGetNewPin" component={SettingGetNewPin} options={( { navigation } ) => {
-        return {
-          ...defaultStackScreenNavigationOptions,
-          headerLeft: () => {
-            return <SmallNavHeaderBackButton onPress={() => {
-              navigation.popToTop() }} />
-          },
-          title: 'Manage Passcode',
-          headerShown: true
-        }
-      }} />
+      <Stack.Screen name="SettingGetNewPin" component={SettingGetNewPin}/>
       <Stack.Screen name="PasscodeConfirm" component={PasscodeConfirm} />
       <Stack.Screen name="NewWalletName" component={NewWalletName} />
       <Stack.Screen name="CreateKeeperScreen" component={CreateKeeperScreen} />
@@ -74,6 +66,7 @@ function LoginStack() {
       <Stack.Screen name="NewWalletQuestion" component={NewWalletQuestion} />
       <Stack.Screen name="WalletInitialization" component={WalletInitializationScreen} />
       <Stack.Screen name="RestoreSeedWordsContent" component={RestoreSeedWordsContent} />
+      <Stack.Screen name="PreviewPattern" component={PreviewPattern} />
       <Stack.Screen name="WalletNameRecovery" component={WalletNameRecovery} />
       <Stack.Screen name="RecoveryQuestion" component={RecoveryQuestionScreen} />
       <Stack.Screen name="RestoreSelectedContactsList" component={RestoreSelectedContactsList} />
@@ -92,6 +85,10 @@ function LoginStack() {
       <Stack.Screen name='AppWebView' component={AppWebView} options={{
         headerShown: false
       }}/>
+
+      {//Do we need this?
+      }
+      <Stack.Screen name="WalletCreationSuccess" component={WalletCreationSuccess} />
     </Stack.Navigator>
   )
 }
