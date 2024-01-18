@@ -30,7 +30,6 @@ import QRStack from '../home/QRStack'
 import AccountManagementStack from './AccountManagementStack'
 import WalletBackupStack from './WalletBackupStack'
 import WalletSettingsStack from './WalletSettingsStack'
-import SeedBackupHistory from '../../../pages/NewBHR/SeedBackupHistory'
 
 const Stack = createNativeStackNavigator()
 const MoreOptionsStack = ( { navigation, route } ) => {
