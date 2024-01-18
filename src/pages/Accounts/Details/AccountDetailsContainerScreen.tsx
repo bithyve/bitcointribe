@@ -61,8 +61,7 @@ const sectionListItemKeyExtractor = ( index ) => String( index )
 
 const AccountDetailsContainerScreen: React.FC<Props> = ( { route, navigation } ) => {
   const dispatch = useDispatch()
-  const tempAccId = useSelector( ( state ) => state.doNotStore.tempAccShellID )
-  const accountShellID = route.params?.accountShellID || tempAccId
+  const accountShellID = route.params?.accountShellID
   useLayoutEffect( () => {
     navigation.setOptions( {
       header: () => (
