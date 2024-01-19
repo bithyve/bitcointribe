@@ -974,17 +974,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   cleanupListeners() {
-    this.focusListener?.()
+    try{
+      this.focusListener?.()
 
-    if ( typeof this.appStateListener === 'function' ) {
-      this.appStateListener.remove()
-    }
-    if ( typeof this.linkStateListener === 'function' ) {
-      this.linkStateListener.remove()
-    }
-    clearTimeout( this.openBottomSheetOnLaunchTimeout )
-    if ( this.firebaseNotificationListener ) {
-      this.firebaseNotificationListener()
+      if ( this.appStateListener ) {
+        this.appStateListener.remove()
+      }
+      if ( this.linkStateListener ) {
+        this.linkStateListener.remove()
+      }
+      clearTimeout( this.openBottomSheetOnLaunchTimeout )
+      if ( this.firebaseNotificationListener ) {
+        this.firebaseNotificationListener()
+      }
+    }catch( err ){
+      //
     }
   }
 
@@ -1153,7 +1157,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 1
               )
             }
-            navigation.goBack()
+            setTimeout( ()=>{
+              navigation.goBack()
+            }, 3000 )
           }
         } )
       }
