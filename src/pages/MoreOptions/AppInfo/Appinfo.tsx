@@ -203,7 +203,7 @@ const AppInfo = ( props ) => {
               index: 0,
               routes: [
                 {
-                  name: 'App'
+                  name: 'Home'
                 }
               ],
             } )
