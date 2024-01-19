@@ -19,13 +19,15 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
-import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
+import { RGBConfig, RGB_ASSET_TYPE, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { translations } from '../../common/content/LocContext'
 import BottomSheetAddWalletInfo from '../../components/bottom-sheets/add-wallet/BottomSheetAddWalletInfo'
 import ModalContainer from '../../components/home/ModalContainer'
-import { syncRgb } from '../../store/actions/rgb'
+import RGBServices from '../../services/RGBServices'
+import dbManager from '../../storage/realm/dbManager'
+import { setRgbConfig, syncRgb } from '../../store/actions/rgb'
 import BottomSheetCoinsHeader from './BottomSheetCoinsHeader'
 
 const keyExtractor = ( item: any ) => item.toString()
@@ -40,6 +42,8 @@ export default function AssetsScreen( props ) {
   const { syncing, balances, rgb20Assets, rgb25Assets } = useSelector(
     state => state.rgb,
   )
+  const rgbConfig: RGBConfig = useSelector( state => state.rgb.config )
+  const wallet : Wallet = dbManager.getWallet()
   const dispatch = useDispatch()
   const strings = translations[ 'f&f' ]
   const [ selectedTab, setSelectedTab ] = useState( 0 )
@@ -50,6 +54,7 @@ export default function AssetsScreen( props ) {
   )
 
   useEffect( () => {
+    initiateRgb()
     const assets = []
     assets.push( {
       name: 't-sats',
@@ -70,6 +75,19 @@ export default function AssetsScreen( props ) {
     }
     setCoinsData( assets )
   }, [ syncing, rgb20Assets ] )
+
+  const initiateRgb = ()=> {
+    if( !rgbConfig || rgbConfig.mnemonic ==='' ) {
+      const wallet : Wallet = dbManager.getWallet()
+      const config =  RGBServices.restoreKeys( wallet.primaryMnemonic )
+      dispatch( setRgbConfig( config ) )
+      const isRgbInit =  RGBServices.initiate( rgbConfig.mnemonic, rgbConfig.xpub  )
+      if( isRgbInit ) dispatch( syncRgb() )
+    } else {
+      const isRgbInit =  RGBServices.initiate( rgbConfig.mnemonic, rgbConfig.xpub  )
+      if( isRgbInit ) dispatch( syncRgb() )
+    }
+  }
 
   const renderTabs = () => {
     return (
