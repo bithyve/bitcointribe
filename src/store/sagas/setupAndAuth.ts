@@ -5,9 +5,8 @@ import DeviceInfo from 'react-native-device-info'
 import { call, put, select } from 'redux-saga/effects'
 import semverLte from 'semver/functions/lte'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
-import { Accounts, AccountType, ContactInfo, KeeperInfoInterface, LevelData, MetaShare, RGBConfig, Trusted_Contacts, UnecryptedStreamData, Wallet } from '../../bitcoin/utilities/Interface'
+import { AccountType, ContactInfo, KeeperInfoInterface, LevelData, MetaShare, Trusted_Contacts, UnecryptedStreamData, Wallet } from '../../bitcoin/utilities/Interface'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
-import AccountShell from '../../common/data/models/AccountShell'
 import * as Cipher from '../../common/encryption'
 import RGBServices from '../../services/RGBServices'
 import dbManager from '../../storage/realm/dbManager'
@@ -104,7 +103,7 @@ function* setupWalletWorker( { payload } ) {
   yield put( newAccountShellCreationCompleted() )
   if( security ) yield put( initializeHealthSetup() )  // initialize health-check schema on relay
   yield put( completedWalletSetup( ) )
-  const config = yield call( RGBServices.generateKeys )
+  const config = yield call( RGBServices.restoreKeys, primaryMnemonic )
   yield put( setRgbConfig( config ) )
   const isRgbInit = yield call( RGBServices.initiate, config.mnemonic, config.xpub  )
   if( isRgbInit ) yield put( syncRgb() )
@@ -183,7 +182,6 @@ function* resetPasswordWorker( { payload } ) {
 
 
 function* credentialsAuthWorker( { payload } ) {
-
   yield put( switchSetupLoader( 'authenticating' ) )
   let key
   try {
@@ -193,7 +191,6 @@ function* credentialsAuthWorker( { payload } ) {
     const uint8array =  yield call( Cipher.stringToArrayBuffer, key )
     yield call( dbManager.initDb, uint8array )
   } catch ( err ) {
-
     if ( payload.reLogin ) yield put( switchReLogin( false ) )
     else yield put( credsAuthenticated( false ) )
     return
@@ -209,23 +206,23 @@ function* credentialsAuthWorker( { payload } ) {
     // t.stop()
     yield put( keyFetched( key ) )
     // yield put( autoSyncShells() )
-    const rgbConfig: RGBConfig = yield select( state => state.rgb.config )
-    if( !rgbConfig || rgbConfig.mnemonic ==='' ) {
-      const config = yield call( RGBServices.generateKeys )
-      yield put( setRgbConfig( config ) )
-      const isRgbInit = yield call( RGBServices.initiate, rgbConfig.mnemonic, rgbConfig.xpub  )
-      if( isRgbInit ) yield put( syncRgb() )
-    } else {
-      const wallet : Wallet = dbManager.getWallet()
-      const isRgbInit = yield call( RGBServices.initiate, rgbConfig.mnemonic, rgbConfig.xpub  )
-      if( isRgbInit ) yield put( syncRgb() )
-      const accountShells: AccountShell[] = yield select( ( state ) => state.accounts.accountShells )
-      const shell = accountShells.find( account => account.primarySubAccount.type === AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT )
-      const accounts: Accounts = yield select( ( state ) => state.accounts.accounts )
-      // const defaultAccount = accounts[ shell.id ]
+    // const rgbConfig: RGBConfig = yield select( state => state.rgb.config )
+    // if( !rgbConfig || rgbConfig.mnemonic ==='' ) {
+    //   const wallet : Wallet = dbManager.getWallet()
+    //   const config = yield call( RGBServices.restoreKeys, wallet.primaryMnemonic )
+    //   yield put( setRgbConfig( config ) )
+    //   const isRgbInit = yield call( RGBServices.initiate, rgbConfig.mnemonic, rgbConfig.xpub  )
+    //   if( isRgbInit ) yield put( syncRgb() )
+    // } else {
+    //   const isRgbInit = yield call( RGBServices.initiate, rgbConfig.mnemonic, rgbConfig.xpub  )
+    //   if( isRgbInit ) yield put( syncRgb() )
+    //   // const accountShells: AccountShell[] = yield select( ( state ) => state.accounts.accountShells )
+    //   // const shell = accountShells.find( account => account.primarySubAccount.type === AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT )
+    //   // const accounts: Accounts = yield select( ( state ) => state.accounts.accounts )
+    //   // const defaultAccount = accounts[ shell.id ]
 
 
-    }
+    // }
     // yield put( autoSyncShells() ) // have to synchronize w/ connectToNode saga in order for this to work
 
     // check if the app has been upgraded

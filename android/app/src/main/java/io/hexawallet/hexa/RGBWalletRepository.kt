@@ -21,13 +21,15 @@ object RGBWalletRepository {
 
     fun  initialize(network: String, mnemonic:String, xpub: String): String{
         try {
-             rgbNetwork = getNetwork(network)
+            rgbNetwork = getNetwork(network)
             val walletData =  WalletData(
                 AppConstants.rgbDir.absolutePath,
                 rgbNetwork,
                 DatabaseType.SQLITE,
+                1u,
                 xpub,
                 mnemonic,
+                1u
             )
             wallet = Wallet(walletData)
             online = wallet.goOnline(true, AppConstants.electrumURL)

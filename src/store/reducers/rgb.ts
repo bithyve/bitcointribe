@@ -1,6 +1,8 @@
+import moment from 'moment';
 import { RGBConfig } from '../../bitcoin/utilities/Interface';
 import {
   RGB_SYNCING,
+  SET_LAST_BACKED_UP,
   SET_NEXT_FREE_ADDRESS,
   SET_RECEIVE_DATA,
   SET_RGB121_ASSETS,
@@ -44,7 +46,8 @@ const initialState: {
     assetId: string;
     transactions: [];
   }[];
-  rgb25Assets: []
+  rgb25Assets: [],
+  lastBackedUp?: number
 } = {
   config: {
     bdkDir: '',
@@ -76,7 +79,8 @@ const initialState: {
   },
   transactions: [],
   rgb20Assets: [],
-  rgb25Assets: []
+  rgb25Assets: [],
+  lastBackedUp: null
 }
 //
 
@@ -101,6 +105,11 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           transactions: action.payload.transactions,
+        }
+      case SET_LAST_BACKED_UP:
+        return {
+          ...state,
+          lastBackedUp: moment.now(),
         }
       case SET_RECEIVE_DATA:
         return {
