@@ -328,10 +328,11 @@ class RestoreWithICloud extends Component<
       } )
       this.props.navigation.dispatch( CommonActions.reset( {
         index: 0,
-        routes: [ {
-          name: 'HomeNav',
-          key: 'HomeKey'
-        } ],
+        routes: [
+          {
+            name: 'App'
+          }
+        ],
       } ) )
     }
 
@@ -1187,10 +1188,11 @@ class RestoreWithICloud extends Component<
               } )
               this.props.navigation.dispatch( CommonActions.reset( {
                 index: 0,
-                routes: [ {
-                  name: 'HomeNav',
-                  key: 'HomeKey'
-                } ],
+                routes: [
+                  {
+                    name: 'App',
+                  }
+                ],
               } ) )
             }}
             onPressBack={() => {
@@ -1199,10 +1201,11 @@ class RestoreWithICloud extends Component<
               } )
               this.props.navigation.dispatch( CommonActions.reset( {
                 index: 0,
-                routes: [ {
-                  name: 'HomeNav',
-                  key: 'HomeKey'
-                } ],
+                routes: [
+                  {
+                    name: 'App',
+                  }
+                ],
               } ) )
             }}
           />

@@ -12,7 +12,6 @@ import { AccountType, DeepLinkEncryptionType, Gift } from '../../bitcoin/utiliti
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import { CommonActions } from '@react-navigation/native'
 import idx from 'idx'
 import { RootSiblingParent } from 'react-native-root-siblings'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -219,28 +218,8 @@ export default function AcceptGift( { giftLoading, stopReset, navigation, closeM
     closeModal()
     dispatch( giftAccepted( '' ) )
     if( !stopReset ){
-      navigation.dispatch( state => {
-        return CommonActions.reset( {
-          ...state,
-          index: 3,
-          routes: state.routes.map( route => {
-            if ( route.name === 'GiftStack' ) {
-              return {
-                ...route,
-                state: {
-                  index: 1,
-                  routes: [ {
-                    name: 'GiftScreen', key: 'GiftScreenKey'
-                  }, {
-                    name: 'ManageGifts', key: 'ManageGiftsKey', params: {
-                      giftType: '0'
-                    }
-                  } ]
-                }
-              }
-            } else return route
-          } )
-        } )
+      navigation.navigate( 'ManageGifts', {
+        giftType: '0'
       } )
     }
   }
@@ -963,5 +942,4 @@ const styles = StyleSheet.create( {
 } )
 
 // export default AcceptGift
-
 

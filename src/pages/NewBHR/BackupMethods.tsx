@@ -2,9 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import {
-  Alert,
   Image,
-  NativeModules,
   StatusBar,
   StyleSheet,
   Text,
@@ -12,9 +10,12 @@ import {
   View
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { widthPercentageToDP as wp } from 'react-native-responsive-screen'
+import {
+  widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
+import RNFetchBlob from 'rn-fetch-blob'
 import BorderWalletIcon from '../../assets/images/svgs/borderWallet.svg'
 import { LevelData, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
@@ -30,9 +31,6 @@ import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
 import dbManager from '../../storage/realm/dbManager'
 import { onPressKeeper } from '../../store/actions/BHR'
-import { updateLastBackedUp } from '../../store/actions/rgb'
-
-const GoogleDrive = NativeModules.GoogleDrive
 
 const styles = StyleSheet.create( {
   body: {
@@ -60,9 +58,7 @@ const styles = StyleSheet.create( {
 export default function BackupMethods( { navigation } ) {
   const strings = translations[ 'bhr' ]
   const levelData: LevelData[] = useSelector( state => state.bhr.levelData )
-  const navigationObj: LevelData[] = useSelector(
-    state => state.bhr.navigationObj,
-  )
+  const navigationObj: LevelData[] = useSelector( state => state.bhr.navigationObj )
   const [ btnPress, setBtnPress ] = useState( false )
   const backupWithKeeperStatus: BackupWithKeeperState = useSelector(
     state => state.bhr.backupWithKeeperStatus,
@@ -71,9 +67,7 @@ export default function BackupMethods( { navigation } ) {
     state => state.bhr.createWithKeeperStatus,
   )
   const borderWalletBackup = useSelector( state => state.bhr.borderWalletBackup )
-  const { lastBackedUp } = useSelector(
-    state => state.rgb,
-  )
+
   const [ days, setDays ] = useState( 0 )
   const wallet: Wallet = dbManager.getWallet()
   const dispatch = useDispatch()
@@ -95,9 +89,9 @@ export default function BackupMethods( { navigation } ) {
 
   function onKeeperButtonPress() {
     setBtnPress( true )
-    if ( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed' ) {
+    if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed' ){
       dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
-    } else {
+    }else{
       navigation.navigate( 'SeedBackup', {
         screen: 'SeedBackupHistory',
       } )
@@ -110,11 +104,12 @@ export default function BackupMethods( { navigation } ) {
         selectedTitle: navigationObj.selectedKeeper.name,
         SelectedRecoveryKeyNumber: 1,
         selectedKeeper: navigationObj.selectedKeeper,
-        selectedLevelId: levelData[ 0 ].id,
+        selectedLevelId: levelData[ 0 ].id
       }
       navigation.navigate( 'SeedBackupHistory', navigationParams )
     }
   }, [ navigationObj ] )
+
 
   function onPressBackupWithKeeper() {
     // if( backupWithKeeperStatus!==BackupWithKeeperState.BACKEDUP ) {
@@ -125,58 +120,10 @@ export default function BackupMethods( { navigation } ) {
 
   async function onPressBackupRGB() {
     try {
-      Alert.alert(
-        'Select a Google Account',
-        'This account will be used to upload the RGB backup data file. The file is encrypted with your Backup Phrase.',
-        [
-          {
-            text: 'Cancel',
-            onPress: () => {},
-            style: 'cancel',
-          },
-          {
-            text: 'Continue',
-            onPress: async () => {
-              await GoogleDrive.setup()
-              const login = await GoogleDrive.login()
-              if( !login.error ) {
-                Toast( login.error )
-              } else {
-                await RGBServices.backup( '', wallet.primaryMnemonic )
-                dispatch( updateLastBackedUp() )
-              }
-            },
-            style: 'default',
-          },
-        ],
-        {
-          cancelable: true,
-        },
-      )
-
-
-
-      // GoogleDrive.setup()
-      //   .then( async() => {
-      //     await GoogleDrive.login( async ( err, data ) => {
-      //       console.log( wallet.primaryMnemonic )
-      //       const dir = `${RNFetchBlob.fs.dirs.CacheDir}/rgb`
-      //       console.log( dir )
-      //       const response = await RGBServices.backup(
-      //         dir,
-      //         wallet.primaryMnemonic,
-      //       )
-      //       console.log( response )
-      //     } )
-
-      //   } )
-
-      //   .catch( ( err ) => {
-      //     console.log( 'GOOGLE SetupFail', err )
-      //     throw new Error( err )
-      //   } )
-
-
+      const dir = `${RNFetchBlob.fs.dirs.CacheDir}/rgb`
+      console.log( dir )
+      const response = await RGBServices.backup( dir, 'abcd1234' )
+      console.log( response )
     } catch ( error ) {
       // error
     }
@@ -200,17 +147,16 @@ export default function BackupMethods( { navigation } ) {
           createWithKeeperStatus,
           backupWithKeeperStatus,
           borderWalletBackup,
-          wallet && wallet.borderWalletMnemonic !== '',
+          wallet && wallet.borderWalletMnemonic !==''
         )}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}
         step={''}
       />
-      <View
-        style={{
-          marginTop: 25,
-        }}>
+      <View style={{
+        marginTop: 25
+      }}>
         <View style={styles.body}>
           <TouchableOpacity
             style={{
@@ -319,7 +265,7 @@ export default function BackupMethods( { navigation } ) {
                 margin: 10,
                 textAlign: 'center',
               }}>
-              Backup with Keeper
+            Backup with Keeper
             </Text>
           </TouchableOpacity>
         </View>
@@ -348,29 +294,16 @@ export default function BackupMethods( { navigation } ) {
                 source={require( '../../assets/images/icons/rgb_logo_round.png' )}
               />
             </View>
-            <View>
-              <Text
-                style={{
-                  fontSize: RFValue( 11 ),
-                  fontFamily: Fonts.Regular,
-                  color: Colors.black,
-                  marginHorizontal: 10,
-                  textAlign: 'center',
-                }}>
-              RGB data Backup on Cloud
-              </Text>
-
-              <Text
-                style={{
-                  fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.Regular,
-                  color: Colors.black,
-                  marginHorizontal: 10,
-                  marginTop: 2
-                }}>
-                {`Last backup: ${lastBackedUp ? moment( lastBackedUp ).format( 'DD MMM YYYY' ): 'Never'}`}
-              </Text>
-            </View>
+            <Text
+              style={{
+                fontSize: RFValue( 11 ),
+                fontFamily: Fonts.Regular,
+                color: Colors.black,
+                margin: 10,
+                textAlign: 'center',
+              }}>
+            Backup RGB
+            </Text>
           </TouchableOpacity>
         </View>
         {wallet.borderWalletMnemonic !== '' && (
@@ -407,11 +340,7 @@ export default function BackupMethods( { navigation } ) {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    <FontAwesome
-                      name={'check'}
-                      color={Colors.white}
-                      size={10}
-                    />
+                    <FontAwesome name={'check'} color={Colors.white} size={10} />
                   </View>
                 )}
                 <BorderWalletIcon />
@@ -425,19 +354,20 @@ export default function BackupMethods( { navigation } ) {
                   margin: 10,
                   textAlign: 'center',
                 }}>
-                Backup with Border wallet
+              Backup with Border wallet
               </Text>
             </TouchableOpacity>
           </View>
         )}
       </View>
       <ModalContainer
-        onBackground={() => setVisibleModal( false )}
-        visible={visibleModal}
-        closeBottomSheet={() => setVisibleModal( false )}>
+        onBackground={()=> setVisibleModal( false )}
+        visible={visibleModal }
+        closeBottomSheet={() => setVisibleModal( false )}
+      >
         <BWHealthCheckModal
           title={'Backup wallet using BW'}
-          onPressClose={() => setVisibleModal( false )}
+          onPressClose={()=> setVisibleModal( false )}
           proceedButtonText={'Backup Now'}
           cancelButtonText={'Skip'}
         />

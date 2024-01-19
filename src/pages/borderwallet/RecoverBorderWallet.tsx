@@ -61,10 +61,11 @@ const RecoverBorderWallet = ( props ) => {
       dispatch( setVersion( 'Restored' ) )
       props.navigation.dispatch( CommonActions.reset( {
         index: 0,
-        routes: [ {
-          name: 'HomeNav',
-          key: 'HomeKey'
-        } ],
+        routes: [
+          {
+            name: 'App'
+          }
+        ],
       } ) )
     }
   }, [ wallet ] )

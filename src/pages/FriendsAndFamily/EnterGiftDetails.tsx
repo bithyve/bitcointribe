@@ -204,13 +204,7 @@ const GiftDetails = ( { navigation, route } ) => {
 
   const hardwareBackPressCustom = useCallback( () => {
     if ( route.params?.fromScreen === 'CreateGift' ) {
-      navigation.dispatch( state => {
-        return CommonActions.reset( {
-          ...state,
-          index: 0,
-          routes: state.routes.filter( route => route.name === 'GiftScreen' )
-        } )
-      } )
+      navigation.navigate( 'GiftScreen' )
       return true
     }
     return false
@@ -686,13 +680,7 @@ const GiftDetails = ( { navigation, route } ) => {
               style={CommonStyles.headerLeftIconContainer}
               onPress={() => {
                 if ( route.params?.fromScreen === 'CreateGift' ) {
-                  navigation.dispatch( state => {
-                    return CommonActions.reset( {
-                      ...state,
-                      index: 0,
-                      routes: state.routes.filter( route => route.name === 'GiftScreen' )
-                    } )
-                  } )
+                  navigation.navigate( 'GiftScreen' )
                 } else
                   navigation.goBack()
               }}
