@@ -1,33 +1,45 @@
 package io.hexawallet.hexa
 
 import android.util.Log
+import com.facebook.react.bridge.ReactApplicationContext
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import com.google.api.client.http.FileContent
+import com.google.api.client.http.javanet.NetHttpTransport
+import com.google.api.client.json.gson.GsonFactory
+import com.google.api.services.drive.Drive
+import com.google.api.services.drive.DriveScopes
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import org.rgbtools.AssetRgb20
-import org.rgbtools.AssetRgb25
+import org.rgbtools.AssetCfa
+import org.rgbtools.AssetNia
 import org.rgbtools.Balance
-import org.rgbtools.BlindData
+import org.rgbtools.ReceiveData
 import org.rgbtools.Recipient
 import org.rgbtools.RefreshFilter
 import org.rgbtools.RefreshTransferStatus
 import org.rgbtools.RgbLibException
 import org.rgbtools.Unspent
+import org.rgbtools.restoreKeys
+import java.io.File
 import kotlin.Exception
-import kotlin.math.log
 
 object RGBHelper {
 
     val TAG = "RGBHelper"
+    private lateinit var driveClient: Drive
+    private const val ZIP_MIME_TYPE = "application/zip"
+
 
     fun syncRgbAssets(): String {
         return try {
 
-           // val filter = listOf()
+            // val filter = listOf()
             val refresh =
                 RGBWalletRepository.wallet.refresh(RGBWalletRepository.online, null, listOf())
             var assets = RGBWalletRepository.wallet.listAssets(listOf())
-            val rgb25Assets = assets.rgb25
-            val rgb20Assets = assets.rgb20
+            val rgb25Assets = assets.cfa
+            val rgb20Assets = assets.nia
             if (rgb20Assets != null) {
                 for (rgb20Asset in rgb20Assets) {
                     val assetRefresh = RGBWalletRepository.wallet.refresh(RGBWalletRepository.online, rgb20Asset.assetId, listOf())
@@ -39,6 +51,7 @@ object RGBHelper {
                 }
             }
             assets = RGBWalletRepository.wallet.listAssets(listOf())
+            Log.d(TAG, "syncRgbAssets: ${assets.toString()}")
             val gson = Gson()
             val json = gson.toJson(assets)
             json.toString()
@@ -49,15 +62,15 @@ object RGBHelper {
 
     private fun startRGBReceiving(): String {
 
-            val filter = listOf(
-                RefreshFilter(RefreshTransferStatus.WAITING_COUNTERPARTY, true),
-                RefreshFilter(RefreshTransferStatus.WAITING_COUNTERPARTY, false)
-            )
-            val refresh = RGBWalletRepository.wallet.refresh(RGBWalletRepository.online, null, filter)
-            val blindedData = getBlindedUTXO(null, AppConstants.rgbBlindDuration)
-            val gson = Gson()
-            val json = gson.toJson(blindedData)
-            return json.toString()
+        val filter = listOf(
+            RefreshFilter(RefreshTransferStatus.WAITING_COUNTERPARTY, true),
+            RefreshFilter(RefreshTransferStatus.WAITING_COUNTERPARTY, false)
+        )
+        val refresh = RGBWalletRepository.wallet.refresh(RGBWalletRepository.online, null, filter)
+        val blindedData = getBlindedUTXO(null, AppConstants.rgbBlindDuration)
+        val gson = Gson()
+        val json = gson.toJson(blindedData)
+        return json.toString()
 
     }
 
@@ -80,7 +93,7 @@ object RGBHelper {
                 }
                 is RgbLibException.InvalidBlindedUtxo ->
                     throw Exception("Invalid blinded utxo")
-                is RgbLibException.BlindedUtxoAlreadyUsed ->
+                is RgbLibException.InvalidBlindedUtxo ->
                     throw Exception("Blinded utxo already used")
                 else -> throw e
             }
@@ -95,18 +108,19 @@ object RGBHelper {
         return RGBWalletRepository.wallet.getAssetBalance(assetID)
     }
 
-    fun getBlindedUTXO(assetID: String? = null, expirationSeconds: UInt): BlindData {
+    fun getBlindedUTXO(assetID: String? = null, expirationSeconds: UInt): ReceiveData {
         Log.d(TAG, "getBlindedUTXO: assetID"+assetID)
-        return RGBWalletRepository.wallet.blind(
+        return RGBWalletRepository.wallet.blindReceive(
             assetID,
             null,
             expirationSeconds,
-            listOf(AppConstants.proxyConsignmentEndpoint)
+            listOf(AppConstants.proxyConsignmentEndpoint),
+            0u
         )
     }
 
     fun getMetadata(assetID: String): String {
-        return Gson().toJson(RGBWalletRepository.wallet.getAssetMetadata(RGBWalletRepository.online, assetID)).toString()
+        return Gson().toJson(RGBWalletRepository.wallet.getAssetMetadata(assetID)).toString()
     }
 
     fun getAssetTransfers(assetID: String): String {
@@ -140,9 +154,10 @@ object RGBHelper {
     ): String {
         val txid = handleMissingFunds { RGBWalletRepository.wallet.send(
             RGBWalletRepository.online,
-            mapOf(assetID to listOf(Recipient(blindedUTXO, amount, listOf("rpcs://proxy.iriswallet.com/json-rpc")))),
+            mapOf(assetID to listOf(Recipient(blindedUTXO,null, amount, listOf("rpcs://proxy.iriswallet.com/json-rpc")))),
             false,
             feeRate,
+            0u
         ) }
         val jsonObject = JsonObject()
         jsonObject.addProperty("txid", txid)
@@ -184,8 +199,8 @@ object RGBHelper {
         }
     }
 
-    private fun issueAssetRgb20(ticker: String, name: String, amounts: List<ULong>): AssetRgb20 {
-         val asset = RGBWalletRepository.wallet.issueAssetRgb20(
+    private fun issueAssetRgb20(ticker: String, name: String, amounts: List<ULong>): AssetNia {
+        val asset = RGBWalletRepository.wallet.issueAssetNia(
             RGBWalletRepository.online,
             ticker,
             name,
@@ -196,8 +211,8 @@ object RGBHelper {
         return  asset
     }
 
-    private fun issueAssetRgb25(description: String, name: String, amounts: List<ULong>, filePath: String): AssetRgb25 {
-        val asset = RGBWalletRepository.wallet.issueAssetRgb25(
+    private fun issueAssetRgb25(description: String, name: String, amounts: List<ULong>, filePath: String): AssetCfa {
+        val asset = RGBWalletRepository.wallet.issueAssetCfa(
             RGBWalletRepository.online,
             name,
             description,
@@ -247,15 +262,69 @@ object RGBHelper {
     }
 
     fun getUnspents(): List<Unspent> {
-        return RGBWalletRepository.wallet.listUnspents(false)
+        return RGBWalletRepository.wallet.listUnspents(RGBWalletRepository.online,false)
     }
 
     fun refreshAsset(assetID: String) {
         //return RGBWalletRepository.wallet.refresh(assetID, )
     }
 
-    fun backup(backupPath: String, password: String) {
-        return RGBWalletRepository.wallet.backup(backupPath, password)
+    private fun getBackupFile(mnemonic: String, context: ReactApplicationContext): File {
+        val keys = restoreKeys(RGBWalletRepository.rgbNetwork, mnemonic)
+        return File(
+            context.filesDir,
+            AppConstants.backupName.format(keys.xpubFingerprint)
+        )
     }
+
+    fun backup(backupPath: String, password: String, context: ReactApplicationContext): String {
+        try {
+            val gAccount = GoogleSignIn.getLastSignedInAccount(context)
+            val credential =
+                GoogleAccountCredential.usingOAuth2(
+                    context,
+                    listOf(DriveScopes.DRIVE_FILE)
+                )
+            Log.d(TAG, "allAccounts: ${credential?.allAccounts?.get(0)?.name}")
+
+            if (gAccount != null) {
+                credential.selectedAccount = gAccount.account!!
+            }
+            driveClient =
+                Drive.Builder(NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
+                    .setApplicationName("hexa")
+                    .build()
+            val backupFile = getBackupFile(password, context)
+            backupFile.delete()
+            RGBWalletRepository.wallet.backup(backupFile.absolutePath, password)
+            Log.d(TAG, "Backup done name='${backupFile.name}")
+
+            val gFile = com.google.api.services.drive.model.File()
+            gFile.name = backupFile.name
+            Log.d(TAG, "gFile='${gFile.name}")
+            val newBackupID =
+                driveClient.files().create(gFile, FileContent(ZIP_MIME_TYPE, backupFile)).execute().id
+            Log.d(TAG, "Backup uploaded. Backup file ID: $newBackupID")
+            val oldBackups = driveClient.files().list().setQ("name='${backupFile.name}'").execute()
+            Log.d(TAG, "oldBackups='$oldBackups")
+            if (oldBackups != null) {
+                for (file in oldBackups.files) {
+                    Log.d(TAG, "Deleting old backup file ${file.id} ...")
+                    driveClient.files().delete(file.id).execute()
+                }
+            }
+            Log.d(TAG, "Backup operation completed")
+            return ""
+        }catch (e: Exception){
+            Log.d(TAG, "Exception: ${e}")
+
+            return ""
+        }
+    }
+
+    fun getBackupInfo(): Boolean {
+        return RGBWalletRepository.wallet.backupInfo()
+    }
+
 
 }

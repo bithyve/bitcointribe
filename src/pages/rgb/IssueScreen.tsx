@@ -224,7 +224,7 @@ export default function IssueScreen( props ) {
             <View
               style={styles.IssueAssetWrapper}
             >
-              <Text style={styles.IssueAssetText}>{'Issue Asset'}</Text>
+              <Text style={styles.IssueAssetText}>{'Submit'}</Text>
             </View>
           </TouchableOpacity>
         </View>
