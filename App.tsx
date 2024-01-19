@@ -167,9 +167,9 @@ function AppContent() {
   return (
     <>
       <Navigator
-        onNavigationStateChange={async ( prevState, currentState ) => {
-          setPreviousScreenName( getActiveRouteName( prevState ) )
-          setCurrentScreenName( getActiveRouteName( currentState ) )
+        onNavigationStateChange={async ( ) => {
+          setPreviousScreenName( getActiveRouteName() )
+          setCurrentScreenName( getActiveRouteName() )
         }}
       />
       <ModalContainer

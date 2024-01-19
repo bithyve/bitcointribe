@@ -52,11 +52,6 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
 
   componentDidMount = async() => {
     TestElectrumClient.connect()
-    AppState.addEventListener( 'change', this.handleAppStateChange )
-    Linking.addEventListener( 'url', this.handleDeepLinkEvent )
-    Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {
-      url
-    } ) )
     setTimeout( ()=>{
       this.postSplashScreenActions()
     }, 4000 )
@@ -75,14 +70,6 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
    }
 
 
-  componentWillUnmount = () => {
-    if( this.appStateSubscribe ){
-      this.appStateSubscribe.remove()
-    }
-    if( this.linkStateSubscribe ){
-      this.linkStateSubscribe.remove()
-    }
-  };
 
   handleAppStateChange = ( nextAppState ) => {
     // no need to trigger login screen if accounts are not synced yet
@@ -107,12 +94,12 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
         const isHomePageOpen = Number( diff ) < Number( 20000 )
         if( isHomePageOpen ){
           if ( !this.url ){
-            this.props.navigation.replace( 'Home', {
+            this.props.navigation.replace( 'App', {
               screen: 'Home',
             } )
           } else {
             const processedLink = await processDeepLink( this.url )
-            this.props.navigation.replace( 'Home', {
+            this.props.navigation.replace( 'App', {
               screen: 'Home',
               params: {
                 trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,

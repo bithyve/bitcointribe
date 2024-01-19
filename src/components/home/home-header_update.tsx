@@ -183,33 +183,7 @@ const HomeHeader = ( {
 
     return <TouchableOpacity
       onPress={()=> {
-        navigation.dispatch( state => {
-          const moreOptionsStackRoute = state.routes.find( route => route.name === 'MoreOptionsStack' )
-          let updatedRoutes = state.routes
-          if ( moreOptionsStackRoute ) {
-            updatedRoutes = [
-              ...state.routes.slice( 0, -1 ),
-              {
-                ...state.routes[ state.routes.length - 1 ], // Copy the existing MoreOptionsStack route
-                state: {
-                  ...( state.routes[ state.routes.length - 1 ].state || {
-                  } ),
-                  index: 1,
-                  routes: [ {
-                    name: 'MoreOptionsContainerScreen', key: 'MoreOptionsContainerKey'
-                  }, {
-                    name: 'BackupMethods', key: 'BackupMethodsKey'
-                  } ], // Update the routes of MoreOptionsStack
-                },
-              }
-            ]
-          }
-          return CommonActions.reset( {
-            ...state,
-            index: 4,
-            routes: updatedRoutes,
-          } )
-        } )
+        navigation.navigate( 'BackupMethods' )
       } }
       activeOpacity={0.6}
       style={{

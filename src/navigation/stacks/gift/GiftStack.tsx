@@ -18,6 +18,7 @@ import GiftCreatedScreen from '../../../pages/Gift/GiftCreatedScreen'
 import GiftScreen from '../../../pages/Gift/GiftScreen'
 import SetUpSatCardScreen from '../../../pages/Gift/SetUpSatCardScreen'
 import SetUpSatNextCardScreen from '../../../pages/Gift/SetUpSatNextCardScreen'
+import GiftQRScannerScreen from '../../../pages/FriendsAndFamily/GiftQrScanner'
 import Intermediate from '../../../pages/Intermediate'
 import Launch from '../../../pages/Launch'
 import Login from '../../../pages/Login'
@@ -25,7 +26,7 @@ import QrAndLink from '../../../pages/NewBHR/QrAndLink'
 import ReLogin from '../../../pages/ReLogin'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import QRStack from '../home/QRStack'
-import GiftQRScannerScreen from '../../../pages/FriendsAndFamily/GiftQrScanner'
+
 import AppWebView from '../../../pages/AppWebView'
 
 

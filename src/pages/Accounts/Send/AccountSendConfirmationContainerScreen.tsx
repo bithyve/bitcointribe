@@ -109,14 +109,8 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation, 
               hardRefresh: true,
             } ) )
           } )
-          navigation.navigate( {
-            name: 'AccountDetails',
-            params: {
-              screen: 'AccountDetailsRoot',
-              params:{
-                accountShellID: sourceAccountShell.id,
-              }
-            }
+          navigation.navigate( 'AccountDetailsRoot', {
+            accountShellID: sourceAccountShell.id
           } )
         }}
         onPressCancel={() => setSuccess( false )}
@@ -141,14 +135,8 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation, 
           dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
           // dismissBottomSheet()
           setFailure( false )
-          navigation.navigate( {
-            name: 'AccountDetails',
-            params: {
-              screen: 'AccountDetailsRoot',
-              params:{
-                accountShellID: sourceAccountShell.id,
-              }
-            }
+          navigation.navigate( 'AccountDetailsRoot', {
+            accountShellID: sourceAccountShell.id
           } )
         }}
         isUnSuccess={true}

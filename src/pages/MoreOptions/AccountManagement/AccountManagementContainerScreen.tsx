@@ -178,58 +178,33 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
         onProceed={( accounShell )=>{
           if( ( primarySubAccount as SubAccountDescribing ).type === AccountType.LIGHTNING_ACCOUNT ) {
             const resetAction = CommonActions.reset( {
-              index: 0,
-              routes: [ {
-                name: 'Home',
-                key: 'HomeKey',
-                state: {
-                  routes: [
-                    {
-                      name: 'Home',
-                      key: 'HomeKey2'
-                    },
-                    {
-                      name: 'LNAccountDetails',
-                      key: 'LNAccountDetailsKey',
-                      params: {
-                        screen: 'AccountDetailsRoot',
-                        params: {
-                          accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
-                          node: ( primarySubAccount as SubAccountDescribing ).node
-                        }
-                      }
-                    }
-                  ]
-                }
-              } ],
+              index: 1,
+              routes: [
+                {
+                  name: 'Home'
+                },
+                {
+                  name: 'LNAccountDetails', params: {
+                    accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
+                    node: ( primarySubAccount as SubAccountDescribing ).node
+                  }
+                },
+              ],
             } )
-
             navigation.dispatch( resetAction )
           } else {
             const resetAction = CommonActions.reset( {
-              index: 0,
-              routes: [ {
-                name: 'Home',
-                key: 'HomeKey',
-                state: {
-                  routes: [
-                    {
-                      name: 'Home',
-                      key: 'HomeKey2'
-                    },
-                    {
-                      name: 'AccountDetails',
-                      key: 'AccountDetailsKey',
-                      params: {
-                        screen: 'AccountDetailsRoot',
-                        params: {
-                          accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
-                        }
-                      }
-                    }
-                  ]
-                }
-              } ],
+              index: 1,
+              routes: [
+                {
+                  name: 'Home'
+                },
+                {
+                  name: 'AccountDetailsRoot', params: {
+                    accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
+                  }
+                },
+              ],
             } )
             navigation.dispatch( resetAction )
           }
