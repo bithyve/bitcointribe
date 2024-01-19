@@ -12,6 +12,14 @@ export default class RGBServices{
     return JSON.parse( keys )
   }
 
+  static restoreKeys = async ( mnemonic: string ): Promise<RGBConfig> => {
+    const keys = await RGB.restoreKeys(
+      NETWORK,
+      mnemonic
+    )
+    return JSON.parse( keys )
+  }
+
   static getAddress = async ( mnemonic: string ): Promise<string> => {
     const address = await RGB.getAddress(
       mnemonic,
