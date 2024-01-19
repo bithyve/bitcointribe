@@ -75,7 +75,6 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
     return (
       <TouchableOpacity
         onPress={async() => {
-          dispatch( updateTempAccID( sourcePrimarySubAccount.accountShellID ) )
           if ( text === 'Confirm' ) {
             // closeModal()
             setLoader( true )
@@ -92,11 +91,10 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
             setGiftAddedModel( false )
             dispatch( giftAccepted( '' ) )
             closeModal()
-            navigation.dispatch(
-              resetStackToAccountDetails( {
-                accountShellID: sourcePrimarySubAccount.accountShellID,
-              } )
-            )
+            navigation.popToTop()
+            navigation.navigate( 'AccountDetails', {
+              accountShellID: sourcePrimarySubAccount.accountShellID,
+            } )
             dispatch( refreshAccountShells( [ sendingAccount ], {
               hardRefresh: true
             } ) )

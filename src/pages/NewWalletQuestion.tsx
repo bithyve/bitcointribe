@@ -160,7 +160,7 @@ export default function NewWalletQuestion( props ) {
     if ( walletSetupCompleted ) {
       setSignUpStarted( false )
       setLoaderModal( false )
-      props.navigation.navigate( 'HomeNav', {
+      props.navigation.navigate( 'App', {
         walletName,
       } )
     }

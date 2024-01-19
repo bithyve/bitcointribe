@@ -61,8 +61,7 @@ const sectionListItemKeyExtractor = ( index ) => String( index )
 
 const AccountDetailsContainerScreen: React.FC<Props> = ( { route, navigation } ) => {
   const dispatch = useDispatch()
-  const tempAccId = useSelector( ( state ) => state.doNotStore.tempAccShellID )
-  const accountShellID = route.params?.accountShellID || tempAccId
+  const accountShellID = route.params?.accountShellID
   useLayoutEffect( () => {
     navigation.setOptions( {
       header: () => (
@@ -135,11 +134,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { route, navigation } )
   }
 
   function navigateToAccountSettings() {
-    navigation.navigate( 'SubAccountSettings', {
-      screen: 'AccountSettingsMain',
-      params: {
-        accountShellID
-      }
+    navigation.navigate( 'AccountSettingsMain', {
+      accountShellID
     } )
   }
 
@@ -310,11 +306,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { route, navigation } )
   const onSendBittonPress = () => {
     dispatch( sourceAccountSelectedForSending( accountShell ) )
 
-    navigation.navigate( 'Send', {
-      screen: 'SendRoot',
-      params: {
-        subAccountKind: primarySubAccount.kind,
-      }
+    navigation.navigate( 'SendRoot', {
+      subAccountKind: primarySubAccount.kind,
     } )
   }
 

@@ -1105,12 +1105,12 @@ const WalletBackup = ( props, navigation ) => {
             setMultipleAcccountModal( false )
             const resetAction = CommonActions.reset( {
               index: 0,
-              routes: [ {
-                name: 'Home',
-                key: 'HomeKey'
-              } ],
+              routes: [
+                {
+                  name: 'Home'
+                }
+              ],
             } )
-
             props.navigation.dispatch( resetAction )
 
           }}

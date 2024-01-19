@@ -60,10 +60,9 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { route, navigati
       index: 0,
       routes: [
         {
-          name: 'Home',
-          key: 'HomeKey',
+          name: 'Home'
         }
-      ]
+      ],
     } )
     navigation.dispatch( resetAction )
   }

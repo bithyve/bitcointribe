@@ -213,8 +213,7 @@ export default function RestoreSelectedContactsList( props ) {
           props.navigation.dispatch( CommonActions.reset( {
             index: 0,
             routes: [ {
-              name: 'HomeNav',
-              key: 'HomeKey'
+              name: 'App',
             } ],
           } ) )
         }}
@@ -320,10 +319,11 @@ export default function RestoreSelectedContactsList( props ) {
         dispatch( walletCheckIn() )
         props.navigation.dispatch( CommonActions.reset( {
           index: 0,
-          routes: [ {
-            name: 'HomeNav',
-            key: 'HomeKey'
-          } ],
+          routes: [
+            {
+              name: 'App',
+            }
+          ],
         } ) )
       }
     } )()
@@ -334,13 +334,14 @@ export default function RestoreSelectedContactsList( props ) {
       ( loaderBottomSheet as any ).current.snapTo( 0 )
       props.navigation.dispatch( CommonActions.reset( {
         index: 0,
-        routes: [ {
-          name: 'HomeNav',
-          key: 'HomeKey',
-          params: {
-            exchangeRates,
+        routes: [
+          {
+            name: 'App',
+            params: {
+              exchangeRates,
+            }
           }
-        } ],
+        ],
       } ) )
     }
   }, [ accounts.accountsSynched ] )

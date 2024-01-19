@@ -121,12 +121,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
     else {
       this.props.navigation.navigate( 'AccountDetails', {
-        screen: 'AccountDetailsRoot',
-        params: {
-          accountShellID: selectedAccount.id,
-          swanDeepLinkContent: this.props.swanDeepLinkContent
-        }
-      } )
+        accountShellID: selectedAccount.id,
+        swanDeepLinkContent: this.props.swanDeepLinkContent
+      }
+      )
     }
 
     // }
@@ -293,14 +291,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     },
                   }
                 )
-                this.props.navigation.navigate( {
-                  name: 'AccountDetails',
-                  params: {
-                    screen: 'AccountDetailsRoot',
-                    params:{
-                      accountShellID: accountShell[ 0 ].primarySubAccount.accountShellID,
-                    }
-                  }
+                this.props.navigation.navigate( 'AccountDetails', {
+                  accountShellID: accountShell[ 0 ].primarySubAccount.accountShellID,
                 } )
               }}>
               <View style={styles.iconWrapper}>

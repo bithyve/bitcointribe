@@ -474,7 +474,7 @@ class FriendsAndFamilyScreen extends React.Component<
   }
 
   onAllGiftClick = () => {
-    this.props.navigation.navigate( 'GiftStack' )
+    this.props.navigation.navigate( 'GiftScreen' )
   }
 
   render() {

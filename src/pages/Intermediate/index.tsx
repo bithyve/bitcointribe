@@ -26,7 +26,6 @@ interface IntermediateStateTypes {
 
 class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTypes> {
   url: any;
-  appStateListener: any;
   constructor( props ) {
     super( props )
     this.state = {
@@ -36,11 +35,11 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
   }
 
     componentDidMount = () => {
-      this.appStateListener = AppState.addEventListener( 'change', this.handleAppStateChange )
-      Linking.addEventListener( 'url', this.handleDeepLinkEvent )
-      Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {
-        url
-      } ) )
+      // this.appStateListener = AppState.addEventListener( 'change', this.handleAppStateChange )
+      // Linking.addEventListener( 'url', this.handleDeepLinkEvent )
+      // Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {
+      //   url
+      // } ) )
       setTimeout( () => {
         this.postSplashScreenActions()
       }, 2 )
@@ -84,46 +83,26 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
           const now: any = new Date()
           const diff = Math.abs( now - this.props.lastSeen )
           const isHomePageOpen = Number( diff ) < Number( 20000 )
-          console.log( 'diff', diff, isHomePageOpen )
-          if( isHomePageOpen ){
+          if( !isHomePageOpen ){
             if ( !this.url ){
-              this.props.navigation.replace( 'Home', {
-                screen: 'Home',
-              } )
+              this.props.navigation.replace( 'Login' )
             } else {
               const processedLink = await processDeepLink( this.url )
-              this.props.navigation.replace( 'Home', {
-                screen: 'Home',
-                params: {
-                  trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,
-                  giftRequest: processedLink ? processedLink.giftRequest: null,
-                  swanRequest: processedLink ? processedLink.swanRequest: null,
-                }
+              this.props.navigation.replace( 'Login', {
+                trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,
+                giftRequest: processedLink ? processedLink.giftRequest: null,
+                swanRequest: processedLink ? processedLink.swanRequest: null,
               } )
             }
-          } else if ( !this.url ){
-            this.props.navigation.replace( 'Login' )
-          } else {
-            const processedLink = await processDeepLink( this.url )
-            this.props.navigation.replace( 'Login', {
-              trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,
-              giftRequest: processedLink ? processedLink.giftRequest: null,
-              swanRequest: processedLink ? processedLink.swanRequest: null,
-            } )
           }
-
         } else {
           this.props.navigation.replace( 'PasscodeConfirm' )
         }
-
       } catch ( err ) {
         console.log( 'err', err )
       }
     };
 
-    componentWillUnmount() {
-      this.appStateListener.remove()
-    }
 
 
     render() {

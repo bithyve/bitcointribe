@@ -200,13 +200,12 @@ const AppInfo = ( props ) => {
           onPressConfirm={() => {
             setSuccess( false )
             const resetAction = CommonActions.reset( {
-              index: 1,
+              index: 0,
               routes: [
                 {
-                  name: 'Home',
-                  key: 'HomeKey',
+                  name: 'Home'
                 }
-              ]
+              ],
             } )
             props.navigation.dispatch( resetAction )
           }}

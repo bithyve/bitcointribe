@@ -111,6 +111,7 @@ import { setVersion } from '../../store/actions/versionHistory'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { AccountsState } from '../../store/reducers/accounts'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import { resetToHomeAction } from '../actions/NavigationActions'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -361,19 +362,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   navigateToQRScreen = () => {
-    this.props.navigation.navigate( 'HomeNav', {
-      screen: this.props.route.name,
-      params: {
-        screen: 'QRScanner',
-        params: {
-          screen: 'QRRoot',
-          params: {
-            onCodeScanned:  this.onCodeScanned,
-          }
-        }
-      }
+    this.props.navigation.navigate( 'QRRoot', {
+      onCodeScanned:  this.onCodeScanned,
     } )
-  };
+  }
+
 
   onPressNotifications = async () => {
     this.readAllNotifications()
@@ -575,8 +568,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             this.props.updateLastSeen( new Date() )
             CommonActions.navigate( {
               name: 'Intermediate'
-            } )
-          }
+            } )          }
         }
       )
     } catch ( error ) {
@@ -707,19 +699,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // deep link is opened, we will navigate back to Home first.
     if ( !isFocused )
       navigation.dispatch(
-        CommonActions.reset( {
+        this.props.navigation.dispatch( CommonActions.reset( {
           index: 0,
-          routes: [ {
-            name: 'Home',
-            key: 'HomeKey',
-            params: {
-              unhandledDeepLinkURL: url
+          routes: [
+            {
+              name: 'Home',
+              params: {
+                unhandledDeepLinkURL: url
+              }
             }
-          } ],
-        } )
+          ],
+        } ) )
       )
     else this.handleDeepLinking( url )
   };
+
 
   handleDeepLinking = async ( url ) => {
     if ( url === null ) return
@@ -980,17 +974,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   cleanupListeners() {
-    this.focusListener?.()
+    try{
+      this.focusListener?.()
 
-    if ( typeof this.appStateListener === 'function' ) {
-      this.appStateListener.remove()
-    }
-    if ( typeof this.linkStateListener === 'function' ) {
-      this.linkStateListener.remove()
-    }
-    clearTimeout( this.openBottomSheetOnLaunchTimeout )
-    if ( this.firebaseNotificationListener ) {
-      this.firebaseNotificationListener()
+      if ( this.appStateListener ) {
+        this.appStateListener.remove()
+      }
+      if ( this.linkStateListener ) {
+        this.linkStateListener.remove()
+      }
+      clearTimeout( this.openBottomSheetOnLaunchTimeout )
+      if ( this.firebaseNotificationListener ) {
+        this.firebaseNotificationListener()
+      }
+    }catch( err ){
+      //
     }
   }
 
@@ -1159,7 +1157,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 1
               )
             }
-            navigation.goBack()
+            setTimeout( ()=>{
+              navigation.goBack()
+            }, 3000 )
           }
         } )
       }
@@ -1221,7 +1221,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             case DeepLinkEncryptionType.DEFAULT:
               decryptionKey = giftRequest.encryptedChannelKeys
               break
-
             case DeepLinkEncryptionType.OTP:
             case DeepLinkEncryptionType.LONG_OTP:
             case DeepLinkEncryptionType.SECRET_PHRASE:
