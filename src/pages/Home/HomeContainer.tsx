@@ -19,11 +19,9 @@ import { connect } from 'react-redux'
 import BWIcon from '../../assets/images/svgs/bw.svg'
 import IconRight from '../../assets/images/svgs/icon_arrow_right.svg'
 import LNIcon from '../../assets/images/svgs/lightningWhiteWithBack.svg'
-import TestIcon from '../../assets/images/svgs/testAccountHome.svg'
 import { AccountType } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { LocalizationContext } from '../../common/content/LocContext'
-import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
@@ -277,7 +275,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               </View>
             </AppBottomSheetTouchableWrapper>
 
-            <AppBottomSheetTouchableWrapper
+            {/* <AppBottomSheetTouchableWrapper
               style={[ styles.menuWrapper, {
                 marginBottom: hp( 5 )
               } ]} onPress={()=>{
@@ -315,7 +313,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               <View style={styles.iconRightWrapper}>
                 <IconRight/>
               </View>
-            </AppBottomSheetTouchableWrapper>
+            </AppBottomSheetTouchableWrapper> */}
           </View>
         </ModalContainer>
         <ModalContainer

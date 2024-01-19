@@ -16,8 +16,8 @@ export function* syncRgbWorker(  ) {
     const transactions = yield call( RGBServices.getTransactions, mnemonic )
     yield put( setRgbTxns( transactions ) )
     const assets = yield call( RGBServices.syncRgbAssets, mnemonic, xpub )
-    if( assets.rgb20 ) yield put( setRgb20Assets( assets.rgb20 ) )
-    if( assets.rgb25 ) yield put( setRgb121Assets( assets.rgb25 ) )
+    if( assets.nia ) yield put( setRgb20Assets( assets.nia ) )
+    if( assets.cfa ) yield put( setRgb121Assets( assets.cfa ) )
     yield put( setRgbSyncing( false ) )
   }
   catch( err ){
