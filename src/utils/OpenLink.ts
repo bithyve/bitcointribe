@@ -1,11 +1,10 @@
 import { Linking } from 'react-native'
 
 export default async function openLink( urlPath: string ) {
-  const isSupported = await Linking.canOpenURL( urlPath )
-
-  if ( isSupported ) {
+  try {
     await Linking.openURL( urlPath )
-  } else {
+  } catch ( err ) {
     throw Error( `Unable to open URL at path: ${urlPath}` )
   }
 }
+
