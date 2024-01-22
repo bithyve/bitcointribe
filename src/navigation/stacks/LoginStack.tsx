@@ -2,7 +2,6 @@ import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import SmallNavHeaderBackButton from '../../components/navigation/SmallNavHeaderBackButton'
 import AccountSelection from '../../pages/AccountSelection'
-import AppWebView from '../../pages/AppWebView'
 import CreateKeeperScreen from '../../pages/CreateKeeperScreen'
 import Launch from '../../pages/Launch'
 import Login from '../../pages/Login'
@@ -83,10 +82,6 @@ function LoginStack() {
       <Stack.Screen name="UpdateApp" component={UpdateApp} options={{
         gestureEnabled: false
       }} />
-      <Stack.Screen name='AppWebView' component={AppWebView} options={{
-        headerShown: false
-      }}/>
-
       {//Do we need this?
       }
       <Stack.Screen name="WalletCreationSuccess" component={WalletCreationSuccess} />

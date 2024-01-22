@@ -546,7 +546,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   onAppStateChange = async ( nextAppState ) => {
     const { appState } = this.state
     const { isPermissionSet, setIsPermissionGiven } = this.props
-    if( this.props.linkingURL && this.props.linkingURL.trim() !=='' ){
+    if( this.props.linkingURL ){
       this.props.updateLinkingURL( '' )
     }
     try {
@@ -566,9 +566,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               value: false,
             } )
             this.props.updateLastSeen( new Date() )
-            CommonActions.navigate( {
-              name: 'Intermediate'
-            } )          }
+            // CommonActions.navigate( {
+            //   name: 'Intermediate'
+            // } )
+          }
         }
       )
     } catch ( error ) {
@@ -697,26 +698,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const isFocused = navigation.isFocused()
     // If the user is on one of Home's nested routes, and a
     // deep link is opened, we will navigate back to Home first.
-    if ( !isFocused )
-      navigation.dispatch(
-        this.props.navigation.dispatch( CommonActions.reset( {
-          index: 0,
-          routes: [
-            {
-              name: 'Home',
-              params: {
-                unhandledDeepLinkURL: url
-              }
-            }
-          ],
-        } ) )
-      )
-    else this.handleDeepLinking( url )
+    if ( !isFocused ){
+      navigation.popToTop()
+      this.handleDeepLinking( url )
+    } else {
+      this.handleDeepLinking( url )
+    }
   };
 
 
   handleDeepLinking = async ( url ) => {
-    if ( url === null ) return
+    if ( !url ) return
     if( this.props.linkingURL.trim() === url.trim() ) return
     this.props.updateLinkingURL( url )
     const { trustedContactRequest, swanRequest, giftRequest, campaignId } = await processDeepLink( url )
@@ -774,7 +766,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   componentDidMount = async() => {
-    if( !this.props.shouldListen ){
+    const shouldListen = this.props.route.name === 'HomeTab'
+    if( !shouldListen ){
       return
     }
     const {
@@ -787,10 +780,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       'change',
       this.onAppStateChange
     )
+    this.linkStateListener = Linking.addEventListener( 'url', this.handleDeepLinkEvent )
+    Linking.getInitialURL().then( this.handleDeepLinking )
+
+    // call this once deeplink is detected aswell
+    this.handleDeepLinkModal()
     requestAnimationFrame( () => {
-      // Keeping autoSync disabled
-      // credsAuthenticated( false )
-      //console.log( 'isAuthenticated*****', this.props.isAuthenticated )
+
       this.syncChannel()
       this.closeBottomSheet()
       if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
@@ -809,29 +805,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setUpFocusListener()
       //this.getNewTransactionNotifications()
 
-      this.linkStateListener = Linking.addEventListener( 'url', this.handleDeepLinkEvent )
-      Linking.getInitialURL().then( this.handleDeepLinking )
 
-      // call this once deeplink is detected aswell
-      this.handleDeepLinkModal()
 
       // set FCM token(if haven't already)
       this.storeFCMToken()
 
-      const unhandledDeepLinkURL = this.props.route.params?.unhandledDeepLinkURL
+      // const unhandledDeepLinkURL = this.props.route.params?.unhandledDeepLinkURL
 
-      if ( unhandledDeepLinkURL ) {
-        navigation.setParams( {
-          unhandledDeepLinkURL: null,
-        } )
-        this.handleDeepLinking( unhandledDeepLinkURL )
-      }
+      // if ( unhandledDeepLinkURL ) {
+      //   navigation.setParams( {
+      //     unhandledDeepLinkURL: null,
+      //   } )
+      //   this.handleDeepLinking( unhandledDeepLinkURL )
+      // }
       this.props.setVersion()
       this.props.fetchExchangeRates( this.props.currencyCode )
       this.props.fetchFeeRates()
       this.props.recomputeNetBalance()
     } )
-
   };
 
    storeFCMToken = async () => {
@@ -1242,9 +1233,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   onGiftRequestRejected = ( ) => {
     try {
       this.closeBottomSheet()
-      this.props.navigation.setParams( {
-        unhandledDeepLinkURL: null,
-      } )
       const { giftRequest } = this.state
       this.props.rejectGift( giftRequest.channelAddress )
     } catch ( error ) {

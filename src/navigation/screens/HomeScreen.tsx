@@ -54,15 +54,9 @@ function HomeScreen( { navigation } ) {
       tabBar={GradientTab}
       backBehavior='none'
       screenOptions={( { route, navigation } ) => {
-        const homeNavRoutes = useNavigationState( ( state ) => state.routes[ 0 ].state?.routes )
-        let showContent = true
-        for( const route of homeNavRoutes || [] ) {
-          if ( route.state?.routes?.length > 1 ) showContent = false
-        }
-        const shouldListen = route.name === 'HomeTab'
         return ( {
           header: () => {
-            return <Header showContent={true} route={route} navigation={navigation} shouldListen={shouldListen}/>
+            return <Header showContent={true} route={route} navigation={navigation}/>
           },
           tabBarShowLabel: false,
           tabBarStyle:{

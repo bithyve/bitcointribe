@@ -1,6 +1,5 @@
 import React from 'react'
 import SmallNavHeaderBackButton from '../../components/navigation/SmallNavHeaderBackButton'
-import AppWebView from '../../pages/AppWebView'
 import Launch from '../../pages/Launch'
 import Login from '../../pages/Login'
 import NewOwnQuestions from '../../pages/NewOwnQuestions'
@@ -409,9 +408,6 @@ function AppStack() {
       <Stack.Screen name="GiftCreated" component={GiftCreatedScreen} />
       <Stack.Screen name="ClaimSats" component={ClaimSatsScreen} />
       <Stack.Screen name="GiftQRScannerScreen" component={GiftQRScannerScreen}/>
-      <Stack.Screen name='AppWebView' component={AppWebView} options={{
-        headerShown: false
-      }}/>
       <Stack.Screen name="Login" component={Login} options={{
         headerShown: false,
       }} />
