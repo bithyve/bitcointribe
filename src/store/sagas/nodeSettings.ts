@@ -1,15 +1,15 @@
 import axios from 'axios'
-import { put, call, select } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import config from '../../bitcoin/HexaConfig'
-import PersonalNode from '../../common/data/models/PersonalNode'
-import { bitHyveNodeConnectionSucceeded, CONNECT_TO_BIT_HYVE_NODE, CONNECT_TO_NODE, personalNodeConfigurationSet, personalNodeConnectionFailed, personalNodeConnectionSucceeded, personalNodePreferenceToggled, RESTORE_PERSONAL_NODE_CONFIGURATION, SAVE_PERSONAL_NODE_CONFIGURATION, setDefaultNodes, setDefaultNodesSaved } from '../actions/nodeSettings'
-import { createWatcher } from '../utils/utilities'
-import { NetworkType } from '../../bitcoin/utilities/Interface'
-import { predefinedMainnetNodes, predefinedTestnetNodes } from '../../bitcoin/electrum/predefinedNodes'
-import { NodeStateOperations } from '../reducers/nodeSettings'
 import ElectrumClient from '../../bitcoin/electrum/client'
-import { fetchFeeRates } from '../actions/accounts'
+import { predefinedMainnetNodes, predefinedTestnetNodes } from '../../bitcoin/electrum/predefinedNodes'
+import { NetworkType } from '../../bitcoin/utilities/Interface'
+import PersonalNode from '../../common/data/models/PersonalNode'
 import Toast from '../../components/Toast'
+import { fetchFeeRates } from '../actions/accounts'
+import { CONNECT_TO_BIT_HYVE_NODE, CONNECT_TO_NODE, RESTORE_PERSONAL_NODE_CONFIGURATION, SAVE_PERSONAL_NODE_CONFIGURATION, bitHyveNodeConnectionSucceeded, personalNodeConfigurationSet, personalNodeConnectionFailed, personalNodeConnectionSucceeded, personalNodePreferenceToggled, setDefaultNodes, setDefaultNodesSaved } from '../actions/nodeSettings'
+import { NodeStateOperations } from '../reducers/nodeSettings'
+import { createWatcher } from '../utils/utilities'
 
 
 function* savePersonalNodeConfiguration( { payload }: { payload: PersonalNode } ) {
@@ -67,7 +67,7 @@ export const restorePersonalNodeConfigurationWatcher = createWatcher(
   RESTORE_PERSONAL_NODE_CONFIGURATION
 )
 
-function* connectToNodeWorker() {
+export function* connectToNodeWorker() {
   try {
     console.log( 'Connecting to node...' )
 
