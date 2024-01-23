@@ -1,19 +1,9 @@
-import React, { Component, ReactElement } from 'react'
-import { Text, View, FlatList, StyleSheet } from 'react-native'
-import { Button } from 'react-native-elements/dist/buttons/Button'
-import RESTUtils from '../../../../utils/ln/RESTUtils'
-import axios from 'axios'
-import SendAndReceiveButtonsFooter from '../../../Accounts/Details/SendAndReceiveButtonsFooter'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
+import React from 'react'
+import { Text, View } from 'react-native'
+
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import useAccountShellFromRoute from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 
-export default class TransactionListItemComponent extends Component {
-  constructor( props: any ) {
-    super( props )
-  }
-
-  render() {
+const TransactionListItemComponent = (props)=> {
     return (
       <View>
         <View style = {{
@@ -23,10 +13,10 @@ export default class TransactionListItemComponent extends Component {
           margin: 5
         }}>
           <View>
-            <Text>amount: {this.props.params.amount}</Text>
+            <Text>amount: {props.params.amount}</Text>
           </View>
           <View>
-            <Text>timestamp: {this.props.params.time_stamp}</Text>
+            <Text>timestamp: {props.params.time_stamp}</Text>
           </View>
         </View>
 
@@ -36,4 +26,5 @@ export default class TransactionListItemComponent extends Component {
       </View>
     )
   }
-}
+
+  export default TransactionListItemComponent

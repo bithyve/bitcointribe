@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
 import {
   Text,
   View,
@@ -8,7 +8,6 @@ import {
 } from 'react-native'
 import Clipboard from '@react-native-clipboard/clipboard'
 import ListStyles from '../../../common/Styles/ListStyles'
-import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
 import moment from 'moment'
 import Colors from '../../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -17,21 +16,15 @@ import Invoice from '../../../models/Invoice'
 import Toast from '../../../components/Toast'
 import HeaderTitle from '../../../components/HeaderTitle'
 
-export default class TransactionDetailsScreen extends Component {
-  constructor( props ) {
-    super( props )
-    this.state={
-      invoice: props.route.params?.invoice || null,
-    }
-  }
+const TransactionDetailsScreen=(props)=>{
+  const [invoice, setInvoice] = useState(props.route.params?.invoice || null)
 
-  writeToClipboard = ( text: string ) => {
+
+  const writeToClipboard = ( text: string ) => {
     Clipboard.setString( text )
     Toast( 'Text Copied' )
   };
 
-  render() {
-    const { invoice }: Invoice = this.state
     const {
       fallback_addr,
       r_hash,
@@ -69,7 +62,7 @@ export default class TransactionDetailsScreen extends Component {
           {!!payment_request && (
             <TouchableOpacity
               onPress={() => {
-                this.writeToClipboard( payment_request )
+                writeToClipboard( payment_request )
               }}
             >
               <View style={styles.lineItem}>
@@ -291,7 +284,8 @@ export default class TransactionDetailsScreen extends Component {
       </ScrollView>
     )
   }
-}
+
+export default TransactionDetailsScreen;
 
 const styles = StyleSheet.create( {
   rootContainer: {

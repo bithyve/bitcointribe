@@ -1,29 +1,18 @@
-import React, { Component, ReactElement } from 'react'
-import { Text, View, FlatList, StyleSheet, StatusBar } from 'react-native'
-import { Button } from 'react-native-elements/dist/buttons/Button'
-import RESTUtils from '../../../../utils/ln/RESTUtils'
-import axios from 'axios'
-import SendAndReceiveButtonsFooter from '../../../Accounts/Details/SendAndReceiveButtonsFooter'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
-import { widthPercentageToDP } from 'react-native-responsive-screen'
-import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
-import Transaction from '../../../../models/Transaction'
-import TransactionListItemComponent from './TransactionListItemComponent'
+import React, { ReactElement } from 'react'
+import { TouchableOpacity, View, FlatList, StyleSheet, StatusBar } from 'react-native'
 import PaymentItem from './PaymentItem'
 import Payment from '../../../models/Payment'
 
-export default class PaymentList extends Component {
-  constructor( props: any ) {
-    super( props )
-  }
+ const PaymentList =(props)=> {
 
-    uniqueKey = ( item:any, index: number ) => index.toString();
 
-    renderTemplate = ( { item } : {item: Payment } ): ReactElement => {
+   const uniqueKey = ( item:any, index: number ) => index.toString();
+
+  const renderTemplate = ( { item } : {item: Payment } ): ReactElement => {
       return (
         <TouchableOpacity
           onPress={() => {
-            this.props.navigation.navigate( 'PaymentDetailsScreen', {
+            props.navigation.navigate( 'PaymentDetailsScreen', {
               payment:item
             } )
           }}
@@ -33,20 +22,19 @@ export default class PaymentList extends Component {
       )
     }
 
-    render() {
       return (
         <View
           style={styles.container}>
           <FlatList
-            data={this.props.payments}
-            renderItem={this.renderTemplate}
-            keyExtractor={this.uniqueKey}
+            data={props.payments}
+            renderItem={renderTemplate}
+            keyExtractor={uniqueKey}
           />
         </View>
       )
     }
-}
 
+export default PaymentList;
 
 const styles = StyleSheet.create( {
   container: {
@@ -54,3 +42,4 @@ const styles = StyleSheet.create( {
     marginTop: StatusBar.currentHeight || 0,
   },
 } )
+
