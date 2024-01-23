@@ -37,7 +37,7 @@ export default (  message, icon = false, error= false, toastPosition=-15 ) => {
       {message.length > 100  ? `${message.substring( 0, 100 )}...` : message}
     </Text>
   </View>, {
-    duration: Toast.durations.LONG,
+    duration: Toast.durations.SHORT,
     position: heightPercentageToDP( toastPosition ),
     shadow: true,
     animation: true,
