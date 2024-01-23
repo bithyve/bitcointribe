@@ -3,12 +3,12 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-console */
-import config from '../HexaConfig'
-import ElectrumCli from 'electrum-client'
-import reverse from 'buffer-reverse'
 import * as bitcoinJS from 'bitcoinjs-lib'
-import { ElectrumTransaction, ElectrumUTXO, NodeDetail } from './interface'
+import reverse from 'buffer-reverse'
+import ElectrumCli from 'electrum-client'
+import config from '../HexaConfig'
 import { NetworkType } from '../utilities/Interface'
+import { ElectrumTransaction, ElectrumUTXO, NodeDetail } from './interface'
 
 function shufflePeers( peers ) {
   for ( let i = peers.length - 1; i > 0; i-- ) {
@@ -38,7 +38,7 @@ const ELECTRUM_CLIENT_DEFAULTS = {
   activePeer: null,
 }
 
-let ELECTRUM_CLIENT: {
+export let ELECTRUM_CLIENT: {
   electrumClient: any;
   isClientConnected: boolean;
   currentPeerIndex: number;
@@ -208,6 +208,10 @@ export default class ElectrumClient {
 
     if ( !peers || ELECTRUM_CLIENT.currentPeerIndex > peers.length - 1 ) return null // exhuasted all available peers
     return peers[ ELECTRUM_CLIENT.currentPeerIndex ]
+  }
+
+  public static resetCurrentPeerIndex() {
+    ELECTRUM_CLIENT.currentPeerIndex = -1;
   }
 
   // if current peer to use is not provided, it will try to get the active peer from the saved list of private nodes
