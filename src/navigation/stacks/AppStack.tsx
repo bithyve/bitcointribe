@@ -1,7 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
-import Colors from '../../common/Colors.js'
-import { translations } from '../../common/content/LocContext'
 import { default as SmallNavHeaderBackButton, default as SmallNavHeaderCloseButton } from '../../components/navigation/SmallNavHeaderBackButton'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import AccountSettingsEditDisplayPropertiesScreen from '../../pages/Accounts/AccountSettings/AccountSettingsEditDisplayPropertiesScreen'
@@ -30,7 +28,6 @@ import TransactionsListContainerScreen from '../../pages/Accounts/Transactions/T
 import TwoFASetup from '../../pages/Accounts/TwoFASetup'
 import TwoFASweepFunds from '../../pages/Accounts/TwoFASweepFunds'
 import TwoFAValidation from '../../pages/Accounts/TwoFAValidation'
-import AppWebView from '../../pages/AppWebView'
 import AssetsDetailScreen from '../../pages/Assets/AssetsDetailScreen'
 import BackupGridMnemonic from '../../pages/borderwallet/BackupGridMnemonic'
 import BorderWalletGridScreen from '../../pages/borderwallet/BorderWalletGridScreen'
@@ -134,6 +131,8 @@ import AddNewAccountStack from '../stacks/accounts/AddNewAccountStack'
 import AccountManagementStack from '../stacks/more-options/AccountManagementStack'
 import WalletSettingsStack from '../stacks/more-options/WalletSettingsStack'
 
+import Colors from 'src/common/Colors'
+import { translations } from 'src/common/content/LocContext'
 import AddNewDonationAccountDetailsScreen from '../../pages/Accounts/AddNew/DonationAccount/AddNewDonationAccountDetailsScreen'
 import NewHexaAccountDetailsScreen from '../../pages/Accounts/AddNew/HexaAccount/NewHexaAccountDetailsScreen'
 import NewAccountSelectionContainerScreen from '../../pages/Accounts/AddNew/NewAccountSelectionContainerScreen'
@@ -391,9 +390,6 @@ function AppStack() {
       <Stack.Screen name="GiftCreated" component={GiftCreatedScreen} />
       <Stack.Screen name="ClaimSats" component={ClaimSatsScreen} />
       <Stack.Screen name="GiftQRScannerScreen" component={GiftQRScannerScreen}/>
-      <Stack.Screen name='AppWebView' component={AppWebView} options={{
-        headerShown: false
-      }}/>
       <Stack.Screen name="Login" component={Login} options={{
         headerShown: false,
       }} />

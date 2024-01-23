@@ -4,7 +4,6 @@ import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHea
 import HomeQRScannerScreen from '../../../pages/Home/HomeQRScannerScreen'
 import ReceiveQrScreen from '../../../pages/Home/ReceiveQrScreen'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
-import AppWebView from '../../../pages/AppWebView'
 
 const Stack = createNativeStackNavigator()
 export default function QRStack() {
@@ -29,9 +28,6 @@ export default function QRStack() {
           },
         }
       }} />
-      <Stack.Screen name='AppWebView' component={AppWebView} options={{
-        headerShown: false
-      }}/>
     </Stack.Navigator>
   )
 }

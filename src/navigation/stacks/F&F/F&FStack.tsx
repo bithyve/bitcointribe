@@ -21,7 +21,6 @@ import QrAndLink from '../../../pages/NewBHR/QrAndLink'
 import ReLogin from '../../../pages/ReLogin'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import QRStack from '../home/QRStack'
-import AppWebView from '../../../pages/AppWebView'
 
 const Stack = createNativeStackNavigator()
 const FriendsAndFamily = ( { navigation, route } ) => {
@@ -71,9 +70,7 @@ const FriendsAndFamily = ( { navigation, route } ) => {
         title: 'TransactionDetails'
       }} />
       <Stack.Screen name="RequestKeyFromContact" component={RequestKeyFromContact} />
-      <Stack.Screen name='AppWebView' component={AppWebView} options={{
-        headerShown: false
-      }}/>
+
     </Stack.Navigator>
   )
 }
