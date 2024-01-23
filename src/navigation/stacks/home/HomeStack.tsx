@@ -236,9 +236,6 @@ const HomeStack = ( { navigation, route } ) => {
       <Stack.Screen name="UpgradeBackup" component={UpgradeBackup} />
       <Stack.Screen name="ConfirmKeys" component={ConfirmKeys} />
       <Stack.Screen name="TwoFAValidation" component={TwoFAValidation} />
-      <Stack.Screen name='AppWebView' component={AppWebView} options={{
-        headerShown: false
-      }}/>
     </Stack.Navigator>
   )
 }

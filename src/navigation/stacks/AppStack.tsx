@@ -30,7 +30,6 @@ import TransactionsListContainerScreen from '../../pages/Accounts/Transactions/T
 import TwoFASetup from '../../pages/Accounts/TwoFASetup'
 import TwoFASweepFunds from '../../pages/Accounts/TwoFASweepFunds'
 import TwoFAValidation from '../../pages/Accounts/TwoFAValidation'
-import AppWebView from '../../pages/AppWebView'
 import AssetsDetailScreen from '../../pages/Assets/AssetsDetailScreen'
 import BackupGridMnemonic from '../../pages/borderwallet/BackupGridMnemonic'
 import BorderWalletGridScreen from '../../pages/borderwallet/BorderWalletGridScreen'
@@ -391,9 +390,6 @@ function AppStack() {
       <Stack.Screen name="GiftCreated" component={GiftCreatedScreen} />
       <Stack.Screen name="ClaimSats" component={ClaimSatsScreen} />
       <Stack.Screen name="GiftQRScannerScreen" component={GiftQRScannerScreen}/>
-      <Stack.Screen name='AppWebView' component={AppWebView} options={{
-        headerShown: false
-      }}/>
       <Stack.Screen name="Login" component={Login} options={{
         headerShown: false,
       }} />
