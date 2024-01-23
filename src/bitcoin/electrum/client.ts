@@ -38,7 +38,7 @@ const ELECTRUM_CLIENT_DEFAULTS = {
   activePeer: null,
 }
 
-let ELECTRUM_CLIENT: {
+export let ELECTRUM_CLIENT: {
   electrumClient: any;
   isClientConnected: boolean;
   currentPeerIndex: number;
@@ -193,6 +193,10 @@ export default class ElectrumClient {
 
     if ( !peers || ELECTRUM_CLIENT.currentPeerIndex > peers.length - 1 ) return null // exhuasted all available peers
     return peers[ ELECTRUM_CLIENT.currentPeerIndex ]
+  }
+
+  public static resetCurrentPeerIndex() {
+    ELECTRUM_CLIENT.currentPeerIndex = -1;
   }
 
   // if current peer to use is not provided, it will try to get the active peer from the saved list of private nodes

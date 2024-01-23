@@ -67,7 +67,7 @@ export const restorePersonalNodeConfigurationWatcher = createWatcher(
   RESTORE_PERSONAL_NODE_CONFIGURATION
 )
 
-function* connectToNodeWorker() {
+export function* connectToNodeWorker() {
   try {
 
     const savedDefaultNodes: PersonalNode[] = yield select( state => state.nodeSettings.defaultNodes )
