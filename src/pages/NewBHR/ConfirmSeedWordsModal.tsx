@@ -96,7 +96,7 @@ export default function ConfirmSeedWordsModal( props ) {
           fontFamily: Fonts.Regular,
           marginHorizontal: wp( '5%' ),
           marginTop: 5
-        }}>{'Key in the word exactly like it was displayed'}</Text>
+        }}>{'Enter the word exactly like it was displayed'}</Text>
         <Text style={{
           color: Colors.lightTextColor,
           fontSize: RFValue( 14 ),

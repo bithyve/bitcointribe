@@ -18,14 +18,13 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { Shadow } from 'react-native-shadow-2'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
 import { AccountType, KeeperType, LevelData, LevelHealthInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import CommonStyles from '../../common/Styles/Styles'
 import { translations } from '../../common/content/LocContext'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
@@ -33,14 +32,16 @@ import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import LevelStatus from '../../common/data/enums/LevelStatus'
 import AccountShell from '../../common/data/models/AccountShell'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import HeaderTitle from '../../components/HeaderTitle'
 import ModalContainer from '../../components/home/ModalContainer'
 import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBNewBhrKnowMoreSheetContents'
 import AccountArchiveModal from '../../pages/Accounts/AccountSettings/AccountArchiveModal'
-import { autoShareToLevel2Keepers, deletePrivateData, downloadSMShare, generateMetaShare, keeperProcessStatus, modifyLevelData, onPressKeeper, setApprovalStatus, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError, setLevelToNotSetupStatus, updateKeeperInfoToChannel, upgradeLevelOneKeeper } from '../../store/actions/BHR'
 import { updateAccountSettings } from '../../store/actions/accounts'
+import { autoShareToLevel2Keepers, deletePrivateData, downloadSMShare, generateMetaShare, keeperProcessStatus, modifyLevelData, onPressKeeper, setApprovalStatus, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError, setLevelToNotSetupStatus, updateKeeperInfoToChannel, upgradeLevelOneKeeper } from '../../store/actions/BHR'
 import { setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
 import { sourceAccountSelectedForSending } from '../../store/actions/sending'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
@@ -798,16 +799,16 @@ const WalletBackup = ( props, navigation ) => {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            // props.navigation.pop()
-            props.navigation.navigate( 'MoreOptionsContainerScreen' )
+            props.navigation.pop()
+            // props.navigation.navigate( 'MoreOptionsContainerScreen' )
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
-            {/* <FontAwesome
+            <FontAwesome
               name="long-arrow-left"
               color={Colors.homepageButtonColor}
               size={17}
-            /> */}
+            />
           </View>
         </TouchableOpacity>
       </View>
@@ -1002,7 +1003,9 @@ const WalletBackup = ( props, navigation ) => {
           cancelButtonText={'Cancel'}
           onPressProceed={() => {
             setSeedBackupModal( false )
-            props.navigation.navigate( 'BackupSeedWordsContent' )
+            props.navigation.navigate( 'BackupSeedWordsContent', {
+              from: props.route.params?.from
+            } )
           }}
           onPressIgnore={() => setSeedBackupModal( false )}
           isIgnoreButton={true}
@@ -1102,12 +1105,12 @@ const WalletBackup = ( props, navigation ) => {
             setMultipleAcccountModal( false )
             const resetAction = CommonActions.reset( {
               index: 0,
-              routes: [ {
-                name: 'Home',
-                key: 'HomeKey'
-              } ],
+              routes: [
+                {
+                  name: 'Home'
+                }
+              ],
             } )
-
             props.navigation.dispatch( resetAction )
 
           }}

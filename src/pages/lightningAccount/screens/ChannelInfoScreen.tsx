@@ -1,19 +1,15 @@
 import { inject, observer } from 'mobx-react'
 import React, { Component, ReactElement } from 'react'
-import { Text, View, StyleSheet, TouchableOpacity, ScrollView, Image, StatusBar, Clipboard } from 'react-native'
-import Toast from '../../../components/Toast'
-import Colors from '../../../common/Colors'
+import { Clipboard, Image, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP as hp, widthPercentageToDP, widthPercentageToDP as wp } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import ListStyles from '../../../common/Styles/ListStyles'
-import { widthPercentageToDP } from 'react-native-responsive-screen'
-import HeaderTitle1 from '../../../components/HeaderTitle1'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import HeaderTitle from '../../../components/HeaderTitle'
 import ModalContainer from '../../../components/home/ModalContainer'
+import Toast from '../../../components/Toast'
 interface HTLC {
   hash_lock: string;
   expiration_height: number;
@@ -311,7 +307,7 @@ export default class ChannelInfoScreen extends Component {
           style={styles.rootContainer}
         >
           <StatusBar barStyle="dark-content"/>
-          <HeaderTitle1
+          <HeaderTitle
             firstLineTitle={''}
             secondLineTitle={'Channel Details'}
             infoTextNormal={''}

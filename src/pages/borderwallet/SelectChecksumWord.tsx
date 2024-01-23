@@ -7,15 +7,14 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import deviceInfoModule from 'react-native-device-info'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsive'
+import Fonts from '../../common/Fonts'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 
@@ -110,7 +109,6 @@ const SelectChecksumWord = ( props ) => {
       isNewWallet
     } )
   }
-  console.log( windowHeight )
   return (
     <SafeAreaView
       style={{
@@ -175,21 +173,13 @@ const SelectChecksumWord = ( props ) => {
           disabled={checksumWord === 'Select checksum word'}
           onPress={onPressNext}
         >
-          <LinearGradient
-            colors={checksumWord !== 'Select checksum word'?[ Colors.blue, Colors.darkBlue ]: [ Colors.greyTextColor, Colors.greyTextColor ]}
-            start={{
-              x: 0,
-              y: 0,
-            }}
-            end={{
-              x: 1,
-              y: 0,
-            }}
-            locations={[ 0.2, 1 ]}
-            style={styles.buttonView}
+          <View
+            style={[ styles.buttonView, {
+              backgroundColor: checksumWord !== 'Select checksum word'? Colors.blue : Colors.greyTextColor
+            } ]}
           >
             <Text style={styles.buttonText}>{isNewWallet ? 'Next': 'Recover'}</Text>
-          </LinearGradient>
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -241,7 +231,6 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-    backgroundColor: Colors.blue,
     width: 120,
   },
   buttonText: {

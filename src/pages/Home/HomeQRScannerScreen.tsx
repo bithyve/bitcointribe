@@ -1,20 +1,23 @@
 import React from 'react'
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Button } from 'react-native-elements'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
-import { AccountType, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import { AccountType, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import ButtonStyles from '../../common/Styles/ButtonStyles'
-import ListStyles from '../../common/Styles/ListStyles'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { translations } from '../../common/content/LocContext'
 import { Satoshis } from '../../common/data/enums/UnitAliases'
+import Fonts from '../../common/Fonts'
+import ButtonStyles from '../../common/Styles/ButtonStyles'
+import ListStyles from '../../common/Styles/ListStyles'
+import CommonStyles from '../../common/Styles/Styles'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import HeaderTitle from '../../components/HeaderTitle'
 import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
 import RecipientAddressTextInputSection from '../../components/send/RecipientAddressTextInputSection'
 import { resetStackToSend } from '../../navigation/actions/NavigationActions'
@@ -94,14 +97,39 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) =>
   }
 
   return (
-    <View style={styles.rootContainer}>
-      <ScrollView>
+    <SafeAreaView style={styles.rootContainer}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={CommonStyles.headerContainer}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            navigation.pop()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <HeaderTitle
+        firstLineTitle={'QR'}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
+      <ScrollView showsVerticalScrollIndicator={false}>
         <KeyboardAwareScrollView
           resetScrollToCoords={{
             x: 0, y: 0
           }}
           scrollEnabled={false}
-          style={styles.rootContainer}
+          // style={styles.rootContainer}
         >
           <HeaderSection title={strings.ScanaBitcoinaddress} />
 
@@ -193,7 +221,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) =>
           </View>
         </KeyboardAwareScrollView>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -257,7 +285,7 @@ const styles = StyleSheet.create( {
     paddingVertical: 24,
   },
   floatingActionButtonContainer: {
-    bottom: heightPercentageToDP( 1.5 ),
+    bottom: heightPercentageToDP( 2 ),
     right: 0,
     marginLeft: 'auto',
     padding: heightPercentageToDP( 1.5 ),

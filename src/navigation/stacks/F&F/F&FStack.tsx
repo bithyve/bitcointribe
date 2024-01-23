@@ -70,6 +70,7 @@ const FriendsAndFamily = ( { navigation, route } ) => {
         title: 'TransactionDetails'
       }} />
       <Stack.Screen name="RequestKeyFromContact" component={RequestKeyFromContact} />
+
     </Stack.Navigator>
   )
 }

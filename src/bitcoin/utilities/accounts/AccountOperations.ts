@@ -2,10 +2,7 @@ import * as bip32 from 'bip32'
 import * as bitcoinJS from 'bitcoinjs-lib'
 
 import {
-  Account,
-  AccountType,
-  Accounts,
-  ActiveAddressAssignee,
+  Account, Accounts, AccountType, ActiveAddressAssignee,
   ActiveAddresses,
   AverageTxFees,
   AverageTxFeesByNetwork,
@@ -29,9 +26,9 @@ import coinselect from 'coinselect'
 import coinselectSplit from 'coinselect/split'
 import crypto from 'crypto'
 import idx from 'idx'
-import config from '../../HexaConfig'
 import ElectrumClient from '../../electrum/client'
 import TestElectrumClient from '../../electrum/test-client'
+import config from '../../HexaConfig'
 import { getPurpose } from './AccountFactory'
 import AccountUtilities from './AccountUtilities'
 

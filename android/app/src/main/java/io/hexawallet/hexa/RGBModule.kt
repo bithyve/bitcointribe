@@ -1,7 +1,6 @@
 package io.hexawallet.hexa
 import android.util.Log
 import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
@@ -24,6 +23,15 @@ class RGBModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
     fun generateKeys(network: String, promise: Promise) {
         val rgbNetwork = if(network == "TESTNET") BitcoinNetwork.TESTNET else BitcoinNetwork.MAINNET
         val keys = org.rgbtools.generateKeys(rgbNetwork)
+        val gson = Gson()
+        val json = gson.toJson(keys)
+        promise.resolve(json.toString())
+    }
+
+    @ReactMethod
+    fun restoreKeys(network: String, mnemonic: String, promise: Promise) {
+        val rgbNetwork = if(network == "TESTNET") BitcoinNetwork.TESTNET else BitcoinNetwork.MAINNET
+        val keys = org.rgbtools.restoreKeys(rgbNetwork, mnemonic)
         val gson = Gson()
         val json = gson.toJson(keys)
         promise.resolve(json.toString())
@@ -165,7 +173,7 @@ class RGBModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
 
     @ReactMethod
     fun backup(backupPath: String, password: String, promise: Promise){
-        val response = RGBHelper.backup(backupPath, password)
+        val response = RGBHelper.backup(backupPath, password, reactApplicationContext)
         Log.d(TAG, "backup: response=$response")
         promise.resolve(response.toString())
     }

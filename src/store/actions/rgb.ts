@@ -10,6 +10,7 @@ export const SET_RGB_TXNS = 'SET_RGB_TXNS'
 export const SET_RECEIVE_DATA = 'SET_RECEIVE_DATA'
 export const SET_RGB20_ASSETS = 'SET_RGB20_ASSETS'
 export const SET_RGB121_ASSETS = 'SET_RGB121_ASSETS'
+export const SET_LAST_BACKED_UP = 'SET_LAST_BACKED_UP'
 
 
 export const setRgbConfig = ( config: RGBConfig ) => {
@@ -98,5 +99,11 @@ export const setNextFreeAddress = ( address: string ) => {
     payload: {
       address
     },
+  }
+}
+
+export const updateLastBackedUp = (  ) => {
+  return {
+    type: SET_LAST_BACKED_UP,
   }
 }

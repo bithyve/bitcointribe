@@ -15,7 +15,7 @@ import {
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View,
+  View
 } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -27,7 +27,6 @@ import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-nat
 import Feather from 'react-native-vector-icons/Feather'
 import CommonStyles from '../common/Styles/Styles'
 import BottomInfoBox from '../components/BottomInfoBox'
-import HeaderTitle1 from '../components/HeaderTitle1'
 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { useDispatch, useSelector } from 'react-redux'
@@ -36,12 +35,13 @@ import zxcvbn from 'zxcvbn'
 import CheckMark from '../assets/images/svgs/checkmarktick.svg'
 import { LevelHealthInterface } from '../bitcoin/utilities/Interface'
 import TrustedContactsOperations from '../bitcoin/utilities/TrustedContactsOperations'
-import ButtonStyles from '../common/Styles/ButtonStyles'
 import { LocalizationContext } from '../common/content/LocContext'
-import LoaderModal from '../components/LoaderModal'
+import ButtonStyles from '../common/Styles/ButtonStyles'
+import HeaderTitle from '../components/HeaderTitle'
 import ModalContainer from '../components/home/ModalContainer'
 import ModalContainerScroll from '../components/home/ModalContainerScroll'
 import WalletInitKnowMore from '../components/know-more-sheets/WalletInitKnowMore'
+import LoaderModal from '../components/LoaderModal'
 import { initNewBHRFlow, updateCloudPermission } from '../store/actions/BHR'
 import { setupWallet } from '../store/actions/setupAndAuth'
 import { setVersion } from '../store/actions/versionHistory'
@@ -160,7 +160,7 @@ export default function NewWalletQuestion( props ) {
     if ( walletSetupCompleted ) {
       setSignUpStarted( false )
       setLoaderModal( false )
-      props.navigation.navigate( 'HomeNav', {
+      props.navigation.navigate( 'App', {
         walletName,
       } )
     }
@@ -1299,7 +1299,7 @@ export default function NewWalletQuestion( props ) {
             }}
             disabled={isDisabled}
           >
-            <HeaderTitle1
+            <HeaderTitle
               firstLineTitle={strings.Step2}
               secondLineTitle={''}
               secondLineBoldTitle={'Create a Password'}

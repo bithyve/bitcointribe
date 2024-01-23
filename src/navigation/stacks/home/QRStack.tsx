@@ -1,10 +1,9 @@
-import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
-import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
+import React from 'react'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import HomeQRScannerScreen from '../../../pages/Home/HomeQRScannerScreen'
 import ReceiveQrScreen from '../../../pages/Home/ReceiveQrScreen'
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 
 const Stack = createNativeStackNavigator()
 export default function QRStack() {
@@ -18,13 +17,8 @@ export default function QRStack() {
         },
       } )}
     >
-      <Stack.Screen name="QRRoot" component={HomeQRScannerScreen} options={( { navigation } ) => {
-        return {
-          title: 'QR',
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.goBack() }} />
-          },
-        }
+      <Stack.Screen name="QRRoot" component={HomeQRScannerScreen} options={{
+        headerShown: false
       }} />
       <Stack.Screen name="ReceiveQR" component={ReceiveQrScreen} options={( { navigation } ) => {
         return {

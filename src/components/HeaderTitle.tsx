@@ -1,20 +1,32 @@
-import React, { Component } from 'react'
+import React from 'react'
 import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text
+  Text, TouchableOpacity, View
 } from 'react-native'
-import { widthPercentageToDP as wp } from 'react-native-responsive-screen'
+import { RFValue } from 'react-native-responsive-fontsize'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
 import CommonStyles from '../common/Styles/Styles'
 import KnowMoreButton from './KnowMoreButton'
-import { RFValue } from 'react-native-responsive-fontsize'
 
 export default function HeaderTitle( props ) {
 
   return ( <View>
+    {props.backButton? <View style={CommonStyles.headerContainer}>
+      <TouchableOpacity
+        style={CommonStyles.headerLeftIconContainer}
+        onPress={() => {
+          props.navigation.goBack()
+        }}
+      >
+        <View style={CommonStyles.headerLeftIconInnerContainer}>
+          <FontAwesome
+            name="long-arrow-left"
+            color={Colors.homepageButtonColor}
+            size={17}
+          />
+        </View>
+      </TouchableOpacity>
+    </View>:null}
     <View style={{
       flexDirection: 'row', alignItems: 'center',
     }}>

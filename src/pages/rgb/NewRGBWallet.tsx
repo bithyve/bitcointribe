@@ -1,35 +1,24 @@
 import React, { useContext, useState } from 'react'
 import {
-  StyleSheet,
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  StatusBar,
-  Text,
-  KeyboardAvoidingView,
-  Platform,
-  TextInput,
-  Keyboard,
+  Keyboard, KeyboardAvoidingView,
+  Platform, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View
 } from 'react-native'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Fonts from '../../common/Fonts'
-import Colors from '../../common/Colors'
-import CommonStyles from '../../common/Styles/Styles'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
 import DeviceInfo from 'react-native-device-info'
-import HeaderTitle1 from '../../components/HeaderTitle1'
-import { LocalizationContext } from '../../common/content/LocContext'
-import { useDispatch } from 'react-redux'
 import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import { useDispatch } from 'react-redux'
+import { AccountType } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import { LocalizationContext } from '../../common/content/LocContext'
+import Fonts from '../../common/Fonts'
+import HeaderTitle from '../../components/HeaderTitle'
+import Toast from '../../components/Toast'
+import { goHomeAction } from '../../navigation/actions/NavigationActions'
 import { addNewAccountShells } from '../../store/actions/accounts'
 import { newAccountsInfo } from '../../store/sagas/accounts'
-import { AccountType } from '../../bitcoin/utilities/Interface'
-import { goHomeAction } from '../../navigation/actions/NavigationActions'
-import Toast from '../../components/Toast'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -70,22 +59,6 @@ export default function NewRGBWallet( props ) {
       <View style={{
         flex: 1
       }}>
-        <View style={CommonStyles.headerContainer}>
-          <TouchableOpacity
-            style={CommonStyles.headerLeftIconContainer}
-            onPress={() => {
-              props.navigation.navigate( 'Home' )
-            }}
-          >
-            <View style={CommonStyles.headerLeftIconInnerContainer}>
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.homepageButtonColor}
-                size={17}
-              />
-            </View>
-          </TouchableOpacity>
-        </View>
         <KeyboardAvoidingView
           style={{
             flex: 1
@@ -96,7 +69,9 @@ export default function NewRGBWallet( props ) {
           <View style={{
             flex: 1
           }} >
-            <HeaderTitle1
+            <HeaderTitle
+              navigation={props.navigation}
+              backButton={true}
               firstLineTitle={'Step 1 creating RGB wallet'}
               secondLineBoldTitle={strings.NameyourWallet}
               secondLineTitle={''}

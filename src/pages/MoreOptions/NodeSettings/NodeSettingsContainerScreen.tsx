@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
+import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, View } from 'react-native'
 import { useDispatch } from 'react-redux'
+import { NodeDetail } from '../../../bitcoin/electrum/interface'
+import Node from '../../../bitcoin/electrum/node'
+import Colors from '../../../common/Colors'
+import PersonalNode from '../../../common/data/models/PersonalNode'
+import HeaderTitle from '../../../components/HeaderTitle'
+import Loader from '../../../components/loader'
+import Toast from '../../../components/Toast'
+import { setDefaultNodes, setPersonalNodes } from '../../../store/actions/nodeSettings'
+import { NodeStateOperations } from '../../../store/reducers/nodeSettings'
+import useNodeSettingsState from '../../../utils/hooks/state-selectors/nodeSettings/UseNodeSettingsState'
 import PersonalNodeConnectionForm from './PersonalNodeConnectionForm'
 import PersonalNodeDetailsSection from './PersonalNodeDetailsSection'
-import PersonalNode from '../../../common/data/models/PersonalNode'
-import useNodeSettingsState from '../../../utils/hooks/state-selectors/nodeSettings/UseNodeSettingsState'
-import Node from '../../../bitcoin/electrum/node'
-import Toast from '../../../components/Toast'
-import Loader from '../../../components/loader'
-import { NodeDetail } from '../../../bitcoin/electrum/interface'
-import { setPersonalNodes, setDefaultNodes } from '../../../store/actions/nodeSettings'
-import { NodeStateOperations } from '../../../store/reducers/nodeSettings'
 
 export type Props = {
   navigation: any;
@@ -127,7 +129,18 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) 
   }
 
   return (
-    <View style={styles.rootContainer}>
+    <SafeAreaView style={styles.rootContainer}>
+      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
+      <HeaderTitle
+        navigation={navigation}
+        backButton={true}
+        firstLineTitle={'Node Settings'}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
       <KeyboardAvoidingView
         style={styles.rootContainer}
         behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
@@ -170,7 +183,7 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) 
           />
         </View>
       )} */}
-    </View>
+    </SafeAreaView>
   )
 }
 

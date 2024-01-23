@@ -1,9 +1,17 @@
 import React from 'react'
-import { StyleSheet, Image, FlatList, ImageSourcePropType } from 'react-native'
+import { FlatList, ImageSourcePropType, SafeAreaView, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { ListItem } from 'react-native-elements'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+
+import Colors from '../../../../common/Colors'
 import ListStyles from '../../../../common/Styles/ListStyles'
-import ImageStyles from '../../../../common/Styles/ImageStyles'
+// import ImageStyles from '../../../../common/Styles/ImageStyles'
+import IconSettings from '../../../../assets/images/svgs/icon_accntSettings.svg'
 import { translations } from '../../../../common/content/LocContext'
+import { hp } from '../../../../common/data/responsiveness/responsive'
+import CommonStyles from '../../../../common/Styles/Styles'
+import HeaderTitle from '../../../../components/HeaderTitle'
+
 
 export type Props = {
   navigation: any;
@@ -22,11 +30,12 @@ const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
 const PanAccountSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const strings = translations[ 'stackTitle' ]
+  const accountMgt = translations[ 'accManagement' ]
   const menuOptions: MenuOption[] = [
     {
       title: strings[ 'ShowAllAccounts' ],
       subtitle: strings[ 'ShowAllAccountsSub' ],
-      imageSource: require( '../../../../assets/images/icons/account-visibility/icon_visible.png' ),
+      imageSource: '',
       screenName: 'EnterPasscode',
     },
   ]
@@ -45,11 +54,12 @@ const PanAccountSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
         bottomDivider
         onPress={() => { handleListItemPress( menuOption ) }}
       >
-        <Image
+        {/* <Image
           source={menuOption.imageSource}
           style={ImageStyles.thumbnailImageMedium}
           resizeMode="contain"
-        />
+        /> */}
+        <IconSettings/>
 
         <ListItem.Content style={ListStyles.listItemContentContainer}>
           <ListItem.Title style={ListStyles.listItemTitle}>{menuOption.title}</ListItem.Title>
@@ -65,12 +75,42 @@ const PanAccountSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
   }
 
   return (
-    <FlatList
-      style={styles.rootContainer}
-      data={menuOptions}
-      keyExtractor={listItemKeyExtractor}
-      renderItem={renderItem}
-    />
+    <View>
+      <SafeAreaView />
+      <StatusBar barStyle="dark-content" />
+      <View style={CommonStyles.headerContainer}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            navigation.pop()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.headerWrapper}>
+        <HeaderTitle
+          firstLineTitle={accountMgt[ 'AccountManagement' ]}
+          secondLineTitle={accountMgt.Rearrange}
+          infoTextNormal={''}
+          infoTextBold={''}
+          infoTextNormal1={''}
+          step={''}
+        />
+      </View>
+      <FlatList
+        style={styles.rootContainer}
+        data={menuOptions}
+        keyExtractor={listItemKeyExtractor}
+        renderItem={renderItem}
+      />
+    </View>
   )
 }
 
@@ -78,6 +118,9 @@ const styles = StyleSheet.create( {
   rootContainer: {
     paddingHorizontal: 10,
   },
+  headerWrapper:{
+    marginBottom: hp( 20 )
+  }
 } )
 
 export default PanAccountSettingsContainerScreen

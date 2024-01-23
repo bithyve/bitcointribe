@@ -12,8 +12,6 @@ import { AccountType, DeepLinkEncryptionType, Gift } from '../../bitcoin/utiliti
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import BottomInfoBox from '../../components/BottomInfoBox'
-
-import { CommonActions } from '@react-navigation/native'
 import idx from 'idx'
 import { RootSiblingParent } from 'react-native-root-siblings'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -22,6 +20,8 @@ import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePri
 import AddGiftToAccount from './AddGiftToAccount'
 import DashedLargeContainer from './DahsedLargeContainer'
 import ThemeList from './Theme'
+import ModalContainer from '../../components/home/ModalContainer'
+import LoaderModal from '../../components/LoaderModal'
 
 
 export type Props = {
@@ -40,18 +40,21 @@ export type Props = {
   giftId: string; //NOTE: here gift id stands for channelAddress of the gift(we should use more consistent naming to avoid confusion)
   isGiftWithFnF: boolean;
   isContactAssociated: boolean;
-  version?: string
+  version?: string;
+  stopReset?:boolean;
+  giftLoading:boolean;
 };
 
 const NUMBER_OF_INPUTS = 6
 
-export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject, version }: Props ) {
+export default function AcceptGift( { giftLoading, stopReset, navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject, version }: Props ) {
   const dispatch = useDispatch()
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
   const [ PhoneNumber, setPhoneNumber ] = useState( '' )
   const [ EmailId, setEmailId ] = useState( '' )
   const [ onBlurFocus, setOnBlurFocus ] = useState( false )
+  const [ loading, setLoading ] = useState( false )
   const [ passcode, setPasscode ] = useState( '' )
   const [ passcodeArray, setPasscodeArray ] = useState( [
     '',
@@ -65,6 +68,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const [ downloadedGiftid, seDownloadedGiftId ] = useState( '' )
   const [ confirmAccount, setConfirmAccount ] = useState( false )
   const [ giftAddedModal, setGiftAddedModel ] = useState( false )
+  const toogleLoading = useSelector( ( state ) => state.doNotStore.toogleGiftLoading )
   const [ accType, setAccType ] = useState( AccountType.CHECKING_ACCOUNT )
   const [ accId, setAccId ] = useState( '' )
   const [ giftAcceptedModel, setGiftAcceptedModel ] = useState( false )
@@ -78,10 +82,23 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == accType && shell.primarySubAccount.instanceNumber === 0 )
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
 
+  const handleGiftAccept=( key )=>{
+    setLoading( true )
+    setTimeout( ()=>{
+      onGiftRequestAccepted( key )
+    }, 2000 )
+  }
+
+  useEffect( () => {
+    setLoading( false )
+    setIsDisabled( false )
+  }, [ giftLoading, toogleLoading ] )
+
+
   useEffect( () => {
     setAccId( sourcePrimarySubAccount.id )
     // return `${title} (${strings.availableToSpend}: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
-
+    setLoading( false )
   }, [ sourcePrimarySubAccount ] )
 
   useEffect( ()=> {
@@ -89,11 +106,13 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       if( gift.channelAddress === acceptedGiftId )
         setAcceptedGift( gift )
     } )
+    setLoading( false )
   }, [ acceptedGiftId ] )
 
   useEffect( () => {
     if ( !inputType || inputType === DeepLinkEncryptionType.DEFAULT ) setIsDisabled( false )
     else setIsDisabled( true )
+    setLoading( false )
   }, [ inputType ] )
 
   useEffect( () => {
@@ -105,7 +124,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       setGiftAcceptedModel( true )
       setIsDisabled( false )
     }
-
+    setLoading( false )
   }, [ acceptedGiftId ] )
 
   useEffect( () => {
@@ -114,6 +133,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       setGiftAddedModel( true )
       setIsDisabled( false )
     }
+    setLoading( false )
   }, [ addedGiftId ] )
 
   const getStyle = ( i ) => {
@@ -192,6 +212,54 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       // otpCodeChanged(code);
     }
   }
+
+  const handleClose=()=>{
+    setAcceptGiftModal( false )
+    closeModal()
+    dispatch( giftAccepted( '' ) )
+    if( !stopReset ){
+      navigation.navigate( 'ManageGifts', {
+        giftType: '0'
+      } )
+    }
+  }
+
+  const throttle=( func, delay )=>{
+    let lastCall = 0
+    return function( ...args ) {
+      const now = new Date().getTime()
+      if ( now - lastCall < delay ) {
+        return
+      }
+      lastCall = now
+      return func( ...args )
+    }
+  }
+
+  const handleOTPInput=throttle( ( event: any, i : number )=>{
+    const { text } = event.nativeEvent
+    if ( text.length > 1 ) {
+      applyOTPCodeToInputs( text )
+      setPasscodeArray( text.split( '' ) )
+      return
+    }
+    if ( text.length === 1 && i !== NUMBER_OF_INPUTS - 1 ) {
+      const nextInput = itemsRef.current[ i + 1 ]
+      if ( nextInput ) {
+        nextInput.focus()
+      }
+    }
+    // }
+    // determine new value
+    const newValues = [ ...passcodeArray ]
+    newValues[ i ] = text
+
+    // update state
+    setPasscodeArray( newValues )
+    // also call callback as a flat string
+    // otpCodeChanged(newValues?.join(''));
+
+  }, 300 )
 
   const getInputBox = () => {
     if ( inputType == DeepLinkEncryptionType.EMAIL ) {
@@ -285,37 +353,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               value={passcodeArray[ i ]}
               defaultValue=""
               // first input can have a length of 6 because they paste their code into it
-              maxLength={i === 0 ? NUMBER_OF_INPUTS : 1}
-              onChange={( event ) => {
-                const { text } = event.nativeEvent
-                // only continue one if we see a text of length 1 or 6
-                // if (text.length === 0 || text.length === 1 || text.length === 6) {
-                if ( text.length > 1 ) {
-                  applyOTPCodeToInputs( text )
-                  // determine new value
-                  const newValues = [ ...passcodeArray ]
-                  newValues[ i ] = text.charAt( 0 )
-
-                  // update state
-                  setPasscodeArray( newValues )
-                  return
-                }
-                if ( text.length === 1 && i !== NUMBER_OF_INPUTS - 1 ) {
-                  const nextInput = itemsRef.current[ i + 1 ]
-                  if ( nextInput ) {
-                    nextInput.focus()
-                  }
-                }
-                // }
-                // determine new value
-                const newValues = [ ...passcodeArray ]
-                newValues[ i ] = text
-
-                // update state
-                setPasscodeArray( newValues )
-                // also call callback as a flat string
-                // otpCodeChanged(newValues?.join(''));
-              }}
+              onChange={( event ) => {handleOTPInput( event, i )}}
               onKeyPress={( event ) => {
                 if ( event.nativeEvent.key === 'Backspace' ) {
                   // going backward:
@@ -412,8 +450,8 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 passcodeArray.map( ( item )=> {
                   data+=item
                 } )
-                onGiftRequestAccepted( data )
-              } else onGiftRequestAccepted( passcode )
+                handleGiftAccept( data )
+              } else handleGiftAccept( passcode )
             }
           }
         }}
@@ -529,36 +567,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       <>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => {
-            setAcceptGiftModal( false )
-            closeModal()
-            dispatch( giftAccepted( '' ) )
-            navigation.dispatch( state => {
-              return CommonActions.reset( {
-                ...state,
-                index: 3,
-                routes: state.routes.map( route => {
-                  if ( route.name === 'GiftStack' ) {
-                    return {
-                      ...route,
-                      state: {
-                        index: 1,
-                        routes: [ {
-                          name: 'GiftScreen', key: 'GiftScreenKey'
-                        }, {
-                          name: 'ManageGifts', key: 'ManageGiftsKey', params: {
-                            giftType: '0'
-                          }
-                        } ]
-                      }
-                    }
-                  } else return route
-                } )
-              } )
-            } )
-          }
-
-          }
+          onPress={handleClose}
           style={{
             width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
             alignSelf: 'flex-end',
@@ -673,6 +682,22 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
 
   return (
     <RootSiblingParent>
+      {loading && <View style={styles.modalContentContainer}>
+        <ModalContainer
+          onBackground={() => {}}
+          visible={true}
+          closeBottomSheet={() => {}}
+        >
+          <LoaderModal
+            headerText={'Unpacking Your Gift'}
+            messageText={
+              'Your gift is currently being unpacked. Once this process is complete, you will be able to claim it in the gift section.'
+            }
+            messageText2={''}
+            source={require( '../../assets/images/gift.gif' )}
+          />
+        </ModalContainer>
+      </View>}
       {acceptGift &&
         <View style={styles.modalContentContainer}>
           {renderAcceptModal()}
@@ -917,5 +942,4 @@ const styles = StyleSheet.create( {
 } )
 
 // export default AcceptGift
-
 

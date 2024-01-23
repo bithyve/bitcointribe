@@ -2,7 +2,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
 import { translations } from '../../../common/content/LocContext'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
-import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
 import AccountSettingsEditDisplayPropertiesScreen from '../../../pages/Accounts/AccountSettings/AccountSettingsEditDisplayPropertiesScreen'
 import AccountSettingsMainScreen from '../../../pages/Accounts/AccountSettings/AccountSettingsMainScreen'
 import AccountSettingsEditVisibilityScreen from '../../../pages/Accounts/AccountSettings/EditVisibilityScreen'
@@ -39,20 +38,15 @@ const SubAccountSettingsStack = () => {
       <Stack.Screen
         name="AccountSettingsMain"
         component={AccountSettingsMainScreen}
-        options={
-          ( { navigation } ) => ( {
-            title: strings[ 'AccountSettings' ],
-            headerLeft: () => {
-              return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-            }
-          } )
-        }
+        options={{
+          headerShown: false
+        }}
       />
       <Stack.Screen
         name="EditDisplayProperties"
         component={AccountSettingsEditDisplayPropertiesScreen}
         options={{
-          title: strings[ 'NameDescription' ],
+          headerShown: false
         }}
       />
       <Stack.Screen
@@ -133,19 +127,14 @@ const SubAccountSettingsStack = () => {
         name="EditVisibility"
         component={AccountSettingsEditVisibilityScreen}
         options={{
-          title: 'Account Visibility'
+          headerShown: false
         }}
       />
       <Stack.Screen
         name="ShowXPub"
         component={XPubDetailsScreen}
-        options={( { navigation } ) => {
-          return {
-            ...defaultStackScreenNavigationOptions,
-            headerLeft: () => {
-              return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-            },
-          }
+        options={{
+          headerShown: false
         }}
       />
     </Stack.Navigator>

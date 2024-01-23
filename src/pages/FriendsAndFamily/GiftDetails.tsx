@@ -1,62 +1,36 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  Text,
-  StatusBar,
-  ScrollView,
-  Platform,
-  Alert,
-  FlatList,
-  TextInput,
-  TouchableWithoutFeedback,
-} from 'react-native'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
 import moment from 'moment'
-import { useDispatch, useSelector } from 'react-redux'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import HeaderTitle from '../../components/HeaderTitle'
-import CommonStyles from '../../common/Styles/Styles'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
-  AccountType,
-  DeepLinkEncryptionType,
+  Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View
+} from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
+import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
+import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
+import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
+import {
   Gift,
   GiftStatus,
   GiftType,
-  TrustedContact,
+  TrustedContact
 } from '../../bitcoin/utilities/Interface'
-import idx from 'idx'
-import AccountShell from '../../common/data/models/AccountShell'
+import Colors from '../../common/Colors'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import Fonts from '../../common/Fonts'
 import ImageStyles from '../../common/Styles/ImageStyles'
-import {
-  associateGift,
-  reclaimGift,
-} from '../../store/actions/trustedContacts'
-import GiftCard from '../../assets/images/svgs/icon_gift.svg'
-import LeftArrow from '../../assets/images/svgs/Left_arrow_new.svg'
-import ArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
-import ArrowUp from '../../assets/images/svgs/icon_arrow_up.svg'
-import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
-import RecipientAvatar from '../../components/RecipientAvatar'
-import AccountSelection from './AccountSelection'
+import HeaderTitle from '../../components/HeaderTitle'
 import ModalContainer from '../../components/home/ModalContainer'
+import RecipientAvatar from '../../components/RecipientAvatar'
+import {
+  reclaimGift
+} from '../../store/actions/trustedContacts'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 import AddGiftToAccount from './AddGiftToAccount'
 import ThemeList from './Theme'
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
-import CurrencyKind from '../../common/data/enums/CurrencyKind'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import RadioButton from '../../components/RadioButton'
-import Feather from 'react-native-vector-icons/Feather'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 
 
 const GiftDetails = ( { route, navigation } ) => {
@@ -138,30 +112,6 @@ const GiftDetails = ( { route, navigation } ) => {
         barStyle="dark-content"
       />
       <ScrollView>
-        <View style={styles.advancedButton}>
-          <View
-            style={[
-              CommonStyles.headerContainer,
-              {
-                backgroundColor: Colors.backgroundColor,
-              },
-            ]}
-          >
-            <TouchableOpacity
-              style={CommonStyles.headerLeftIconContainer}
-              onPress={() => {
-                navigation.goBack()
-              }}
-            >
-              <View style={CommonStyles.headerLeftIconInnerContainer}>
-                <LeftArrow/>
-              </View>
-
-            </TouchableOpacity>
-
-          </View>
-
-        </View>
         <View
           style={{
             flexDirection: 'row',
@@ -171,6 +121,8 @@ const GiftDetails = ( { route, navigation } ) => {
           }}
         >
           <HeaderTitle
+            navigation={navigation}
+            backButton={true}
             firstLineTitle={'Gift Details'}
             secondLineTitle={'Logs of Gift status appear here'}
             infoTextNormal={''}

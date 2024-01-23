@@ -1,30 +1,24 @@
-import React, { useState, useEffect } from 'react'
-import {
-  View,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  FlatList,
-  Text,
-  TouchableOpacity,
-} from 'react-native'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
-import Fonts from '../../common/Fonts'
-import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsive'
-import LinearGradient from 'react-native-linear-gradient'
-import deviceInfoModule from 'react-native-device-info'
-import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
+import { CommonActions } from '@react-navigation/native'
 import * as bip39 from 'bip39'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import dbManager from '../../storage/realm/dbManager'
-import { Wallet } from '../../bitcoin/utilities/Interface'
-import Toast from '../../components/Toast'
+import React, { useEffect, useState } from 'react'
+import {
+  FlatList, SafeAreaView,
+  StatusBar,
+  StyleSheet, Text,
+  TouchableOpacity, View
+} from 'react-native'
+import deviceInfoModule from 'react-native-device-info'
+import { RFValue } from 'react-native-responsive-fontsize'
 import { useDispatch } from 'react-redux'
+import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
+import Colors from '../../common/Colors'
+import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsive'
+import Fonts from '../../common/Fonts'
+import ModalContainer from '../../components/home/ModalContainer'
+import Toast from '../../components/Toast'
 import { setBorderWalletBackup } from '../../store/actions/BHR'
 import SeedBacupModalContents from '../NewBHR/SeedBacupModalContents'
-import ModalContainer from '../../components/home/ModalContainer'
+import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 
 const wordlists = bip39.wordlists.english
 
@@ -98,10 +92,18 @@ const ValidateBorderWalletChecksum = ( props ) => {
     const selectedWord = checksumWord.split( ' ' )[ 1 ]
     const mnemonicWords = mnemonic.split( ' ' )
     if( selectedWord === mnemonicWords[ mnemonicWords.length - 1 ] ) {
-      Toast( 'Checksum matched' )
+      Toast( 'Border Wallet backed-up successfully' )
       dispatch( setBorderWalletBackup( true ) )
       //TO-DO-BW
-      props.navigation.navigate( 'Home' )
+      props.navigation.dispatch( CommonActions.reset( {
+        index: 0,
+        routes: [
+          {
+            name: 'Home'
+          }
+        ],
+      } ) )
+      // props.navigation.navigate( 'Home' )
     } else {
       Toast( 'Invalid checksum' )
     }
@@ -158,21 +160,11 @@ const ValidateBorderWalletChecksum = ( props ) => {
           disabled={checksumWord === 'Select checksum word'}
           onPress={onPressVerify}
         >
-          <LinearGradient
-            colors={[ Colors.blue, Colors.darkBlue ]}
-            start={{
-              x: 0,
-              y: 0,
-            }}
-            end={{
-              x: 1,
-              y: 0,
-            }}
-            locations={[ 0.2, 1 ]}
+          <View
             style={styles.buttonView}
           >
             <Text style={styles.buttonText}>Verify</Text>
-          </LinearGradient>
+          </View>
         </TouchableOpacity>
       </View>
       <ModalContainer onBackground={() => setBWSuccessModal( false )} visible={BWSuccessModal}

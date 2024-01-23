@@ -30,7 +30,8 @@ export default function BottomInfoBox( props ) {
             color: props.titleColor ? props.titleColor : Colors.THEAM_TEXT_COLOR,
             fontSize: RFValue( 12 ),
             marginBottom: 2,
-            fontFamily: Fonts.SemiBold,
+            fontFamily: Fonts.Medium,
+            fontWeight:'bold'
           }}
         >
           {props.title}
@@ -65,6 +66,22 @@ export default function BottomInfoBox( props ) {
               {props.italicText}
             </Text>
           ) : null}
+          {props.italicTextTC ? (
+            <Text
+              style={{
+                fontFamily: Fonts.Medium,
+                fontWeight: 'bold',
+                fontStyle: 'italic',
+                textDecorationLine: 'underline',
+                fontSize: RFValue( 13 ),
+                letterSpacing:0.5,
+                color:'#2C3E51',
+              }}
+              onPress={props.onPress ? props.onPress : () => {}}
+            >
+              {props.italicTextTC}
+            </Text>
+          ) : null}
         </Text>
       </View>
       {props.icon &&
@@ -76,9 +93,8 @@ export default function BottomInfoBox( props ) {
 const styles = StyleSheet.create( {
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 12 ),
-    fontFamily: Fonts.Regular,
-    letterSpacing: 0.6,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.Medium,
     lineHeight: 18
   },
   extraPadding:{

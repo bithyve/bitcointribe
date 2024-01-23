@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
@@ -10,8 +10,8 @@ import {
 import Colors from '../../common/Colors'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 import { LocalizationContext } from '../../common/content/LocContext'
-import Gifts from '../../assets/images/satCards/gifts.svg'
-import Add_gifts from '../../assets/images/satCards/Add_gifts.svg'
+import Gifts from '../../assets/images/svgs/gift.svg'
+import Add_gifts from '../../assets/images/svgs/add2.svg'
 import Fonts from '../../common/Fonts'
 import ArrowRight from '../../assets/images/svgs/icon_arrow_right.svg'
 
@@ -53,16 +53,10 @@ const CreateFNFInvite = ( props: Props ) => {
       <View style={{
         padding: 10
       }}>
-        <View style={{
-          marginBottom: 40
-        }}>
+        <View>
           <Text
             style={[
               styles.titleText,
-              {
-                fontSize: RFValue( 14 ), marginBottom: 10,
-                fontFamily: Fonts.Medium,
-              },
             ]}
           >
             Create an F{'&'}F invite
@@ -73,14 +67,14 @@ const CreateFNFInvite = ( props: Props ) => {
           onPress={() => props.sendRequestToContact()}
         >
           <View style={{
-            width: '18%', paddingRight:20
+            width: '15%'
           }}>
             <Add_gifts />
           </View>
           <View style={{
-            width: '82%', paddingRight:10
+            flex:1
           }}>
-            <Text style={ styles.subtitleText }>
+            <Text style={styles.subtitleText}>
               Create Invitation link
             </Text>
             <Text style={styles.paragraphTitleText}>
@@ -88,30 +82,47 @@ const CreateFNFInvite = ( props: Props ) => {
               generated link
             </Text>
           </View>
-          <ArrowRight/>
-
+          <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
+            style={{
+              width: RFValue( 10 ),
+              height: RFValue( 16 ),
+              resizeMode: 'contain',
+              // marginBottom: hp( 0.7 ),
+              // marginLeft: wp( 3 )
+              marginStart:RFValue( 15 )
+            }}
+          />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.cardBackView}
           onPress={() => props.createGifts()}
         >
           <View style={{
-            width: '18%', paddingRight:20
+            width: '15%'
           }}>
             <Gifts />
           </View>
           <View style={{
-            width: '82%', paddingRight:10
+            flex:1
           }}>
-            <Text style={ styles.subtitleText}>
-              Create Invitation link with gift
+            <Text style={styles.subtitleText}>
+              Create Invitation link with Gift
             </Text>
             <Text style={styles.paragraphTitleText}>
               Add gifts when sending an invite link to any of your family and
               friends using the generated link
             </Text>
           </View>
-          <ArrowRight/>
+          <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
+            style={{
+              width: RFValue( 10 ),
+              height: RFValue( 16 ),
+              resizeMode: 'contain',
+              // marginBottom: hp( 0.7 ),
+              // marginLeft: wp( 3 )
+              marginStart:RFValue( 15 )
+            }}
+          />
         </TouchableOpacity>
       </View>
     </View>
@@ -119,17 +130,21 @@ const CreateFNFInvite = ( props: Props ) => {
 }
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    backgroundColor: Colors.LIGHT_BACKGROUND,
+    backgroundColor: Colors.backgroundColor,
     padding: 10,
     paddingBottom:70
   },
   titleText: {
-    color: Colors.blueText,
+    color: Colors.blue,
     fontWeight: '600',
-    marginBottom: 5,
+    marginBottom: 20,
+    fontFamily: Fonts.Medium,
+    letterSpacing:1,
+    fontSize: RFValue( 17 ),
+    marginLeft:10
   },
   subtitleText: {
-    color: Colors.THEAM_INFO_TEXT_COLOR,
+    color: Colors.black,
     marginBottom: 5,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.Regular
@@ -139,17 +154,16 @@ const styles = StyleSheet.create( {
     color: Colors.gray3,
     textAlign: 'left',
     flexWrap: 'wrap',
-    fontFamily: Fonts.Regular
-
+    paddingRight:10
   },
   cardBackView: {
     alignItems: 'center',
     flexDirection: 'row',
     width: '100%',
     backgroundColor: Colors.white,
-    paddingVertical: 30,
-    paddingHorizontal:20,
-    marginVertical: 5,
+    padding: 15,
+    paddingVertical:30,
+    marginVertical: 10,
     borderRadius: 10,
   },
 } )

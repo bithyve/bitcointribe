@@ -5,12 +5,12 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -20,8 +20,9 @@ import Fonts from '../common/Fonts'
 import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth'
 
 export default function Login( props ) {
-  const pattern = props.navigation.getParam( 'pattern' )
-  const isValidate = props.navigation.getParam( 'isValidate' ) || false
+  const pattern = props.route.params?.pattern
+  const isValidate = props.route.params?.isValidate || false
+  const viewPattern = props.route.params?.viewPattern || false
   const [ passcode, setPasscode ] = useState( '' )
   const [ passcodeFlag, setPasscodeFlag ] = useState( true )
   const [ checkAuth, setCheckAuth ] = useState( false )
@@ -47,13 +48,26 @@ export default function Login( props ) {
     state => state.setupAndAuth,
   )
 
-  if ( reLogin ) {
-    if ( props.route.params?.isPasscodeCheck ){
-      if( props.route.params?.onPasscodeVerify ) props.route.params?.onPasscodeVerify( )
-      props.navigation.goBack() }
-    else props.navigation.pop( 2 )
-    dispatch( switchReLogin( false, true ) )
-  }
+
+
+  useEffect( () => {
+    if( reLogin && viewPattern && passcodeCheck ){
+      props.navigation.replace( 'PreviewPattern', {
+        pattern: pattern,
+        isValidate: isValidate,
+        payload:  props.route.params?.payload
+      } )
+      return
+    }
+    if ( reLogin && !viewPattern ) {
+      if ( props.route.params?.isPasscodeCheck ){
+        if( props.route.params?.onPasscodeVerify ) props.route.params?.onPasscodeVerify( )
+        props.navigation.goBack() }
+      else props.navigation.pop( 2 )
+      dispatch( switchReLogin( false, true ) )
+    }
+  }, [ reLogin ] )
+
 
   useEffect( () => {
     if ( authenticationFailed ) {
@@ -78,7 +92,11 @@ export default function Login( props ) {
     setTimeout( () => {
       setCheckAuth( false )
       setPasscodeCheck( true )
-      dispatch( credsAuth( passcode ) )
+      if( viewPattern ){ //Adding this for proper working of ViewForgetPattern flow.
+        dispatch( credsAuth( passcode, true ) )
+      }else{
+        dispatch( credsAuth( passcode ) )
+      }
     }, 2 )
   }
 
@@ -243,7 +261,7 @@ export default function Login( props ) {
                   </Text>
                 </View>
               </View>
-              {checkAuth ? (
+              {passcode.length > 4 && checkAuth ? (
                 <View style={{
                   marginLeft: 'auto'
                 }}>
@@ -258,7 +276,7 @@ export default function Login( props ) {
             <View>
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
-                onPress={() => isValidate? checkReloginNext() : loginNext()}
+                onPress={() => isValidate  ? checkReloginNext() : loginNext()}
                 style={{
                   ...styles.proceedButtonView,
                   backgroundColor:
@@ -478,7 +496,6 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
   },
   proceedButtonText: {
     color: Colors.white,

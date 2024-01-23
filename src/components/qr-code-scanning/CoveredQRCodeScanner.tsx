@@ -141,7 +141,7 @@ const styles = StyleSheet.create( {
     borderRadius: 20,
     alignSelf: 'center',
     width: widthPercentageToDP( 90 ),
-    height: widthPercentageToDP( 90 ),
+    height: widthPercentageToDP( 80 ),
   },
   view1: {
     flexDirection: 'row',

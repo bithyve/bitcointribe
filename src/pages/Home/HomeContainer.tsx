@@ -19,11 +19,9 @@ import { connect } from 'react-redux'
 import BWIcon from '../../assets/images/svgs/bw.svg'
 import IconRight from '../../assets/images/svgs/icon_arrow_right.svg'
 import LNIcon from '../../assets/images/svgs/lightningWhiteWithBack.svg'
-import TestIcon from '../../assets/images/svgs/testAccountHome.svg'
 import { AccountType } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { LocalizationContext } from '../../common/content/LocContext'
-import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
@@ -123,12 +121,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
     else {
       this.props.navigation.navigate( 'AccountDetails', {
-        screen: 'AccountDetailsRoot',
-        params: {
-          accountShellID: selectedAccount.id,
-          swanDeepLinkContent: this.props.swanDeepLinkContent
-        }
-      } )
+        accountShellID: selectedAccount.id,
+        swanDeepLinkContent: this.props.swanDeepLinkContent
+      }
+      )
     }
 
     // }
@@ -185,7 +181,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }}>
             <HomeBuyCard
               cardContainer={{
-                backgroundColor: 'white',
+                backgroundColor: Colors.white,
                 marginRight: wp( 2 ),
                 height: hp( Platform.OS == 'ios' ? '13%' : '15%' ),
                 width:wp( '91%' ),
@@ -277,7 +273,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               </View>
             </AppBottomSheetTouchableWrapper>
 
-            <AppBottomSheetTouchableWrapper
+            {/* <AppBottomSheetTouchableWrapper
               style={[ styles.menuWrapper, {
                 marginBottom: hp( 5 )
               } ]} onPress={()=>{
@@ -295,14 +291,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     },
                   }
                 )
-                this.props.navigation.navigate( {
-                  name: 'AccountDetails',
-                  params: {
-                    screen: 'AccountDetailsRoot',
-                    params:{
-                      accountShellID: accountShell[ 0 ].primarySubAccount.accountShellID,
-                    }
-                  }
+                this.props.navigation.navigate( 'AccountDetails', {
+                  accountShellID: accountShell[ 0 ].primarySubAccount.accountShellID,
                 } )
               }}>
               <View style={styles.iconWrapper}>
@@ -315,7 +305,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               <View style={styles.iconRightWrapper}>
                 <IconRight/>
               </View>
-            </AppBottomSheetTouchableWrapper>
+            </AppBottomSheetTouchableWrapper> */}
           </View>
         </ModalContainer>
         <ModalContainer

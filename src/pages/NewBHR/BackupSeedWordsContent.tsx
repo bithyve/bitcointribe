@@ -1,26 +1,24 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
   SafeAreaView,
-  StatusBar,
+  StatusBar, View
 } from 'react-native'
 import Colors from '../../common/Colors'
-import _ from 'underscore'
-import ModalContainer from '../../components/home/ModalContainer'
 import BottomInputModalContainer from '../../components/home/BottomInputModalContainer'
+import ModalContainer from '../../components/home/ModalContainer'
 
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import moment from 'moment'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import RNPreventScreenshot from 'react-native-screenshot-prevent'
+import { useDispatch } from 'react-redux'
+import AlertModalContents from '../../components/AlertModalContents'
+import dbManager from '../../storage/realm/dbManager'
+import { updateSeedHealth } from '../../store/actions/BHR'
+import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
+import SeedBacupModalContents from './SeedBacupModalContents'
 import SeedHeaderComponent from './SeedHeaderComponent'
 import SeedPageComponent from './SeedPageComponent'
-import SeedBacupModalContents from './SeedBacupModalContents'
-import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
-import { useDispatch } from 'react-redux'
-import { updateSeedHealth } from '../../store/actions/BHR'
-import AlertModalContents from '../../components/AlertModalContents'
-import RNPreventScreenshot from 'react-native-screenshot-prevent'
-import dbManager from '../../storage/realm/dbManager'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import moment from 'moment'
 
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
@@ -193,21 +191,16 @@ const BackupSeedWordsContent = ( props ) => {
             setSeedWordModal( false )
             const navigationParams =  props.route.params?.navigationParams
             if ( isChangeKeeperType ) {
-              props.navigation.navigate( 'SeedBackup', {
-                screen: 'SeedBackupHistory',
-                params: {
-                  navigationParams,
-                  isChangeKeeperType: true,
-                }
+              props.navigation.navigate( 'SeedBackup',  {
+                navigationParams,
+                isChangeKeeperType: true,
               } )
             } else {
               props.navigation.navigate( 'SeedBackup', {
-                screen: 'SeedBackupHistory',
-                params: {
-                  navigationParams,
-                  // isChangeKeeperType: true,
-                }
-              } )
+                navigationParams,
+                // isChangeKeeperType: true,
+              }
+              )
             }
           }}
           onPressIgnore={() => setSeedWordModal( false )}

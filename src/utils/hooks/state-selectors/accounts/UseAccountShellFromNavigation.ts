@@ -6,7 +6,6 @@ function useAccountShellFromRoute( route: any ): AccountShell | undefined {
   const accountShellID: string = useMemo( () => {
     return route.params?.accountShellID || ''
   }, [ route ] )
-
   return useAccountShellForID( accountShellID )
 }
 

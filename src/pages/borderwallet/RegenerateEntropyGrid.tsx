@@ -32,9 +32,13 @@ const RegenerateEntropyGrid = ( props ) => {
 
   const dirtyGridTypePrediction =
    (  data ) => {
-     let gridType = GridType.WORDS
+     if( Platform.OS==='android' ){
+       const gtype = differentiateText( data )
+       return gtype
+     }
+     let gridType = GridType.BLANK
      const start = data.indexOf( 'ABCDEFGHIJKLMNOP' )+16
-     const rowApprox = Platform.OS === 'android'? data.slice( data.indexOf( 'A B C D E F G H I J K L M N O P' )+32, 200 ) :data.slice( start, start+50 )
+     const rowApprox = data.slice( start, start+50 )
      const counts = new Map()
      for ( const ch of rowApprox ) {
        if( ch !== ' ' && ch !== '' ){
@@ -88,6 +92,20 @@ const RegenerateEntropyGrid = ( props ) => {
     }
     return {
       decodedString, gridType
+    }
+  }
+
+  function differentiateText( text ) {
+    if ( /Grid Type: words/.test( text ) ) {
+      return    GridType.WORDS
+    } else if ( /Grid Type: numbers/.test( text ) ) {
+      return    GridType.NUMBERS
+    } else if ( /Grid Type: hexadecimal\(base64\)/.test( text ) ) {
+      return    GridType.HEXADECIMAL
+    } else if ( /Grid Type: blank/.test( text ) ) {
+      return    GridType.BLANK
+    } else {
+      return    GridType.WORDS
     }
   }
 

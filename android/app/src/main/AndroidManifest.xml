@@ -121,6 +121,7 @@
                 android:host="@string/host"
                 android:pathPrefix="@string/contactGiftKeeperPrefix" />
         </intent-filter>
+        
         <intent-filter android:label="Hexa">
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
@@ -168,6 +169,7 @@
      <action android:name="android.intent.action.VIEW" />
      <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
      <data android:mimeType="application/pdf" />
+     <data android:scheme="https"/>
     </intent>
    </queries>
 </manifest>

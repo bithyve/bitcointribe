@@ -6,23 +6,23 @@ import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
 import { AccountType, Wallet } from '../../../bitcoin/utilities/Interface'
 import Colors from '../../../common/Colors'
-import Fonts from '../../../common/Fonts'
-import ListStyles from '../../../common/Styles/ListStyles'
-import CommonStyles from '../../../common/Styles/Styles'
 import { translations } from '../../../common/content/LocContext'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import AccountShell from '../../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
-import ButtonBlue from '../../../components/ButtonBlue'
-import HeaderTitle from '../../../components/HeaderTitle'
+import Fonts from '../../../common/Fonts'
+import ListStyles from '../../../common/Styles/ListStyles'
+import CommonStyles from '../../../common/Styles/Styles'
 import UnHideArchiveAccountBottomSheet from '../../../components/bottom-sheets/account-management/UnHideArchiveAccountBottomSheet'
 import UnHideRestoreAccountSuccessBottomSheet from '../../../components/bottom-sheets/account-management/UnHideRestoreAccountSuccessBottomSheet'
+import ButtonBlue from '../../../components/ButtonBlue'
+import HeaderTitle from '../../../components/HeaderTitle'
 import ModalContainer from '../../../components/home/ModalContainerScroll'
 import ReorderAccountShellsDraggableList from '../../../components/more-options/account-management/ReorderAccountShellsDraggableList'
 import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
@@ -178,58 +178,33 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
         onProceed={( accounShell )=>{
           if( ( primarySubAccount as SubAccountDescribing ).type === AccountType.LIGHTNING_ACCOUNT ) {
             const resetAction = CommonActions.reset( {
-              index: 0,
-              routes: [ {
-                name: 'Home',
-                key: 'HomeKey',
-                state: {
-                  routes: [
-                    {
-                      name: 'Home',
-                      key: 'HomeKey2'
-                    },
-                    {
-                      name: 'LNAccountDetails',
-                      key: 'LNAccountDetailsKey',
-                      params: {
-                        screen: 'AccountDetailsRoot',
-                        params: {
-                          accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
-                          node: ( primarySubAccount as SubAccountDescribing ).node
-                        }
-                      }
-                    }
-                  ]
-                }
-              } ],
+              index: 1,
+              routes: [
+                {
+                  name: 'Home'
+                },
+                {
+                  name: 'LNAccountDetails', params: {
+                    accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
+                    node: ( primarySubAccount as SubAccountDescribing ).node
+                  }
+                },
+              ],
             } )
-
             navigation.dispatch( resetAction )
           } else {
             const resetAction = CommonActions.reset( {
-              index: 0,
-              routes: [ {
-                name: 'Home',
-                key: 'HomeKey',
-                state: {
-                  routes: [
-                    {
-                      name: 'Home',
-                      key: 'HomeKey2'
-                    },
-                    {
-                      name: 'AccountDetails',
-                      key: 'AccountDetailsKey',
-                      params: {
-                        screen: 'AccountDetailsRoot',
-                        params: {
-                          accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
-                        }
-                      }
-                    }
-                  ]
-                }
-              } ],
+              index: 1,
+              routes: [
+                {
+                  name: 'Home'
+                },
+                {
+                  name: 'AccountDetailsRoot', params: {
+                    accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
+                  }
+                },
+              ],
             } )
             navigation.dispatch( resetAction )
           }

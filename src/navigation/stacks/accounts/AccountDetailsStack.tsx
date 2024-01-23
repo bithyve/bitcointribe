@@ -1,15 +1,14 @@
+import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import React from 'react'
-import { NavigationContainer } from '@react-navigation/native'
-import { NativeStackNavigationOptions, createNativeStackNavigator } from '@react-navigation/native-stack'
+import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
+import DonationAccountWebViewSettingsScreen from '../../../pages/Accounts/AccountSettings/DonationAccountWebViewSettingsScreen'
 import AccountDetailsContainerScreen from '../../../pages/Accounts/Details/AccountDetailsContainerScreen'
+import SubAccountTFAHelpScreen from '../../../pages/Accounts/SubAccountTFAHelpScreen'
 import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 import TransactionsListContainerScreen from '../../../pages/Accounts/Transactions/TransactionsListContainerScreen'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
-import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
-import SubAccountSettingsStack from './SubAccountSettingsStack'
-import DonationAccountWebViewSettingsScreen from '../../../pages/Accounts/AccountSettings/DonationAccountWebViewSettingsScreen'
 import SendStack from '../send/SendStack'
-import SubAccountTFAHelpScreen from '../../../pages/Accounts/SubAccountTFAHelpScreen'
+import SubAccountSettingsStack from './SubAccountSettingsStack'
 
 const Stack = createNativeStackNavigator()
 export default function AccountDetailsStack() {
@@ -26,10 +25,10 @@ export default function AccountDetailsStack() {
         headerShown: false
       }} />
       <Stack.Screen name="TransactionsList" component={TransactionsListContainerScreen} options={{
-        title: 'All Transactions'
+        headerShown: false
       }} />
       <Stack.Screen name="TransactionDetails" component={TransactionDetailsContainerScreen} options={{
-        title: 'TransactionDetails'
+        headerShown: false
       }} />
       <Stack.Screen name="DonationAccountWebViewSettings" component={DonationAccountWebViewSettingsScreen} options={{
         headerShown: false

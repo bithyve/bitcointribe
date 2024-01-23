@@ -17,15 +17,13 @@ import DeviceInfo from 'react-native-device-info'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
 import { LevelHealthInterface, Wallet } from '../../../bitcoin/utilities/Interface'
 import Colors from '../../../common/Colors'
-import Fonts from '../../../common/Fonts'
-import CommonStyles from '../../../common/Styles/Styles'
 import CloudBackupStatus from '../../../common/data/enums/CloudBackupStatus'
+import Fonts from '../../../common/Fonts'
 import { getVersions } from '../../../common/utilities'
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
 import HeaderTitle from '../../../components/HeaderTitle'
@@ -202,38 +200,20 @@ const AppInfo = ( props ) => {
           onPressConfirm={() => {
             setSuccess( false )
             const resetAction = CommonActions.reset( {
-              index: 1,
+              index: 0,
               routes: [
                 {
-                  name: 'Home',
-                  key: 'HomeKey',
+                  name: 'Home'
                 }
-              ]
+              ],
             } )
             props.navigation.dispatch( resetAction )
           }}
         />
       </ModalContainer>
-
-      <View style={[ CommonStyles.headerContainer, {
-        backgroundColor: Colors.backgroundColor
-      } ]}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            props.navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
       <HeaderTitle
+        navigation={props.navigation}
+        backButton={true}
         firstLineTitle={strings.AppInfo}
         secondLineTitle={strings.AppInfoSub}
         infoTextNormal={''}
@@ -245,6 +225,9 @@ const AppInfo = ( props ) => {
         height:20
       }}/>
       <FlatList
+        style={{
+          marginTop: hp( 5 )
+        }}
         data={menuOptions}
         keyExtractor={listItemKeyExtractor}
         renderItem={( { item: menuOption }: { item: MenuOption } ) => {

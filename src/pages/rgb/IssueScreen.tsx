@@ -3,10 +3,9 @@ import { ActivityIndicator, Keyboard, SafeAreaView, StatusBar, StyleSheet, Text,
 import { Input } from 'react-native-elements'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { launchImageLibrary } from 'react-native-image-picker'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch } from 'react-redux'
@@ -14,6 +13,7 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import FormStyles from '../../common/Styles/FormStyles'
 import CommonStyles from '../../common/Styles/Styles'
+import HeaderTitle from '../../components/HeaderTitle'
 import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
 import { syncRgb } from '../../store/actions/rgb'
@@ -133,8 +133,14 @@ export default function IssueScreen( props ) {
           </View>
         </TouchableOpacity>
       </View>
-      <Text style={styles.headerTitleText}>{'Issue ' + issueType}</Text>
-      {/* <Text style={styles.headerSubTitleText}>{'Lorem ipsum dolor sit amet, consec tetur'}</Text> */}
+      <HeaderTitle
+        firstLineTitle={'Issue ' + issueType}
+        secondLineTitle={issueType=== 'collectible' ? 'Enter collectible asset details' : 'Enter coin asset details'}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
 
       <View style={styles.bodySection}>
         <Input
@@ -215,17 +221,11 @@ export default function IssueScreen( props ) {
         }
         <View style={styles.footerSection}>
           <TouchableOpacity disabled={requesting} activeOpacity={0.6} onPress={IssueAssetClick}>
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
+            <View
               style={styles.IssueAssetWrapper}
             >
-              <Text style={styles.IssueAssetText}>{'Issue Asset'}</Text>
-            </LinearGradient>
+              <Text style={styles.IssueAssetText}>{'Submit'}</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </View>
@@ -239,6 +239,7 @@ const styles = StyleSheet.create( {
   bodySection: {
     paddingHorizontal: 16,
     flex: 1,
+    marginTop: 20
   },
 
   textInputContainer: {
@@ -257,28 +258,14 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 30
+    marginTop: 30,
+    backgroundColor: Colors.blue
   },
   IssueAssetText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.Medium
   },
-  headerTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue( 20 ),
-    marginLeft: 20,
-    fontFamily: Fonts.Regular,
-    marginBottom: 22
-  },
-  // headerSubTitleText: {
-  //   fontSize: RFValue( 12 ),
-  //   color: Colors.THEAM_INFO_TEXT_COLOR,
-  //   fontFamily: Fonts.Regular,
-  //   marginLeft: 20,
-  //   marginTop: 6,
-  //   marginBottom: 20
-  // },
   attachPlaceholderText: {
     flex: 1,
     paddingHorizontal: 20,

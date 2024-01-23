@@ -12,15 +12,15 @@ import {
 } from 'react-native'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { KeeperInfoInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import {
   PermanentChannelsSyncKind,
-  syncPermanentChannels,
+  syncPermanentChannels
 } from '../../store/actions/trustedContacts'
 
-import Add from '../../assets/images/svgs/add.svg'
+import Add from '../../assets/images/svgs/add_brown.svg'
 
 import axios from 'axios'
 import { CKTapCard } from 'cktap-protocol-react-native'
@@ -31,24 +31,24 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { connect } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
-import Gifts from '../../assets/images/satCards/gifts.svg'
-import Sat_card from '../../assets/images/satCards/sats_card.svg'
+import Gifts from '../../assets/images/svgs/gifts_screen_icon.svg'
+import Sat_card from '../../assets/images/svgs/satscard.svg'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import ImageStyles from '../../common/Styles/ImageStyles'
 import { LocalizationContext } from '../../common/content/LocContext'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import {
-  ContactRecipientDescribing,
+  ContactRecipientDescribing
 } from '../../common/data/models/interfaces/RecipientDescribing'
+import Fonts from '../../common/Fonts'
+import ImageStyles from '../../common/Styles/ImageStyles'
 import AlertModalContents from '../../components/AlertModalContents'
+import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
 import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
+import ModalContainer from '../../components/home/ModalContainer'
+import Loader from '../../components/loader'
 import ModalHeader from '../../components/ModalHeader'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
-import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
-import ModalContainer from '../../components/home/ModalContainer'
-import Loader from '../../components/loader'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ToggleContainer from '../FriendsAndFamily/CurrencyToggle'
 import ClaimSatComponent from './ClaimSatComponent'
@@ -705,7 +705,7 @@ class GiftScreen extends React.Component<
             }}
           >
             <GiftBoxComponent
-              titleText={'Create New Gift'}
+              titleText={'Create a new gift'}
               subTitleText={this.strings[ 'giftSubTextF&F' ]}
               onPress={() => {
 
@@ -715,7 +715,7 @@ class GiftScreen extends React.Component<
               image={<Add />}
             />
             <GiftBoxComponent
-              titleText={'Available Gifts'}
+              titleText={'All Gifts'}
               subTitleText={'All the gifts you have created, not sent, \nand gifts you have received are shown here'}
               onPress={() => this.props.navigation.navigate( 'ManageGifts', {
                 giftType : '0'
@@ -723,7 +723,7 @@ class GiftScreen extends React.Component<
               image={<Gifts />}
             />
             <GiftBoxComponent
-              titleText={'Claim SATSCARD'}
+              titleText={'Claim you Satscard'}
               scTitleText={'TM'}
               subTitleText={'Move sats from your SATSCARD™'}
               scSubText={'TM'}
@@ -761,7 +761,7 @@ class GiftScreen extends React.Component<
             proceedButtonText={'Detect SATSCARD'}
             proceedButtonSubText={'TM'}
             subPoints={'Touch your SATSCARD™ on your phone after clicking \'Detect SATSCARD™'}
-            bottomImage={require( '../../assets/images/satCards/illustration.png' )}
+            bottomImage={require( '../../assets/images/svgs/tapSat.png' )}
             onCloseClick={this.onCloseClick}
             onPressProceed={this.onViewHealthClick}
             closeModal
@@ -930,7 +930,7 @@ const styles = StyleSheet.create( {
   accountCardsSectionContainer: {
     height: hp( '71.46%' ),
     // marginTop: 30,
-    backgroundColor: Colors.backgroundColor1,
+    backgroundColor: Colors.backgroundColor,
     opacity: 1,
     borderTopLeftRadius: 25,
     shadowColor: 'black',

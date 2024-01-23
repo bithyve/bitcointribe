@@ -1,20 +1,19 @@
 import React from 'react'
-import { View, Text, StyleSheet, FlatList } from 'react-native'
-import PersonalNode from '../../../common/data/models/PersonalNode'
-import ListStyles from '../../../common/Styles/ListStyles'
+import { FlatList, StyleSheet, Text, View } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
-import Colors from '../../../common/Colors'
 import {
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import Fonts from '../../../common/Fonts'
-import { translations } from '../../../common/content/LocContext'
-import Node from '../../../bitcoin/electrum/node'
 import ConnectIcon from '../../../assets/images/icons/connect.svg'
-import DisconnectIcon from '../../../assets/images/icons/disconnect.svg'
 import DeleteIcon from '../../../assets/images/icons/delete_orange.svg'
-import LinearGradient from 'react-native-linear-gradient'
+import DisconnectIcon from '../../../assets/images/icons/disconnect.svg'
+import Node from '../../../bitcoin/electrum/node'
+import Colors from '../../../common/Colors'
+import { translations } from '../../../common/content/LocContext'
+import PersonalNode from '../../../common/data/models/PersonalNode'
+import Fonts from '../../../common/Fonts'
+import ListStyles from '../../../common/Styles/ListStyles'
 
 export type Props = {
   // personalNode: PersonalNode | null;
@@ -57,17 +56,11 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
             {strings.PersonalNodeDetails}
           </Text>
           <TouchableOpacity onPress={onAddButtonPressed}>
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
+            <View
               style={styles.proceedBtnWrapper}
             >
               <Text style={styles.proceedBtnText}>Add</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -250,6 +243,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     borderRadius: 8,
     alignItems: 'center',
+    backgroundColor: Colors.blue,
   },
   proceedBtnText: {
     color: Colors.white,

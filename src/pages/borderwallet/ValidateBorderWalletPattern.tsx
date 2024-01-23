@@ -1,30 +1,21 @@
 import * as bip39 from 'bip39'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ActivityIndicator,
-  FlatList,
-  InteractionManager,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+  ActivityIndicator, FlatList,
+  InteractionManager, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import IconRight from '../../assets/images/svgs/icon_right.svg'
 import StartAgain from '../../assets/images/svgs/startagain.svg'
-import { GridType, Wallet } from '../../bitcoin/utilities/Interface'
+import { GridType } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
 import Toast from '../../components/Toast'
-import dbManager from '../../storage/realm/dbManager'
 import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
 import uheprng from '../../utils/uheprng'
 
@@ -181,9 +172,7 @@ const styles = StyleSheet.create( {
   }
 } )
 
-export const Ceil = ( { onPress, text, index, selected } ) => {
-  const isSelected = selected.includes( index )
-  const sequence = isSelected ? selected.findIndex( ( i ) => i === index ) + 1 : -1
+const Cell = React.memo<any>( ( { onPress, text, index, isSelected, sequence } ) => {
   return (
     <TouchableOpacity
       activeOpacity={0.6}
@@ -199,14 +188,15 @@ export const Ceil = ( { onPress, text, index, selected } ) => {
       } ]}>{text}</Text>
     </TouchableOpacity>
   )
-}
+}, ( prevProps, nextProps ) => {
+  return prevProps.isSelected === nextProps.isSelected && prevProps.sequence === nextProps.sequence
+} )
 
 const ValidateBorderWalletPattern = ( { route, navigation } ) => {
-  const wallet: Wallet =  dbManager.getWallet()
+  // const wallet: Wallet =  dbManager.getWallet()
   const gridType = route.params?.borderWalletGridType
   const mnemonic = route.params?.borderWalletMnemonic
   const gridMnemonic = route.params?.borderWalletGridMnemonic
-
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
   const columnHeaderRef = useRef()
@@ -248,7 +238,7 @@ const ValidateBorderWalletPattern = ( { route, navigation } ) => {
       }, 500 )
     } )
     return () => clearTimeout( listener )
-  }, [ gridType ] )
+  }, [] )
 
   const isNext = useMemo( () => {
     return selected.length === 11 || selected.length === 23
@@ -256,7 +246,7 @@ const ValidateBorderWalletPattern = ( { route, navigation } ) => {
 
   const generateGrid = ()=>{
     const words = [ ...wordlists ]
-    shuffle( words, gridMnemonic )
+    shuffle( words, mnemonic )
     const cells = words.map( ( word ) => {
       switch ( gridType ) {
           case GridType.WORDS:
@@ -269,29 +259,34 @@ const ValidateBorderWalletPattern = ( { route, navigation } ) => {
             return ' '
       }
     } )
-    const g = []
-    Array.from( {
-      length: 128
-    }, ( _, rowIndex ) => {
-      g.push( cells.slice( rowIndex * 16, ( rowIndex + 1 ) * 16 ) )
-    } )
-    setGrid( g )
+    setGrid( cells )
     setLoading( false )
   }
 
-  const onCeilPress = ( index ) => {
+  const onCeilPress = useCallback( ( index ) => {
     const isSelected = selected.includes( index )
     if ( isSelected ) {
-      const i = selected.findIndex( ( i ) => i === index )
-      selected.splice( i, 1 )
-      setSelected( [ ...selected ] )
+      setSelected( prevSelected => ( prevSelected.filter( i => i !== index ) ) )
     } else if ( selected.length < 23 ) {
-      selected.push( index )
-      setSelected( [ ...selected ] )
-    }else{
+      setSelected( prevSelected => ( [ ...prevSelected, index ] ) )
+    } else{
       Toast( 'Pattern selection limit reached. You have selected 23 words' )
     }
-  }
+  }, [ selected, setSelected ] )
+
+  const renderCell = useCallback( ( { item, index } ) => {
+    const isSelected = selected.includes( index )
+    return (
+      <Cell
+        key={index}
+        onPress={onCeilPress}
+        text={item}
+        index={index}
+        isSelected={isSelected}
+        sequence={isSelected ? selected.findIndex( ( i ) => i === index ) + 1 : -1}
+      />
+    )}, [ selected, onCeilPress ] )
+
   const onPressForgot = () => {
     const selected = []
     const words = mnemonic.split( ' ' )
@@ -303,11 +298,17 @@ const ValidateBorderWalletPattern = ( { route, navigation } ) => {
       } )
       selected.push( index )
     } )
+    clearSelection()
     navigation.navigate( 'ReLogin', {
       pattern: selected,
-      isValidate: true
+      isValidate: true,
+      viewPattern: true,
+      payload:{
+        borderWalletGridType: gridType,
+        borderWalletMnemonic:mnemonic,
+        borderWalletGridMnemonic:gridMnemonic
+      }
     } )
-    clearSelection()
   }
   const onPressVerify = () => {
     const words = [ ...wordlists ]
@@ -441,7 +442,7 @@ const ValidateBorderWalletPattern = ( { route, navigation } ) => {
               overScrollMode="never"
               bounces={false}
               scrollEnabled={false}
-              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
               renderItem={( { item } ) => (
                 <View style={styles.cell}>
                   <Text style={styles.ceilText}>{( '000' + ( item + 1 ) ).substr( -3 )}</Text>
@@ -484,27 +485,15 @@ const ValidateBorderWalletPattern = ( { route, navigation } ) => {
                   } )
                 }}
               >
-                {grid.map( ( rowData, index ) => (
-                  <FlatList
-                    key={index}
-                    data={rowData}
-                    horizontal
-                    overScrollMode="never"
-                    bounces={false}
-                    scrollEnabled={false}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={( { item, index: i } ) => (
-                      <Ceil
-                        key={`${item}_${index}`}
-                        onPress={( i ) => onCeilPress( i )}
-                        text={item}
-                        index={index * 16 + i}
-                        selected={selected}
-                      />
-                    )}
-                    // keyExtractor={( item ) => item}
-                  />
-                ) )}
+                <FlatList
+                  data={grid}
+                  overScrollMode="never"
+                  bounces={false}
+                  scrollEnabled={false}
+                  showsHorizontalScrollIndicator={false}
+                  numColumns={16}
+                  renderItem={renderCell}
+                />
               </ScrollView>
             </ScrollView>
           </View>

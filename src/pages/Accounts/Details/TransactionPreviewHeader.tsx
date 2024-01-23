@@ -1,18 +1,17 @@
 import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
+import { translations } from '../../../common/content/LocContext'
+import BitcoinUnit, { displayNameForBitcoinUnit } from '../../../common/data/enums/BitcoinUnit'
+import SubAccountKind from '../../../common/data/enums/SubAccountKind'
+import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
 import Fonts from '../../../common/Fonts'
 import ListStyles from '../../../common/Styles/ListStyles'
-import BitcoinUnit, { displayNameForBitcoinUnit } from '../../../common/data/enums/BitcoinUnit'
 import { UsNumberFormat } from '../../../common/utilities'
+import { shadowColorForAccountKind } from '../../../components/account-details/AccountDetailsCard'
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
-import SubAccountKind from '../../../common/data/enums/SubAccountKind'
-import { shadowColorForAccountKind } from '../../../components/account-details/AccountDetailsCard'
-import { translations } from '../../../common/content/LocContext'
-import LinearGradient from 'react-native-linear-gradient'
 
 export type Props = {
   availableBalance: Satoshis;
@@ -58,19 +57,13 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
         <TouchableOpacity
           onPress={onViewMorePressed}
         >
-          <LinearGradient
-            start={{
-              x: 0, y: 0
-            }} end={{
-              x: 1, y: 0
-            }}
-            colors={[ Colors.skyBlue, Colors.darkBlue ]}
+          <View
             style={styles.viewMoreWrapper}
           >
             <Text style={styles.headerTouchableText}>
               {strings.ViewMore}
             </Text>
-          </LinearGradient>
+          </View>
         </TouchableOpacity>
       </View>
     </View>
@@ -104,7 +97,8 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'center',
     padding: 3,
-    borderRadius: 5
+    borderRadius: 5,
+    backgroundColor: Colors.blue
   }
 } )
 
