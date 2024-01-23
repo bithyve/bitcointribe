@@ -6,19 +6,21 @@ import { generateAccount, generateDonationAccount, generateMultiSigAccount } fro
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import {
-  Account,
-  Accounts,
-  AccountType,
-  ActiveAddressAssignee,
+  Account, Accounts, AccountType, ActiveAddressAssignee,
   ActiveAddresses,
   ContactInfo,
   DeepLinkEncryptionType,
-  DeepLinkKind, DerivationPurpose, DonationAccount,
+  DeepLinkKind,
+  DerivationPurpose,
+  DonationAccount,
   Gift,
   GiftMetaData,
   GiftStatus,
   GiftThemeId,
-  GiftType, GridType, LNNode, MultiSigAccount,
+  GiftType,
+  GridType,
+  LNNode,
+  MultiSigAccount,
   NetworkType,
   TrustedContact,
   Trusted_Contacts,
@@ -38,12 +40,25 @@ import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubA
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import { APP_STAGE } from '../../common/interfaces/Interfaces'
 import {
-  accountChecked, accountSettingsUpdated,
-  accountSettingsUpdateFailed, accountShellMergeFailed, accountShellMergeSucceeded, accountShellRefreshCompleted,
-  accountShellRefreshStarted, ADD_NEW_ACCOUNT_SHELLS, autoSyncShells, AUTO_SYNC_SHELLS, CREATE_BORDER_WALLET, CREATE_SM_N_RESETTFA_OR_XPRIV, exchangeRatesCalculated, FETCH_EXCHANGE_RATES, FETCH_FEE_RATES, generateSecondaryXpriv, GENERATE_GIFTS, GENERATE_SECONDARY_XPRIV, getTestcoins, GET_TESTCOINS, giftCreationSuccess, MARK_ACCOUNT_CHECKED,
-  MARK_READ_TRANSACTION, MergeAccountShellsActionPayload,
-  MERGE_ACCOUNT_SHELLS, newAccountShellsAdded, readTxn, ReassignTransactionsActionPayload,
-  REASSIGN_TRANSACTIONS, recomputeNetBalance, refreshAccountShells, REFRESH_ACCOUNT_SHELLS, resetTwoFA, RESET_TWO_FA, RESTORE_ACCOUNT_SHELLS, secondaryXprivGenerated, setAverageTxFee, setResetTwoFALoader, SYNC_ACCOUNTS, transactionReassignmentFailed, transactionReassignmentSucceeded, twoFAResetted, twoFAValid, updateAccounts, updateAccountShells, updateGift, UPDATE_ACCOUNT_SETTINGS, UPDATE_DONATION_PREFERENCES, VALIDATE_TWO_FA
+  accountChecked, accountSettingsUpdated, accountSettingsUpdateFailed, accountShellMergeFailed,
+  accountShellMergeSucceeded,
+  accountShellRefreshCompleted,
+  accountShellRefreshStarted, ADD_NEW_ACCOUNT_SHELLS, autoSyncShells, AUTO_SYNC_SHELLS,
+  CREATE_BORDER_WALLET,
+  CREATE_SM_N_RESETTFA_OR_XPRIV, exchangeRatesCalculated, FETCH_EXCHANGE_RATES,
+  FETCH_FEE_RATES, generateSecondaryXpriv, GENERATE_GIFTS,
+  GENERATE_SECONDARY_XPRIV, getTestcoins, GET_TESTCOINS, giftCreationSuccess, MARK_ACCOUNT_CHECKED,
+  MARK_READ_TRANSACTION, MergeAccountShellsActionPayload, MERGE_ACCOUNT_SHELLS, newAccountShellsAdded,
+  readTxn, ReassignTransactionsActionPayload, REASSIGN_TRANSACTIONS, recomputeNetBalance,
+  refreshAccountShells, REFRESH_ACCOUNT_SHELLS, resetTwoFA, RESET_TWO_FA,
+  RESTORE_ACCOUNT_SHELLS, secondaryXprivGenerated,
+  setAverageTxFee,
+  setResetTwoFALoader, SYNC_ACCOUNTS, transactionReassignmentFailed,
+  transactionReassignmentSucceeded,
+  twoFAResetted,
+  twoFAValid, updateAccounts, updateAccountShells, updateGift, UPDATE_ACCOUNT_SETTINGS,
+  UPDATE_DONATION_PREFERENCES,
+  VALIDATE_TWO_FA
 } from '../actions/accounts'
 import {
   setAllowSecureAccount,
@@ -55,7 +70,7 @@ import { createWatcher } from '../utils/utilities'
 
 import _ from 'lodash'
 import { Alert } from 'react-native'
-import { ELECTRUM_NOT_CONNECTED_ERR } from '../../bitcoin/electrum/client'
+import ElectrumClient, { ELECTRUM_CLIENT, ELECTRUM_NOT_CONNECTED_ERR } from '../../bitcoin/electrum/client'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import Relay from '../../bitcoin/utilities/Relay'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
@@ -67,6 +82,7 @@ import dbManager from '../../storage/realm/dbManager'
 import RESTUtils from '../../utils/ln/RESTUtils'
 import { setElectrumNotConnectedErr } from '../actions/nodeSettings'
 import { PermanentChannelsSyncKind } from '../actions/trustedContacts'
+import { connectToNodeWorker } from './nodeSettings'
 import { syncPermanentChannelsWorker } from './trustedContacts'
 
 // to be used by react components(w/ dispatch)
@@ -539,6 +555,10 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
   const accountShells: AccountShell[] = payload.shells
   const options: { hardRefresh?: boolean } = payload.options
   try {
+    if (!ELECTRUM_CLIENT.isClientConnected) {
+      ElectrumClient.resetCurrentPeerIndex();
+      yield call(connectToNodeWorker);
+    }
     yield put( accountShellRefreshStarted( accountShells ) )
     const accountState: AccountsState = yield select(
       ( state ) => state.accounts
