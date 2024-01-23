@@ -51,7 +51,7 @@ export default function Login( props ) {
 
 
   useEffect( () => {
-    if( reLogin && viewPattern && passcodeCheck ){
+    if( reLogin && viewPattern){
       props.navigation.replace( 'PreviewPattern', {
         pattern: pattern,
         isValidate: isValidate,

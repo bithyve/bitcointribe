@@ -257,9 +257,10 @@ function AppStack() {
         headerShown: false,
       }} />
       <Stack.Screen name="PlaceRampOrder" component={RampOrderFormScreen} options={{
-        title: 'Buy with Ramp'
+        title: 'Buy with Ramp' 
       }} />
       <Stack.Screen name="TransactionDetails" component={TransactionDetailsContainerScreen} options={{
+        headerShown:true,
         title: 'Transaction Details'
       }} />
       <Stack.Screen name="Receive" component={Receive} options={{
@@ -306,9 +307,33 @@ function AppStack() {
       <Stack.Screen name="SendRequest" component={SendRequest} />
       <Stack.Screen name="AddContactSendRequest" component={AddContactSendRequest} />
       <Stack.Screen name="ManageBackupNewBHR" component={ManageBackupNewBHR} />
-      <Stack.Screen name="SecurityQuestionHistoryNewBHR" component={SecurityQuestionHistoryNewBHR} />
-      <Stack.Screen name="TrustedContactHistoryNewBHR" component={TrustedContactHistoryNewBHR} />
-      <Stack.Screen name="PersonalCopyHistoryNewBHR" component={PersonalCopyHistoryNewBHR} />
+      <Stack.Screen name="SecurityQuestionHistoryNewBHR" component={SecurityQuestionHistoryNewBHR} options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerShown: true,
+          headerLeft: () => {
+            return <SmallNavHeaderBackButton onPress={() => { navigation.goBack() }} />
+          },
+        }
+      }} />
+      <Stack.Screen name="TrustedContactHistoryNewBHR" component={TrustedContactHistoryNewBHR} options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerShown: true,
+          headerLeft: () => {
+            return <SmallNavHeaderBackButton onPress={() => { navigation.goBack() }} />
+          },
+        }
+      }} />
+      <Stack.Screen name="PersonalCopyHistoryNewBHR" component={PersonalCopyHistoryNewBHR} options={( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerShown: true,
+          headerLeft: () => {
+            return <SmallNavHeaderBackButton onPress={() => { navigation.goBack() }} />
+          },
+        }
+      }} />
       <Stack.Screen name="NewOwnQuestions" component={NewOwnQuestions} />
       <Stack.Screen name="RestoreWithICloud" component={RestoreWithICloud} />
       <Stack.Screen name="RestoreWithoutICloud" component={RestoreWithoutICloud} />
@@ -464,6 +489,7 @@ function AppStack() {
       <Stack.Screen name="AccountDetailsRoot" component={AccountDetailsContainerScreen}   options={( { navigation } ) => {
         return {
           ...defaultStackScreenNavigationOptions,
+          headerShown: true,
           headerLeft: () => {
             return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
@@ -542,17 +568,35 @@ function AppStack() {
         }}
       />
       <Stack.Screen name="SendRoot" component={AccountSendContainerScreen}
-        options={{
-          title: 'Send'
+        options={( { navigation } ) => {
+          return {
+            title: 'Send',
+            headerShown:true,
+            headerLeft: () => {
+              return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+            },
+          }
         }}/>
       <Stack.Screen name="Send" component={AccountSendContainerScreen}
-        options={{
-          title: 'Send'
+        options={( { navigation } ) => {
+          return {
+            title: 'Send',
+            headerShown:true,
+            headerLeft: () => {
+              return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+            },
+          }
         }}/>
       <Stack.Screen name="AccountSend" component={AccountSendContainerScreen}  />
-      <Stack.Screen name="SentAmountForContactForm" component={SentAmountForContactFormScreen} options={{
-        title: 'Send To'
-      }} />
+      <Stack.Screen name="SentAmountForContactForm" component={SentAmountForContactFormScreen} options={( { navigation } ) => {
+          return {
+            title: 'Send To',
+            headerShown:true,
+            headerLeft: () => {
+              return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+            },
+          }
+        }} />
       <Stack.Screen name="SendConfirmation" component={AccountSendConfirmationContainerScreen} options={{
         headerShown: false
       }} />

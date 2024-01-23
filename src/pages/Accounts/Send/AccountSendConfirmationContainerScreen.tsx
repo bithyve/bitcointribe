@@ -31,6 +31,7 @@ import useAccountSendST2CompletionEffect from '../../../utils/sending/UseAccount
 import SendConfirmationContent from '../SendConfirmationContent'
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import TransactionPriorityMenu from './TransactionPriorityMenu'
+import { resetStackToAccountDetails } from 'src/navigation/actions/NavigationActions'
 
 export type Props = {
   navigation: NavigationProp<ParamListBase>;
@@ -109,9 +110,11 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation, 
               hardRefresh: true,
             } ) )
           } )
-          navigation.navigate( 'AccountDetailsRoot', {
-            accountShellID: sourceAccountShell.id
-          } )
+          navigation.dispatch(
+            resetStackToAccountDetails( {
+              accountShellID: sourceAccountShell.id,
+            } )
+          )
         }}
         onPressCancel={() => setSuccess( false )}
         isSuccess={true}
@@ -135,9 +138,11 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation, 
           dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
           // dismissBottomSheet()
           setFailure( false )
-          navigation.navigate( 'AccountDetailsRoot', {
-            accountShellID: sourceAccountShell.id
-          } )
+          navigation.dispatch(
+            resetStackToAccountDetails( {
+              accountShellID: sourceAccountShell.id,
+            } )
+          )
         }}
         isUnSuccess={true}
         accountKind={sourcePrimarySubAccount.kind}
