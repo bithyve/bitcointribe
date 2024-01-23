@@ -500,7 +500,7 @@ function AppStack() {
             ...defaultStackScreenNavigationOptions,
             headerShown: true,
             headerLeft: () => {
-              return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+              return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
             },
           }
         }}/>
@@ -509,7 +509,7 @@ function AppStack() {
           ...defaultStackScreenNavigationOptions,
           headerShown: true,
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
         }
       }}/>
@@ -591,7 +591,7 @@ function AppStack() {
             title: 'Send',
             headerShown:true,
             headerLeft: () => {
-              return <SmallNavHeaderBackButton onPress={() => { navigation.popToTop() }} />
+              return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
             },
           }
         }}/>
@@ -601,7 +601,7 @@ function AppStack() {
             title: 'Send',
             headerShown:true,
             headerLeft: () => {
-              return <SmallNavHeaderBackButton onPress={() => { navigation.popToTop() }} />
+              return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
             },
           }
         }}/>
@@ -611,7 +611,7 @@ function AppStack() {
             title: 'Send To',
             headerShown:true,
             headerLeft: () => {
-              return <SmallNavHeaderBackButton onPress={() => { navigation.popToTop() }} />
+              return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
             },
           }
         }} />
@@ -627,7 +627,7 @@ function AppStack() {
             title: 'Transactions',
             headerShown:true,
             headerLeft: () => {
-              return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+              return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
             },
           }
         }}/>
@@ -636,7 +636,7 @@ function AppStack() {
           ...defaultStackScreenNavigationOptions,
           headerShown:true,
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
         }
       }}/>
@@ -647,7 +647,7 @@ function AppStack() {
           title: '',
           headerShadowVisible: false,
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
         }
       }}/>
@@ -665,7 +665,7 @@ function AppStack() {
               backgroundColor: Colors.offWhite
             },
             headerLeft: () => {
-              return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+              return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
             },
           }
         }}
@@ -678,7 +678,7 @@ function AppStack() {
             headerShadowVisible: false,
             headerShown:true,
             headerLeft: () => {
-              return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+              return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
             },
           }
         }} />
@@ -693,7 +693,7 @@ function AppStack() {
             headerShadowVisible: false,
             headerShown:true,
             headerLeft: () => {
-              return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+              return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
             },
           }
         }}/>
@@ -704,7 +704,7 @@ function AppStack() {
           headerShadowVisible: false,
           headerShown:true,
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
         }
       }}/>
@@ -715,7 +715,7 @@ function AppStack() {
           headerShadowVisible: false,
           headerShown:true,
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
         }
       }}/>
@@ -726,7 +726,7 @@ function AppStack() {
           headerShadowVisible: false,
           headerShown:true,
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
         }
       }}/>
@@ -740,7 +740,7 @@ function AppStack() {
             backgroundColor: Colors.offWhite
           },
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
         }
       }}/>
@@ -754,7 +754,7 @@ function AppStack() {
             backgroundColor: Colors.offWhite
           },
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
         }
       }}/>
@@ -768,7 +768,7 @@ function AppStack() {
             backgroundColor: Colors.offWhite
           },
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
         }
       }}/>
@@ -782,7 +782,7 @@ function AppStack() {
             backgroundColor: Colors.offWhite
           },
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
         }
       }}/>
@@ -796,7 +796,7 @@ function AppStack() {
             backgroundColor: Colors.offWhite
           },
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.popToTop() }} />
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
         }
       }}/>
