@@ -1,7 +1,6 @@
 import BottomSheet from '@gorhom/bottom-sheet'
 import PushNotificationIOS from '@react-native-community/push-notification-ios'
 import messaging from '@react-native-firebase/messaging'
-import { CommonActions } from '@react-navigation/native'
 import idx from 'idx'
 import moment from 'moment'
 import React, { createRef, PureComponent } from 'react'
@@ -111,7 +110,6 @@ import { setVersion } from '../../store/actions/versionHistory'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { AccountsState } from '../../store/reducers/accounts'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
-import { resetToHomeAction } from '../actions/NavigationActions'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -566,9 +564,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               value: false,
             } )
             this.props.updateLastSeen( new Date() )
-            // CommonActions.navigate( {
-            //   name: 'Intermediate'
-            // } )
           }
         }
       )
@@ -771,10 +766,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       return
     }
     const {
-      navigation,
       initializeHealthSetup,
       newBHRFlowStarted,
-      credsAuthenticated,
     } = this.props
     this.appStateListener = AppState.addEventListener(
       'change',
@@ -876,10 +869,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  getAssociatedContact = async () => {
-    // TODO -- need to check this
-    this.setSecondaryDeviceAddresses()
-  };
+
 
   componentDidUpdate = ( prevProps, prevState ) => {
     if (
@@ -1042,11 +1032,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
   }
 
-  handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
-    this.props.navigation.navigate( 'AccountDetails', {
-      accountShellID: selectedAccount.id,
-    } )
-  };
 
   openBottomSheet = (
     kind: BottomSheetKind,
@@ -1287,10 +1272,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  numberWithCommas = ( x ) => {
-    return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
-  }
-
 
   onBackPress = () => {
     this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
@@ -1326,9 +1307,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  renderAcceptModal = () => {
-
-  }
 
   moveToContactDetails = ( channelKey, type ) => {
     this.closeBottomSheet()

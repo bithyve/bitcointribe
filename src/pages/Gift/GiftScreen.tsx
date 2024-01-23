@@ -26,9 +26,7 @@ import axios from 'axios'
 import { CKTapCard } from 'cktap-protocol-react-native'
 import idx from 'idx'
 import React from 'react'
-import { ListItem } from 'react-native-elements'
 import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { connect } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
 import Gifts from '../../assets/images/svgs/gifts_screen_icon.svg'
@@ -42,13 +40,8 @@ import {
 import Fonts from '../../common/Fonts'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import AlertModalContents from '../../components/AlertModalContents'
-import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
-import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
 import ModalContainer from '../../components/home/ModalContainer'
 import Loader from '../../components/loader'
-import ModalHeader from '../../components/ModalHeader'
-import RecipientAvatar from '../../components/RecipientAvatar'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ToggleContainer from '../FriendsAndFamily/CurrencyToggle'
 import ClaimSatComponent from './ClaimSatComponent'
@@ -169,31 +162,7 @@ class GiftScreen extends React.Component<
     this.focusListener?.()
   }
 
-  setUpFocusListener = () => {
-    this.focusListener = this.props.navigation.addListener( 'focus', () => {
 
-      this.setState( {
-        showIndicator: true
-      } )
-    } )
-    this.props.navigation.setParams( {
-      toggleKnowMoreSheet: this.toggleKnowMoreSheet,
-    } )
-  };
-
-  toggleKnowMoreSheet = () => {
-    const shouldShow = !this.state.isShowingKnowMoreSheet
-
-    this.setState( {
-      isShowingKnowMoreSheet: shouldShow
-    }, () => {
-      if ( shouldShow ) {
-        // this.helpBottomSheetRef.current?.snapTo( 1 )
-      } else {
-        this.helpBottomSheetRef.current?.snapTo( 0 )
-      }
-    } )
-  };
 
   updateAddressBook = async () => {
     const { trustedContacts, keeperInfo } = this.props
@@ -239,27 +208,7 @@ class GiftScreen extends React.Component<
     // } )
   };
 
-  renderHelpHeader = () => {
-    return (
-      <SmallHeaderModal
-        borderColor={Colors.blue}
-        backgroundColor={Colors.blue}
-        onPressHeader={() => {
-          this.helpBottomSheetRef.current?.snapTo( 0 )
-        }}
-      />
-    )
-  };
 
-  renderHelpContent = () => {
-    return (
-      <AddressBookHelpContents
-        titleClicked={() => {
-          this.helpBottomSheetRef.current?.snapTo( 0 )
-        }}
-      />
-    )
-  };
 
   handleContactSelection(
     contactDescription: ContactRecipientDescribing,
@@ -274,260 +223,8 @@ class GiftScreen extends React.Component<
   }
 
 
-  renderContactItem = ( {
-    contactDescription,
-    index,
-    contactsType,
-  }: {
-    contactDescription: ContactRecipientDescribing;
-    index: number;
-    contactsType: string;
-  } ) => {
-    return (
-      <TouchableOpacity style={{
-        alignItems: 'center',
-        flex: 1
-      }}
-      key={index}
-      >
-        <RecipientAvatar recipient={contactDescription} contentContainerStyle={styles.avatarImage} />
-        <Text style={{
-          textAlign: 'center', marginTop: hp( 0.5 )
-        }}>{contactDescription.displayedName.split( ' ' )[ 0 ] + ' '} </Text>
-      </TouchableOpacity>
-    )
-  };
-  renderContactListItem = ( {
-    contactDescription,
-    index,
-    contactsType,
-  }: {
-    contactDescription: ContactRecipientDescribing;
-    index: number;
-    contactsType: string;
-  } ) => {
-    return (
-      <ListItem
-        key={String( index )}
-        onPress={() =>
-          this.handleContactSelection( contactDescription, index, contactsType )
-        }
-        containerStyle={{
-          backgroundColor: Colors.backgroundColor1,
-          paddingHorizontal: wp( 3 )
-        }}
-      >
-        <FriendsAndFamilyContactListItemContent contact={contactDescription} index={index} />
-      </ListItem>
-    )
-  };
-
-  renderAddContactAddressBookHeader = () => {
-    return <ModalHeader />
-  };
-  renderAddFnFModal = () => {
-    const { activeIndex } = this.state
-    return (
-      <View style={{
-        ...styles.modalContentContainer,
-      }}>
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => {
-            this.setState( {
-              addFnF: false
-            } )
-          }}
-          style={styles.closeButton}
-        >
-          <FontAwesome name="close" color={Colors.white} size={19} style={{
-            // marginTop: hp( 0.5 )
-          }} />
-        </TouchableOpacity>
-        <Text style={styles.title}>Add Friends & Family</Text>
-        <Text style={styles.subTitle}>Add a new contact, or invite a ward Lorem ipsum dolor sit amet, consectetur adipiscing elit</Text>
-        <TouchableOpacity
-          onPress={() => this.setState( {
-            activeIndex: 0
-          } )}
-          style={[ styles.cardView, {
-            backgroundColor: activeIndex === 0 ? Colors.lightBlue : Colors.backgroundColor1
-          } ]}>
-          <View style={styles.cardSubView}>
-            <View style={{
-              width: 18,
-              height: 18,
-              borderRadius: 9,
-              // borderWidth: 0.3,
-              // borderColor: Colors.borderColor,
-              backgroundColor: Colors.white,
-              justifyContent: 'center',
-              alignItems: 'center',
-              elevation: 10,
-              // shadowColor: Colors.gray,
-              shadowOpacity: 0.1,
-              shadowOffset: {
-                width: 1, height: 1
-              },
-            }}>
-              {activeIndex === 0 &&
-                <Image
-                  style={{
-                    width: '100%', height: '100%'
-                  }}
-                  source={require( '../../assets/images/icons/checkmark.png' )}
-                />
-              }
-            </View>
-            {activeIndex === 0 ?
-              <Image
-                style={styles.icon}
-                source={require( '../../assets/images/icons/phone-bookFnF.png' )}
-              />
-              :
-              <Image
-                style={styles.icon}
-                source={require( '../../assets/images/icons/phone-book_white.png' )}
-              />
-            }
-
-            <View style={{
-              // width: '70%',
-              flex: 1,
-            }} >
-              <Text style={{
-                fontSize: RFValue( 13 ), fontFamily: activeIndex === 0 ? Fonts.Medium : Fonts.Regular, color: activeIndex === 0 ? Colors.white : Colors.black
-              }}>
-                Add Contacts
-              </Text>
-              <Text style={[ styles.cardSubText, {
-                color: activeIndex === 0 ? Colors.white : Colors.textColorGrey,
-              } ]}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-              </Text>
-            </View>
-          </View>
-          {/* {isSelected && ( */}
 
 
-          {/* )} */}
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => this.setState( {
-            activeIndex: 1
-          } )}
-          style={[ styles.cardView, {
-            backgroundColor: activeIndex === 1 ? Colors.lightBlue : Colors.backgroundColor1,
-            marginTop: 0
-          } ]}>
-          <View style={styles.cardSubView}>
-            <View style={styles.imageView}>
-              {activeIndex === 1 &&
-                <Image
-                  style={{
-                    width: '100%', height: '100%'
-                  }}
-                  source={require( '../../assets/images/icons/checkmark.png' )}
-                />
-              }
-            </View>
-            <Image
-              style={styles.icon}
-              source={require( '../../assets/images/icons/icon_f&F_white.png' )}
-            />
-            <View style={{
-              // width: '70%',
-              flex: 1
-            }} >
-
-              <Text style={{
-                fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.Medium : Fonts.Regular, color: activeIndex === 1 ? Colors.white : Colors.black
-              }}>
-                Add a Ward
-              </Text>
-              <Text style={[ styles.cardSubText, {
-                color: activeIndex === 1 ? Colors.white : Colors.textColorGrey,
-              } ]}>
-                Need text to be replaced
-              </Text>
-            </View>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => this.setState( {
-            activeIndex: 2
-          } )}
-          style={{
-            marginTop: hp( 3 ),
-            width: '95%', height: hp( '12%' ),
-            alignSelf: 'center', justifyContent: 'center',
-            borderRadius: wp( '4' ),
-            // marginVertical: hp( '3%' )
-          }}>
-          <View style={{
-            flexDirection: 'row',
-            // alignItems: 'center',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginHorizontal: wp( '5%' ),
-          }}>
-            <View style={styles.imageView}>
-              {activeIndex === 2 &&
-                <Image
-                  style={{
-                    width: '100%', height: '100%'
-                  }}
-                  source={require( '../../assets/images/icons/checkmark.png' )}
-                />
-              }
-            </View>
-
-            <Text style={{
-              fontSize: RFValue( 11 ), fontFamily: Fonts.Regular, color: Colors.textColorGrey,
-              marginHorizontal: wp( 3 ),
-              width: '95%', flex: 1
-            }}>
-              Gift Sats when sending invite Gift Sats when sending invite Gift Sats when sending invite
-            </Text>
-          </View>
-          {/* {isSelected && ( */}
-
-
-          {/* )} */}
-        </TouchableOpacity>
-        {this.setButtonVisible()}
-      </View>
-    )
-  }
-
-  setButtonVisible = () => {
-    return (
-      <TouchableOpacity
-        onPress={async () => {
-          if ( this.state.activeIndex === 0 ) {
-            this.setState( {
-              isLoadContacts: true,
-              addFnF: false
-            }, () => {
-              this.props.navigation.navigate( 'AddContact' )
-            } )
-          } else {
-            // showEncryptionPswd( false )
-          }
-        }}
-        style={{
-          ...styles.buttonView, elevation: 5
-        }}
-      >
-        {/* {!loading.initializing ? ( */}
-        <Text style={styles.buttonText}>Proceed</Text>
-        {/* ) : (
-          <ActivityIndicator size="small" />
-        )} */}
-      </TouchableOpacity>
-    )
-  }
   onCloseClick = () =>{
     this.setState( {
       showVerification:false
@@ -638,12 +335,7 @@ class GiftScreen extends React.Component<
   }
 
   render() {
-    const { syncPermanentChannels, navigation } = this.props
-    const { isLoadContacts, addFnF } = this.state
     const {
-      keepers,
-      keeping,
-      otherContacts,
       showLoader,
       showIndicator
     } = this.state
@@ -660,25 +352,6 @@ class GiftScreen extends React.Component<
               <ActivityIndicator color={Colors.white} size='large' />
             </ModalContainer>
           }
-
-          {/* <View style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              paddingVertical: wp( 4 ),
-              paddingHorizontal: wp( 4 ),
-              alignItems: 'center'
-            }}>
-              <Text style={{
-                color: Colors.blue,
-                fontSize: RFValue( 16 ),
-                marginLeft: 2,
-                fontFamily: Fonts.Medium,
-
-              }}>
-              My Accounts
-              </Text>
-              <ToggleContainer />
-            </View> */}
           <View style={{
             flexDirection: 'row', marginHorizontal: 30, marginTop: 15, alignItems: 'flex-end'
           }}>
@@ -700,7 +373,6 @@ class GiftScreen extends React.Component<
           }}>{'Give sats as gifts to your friends and family, view and manage created gifts.'}</Text>
           <ScrollView
             contentContainerStyle={{
-              // flex: 1,
               paddingHorizontal: 38, paddingBottom: 20
             }}
           >
@@ -710,7 +382,6 @@ class GiftScreen extends React.Component<
               onPress={() => {
 
                 this.props.navigation.navigate( 'CreateGift', {
-                // setActiveTab: buttonPress
                 } )}}
               image={<Add />}
             />
@@ -845,13 +516,10 @@ const styles = StyleSheet.create( {
     width: 18,
     height: 18,
     borderRadius: 9,
-    // borderWidth: 0.3,
-    // borderColor: Colors.borderColor,
     backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 10,
-    // shadowColor: Colors.gray,
     shadowOpacity: 0.1,
     shadowOffset: {
       width: 1, height: 1
@@ -943,12 +611,9 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-around',
   },
   contactText: {
-    // marginLeft: 10,
-    // marginHorizontal: wp ( 1 ),
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.Regular,
     color: Colors.white,
-    // padding: wp( 2 )
   },
   phoneText: {
     marginTop: 3,
@@ -958,29 +623,17 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
   },
   selectedContactsView: {
-    // marginLeft: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    // marginRight: 20,
-    // marginTop: 5,
-    // paddingBottom: 15,
-    // paddingTop: 15,
-    // borderBottomWidth: 1,
-    // borderColor: Colors.borderColor,
     backgroundColor: Colors.blue,
     borderRadius: wp( 2 ),
-    // width: wp( 22 )
-    // padding: wp( 1 ),
-    //width: wp( 24 ),
     height: hp( 4 ),
     paddingHorizontal: wp( 2 )
   },
   pageTitle: {
     color: Colors.THEAM_TEXT_COLOR,
     fontSize: RFValue( 16 ),
-    // letterSpacing: 0.7,
-    // fontFamily: Fonts.Regular,
     fontFamily: Fonts.SemiBold,
     alignItems: 'center',
     marginHorizontal: wp( 4 ),
@@ -988,7 +641,6 @@ const styles = StyleSheet.create( {
   cardTitle: {
     color: Colors.THEAM_TEXT_COLOR,
     fontSize: RFValue( 12 ),
-    // fontFamily: Fonts.Regular,
     fontFamily: Fonts.Medium,
     marginVertical: wp( 2 ),
     marginHorizontal: wp( 4 )
