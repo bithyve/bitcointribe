@@ -10,7 +10,7 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch } from 'react-redux'
 import ModalContainer from 'src/components/home/ModalContainer'
-import LoaderModal from 'src/components/LoaderModal'
+import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import FormStyles from '../../common/Styles/FormStyles'
@@ -226,10 +226,11 @@ export default function IssueScreen( props ) {
         </View>
       </View>
       <ModalContainer
-      onBackground={''}
+        onBackground={()=>{}}
+        closeBottomSheet={() => {}}
         visible={requesting}
       >
-        {/* <RGBIntroModal
+        <RGBIntroModal
           title={'Creating Asset'}
           info={'Embark on journey with Bitcoin Tribe wallet, Your Comprehensive solution for managing RGB assets effortlessly.'}
           otherText={'To regenerate your Grid at a later date'}
@@ -242,12 +243,6 @@ export default function IssueScreen( props ) {
           }}
           isBottomImage={true}
           bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
-        /> */}
-        <LoaderModal
-          headerText={'Creating Asset'}
-          messageText={'Embark on journey with Bitcoin Tribe wallet, Your Comprehensive solution for managing RGB assets effortlessly.'}
-          messageText2={'To regenerate your Grid at a later date'}
-          showGif={false}
         />
       </ModalContainer>
     </View>

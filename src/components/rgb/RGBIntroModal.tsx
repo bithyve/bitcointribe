@@ -1,10 +1,9 @@
 import React, { useRef } from 'react'
-import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ImageBackground, StyleSheet, Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-    heightPercentageToDP as hp, widthPercentageToDP as wp
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import MemoriableIllustration from '../../assets/images/svgs/MemoriableIllustration.svg'
 import Colors from '../../common/Colors'
@@ -84,7 +83,7 @@ export default function RGBIntroModal( props ) {
               <BounceLoader />
             </View>
           </View>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {
               props.closeModal()
             }}
@@ -104,7 +103,7 @@ export default function RGBIntroModal( props ) {
             >
               <Text style={styles.buttonText}>Next</Text>
             </LinearGradient>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </View>
@@ -155,7 +154,8 @@ const styles = StyleSheet.create( {
   modalMessageWrapper: {
     flexDirection: 'row',
     width: '100%',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginBottom: 10
   },
   modalMessageText: {
     fontSize: 13,

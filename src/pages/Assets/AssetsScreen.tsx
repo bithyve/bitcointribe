@@ -19,7 +19,7 @@ import {
   widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
-import LoaderModal from 'src/components/LoaderModal'
+import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
 import { RGBConfig, RGB_ASSET_TYPE, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
@@ -394,14 +394,17 @@ export default function AssetsScreen( props ) {
         {renderBottomSheetContent()}
       </ModalContainer>
       <ModalContainer
-      onBackground={''}
+        onBackground={()=>{}}
         visible={syncing}
       >
-        <LoaderModal
-          headerText={'Syncing Asset'}
-          messageText={'Embark on journey with Bitcoin Tribe wallet, Your Comprehensive solution for managing RGB assets effortlessly.'}
-          messageText2={'To regenerate your Grid at a later date'}
-          showGif={false}
+        <RGBIntroModal
+          title={'Syncing Asset'}
+          info={'Embark on journey with Bitcoin Tribe wallet, Your Comprehensive solution for managing RGB assets effortlessly.'}
+          otherText={'To regenerate your Grid at a later date'}
+          proceedButtonText={'Continue'}
+          isIgnoreButton={false}
+          isBottomImage={true}
+          bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
         />
       </ModalContainer>
     </View>
