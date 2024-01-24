@@ -40,15 +40,17 @@ export default function RGBSend(props) {
         }
         const utxo = payTo.match(/~\/~\/([^?]+)\?/)[1]
         const endpoint = payTo.match(/endpoints=([^&]+)/)[1]
-        const isValidInvoice = await RGBServices.isValidBlindedUtxo(utxo)
         setSending(true)
-        if (isValidInvoice) {
-          response = await RGBServices.sendAsset(asset.assetId, utxo, amount, endpoint)
-          setSending(false)
-        } else {
-          Toast('Invalid RGB invoice/blinded UTXO')
-          setSending(false)
-        }
+        setTimeout(async () => {
+          const isValidInvoice = await RGBServices.isValidBlindedUtxo(utxo)
+          if (isValidInvoice) {
+            response = await RGBServices.sendAsset(asset.assetId, utxo, amount, endpoint)
+            setSending(false)
+          } else {
+            Toast('Invalid RGB invoice/blinded UTXO')
+            setSending(false)
+          }
+        }, 300)
       } else {
         if (!fee || !payTo || !amount) {
           Toast('Please fill all details!')
