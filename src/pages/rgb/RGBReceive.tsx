@@ -111,7 +111,7 @@ export default function RGBReceive( props ) {
               }} size="large" /> :
                 <ScrollView>
                   <View style={styles.QRView}>
-                    <QRCode title={assetType === RGB_ASSET_TYPE.BITCOIN ? 'Bitcoin address' : 'Invoice'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp( '27%' )} />
+                    <QRCode title={assetType === RGB_ASSET_TYPE.BITCOIN ? 'Bitcoin address' : 'RGB Invoice'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp( '27%' )} />
                   </View>
 
                   <CopyThisText
@@ -128,7 +128,7 @@ export default function RGBReceive( props ) {
               <BottomInfoBox
                 backgroundColor={Colors.white}
                 title={common.note}
-                infoText={strings.Itwouldtake}
+                infoText={assetType === RGB_ASSET_TYPE.BITCOIN ? strings.Itwouldtake: 'Blinded UTXO in this invoice will expire after 24 hours '}
               />
             </View>
           </View>
