@@ -9,23 +9,23 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
+import LoaderModal from 'src/components/LoaderModal'
 import BorderWalletIcon from '../../assets/images/svgs/borderWallet.svg'
 import { LevelData, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
-import Fonts from '../../common/Fonts'
 import { translations } from '../../common/content/LocContext'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
-import HeaderTitle from '../../components/HeaderTitle'
-import Toast from '../../components/Toast'
+import Fonts from '../../common/Fonts'
 import BWHealthCheckModal from '../../components/border-wallet/BWHealthCheckModal'
+import HeaderTitle from '../../components/HeaderTitle'
 import ModalContainer from '../../components/home/ModalContainer'
 import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
@@ -79,6 +79,7 @@ export default function BackupMethods( { navigation } ) {
   const wallet: Wallet = dbManager.getWallet()
   const dispatch = useDispatch()
   const [ visibleModal, setVisibleModal ] = useState( false )
+  const [ googleVisibleModal, setGoogleVisibleModal] = useState( false )
 
   useEffect( () => {
     async function fetchWalletDays() {
@@ -135,13 +136,17 @@ export default function BackupMethods( { navigation } ) {
           {
             text: 'Continue',
             onPress: async () => {
+              setGoogleVisibleModal(true)
               await GoogleDrive.setup()
               const login = await GoogleDrive.login()
               if( login.error ) {
                 Toast( login.error )
+                setGoogleVisibleModal(false)
               } else {
                 await RGBServices.backup( '', wallet.primaryMnemonic )
                 dispatch( updateLastBackedUp() )
+                setGoogleVisibleModal(false)
+                Toast('Backuped successfully')
               }
             },
             style: 'default',
@@ -405,6 +410,18 @@ export default function BackupMethods( { navigation } ) {
           </View>
         )}
       </View>
+      <ModalContainer
+        onBackground={()=>{}}
+        closeBottomSheet={() => {}}
+        visible={googleVisibleModal}
+      >
+        <LoaderModal
+          headerText={'Backup In Progress'}
+          messageText={'Embark on journey with Bitcoin Tribe wallet, Your Comprehensive solution for managing RGB assets effortlessly.'}
+          messageText2={'To regenerate your Grid at a later date'}
+          showGif={false}
+        />
+      </ModalContainer>
       <ModalContainer
         onBackground={() => setVisibleModal( false )}
         visible={visibleModal}

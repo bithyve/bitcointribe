@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ActivityIndicator, Keyboard, SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native'
+import { Keyboard, SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { Input } from 'react-native-elements'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { launchImageLibrary } from 'react-native-image-picker'
@@ -9,6 +9,8 @@ import {
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch } from 'react-redux'
+import ModalContainer from 'src/components/home/ModalContainer'
+import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import FormStyles from '../../common/Styles/FormStyles'
@@ -28,18 +30,17 @@ export default function IssueScreen( props ) {
   const [ ticker, setTicker ] = useState( '' )
   const [ attachedfile, setAttachedFile ] = useState( 'Attach File' )
   const [ requesting, setRequesting ] = useState( false )
-  const [ loading, setLoading ] = useState( false )
+  // const [ loading, setLoading ] = useState( false )
 
   async function IssueAssetClick() {
-    setLoading( true )
     Keyboard.dismiss()
     try {
       if( issueType === 'collectible' ) {
         if ( !name || !description || !totalAmount || !attachedfile ) {
           Toast( 'Please enter all details.' )
-          setLoading( false )
         } else {
           setRequesting( true )
+          setTimeout(async()=>{
           const newAsset = await RGBServices.issueRgb25Asset( name, description, totalAmount, attachedfile )
           setRequesting( false )
           if( newAsset.assetId ) {
@@ -47,16 +48,16 @@ export default function IssueScreen( props ) {
             dispatch( syncRgb() )
             Toast( 'Asset created' )
           } else {
-            setLoading( false )
             Toast( `Failed ${newAsset.error}` )
           }
+        },300)
         }
       } else {
         if ( !ticker || !name || !totalAmount ) {
           Toast( 'Please enter all details.' )
-          setLoading( false )
         } else {
           setRequesting( true )
+          setTimeout(async()=>{
           const newAsset = await RGBServices.issueRgb20Asset( ticker, name, totalAmount )
           setRequesting( false )
           if( newAsset.assetId ) {
@@ -64,14 +65,13 @@ export default function IssueScreen( props ) {
             dispatch( syncRgb() )
             Toast( 'Asset created' )
           } else {
-            setLoading( false )
             Toast( `Failed ${newAsset.error}` )
           }
+        },300)
         }
       }
     } catch ( error ) {
       setRequesting( false )
-      setLoading( false )
       Toast( `Failed ${error}` )
     }
   }
@@ -92,25 +92,21 @@ export default function IssueScreen( props ) {
       },
     )
   }
-
+  
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
-      {
-        loading &&
+      {/* {
+        requesting &&
         <View style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          top: 15,
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 10
         }}>
           <ActivityIndicator size="large" color={Colors.darkBlue} />
         </View>
-      }
+      } */}
       <SafeAreaView style={{
         flex: 0
       }} />
@@ -227,6 +223,26 @@ export default function IssueScreen( props ) {
           </TouchableOpacity>
         </View>
       </View>
+      <ModalContainer
+        onBackground={()=>{}}
+        closeBottomSheet={() => {}}
+        visible={requesting}
+      >
+        <RGBIntroModal
+          title={'Creating Asset'}
+          info={'Embark on journey with Bitcoin Tribe wallet, Your Comprehensive solution for managing RGB assets effortlessly.'}
+          otherText={'To regenerate your Grid at a later date'}
+          proceedButtonText={'Continue'}
+          isIgnoreButton={false}
+          closeModal={()=> setRequesting( false )}
+          onPressProceed={() => {setRequesting( false )}}
+          onPressIgnore={() => {
+            setRequesting( false )
+          }}
+          isBottomImage={true}
+          bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
+        />
+      </ModalContainer>
     </View>
   )
 }

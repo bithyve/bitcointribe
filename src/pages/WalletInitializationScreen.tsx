@@ -11,20 +11,18 @@ import {
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { useDispatch } from 'react-redux'
 import BorderWallet from '../assets/images/svgs/borderWallet.svg'
 import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
 import { LocalizationContext } from '../common/content/LocContext'
 import { hp } from '../common/data/responsiveness/responsive'
-import BottomInfoBox from '../components/BottomInfoBox'
+import Fonts from '../common/Fonts'
 import GenerateEntropyGridModal from '../components/border-wallet/GenerateEntropyGridModal'
+import BottomInfoBox from '../components/BottomInfoBox'
 import ModalContainer from '../components/home/ModalContainer'
-import { setDownloadedBackupData } from '../store/actions/BHR'
-import { setCloudDataRecovery, setIsFileReading } from '../store/actions/cloud'
 import openLink from '../utils/OpenLink'
 
 const WalletInitializationScreen = props => {
@@ -174,7 +172,7 @@ const WalletInitializationScreen = props => {
               />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={async () => {
               dispatch( setDownloadedBackupData( [] ) )
               dispatch( setCloudDataRecovery( null ) )
@@ -202,7 +200,7 @@ const WalletInitializationScreen = props => {
                 }}
               />
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             onPress={() => props.navigation.navigate( 'RegenerateEntropyGrid', {
               navigation: props.navigation

@@ -10,19 +10,20 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
+import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
 import { RGBConfig, RGB_ASSET_TYPE, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { translations } from '../../common/content/LocContext'
+import Fonts from '../../common/Fonts'
 import BottomSheetAddWalletInfo from '../../components/bottom-sheets/add-wallet/BottomSheetAddWalletInfo'
 import ModalContainer from '../../components/home/ModalContainer'
 import RGBServices from '../../services/RGBServices'
@@ -391,6 +392,20 @@ export default function AssetsScreen( props ) {
         visible={bottomSheetState == BottomSheetState.Open}
         closeBottomSheet={() => {}}>
         {renderBottomSheetContent()}
+      </ModalContainer>
+      <ModalContainer
+        onBackground={()=>{}}
+        visible={syncing}
+      >
+        <RGBIntroModal
+          title={'Syncing Asset'}
+          info={'Embark on journey with Bitcoin Tribe wallet, Your Comprehensive solution for managing RGB assets effortlessly.'}
+          otherText={'To regenerate your Grid at a later date'}
+          proceedButtonText={'Continue'}
+          isIgnoreButton={false}
+          isBottomImage={true}
+          bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
+        />
       </ModalContainer>
     </View>
   )

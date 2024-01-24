@@ -10,8 +10,8 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
-import Fonts from '../../../common/Fonts'
 import { translations } from '../../../common/content/LocContext'
+import Fonts from '../../../common/Fonts'
 
 type Props = {
   onRGBWalletClick: ()=>any;
