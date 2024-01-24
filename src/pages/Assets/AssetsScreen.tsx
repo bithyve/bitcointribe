@@ -395,6 +395,7 @@ export default function AssetsScreen( props ) {
       </ModalContainer>
       <ModalContainer
         onBackground={()=>{}}
+        closeBottomSheet={() => {}}
         visible={syncing}
       >
         <RGBIntroModal
