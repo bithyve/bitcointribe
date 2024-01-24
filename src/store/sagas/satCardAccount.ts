@@ -41,7 +41,6 @@ function* satCardAccountWorker( { payload }: { payload: { accountId: string, pri
     // const defaultFeePerByte = accountsState.averageTxFees[ defaultTxPriority ]
     const averageTxFeeByNetwork = accountsState.averageTxFees[ associateAccount.networkType ]
 
-    console.log( 'skk before txid', payload.privKey )
     const { txid } = yield call(
       AccountOperations.sweepPrivateKey,
       payload.privKey,
@@ -50,8 +49,6 @@ function* satCardAccountWorker( { payload }: { payload: { accountId: string, pri
       averageTxFeeByNetwork,
       network,
     )
-    // console.log( 'skk txid', JSON.stringify( txid ) )
-
     // AccountOperations.importAddress( associateAccount, payload.privKey, payload.address, {
     //   type: ActiveAddressAssigneeType.GIFT,
     //   senderInfo: {

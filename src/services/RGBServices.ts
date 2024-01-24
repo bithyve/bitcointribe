@@ -139,9 +139,24 @@ export default class RGBServices{
     const data = await RGB.getUnspents()
     return JSON.parse( data )
   }
-
+  
   static backup = async ( path: string, password: string ): Promise<{}> => {
     const data = await RGB.backup( path, password )
+    return data
+  }
+
+  static isBackupRequired = async (): Promise<{}> => {
+    const data = await RGB.isBackupRequired( )
+    return data
+  }
+
+  static restore = async (mnemonic: string): Promise<{}> => {
+    const data = await RGB.restore( mnemonic )
+    return data
+  }
+
+  static isValidBlindedUtxo = async (invoiceData: string): Promise<{}> => {
+    const data = await RGB.isValidBlindedUtxo( invoiceData )
     return data
   }
 }

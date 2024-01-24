@@ -136,7 +136,7 @@ export default function BackupMethods( { navigation } ) {
             onPress: async () => {
               await GoogleDrive.setup()
               const login = await GoogleDrive.login()
-              if( !login.error ) {
+              if( login.error ) {
                 Toast( login.error )
               } else {
                 await RGBServices.backup( '', wallet.primaryMnemonic )
