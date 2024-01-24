@@ -1,6 +1,5 @@
-import React, { useRef } from 'react'
+import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { ScrollView } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp, widthPercentageToDP as wp
@@ -12,7 +11,6 @@ import Fonts from '../../common/Fonts'
 import BounceLoader from '../loader/BounceLoader'
 
 export default function RGBIntroModal(props) {
-  const scrollViewRef = useRef<ScrollView>()
   const strings = translations['accounts']
 
   return (
