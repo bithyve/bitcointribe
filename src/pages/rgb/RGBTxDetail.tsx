@@ -45,7 +45,6 @@ export default function RGBTxDetail( props ) {
   const getTransfers = async () => {
     try {
       const txns = await RGBServices.getRgbAssetTransactions( asset.assetId )
-      console.log( 'txns', JSON.stringify( txns ) )
       if ( txns ) {
         setTransactionData( txns )
         setLoading( false )
@@ -114,7 +113,7 @@ export default function RGBTxDetail( props ) {
           <Text
             numberOfLines={1}
             style={[ styles.amountText, {
-              color: ( item.kind === 'RECEIVE' || item.kind ==='ISSUANCE' ) ? '#04A777' : '#FD746C'
+              color: ( item.kind === 'RECEIVE_BLIND' || item.kind ==='ISSUANCE' || item.kind === 'RECEIVE_WITNESS' ) ? '#04A777' : '#FD746C'
             } ]}
           >
             {item.amount}
