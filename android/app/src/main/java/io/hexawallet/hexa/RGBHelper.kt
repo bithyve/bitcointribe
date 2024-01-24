@@ -14,14 +14,18 @@ import com.google.gson.JsonObject
 import org.rgbtools.AssetCfa
 import org.rgbtools.AssetNia
 import org.rgbtools.Balance
+import org.rgbtools.BlindedUtxo
 import org.rgbtools.ReceiveData
 import org.rgbtools.Recipient
 import org.rgbtools.RefreshFilter
 import org.rgbtools.RefreshTransferStatus
 import org.rgbtools.RgbLibException
 import org.rgbtools.Unspent
+import org.rgbtools.restoreBackup
 import org.rgbtools.restoreKeys
 import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import kotlin.Exception
 
 object RGBHelper {
@@ -154,7 +158,7 @@ object RGBHelper {
     ): String {
         val txid = handleMissingFunds { RGBWalletRepository.wallet.send(
             RGBWalletRepository.online,
-            mapOf(assetID to listOf(Recipient(blindedUTXO,null, amount, listOf("rpcs://proxy.iriswallet.com/json-rpc")))),
+            mapOf(assetID to listOf(Recipient(blindedUTXO,null, amount, consignmentEndpoints))),
             false,
             feeRate,
             0u
@@ -285,14 +289,13 @@ object RGBHelper {
                     context,
                     listOf(DriveScopes.DRIVE_FILE)
                 )
-            Log.d(TAG, "allAccounts: ${credential?.allAccounts?.get(0)?.name}")
 
             if (gAccount != null) {
                 credential.selectedAccount = gAccount.account!!
             }
             driveClient =
                 Drive.Builder(NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
-                    .setApplicationName("hexa")
+                    .setApplicationName("tribe")
                     .build()
             val backupFile = getBackupFile(password, context)
             backupFile.delete()
@@ -307,12 +310,12 @@ object RGBHelper {
             Log.d(TAG, "Backup uploaded. Backup file ID: $newBackupID")
             val oldBackups = driveClient.files().list().setQ("name='${backupFile.name}'").execute()
             Log.d(TAG, "oldBackups='$oldBackups")
-            if (oldBackups != null) {
-                for (file in oldBackups.files) {
-                    Log.d(TAG, "Deleting old backup file ${file.id} ...")
-                    driveClient.files().delete(file.id).execute()
-                }
-            }
+//            if (oldBackups != null) {
+//                for (file in oldBackups.files) {
+//                    Log.d(TAG, "Deleting old backup file ${file.id} ...")
+//                    driveClient.files().delete(file.id).execute()
+//                }
+//            }
             Log.d(TAG, "Backup operation completed")
             return ""
         }catch (e: Exception){
@@ -325,6 +328,56 @@ object RGBHelper {
     fun getBackupInfo(): Boolean {
         return RGBWalletRepository.wallet.backupInfo()
     }
+
+    fun restore(password: String, context: ReactApplicationContext): String {
+        try {
+            val gAccount = GoogleSignIn.getLastSignedInAccount(context)
+            val credential =
+                GoogleAccountCredential.usingOAuth2(
+                    context,
+                    listOf(DriveScopes.DRIVE_FILE)
+                )
+            if (gAccount != null) {
+                credential.selectedAccount = gAccount.account!!
+            }
+            driveClient =
+                Drive.Builder(NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
+                    .setApplicationName("tribe")
+                    .build()
+            val backupFile = getBackupFile(password, context)
+            val lastBackups =
+                driveClient
+                    .files()
+                    .list()
+                    .setQ("name='${backupFile.name}'")
+                    .setOrderBy("createdTime")
+                    .execute()
+            val oldBackups = driveClient.files().list().setQ("name='${backupFile.name}'").execute()
+            Log.d(TAG, "oldBackups='$oldBackups")
+            if (lastBackups.files.isNullOrEmpty()){
+                return "No backup"
+            }
+            val lastBackup = lastBackups.files.last()
+
+
+            val outputStream: OutputStream = FileOutputStream(backupFile)
+            driveClient.files().get(lastBackup.id).executeMediaAndDownloadTo(outputStream)
+            return restoreBackup(backupFile.absolutePath, password, AppConstants.rgbDir.absolutePath).toString()
+        }catch (e: Exception){
+            Log.d(TAG, "Exception: ${e}")
+            return ""
+        }
+    }
+
+    fun isValidBlindedUtxo(invoice: String): Boolean {
+        return try {
+            BlindedUtxo(invoice)
+            true
+        } catch (e: RgbLibException.InvalidBlindedUtxo){
+            false
+        }
+    }
+
 
 
 }

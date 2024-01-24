@@ -67,7 +67,6 @@ const SeedPageComponent = ( props ) => {
   } )
 
   useEffect( () => {
-    console.log( 'skk primaryMnemonic'+ primaryMnemonic )
     const tempData = []
     let innerTempData = []
     let initPosition = 0

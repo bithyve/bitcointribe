@@ -208,8 +208,6 @@ export default function SetUpSatNextCardScreen( props ) {
 
     setTimeout( () => {
       if ( recipient.id != null && recipient.id != '' ) {
-        // console.log( 'skk inside recipent', JSON.stringify( recipient ) )
-        // console.log( 'skk send giftAmount', JSON.stringify( giftAmount ) )
         dispatch( amountForRecipientUpdated( {
           recipient: recipient,
           amount: giftAmount
@@ -228,7 +226,6 @@ export default function SetUpSatNextCardScreen( props ) {
 
   useAccountSendST1CompletionEffect( {
     onSuccess: () => {
-      console.log( 'skk use acc 1 success' )
       dispatch( executeSendStage2( {
         accountShell: sourceAccountShell,
         txnPriority: TxPriority.LOW,
@@ -244,7 +241,6 @@ export default function SetUpSatNextCardScreen( props ) {
 
   useAccountSendST2CompletionEffect( {
     onSuccess: ( txid: string | null, amt: number | null ) => {
-      console.log( 'skk use acc 2 success', txid )
       if ( txid ) {
         let type
         if ( sourceAccountShell.primarySubAccount.type === undefined ) {

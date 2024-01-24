@@ -170,11 +170,28 @@ class RGBModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
         jsonObject.addProperty("bitcoin", Gson().toJson(bitcoinUtxo))
         promise.resolve(jsonObject.toString())
     }
+    @ReactMethod
+    fun isValidBlindedUtxo(invoice:String,promise: Promise){
+        val response = RGBHelper.isValidBlindedUtxo(invoice)
+        promise.resolve(response)
+    }
 
     @ReactMethod
     fun backup(backupPath: String, password: String, promise: Promise){
         val response = RGBHelper.backup(backupPath, password, reactApplicationContext)
-        Log.d(TAG, "backup: response=$response")
         promise.resolve(response.toString())
+    }
+
+    @ReactMethod
+    fun isBackupRequired(promise: Promise){
+        val response = RGBHelper.getBackupInfo()
+        promise.resolve(response)
+    }
+
+    @ReactMethod
+    fun restore(mnemonic: String,promise: Promise){
+        val response = RGBHelper.restore(mnemonic, reactApplicationContext)
+        Log.d(TAG, "restore: $response")
+        promise.resolve(response)
     }
 }
