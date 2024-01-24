@@ -273,7 +273,7 @@ function AppStack() {
         title: 'Buy with Ramp' 
       }} />
       <Stack.Screen name="TransactionDetails" component={TransactionDetailsContainerScreen} options={{
-        headerShown:true,
+        headerShown:false,
         title: 'Transaction Details'
       }} />
       <Stack.Screen name="Receive" component={Receive} options={{
