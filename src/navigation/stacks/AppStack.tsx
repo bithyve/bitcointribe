@@ -414,6 +414,7 @@ function AppStack() {
       }} />
       <Stack.Screen name="ReceiveQR" component={ReceiveQrScreen} options={( { navigation } ) => {
         return {
+          headerShown:true,
           title: 'Receive',
           headerLeft: () => {
             return <SmallNavHeaderBackButton onPress={() => { navigation.goBack() }} />
@@ -786,20 +787,8 @@ function AppStack() {
           },
         }
       }}/>
-      <Stack.Screen name="TransactionDetailsScreen" component={TransactionDetailsScreen} options={( { navigation } ) => {
-        return {
-          ...defaultStackScreenNavigationOptions,
-          title: '',
-          headerShadowVisible: false,
-          headerShown:true,
-          headerStyle: {
-            backgroundColor: Colors.offWhite
-          },
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-          },
-        }
-      }}/>
+      <Stack.Screen name="TransactionDetailsScreen" component={TransactionDetailsScreen}/>
+      
       <Stack.Screen name="ChannelOpenScreen" component={ChannelOpenScreen} options={{
         headerShown: false
       }}/>
