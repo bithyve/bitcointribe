@@ -1,7 +1,6 @@
 import BottomSheet from '@gorhom/bottom-sheet'
 import PushNotificationIOS from '@react-native-community/push-notification-ios'
 import messaging from '@react-native-firebase/messaging'
-import { CommonActions } from '@react-navigation/native'
 import idx from 'idx'
 import moment from 'moment'
 import React, { createRef, PureComponent } from 'react'
@@ -111,7 +110,6 @@ import { setVersion } from '../../store/actions/versionHistory'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { AccountsState } from '../../store/reducers/accounts'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
-import { resetToHomeAction } from '../actions/NavigationActions'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
