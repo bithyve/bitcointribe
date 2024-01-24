@@ -149,7 +149,7 @@ const AssetMetaData = ( props ) => {
             padding: 20, flex: 1
           }}>
             {
-              asset.dataPaths && (
+              asset?.dataPaths.length > 0 && (
                 <View>
                   <Image
                     style={{

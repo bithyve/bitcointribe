@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { CommonActions } from '@react-navigation/native'
 import idx from 'idx'
 import React, { useCallback, useEffect, useState } from 'react'
 import {
@@ -20,8 +21,10 @@ import {
   widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
+import Options from '../../../assets/images/svgs/options.svg'
 import { LevelHealthInterface, Wallet } from '../../../bitcoin/utilities/Interface'
 import Colors from '../../../common/Colors'
+import { translations } from '../../../common/content/LocContext'
 import CloudBackupStatus from '../../../common/data/enums/CloudBackupStatus'
 import Fonts from '../../../common/Fonts'
 import { getVersions } from '../../../common/utilities'
@@ -34,10 +37,6 @@ import EditWalletName from './EditWalletName'
 import EditWalletSuccess from './EditWalletSuccess'
 import EnterPasscodeScreen from './EnterPasscodeScreen'
 import SecurityQuestion from './SecurityQuestion'
-// import { goHomeAction } from '../../../navigation/actions/NavigationActions'
-import { CommonActions } from '@react-navigation/native'
-import Options from '../../../assets/images/svgs/options.svg'
-import { translations } from '../../../common/content/LocContext'
 
 interface MenuOption {
     title: string;

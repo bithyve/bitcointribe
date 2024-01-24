@@ -17,6 +17,7 @@ import {
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch } from 'react-redux'
+import { RGB_ASSET_TYPE } from 'src/bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { LocalizationContext } from '../../common/content/LocContext'
 import NetworkKind from '../../common/data/enums/NetworkKind'
@@ -81,6 +82,7 @@ export default function RGBTxDetail( props ) {
             }}
             onReceivePressed={() => {
               props.navigation.navigate( 'RGBReceive', {
+                assetType: RGB_ASSET_TYPE.RGB20,
               } )
             }}
             averageTxFees={averageTxFees}
@@ -112,7 +114,7 @@ export default function RGBTxDetail( props ) {
           <Text
             numberOfLines={1}
             style={[ styles.amountText, {
-              color: ( item.kind === 'RECEIVE' || item.kind ==='ISSUANCE' ) ? '#04A777' : '#FD746C'
+              color: ( item.kind === 'RECEIVE_BLIND' || item.kind ==='ISSUANCE' || item.kind === 'RECEIVE_WITNESS' ) ? '#04A777' : '#FD746C'
             } ]}
           >
             {item.amount}

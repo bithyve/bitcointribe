@@ -39,7 +39,12 @@ export default function RGBSend ( props ) {
         }
         const utxo = payTo.match( /~\/~\/([^?]+)\?/ )[ 1 ]
         const endpoint = payTo.match( /endpoints=([^&]+)/ )[ 1 ]
-        response = await RGBServices.sendAsset( asset.assetId, utxo, amount, endpoint )
+        const isValidInvoice = await RGBServices.isValidBlindedUtxo(utxo)
+        if(isValidInvoice) {
+          response = await RGBServices.sendAsset( asset.assetId, utxo, amount, endpoint )
+        } else {
+          Toast( 'Invalid RGB invoice/blinded UTXO' )
+        }
       } else {
         if ( !fee || !payTo || !amount ) {
           Toast( 'Please fill all details!' )
@@ -114,7 +119,7 @@ export default function RGBSend ( props ) {
               styles.textInputContainer,
             ]}
             inputStyle={FormStyles.inputText}
-            placeholder={'Pay to'}
+            placeholder={'Invoice/Blinded UTXO'}
             placeholderTextColor={FormStyles.placeholderText.color}
             underlineColorAndroid={'transparent'}
             value={payTo}
@@ -146,7 +151,7 @@ export default function RGBSend ( props ) {
               styles.textInputContainer,
             ]}
             inputStyle={FormStyles.inputText}
-            placeholder={'Fee rates'}
+            placeholder={'Fee rate'}
             placeholderTextColor={FormStyles.placeholderText.color}
             underlineColorAndroid={'transparent'}
             value={fee}
