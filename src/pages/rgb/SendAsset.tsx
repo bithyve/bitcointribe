@@ -3,63 +3,67 @@ import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { Input } from 'react-native-elements'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useSelector } from 'react-redux'
+import ModalContainer from 'src/components/home/ModalContainer'
+import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
 import { RGBConfig } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
+import { translations } from '../../common/content/LocContext'
 import Fonts from '../../common/Fonts'
 import FormStyles from '../../common/Styles/FormStyles'
 import CommonStyles from '../../common/Styles/Styles'
-import { translations } from '../../common/content/LocContext'
 import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
 
-export default function RGBSend ( props ) {
-  const strings  = translations[ 'settings' ]
-  const common  = translations[ 'common' ]
+export default function RGBSend(props) {
+  const strings = translations['settings']
+  const common = translations['common']
   const asset = props.route.params?.asset
-  const [ payTo, setPayTo ] = useState( props.route.params?.invoice || '' )
-  const [ amount, setamount ] = useState( '' )
-  const [ fee, setfee ] = useState( '' )
-  const [ Sending, setSending ] = useState( false )
-  const { mnemonic } : RGBConfig = useSelector( state => state.rgb.config )
+  const [payTo, setPayTo] = useState(props.route.params?.invoice || '')
+  const [amount, setamount] = useState('')
+  const [fee, setfee] = useState('')
+  const [Sending, setSending] = useState(false)
+  const { mnemonic }: RGBConfig = useSelector(state => state.rgb.config)
 
   async function SendButtonClick() {
     try {
       let response: any = null
-      if ( asset ) {
-        if ( !payTo || !amount ) {
-          Toast( 'Please fill Pay to and amount details!' )
+      if (asset) {
+        if (!payTo || !amount) {
+          Toast('Please fill Pay to and amount details!')
           return
         }
-        const utxo = payTo.match( /~\/~\/([^?]+)\?/ )[ 1 ]
-        const endpoint = payTo.match( /endpoints=([^&]+)/ )[ 1 ]
+        const utxo = payTo.match(/~\/~\/([^?]+)\?/)[1]
+        const endpoint = payTo.match(/endpoints=([^&]+)/)[1]
         const isValidInvoice = await RGBServices.isValidBlindedUtxo(utxo)
-        if(isValidInvoice) {
-          response = await RGBServices.sendAsset( asset.assetId, utxo, amount, endpoint )
+        setSending(true)
+        if (isValidInvoice) {
+          response = await RGBServices.sendAsset(asset.assetId, utxo, amount, endpoint)
+          setSending(false)
         } else {
-          Toast( 'Invalid RGB invoice/blinded UTXO' )
+          Toast('Invalid RGB invoice/blinded UTXO')
+          setSending(false)
         }
       } else {
-        if ( !fee || !payTo || !amount ) {
-          Toast( 'Please fill all details!' )
+        if (!fee || !payTo || !amount) {
+          Toast('Please fill all details!')
           return
         }
-        response = await RGBServices.sendBtc( mnemonic, payTo, amount, Number( fee ) )
+        response = await RGBServices.sendBtc(mnemonic, payTo, amount, Number(fee))
       }
-      if( response?.txid ) {
-        Toast( 'Sent Successfully' )
+      if (response?.txid) {
+        Toast('Sent Successfully')
         props.navigation.goBack()
       } else {
-        Toast( 'Failed' )
+        Toast('Failed')
       }
-    } catch ( error ) {
-      console.log( error )
+    } catch (error) {
+      console.log(error)
     }
   }
 
@@ -123,8 +127,8 @@ export default function RGBSend ( props ) {
             placeholderTextColor={FormStyles.placeholderText.color}
             underlineColorAndroid={'transparent'}
             value={payTo}
-            onChangeText={( text ) => {
-              setPayTo( text )
+            onChangeText={(text) => {
+              setPayTo(text)
             }}
             numberOfLines={1}
           />
@@ -139,8 +143,8 @@ export default function RGBSend ( props ) {
             placeholderTextColor={FormStyles.placeholderText.color}
             underlineColorAndroid={'transparent'}
             value={amount}
-            onChangeText={( text ) => {
-              setamount( text )
+            onChangeText={(text) => {
+              setamount(text)
             }}
             keyboardType="number-pad"
             numberOfLines={1}
@@ -155,34 +159,43 @@ export default function RGBSend ( props ) {
             placeholderTextColor={FormStyles.placeholderText.color}
             underlineColorAndroid={'transparent'}
             value={fee}
-            onChangeText={( text ) => {
-              setfee( text )
+            onChangeText={(text) => {
+              setfee(text)
             }}
             keyboardType="number-pad"
             numberOfLines={1}
           />
           <View style={styles.footerSection}>
             <TouchableOpacity onPress={SendButtonClick}>
-              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-                start={{
-                  x: 0, y: 0
-                }} end={{
-                  x: 1, y: 0
-                }}
-                locations={[ 0.2, 1 ]}
+              <View
                 style={styles.sendBtnWrapper}
               >
                 <Text style={styles.sendBtnText}>{common.send}</Text>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
+        <ModalContainer
+          onBackground={() => { }}
+          closeBottomSheet={() => { }}
+          visible={Sending}
+        >
+          <RGBIntroModal
+            title={'Sending Asset'}
+            info={'Embark on journey with Bitcoin Tribe wallet, Your Comprehensive solution for managing RGB assets effortlessly.'}
+            otherText={'To regenerate your Grid at a later date'}
+            proceedButtonText={'Continue'}
+            isIgnoreButton={false}
+            isBottomImage={true}
+            bottomImage={require('../../assets/images/icons/contactPermission.png')}
+          />
+        </ModalContainer>
       </KeyboardAwareScrollView>
     </View>
   )
 }
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
   rootContainer: {
   },
   bodySection: {
@@ -198,35 +211,36 @@ const styles = StyleSheet.create( {
     alignItems: 'flex-end',
   },
   sendBtnWrapper: {
-    height: wp( '13%' ),
-    width: wp( '35%' ),
+    height: wp('13%'),
+    width: wp('35%'),
     justifyContent: 'center',
     borderRadius: 8,
     alignItems: 'center',
+    backgroundColor: Colors.blue
   },
   sendBtnText: {
     color: Colors.white,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue(13),
     fontFamily: Fonts.Medium
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue( 20 ),
+    fontSize: RFValue(20),
     marginLeft: 20,
     fontFamily: Fonts.Regular,
   },
   headerSubTitleText: {
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue(12),
     color: Colors.THEAM_INFO_TEXT_COLOR,
     fontFamily: Fonts.Regular,
     marginLeft: 20,
-    marginTop:3,
-    marginBottom:20
+    marginTop: 3,
+    marginBottom: 20
   },
   infoHeaderText: {
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue(12),
     color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
     fontFamily: Fonts.Regular,
   },
 
-} )
+})
