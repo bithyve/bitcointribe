@@ -24,10 +24,11 @@ const PassCodeTextBox: React.FC<IPassCodeTextBoxProps> = ( { passcode, setPassco
 
   const [ active, setActive ] = useState<boolean>( false )
 
-  useEffect( ()=>{
-    if( active )
-      ref.current.focus()
-  }, [ active ] )
+  useEffect(()=>{
+if(active)
+ref.current.focus()
+// setTimeout(() => ref.current.focus(), 100);
+  },[active])
 
   useEffect( () => {
     if ( passcode.length === 6 ) {
@@ -81,7 +82,8 @@ const PassCodeTextBox: React.FC<IPassCodeTextBoxProps> = ( { passcode, setPassco
       }}>{errMsg}</Text>
       <TouchableOpacity
         onPress={() => {
-          setActive( true )
+          // setTimeout(() => ref.current.focus(), 1000);
+          setActive(true);
         }}
         onLongPress={async () => {
           const data = await Clipboard.getString()

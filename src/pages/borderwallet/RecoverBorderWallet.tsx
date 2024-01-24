@@ -5,11 +5,14 @@ import * as bip39 from 'bip39'
 import React, { useEffect, useState } from 'react'
 import {
   ActivityIndicator,
+  Alert,
+  NativeModules,
   SafeAreaView,
   StatusBar,
   View
 } from 'react-native'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
+import RGBServices from 'src/services/RGBServices'
 import { Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
@@ -23,6 +26,8 @@ import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 import RestoreSeedPageComponent from '../RestoreHexaWithKeeper/RestoreSeedPageComponent'
+
+const GoogleDrive = NativeModules.GoogleDrive
 
 const RecoverBorderWallet = ( props ) => {
   const [ showSeedError, setShowSeedError ] = useState( false )
@@ -59,14 +64,40 @@ const RecoverBorderWallet = ( props ) => {
       dispatch( completedWalletSetup() )
       AsyncStorage.setItem( 'walletRecovered', 'true' )
       dispatch( setVersion( 'Restored' ) )
-      props.navigation.dispatch( CommonActions.reset( {
-        index: 0,
-        routes: [
+      try {
+        Alert.alert(
+          'Restore RGB',
+          'Do you want to restore state of your RGB assets?',
+          [
+            {
+              text: 'No',
+              onPress: () => goToApp(),
+              style: 'cancel',
+            },
+            {
+              text: 'YES',
+              onPress: async () => {
+                await GoogleDrive.setup()
+                const login = await GoogleDrive.login()
+                if( login.error ) {
+                  Toast( login.error )
+                } else {
+                  const config = await  RGBServices.restoreKeys( mnemonic )
+                  RGBServices.initiate( config.mnemonic, config.xpub  )
+                  await RGBServices.restore( mnemonic )
+                  goToApp()
+                }
+              },
+              style: 'default',
+            },
+          ],
           {
-            name: 'App'
-          }
-        ],
-      } ) )
+            cancelable: true,
+          },
+        )
+      } catch ( error ) {
+        console.log( error )
+      }
     }
   }, [ wallet ] )
 
@@ -78,6 +109,17 @@ const RecoverBorderWallet = ( props ) => {
       } )
     }
   }, [ restoreSeedData ] )
+
+  const goToApp = () => {
+    props.navigation.dispatch( CommonActions.reset( {
+      index: 0,
+      routes: [
+        {
+          name: 'App',
+        }
+      ],
+    } ) )
+  }
 
   const renderSeedErrorModal = () => {
     return (

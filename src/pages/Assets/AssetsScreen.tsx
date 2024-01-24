@@ -53,8 +53,11 @@ export default function AssetsScreen( props ) {
     BottomSheetState.Closed,
   )
 
-  useEffect( () => {
+  useEffect(() => {
     initiateRgb()
+  }, [])
+
+  useEffect( () => {
     const assets = []
     assets.push( {
       name: 't-sats',
@@ -76,16 +79,27 @@ export default function AssetsScreen( props ) {
     setCoinsData( assets )
   }, [ syncing, rgb20Assets ] )
 
-  const initiateRgb = ()=> {
+  const backupRgb = async()=> {
+    const isReqired = await RGBServices.isBackupRequired()
+    if(isReqired) RGBServices.backup('', wallet.primaryMnemonic)
+  }
+
+  const initiateRgb = async () => {
     if( !rgbConfig || rgbConfig.mnemonic ==='' ) {
       const wallet : Wallet = dbManager.getWallet()
-      const config =  RGBServices.restoreKeys( wallet.primaryMnemonic )
+      const config = await  RGBServices.restoreKeys( wallet.primaryMnemonic )
       dispatch( setRgbConfig( config ) )
       const isRgbInit =  RGBServices.initiate( rgbConfig.mnemonic, rgbConfig.xpub  )
-      if( isRgbInit ) dispatch( syncRgb() )
+      if( isRgbInit ) {
+        dispatch( syncRgb() )
+        backupRgb()
+      }
     } else {
-      const isRgbInit =  RGBServices.initiate( rgbConfig.mnemonic, rgbConfig.xpub  )
-      if( isRgbInit ) dispatch( syncRgb() )
+      const isRgbInit =  await RGBServices.initiate( rgbConfig.mnemonic, rgbConfig.xpub  )
+      if( isRgbInit ) {
+        dispatch( syncRgb() )
+        backupRgb()
+      }
     }
   }
 

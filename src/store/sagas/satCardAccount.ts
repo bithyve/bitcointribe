@@ -47,7 +47,6 @@ function* satCardAccountWorker( { payload }: { payload: { accountId: string, pri
       averageTxFeeByNetwork,
       network,
     )
-
     // AccountOperations.importAddress( associateAccount, payload.privKey, payload.address, {
     //   type: ActiveAddressAssigneeType.GIFT,
     //   senderInfo: {
