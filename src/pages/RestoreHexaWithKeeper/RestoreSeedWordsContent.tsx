@@ -4,7 +4,6 @@ import { CommonActions } from '@react-navigation/native'
 import * as bip39 from 'bip39'
 import React, { useEffect, useState } from 'react'
 import {
-  ActivityIndicator,
   Alert,
   NativeModules,
   SafeAreaView,
@@ -12,6 +11,7 @@ import {
   View
 } from 'react-native'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
+import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
 import Toast from 'src/components/Toast'
 import RGBServices from 'src/services/RGBServices'
 import { Wallet } from '../../bitcoin/utilities/Interface'
@@ -19,8 +19,8 @@ import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
 import AlertModalContents from '../../components/AlertModalContents'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import LoaderModal from '../../components/LoaderModal'
 import ModalContainer from '../../components/home/ModalContainer'
+import LoaderModal from '../../components/LoaderModal'
 import { recoverWalletUsingMnemonic, restoreSeedWordFailed } from '../../store/actions/BHR'
 import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
@@ -29,41 +29,41 @@ import RestoreSeedPageComponent from './RestoreSeedPageComponent'
 
 const GoogleDrive = NativeModules.GoogleDrive
 
-const RestoreSeedWordsContent = ( props ) => {
-  const [ showSeedError, setShowSeedError ] = useState( false )
-  const [ showLoader, setShowLoader ] = useState( false )
-  const [ loaderModal, setLoaderModal ] = useState( false )
-  const [ showAlertModal, setShowAlertModal ] = useState( false )
-  const [ showSeedFailedModal, setSeedFailedModal ] = useState( false )
-  const [ seedRecovered, setSeedRecovered ] = useState( false )
+const RestoreSeedWordsContent = (props) => {
+  const [showSeedError, setShowSeedError] = useState(false)
+  const [showLoader, setShowLoader] = useState(false)
+  const [loaderModal, setLoaderModal] = useState(false)
+  const [showAlertModal, setShowAlertModal] = useState(false)
+  const [showSeedFailedModal, setSeedFailedModal] = useState(false)
+  const [seedRecovered, setSeedRecovered] = useState(false)
   const loaderMessage = {
-    heading: translations[ 'bhr' ].Importingyourwallet,
-    text: translations[ 'bhr' ].Thismaytake
+    heading: translations['bhr'].Importingyourwallet,
+    text: translations['bhr'].Thismaytake
   }
   const subPoints = [
-    translations[ 'bhr' ].Settingupmultipleaccounts,
-    translations[ 'bhr' ].Preloading,
+    translations['bhr'].Settingupmultipleaccounts,
+    translations['bhr'].Preloading,
   ]
-  const bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
+  const bottomTextMessage = translations['bhr'].Hexaencrypts
   const mnemonicSuggestions = bip39.wordlists.english
 
   const dispatch = useDispatch()
-  const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
-  const restoreSeedData = useSelector( ( state ) => state.bhr.loading.restoreSeedData )
-  const [ mnemonic, setMnemonic ] = useState( null )
+  const wallet: Wallet = useSelector((state: RootStateOrAny) => state.storage.wallet)
+  const restoreSeedData = useSelector((state) => state.bhr.loading.restoreSeedData)
+  const [mnemonic, setMnemonic] = useState(null)
 
-  useEffect( () => {
+  useEffect(() => {
     return () => {
-      dispatch( restoreSeedWordFailed( false ) )
+      dispatch(restoreSeedWordFailed(false))
     }
-  }, [] )
+  }, [])
 
-  useEffect( () => {
-    setLoaderModal( false )
-    if ( wallet ) {
-      dispatch( completedWalletSetup() )
-      AsyncStorage.setItem( 'walletRecovered', 'true' )
-      dispatch( setVersion( 'Restored' ) )
+  useEffect(() => {
+    setLoaderModal(false)
+    if (wallet) {
+      dispatch(completedWalletSetup())
+      AsyncStorage.setItem('walletRecovered', 'true')
+      dispatch(setVersion('Restored'))
       try {
         Alert.alert(
           'Restore RGB',
@@ -77,15 +77,19 @@ const RestoreSeedWordsContent = ( props ) => {
             {
               text: 'YES',
               onPress: async () => {
+                setShowLoader(true)
                 await GoogleDrive.setup()
                 const login = await GoogleDrive.login()
-                if( login.error ) {
-                  Toast( login.error )
+                if (login.error) {
+                  Toast(login.error)
                 } else {
-                  const config = await  RGBServices.restoreKeys( mnemonic )
-                  RGBServices.initiate( config.mnemonic, config.xpub  )
-                  await RGBServices.restore( mnemonic )
-                  goToApp()
+                  setShowLoader(true)
+                  setTimeout(async () => {
+                    const config = await RGBServices.restoreKeys(mnemonic)
+                    RGBServices.initiate(config.mnemonic, config.xpub)
+                    await RGBServices.restore(mnemonic)
+                    goToApp()
+                  }, 300)
                 }
               },
               style: 'default',
@@ -95,30 +99,32 @@ const RestoreSeedWordsContent = ( props ) => {
             cancelable: true,
           },
         )
-      } catch ( error ) {
-        console.log( error )
+      } catch (error) {
+        setLoaderModal(false)
+        console.log(error)
       }
     }
-  }, [ wallet ] )
+  }, [wallet])
 
-  useEffect( () => {
-    if( restoreSeedData == 'restoreSeedDataFailed' ){
-      setLoaderModal( false )
-      props.navigation.navigate( 'NewWalletName', {
+  useEffect(() => {
+    if (restoreSeedData == 'restoreSeedDataFailed') {
+      setLoaderModal(false)
+      props.navigation.navigate('NewWalletName', {
         mnemonic,
-      } )
+      })
     }
-  }, [ restoreSeedData ] )
+  }, [restoreSeedData])
 
   const goToApp = () => {
-    props.navigation.dispatch( CommonActions.reset( {
+    props.navigation.dispatch(CommonActions.reset({
       index: 0,
       routes: [
         {
           name: 'App',
         }
       ],
-    } ) )
+    }))
+    setShowLoader(false)
   }
 
   const renderSeedErrorModal = () => {
@@ -132,37 +138,37 @@ const RestoreSeedWordsContent = ( props ) => {
     )
   }
 
-  const recoverWalletViaSeed = ( mnemonic: string ) => {
-    setShowLoader( true )
-    setMnemonic( mnemonic )
-    setTimeout( () => {
-      const isValidMnemonic = bip39.validateMnemonic( mnemonic )
-      if ( !isValidMnemonic ) {
-        setShowLoader( false )
+  const recoverWalletViaSeed = (mnemonic: string) => {
+    setShowLoader(true)
+    setMnemonic(mnemonic)
+    setTimeout(() => {
+      const isValidMnemonic = bip39.validateMnemonic(mnemonic)
+      if (!isValidMnemonic) {
+        setShowLoader(false)
         // Alert.alert( 'Invalid mnemonic, try again!' )
-        setShowAlertModal( true )
+        setShowAlertModal(true)
         return
       }
-      setShowLoader( false )
-      setLoaderModal( true )
-      setTimeout( () => {
-        dispatch( recoverWalletUsingMnemonic( mnemonic ) )
-      }, 500 )
-    }, 1000 )
+      setShowLoader(false)
+      setLoaderModal(true)
+      setTimeout(() => {
+        dispatch(recoverWalletUsingMnemonic(mnemonic))
+      }, 500)
+    }, 1000)
   }
   const onBackgroundOfLoader = () => {
-    setLoaderModal( false )
-    if ( seedRecovered )
-      setTimeout( () => {
-        console.log( 'TIMEOUT' )
-        setLoaderModal( true )
-      }, 1000 )
+    setLoaderModal(false)
+    if (seedRecovered)
+      setTimeout(() => {
+        console.log('TIMEOUT')
+        setLoaderModal(true)
+      }, 1000)
   }
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
-      {
+      {/* {
         showLoader &&
         <View style={{
           position: 'absolute',
@@ -176,7 +182,7 @@ const RestoreSeedWordsContent = ( props ) => {
         }}>
           <ActivityIndicator size="large" color={Colors.babyGray} />
         </View>
-      }
+      } */}
       <SafeAreaView
         style={{
           flex: 0, backgroundColor: Colors.backgroundColor
@@ -209,7 +215,7 @@ const RestoreSeedWordsContent = ( props ) => {
           isChangeKeeperAllow={true}
           isTwelveCheckbox
         />
-        <ModalContainer visible={( showSeedError )} onBackground={() => setShowSeedError}>
+        <ModalContainer visible={(showSeedError)} onBackground={() => setShowSeedError}>
           {renderSeedErrorModal()}
         </ModalContainer>
       </View>
@@ -220,33 +226,48 @@ const RestoreSeedWordsContent = ( props ) => {
           subPoints={subPoints}
           bottomText={bottomTextMessage} />
       </ModalContainer>
-      <ModalContainer onBackground={() => { setShowAlertModal( false ) }} visible={showAlertModal} closeBottomSheet={() => { }}>
+      <ModalContainer onBackground={() => { setShowAlertModal(false) }} visible={showAlertModal} closeBottomSheet={() => { }}>
         <AlertModalContents
           // modalRef={this.ErrorBottomSheet}
           // title={''}
           info={'Invalid mnemonic, try again!'}
           proceedButtonText={'Okay'}
           onPressProceed={() => {
-            setShowAlertModal( false )
+            setShowAlertModal(false)
           }}
           isBottomImage={false}
         // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>
-      <ModalContainer onBackground={() => { setSeedFailedModal( false ) }} visible={showSeedFailedModal} closeBottomSheet={() => { }}>
+      <ModalContainer onBackground={() => { setSeedFailedModal(false) }} visible={showSeedFailedModal} closeBottomSheet={() => { }}>
         <AlertModalContents
           // modalRef={this.ErrorBottomSheet}
           title={'Wallet Not Found'}
           info={'You can choose to create a new Wallet'}
           proceedButtonText={'Create New Wallet'}
           onPressProceed={() => {
-            setSeedFailedModal( false )
+            setSeedFailedModal(false)
             props.navigation.goBack()
           }}
           isBottomImage={false}
         // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>
+      <ModalContainer
+          onBackground={() => { }}
+          closeBottomSheet={() => { }}
+          visible={showLoader}
+        >
+          <RGBIntroModal
+            title={'Backup In Progress'}
+            info={'Embark on journey with Bitcoin Tribe wallet, Your Comprehensive solution for managing RGB assets effortlessly.'}
+            otherText={'To regenerate your Grid at a later date'}
+            proceedButtonText={'Continue'}
+            isIgnoreButton={false}
+            isBottomImage={true}
+            bottomImage={require('../../assets/images/icons/contactPermission.png')}
+          />
+        </ModalContainer>
     </View>
   )
 }
