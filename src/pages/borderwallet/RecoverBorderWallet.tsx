@@ -4,23 +4,23 @@ import { CommonActions } from '@react-navigation/native'
 import * as bip39 from 'bip39'
 import React, { useEffect, useState } from 'react'
 import {
-  ActivityIndicator,
   Alert,
   NativeModules,
   SafeAreaView,
   StatusBar,
-  View,
+  View
 } from 'react-native'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
+import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
 import RGBServices from 'src/services/RGBServices'
 import { Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
 import AlertModalContents from '../../components/AlertModalContents'
 import ErrorModalContents from '../../components/ErrorModalContents'
+import ModalContainer from '../../components/home/ModalContainer'
 import LoaderModal from '../../components/LoaderModal'
 import Toast from '../../components/Toast'
-import ModalContainer from '../../components/home/ModalContainer'
 import { restoreSeedWordFailed } from '../../store/actions/BHR'
 import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
@@ -77,15 +77,19 @@ const RecoverBorderWallet = ( props ) => {
             {
               text: 'YES',
               onPress: async () => {
+                setShowLoader(true)
                 await GoogleDrive.setup()
                 const login = await GoogleDrive.login()
                 if( login.error ) {
                   Toast( login.error )
                 } else {
+                  setShowLoader(true)
+                  setTimeout(async () => {
                   const config = await  RGBServices.restoreKeys( mnemonic )
                   RGBServices.initiate( config.mnemonic, config.xpub  )
                   await RGBServices.restore( mnemonic )
                   goToApp()
+                }, 300)
                 }
               },
               style: 'default',
@@ -119,6 +123,7 @@ const RecoverBorderWallet = ( props ) => {
         }
       ],
     } ) )
+    setShowLoader(false)
   }
 
   const renderSeedErrorModal = () => {
@@ -133,14 +138,17 @@ const RecoverBorderWallet = ( props ) => {
   }
 
   const recoverWalletViaSeed = ( mnemonic: string ) => {
+    setShowLoader(true)
     const isValidMnemonic = bip39.validateMnemonic( mnemonic )
     if( isValidMnemonic ) {
       props.navigation.navigate( 'BorderWalletGridScreen', {
         mnemonic,
         isNewWallet: false
       } )
+      setShowLoader(false)
     } else {
       Toast( 'Invalid mnemonic' )
+      setShowLoader(false)
     }
     // setShowLoader( true )
     // setMnemonic( mnemonic )
@@ -171,7 +179,7 @@ const RecoverBorderWallet = ( props ) => {
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
-      {
+      {/* {
         showLoader &&
         <View style={{
           position: 'absolute',
@@ -185,7 +193,7 @@ const RecoverBorderWallet = ( props ) => {
         }}>
           <ActivityIndicator size="large" color={Colors.babyGray} />
         </View>
-      }
+      } */}
       <SafeAreaView
         style={{
           flex: 0, backgroundColor: Colors.backgroundColor
@@ -259,6 +267,21 @@ const RecoverBorderWallet = ( props ) => {
         // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>
+      <ModalContainer
+          onBackground={() => { }}
+          closeBottomSheet={() => { }}
+          visible={showLoader}
+        >
+          <RGBIntroModal
+            title={'Backup In Progress'}
+            info={'Embark on journey with Bitcoin Tribe wallet, Your Comprehensive solution for managing RGB assets effortlessly.'}
+            otherText={'To regenerate your Grid at a later date'}
+            proceedButtonText={'Continue'}
+            isIgnoreButton={false}
+            isBottomImage={true}
+            bottomImage={require('../../assets/images/icons/contactPermission.png')}
+          />
+        </ModalContainer>
     </View>
   )
 }
