@@ -25,7 +25,8 @@ const styles = StyleSheet.create( {
     width: '80%',
     alignSelf: 'center',
     backgroundColor: Colors.blue,
-    marginBottom: 20
+    marginBottom: 20,
+    marginTop:10
   },
   text: {
     letterSpacing: 0.6,

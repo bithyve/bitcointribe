@@ -23,6 +23,10 @@ import LoaderModal from '../../components/LoaderModal'
 import Toast from '../../components/Toast'
 import { recoverWalletUsingMnemonic, restoreSeedWordFailed, setBorderWalletBackup } from '../../store/actions/BHR'
 import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { completedWalletSetup } from 'src/store/actions/setupAndAuth'
+import { setVersion } from 'src/store/actions/versionHistory'
+import { CommonActions } from '@react-navigation/native'
 
 const ImportWalletPassphrase = ( props ) => {
   const loaderMessage = {
@@ -73,15 +77,22 @@ const ImportWalletPassphrase = ( props ) => {
     }
   }, [ restoreSeedData ] )
 
-  //   useEffect( () => {
-  //     setLoaderModal( false )
-  //     if ( wallet && !isAccountCreation ) {
-  //       dispatch( completedWalletSetup() )
-  //       AsyncStorage.setItem( 'walletRecovered', 'true' )
-  //       dispatch( setVersion( 'Restored' ) )
-  //       props.navigation.navigate( 'HomeNav' )
-  //     }
-  //   }, [ wallet, isAccountCreation ] )
+    useEffect( () => {
+      setLoaderModal( false )
+      if ( wallet && !isAccountCreation ) {
+        dispatch( completedWalletSetup() )
+        AsyncStorage.setItem( 'walletRecovered', 'true' )
+        dispatch( setVersion( 'Restored' ) )
+        props.navigation.dispatch( CommonActions.reset( {
+          index: 0,
+          routes: [
+            {
+              name: 'App',
+            },
+          ]
+        } ) )
+      }
+    }, [ wallet, isAccountCreation ] )
 
   const onPressNext = () => {
     if( passphrase === '' || confirmPassphrase === '' ) {
