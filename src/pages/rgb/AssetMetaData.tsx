@@ -16,7 +16,7 @@ import RNFS from 'react-native-fs'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
-import { wp } from '../../common/data/responsiveness/responsive'
+import { hp, wp } from '../../common/data/responsiveness/responsive'
 import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
 import HeaderTitle from '../../components/HeaderTitle'
@@ -145,15 +145,14 @@ const AssetMetaData = ( props ) => {
           <ActivityIndicator size="large" style={{
             height: '70%'
           }}/> :
-          <ScrollView contentContainerStyle={{
-            padding: 20, flex: 1
-          }}>
+          <ScrollView style={{height: '100%',padding: 20}}>
             {
               asset?.dataPaths.length > 0 && (
-                <View>
+                <View >
                   <Image
                     style={{
-                      height: '60%'
+                      height: hp(250),
+                      width: '100%'
                     }}
                     resizeMode="contain"
                     source={{
