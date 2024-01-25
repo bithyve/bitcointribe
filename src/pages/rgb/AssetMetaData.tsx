@@ -28,25 +28,28 @@ const styles = StyleSheet.create( {
     marginBottom: RFValue( 2 ),
     padding: 2,
     paddingHorizontal: 10,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    width: '100%'
   },
   textTitle: {
-    flex: 2.5,
     fontSize: RFValue( 13 ),
     color: '#6C7074',
-    fontFamily: Fonts.Medium
+    fontFamily: Fonts.Medium,
+    width: '40%'
   },
   title: {
     fontSize: RFValue( 15 ),
     color: '#A36363',
     fontFamily: Fonts.Medium,
-    marginVertical: 10
+    marginVertical: 10,
+    width: '60%'
   },
   textValue: {
     flex: 4,
     fontSize: RFValue( 14 ),
     color: '#2C3E50',
-    fontFamily: Fonts.Regular
+    fontFamily: Fonts.Regular,
+    flexWrap: 'wrap'
   },
   selectedContactsView: {
     flexDirection: 'row',
@@ -73,7 +76,7 @@ export const DetailsItem = ( { name, value } ) => {
       <Text style={styles.textTitle}>{name}</Text>
       <Text
         selectable
-        numberOfLines={1}
+        numberOfLines={2}
         ellipsizeMode="middle"
         style={styles.textValue}
       >
