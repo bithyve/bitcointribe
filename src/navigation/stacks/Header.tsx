@@ -698,6 +698,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // deep link is opened, we will navigate back to Home first.
     if ( !isFocused ){
       navigation.popToTop()
+      navigation.navigate( 'Home',{screen:'HomeTab'} )
       this.handleDeepLinking( url )
     } else {
       this.handleDeepLinking( url )
@@ -768,6 +769,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if( !shouldListen ){
       return
     }
+    console.log("klj",shouldListen)
     const {
       navigation,
       initializeHealthSetup,
@@ -1696,24 +1698,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             currentLevel={currentLevel}
           />
           <ModalContainer
-            onBackground={() => {
-              if ( this.state.currentBottomSheetKind === BottomSheetKind.GIFT_REQUEST ) {
-                console.log( 'bgState' )
-              } else if ( this.state.currentBottomSheetKind === BottomSheetKind.TRUSTED_CONTACT_REQUEST ) {
-                console.log( 'bgState' )
-              } else {
-                const perviousState = this.state.currentBottomSheetKind
-                this.setState( {
-                  currentBottomSheetKind: null
-                } )
-                setTimeout( () => {
-                  this.setState( {
-                    currentBottomSheetKind: perviousState
-                  }
-                  )
-                }, 200 )
-              }
-            }}
+            onBackground={()=>{}}
             visible={this.state.currentBottomSheetKind != null}
             closeBottomSheet={() => {}}
           >
