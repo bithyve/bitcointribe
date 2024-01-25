@@ -5,6 +5,8 @@
 #import "ExpoModulesCore-Swift.h"
 #import "HEXA-Swift.h"
 #import <React/RCTBundleURLProvider.h>
+#import <React/RCTLinkingManager.h>
+
 
 @implementation AppDelegate
 
@@ -24,6 +26,21 @@
   iCloudRestore *restore = [[iCloudRestore alloc] init];
 
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
+}
+
+- (BOOL)application:(UIApplication *)application
+   openURL:(NSURL *)url
+   options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
+{
+  return [RCTLinkingManager application:application openURL:url options:options];
+}
+
+- (BOOL)application:(UIApplication *)application continueUserActivity:(nonnull NSUserActivity *)userActivity
+ restorationHandler:(nonnull void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler
+{
+ return [RCTLinkingManager application:application
+                  continueUserActivity:userActivity
+                    restorationHandler:restorationHandler];
 }
 
 //Called when a notification is delivered to a foreground app.
