@@ -769,7 +769,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if( !shouldListen ){
       return
     }
-    console.log("klj",shouldListen)
     const {
       navigation,
       initializeHealthSetup,
