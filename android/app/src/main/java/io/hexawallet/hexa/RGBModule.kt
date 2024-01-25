@@ -7,6 +7,8 @@ import com.facebook.react.bridge.Promise
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.rgbtools.BitcoinNetwork
+import android.os.Handler
+import android.os.Looper
 
 import kotlin.math.log
 
@@ -50,8 +52,13 @@ class RGBModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
 
     @ReactMethod
     fun sync( mnemonic:String, network: String, promise: Promise){
-        val isSynced = BdkHelper.sync()
-        promise.resolve(isSynced)
+        Thread {
+            Looper.prepare()
+            Handler(Looper.getMainLooper()).post {
+                val isSynced = BdkHelper.sync()
+                promise.resolve(isSynced)            }
+            Looper.loop()
+        }.start()
     }
 
     @ReactMethod
@@ -81,7 +88,13 @@ class RGBModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
 
     @ReactMethod
     fun syncRgbAssets( mnemonic:String, pubKey:String, network: String, promise: Promise){
-        promise.resolve(RGBHelper.syncRgbAssets())
+        Thread {
+            Looper.prepare()
+            Handler(Looper.getMainLooper()).post {
+                promise.resolve(RGBHelper.syncRgbAssets())
+            }
+            Looper.loop()
+        }.start()
     }
 
     @ReactMethod
@@ -163,12 +176,17 @@ class RGBModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
 
     @ReactMethod
     fun refreshAsset(assetId: String, promise: Promise){
-        val rgbUtxo = RGBHelper.getUnspents()
-        val bitcoinUtxo = BdkHelper.getUnspents()
-        val jsonObject = JsonObject()
-        jsonObject.addProperty("rgb", Gson().toJson(rgbUtxo))
-        jsonObject.addProperty("bitcoin", Gson().toJson(bitcoinUtxo))
-        promise.resolve(jsonObject.toString())
+        Thread {
+            Looper.prepare()
+            Handler(Looper.getMainLooper()).post {
+                val rgbUtxo = RGBHelper.getUnspents()
+                val bitcoinUtxo = BdkHelper.getUnspents()
+                val jsonObject = JsonObject()
+                jsonObject.addProperty("rgb", Gson().toJson(rgbUtxo))
+                jsonObject.addProperty("bitcoin", Gson().toJson(bitcoinUtxo))
+                promise.resolve(jsonObject.toString())            }
+            Looper.loop()
+        }.start()
     }
     @ReactMethod
     fun isValidBlindedUtxo(invoice:String,promise: Promise){
