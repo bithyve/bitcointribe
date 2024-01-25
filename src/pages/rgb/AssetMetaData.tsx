@@ -23,22 +23,22 @@ import HeaderTitle from '../../components/HeaderTitle'
 import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
   lineItem: {
-    marginBottom: RFValue( 2 ),
+    marginBottom: RFValue(2),
     padding: 2,
     paddingHorizontal: 10,
     flexDirection: 'row',
     width: '100%'
   },
   textTitle: {
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue(13),
     color: '#6C7074',
     fontFamily: Fonts.Medium,
     width: '40%'
   },
   title: {
-    fontSize: RFValue( 15 ),
+    fontSize: RFValue(15),
     color: '#A36363',
     fontFamily: Fonts.Medium,
     marginVertical: 10,
@@ -46,7 +46,7 @@ const styles = StyleSheet.create( {
   },
   textValue: {
     flex: 4,
-    fontSize: RFValue( 14 ),
+    fontSize: RFValue(14),
     color: '#2C3E50',
     fontFamily: Fonts.Regular,
     flexWrap: 'wrap'
@@ -59,19 +59,19 @@ const styles = StyleSheet.create( {
     borderRadius: 5,
     height: 30,
     width: 100,
-    paddingHorizontal: wp( 2 ),
+    paddingHorizontal: wp(2),
     marginTop: 15,
     alignSelf: 'flex-end'
   },
   addNewText: {
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue(12),
     fontFamily: Fonts.Regular,
     color: Colors.white,
   },
-} )
+})
 
-export const DetailsItem = ( { name, value } ) => {
-  return(
+export const DetailsItem = ({ name, value }) => {
+  return (
     <View style={styles.lineItem}>
       <Text style={styles.textTitle}>{name}</Text>
       <Text
@@ -86,30 +86,30 @@ export const DetailsItem = ( { name, value } ) => {
   )
 }
 
-const AssetMetaData = ( props ) => {
-  const [ loading, setLoading ] = useState( true )
-  const [ downloading, setDownloading ] = useState( false )
+const AssetMetaData = (props) => {
+  const [loading, setLoading] = useState(true)
+  const [downloading, setDownloading] = useState(false)
   const asset = props.route.params.asset
-  const [ metaData, setMetaData ] = useState( {
-  } )
+  const [metaData, setMetaData] = useState({
+  })
 
-  useEffect( () => {
+  useEffect(() => {
     getMetaData()
-  }, [] )
+  }, [])
 
   const getMetaData = async () => {
     try {
-      const data = await RGBServices.getRgbAssetMetaData( asset.assetId )
-      if ( data ) {
-        setMetaData( data )
-        setLoading( false )
+      const data = await RGBServices.getRgbAssetMetaData(asset.assetId)
+      if (data) {
+        setMetaData(data)
+        setLoading(false)
       } else {
         props.navigation.goBack()
       }
 
-    } catch ( error ) {
+    } catch (error) {
       props.navigation.goBack()
-      console.log( error )
+      console.log(error)
     }
   }
 
@@ -147,8 +147,8 @@ const AssetMetaData = ( props ) => {
         loading ?
           <ActivityIndicator size="large" style={{
             height: '70%'
-          }}/> :
-          <ScrollView style={{height: '100%',padding: 20}}>
+          }} /> :
+          <ScrollView style={{ height: '100%', padding: 20 }}>
             {
               asset?.dataPaths.length > 0 && (
                 <View >
@@ -159,41 +159,41 @@ const AssetMetaData = ( props ) => {
                     }}
                     resizeMode="contain"
                     source={{
-                      uri: Platform.select( {
-                        android: `file://${asset.dataPaths[ 0 ].filePath}`,
-                        ios: asset.dataPaths[ 0 ].filePath
-                      } )
+                      uri: Platform.select({
+                        android: `file://${asset.dataPaths[0].filePath}`,
+                        ios: asset.dataPaths[0].filePath
+                      })
                     }}
                   />
                   <TouchableOpacity disabled={downloading ? true : false} onPress={() => {
-                    setDownloading( true )
-                    const localFilePath = Platform.select( {
-                      android: `file://${asset.dataPaths[ 0 ].filePath}`,
-                      ios: asset.dataPaths[ 0 ].filePath
-                    } )
-                    const mime = asset.dataPaths[ 0 ].mime || 'application/octet-stream'
-                    const extension = mime.split( '/' )[ 1 ]
+                    setDownloading(true)
+                    const localFilePath = Platform.select({
+                      android: `file://${asset.dataPaths[0].filePath}`,
+                      ios: asset.dataPaths[0].filePath
+                    })
+                    const mime = asset.dataPaths[0].mime || 'application/octet-stream'
+                    const extension = mime.split('/')[1]
                     const destinationPath = `${RNFS.DownloadDirectoryPath}/${asset.name || 'asset'}.${extension}`
 
-                    RNFS.copyFile( localFilePath, destinationPath )
-                      .then( () => {
-                        Toast( `Downloaded to: ${destinationPath}` )
-                        setDownloading( false )
-                      } )
-                      .catch( ( error ) => {
-                        console.error( 'Error downloading file:', error )
-                        Toast( 'Failed to download the file.' )
-                        setDownloading( false )
-                      } )
+                    RNFS.copyFile(localFilePath, destinationPath)
+                      .then(() => {
+                        Toast(`Downloaded to: ${destinationPath}`)
+                        setDownloading(false)
+                      })
+                      .catch((error) => {
+                        console.error('Error downloading file:', error)
+                        Toast('Failed to download the file.')
+                        setDownloading(false)
+                      })
                   }}>
                     <View
                       style={{
                         ...styles.selectedContactsView, backgroundColor: downloading ? Colors.textColorGrey : Colors.blue,
                       }}
                     >
-                      {downloading ? ( <ActivityIndicator size="small" style={{
+                      {downloading ? (<ActivityIndicator size="small" style={{
                         height: '70%'
-                      }}/> ) : ( <Text style={styles.addNewText}>Download</Text> )}
+                      }} />) : (<Text style={styles.addNewText}>Download</Text>)}
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -217,7 +217,7 @@ const AssetMetaData = ( props ) => {
 
             <DetailsItem
               name="Issue Date"
-              value={moment.unix( metaData.timestamp ).format( 'DD/MM/YY • hh:MMa' )}
+              value={moment.unix(metaData.timestamp).format('DD/MM/YY • hh:MMa')}
             />
 
             {
@@ -228,8 +228,6 @@ const AssetMetaData = ( props ) => {
                 />
               )
             }
-
-
           </ScrollView>
       }
 
