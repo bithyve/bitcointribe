@@ -237,30 +237,31 @@ export default function Login( props ) {
 
 
   useEffect( () => {
-    if ( isAuthenticated ) {
-      if( !walletExists ) {
-        props.navigation.replace( 'WalletInitialization' )
-      } else {
-        setloaderModal( false )
-        if( !creationFlag ) {
-          props.navigation.replace( 'App', {
-            screen:'Home'
-          } )
-        } else if( processedLink ){
-          props.navigation.replace( 'App', {
-            screen: 'Home',
-            params: {
-              trustedContactRequest: processedLink.trustedContactRequest,
-              giftRequest: processedLink.giftRequest,
-              swanRequest: processedLink.swanRequest,
-            }
-          } )
+    setloaderModal( false );
+    setTimeout( () => {
+      if ( isAuthenticated ) {
+        if( !walletExists ) {
+          props.navigation.replace( 'WalletInitialization' )
+        } else {
+          if( !creationFlag ) {
+            props.navigation.replace( 'App', {
+              screen:'Home'
+            } )
+          } else if( processedLink ){
+            props.navigation.replace( 'App', {
+              screen: 'Home',
+              params: {
+                trustedContactRequest: processedLink.trustedContactRequest,
+                giftRequest: processedLink.giftRequest,
+                swanRequest: processedLink.swanRequest,
+              }
+            } )
+          }
+          bootStrapNotifications()
         }
-        bootStrapNotifications()
       }
-    }
+    }, 100 )
   }, [ isAuthenticated, walletExists, processedLink ] )
-
   const bootStrapNotifications = async () => {
     dispatch( setIsPermissionGiven( true ) )
     const t0 = performance.now()
