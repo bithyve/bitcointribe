@@ -13,13 +13,12 @@ import {
   View
 } from 'react-native'
 import RNFS from 'react-native-fs'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
+import { wp } from '../../common/data/responsiveness/responsive'
 import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
-import { wp } from '../../common/data/responsiveness/responsive'
 import HeaderTitle from '../../components/HeaderTitle'
 import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
@@ -185,21 +184,15 @@ const AssetMetaData = ( props ) => {
                         setDownloading( false )
                       } )
                   }}>
-                    <LinearGradient colors={[ downloading ? Colors.textColorGrey : Colors.blue, downloading ? Colors.textColorGrey : Colors.blue ]}
-                      start={{
-                        x: 0, y: 0
-                      }} end={{
-                        x: 1, y: 0
-                      }}
-                      locations={[ 0.2, 1 ]}
+                    <View
                       style={{
-                        ...styles.selectedContactsView, backgroundColor: Colors.lightBlue,
+                        ...styles.selectedContactsView, backgroundColor: downloading ? Colors.textColorGrey : Colors.blue,
                       }}
                     >
                       {downloading ? ( <ActivityIndicator size="small" style={{
                         height: '70%'
                       }}/> ) : ( <Text style={styles.addNewText}>Download</Text> )}
-                    </LinearGradient>
+                    </View>
                   </TouchableOpacity>
                 </View>
               )
