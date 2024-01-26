@@ -12,7 +12,6 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
@@ -31,26 +30,26 @@ import dbManager from '../../storage/realm/dbManager'
 import { setRgbConfig, syncRgb } from '../../store/actions/rgb'
 import BottomSheetCoinsHeader from './BottomSheetCoinsHeader'
 
-const keyExtractor = ( item: any ) => item.toString()
+const keyExtractor = (item: any) => item.toString()
 
-const assetColors = [ '#6992B0', '#D88383', '#A29DD3', '#5CB5A1', '#A29DD3' ]
+const assetColors = ['#6992B0', '#D88383', '#A29DD3', '#5CB5A1', '#A29DD3']
 
 export enum BottomSheetState {
   Closed,
   Open,
 }
-export default function AssetsScreen( props ) {
+export default function AssetsScreen(props) {
   const { syncing, balances, rgb20Assets, rgb25Assets } = useSelector(
     state => state.rgb,
   )
-  const rgbConfig: RGBConfig = useSelector( state => state.rgb.config )
-  const wallet : Wallet = dbManager.getWallet()
+  const rgbConfig: RGBConfig = useSelector(state => state.rgb.config)
+  const wallet: Wallet = dbManager.getWallet()
   const dispatch = useDispatch()
-  const strings = translations[ 'f&f' ]
-  const [ selectedTab, setSelectedTab ] = useState( 0 )
-  const [ coinsData, setCoinsData ] = useState( [ {
-  } ] )
-  const [ bottomSheetState, setBottomSheetState ] = useState(
+  const strings = translations['f&f']
+  const [selectedTab, setSelectedTab] = useState(0)
+  const [coinsData, setCoinsData] = useState([{
+  }])
+  const [bottomSheetState, setBottomSheetState] = useState(
     BottomSheetState.Closed,
   )
 
@@ -58,47 +57,47 @@ export default function AssetsScreen( props ) {
     initiateRgb()
   }, [])
 
-  useEffect( () => {
+  useEffect(() => {
     const assets = []
-    assets.push( {
+    assets.push({
       name: 't-sats',
       ticker: 'BTC',
       amount: balances.total,
       color: '#5CB5A1',
       type: 'bitcoin',
-    } )
-    if ( rgb20Assets ) {
-      rgb20Assets?.forEach( ( asset, index ) => {
-        assets.push( {
+    })
+    if (rgb20Assets) {
+      rgb20Assets?.forEach((asset, index) => {
+        assets.push({
           ...asset,
-          color: assetColors[ index % assetColors.length ],
+          color: assetColors[index % assetColors.length],
           type: 'rgb',
           amount: asset.spendableBalance,
-        } )
-      } )
+        })
+      })
     }
-    setCoinsData( assets )
-  }, [ syncing, rgb20Assets ] )
+    setCoinsData(assets)
+  }, [syncing, rgb20Assets])
 
-  const backupRgb = async()=> {
+  const backupRgb = async () => {
     const isReqired = await RGBServices.isBackupRequired()
-    if(isReqired) RGBServices.backup('', wallet.primaryMnemonic)
+    if (isReqired) RGBServices.backup('', wallet.primaryMnemonic)
   }
 
   const initiateRgb = async () => {
-    if( !rgbConfig || rgbConfig.mnemonic ==='' ) {
-      const wallet : Wallet = dbManager.getWallet()
-      const config = await  RGBServices.restoreKeys( wallet.primaryMnemonic )
-      dispatch( setRgbConfig( config ) )
-      const isRgbInit =  RGBServices.initiate( rgbConfig.mnemonic, rgbConfig.xpub  )
-      if( isRgbInit ) {
-        dispatch( syncRgb() )
+    if (!rgbConfig || rgbConfig.mnemonic === '') {
+      const wallet: Wallet = dbManager.getWallet()
+      const config = await RGBServices.restoreKeys(wallet.primaryMnemonic)
+      dispatch(setRgbConfig(config))
+      const isRgbInit = RGBServices.initiate(rgbConfig.mnemonic, rgbConfig.xpub)
+      if (isRgbInit) {
+        dispatch(syncRgb())
         backupRgb()
       }
     } else {
-      const isRgbInit =  await RGBServices.initiate( rgbConfig.mnemonic, rgbConfig.xpub  )
-      if( isRgbInit ) {
-        dispatch( syncRgb() )
+      const isRgbInit = await RGBServices.initiate(rgbConfig.mnemonic, rgbConfig.xpub)
+      if (isRgbInit) {
+        dispatch(syncRgb())
         backupRgb()
       }
     }
@@ -110,7 +109,7 @@ export default function AssetsScreen( props ) {
         <TouchableOpacity
           style={styles.collectibleContainer}
           onPress={() => {
-            setSelectedTab( 1 )
+            setSelectedTab(1)
           }}
           activeOpacity={1}>
           <View
@@ -139,7 +138,7 @@ export default function AssetsScreen( props ) {
         <TouchableOpacity
           style={styles.collectibleContainer}
           onPress={() => {
-            setSelectedTab( 0 )
+            setSelectedTab(0)
           }}
           activeOpacity={1}>
           <View
@@ -168,18 +167,18 @@ export default function AssetsScreen( props ) {
     )
   }
 
-  const renderCoinItems = ( { item, index } ) => {
+  const renderCoinItems = ({ item, index }) => {
     return (
       <TouchableOpacity
         style={styles.coinItemContainer}
         activeOpacity={1}
         onPress={() => {
-          if ( item.type === 'bitcoin' ) {
-            props.navigation.navigate( 'RGBWalletDetail' )
+          if (item.type === 'bitcoin') {
+            props.navigation.navigate('RGBWalletDetail')
           } else {
-            props.navigation.navigate( 'RGBTxDetail', {
+            props.navigation.navigate('RGBTxDetail', {
               asset: item,
-            } )
+            })
           }
         }}>
         <View
@@ -189,7 +188,7 @@ export default function AssetsScreen( props ) {
               backgroundColor: item.color,
             },
           ]}>
-          <Text style={styles.labelText}>{item.ticker.substring( 0, 3 )}</Text>
+          <Text style={styles.labelText}>{item.ticker.substring(0, 3)}</Text>
         </View>
         <Text numberOfLines={1} style={styles.nameText}>
           {item.name}
@@ -202,7 +201,7 @@ export default function AssetsScreen( props ) {
     )
   }
 
-  const renderCollectibleItems = ( item, index ) => {
+  const renderCollectibleItems = (item, index) => {
     return (
       <TouchableOpacity
         style={
@@ -212,9 +211,9 @@ export default function AssetsScreen( props ) {
         }
         activeOpacity={1}
         onPress={() =>
-          props.navigation.navigate( 'RGB121TxDetail', {
+          props.navigation.navigate('RGB121TxDetail', {
             asset: item,
-          } )
+          })
         }>
         <View
           style={
@@ -223,10 +222,10 @@ export default function AssetsScreen( props ) {
           <Image
             style={styles.image}
             source={{
-              uri: Platform.select( {
-                android: `file://${item.dataPaths[ 0 ].filePath}`,
-                ios: item.dataPaths[ 0 ].filePath,
-              } ),
+              uri: Platform.select({
+                android: `file://${item.dataPaths[0].filePath}`,
+                ios: item.dataPaths[0].filePath,
+              }),
             }}
           />
         </View>
@@ -239,14 +238,14 @@ export default function AssetsScreen( props ) {
   }
 
   const closeBottomSheet = () => {
-    setBottomSheetState( BottomSheetState.Closed )
+    setBottomSheetState(BottomSheetState.Closed)
   }
 
   const renderBottomSheetContent = () => {
     return (
       <>
         <BottomSheetCoinsHeader
-          title={'Add ' + ( selectedTab == 0 ? 'Collectibles' : 'Coins' )}
+          title={'Add ' + (selectedTab == 0 ? 'Collectibles' : 'Coins')}
           onPress={closeBottomSheet}
         />
         {/* <Text numberOfLines={2} style={styles.descText}>{'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'}</Text> */}
@@ -254,19 +253,21 @@ export default function AssetsScreen( props ) {
         <BottomSheetAddWalletInfo
           onRGBWalletClick={() => {
             closeBottomSheet()
-            props.navigation.navigate( 'IssueScreen', {
+            props.navigation.navigate('IssueScreen', {
               issueType: selectedTab == 0 ? 'collectible' : 'coin',
-            } )
+            })
           }}
           onLighteningWalletClick={() => {
             closeBottomSheet()
 
-            props.navigation.navigate( 'RGBReceive', {
+            props.navigation.navigate('RGBReceive', {
               assetType: RGB_ASSET_TYPE.RGB20,
-            } )
+            })
           }}
           title1="Issue"
           title2="Recieve"
+          desc1={`Issue new ${selectedTab === 0 ? 'collectibles' : 'coins'} on RGB. Set limit and send it around your Tribe`}
+          desc2='You can also add an asset to your Tribe wallet by receiving it from someone'
         />
       </>
     )
@@ -282,7 +283,7 @@ export default function AssetsScreen( props ) {
           <RefreshControl
             refreshing={syncing}
             onRefresh={() => {
-              dispatch( syncRgb() )
+              dispatch(syncRgb())
             }}
           />
         }
@@ -292,34 +293,24 @@ export default function AssetsScreen( props ) {
           <Text style={styles.pageTitle}>{'My Assets'}</Text>
           <TouchableOpacity
             onPress={() => {
-              setBottomSheetState( BottomSheetState.Open )
+              setBottomSheetState(BottomSheetState.Open)
             }}>
-            <LinearGradient
-              colors={[ Colors.blue, Colors.blue ]}
-              start={{
-                x: 0,
-                y: 0,
-              }}
-              end={{
-                x: 1,
-                y: 0,
-              }}
-              locations={[ 0.2, 1 ]}
+            <View
               style={{
                 ...styles.selectedContactsView,
-                backgroundColor: Colors.lightBlue,
+                backgroundColor: Colors.blue,
               }}>
               <Text
                 style={[
                   styles.addNewText,
                   {
-                    fontSize: RFValue( 18 ),
+                    fontSize: RFValue(18),
                   },
                 ]}>
                 +{' '}
               </Text>
-              <Text style={styles.addNewText}>{strings[ 'AddNew' ]}</Text>
-            </LinearGradient>
+              <Text style={styles.addNewText}>{strings['AddNew']}</Text>
+            </View>
           </TouchableOpacity>
         </View>
         {renderTabs()}
@@ -362,7 +353,7 @@ export default function AssetsScreen( props ) {
                 </Text>
               )}
               contentContainerStyle={styles.flatListStyle}
-              renderItem={( { item, i } ) => renderCollectibleItems( item, i )}
+              renderItem={({ item, i }) => renderCollectibleItems(item, i)}
             />
           </ScrollView>
         ) : (
@@ -373,7 +364,7 @@ export default function AssetsScreen( props ) {
             alwaysBounceVertical={false}>
             <FlatList
               data={coinsData}
-              extraData={[ coinsData, syncing ]}
+              extraData={[coinsData, syncing]}
               contentContainerStyle={styles.flatListStyle}
               keyExtractor={keyExtractor}
               renderItem={renderCoinItems}
@@ -390,31 +381,31 @@ export default function AssetsScreen( props ) {
           closeBottomSheet()
         }}
         visible={bottomSheetState == BottomSheetState.Open}
-        closeBottomSheet={() => {}}>
+        closeBottomSheet={() => { }}>
         {renderBottomSheetContent()}
       </ModalContainer>
       <ModalContainer
-        onBackground={()=>{}}
-        closeBottomSheet={() => {}}
+        onBackground={() => { }}
+        closeBottomSheet={() => { }}
         visible={syncing}
       >
         <RGBIntroModal
           title={'Syncing Asset'}
-          info={'Embark on journey with Bitcoin Tribe wallet, Your Comprehensive solution for managing RGB assets effortlessly.'}
-          otherText={'To regenerate your Grid at a later date'}
+          info={'RGB protocol allows you to issue and manage fungible (coins) and non-fungible (collectibles) assets on the bitcoin network'}
+          otherText={'Syncing assets with RGB nodes'}
           proceedButtonText={'Continue'}
           isIgnoreButton={false}
           isBottomImage={true}
-          bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
+          bottomImage={require('../../assets/images/icons/contactPermission.png')}
         />
       </ModalContainer>
     </View>
   )
 }
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
   container: {
-    height: hp( '71.46%' ),
+    height: hp('71.46%'),
     // marginTop: 30,
     backgroundColor: '#F2F2F2',
     opacity: 1,
@@ -432,12 +423,12 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: hp( 3.5 ),
-    marginHorizontal: wp( 6 ),
+    marginTop: hp(3.5),
+    marginHorizontal: wp(6),
   },
   pageTitle: {
     color: Colors.THEAM_TEXT_COLOR,
-    fontSize: RFValue( 16 ),
+    fontSize: RFValue(16),
     letterSpacing: 0.54,
     // fontFamily: Fonts.Regular,
     fontFamily: Fonts.SemiBold,
@@ -448,12 +439,12 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'space-around',
     backgroundColor: Colors.blue,
-    borderRadius: wp( 2 ),
-    height: hp( 4 ),
-    paddingHorizontal: wp( 2 ),
+    borderRadius: wp(2),
+    height: hp(4),
+    paddingHorizontal: wp(2),
   },
   addNewText: {
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue(12),
     fontFamily: Fonts.Regular,
     color: Colors.white,
   },
@@ -462,8 +453,8 @@ const styles = StyleSheet.create( {
     borderRadius: 10,
     backgroundColor: Colors.white,
     flexDirection: 'row',
-    marginHorizontal: wp( 6 ),
-    marginTop: hp( 2 ),
+    marginHorizontal: wp(6),
+    marginTop: hp(2),
   },
   collectibleContainer: {
     flex: 1,
@@ -533,7 +524,7 @@ const styles = StyleSheet.create( {
   },
 
   labelText: {
-    fontSize: RFValue( 9 ),
+    fontSize: RFValue(9),
     fontFamily: Fonts.SemiBold,
     color: Colors.white,
   },
@@ -542,7 +533,7 @@ const styles = StyleSheet.create( {
     alignSelf: 'flex-start',
   },
   nameText: {
-    fontSize: RFValue( 9 ),
+    fontSize: RFValue(9),
     fontFamily: Fonts.Regular,
     color: Colors.THEAM_INFO_TEXT_COLOR,
     marginTop: 5,
@@ -580,4 +571,4 @@ const styles = StyleSheet.create( {
   //     // paddingVertical:10,
   //     backgroundColor: Colors.bgColor
   //   },
-} )
+})

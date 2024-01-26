@@ -14,23 +14,25 @@ import { translations } from '../../../common/content/LocContext'
 import Fonts from '../../../common/Fonts'
 
 type Props = {
-  onRGBWalletClick: ()=>any;
-  onLighteningWalletClick: ()=>any;
+  onRGBWalletClick: () => any;
+  onLighteningWalletClick: () => any;
   title1: string;
-title2:string;
+  title2: string;
+  desc1: string;
+  desc2: string;
 }
 
-const BottomSheetAddWalletInfo: React.FC<Props> = ( { onRGBWalletClick, onLighteningWalletClick, title1, title2 }: Props ) => {
+const BottomSheetAddWalletInfo: React.FC<Props> = ({ onRGBWalletClick, onLighteningWalletClick, title1, title2, desc1, desc2 }: Props) => {
   const dispatch = useDispatch()
-  const common  = translations[ 'common' ]
-  const strings  = translations[ 'accounts' ]
-  const [ isConfirm, setIsConfirm ] = useState( false )
+  const common = translations['common']
+  const strings = translations['accounts']
+  const [isConfirm, setIsConfirm] = useState(false)
   const swanMessage = strings.swanMessage
   const swanTitle = strings.StackSats
 
 
-  const renderWallet =( onPress, title, desc ) => {
-    return(
+  const renderWallet = (onPress, title, desc) => {
+    return (
       <TouchableOpacity style={styles.container} onPress={onPress}>
         {/* <Image
           style={styles.addIcon}
@@ -40,10 +42,10 @@ const BottomSheetAddWalletInfo: React.FC<Props> = ( { onRGBWalletClick, onLighte
           <Text style={styles.titleText}>{title}</Text>
           <Text numberOfLines={2} style={styles.descText}>{desc}</Text>
         </View>
-        <Image source={require( '../../../assets/images/icons/icon_arrow.png' )}
+        <Image source={require('../../../assets/images/icons/icon_arrow.png')}
           style={{
-            width: wp( '2.5%' ),
-            height: wp( '2.5%' ),
+            width: wp('2.5%'),
+            height: wp('2.5%'),
             alignSelf: 'center',
             resizeMode: 'contain',
             tintColor: Colors.theam_icon_color
@@ -53,21 +55,21 @@ const BottomSheetAddWalletInfo: React.FC<Props> = ( { onRGBWalletClick, onLighte
     )
   }
 
-  return ( <View style={{
+  return (<View style={{
     ...styles.modalContentContainer
   }}>
-    {renderWallet( onRGBWalletClick, title1, 'Issue new coins or collectibles on RGB. Set limit and send it around your Tribe' )}
-    {renderWallet( onLighteningWalletClick, title2, 'You can also add an asset to your Tribe wallet by receiving it from someone' )}
+    {renderWallet(onRGBWalletClick, title1, desc1)}
+    {renderWallet(onLighteningWalletClick, title2, desc2)}
   </View>
   )
 }
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
   statusIndicatorView: {
     flexDirection: 'row',
     marginLeft: 'auto',
-    marginHorizontal: wp( '6%' ),
-    marginBottom: hp( 2 )
+    marginHorizontal: wp('6%'),
+    marginBottom: hp(2)
   },
   statusIndicatorActiveView: {
     height: 5,
@@ -85,33 +87,33 @@ const styles = StyleSheet.create( {
   modalContentContainer: {
     backgroundColor: Colors.bgColor,
     // backgroundColor: Colors.red,
-    paddingBottom: hp( 5 )
+    paddingBottom: hp(5)
   },
   titleText: {
     color: Colors.THEAM_TEXT_COLOR,
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue(12),
     fontFamily: Fonts.Medium,
   },
   descText: {
     color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
-    fontSize: RFValue( 11 ),
+    fontSize: RFValue(11),
     fontFamily: Fonts.Regular,
     marginTop: 10
   },
-  addIcon:{
+  addIcon: {
     width: 30, height: 30
   },
-  innerContainer:{
-    flex:1, marginStart:wp( '2%' )
+  innerContainer: {
+    flex: 1, marginStart: wp('2%')
   },
-  container:{
-    marginHorizontal: wp( '6%' ),
-    marginTop:hp( 2 ),
-    paddingHorizontal: wp( '2%' ),
-    paddingVertical:hp( 2 ),
-    backgroundColor:Colors.white, borderRadius: 8,
+  container: {
+    marginHorizontal: wp('6%'),
+    marginTop: hp(2),
+    paddingHorizontal: wp('2%'),
+    paddingVertical: hp(2),
+    backgroundColor: Colors.white, borderRadius: 8,
     flexDirection: 'row',
-    alignItems:'center'
+    alignItems: 'center'
   }
-} )
+})
 export default BottomSheetAddWalletInfo

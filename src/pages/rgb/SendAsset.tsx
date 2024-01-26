@@ -184,8 +184,8 @@ export default function RGBSend(props) {
         >
           <RGBIntroModal
             title={'Sending Asset'}
-            info={'Embark on journey with Bitcoin Tribe wallet, Your Comprehensive solution for managing RGB assets effortlessly.'}
-            otherText={'To regenerate your Grid at a later date'}
+            info={'RGB protocol allows you to issue and manage fungible (coins) and non-fungible (collectibles) assets on the bitcoin network'}
+            otherText={'Syncing assets with RGB nodes'}
             proceedButtonText={'Continue'}
             isIgnoreButton={false}
             isBottomImage={true}
