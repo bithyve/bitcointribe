@@ -417,8 +417,8 @@ export default function BackupMethods( { navigation } ) {
       >
         <LoaderModal
           headerText={'Backup In Progress'}
-          messageText={'Embark on journey with Bitcoin Tribe wallet, Your Comprehensive solution for managing RGB assets effortlessly.'}
-          messageText2={'To regenerate your Grid at a later date'}
+          messageText={'RGB protocol allows you to issue and manage fungible (coins) and non-fungible (collectibles) assets on the bitcoin network'}
+          messageText2={'Syncing assets with RGB nodes'}
           showGif={false}
         />
       </ModalContainer>
