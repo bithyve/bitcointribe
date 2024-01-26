@@ -425,7 +425,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   renderBottomSheetContent() {
-    // console.log( 'this.state.currentBottomSheetKind', this.state.currentBottomSheetKind )
     switch (this.state.currentBottomSheetKind) {
       case BottomSheetKind.TAB_BAR_BUY_MENU:
         return (
@@ -447,7 +446,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               onClickSetting={() => {
                 this.closeBottomSheet()
               }}
-              // onPress={this.closeBottomSheet}
               onPress={this.onBackPress}
             />
           </>
@@ -480,7 +478,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               onClickSetting={() => {
                 this.closeBottomSheet()
               }}
-              // onPress={this.closeBottomSheet}
               onPress={this.onBackPress}
             />
           </>
@@ -530,7 +527,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }}>
           <StatusBar translucent={false} backgroundColor={'transparent'} barStyle="light-content" />
         </LinearGradient>
-        {/* <StatusBar backgroundColor={Colors.blue} barStyle="light-content" /> */}
         <ModalContainer
           onBackground={() => this.setState({
             currentBottomSheetKind: null
