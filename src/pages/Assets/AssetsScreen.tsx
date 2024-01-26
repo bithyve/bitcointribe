@@ -12,7 +12,6 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
@@ -296,20 +295,10 @@ export default function AssetsScreen(props) {
             onPress={() => {
               setBottomSheetState(BottomSheetState.Open)
             }}>
-            <LinearGradient
-              colors={[Colors.blue, Colors.blue]}
-              start={{
-                x: 0,
-                y: 0,
-              }}
-              end={{
-                x: 1,
-                y: 0,
-              }}
-              locations={[0.2, 1]}
+            <View
               style={{
                 ...styles.selectedContactsView,
-                backgroundColor: Colors.lightBlue,
+                backgroundColor: Colors.blue,
               }}>
               <Text
                 style={[
@@ -321,7 +310,7 @@ export default function AssetsScreen(props) {
                 +{' '}
               </Text>
               <Text style={styles.addNewText}>{strings['AddNew']}</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         </View>
         {renderTabs()}
