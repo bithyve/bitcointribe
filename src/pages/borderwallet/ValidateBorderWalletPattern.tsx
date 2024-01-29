@@ -18,6 +18,7 @@ import CommonStyles from '../../common/Styles/Styles'
 import Toast from '../../components/Toast'
 import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
 import uheprng from '../../utils/uheprng'
+import { CommonActions } from '@react-navigation/native'
 
 const wordlists = bip39.wordlists.english
 const columns = [
@@ -386,7 +387,17 @@ const ValidateBorderWalletPattern = ( { route, navigation } ) => {
 
           } ]}
           onPress={() => {
-            navigation.goBack()
+            navigation.dispatch(CommonActions.reset( {
+              index: 1,
+              routes: [
+                {
+                  name: 'Home'
+                },
+                {
+                  name: 'BackupMethods'
+                },
+              ],
+            } ))
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>

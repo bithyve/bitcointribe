@@ -78,19 +78,21 @@ const CreatePassPhrase = ( props ) => {
 
   useEffect( () => {
     setLoaderModal( false )
-    if ( wallet && !isAccountCreation ) {
-      dispatch( completedWalletSetup() )
-      AsyncStorage.setItem( 'walletRecovered', 'true' )
-      dispatch( setVersion( 'Restored' ) )
-      props.navigation.dispatch( CommonActions.reset( {
-        index: 0,
-        routes: [
-          {
-            name: 'App'
-          }
-        ],
-      } ) )
-    }
+    setTimeout( () => {
+      if ( wallet && !isAccountCreation ) {
+        dispatch( completedWalletSetup() )
+        AsyncStorage.setItem( 'walletRecovered', 'true' )
+        dispatch( setVersion( 'Restored' ) )
+        props.navigation.dispatch( CommonActions.reset( {
+          index: 0,
+          routes: [
+            {
+              name: 'App'
+            }
+          ],
+        } ) )
+      }
+    },100)
   }, [ wallet, isAccountCreation ] )
 
   const onPressNext = () => {

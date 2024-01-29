@@ -89,7 +89,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation, 
       setFailure( false )
     }
   }, [ navigation ] )
-
   const showSendSuccessBottomSheet = () => {
     return(
       <SendConfirmationContent
@@ -105,16 +104,18 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation, 
           // dismissBottomSheet()
           setSuccess( false )
           // dispatch( resetSendState() ) // need to delay reset as other background sagas read from the send state
-          requestAnimationFrame( () => {
-            dispatch( refreshAccountShells( [ sourceAccountShell ], {
-              hardRefresh: true,
-            } ) )
-          } )
-          navigation.dispatch(
-            resetStackToAccountDetails( {
-              accountShellID: sourceAccountShell.id,
+          setTimeout(()=>{
+            requestAnimationFrame( () => {
+              dispatch( refreshAccountShells( [ sourceAccountShell ], {
+                hardRefresh: true,
+              } ) )
             } )
-          )
+            navigation.dispatch(
+              resetStackToAccountDetails( {
+                accountShellID: sourceAccountShell.id,
+              } )
+            )
+          },100)
         }}
         onPressCancel={() => setSuccess( false )}
         isSuccess={true}
@@ -135,14 +136,16 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation, 
         isCancel={true}
         onPressOk={() => setFailure( false )}
         onPressCancel={() => {
+          setFailure( false )
           dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
           // dismissBottomSheet()
-          setFailure( false )
-          navigation.dispatch(
-            resetStackToAccountDetails( {
-              accountShellID: sourceAccountShell.id,
-            } )
-          )
+          setTimeout(()=>{
+            navigation.dispatch(
+              resetStackToAccountDetails( {
+                accountShellID: sourceAccountShell.id,
+              } )
+            )
+          },100)
         }}
         isUnSuccess={true}
         accountKind={sourcePrimarySubAccount.kind}
@@ -171,7 +174,9 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation, 
 
   function handleBackButtonPress() {
     dispatch( resetSendStage1() )
-    navigation.goBack()
+    setTimeout(()=>{
+      navigation.goBack()
+    },100)
   }
 
   useEffect( ()=>{
