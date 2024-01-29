@@ -347,7 +347,6 @@ export default function AssetsScreen(props) {
                     textAlign: 'center',
                     marginVertical: 100,
                     alignSelf: 'center',
-                    marginLeft: 20
                   }}>
                   Click on Add New to issue new collectible asset.
                 </Text>
