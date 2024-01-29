@@ -32,6 +32,7 @@ import RGBServices from '../../services/RGBServices'
 import dbManager from '../../storage/realm/dbManager'
 import { onPressKeeper } from '../../store/actions/BHR'
 import { updateLastBackedUp } from '../../store/actions/rgb'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const GoogleDrive = NativeModules.GoogleDrive
 
@@ -162,7 +163,7 @@ export default function BackupMethods( { navigation } ) {
   }
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
         backgroundColor: Colors.backgroundColor,
@@ -433,6 +434,6 @@ export default function BackupMethods( { navigation } ) {
           cancelButtonText={'Skip'}
         />
       </ModalContainer>
-    </View>
+    </SafeAreaView>
   )
 }
