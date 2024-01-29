@@ -45,7 +45,7 @@ export default function RGBIntroModal(props) {
             {props.otherText}
           </Text>
         </View>
-        <View>
+        <View style={{marginBottom: hp(15)}}>
           <View style={styles.modalMessageWrapper}>
             <View style={{ width: '80%' }}>
               <Text style={styles.modalMessageText}>
