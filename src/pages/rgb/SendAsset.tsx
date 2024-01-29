@@ -13,10 +13,10 @@ import ModalContainer from 'src/components/home/ModalContainer'
 import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
 import { RGBConfig } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
-import { translations } from '../../common/content/LocContext'
 import Fonts from '../../common/Fonts'
 import FormStyles from '../../common/Styles/FormStyles'
 import CommonStyles from '../../common/Styles/Styles'
+import { translations } from '../../common/content/LocContext'
 import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
 
@@ -46,6 +46,12 @@ export default function RGBSend(props) {
           if (isValidInvoice) {
             response = await RGBServices.sendAsset(asset.assetId, utxo, amount, endpoint)
             setSending(false)
+            if (response?.txid) {
+              Toast('Sent Successfully')
+              props.navigation.goBack()
+            } else {
+              Toast('Failed')
+            }
           } else {
             Toast('Invalid RGB invoice/blinded UTXO')
             setSending(false)
