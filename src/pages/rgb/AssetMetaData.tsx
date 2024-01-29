@@ -10,7 +10,8 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  PermissionsAndroid
 } from 'react-native'
 import RNFS from 'react-native-fs'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -22,6 +23,7 @@ import CommonStyles from '../../common/Styles/Styles'
 import HeaderTitle from '../../components/HeaderTitle'
 import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
+import RNFetchBlob from 'rn-fetch-blob'
 
 const styles = StyleSheet.create({
   lineItem: {
@@ -113,6 +115,56 @@ const AssetMetaData = (props) => {
     }
   }
 
+  const requestPermission=async ()=>{
+    if(Platform.OS==='ios'){
+      return true;
+    }
+    try {
+      const granted = await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      ]);
+  
+      if (granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED
+        && granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      return false;
+    }
+  }
+
+  const downloadFile=async()=>{
+    const result = await requestPermission();
+    if(!result){
+      Toast("Please grant storage permission to download asset. ")
+      return;
+    }
+    setDownloading(true)
+    const localFilePath = Platform.select({
+      android: `file://${asset.dataPaths[0].filePath}`,
+      ios: asset.dataPaths[0].filePath
+    })
+    const mime = asset.dataPaths[0].mime || 'application/octet-stream'
+    const extension = mime.split('/')[1]
+    const destinationPath = Platform.select({
+      android:`${RNFS.DownloadDirectoryPath}/${asset.name || 'asset'}.${extension}`,
+      ios: `${RNFS.DocumentDirectoryPath}/${asset.name || 'asset'}.${extension}`
+    })
+      RNFetchBlob.fs.cp(localFilePath, destinationPath)
+        .then(() => {
+          console.log(`File copied from ${localFilePath} to ${destinationPath}`);
+          Toast(`Asset Downloaded in ${destinationPath}` )
+          setDownloading(false)
+        })
+        .catch(error => {
+          Toast("Failed to download, please try again.")
+          setDownloading(false)
+        });
+  }
+
 
   return (
     <SafeAreaView style={{
@@ -165,27 +217,7 @@ const AssetMetaData = (props) => {
                       })
                     }}
                   />
-                  <TouchableOpacity disabled={downloading ? true : false} onPress={() => {
-                    setDownloading(true)
-                    const localFilePath = Platform.select({
-                      android: `file://${asset.dataPaths[0].filePath}`,
-                      ios: asset.dataPaths[0].filePath
-                    })
-                    const mime = asset.dataPaths[0].mime || 'application/octet-stream'
-                    const extension = mime.split('/')[1]
-                    const destinationPath = `${RNFS.DownloadDirectoryPath}/${asset.name || 'asset'}.${extension}`
-
-                    RNFS.copyFile(localFilePath, destinationPath)
-                      .then(() => {
-                        Toast(`Downloaded to: ${destinationPath}`)
-                        setDownloading(false)
-                      })
-                      .catch((error) => {
-                        console.error('Error downloading file:', error)
-                        Toast('Failed to download the file.')
-                        setDownloading(false)
-                      })
-                  }}>
+                  <TouchableOpacity disabled={downloading ? true : false} onPress={() => {downloadFile()}}>
                     <View
                       style={{
                         ...styles.selectedContactsView, backgroundColor: downloading ? Colors.textColorGrey : Colors.blue,
