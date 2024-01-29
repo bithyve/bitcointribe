@@ -46,7 +46,6 @@ const ConfirmDownload = ( props ) => {
       // Alert.alert( 'Wallet Created!', 'Border Wallet has been succssefully created', [ {
       //   text: 'Ok', onPress: ()=> {  props.navigation.navigate( 'Home' )}
       // } ] )
-      setSuccessModal( true )
       setTimeout( ()=>{
         props.navigation.dispatch( CommonActions.reset( {
           index: 0,

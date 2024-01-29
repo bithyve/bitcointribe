@@ -145,12 +145,13 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation, route }:
         onPressCancel={() => {
           dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
           setFailure( false )
-
-          navigation.dispatch(
-            resetStackToAccountDetails( {
-              accountShellID: sourceAccountShell.id,
-            } )
-          )
+          setTimeout(()=>{
+            navigation.dispatch(
+              resetStackToAccountDetails( {
+                accountShellID: sourceAccountShell.id,
+              } )
+            )
+          },100)
         }}
         isUnSuccess={true}
         accountKind={sourcePrimarySubAccount.kind}

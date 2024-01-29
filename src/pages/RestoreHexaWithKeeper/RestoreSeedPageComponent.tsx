@@ -392,11 +392,11 @@ const RestoreSeedPageComponent = ( props ) => {
                             data[ currentPosition ][ getTextIndex( onChangeIndex ) ].name = word
                             setPartialSeedData( data )
                             setSuggestedWords( [] )
-                            // const position =  onChangeIndex + 1
-                            // if ( position % 6 === 0 ) {
-                            //   onNextClick()
-                            // }
-                            // if ( onChangeIndex !== 11 ) inputRefs.current[ onChangeIndex + 1 ].focus()
+                            const pos = getIndex( onChangeIndex, seedIndex )
+                            if ( pos < inputRefs.current.length ) {
+                              if ( pos % 6 === 0 ) onNextClick()
+                              if ( onChangeIndex !== 11) inputRefs.current[ pos ].focus()
+                            }
                           }}>
                             <Text style={{
                               color: Colors.white
