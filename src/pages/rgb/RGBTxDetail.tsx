@@ -104,7 +104,6 @@ export default function RGBTxDetail( props ) {
   }
 
   const renderItem = ( { item } ) => {
-
     return (
       <TouchableOpacity style={styles.itemContainer} onPress={() => onItemClick( item )}>
         <View style={styles.textContainer}>
@@ -115,7 +114,7 @@ export default function RGBTxDetail( props ) {
           <Text
             numberOfLines={1}
             style={[ styles.amountText, {
-              color: ( item.kind === 'RECEIVE_BLIND' || item.kind ==='ISSUANCE' || item.kind === 'RECEIVE_WITNESS' ) ? '#04A777' : '#FD746C'
+              color: ( item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() ==='ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS' ) ? '#04A777' : '#FD746C'
             } ]}
           >
             {item.amount}

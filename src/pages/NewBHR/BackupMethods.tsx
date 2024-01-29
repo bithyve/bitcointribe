@@ -5,6 +5,7 @@ import {
   Alert,
   Image,
   NativeModules,
+  Platform,
   StatusBar,
   StyleSheet,
   Text,
@@ -20,14 +21,14 @@ import BorderWalletIcon from '../../assets/images/svgs/borderWallet.svg'
 import { LevelData, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
+import Fonts from '../../common/Fonts'
 import { translations } from '../../common/content/LocContext'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
-import Fonts from '../../common/Fonts'
-import BWHealthCheckModal from '../../components/border-wallet/BWHealthCheckModal'
 import HeaderTitle from '../../components/HeaderTitle'
-import ModalContainer from '../../components/home/ModalContainer'
 import Toast from '../../components/Toast'
+import BWHealthCheckModal from '../../components/border-wallet/BWHealthCheckModal'
+import ModalContainer from '../../components/home/ModalContainer'
 import RGBServices from '../../services/RGBServices'
 import dbManager from '../../storage/realm/dbManager'
 import { onPressKeeper } from '../../store/actions/BHR'
@@ -125,6 +126,8 @@ export default function BackupMethods( { navigation } ) {
 
   async function onPressBackupRGB() {
     try {
+      if(Platform.OS === 'android') {
+
       Alert.alert(
         'Select a Google Account',
         'This account will be used to upload the RGB backup data file. The file is encrypted with your Backup Phrase.',
@@ -157,6 +160,36 @@ export default function BackupMethods( { navigation } ) {
           cancelable: true,
         },
       )
+      } else {
+        Alert.alert(
+          '',
+          'This step will upload the RGB backup data file on your iCloud. The file is encrypted with your Backup Phrase.',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => {},
+              style: 'cancel',
+            },
+            {
+              text: 'Continue',
+              onPress: async () => {
+                const response = await RGBServices.backup( '', wallet.primaryMnemonic )
+                if( response.error ) {
+                  Toast( response.error )
+                  setGoogleVisibleModal(false)
+                } else {
+                  dispatch( updateLastBackedUp() )
+                  Toast('Backuped successfully')
+                }
+              },
+              style: 'default',
+            },
+          ],
+          {
+            cancelable: true,
+          },
+        )
+      }
     } catch ( error ) {
       console.log( error )
     }

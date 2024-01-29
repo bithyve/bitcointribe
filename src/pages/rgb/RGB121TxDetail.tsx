@@ -118,7 +118,7 @@ export default function RGB121TxDetail( props ) {
           <Text
             numberOfLines={1}
             style={[ styles.amountText, {
-              color: ( item.kind === 'RECEIVE' || item.kind ==='ISSUANCE' ) ? '#04A777' : '#FD746C'
+              color: ( item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() ==='ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS' ) ? '#04A777' : '#FD746C'
             } ]}
           >
             {item.amount}
