@@ -179,7 +179,7 @@ export default function RGBTxDetail( props ) {
       <View style={{
         flex: 1,
       }}>
-        <View style={styles.viewMoreLinkRow}>
+        {/* <View style={styles.viewMoreLinkRow}>
           <Text style={styles.headerDateText}>{accountStr.RecentTransactions}</Text>
           <TouchableOpacity
             onPress={onViewMorePressed}
@@ -198,7 +198,7 @@ export default function RGBTxDetail( props ) {
               </Text>
             </LinearGradient>
           </TouchableOpacity>
-        </View>
+        </View> */}
         {
           loading ? <ActivityIndicator /> :
             <FlatList
