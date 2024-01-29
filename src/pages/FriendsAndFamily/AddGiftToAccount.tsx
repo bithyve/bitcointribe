@@ -89,15 +89,17 @@ export default function AddGiftToAccount( { getTheme, navigation, giftAmount, gi
             }, 2000 )
           } else if ( text === 'View Account' ) {
             setGiftAddedModel( false )
-            dispatch( giftAccepted( '' ) )
             closeModal()
-            navigation.popToTop()
-            navigation.navigate( 'AccountDetails', {
-              accountShellID: sourcePrimarySubAccount.accountShellID,
-            } )
-            dispatch( refreshAccountShells( [ sendingAccount ], {
-              hardRefresh: true
-            } ) )
+            setTimeout(()=>{
+              dispatch( giftAccepted( '' ) )
+              navigation.popToTop()
+              navigation.navigate( 'AccountDetails', {
+                accountShellID: sourcePrimarySubAccount.accountShellID,
+              } )
+              dispatch( refreshAccountShells( [ sendingAccount ], {
+                hardRefresh: true
+              } ) )
+            },100)
           }
         }}
         style={{

@@ -80,19 +80,21 @@ const NewWalletName: React.FC<Props> = ( { route, navigation }: Props ) => {
 
   useEffect( () => {
     if ( walletSetupCompleted ) {
-      setLoaderModal( false )
-      navigation.dispatch( CommonActions.reset( {
-        index: 0,
-        routes: [
-          {
-            name: 'App',
-            params: {
-              walletName
-            }
-          },
-        ]
-      } ) )
-    }
+    setLoaderModal( false )
+    setTimeout( () => {
+        navigation.dispatch( CommonActions.reset( {
+          index: 0,
+          routes: [
+            {
+              name: 'App',
+              params: {
+                walletName
+              }
+            },
+          ]
+        } ) )
+      },100)
+  }
   }, [ walletSetupCompleted, cloudBackupStatus ] )
 
   const renderLoaderModalContent = useCallback( () => {
