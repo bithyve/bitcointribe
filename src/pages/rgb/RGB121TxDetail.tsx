@@ -127,9 +127,10 @@ export default function RGB121TxDetail( props ) {
       </TouchableOpacity>
     )
   }
-
   const onViewMorePressed = () => {
-
+    props.navigation.navigate( 'RGBTransactionsList', {
+      asset: asset
+    } )  
   }
 
   return (
@@ -198,7 +199,7 @@ export default function RGB121TxDetail( props ) {
         <View style={{
           flex: 1,
         }}>
-          {/* <View style={styles.viewMoreLinkRow}>
+          <View style={styles.viewMoreLinkRow}>
             <Text style={styles.headerDateText}>{accountStr.RecentTransactions}</Text>
             <TouchableOpacity
               onPress={onViewMorePressed}
@@ -217,7 +218,7 @@ export default function RGB121TxDetail( props ) {
                 </Text>
               </LinearGradient>
             </TouchableOpacity>
-          </View> */}
+          </View>
           <FlatList
             data={transactionData}
             renderItem={renderItem}
