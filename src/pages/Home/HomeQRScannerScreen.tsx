@@ -283,6 +283,7 @@ const styles = StyleSheet.create( {
   infoHeaderSection: {
     paddingHorizontal: 24,
     paddingVertical: 24,
+    marginTop:5,
   },
   floatingActionButtonContainer: {
     bottom: heightPercentageToDP( 2 ),

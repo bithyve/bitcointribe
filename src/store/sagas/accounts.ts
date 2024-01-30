@@ -224,7 +224,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
       encryptionKey: deepLinkEncryptionKey,
       walletName: walletName,
       keysToEncrypt: encryptionKey,
-      generateShortLink: encryptionType !== DeepLinkEncryptionType.DEFAULT ? generateShortLink: false,
+      generateShortLink: true,
       extraData: {
         channelAddress: giftToSend.channelAddress,
         amount: giftToSend.amount,
