@@ -45,7 +45,7 @@ export default function RGBIntroModal(props) {
             {props.otherText}
           </Text>
         </View>
-        <View>
+        <View style={{marginBottom: hp(15)}}>
           <View style={styles.modalMessageWrapper}>
             <View style={{ width: '80%' }}>
               <Text style={styles.modalMessageText}>
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     letterSpacing: 0.6,
     fontFamily: Fonts.Regular,
-    marginHorizontal: wp('8%'),
+    marginHorizontal: wp('7%'),
   },
   buttonView: {
     padding: 10,
@@ -127,6 +127,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.white,
     fontFamily: Fonts.Regular,
-    marginHorizontal: wp('8%'),
+    marginHorizontal: wp('7%'),
   },
 })
