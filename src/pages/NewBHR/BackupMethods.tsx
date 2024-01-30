@@ -5,6 +5,7 @@ import {
   Alert,
   Image,
   NativeModules,
+  Platform,
   StatusBar,
   StyleSheet,
   Text,
@@ -20,18 +21,19 @@ import BorderWalletIcon from '../../assets/images/svgs/borderWallet.svg'
 import { LevelData, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
+import Fonts from '../../common/Fonts'
 import { translations } from '../../common/content/LocContext'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
-import Fonts from '../../common/Fonts'
-import BWHealthCheckModal from '../../components/border-wallet/BWHealthCheckModal'
 import HeaderTitle from '../../components/HeaderTitle'
-import ModalContainer from '../../components/home/ModalContainer'
 import Toast from '../../components/Toast'
+import BWHealthCheckModal from '../../components/border-wallet/BWHealthCheckModal'
+import ModalContainer from '../../components/home/ModalContainer'
 import RGBServices from '../../services/RGBServices'
 import dbManager from '../../storage/realm/dbManager'
 import { onPressKeeper } from '../../store/actions/BHR'
 import { updateLastBackedUp } from '../../store/actions/rgb'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const GoogleDrive = NativeModules.GoogleDrive
 
@@ -124,6 +126,8 @@ export default function BackupMethods( { navigation } ) {
 
   async function onPressBackupRGB() {
     try {
+      if(Platform.OS === 'android') {
+
       Alert.alert(
         'Select a Google Account',
         'This account will be used to upload the RGB backup data file. The file is encrypted with your Backup Phrase.',
@@ -156,13 +160,43 @@ export default function BackupMethods( { navigation } ) {
           cancelable: true,
         },
       )
+      } else {
+        Alert.alert(
+          '',
+          'This step will upload the RGB backup data file on your iCloud. The file is encrypted with your Backup Phrase.',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => {},
+              style: 'cancel',
+            },
+            {
+              text: 'Continue',
+              onPress: async () => {
+                const response = await RGBServices.backup( '', wallet.primaryMnemonic )
+                if( response.error ) {
+                  Toast( response.error )
+                  setGoogleVisibleModal(false)
+                } else {
+                  dispatch( updateLastBackedUp() )
+                  Toast('Backuped successfully')
+                }
+              },
+              style: 'default',
+            },
+          ],
+          {
+            cancelable: true,
+          },
+        )
+      }
     } catch ( error ) {
       // error
     }
   }
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
         backgroundColor: Colors.backgroundColor,
@@ -417,8 +451,8 @@ export default function BackupMethods( { navigation } ) {
       >
         <LoaderModal
           headerText={'Backup In Progress'}
-          messageText={'Embark on journey with Bitcoin Tribe wallet, Your Comprehensive solution for managing RGB assets effortlessly.'}
-          messageText2={'To regenerate your Grid at a later date'}
+          messageText={'RGB protocol allows you to issue and manage fungible (coins) and non-fungible (collectibles) assets on the bitcoin network'}
+          messageText2={'Syncing assets with RGB nodes'}
           showGif={false}
         />
       </ModalContainer>
@@ -433,6 +467,6 @@ export default function BackupMethods( { navigation } ) {
           cancelButtonText={'Skip'}
         />
       </ModalContainer>
-    </View>
+    </SafeAreaView>
   )
 }

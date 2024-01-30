@@ -436,6 +436,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
   }
 
   let shortLink = ''
+  let id = DeviceInfo.getBundleId();
   if( generateShortLink ) {
     try {
       const url = deepLink.replace( /\s+/g, '' )
@@ -453,15 +454,15 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         link: url,
         domainUriPrefix: domain,
         android: {
-          packageName: DeviceInfo.getBundleId(),
-          fallbackUrl: url,
+          packageName: id,
+          fallbackUrl: 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa2&hl=en',
         },
         ios: {
-          fallbackUrl: url,
-          bundleId: DeviceInfo.getBundleId()
+          bundleId: id,
+          appStoreId: '1586334138'
         },
         navigation: {
-          forcedRedirectEnabled:  false
+          forcedRedirectEnabled:  true
         },
         social: {
           descriptionText: getLinkDescription( deepLinkKind ),
