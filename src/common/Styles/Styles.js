@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import Colors from '../Colors'
 import Fonts from '../Fonts'
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
 
 export default StyleSheet.create( {
   headerContainer: {
@@ -35,7 +35,7 @@ export default StyleSheet.create( {
   },
   //
   headerTitles1: {
-    color: Colors.THEAM_INFO_TEXT_COLOR,
+    color: Colors.darkBlue,
     fontSize: RFValue( 16 ),
     letterSpacing: 0.01,
     marginLeft: 20,
