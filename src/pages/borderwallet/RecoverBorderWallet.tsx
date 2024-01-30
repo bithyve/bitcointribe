@@ -272,9 +272,9 @@ const RecoverBorderWallet = ( props ) => {
           visible={showLoader}
         >
           <RGBIntroModal
-            title={'Backup In Progress'}
-            info={'Embark on journey with Bitcoin Tribe wallet, Your Comprehensive solution for managing RGB assets effortlessly.'}
-            otherText={'To regenerate your Grid at a later date'}
+            title={'Recovery in Progress'}
+            info={'RGB protocol allows you to issue and manage fungible (coins) and non-fungible (collectibles) assets on the bitcoin network'}
+            otherText={'Syncing assets with RGB nodes'}
             proceedButtonText={'Continue'}
             isIgnoreButton={false}
             isBottomImage={true}
