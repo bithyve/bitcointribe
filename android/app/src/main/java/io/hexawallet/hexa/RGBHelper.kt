@@ -243,6 +243,7 @@ object RGBHelper {
         if (e is RgbLibException.InsufficientBitcoins) {
             Log.d(TAG, "Sending funds to RGB wallet...")
             try {
+                BdkHelper.sync()
                 val txid =
                     BdkHelper.sendToAddress(
                         getAddress(),
