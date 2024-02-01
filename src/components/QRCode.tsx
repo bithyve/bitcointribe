@@ -9,6 +9,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import Fonts from '../common/Fonts'
+import Toast from './Toast'
 
 export type Props = {
   value: string;
@@ -31,6 +32,9 @@ const QRCode: React.FC<Props> = ( {
         logoBackgroundColor="white"
         logoBorderRadius={45}
         value={value}
+        onError={()=>{
+          Toast('Something went wrong, please try again')
+        }}
         size={size} />
       {
         title !== '' && (

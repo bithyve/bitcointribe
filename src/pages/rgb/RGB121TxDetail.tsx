@@ -127,9 +127,10 @@ export default function RGB121TxDetail( props ) {
       </TouchableOpacity>
     )
   }
-
   const onViewMorePressed = () => {
-
+    props.navigation.navigate( 'RGBTransactionsList', {
+      asset: asset
+    } )  
   }
 
   return (

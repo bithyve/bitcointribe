@@ -111,7 +111,7 @@ export default function CollectibleDetailScreen( props ) {
           containerBg={'#B7B7B7'}
         />
 
-        <View style={styles.viewMoreLinkRow}>
+        {/* <View style={styles.viewMoreLinkRow}>
           <Text style={styles.headerDateText}>{accountStr.RecentTransactions}</Text>
           <TouchableOpacity
             onPress={onViewMorePressed}
@@ -133,7 +133,7 @@ export default function CollectibleDetailScreen( props ) {
               </Text>
             </LinearGradient>
           </TouchableOpacity>
-        </View>
+        </View> */}
         <FlatList
           data={transactionData}
           renderItem={renderItem}

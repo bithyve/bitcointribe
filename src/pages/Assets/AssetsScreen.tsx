@@ -1,6 +1,7 @@
 import StaggeredList from '@mindinventory/react-native-stagger-view'
 import React, { useEffect, useState } from 'react'
 import {
+  Dimensions,
   FlatList,
   Image,
   Platform,
@@ -340,16 +341,18 @@ export default function AssetsScreen(props) {
                 marginVertical: 10,
               }}
               ListEmptyComponent={() => (
-                <Text
+                <View style={styles.emptyComp}>
+                  <Text
                   style={{
                     fontFamily: Fonts.Medium,
                     fontSize: 14,
-                    textAlign: 'center',
                     marginVertical: 100,
-                    alignSelf: 'center',
+                    textAlign:'center',
+                    lineHeight:18
                   }}>
-                  Click on Add New to issue new collectible asset.
+                  Click on Add New to issue {"\n"} new collectible asset.
                 </Text>
+                </View>
               )}
               contentContainerStyle={styles.flatListStyle}
               renderItem={({ item, i }) => renderCollectibleItems(item, i)}
@@ -371,6 +374,18 @@ export default function AssetsScreen(props) {
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
               scrollEnabled={false}
+              ListEmptyComponent={() => (
+                <View style={styles.emptyComp}>
+                  <Text
+                  style={{
+                    fontFamily: Fonts.Medium,
+                    fontSize: 14,
+                    marginVertical: 100,
+                  }}>
+                  Tap on Add New to issue new coins
+                </Text>
+                </View>
+              )}
             />
           </ScrollView>
         )}
@@ -542,6 +557,12 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.SemiBold,
     color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
     marginTop: 5,
+  },
+  emptyComp:{
+    width: Dimensions.get('window').width,
+    justifyContent:'center',
+    alignItems:'center',
+    marginLeft: -wp(6),
   },
   amountText: {
     fontSize: 11,
