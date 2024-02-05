@@ -23,7 +23,18 @@ RCT_EXPORT_METHOD(generateKeys:(NSString*)network
                   rejecter:(RCTPromiseRejectBlock)reject){
   RGBHelper *helper = [[RGBHelper alloc]init];
   
-  [helper generateKeysWithBtcNetwotk:network callback:^(NSString * _Nonnull response) {
+  [helper generate_keysWithBtcNetwotk:network callback:^(NSString * _Nonnull response) {
+    resolve(response);
+  }];
+}
+
+RCT_EXPORT_METHOD(restoreKeys:(NSString*)network
+                  mnemonic:(NSString *)mnemonic
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+  RGBHelper *helper = [[RGBHelper alloc]init];
+  
+  [helper restore_keysWithBtcNetwotk:network mnemonic:mnemonic callback:^(NSString * _Nonnull response) {
     resolve(response);
   }];
 }
@@ -84,7 +95,7 @@ RCT_EXPORT_METHOD(getTransactions:(NSString*)mnemonic
    ];
 }
 
-RCT_EXPORT_METHOD(syncRgbAsset:(NSString*)mnemonic
+RCT_EXPORT_METHOD(syncRgbAssets:(NSString*)mnemonic
                   pubKey:(NSString *)pubKey
                   network:(NSString *)network
                   resolver:(RCTPromiseResolveBlock)resolve
@@ -121,7 +132,6 @@ RCT_EXPORT_METHOD(getRgbAssetMetaData:(NSString*)assetId
    ];
 }
 
-
 RCT_EXPORT_METHOD(getRgbAssetTransactions:(NSString*)assetId
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject){
@@ -136,12 +146,26 @@ RCT_EXPORT_METHOD(sendBtc:(NSString*)mnemonic
                   network:(NSString *)network
                   address:(NSString *)address
                   amount:(NSString *)amount
-                  feeRate:(Float *)feeRate
+                  feeRate:(float *)feeRate
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject){
   RGBHelper *helper = [[RGBHelper alloc]init];
   [
-    helper sendBtcWithBtcNetwotk:network mnemonic:mnemonic address:address amount:amount feeRate:feeRate callback:^(NSString * _Nonnull response) {
+    helper sendBtcWithBtcNetwotk:network mnemonic:mnemonic address:address amount:amount feeRate:*feeRate callback:^(NSString * _Nonnull response) {
+      resolve(response);
+    }
+   ];
+}
+
+RCT_EXPORT_METHOD(sendAsset:(NSString*)assetId
+                  blindedUTXO:(NSString *)blindedUTXO
+                  amount:(NSString *)amount
+                  consignmentEndpoints:(NSString *)consignmentEndpoints
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+  RGBHelper *helper = [[RGBHelper alloc]init];
+  [
+    helper sendAssetWithAssetId:assetId blindedUTXO:blindedUTXO amount:amount consignmentEndpoints:consignmentEndpoints callback:^(NSString * _Nonnull response) {
       resolve(response);
     }
    ];
@@ -159,8 +183,8 @@ RCT_EXPORT_METHOD(issueRgb20Asset:(NSString*)ticker
   }];
 }
 
-RCT_EXPORT_METHOD(issueRgb121Asset:(NSString*)description
-                  name:(NSString *)name
+RCT_EXPORT_METHOD(issueRgb25Asset:(NSString*) name
+                  description:(NSString *)description
                   supply:(NSString *)supply
                   filePath:(NSString *)filePath
                   resolver:(RCTPromiseResolveBlock)resolve
@@ -169,7 +193,44 @@ RCT_EXPORT_METHOD(issueRgb121Asset:(NSString*)description
   
   [helper issueRgb121AssetWithName:name description:description supply:supply filePath:filePath callback:^(NSString * _Nonnull response) {
     resolve(response);
-  }
+  }];
+}
+
+RCT_EXPORT_METHOD(backup:(NSString*)path
+                  password:(NSString *)password
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+  RGBHelper *helper = [[RGBHelper alloc]init];
+  [helper backupWithPath:path password:password callback:^(NSString * _Nonnull response) {
+    resolve(response);
+  }];
+}
+
+RCT_EXPORT_METHOD(restore:(NSString*)mnemonic
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+  RGBHelper *helper = [[RGBHelper alloc]init];
+  [helper restoreWithMnemonic:mnemonic callback:^(NSString * _Nonnull response) {
+    resolve(response);
+  }];
+}
+
+RCT_EXPORT_METHOD(isBackupRequired:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)rejecter){
+  RGBHelper *helper = [[RGBHelper alloc]init];
+  [helper
+   isBackupRequiredWithCallback:^(BOOL response) {
+    resolve(@(response));
+  }];
+}
+
+RCT_EXPORT_METHOD(isValidBlindedUtxo:(NSString*)invoiceData
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject){
+  RGBHelper *helper = [[RGBHelper alloc]init];
+  [
+    helper isValidBlindedUtxoWithInvoiceData:invoiceData callback:^(BOOL response) {
+      resolve(@(response));
+    }
    ];
 }
 
