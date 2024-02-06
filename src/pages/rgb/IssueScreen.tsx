@@ -185,10 +185,11 @@ export default function IssueScreen( props ) {
             underlineColorAndroid={'transparent'}
             value={ticker}
             onChangeText={( text ) => {
-              setTicker( text )
+              setTicker( text.toUpperCase() )
             }}
             numberOfLines={1}
             editable={!requesting}
+            autoCapitalize={'characters'}
           />
         }
         <Input
