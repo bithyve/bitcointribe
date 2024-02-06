@@ -4,7 +4,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import MemoriableIllustration from '../../assets/images/svgs/MemoriableIllustration.svg'
+import RGBInactive from '../../assets/images/tabs/rgb_inactive.svg'
 import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
 import Fonts from '../../common/Fonts'
@@ -34,7 +34,7 @@ export default function RGBIntroModal(props) {
           </Text>
         </View>
         <View style={{ alignItems: 'center', marginVertical: hp(1) }}>
-          <MemoriableIllustration />
+          <RGBInactive height={hp(20)} width={wp(25)} />
         </View>
         <View style={{ marginVertical: hp(1) }}>
           <Text
@@ -45,7 +45,7 @@ export default function RGBIntroModal(props) {
             {props.otherText}
           </Text>
         </View>
-        <View style={{marginBottom: hp(15)}}>
+        <View style={{ marginBottom: hp(15) }}>
           <View style={styles.modalMessageWrapper}>
             <View style={{ width: '80%' }}>
               <Text style={styles.modalMessageText}>
