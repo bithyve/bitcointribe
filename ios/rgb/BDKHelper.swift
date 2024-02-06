@@ -114,7 +114,7 @@ struct BDKHelper{
    }
   }
   
-  static func sendToAddress(address: String, amount: UInt64, fee: Float, wallet: BitcoinDevKit.Wallet)->String{
+  static func sendToAddress(address: String, amount: UInt64, fee: Float, wallet: BitcoinDevKit.Wallet) throws -> String{
     do{
       let psbt = try BitcoinDevKit.TxBuilder()
         .addRecipient(script: BitcoinDevKit.Address(address: address).scriptPubkey(), amount: amount)
@@ -126,7 +126,7 @@ struct BDKHelper{
       return psbt.txid()
     }catch{
       print("sendToAddress err: \(error)")
-      return ""
+      throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription])
     }
   }
   

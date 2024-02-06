@@ -14,6 +14,7 @@ import {
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
 import LoaderModal from 'src/components/LoaderModal'
@@ -33,7 +34,6 @@ import RGBServices from '../../services/RGBServices'
 import dbManager from '../../storage/realm/dbManager'
 import { onPressKeeper } from '../../store/actions/BHR'
 import { updateLastBackedUp } from '../../store/actions/rgb'
-import { SafeAreaView } from 'react-native-safe-area-context'
 
 const GoogleDrive = NativeModules.GoogleDrive
 
@@ -140,13 +140,12 @@ export default function BackupMethods( { navigation } ) {
           {
             text: 'Continue',
             onPress: async () => {
-              setGoogleVisibleModal(true)
               await GoogleDrive.setup()
               const login = await GoogleDrive.login()
               if( login.error ) {
                 Toast( login.error )
-                setGoogleVisibleModal(false)
               } else {
+                setGoogleVisibleModal(true)
                 await RGBServices.backup( '', wallet.primaryMnemonic )
                 dispatch( updateLastBackedUp() )
                 setGoogleVisibleModal(false)

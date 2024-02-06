@@ -58,4 +58,16 @@ struct Utility{
       return nil
     }
   }
+  
+  static func getBackupPath(fileName: String)->URL?{
+    let dir = getDocumentsDirectory().appendingPathComponent(String(format: Constants.backupName, fileName))
+    do{
+      try FileManager.default.removeItem(atPath: dir.path)
+      //try FileManager.default.createDirectory(atPath: dir.path, withIntermediateDirectories: true)
+      print("BACKUP: \(dir.path)")
+      return dir
+    }catch{
+      return nil
+    }
+  }
 }

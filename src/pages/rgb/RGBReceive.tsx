@@ -41,13 +41,16 @@ export default function RGBReceive( props ) {
   const [ paymentURI, setPaymentURI ] = useState( null )
   const { nextFreeAddress } = useSelector( state => state.rgb )
   const { loading, isError, message, data } = useSelector( state => state.rgb.receiveAssets )
-  const [ requesting, setRequesting ] = useState( false )
+  const [ requesting, setRequesting ] = useState( true )
 
   useEffect( () => {
     if ( assetType == RGB_ASSET_TYPE.BITCOIN ) {
       setReceivingAddress( nextFreeAddress )
     } else {
-      dispatch( receiveRgbAsset() )
+      setRequesting( true )
+      setTimeout(() => {
+        dispatch( receiveRgbAsset() )
+      }, 5000);
     }
   }, [] )
 

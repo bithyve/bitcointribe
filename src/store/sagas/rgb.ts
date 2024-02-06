@@ -10,7 +10,7 @@ export function* syncRgbWorker(  ) {
     const { mnemonic, xpub }: RGBConfig = yield select( state => state.rgb.config )
     const address = yield call( RGBServices.getAddress, mnemonic )
     if( address ) yield put( setNextFreeAddress( address ) )
-    const sync = yield call( RGBServices.sync, mnemonic )
+    // const sync = yield call( RGBServices.sync, mnemonic )
     const balances = yield call( RGBServices.getBalance, mnemonic )
     if( balances ) yield put( setRgbOnchainBalances( balances ) )
     const transactions = yield call( RGBServices.getTransactions, mnemonic )
