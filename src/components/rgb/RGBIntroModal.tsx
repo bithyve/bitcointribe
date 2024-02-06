@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp, widthPercentageToDP as wp
@@ -9,6 +9,7 @@ import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
 import Fonts from '../../common/Fonts'
 import BounceLoader from '../loader/BounceLoader'
+import LinearGradient from 'react-native-linear-gradient'
 
 export default function RGBIntroModal(props) {
   const strings = translations['accounts']
@@ -46,7 +47,7 @@ export default function RGBIntroModal(props) {
           </Text>
         </View>
         <View style={{marginBottom: hp(15)}}>
-          <View style={styles.modalMessageWrapper}>
+          {!props.showBtn?<View style={styles.modalMessageWrapper}>
             <View style={{ width: '80%' }}>
               <Text style={styles.modalMessageText}>
                 This step will take a few seconds. You would be able to proceed soon
@@ -55,8 +56,8 @@ export default function RGBIntroModal(props) {
             <View style={{ width: '20%' }}>
               <BounceLoader />
             </View>
-          </View>
-          {/* <TouchableOpacity
+          </View>:
+          <TouchableOpacity
             onPress={() => {
               props.closeModal()
             }}
@@ -74,9 +75,9 @@ export default function RGBIntroModal(props) {
               locations={[ 0.2, 1 ]}
               style={styles.buttonView}
             >
-              <Text style={styles.buttonText}>Next</Text>
+              <Text style={styles.buttonText}>{props.proceedButtonText}</Text>
             </LinearGradient>
-          </TouchableOpacity> */}
+          </TouchableOpacity>}
         </View>
       </View>
     </View>

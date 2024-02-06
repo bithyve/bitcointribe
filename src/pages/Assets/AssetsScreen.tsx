@@ -45,6 +45,7 @@ export default function AssetsScreen(props) {
   )
   const rgbConfig: RGBConfig = useSelector(state => state.rgb.config)
   const wallet: Wallet = dbManager.getWallet()
+  const [proceed, setProceed] = useState(false)
   const dispatch = useDispatch()
   const strings = translations['f&f']
   const [selectedTab, setSelectedTab] = useState(0)
@@ -59,6 +60,9 @@ export default function AssetsScreen(props) {
   }, [])
 
   useEffect(() => {
+    if(!syncing){
+      setProceed(true)
+    }
     const assets = []
     assets.push({
       name: 't-sats',
@@ -401,16 +405,18 @@ export default function AssetsScreen(props) {
       <ModalContainer
         onBackground={() => { }}
         closeBottomSheet={() => { }}
-        visible={syncing}
+        visible={syncing || (!syncing && proceed)}
       >
         <RGBIntroModal
           title={'Syncing Asset'}
           info={'RGB protocol allows you to issue and manage fungible (coins) and non-fungible (collectibles) assets on the bitcoin network'}
           otherText={'Syncing assets with RGB nodes'}
-          proceedButtonText={'Continue'}
+          proceedButtonText={'Close'}
           isIgnoreButton={false}
           isBottomImage={true}
           bottomImage={require('../../assets/images/icons/contactPermission.png')}
+          showBtn={!syncing && proceed}
+          closeModal={()=>{setProceed(false)}}
         />
       </ModalContainer>
     </View>
