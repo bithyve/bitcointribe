@@ -13,6 +13,7 @@ import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
 import { translations } from '../../common/content/LocContext'
 import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function RGBSendWithQR( props ) {
   const common = translations[ 'common' ]
@@ -29,6 +30,10 @@ export default function RGBSendWithQR( props ) {
     }
   }
   return (
+    <SafeAreaView  style={{
+      flex: 1,
+      backgroundColor: Colors.backgroundColor,
+    }}>
     <ScrollView
       style={{
         flex: 1,
@@ -76,6 +81,7 @@ export default function RGBSendWithQR( props ) {
         <ArrowRight />
       </TouchableOpacity>
     </ScrollView>
+    </SafeAreaView>
   )
 }
 
