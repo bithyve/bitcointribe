@@ -130,7 +130,7 @@ export default function IssueScreen( props ) {
         </TouchableOpacity>
       </View>
       <HeaderTitle
-        firstLineTitle={'Issue ' + issueType}
+        firstLineTitle={'Issue ' + issueType.slice(0,1).toUpperCase() + issueType.slice(1, issueType.length)}
         secondLineTitle={issueType=== 'collectible' ? 'Enter collectible asset details' : 'Enter coin asset details'}
         infoTextNormal={''}
         infoTextBold={''}
