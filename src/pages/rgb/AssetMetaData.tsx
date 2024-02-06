@@ -147,11 +147,12 @@ const AssetMetaData = (props) => {
       android: `file://${asset.dataPaths[0].filePath}`,
       ios: asset.dataPaths[0].filePath
     })
+    const timestamp = new Date().getTime()
     const mime = asset.dataPaths[0].mime || 'application/octet-stream'
     const extension = mime.split('/')[1]
     const destinationPath = Platform.select({
-      android:`${RNFS.DownloadDirectoryPath}/${asset.name || 'asset'}.${extension}`,
-      ios: `${RNFS.DocumentDirectoryPath}/${asset.name || 'asset'}.${extension}`
+      android:`${RNFS.DownloadDirectoryPath}/${timestamp}.${extension}`,
+      ios: `${RNFS.DocumentDirectoryPath}/${timestamp}.${extension}`
     })
       RNFetchBlob.fs.cp(localFilePath, destinationPath)
         .then(() => {
