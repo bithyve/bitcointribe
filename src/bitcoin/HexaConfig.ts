@@ -41,6 +41,10 @@ class HexaConfig {
   public ENVIRONMENT: string;
   public NETWORK: bitcoinJS.Network;
   public NETWORK_TYPE: NetworkType;
+  public BUNDLE_ID_PROD: string = 'io.hexawallet.hexa2';
+  public BUNDLE_ID_DEV: string = 'io.hexawallet.hexa.development';
+  public APPSTORE_PROD_ID: string = '1586334138';
+  public PLAYSTORE_LINK: string = 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa2&hl=en';
 
   public SECURE_WALLET_XPUB_PATH: string = Config.BIT_SECURE_WALLET_XPUB_PATH ? Config.BIT_SECURE_WALLET_XPUB_PATH.trim() : '2147483651/2147483649/';
   public SECURE_DERIVATION_BRANCH: string = Config.BIT_SECURE_DERIVATION_BRANCH ? Config.BIT_SECURE_DERIVATION_BRANCH.trim() : '1';

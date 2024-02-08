@@ -10,6 +10,7 @@ import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOp
 import { encrypt } from '../encryption'
 import { getVersions } from '../utilities'
 import Toast from '../../components/Toast'
+import HexaConfig from '../../bitcoin/HexaConfig'
 
 export const nameToInitials = fullName => {
   if( !fullName ) return
@@ -437,7 +438,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
     deepLink =
     `https://bitcointribe.app/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}${currentLevel != undefined ? '/'+ currentLevel: ''}`
   }
-
+  let id = HexaConfig.ENVIRONMENT === 'DEV'? HexaConfig.BUNDLE_ID_DEV:HexaConfig.BUNDLE_ID_PROD;
   let shortLink = ''
   if( generateShortLink ) {
     try {
@@ -456,15 +457,15 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         link: url,
         domainUriPrefix: domain,
         android: {
-          packageName: DeviceInfo.getBundleId(),
-          fallbackUrl: url,
+          packageName: id,
+          fallbackUrl: HexaConfig.PLAYSTORE_LINK,
         },
         ios: {
-          fallbackUrl: url,
-          bundleId: DeviceInfo.getBundleId()
+          bundleId: id,
+          appStoreId: HexaConfig.APPSTORE_PROD_ID
         },
         navigation: {
-          forcedRedirectEnabled:  true
+          forcedRedirectEnabled:  false
         },
         social: {
           descriptionText: getLinkDescription( deepLinkKind ),
