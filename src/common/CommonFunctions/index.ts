@@ -439,6 +439,10 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
     `https://bitcointribe.app/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}${currentLevel != undefined ? '/'+ currentLevel: ''}`
   }
   let shortLink = ''
+  let id =  DeviceInfo.getBundleId();
+  if(typeof id !== 'string'){
+    id = HexaConfig.ENVIRONMENT === 'dev'? HexaConfig.BUNDLE_ID_DEV: HexaConfig.BUNDLE_ID_PROD
+  }
   if( generateShortLink ) {
     try {
       const url = deepLink.replace( /\s+/g, '' )
@@ -456,12 +460,12 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         link: url,
         domainUriPrefix: domain,
         android: {
-          packageName: DeviceInfo.getBundleId(),
+          packageName: id,
           fallbackUrl: url,
         },
         ios: {
           fallbackUrl: url,
-          bundleId: DeviceInfo.getBundleId()
+          bundleId: id
         },
         navigation: {
           forcedRedirectEnabled: false
