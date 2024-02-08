@@ -9,7 +9,6 @@ import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
 import Fonts from '../../common/Fonts'
 import BounceLoader from '../loader/BounceLoader'
-import LinearGradient from 'react-native-linear-gradient'
 
 export default function RGBIntroModal(props) {
   const strings = translations['accounts']
@@ -66,17 +65,9 @@ export default function RGBIntroModal(props) {
               margin: 10
             }}
           >
-            <LinearGradient colors={[ Colors.white, Colors.white ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
-              style={styles.buttonView}
-            >
+            <View style={styles.buttonView}>
               <Text style={styles.buttonText}>{props.proceedButtonText}</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>}
         </View>
       </View>
@@ -112,6 +103,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
+    backgroundColor: Colors.white,
+    marginRight: 5
   },
   buttonText: {
     color: Colors.blue,
