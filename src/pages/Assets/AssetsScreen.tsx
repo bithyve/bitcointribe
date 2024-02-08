@@ -20,6 +20,7 @@ import {
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
 import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
+import RGBInactive from '../../assets/images/tabs/rgb_inactive.svg'
 import { RGBConfig, RGB_ASSET_TYPE, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
@@ -224,6 +225,7 @@ export default function AssetsScreen(props) {
           style={
             index == 7 ? styles.randomImageContainer : styles.imageContainer
           }>
+          {item.dataPaths[0].filePath? 
           <Image
             style={styles.image}
             source={{
@@ -232,7 +234,11 @@ export default function AssetsScreen(props) {
                 ios: item.dataPaths[0].filePath,
               }),
             }}
-          />
+          />:
+          <View style={styles.imageWrapper}>
+            <RGBInactive/>
+          </View>
+        } 
         </View>
         <Text style={styles.collectibleOuterText}>{item.name}</Text>
         <Text style={styles.collectibleAmountText}>
@@ -589,6 +595,14 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.Regular,
     color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
   },
+  imageWrapper: {
+    backgroundColor: Colors.blue,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+    borderRadius: 10,
+  }
   //   descText: {
   //     color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
   //     fontSize: RFValue( 11 ),
