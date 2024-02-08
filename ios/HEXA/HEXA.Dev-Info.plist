@@ -29,7 +29,7 @@
 			<string>hexa</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>hexa</string>
+				<string>io.hexawallet.hexa.development</string>
 			</array>
 		</dict>
 	</array>
