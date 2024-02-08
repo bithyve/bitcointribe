@@ -35,8 +35,9 @@ export default function IssueScreen( props ) {
   async function IssueAssetClick() {
     Keyboard.dismiss()
     try {
+      console.log('issueType', issueType)
       if( issueType === 'collectible' ) {
-        if ( !name || !description || !totalAmount || !attachedfile ) {
+        if ( !name || !description || !totalAmount || attachedfile == 'Attach File' ) {
           Toast( 'Please enter all details.' )
         } else {
           setRequesting( true )
