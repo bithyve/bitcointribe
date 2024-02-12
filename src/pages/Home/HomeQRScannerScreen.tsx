@@ -41,57 +41,57 @@ export type Props = {
 //   )
 // }
 
-const HomeQRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
+const HomeQRScannerScreen: React.FC<Props> = ({ navigation, route }: Props) => {
   const dispatch = useDispatch()
-  const accountsState: AccountsState = useSelector( ( state ) => state.accounts, )
-  const defaultSourceAccount = accountsState.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && !shell.primarySubAccount.instanceNumber )
-  const common = translations[ 'common' ]
-  const strings = translations[ 'accounts' ]
-  function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
-    const networkType: NetworkType = AccountUtilities.networkType( scannedData )
-    if ( networkType ) {
-      const network = AccountUtilities.getNetworkByType( networkType )
-      const { type } = AccountUtilities.addressDiff( scannedData, network )
-      if ( type === ScannedAddressKind.ADDRESS ) {
-        onSend( scannedData, 0 )
-      } else if ( type === ScannedAddressKind.PAYMENT_URI ) {
-        const res = AccountUtilities.decodePaymentURI( scannedData )
+  const accountsState: AccountsState = useSelector((state) => state.accounts,)
+  const defaultSourceAccount = accountsState.accountShells.find(shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && !shell.primarySubAccount.instanceNumber)
+  const common = translations['common']
+  const strings = translations['accounts']
+  function handleBarcodeRecognized({ data: scannedData }: { data: string }) {
+    const networkType: NetworkType = AccountUtilities.networkType(scannedData)
+    if (networkType) {
+      const network = AccountUtilities.getNetworkByType(networkType)
+      const { type } = AccountUtilities.addressDiff(scannedData, network)
+      if (type === ScannedAddressKind.ADDRESS) {
+        onSend(scannedData, 0)
+      } else if (type === ScannedAddressKind.PAYMENT_URI) {
+        const res = AccountUtilities.decodePaymentURI(scannedData)
         const address = res.address
         const options = res.options
 
-        onSend( address, options.amount )
+        onSend(address, options.amount)
       }
       return
     }
 
     const onCodeScanned = route.params?.onCodeScanned
     try {
-      if ( typeof onCodeScanned === 'function' ) onCodeScanned( getFormattedStringFromQRString( scannedData ) )
-    } catch ( error ) {
+      if (typeof onCodeScanned === 'function') onCodeScanned(getFormattedStringFromQRString(scannedData))
+    } catch (error) {
       //
     }
-    navigation.goBack( null )
+    navigation.goBack(null)
   }
 
-  function onSend( address: string, amount: Satoshis ) {
-    const recipient = makeAddressRecipientDescription( {
+  function onSend(address: string, amount: Satoshis) {
+    const recipient = makeAddressRecipientDescription({
       address
-    } )
+    })
 
-    dispatch( sourceAccountSelectedForSending(
+    dispatch(sourceAccountSelectedForSending(
       defaultSourceAccount
-    ) )
-    dispatch( addRecipientForSending( recipient ) )
-    dispatch( recipientSelectedForAmountSetting( recipient ) )
-    dispatch( amountForRecipientUpdated( {
+    ))
+    dispatch(addRecipientForSending(recipient))
+    dispatch(recipientSelectedForAmountSetting(recipient))
+    dispatch(amountForRecipientUpdated({
       recipient,
       amount: amount < 1 ? amount * SATOSHIS_IN_BTC : amount
-    } ) )
+    }))
 
     navigation.dispatch(
-      resetStackToSend( {
+      resetStackToSend({
         selectedRecipientID: recipient.id,
-      } )
+      })
     )
   }
 
@@ -128,7 +128,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) =>
             x: 0, y: 0
           }}
           scrollEnabled={false}
-          // style={styles.rootContainer}
+        // style={styles.rootContainer}
         >
           {/* <HeaderSection title={strings.ScanaBitcoinaddress} /> */}
 
@@ -146,21 +146,22 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) =>
               }}
               placeholder={strings.Enteraddressmanually}
               accountShell={defaultSourceAccount}
-              onAddressEntered={( address ) => {
-                onSend( address, 0 )
+              onAddressEntered={(address) => {
+                onSend(address, 0)
               }}
-              onPaymentURIEntered={( uri ) => {
-                const decodingResult = AccountUtilities.decodePaymentURI( uri )
+              onPaymentURIEntered={(uri) => {
+                const decodingResult = AccountUtilities.decodePaymentURI(uri)
 
                 const address = decodingResult.address
                 const options = decodingResult.options
 
                 let amount = 0
-                if ( options?.amount )
+                if (options?.amount)
                   amount = options.amount
 
-                onSend( address, amount )
+                onSend(address, amount)
               }}
+              address={''}
             />
           </View>
 
@@ -173,10 +174,10 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) =>
               title={strings.Receivebitcoin}
               icon={
                 <Image
-                  source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
+                  source={require('../../assets/images/icons/icon_bitcoin_light.png')}
                   style={{
-                    width: widthPercentageToDP( 4 ),
-                    height: widthPercentageToDP( 4 ),
+                    width: widthPercentageToDP(4),
+                    height: widthPercentageToDP(4),
                     resizeMode: 'contain',
                   }}
                 />
@@ -187,13 +188,13 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) =>
               buttonStyle={{
                 ...ButtonStyles.floatingActionButton,
                 borderRadius: 9999,
-                paddingHorizontal: widthPercentageToDP( 5 )
+                paddingHorizontal: widthPercentageToDP(5)
               }}
               titleStyle={{
                 ...ButtonStyles.floatingActionButtonText,
                 marginLeft: 8,
               }}
-              onPress={() => { navigation.navigate( 'ReceiveQR' ) }}
+              onPress={() => { navigation.navigate('ReceiveQR') }}
             />
           </View>
           {/* {
@@ -224,15 +225,15 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) =>
   )
 }
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue(13),
     fontFamily: Fonts.Medium,
   },
   buttonView: {
-    height: widthPercentageToDP( '12%' ),
-    width: widthPercentageToDP( '35%' ),
+    height: widthPercentageToDP('12%'),
+    width: widthPercentageToDP('35%'),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
@@ -245,33 +246,33 @@ const styles = StyleSheet.create( {
   },
   availableToSpendText: {
     color: Colors.blue,
-    fontSize: RFValue( 10 ),
+    fontSize: RFValue(10),
     fontFamily: Fonts.Italic,
     lineHeight: 15,
   },
   balanceText: {
     color: Colors.blue,
-    fontSize: RFValue( 10 ),
+    fontSize: RFValue(10),
     fontFamily: Fonts.Italic,
   },
   modalTitleText: {
     color: Colors.blue,
-    fontSize: RFValue( 18 ),
+    fontSize: RFValue(18),
     fontFamily: Fonts.Regular,
   },
   modalInfoText: {
     // marginTop: hp( '3%' ),
-    marginTop: heightPercentageToDP( 0.5 ),
+    marginTop: heightPercentageToDP(0.5),
     color: Colors.textColorGrey,
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue(12),
     fontFamily: Fonts.Regular,
-    marginRight: widthPercentageToDP( 12 ),
+    marginRight: widthPercentageToDP(12),
     letterSpacing: 0.6
   },
   modalContentContainer: {
     // height: '100%',
     backgroundColor: Colors.backgroundColor,
-    paddingBottom: heightPercentageToDP( 4 ),
+    paddingBottom: heightPercentageToDP(4),
   },
   rootContainer: {
     flex: 1
@@ -282,13 +283,13 @@ const styles = StyleSheet.create( {
   infoHeaderSection: {
     paddingHorizontal: 24,
     paddingVertical: 24,
-    marginTop:5,
+    marginTop: 5,
   },
   floatingActionButtonContainer: {
-    bottom: heightPercentageToDP( 2 ),
+    bottom: heightPercentageToDP(2),
     right: 0,
     marginLeft: 'auto',
-    padding: heightPercentageToDP( 1.5 ),
+    padding: heightPercentageToDP(1.5),
     //flexDirection: 'row'
   },
   btnImport: {
@@ -300,11 +301,11 @@ const styles = StyleSheet.create( {
     flexDirection: 'row'
   },
   textImport: {
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue(13),
     fontFamily: Fonts.Regular,
     marginHorizontal: 2,
   }
-} )
+})
 
 export default HomeQRScannerScreen
 
