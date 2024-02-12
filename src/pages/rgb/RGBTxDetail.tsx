@@ -13,16 +13,16 @@ import {
 import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch } from 'react-redux'
 import { RGB_ASSET_TYPE } from 'src/bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import CommonStyles from '../../common/Styles/Styles'
 import { LocalizationContext } from '../../common/content/LocContext'
 import NetworkKind from '../../common/data/enums/NetworkKind'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
 import RGBServices from '../../services/RGBServices'
 import { fetchExchangeRates, fetchFeeRates } from '../../store/actions/accounts'
 import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
@@ -104,6 +104,7 @@ export default function RGBTxDetail( props ) {
   }
 
   const renderItem = ( { item } ) => {
+    console.log('item', item)
     return (
       <TouchableOpacity style={styles.itemContainer} onPress={() => onItemClick( item )}>
         <View style={styles.textContainer}>
