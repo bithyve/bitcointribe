@@ -16,7 +16,7 @@ object BdkHelper {
     val TAG = "BdkHelper"
 
     fun getAddress():String {
-        return BDKWalletRepository.wallet.getAddress(AddressIndex.LAST_UNUSED).address
+        return BDKWalletRepository.wallet.getAddress(AddressIndex.LastUnused).address.asString()
     }
 
     fun sync():String {
@@ -27,7 +27,8 @@ object BdkHelper {
                     null,
                     AppConstants.bdkRetry.toUByte(),
                     AppConstants.bdkTimeout.toUByte(),
-                    AppConstants.bdkStopGap.toULong()
+                    AppConstants.bdkStopGap.toULong(),
+                    true
                 )
             )
         )
@@ -48,7 +49,7 @@ object BdkHelper {
     }
 
     fun getTransactions():String {
-        val txns = BDKWalletRepository.wallet.listTransactions()
+        val txns = BDKWalletRepository.wallet.listTransactions(true)
         val gson = Gson()
         val json = gson.toJson(txns)
         return json.toString()
@@ -62,8 +63,8 @@ object BdkHelper {
                     .feeRate(feeRate)
                     .finish(BDKWalletRepository.wallet)
                     .psbt
-            BDKWalletRepository.wallet.sign(psbt)
-            BDKWalletRepository.blockchain.broadcast(psbt)
+            BDKWalletRepository.wallet.sign(psbt,null)
+            BDKWalletRepository.blockchain.broadcast(psbt.extractTx())
 
             return psbt.txid()
         } catch (e: BdkException.InsufficientFunds) {

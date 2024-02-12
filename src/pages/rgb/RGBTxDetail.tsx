@@ -124,8 +124,9 @@ export default function RGBTxDetail( props ) {
   }
 
   const onViewMorePressed = () => {
-
-  }
+    props.navigation.navigate( 'RGBTransactionsList', {
+      asset: asset
+    } )  }
 
   return (
     <SafeAreaView style={{

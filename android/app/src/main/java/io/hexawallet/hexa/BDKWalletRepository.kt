@@ -4,6 +4,7 @@ import org.bitcoindevkit.Blockchain
 import org.bitcoindevkit.BlockchainConfig
 import org.bitcoindevkit.DatabaseConfig
 import org.bitcoindevkit.DerivationPath
+import org.bitcoindevkit.Descriptor
 import org.bitcoindevkit.DescriptorSecretKey
 import org.bitcoindevkit.ElectrumConfig
 import org.bitcoindevkit.Mnemonic
@@ -36,7 +37,8 @@ object BDKWalletRepository {
                         null,
                         AppConstants.bdkRetry.toUByte(),
                         AppConstants.bdkTimeout.toUByte(),
-                        AppConstants.bdkStopGap.toULong()
+                        AppConstants.bdkStopGap.toULong(),
+                        false
                     )
                 )
             )
@@ -45,8 +47,8 @@ object BDKWalletRepository {
             val changeDescriptor: String = calculateDescriptor(descriptorSecretKey, bitcoinNetwork, true)
             val dbPath = AppConstants.bdkDBPath
             wallet =  Wallet(
-                descriptor,
-                changeDescriptor,
+                Descriptor(descriptor, bitcoinNetwork),
+                Descriptor(changeDescriptor, bitcoinNetwork),
                 bitcoinNetwork,
                 DatabaseConfig.Sqlite(SqliteDbConfiguration(dbPath.absolutePath)),)
             "true"

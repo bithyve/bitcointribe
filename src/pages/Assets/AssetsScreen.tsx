@@ -1,6 +1,7 @@
 import StaggeredList from '@mindinventory/react-native-stagger-view'
 import React, { useEffect, useState } from 'react'
 import {
+  Dimensions,
   FlatList,
   Image,
   Platform,
@@ -19,6 +20,7 @@ import {
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
 import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
+import RGBInactive from '../../assets/images/tabs/rgb_inactive.svg'
 import { RGBConfig, RGB_ASSET_TYPE, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
@@ -44,6 +46,7 @@ export default function AssetsScreen(props) {
   )
   const rgbConfig: RGBConfig = useSelector(state => state.rgb.config)
   const wallet: Wallet = dbManager.getWallet()
+  const [proceed, setProceed] = useState(false)
   const dispatch = useDispatch()
   const strings = translations['f&f']
   const [selectedTab, setSelectedTab] = useState(0)
@@ -58,6 +61,9 @@ export default function AssetsScreen(props) {
   }, [])
 
   useEffect(() => {
+    if(!syncing){
+      setProceed(true)
+    }
     const assets = []
     assets.push({
       name: 't-sats',
@@ -219,6 +225,7 @@ export default function AssetsScreen(props) {
           style={
             index == 7 ? styles.randomImageContainer : styles.imageContainer
           }>
+          {item.dataPaths[0].filePath? 
           <Image
             style={styles.image}
             source={{
@@ -227,7 +234,11 @@ export default function AssetsScreen(props) {
                 ios: item.dataPaths[0].filePath,
               }),
             }}
-          />
+          />:
+          <View style={styles.imageWrapper}>
+            <RGBInactive/>
+          </View>
+        } 
         </View>
         <Text style={styles.collectibleOuterText}>{item.name}</Text>
         <Text style={styles.collectibleAmountText}>
@@ -340,17 +351,18 @@ export default function AssetsScreen(props) {
                 marginVertical: 10,
               }}
               ListEmptyComponent={() => (
-                <Text
+                <View style={styles.emptyComp}>
+                  <Text
                   style={{
                     fontFamily: Fonts.Medium,
                     fontSize: 14,
-                    textAlign: 'center',
                     marginVertical: 100,
-                    alignSelf: 'center',
-                    marginLeft: 20
+                    textAlign:'center',
+                    lineHeight:18
                   }}>
-                  Click on Add New to issue new collectible asset.
+                  Click on Add New to issue {"\n"} new collectible asset.
                 </Text>
+                </View>
               )}
               contentContainerStyle={styles.flatListStyle}
               renderItem={({ item, i }) => renderCollectibleItems(item, i)}
@@ -372,6 +384,18 @@ export default function AssetsScreen(props) {
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
               scrollEnabled={false}
+              ListEmptyComponent={() => (
+                <View style={styles.emptyComp}>
+                  <Text
+                  style={{
+                    fontFamily: Fonts.Medium,
+                    fontSize: 14,
+                    marginVertical: 100,
+                  }}>
+                  Tap on Add New to issue new coins
+                </Text>
+                </View>
+              )}
             />
           </ScrollView>
         )}
@@ -387,16 +411,18 @@ export default function AssetsScreen(props) {
       <ModalContainer
         onBackground={() => { }}
         closeBottomSheet={() => { }}
-        visible={syncing}
+        visible={syncing || (!syncing && proceed)}
       >
         <RGBIntroModal
           title={'Syncing Asset'}
           info={'RGB protocol allows you to issue and manage fungible (coins) and non-fungible (collectibles) assets on the bitcoin network'}
           otherText={'Syncing assets with RGB nodes'}
-          proceedButtonText={'Continue'}
+          proceedButtonText={'Close'}
           isIgnoreButton={false}
           isBottomImage={true}
           bottomImage={require('../../assets/images/icons/contactPermission.png')}
+          showBtn={!syncing && proceed}
+          closeModal={()=>{setProceed(false)}}
         />
       </ModalContainer>
     </View>
@@ -544,6 +570,12 @@ const styles = StyleSheet.create({
     color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
     marginTop: 5,
   },
+  emptyComp:{
+    width: Dimensions.get('window').width,
+    justifyContent:'center',
+    alignItems:'center',
+    marginLeft: -wp(6),
+  },
   amountText: {
     fontSize: 11,
     fontFamily: Fonts.Regular,
@@ -563,6 +595,14 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.Regular,
     color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
   },
+  imageWrapper: {
+    backgroundColor: Colors.blue,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+    borderRadius: 10,
+  }
   //   descText: {
   //     color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
   //     fontSize: RFValue( 11 ),

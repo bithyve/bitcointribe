@@ -1,10 +1,10 @@
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import MemoriableIllustration from '../../assets/images/svgs/MemoriableIllustration.svg'
+import RGBInactive from '../../assets/images/tabs/rgb_inactive.svg'
 import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
 import Fonts from '../../common/Fonts'
@@ -34,7 +34,7 @@ export default function RGBIntroModal(props) {
           </Text>
         </View>
         <View style={{ alignItems: 'center', marginVertical: hp(1) }}>
-          <MemoriableIllustration />
+          <RGBInactive height={hp(20)} width={wp(25)} />
         </View>
         <View style={{ marginVertical: hp(1) }}>
           <Text
@@ -45,8 +45,8 @@ export default function RGBIntroModal(props) {
             {props.otherText}
           </Text>
         </View>
-        <View>
-          <View style={styles.modalMessageWrapper}>
+        <View style={{marginBottom: hp(15)}}>
+          {!props.showBtn?<View style={styles.modalMessageWrapper}>
             <View style={{ width: '80%' }}>
               <Text style={styles.modalMessageText}>
                 This step will take a few seconds. You would be able to proceed soon
@@ -55,8 +55,8 @@ export default function RGBIntroModal(props) {
             <View style={{ width: '20%' }}>
               <BounceLoader />
             </View>
-          </View>
-          {/* <TouchableOpacity
+          </View>:
+          <TouchableOpacity
             onPress={() => {
               props.closeModal()
             }}
@@ -65,18 +65,10 @@ export default function RGBIntroModal(props) {
               margin: 10
             }}
           >
-            <LinearGradient colors={[ Colors.white, Colors.white ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
-              style={styles.buttonView}
-            >
-              <Text style={styles.buttonText}>Next</Text>
-            </LinearGradient>
-          </TouchableOpacity> */}
+            <View style={styles.buttonView}>
+              <Text style={styles.buttonText}>{props.proceedButtonText}</Text>
+            </View>
+          </TouchableOpacity>}
         </View>
       </View>
     </View>
@@ -103,7 +95,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     letterSpacing: 0.6,
     fontFamily: Fonts.Regular,
-    marginHorizontal: wp('8%'),
+    marginHorizontal: wp('7%'),
   },
   buttonView: {
     padding: 10,
@@ -111,6 +103,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
+    backgroundColor: Colors.white,
+    marginRight: 5
   },
   buttonText: {
     color: Colors.blue,
@@ -127,6 +121,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.white,
     fontFamily: Fonts.Regular,
-    marginHorizontal: wp('8%'),
+    marginHorizontal: wp('7%'),
   },
 })

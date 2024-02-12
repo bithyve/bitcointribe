@@ -62,6 +62,12 @@ export default function SendViaLinkAndQR( props ) {
     init()
   }, [ qrCode ] )
 
+  useEffect(()=>{
+    if(!link){
+      Toast('Something went wrong, please try again.')
+    }
+  },[])
+
   function init() {
     setTimeout( () => {
       onPress()
