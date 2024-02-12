@@ -3,7 +3,7 @@ import dynamicLinks from '@react-native-firebase/dynamic-links'
 import crypto from 'crypto'
 import { Alert, Linking } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
-import config from '../../bitcoin/HexaConfig'
+import { default as config, default as HexaConfig } from '../../bitcoin/HexaConfig'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { Accounts, DeepLinkEncryptionType, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, ShortLinkDescription, ShortLinkDomain, ShortLinkImage, ShortLinkTitle, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
@@ -434,9 +434,11 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
     deepLink =
     `https://bitcointribe.app/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}${currentLevel != undefined ? '/'+ currentLevel: ''}`
   }
-
   let shortLink = ''
-  let id = DeviceInfo.getBundleId();
+  let id =  DeviceInfo.getBundleId();
+  if(typeof id !== 'string'){
+    id = HexaConfig.ENVIRONMENT === 'dev'? HexaConfig.BUNDLE_ID_DEV: HexaConfig.BUNDLE_ID_PROD
+  }
   if( generateShortLink ) {
     try {
       const url = deepLink.replace( /\s+/g, '' )
@@ -455,14 +457,14 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         domainUriPrefix: domain,
         android: {
           packageName: id,
-          fallbackUrl: 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa2&hl=en',
+          fallbackUrl: url,
         },
         ios: {
-          bundleId: id,
-          appStoreId: '1586334138'
+          fallbackUrl: url,
+          bundleId: id
         },
         navigation: {
-          forcedRedirectEnabled:  true
+          forcedRedirectEnabled: false
         },
         social: {
           descriptionText: getLinkDescription( deepLinkKind ),

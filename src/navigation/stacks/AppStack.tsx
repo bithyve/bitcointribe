@@ -168,6 +168,7 @@ import NewRecoveryOwnQuestions from '../../pages/Recovery/NewRecoveryOwnQuestion
 import RestoreSelectedContactsList from '../../pages/Recovery/RestoreSelectedContactsList'
 import AllTransactionsContainerScreen from '../../pages/Transactions/AllTransactionsContainerScreen'
 import defaultStackScreenNavigationOptions from '../options/DefaultStackScreenNavigationOptions'
+import RGBTransactionsList from '../../pages/rgb/RGBTransactionsList'
 
 
 
@@ -497,6 +498,9 @@ function AppStack() {
         }
       }}/>
       <Stack.Screen name="TransactionsList" component={TransactionsListContainerScreen} options={{
+        headerShown: false
+      }} />
+       <Stack.Screen name="RGBTransactionsList" component={RGBTransactionsList} options={{
         headerShown: false
       }} />
       <Stack.Screen name="RestoreSelectedContactsList" component={RestoreSelectedContactsList} />

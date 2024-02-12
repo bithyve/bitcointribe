@@ -1,63 +1,54 @@
 import moment from 'moment'
 import React, { useContext, useEffect, useState } from 'react'
 import {
+  ActivityIndicator,
   FlatList,
-  Image,
-  Platform,
-  RefreshControl,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View
 } from 'react-native'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch } from 'react-redux'
 import Colors from '../../common/Colors'
-import { LocalizationContext } from '../../common/content/LocContext'
-import NetworkKind from '../../common/data/enums/NetworkKind'
 import Fonts from '../../common/Fonts'
-import CommonStyles from '../../common/Styles/Styles'
 import RGBServices from '../../services/RGBServices'
 import { fetchExchangeRates, fetchFeeRates } from '../../store/actions/accounts'
 import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
-import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
-import DetailsCard from './DetailsCard'
+import { useNavigation, useRoute } from '@react-navigation/native'
 
-export default function RGB121TxDetail( props ) {
+export default function RGBTxDetail( ) {
   const dispatch = useDispatch()
-  const { translations } = useContext( LocalizationContext )
-  const accountStr = translations[ 'accounts' ]
-  const asset = props.route.params.asset
+  const navigation = useNavigation<any>();
+  const route = useRoute();
   const accountsState = useAccountsState()
   const { averageTxFees, exchangeRates } = accountsState
   const [ loading, setLoading ] = useState( true )
   const [ transactionData, setTransactionData ] = useState( [] )
-
+  const asset = route.params?.asset
   useEffect( () => {
     getTransfers()
+    console.log("jkadc",route.params?.asset)
   }, [] )
 
   const getTransfers = async () => {
     try {
-      setLoading( true )
       const txns = await RGBServices.getRgbAssetTransactions( asset.assetId )
-      setLoading( false )
       if ( txns ) {
         setTransactionData( txns )
+        setLoading( false )
       } else {
-        props.navigation.goBack()
+        //navigation.goBack()
       }
     } catch ( error ) {
-      setLoading( false )
-      props.navigation.goBack()
+      console.log( error )
+      //navigation.goBack()
     }
   }
 
@@ -74,33 +65,9 @@ export default function RGB121TxDetail( props ) {
     }
   }, [] )
 
-  const renderFooter = () => {
-    return (
-      <View style={styles.viewSectionContainer}>
-        <View style={styles.footerSection}>
-          <SendAndReceiveButtonsFooter
-            onSendPressed={() => {
-              props.navigation.navigate( 'RGBSendWithQR', {
-                asset
-              } )
-            }}
-            onReceivePressed={() => {
-              props.navigation.navigate( 'RGBReceive', {
-              } )
-            }}
-            averageTxFees={averageTxFees}
-            network={
-              NetworkKind.MAINNET
-            }
-            isTestAccount={false}
-          />
-        </View>
-      </View>
-    )
-  }
 
   const onItemClick = ( item ) => {
-    props.navigation.navigate( 'AssetTransferDetails', {
+    navigation.navigate( 'AssetTransferDetails', {
       item, asset
     } )
   }
@@ -117,7 +84,7 @@ export default function RGB121TxDetail( props ) {
           <Text
             numberOfLines={1}
             style={[ styles.amountText, {
-              color: ( item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() ==='ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS' ) ? '#04A777' : '#FD746C'
+              color: ( item.kind === 'RECEIVE_BLIND' || item.kind ==='ISSUANCE' || item.kind === 'RECEIVE_WITNESS' ) ? '#04A777' : '#FD746C'
             } ]}
           >
             {item.amount}
@@ -126,107 +93,38 @@ export default function RGB121TxDetail( props ) {
       </TouchableOpacity>
     )
   }
-  const onViewMorePressed = () => {
-    props.navigation.navigate( 'RGBTransactionsList', {
-      asset: asset
-    } )  
-  }
 
   return (
     <SafeAreaView style={{
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      <ScrollView
-        scrollEnabled={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={loading}
-            onRefresh={getTransfers}
-          />
+        <TouchableOpacity
+          onPress={() => {
+            navigation.goBack()
+          }}
+          style={styles.headerContainer}
+        >
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+              style={styles.arrowIcon}
+            />
+          <Text style={styles.headerLabel}>Recent Transactions</Text>
+        </TouchableOpacity>
+      <View style={{
+        flex: 1,
+      }}>
+        {
+          loading ? <ActivityIndicator /> :
+            <FlatList
+              data={transactionData}
+              renderItem={renderItem}
+              keyExtractor={( item, index ) => index.toString()}
+            />
         }
-      >
-        <View style={CommonStyles.headerContainer}>
-          <TouchableOpacity
-            style={CommonStyles.headerLeftIconContainer}
-            onPress={() => {
-              props.navigation.goBack()
-            }}
-          >
-            <View style={CommonStyles.headerLeftIconInnerContainer}>
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.homepageButtonColor}
-                size={17}
-              />
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View style={{
-          paddingHorizontal: 20, marginBottom: 20,
-        }}>
-          <DetailsCard
-            onKnowMorePressed={() => {
-              props.navigation.navigate( 'AssetMetaData', {
-                asset
-              } )
-            }}
-            showKnowMore
-            onSettingsPressed={() => { }}
-            balance={asset.balance.settled}
-            cardColor={'#B7B7B7'}
-            title={asset.name}
-            description={asset.description}
-            assetId={asset.assetId}
-            renderIcon={() => <View style={[ styles.labelContainer, {
-              backgroundColor: '#B7B7B7'
-            } ]}>
-              <Image style={{
-                height: 50, width: 50, borderRadius: 30
-              }} source={{
-                uri: Platform.select( {
-                  android: `file://${asset.dataPaths[ 0 ].filePath}`,
-                  ios: asset.dataPaths[ 0 ].filePath
-                } )
-              }}/>
-            </View>}
-            isBitcoin={false}
-          />
-        </View>
-
-
-        <View style={{
-          flex: 1,
-        }}>
-          <View style={styles.viewMoreLinkRow}>
-            <Text style={styles.headerDateText}>{accountStr.RecentTransactions}</Text>
-            <TouchableOpacity
-              onPress={onViewMorePressed}
-            >
-              <LinearGradient
-                start={{
-                  x: 0, y: 0
-                }} end={{
-                  x: 1, y: 0
-                }}
-                colors={[ Colors.skyBlue, Colors.darkBlue ]}
-                style={styles.viewMoreWrapper}
-              >
-                <Text style={styles.headerTouchableText}>
-                  {accountStr.ViewMore}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-          <FlatList
-            data={transactionData}
-            renderItem={renderItem}
-            keyExtractor={( item, index ) => index.toString()}
-          />
-          {renderFooter()}
-
-        </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   )
 }
@@ -352,5 +250,18 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 9 ),
     fontFamily: Fonts.SemiBold,
     color: Colors.white,
+  },
+  headerLabel:{
+    fontSize:16,
+    fontFamily:Fonts.Medium,
+  },
+  headerContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    marginTop:10
+  },
+  arrowIcon:{
+    marginLeft:10,
+    marginRight:10
   }
 } )

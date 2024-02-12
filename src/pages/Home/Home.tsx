@@ -1,4 +1,7 @@
+import BottomSheet from '@gorhom/bottom-sheet'
 import PushNotificationIOS from '@react-native-community/push-notification-ios'
+import idx from 'idx'
+import moment from 'moment'
 import React, { createRef, PureComponent } from 'react'
 import {
   Platform,
@@ -6,6 +9,8 @@ import {
   StyleSheet,
   View
 } from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
+import * as RNLocalize from 'react-native-localize'
 import {
   heightPercentageToDP,
   heightPercentageToDP as hp,
@@ -13,44 +18,15 @@ import {
   widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { connect } from 'react-redux'
-import Colors from '../../common/Colors'
-import {
-  SECURE_ACCOUNT
-} from '../../common/constants/wallet-service-types'
-import {
-  acceptExistingContactRequest,
-  initializeHealthSetup,
-  updateCloudPermission
-} from '../../store/actions/BHR'
-import {
-  getMessages,
-  notificationsUpdated,
-  setupNotificationList,
-  updateFCMTokens,
-  updateMessageStatus,
-  updateMessageStatusInApp,
-  updateNotificationList
-} from '../../store/actions/notifications'
-import {
-  setCardData,
-  setCurrencyCode,
-  setIsPermissionGiven
-} from '../../store/actions/preferences'
-import {
-  rejectTrustedContact,
-  syncPermanentChannels
-} from '../../store/actions/trustedContacts'
-//import HomeHeader from '../../components/home/home-header'
-import BottomSheet from '@gorhom/bottom-sheet'
-import idx from 'idx'
-import moment from 'moment'
-import LinearGradient from 'react-native-linear-gradient'
-import * as RNLocalize from 'react-native-localize'
 import {
   AccountType,
   LevelHealthInterface,
   Wallet
 } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import {
+  SECURE_ACCOUNT
+} from '../../common/constants/wallet-service-types'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -69,15 +45,33 @@ import {
   fetchFeeRates,
   setShowAllAccount
 } from '../../store/actions/accounts'
+import {
+  acceptExistingContactRequest,
+  initializeHealthSetup,
+  updateCloudPermission
+} from '../../store/actions/BHR'
 import { setCloudData } from '../../store/actions/cloud'
 import {
-  setFCMToken,
-  setSecondaryDeviceAddress,
+  getMessages,
+  notificationsUpdated,
+  setupNotificationList,
+  updateFCMTokens,
+  updateMessageStatus,
+  updateMessageStatusInApp,
+  updateNotificationList
+} from '../../store/actions/notifications'
+import {
+  setCardData,
+  setCurrencyCode, setFCMToken, setIsPermissionGiven, setSecondaryDeviceAddress,
   updatePreference
 } from '../../store/actions/preferences'
 import { clearRampCache } from '../../store/actions/RampIntegration'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
 import { clearSwanCache, createTempSwanAccountInfo, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import {
+  rejectTrustedContact,
+  syncPermanentChannels
+} from '../../store/actions/trustedContacts'
 import { setVersion } from '../../store/actions/versionHistory'
 import { AccountsState } from '../../store/reducers/accounts'
 import BottomSheetHeader from '../Accounts/BottomSheetHeader'
@@ -619,9 +613,6 @@ const styles = StyleSheet.create({
   cardContainer: {
     backgroundColor: Colors.white,
     width: widthPercentageToDP('95%'),
-    // height: heightPercentageToDP( '7%' ),
-    // borderColor: Colors.borderColor,
-    // borderWidth: 1,
     borderRadius: widthPercentageToDP(3),
     marginBottom: 10,
     alignItems: 'center',
@@ -633,7 +624,6 @@ const styles = StyleSheet.create({
   },
   accountCardsSectionContainer: {
     height: hp('71.46%'),
-    // marginTop: 30,
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
@@ -647,11 +637,6 @@ const styles = StyleSheet.create({
   },
 
   floatingActionButtonContainer: {
-    // position: 'absolute',
-    // zIndex: 0,
-    // bottom: TAB_BAR_HEIGHT,
-    // right: 0,
-    // flexDirection: 'row',
     justifyContent: 'flex-end',
     alignSelf: 'flex-end',
     padding: heightPercentageToDP(1.5),
