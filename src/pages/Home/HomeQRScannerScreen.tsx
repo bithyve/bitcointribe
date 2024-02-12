@@ -1,5 +1,5 @@
 import React from 'react'
-import { Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, SafeAreaView, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Button } from 'react-native-elements'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -14,7 +14,6 @@ import { translations } from '../../common/content/LocContext'
 import { Satoshis } from '../../common/data/enums/UnitAliases'
 import Fonts from '../../common/Fonts'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
-import ListStyles from '../../common/Styles/ListStyles'
 import CommonStyles from '../../common/Styles/Styles'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import HeaderTitle from '../../components/HeaderTitle'
@@ -32,15 +31,15 @@ export type Props = {
   route: any;
 };
 
-const HeaderSection: React.FC = ( { title } ) => {
-  return (
-    <View style={styles.infoHeaderSection}>
-      <Text style={ListStyles.infoHeaderSubtitleText}>
-        {title}
-      </Text>
-    </View>
-  )
-}
+// const HeaderSection: React.FC = ( { title } ) => {
+//   return (
+//     <View style={styles.infoHeaderSection}>
+//       <Text style={ListStyles.infoHeaderSubtitleText}>
+//         {title}
+//       </Text>
+//     </View>
+//   )
+// }
 
 const HomeQRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
   const dispatch = useDispatch()
