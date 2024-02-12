@@ -33,12 +33,14 @@ export type Props = {
   accountShell: AccountShell;
   bitcoinDisplayUnit: BitcoinUnit;
   onTransactionPriorityChanged: ( priority: TxPriority ) => void;
+  showInsights:()=>void;
 };
 
 const TransactionPriorityMenu: React.FC<Props> = ( {
   accountShell,
   bitcoinDisplayUnit,
   onTransactionPriorityChanged,
+  showInsights
 }: Props ) => {
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
   const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.LOW )
@@ -117,6 +119,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
 
   return (
     <View style={styles.rootContainer}>
+      <View style={styles.rowContainer}>
       <Text style={{
         ...HeadingStyles.listSectionHeading,
         paddingHorizontal: 24,
@@ -124,6 +127,17 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
       }}>
         Transaction Priority
       </Text>
+      <View style={styles.divider}/>
+      <Text style={{
+        ...HeadingStyles.listSectionHeading,
+        paddingHorizontal: 24,
+        marginBottom: 14,
+      }}
+      onPress={showInsights}
+      >
+        Show Insight
+      </Text>
+      </View>
 
       <View style={{
         paddingHorizontal: 16
@@ -237,13 +251,18 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
 const styles = StyleSheet.create( {
   rootContainer: {
   },
-
+  rowContainer:{
+    flexDirection:'row',
+    alignItems:"center",
+  },
+  divider:{
+    flex:1
+  },
   tableHeadingText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 10 ),
     fontFamily: Fonts.Medium,
   },
-
   priorityTableText: {
     fontSize: RFValue( 12 ),
     lineHeight: RFValue( 14 ),

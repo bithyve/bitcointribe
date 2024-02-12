@@ -32,6 +32,7 @@ import SendConfirmationContent from '../SendConfirmationContent'
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import TransactionPriorityMenu from './TransactionPriorityMenu'
 import { resetStackToAccountDetails } from 'src/navigation/actions/NavigationActions'
+import FeesInsight from './FeesInsight'
 
 export type Props = {
   navigation: NavigationProp<ParamListBase>;
@@ -54,6 +55,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation, 
   const strings  = translations[ 'accounts' ]
   const common  = translations[ 'common' ]
   const [ sendSuccessModal, setSuccess ] = useState( false )
+  const [ showInsights, toogleShowInsights ] = useState( false )
   const [ sendFailureModal, setFailure ] = useState( false )
   const [ handleButton, setHandleButton ] = useState( true )
   const [ errorMessage, setError ] = useState( '' )
@@ -249,6 +251,11 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation, 
         <ModalContainer onBackground={()=>setFailure( false )} visible={sendFailureModal} closeBottomSheet={() => {}} >
           {showSendFailureBottomSheet()}
         </ModalContainer>
+        <ModalContainer onBackground={()=>toogleShowInsights( false )} visible={showInsights} closeBottomSheet={() => {}} >
+          <FeesInsight close={()=>{
+            toogleShowInsights(false)
+          }}/>
+        </ModalContainer>
         <View style={{
           flexDirection: 'row',
           justifyContent: 'center',
@@ -279,11 +286,11 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation, 
             subAccountKind={sourcePrimarySubAccount.kind}
             showRemoveButton={false}
           />
-
           <TransactionPriorityMenu
             accountShell={sourceAccountShell}
             bitcoinDisplayUnit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
             onTransactionPriorityChanged={setTransactionPriority}
+            showInsights={()=>{toogleShowInsights(true)}}
           />
           {selectedRecipients.length === 1 &&
       <>
