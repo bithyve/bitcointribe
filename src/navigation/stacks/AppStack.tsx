@@ -411,6 +411,7 @@ function AppStack() {
       }} />
       <Stack.Screen name="ReceiveQR" component={ReceiveQrScreen} options={( { navigation } ) => {
         return {
+          animation:'none',
           headerShown:true,
           title: 'Receive',
           headerLeft: () => {
