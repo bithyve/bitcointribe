@@ -117,7 +117,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) =>
       </View>
       <HeaderTitle
         firstLineTitle={'QR'}
-        secondLineTitle={''}
+        secondLineTitle={strings.ScanaBitcoinaddress}
         infoTextNormal={''}
         infoTextBold={''}
         infoTextNormal1={''}
@@ -131,12 +131,12 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) =>
           scrollEnabled={false}
           // style={styles.rootContainer}
         >
-          <HeaderSection title={strings.ScanaBitcoinaddress} />
+          {/* <HeaderSection title={strings.ScanaBitcoinaddress} /> */}
 
           <CoveredQRCodeScanner
             onCodeScanned={handleBarcodeRecognized}
             containerStyle={{
-              marginBottom: 16
+              marginVertical: 16
             }}
           />
 
@@ -197,7 +197,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) =>
               onPress={() => { navigation.navigate( 'ReceiveQR' ) }}
             />
           </View>
-          {
+          {/* {
             __DEV__ && (
               <TouchableOpacity onPress={() => {
                 const qrScannedData = {
@@ -208,7 +208,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, route }: Props ) =>
                 <Text>Continue</Text>
               </TouchableOpacity>
             )
-          }
+          } */}
 
           <View style={{
             marginTop: 'auto'
