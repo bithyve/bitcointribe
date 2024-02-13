@@ -133,7 +133,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       if( hasAccountSettingsUpdateSucceeded && selectedAccount ){
         dispatch( resetAccountUpdateFlag() )
       }
-    }, 100 )
+    }, 5 )
 
   }, [ hasAccountSettingsUpdateSucceeded, selectedAccount ] )
   // useEffect( () => {
@@ -215,13 +215,13 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
             navigation.dispatch( resetAction )
           }
         
-          },100)
+          },5)
         }
         }
         onClose={() => {
           setTimeout(()=>{
             showSuccessModel( false )
-          },100)
+          },5)
         }}
         accountInfo={primarySubAccount}
         accountVisibility={accountVisibility}

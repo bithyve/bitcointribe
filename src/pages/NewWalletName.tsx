@@ -96,7 +96,7 @@ const NewWalletName: React.FC<Props> = ( { route, navigation }: Props ) => {
             },
           ]
         } ) )
-      },100)
+      },5)
   }
   }, [ walletSetupCompleted, cloudBackupStatus ] )
 
@@ -186,7 +186,7 @@ const NewWalletName: React.FC<Props> = ( { route, navigation }: Props ) => {
       setTimeout( () => {
         console.log( 'TIMEOUT' )
         setLoaderModal( true )
-      }, 100 )
+      }, 5 )
   }
 
   return (
