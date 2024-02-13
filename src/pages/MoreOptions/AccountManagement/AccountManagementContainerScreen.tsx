@@ -27,7 +27,6 @@ import ModalContainer from '../../../components/home/ModalContainerScroll'
 import ReorderAccountShellsDraggableList from '../../../components/more-options/account-management/ReorderAccountShellsDraggableList'
 import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
 import { accountShellsOrderUpdated, resetAccountUpdateFlag, updateAccountSettings } from '../../../store/actions/accounts'
-import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
 
 export type Props = {
   navigation: any;
@@ -125,12 +124,14 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   }, [] )
   useEffect( () => {
     if( hasAccountSettingsUpdateSucceeded && selectedAccount ){
-      dispatch( resetAccountUpdateFlag() )
-      setTimeout( () => {
-        showSuccessModel( true )
-      }, 100 )
-
+       showSuccessModel( true )
     }
+    setTimeout( () => {
+      if( hasAccountSettingsUpdateSucceeded && selectedAccount ){
+        dispatch( resetAccountUpdateFlag() )
+      }
+    }, 100 )
+
   }, [ hasAccountSettingsUpdateSucceeded, selectedAccount ] )
   // useEffect( () => {
   //   if( numberOfTabs!=0 ){
@@ -176,6 +177,9 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     return(
       <UnHideRestoreAccountSuccessBottomSheet
         onProceed={( accounShell )=>{
+          showSuccessModel( false )
+          setTimeout(()=>{
+
           if( ( primarySubAccount as SubAccountDescribing ).type === AccountType.LIGHTNING_ACCOUNT ) {
             const resetAction = CommonActions.reset( {
               index: 1,
@@ -208,9 +212,15 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
             } )
             navigation.dispatch( resetAction )
           }
+        
+          },100)
         }
         }
-        onClose={() => showSuccessModel( false )}
+        onClose={() => {
+          setTimeout(()=>{
+            showSuccessModel( false )
+          },100)
+        }}
         accountInfo={primarySubAccount}
         accountVisibility={accountVisibility}
       />
