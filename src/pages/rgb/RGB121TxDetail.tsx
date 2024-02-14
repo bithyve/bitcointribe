@@ -20,6 +20,8 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { useDispatch } from 'react-redux'
+import ReceiveIcon from '../../assets/images/svgs/icon_receive.svg'
+import SentIcon from '../../assets/images/svgs/icon_sent.svg'
 import Colors from '../../common/Colors'
 import { LocalizationContext } from '../../common/content/LocContext'
 import NetworkKind from '../../common/data/enums/NetworkKind'
@@ -110,6 +112,9 @@ export default function RGB121TxDetail(props) {
 
     return (
       <TouchableOpacity style={styles.itemContainer} onPress={() => onItemClick(item)}>
+        <View style={styles.iconWrapper}>
+          {(item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() === 'ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS') ? <ReceiveIcon/> : <SentIcon/>}
+        </View>
         <View style={styles.textContainer}>
           <Text style={styles.itemTitle}>{item.status}</Text>
           <Text style={styles.itemDesc}>{moment.unix(item.createdAt).format('DD/MM/YY • hh:MMa')}</Text>
@@ -118,7 +123,7 @@ export default function RGB121TxDetail(props) {
           <Text
             numberOfLines={1}
             style={[styles.amountText, {
-              color: (item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() === 'ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS') ? '#04A777' : '#FD746C'
+              color: (item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() === 'ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS') ? Colors.grayShade : Colors.lightBlue
             }]}
           >
             {item.amount}
@@ -291,9 +296,11 @@ const styles = StyleSheet.create({
   itemContainer: {
     marginHorizontal: 20,
     paddingVertical: 10,
-    marginTop: 20,
     flexDirection: 'row',
     alignItems: 'center'
+  },
+  iconWrapper: {
+    width: '11%'
   },
   itemImage: {
     width: 35, height: 35, borderRadius: 20, backgroundColor: 'gray'
@@ -323,7 +330,8 @@ const styles = StyleSheet.create({
   viewMoreLinkRow: {
     justifyContent: 'space-between',
     flexDirection: 'row',
-    marginHorizontal: 20
+    marginHorizontal: 20,
+    marginBottom: 20,
   },
 
   headerDateText: {
