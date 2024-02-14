@@ -230,7 +230,9 @@ export default function AddContactSendRequest( props ) {
       amount: giftToSend.amount,
       note: note,
       themeId: giftToSend.themeId
-    }: null
+    }: {
+      channelAddress: channelKey
+    }
 
     const { deepLink, encryptedChannelKeys, encryptionType, encryptionHint, shortLink } = await generateDeepLink( {
       deepLinkKind: giftToSend? DeepLinkKind.CONTACT_GIFT: getDeepLinkKindFromContactsRelationType( currentContact.relationType ),

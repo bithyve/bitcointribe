@@ -436,7 +436,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
     `https://bitcointribe.app/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/${extraData.themeId}/v${appVersion}`
   } else {
     deepLink =
-    `https://bitcointribe.app/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}${currentLevel != undefined ? '/'+ currentLevel: ''}`
+    `https://bitcointribe.app/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/v${appVersion}${currentLevel != undefined ? '/'+ currentLevel: ''}`
   }
   let shortLink = ''
   let id =  DeviceInfo.getBundleId();
@@ -542,6 +542,7 @@ export const processDeepLink = ( deepLink: string ) => {
             isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER, DeepLinkKind.EXISTING_CONTACT ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
             isQR: false,
             deepLinkKind: splits[ 4 ],
+            channelAddress: splits[ 8 ],
             version,
           }
           return {

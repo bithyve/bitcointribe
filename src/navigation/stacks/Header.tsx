@@ -1163,30 +1163,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     try {
       this.closeBottomSheet()
       const { trustedContactRequest } = this.state
-      let channelKeys: string[]
-      try{
-        switch( trustedContactRequest.encryptionType ){
-            case DeepLinkEncryptionType.DEFAULT:
-              channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
-              break
-
-            case DeepLinkEncryptionType.NUMBER:
-            case DeepLinkEncryptionType.EMAIL:
-            case DeepLinkEncryptionType.OTP:
-              const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
-              channelKeys = decryptedKeys.split( '-' )
-              break
-        }
-
-        trustedContactRequest.channelKey = channelKeys[ 0 ]
-        trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
-      } catch( err ){
-        Toast( 'Invalid key', true, true  )
-        this.onToogleGiftLoading()
-        return
-      }
       this.props.rejectTrustedContact( {
-        channelKey: trustedContactRequest.channelKey, isExistingContact: trustedContactRequest.isExistingContact
+        channelKey: trustedContactRequest.channelAddress, isExistingContact: trustedContactRequest.isExistingContact
       } )
     } catch ( error ) {
       Alert.alert( 'Incompatible request, updating your app might help' )
