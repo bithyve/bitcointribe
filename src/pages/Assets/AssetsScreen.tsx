@@ -115,35 +115,6 @@ export default function AssetsScreen(props) {
         <TouchableOpacity
           style={styles.collectibleContainer}
           onPress={() => {
-            setSelectedTab(1)
-          }}
-          activeOpacity={1}>
-          <View
-            style={[
-              styles.collectibleInnerContainer,
-              {
-                backgroundColor:
-                  selectedTab == 1 ? Colors.CLOSE_ICON_COLOR : null,
-              },
-            ]}>
-            <Text
-              style={[
-                styles.collectibleText,
-                {
-                  color:
-                    selectedTab == 1
-                      ? Colors.white
-                      : Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
-                },
-              ]}>
-              COINS
-            </Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.collectibleContainer}
-          onPress={() => {
             setSelectedTab(0)
           }}
           activeOpacity={1}>
@@ -161,6 +132,35 @@ export default function AssetsScreen(props) {
                 {
                   color:
                     selectedTab == 0
+                      ? Colors.white
+                      : Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
+                },
+              ]}>
+              COINS
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.collectibleContainer}
+          onPress={() => {
+            setSelectedTab(1)
+          }}
+          activeOpacity={1}>
+          <View
+            style={[
+              styles.collectibleInnerContainer,
+              {
+                backgroundColor:
+                  selectedTab == 1 ? Colors.CLOSE_ICON_COLOR : null,
+              },
+            ]}>
+            <Text
+              style={[
+                styles.collectibleText,
+                {
+                  color:
+                    selectedTab == 1
                       ? Colors.white
                       : Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
                 },
@@ -194,7 +194,7 @@ export default function AssetsScreen(props) {
               backgroundColor: item.color,
             },
           ]}>
-          <Text style={styles.labelText}>{item.ticker.substring(0, 3)}</Text>
+          <Text style={styles.labelText}>{item && item.ticker ? item.ticker.substring(0, 3): ''}</Text>
         </View>
         <Text numberOfLines={1} style={styles.nameText}>
           {item.name}
@@ -256,7 +256,7 @@ export default function AssetsScreen(props) {
     return (
       <>
         <BottomSheetCoinsHeader
-          title={'Add ' + (selectedTab == 0 ? 'Collectibles' : 'Coins')}
+          title={'Add ' + (selectedTab == 1 ? 'Collectibles' : 'Coins')}
           onPress={closeBottomSheet}
         />
         {/* <Text numberOfLines={2} style={styles.descText}>{'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'}</Text> */}
@@ -265,7 +265,7 @@ export default function AssetsScreen(props) {
           onRGBWalletClick={() => {
             closeBottomSheet()
             props.navigation.navigate('IssueScreen', {
-              issueType: selectedTab == 0 ? 'collectible' : 'coin',
+              issueType: selectedTab == 1 ? 'collectible' : 'coin',
             })
           }}
           onLighteningWalletClick={() => {
@@ -277,7 +277,7 @@ export default function AssetsScreen(props) {
           }}
           title1="Issue"
           title2="Recieve"
-          desc1={`Issue new ${selectedTab === 0 ? 'collectibles' : 'coins'} on RGB. Set limit and send it around your Tribe`}
+          desc1={`Issue new ${selectedTab === 1 ? 'collectibles' : 'coins'} on RGB. Set limit and send it around your Tribe`}
           desc2='You can also add an asset to your Tribe wallet by receiving it from someone'
         />
       </>
@@ -325,7 +325,7 @@ export default function AssetsScreen(props) {
           </TouchableOpacity>
         </View>
         {renderTabs()}
-        {selectedTab == 0 ? (
+        {selectedTab == 1 ? (
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -522,8 +522,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   labelContainer: {
-    backgroundColor: Colors.THEAM_TEXT_COLOR,
-    borderRadius: 20,
+    // backgroundColor: Colors.THEAM_TEXT_COLOR,
+    borderRadius: 25,
     height: 36,
     width: 36,
     justifyContent: 'center',
