@@ -461,11 +461,11 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         domainUriPrefix: domain,
         android: {
           packageName: id,
-          fallbackUrl: url,
+          fallbackUrl: HexaConfig.PLAYSTORE_LINK,
         },
         ios: {
-          fallbackUrl: url,
-          bundleId: id
+          bundleId: id,
+          appStoreId:HexaConfig.APPSTORE_PROD_ID
         },
         navigation: {
           forcedRedirectEnabled: false
@@ -476,6 +476,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
           imageUrl: getLinkImage( deepLinkKind ),
         }
       }, dynamicLinks.ShortLinkType.UNGUESSABLE )
+    console.log("FInal",shortLink)
     } catch ( error ) {
       console.log( error )
       shortLink = ''
