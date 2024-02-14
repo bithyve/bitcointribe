@@ -226,7 +226,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     color: Colors.white,
-    marginVertical: 1,
+    marginTop: 1,
     marginBottom: 5
   },
 
