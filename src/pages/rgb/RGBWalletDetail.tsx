@@ -10,11 +10,11 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
@@ -22,11 +22,11 @@ import AccountChecking from '../../assets/images/accIcons/acc_checking.svg'
 import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions'
-import Fonts from '../../common/Fonts'
-import CommonStyles from '../../common/Styles/Styles'
 import BitcoinUnit, { displayNameForBitcoinUnit } from '../../common/data/enums/BitcoinUnit'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import NetworkKind from '../../common/data/enums/NetworkKind'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
 import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../components/MaterialCurrencyCodeIcon'
 import { syncRgb } from '../../store/actions/rgb'
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'

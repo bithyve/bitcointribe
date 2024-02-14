@@ -104,7 +104,6 @@ export default function RGBTxDetail( props ) {
   }
 
   const renderItem = ( { item } ) => {
-    console.log('item', item)
     return (
       <TouchableOpacity style={styles.itemContainer} onPress={() => onItemClick( item )}>
         <View style={styles.textContainer}>

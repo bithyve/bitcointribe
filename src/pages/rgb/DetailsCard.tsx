@@ -3,16 +3,16 @@ import React, { useMemo } from 'react'
 import {
   StyleSheet,
   Text,
-  View,
+  View
 } from 'react-native'
 import { Button } from 'react-native-elements'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import ButtonStyles from '../../common/Styles/ButtonStyles'
 import { translations } from '../../common/content/LocContext'
 import { wp } from '../../common/data/responsiveness/responsive'
+import Fonts from '../../common/Fonts'
+import ButtonStyles from '../../common/Styles/ButtonStyles'
 import LabeledBalanceDisplay from '../../components/LabeledBalanceDisplay'
 
 export type Props = {
