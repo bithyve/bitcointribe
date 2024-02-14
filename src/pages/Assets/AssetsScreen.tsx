@@ -285,10 +285,7 @@ export default function AssetsScreen(props) {
   }
 
   return (
-    <View
-      style={{
-        backgroundColor: Colors.blue,
-      }}>
+    <View>
       <ScrollView
         refreshControl={
           <RefreshControl

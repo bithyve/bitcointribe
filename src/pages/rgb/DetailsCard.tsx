@@ -96,7 +96,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           numberOfLines={2}
           ellipsizeMode={'tail'}
         >
-          {description}
+          {description}0
         </Text>
       </View>
     )
