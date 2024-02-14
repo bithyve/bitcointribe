@@ -96,7 +96,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           numberOfLines={2}
           ellipsizeMode={'tail'}
         >
-          {description}0
+          {description}
         </Text>
       </View>
     )
@@ -226,7 +226,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     color: Colors.white,
-    marginTop: 1,
+    marginVertical: 1,
   },
 
   footerSection: {

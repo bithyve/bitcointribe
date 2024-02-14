@@ -113,7 +113,7 @@ export default function RGB121TxDetail(props) {
     return (
       <TouchableOpacity style={styles.itemContainer} onPress={() => onItemClick(item)}>
         <View style={styles.iconWrapper}>
-          {(item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() === 'ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS') ? <ReceiveIcon/> : <SentIcon/>}
+          {(item && item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() === 'ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS') ? <ReceiveIcon/> : <SentIcon/>}
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.itemTitle}>{item.status}</Text>
@@ -123,7 +123,7 @@ export default function RGB121TxDetail(props) {
           <Text
             numberOfLines={1}
             style={[styles.amountText, {
-              color: (item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() === 'ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS') ? Colors.grayShade : Colors.lightBlue
+              color: (item && item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() === 'ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS') ? Colors.grayShade : Colors.lightBlue
             }]}
           >
             {item.amount}
