@@ -227,6 +227,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     color: Colors.white,
     marginVertical: 1,
+    marginBottom: 5
   },
 
   footerSection: {
