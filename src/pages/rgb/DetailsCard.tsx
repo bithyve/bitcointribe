@@ -83,12 +83,10 @@ const AccountDetailsCard: React.FC<Props> = ( {
           flexDirection: 'row',
           alignItems: 'flex-start',
           justifyContent: 'space-between',
-          marginBottom: 4,
         }}>
           <Text style={styles.title1Text}>
             {title}
           </Text>
-          {/* <Text style={styles.title1Text}>2FA</Text> */}
         </View>
 
         <Text
@@ -226,8 +224,8 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     color: Colors.white,
-    marginTop: 1,
-    marginBottom: 5
+    letterSpacing: 0.01,
+    marginBottom: 10
   },
 
   footerSection: {
