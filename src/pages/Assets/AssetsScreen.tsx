@@ -19,7 +19,7 @@ import {
   widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
-import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
+import ActivityIndicatorView from 'src/components/loader/ActivityIndicatorView'
 import RGBInactive from '../../assets/images/tabs/rgb_inactive.svg'
 import { RGBConfig, RGB_ASSET_TYPE, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
@@ -297,6 +297,7 @@ export default function AssetsScreen(props) {
         }
         style={styles.container}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
+        <ActivityIndicatorView showLoader={syncing} />
         <View style={styles.headerContainer}>
           <Text style={styles.pageTitle}>{'My Assets'}</Text>
           <TouchableOpacity
@@ -405,7 +406,7 @@ export default function AssetsScreen(props) {
         closeBottomSheet={() => { }}>
         {renderBottomSheetContent()}
       </ModalContainer>
-      <ModalContainer
+      {/* <ModalContainer
         onBackground={() => { }}
         closeBottomSheet={() => { }}
         visible={syncing || (!syncing && proceed)}
@@ -421,7 +422,7 @@ export default function AssetsScreen(props) {
           showBtn={!syncing && proceed}
           closeModal={()=>{setProceed(false)}}
         />
-      </ModalContainer>
+      </ModalContainer> */}
     </View>
   )
 }
