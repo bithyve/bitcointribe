@@ -20,6 +20,7 @@ import {
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
 import ActivityIndicatorView from 'src/components/loader/ActivityIndicatorView'
+import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
 import RGBInactive from '../../assets/images/tabs/rgb_inactive.svg'
 import { RGBConfig, RGB_ASSET_TYPE, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
@@ -29,7 +30,7 @@ import BottomSheetAddWalletInfo from '../../components/bottom-sheets/add-wallet/
 import ModalContainer from '../../components/home/ModalContainer'
 import RGBServices from '../../services/RGBServices'
 import dbManager from '../../storage/realm/dbManager'
-import { setRgbConfig, syncRgb } from '../../store/actions/rgb'
+import { setRgbConfig, setRgbIntroModal, syncRgb } from '../../store/actions/rgb'
 import BottomSheetCoinsHeader from './BottomSheetCoinsHeader'
 
 const keyExtractor = (item: any) => item.toString()
@@ -45,6 +46,7 @@ export default function AssetsScreen(props) {
     state => state.rgb,
   )
   const rgbConfig: RGBConfig = useSelector(state => state.rgb.config)
+  const RgbIntroModal: boolean = useSelector(state => state.rgb.isIntroModal)
   const wallet: Wallet = dbManager.getWallet()
   const [proceed, setProceed] = useState(false)
   const dispatch = useDispatch()
@@ -297,7 +299,7 @@ export default function AssetsScreen(props) {
         }
         style={styles.container}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        <ActivityIndicatorView showLoader={syncing} />
+        <ActivityIndicatorView showLoader={!RgbIntroModal && syncing} />
         <View style={styles.headerContainer}>
           <Text style={styles.pageTitle}>{'My Assets'}</Text>
           <TouchableOpacity
@@ -405,6 +407,24 @@ export default function AssetsScreen(props) {
         visible={bottomSheetState == BottomSheetState.Open}
         closeBottomSheet={() => { }}>
         {renderBottomSheetContent()}
+      </ModalContainer>
+      <ModalContainer
+        onBackground={() => { }}
+        closeBottomSheet={() => { }}
+        visible={RgbIntroModal}
+      >
+        <RGBIntroModal
+          title={'Introducing RGB Assets'}
+          info={'Embark on a journey with Bitcoin Tribe Wallet, your comprehensive solution for managing RGB assets effortlessly. Experience a new era of asset handling with a familiar wallet interface.'}
+          otherText={'Now Issue, receive, send and sync assets with your Bitcoin Tribe'}
+          proceedButtonText={'Continue'}
+          isIgnoreButton={false}
+          isBottomImage={true}
+          bottomImage={require('../../assets/images/icons/contactPermission.png')}
+          showBtn={!syncing && proceed}
+          closeModal={()=>{dispatch(setRgbIntroModal(false));setProceed(false)}}
+          height={hp(60)}
+        />
       </ModalContainer>
       {/* <ModalContainer
         onBackground={() => { }}
