@@ -18,7 +18,7 @@ export default function RGBIntroModal(props) {
       ...styles.modalContainer, ...props.containerStyle
     }}>
       <View style={{
-        height: hp(55)
+        height: props.height ? props.height :  hp(55)
       }}>
         <View style={{ marginVertical: hp(1) }}>
           <Text style={styles.headerText}>{props.title}</Text>
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   },
   buttonView: {
     padding: 10,
-    width: 100,
+    width: 120,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
