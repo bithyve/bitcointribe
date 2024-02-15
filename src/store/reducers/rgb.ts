@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { RGBConfig } from '../../bitcoin/utilities/Interface';
 import {
-  RGB_SYNCING,
+  RGB_INTRO_MODAL, RGB_SYNCING,
   SET_LAST_BACKED_UP,
   SET_NEXT_FREE_ADDRESS,
   SET_RECEIVE_DATA,
@@ -15,6 +15,7 @@ import {
 const initialState: {
   config: RGBConfig;
   syncing: boolean;
+  isIntroModal: boolean;
   balances: {
     confirmed: number;
     immature: number;
@@ -57,6 +58,7 @@ const initialState: {
     xpubFingerprint: '',
   },
   syncing: false,
+  isIntroModal: true,
   balances: {
     confirmed: 0,
     immature: 0,
@@ -130,6 +132,11 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           rgb25Assets: action.payload.assets,
+        }
+        case RGB_INTRO_MODAL:
+        return {
+          ...state,
+          isIntroModal: action.payload.isIntroModal,
         }
       default:
         return state
