@@ -476,7 +476,6 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
           imageUrl: getLinkImage( deepLinkKind ),
         }
       }, dynamicLinks.ShortLinkType.UNGUESSABLE )
-    console.log("FInal",shortLink)
     } catch ( error ) {
       console.log( error )
       shortLink = ''
