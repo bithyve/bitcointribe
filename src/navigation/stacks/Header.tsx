@@ -110,6 +110,7 @@ import { setVersion } from '../../store/actions/versionHistory'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { AccountsState } from '../../store/reducers/accounts'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import { CommonActions } from '@react-navigation/native'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -696,6 +697,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   handleDeepLinkEvent = async ( { url } ) => {
+    if(url.includes('backup')){
+      this.props.navigation.navigate("BackupWithKeeper")
+      return;
+    }   
     const { navigation } = this.props
     const isFocused = navigation.isFocused()
     // If the user is on one of Home's nested routes, and a
