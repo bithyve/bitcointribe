@@ -36,7 +36,6 @@ export default function IssueScreen(props) {
   async function IssueAssetClick() {
     Keyboard.dismiss()
     try {
-      console.log('issueType', issueType)
       if (issueType === 'collectible') {
         if (!name || !description || !totalAmount || attachedfile == 'Attach File') {
           Toast('Please enter all details.')
@@ -96,7 +95,6 @@ export default function IssueScreen(props) {
       },
     )
   }
-
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -149,7 +147,7 @@ export default function IssueScreen(props) {
           <Input
             inputContainerStyle={[
               FormStyles.textInputContainer,
-              styles.textInputContainer,
+              styles.textInputContainer
             ]}
             inputStyle={FormStyles.inputText}
             placeholder={'Asset Name'}
