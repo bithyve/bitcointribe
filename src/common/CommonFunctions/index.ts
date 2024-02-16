@@ -465,7 +465,7 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         },
         ios: {
           bundleId: id,
-          appStoreId:HexaConfig.APPSTORE_PROD_ID
+          fallbackUrl: url,
         },
         navigation: {
           forcedRedirectEnabled: false
