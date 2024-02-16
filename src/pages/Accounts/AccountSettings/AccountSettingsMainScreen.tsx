@@ -3,6 +3,7 @@ import { FlatList, SafeAreaView, StatusBar, StyleSheet, TouchableOpacity, View }
 import { ListItem } from 'react-native-elements'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch } from 'react-redux'
+import Toast from 'src/components/Toast'
 import Archive from '../../../assets/images/svgs/icon_archive.svg'
 import Visibilty from '../../../assets/images/svgs/icon_visibility.svg'
 import NameNDesc from '../../../assets/images/svgs/name_desc.svg'
@@ -155,6 +156,14 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
         imageSource: () => <NameNDesc />,
       } )
     }
+    if( account.type === AccountType.TEST_ACCOUNT ) {
+      items.push( {
+        title: 'Receive Test Sats',
+        subtitle: 'Receive Test Sats to this address',
+        onOptionPressed: receiveTestSats,
+        imageSource: () => <NameNDesc />,
+      } )
+    }
     return items
   }, [ accountShell, account ] )
 
@@ -254,6 +263,9 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
     } else {
       setCheckAccountModal( true )
     }
+  }
+  function receiveTestSats() {
+    Toast('Receive Test Sats.. (Comming Soon)')
   }
 
   function handleTransactionDataSelectionFromRescan( transactionData: RescannedTransactionData ) {
