@@ -466,6 +466,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.moveToContactDetails( message.additionalInfo.channelKey, 'Contact' )
           break
         case NotificationType.FNF_REQUEST_REJECTED:
+          this.closeBottomSheet()
+          this.props.navigation.popToTop()
+          this.props.navigation.navigate( 'FriendsAndFamily')
+          break
         case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
           this.moveToContactDetails( message.additionalInfo.channelKey, 'I am the Keeper of' )
           break
