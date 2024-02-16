@@ -33,6 +33,9 @@ import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAcco
 import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
 import DetailsCard from './DetailsCard'
 
+const numberWithCommas = ( x ) => {
+  return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+}
 export default function RGB121TxDetail(props) {
   const dispatch = useDispatch()
   const { translations } = useContext(LocalizationContext)
@@ -109,7 +112,6 @@ export default function RGB121TxDetail(props) {
   }
 
   const renderItem = ({ item }) => {
-
     return (
       <TouchableOpacity style={styles.itemContainer} onPress={() => onItemClick(item)}>
         <View style={styles.iconWrapper}>
@@ -126,7 +128,7 @@ export default function RGB121TxDetail(props) {
               color: (item && item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() === 'ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS') ? Colors.grayShade : Colors.lightBlue
             }]}
           >
-            {item.amount}
+            {numberWithCommas(item.amount)}
           </Text>
         </View>
         <View style={{

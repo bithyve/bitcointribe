@@ -35,6 +35,10 @@ import BottomSheetCoinsHeader from './BottomSheetCoinsHeader'
 
 const keyExtractor = (item: any) => item.toString()
 
+const numberWithCommas = ( x ) => {
+  return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+}
+
 const assetColors = ['#6992B0', '#D88383', '#A29DD3', '#5CB5A1', '#A29DD3']
 
 export enum BottomSheetState {
@@ -244,7 +248,7 @@ export default function AssetsScreen(props) {
         </View>
         <Text style={styles.collectibleOuterText}>{item.name}</Text>
         <Text style={styles.collectibleAmountText}>
-          {item.balance ? item.balance.spendable : item.spendableBalance}
+          {item.balance ? numberWithCommas(item.balance.spendable) : numberWithCommas(item.spendableBalance)}
         </Text>
       </TouchableOpacity>
     )
@@ -299,7 +303,7 @@ export default function AssetsScreen(props) {
         }
         style={styles.container}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        <ActivityIndicatorView showLoader={!RgbIntroModal && syncing} />
+        {!RgbIntroModal && <ActivityIndicatorView showLoader={syncing} />}
         <View style={styles.headerContainer}>
           <Text style={styles.pageTitle}>{'My Assets'}</Text>
           <TouchableOpacity

@@ -8,6 +8,7 @@ import {
 import { Button } from 'react-native-elements'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
+import useFormattedAmountText from 'src/utils/hooks/formatting/UseFormattedAmountText'
 import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
 import { wp } from '../../common/data/responsiveness/responsive'
@@ -114,7 +115,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
               textColor={Colors.white}
               isTestAccount={false}
             />:
-            <Text style={styles.amountText}>{balance}</Text>
+            <Text style={styles.amountText}>{useFormattedAmountText(balance)}</Text>
         }
 
         {
