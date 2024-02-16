@@ -140,6 +140,7 @@ export default function IssueScreen(props) {
         step={''}
       />
       <KeyboardAwareScrollView
+        showsVerticalScrollIndicator={false}
         resetScrollToCoords={{
           x: 0, y: 0
         }}
