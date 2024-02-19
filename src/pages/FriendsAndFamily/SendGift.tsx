@@ -1,51 +1,45 @@
-import React, { useState, useEffect, useMemo, useContext } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import {
-  View,
-  StyleSheet,
   SafeAreaView,
-  StatusBar,
-  TouchableOpacity,
   ScrollView,
-  Text,
-  Alert
+  StatusBar,
+  StyleSheet,
+  TouchableOpacity,
+  View
 } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
+import DeviceInfo from 'react-native-device-info'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp
 } from 'react-native-responsive-screen'
-import CommonStyles from '../../common/Styles/Styles'
-import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import { Account, DeepLinkEncryptionType, Gift, GiftThemeId, QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
+import { useDispatch, useSelector } from 'react-redux'
+import { Account, DeepLinkEncryptionType, GiftThemeId, QRCodeTypes, Wallet } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import CommonStyles from '../../common/Styles/Styles'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { LocalizationContext } from '../../common/content/LocContext'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import RequestKeyFromContact from '../../components/RequestKeyFromContact'
+import dbManager from '../../storage/realm/dbManager'
+import { updateWalletImageHealth } from '../../store/actions/BHR'
+import { updateGift } from '../../store/actions/accounts'
 import { AccountsState } from '../../store/reducers/accounts'
 import { generateGiftLink } from '../../store/sagas/accounts'
-import DeviceInfo from 'react-native-device-info'
-import { updateGift } from '../../store/actions/accounts'
-import { updateWalletImageHealth } from '../../store/actions/BHR'
-import { RFValue } from 'react-native-responsive-fontsize'
-import Fonts from '../../common/Fonts'
-import dbManager from '../../storage/realm/dbManager'
-import BottomInfoBox from '../../components/BottomInfoBox'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
-import CurrencyKind from '../../common/data/enums/CurrencyKind'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 
 export default function SendGift( props ) {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'f&f' ]
 
-  const giftId = props.navigation.getParam( 'giftId' )
-  const note = props.navigation.getParam( 'note' )
-  const contactDetails = props.navigation.getParam( 'selectedContact' )
-  const giftLinkEncryptionType: DeepLinkEncryptionType = props.navigation.getParam( 'encryptionType' )
+  const giftId = props.route.params?.giftId
+  const note = props.route.params?.note
+  const contactDetails = props.route.params?.selectedContact
+  const giftLinkEncryptionType: DeepLinkEncryptionType = props.route.params?.encryptionType
 
-  const secretPhrase = props.navigation.getParam( 'secretPhrase' )
-  const secretPhraseHint = props.navigation.getParam( 'secretPhraseHint' )
-  const senderEditedName = props.navigation.getParam( 'senderName' )
-  const themeId = props.navigation.getParam( 'themeId' )
+  const secretPhrase = props.route.params?.secretPhrase
+  const secretPhraseHint = props.route.params?.secretPhraseHint
+  const senderEditedName = props.route.params?.senderName
+  const themeId = props.route.params?.themeId
   const accountsState: AccountsState = useSelector( state => state.accounts )
   const wallet: Wallet = useSelector( state => state.storage.wallet )
   const fcmToken: string = useSelector( state => state.preferences.fcmTokenValue )
@@ -153,6 +147,7 @@ export default function SendGift( props ) {
         </TouchableOpacity>
       </View>
       <RequestKeyFromContact
+        navigation={props.navigation}
         isModal={false}
         headerText={'Send Gift'}
         subHeaderText={'You can send it to anyone using the QR or the link'}
@@ -162,7 +157,10 @@ export default function SendGift( props ) {
         encryptionKey={encryptionOTP}
         themeId={themeId}
         senderName={senderEditedName}
-        contact={contactDetails?{contactDetails}:{}}
+        contact={contactDetails?{
+          contactDetails
+        }:{
+        }}
         QR={giftQR}
         link={giftDeepLink}
         contactEmail={''}

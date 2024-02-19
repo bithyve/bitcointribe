@@ -1,41 +1,33 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import {
+  Image,
+  SafeAreaView,
+  StatusBar,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
-  StatusBar,
-  Platform,
-  BackHandler,
-  Linking,
-  Keyboard,
-  Alert,
-  Image,
-  SafeAreaView
+  View
 } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { credsAuth } from '../../store/actions/setupAndAuth'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
-import ModalContainer from '../../components/home/ModalContainer'
+import Colors from '../../common/Colors'
 import { LocalizationContext } from '../../common/content/LocContext'
-import Toast from '../../components/Toast'
-import AlertModalContents from '../../components/AlertModalContents'
-import { setCloudBackupStatus } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import Fonts from '../../common/Fonts'
+import Toast from '../../components/Toast'
 import { setOpenToApproval } from '../../store/actions/BHR'
-import LinearGradient from 'react-native-linear-gradient'
+import { setCloudBackupStatus } from '../../store/actions/cloud'
+import { credsAuth } from '../../store/actions/setupAndAuth'
 
 export default function CheckPasscodeComponent( props ) {
-  const backupType = props.navigation.getParam( 'backupType' )
+  const backupType = props.route.params?.backupType
   console.log( 'backupType', backupType )
   const dispatch = useDispatch()
   const { translations } = useContext( LocalizationContext )
@@ -62,14 +54,6 @@ export default function CheckPasscodeComponent( props ) {
   useEffect( () => {
     dispatch( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     dispatch( setOpenToApproval( false, [], null ) )
-    // Linking.addEventListener( 'url', handleDeepLinkEvent )
-    // //Linking.getInitialURL().then( handleDeepLinking )
-    // BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
-    // return () => {
-    //   BackHandler.removeEventListener( 'hardwareBackPress', hardwareBackPressCustom )
-    //   Linking.removeEventListener( 'url', handleDeepLinkEvent )
-    // }
-
   }, [] )
 
   const onPressNumber = useCallback(
@@ -336,6 +320,7 @@ export default function CheckPasscodeComponent( props ) {
           }}>
             <TouchableOpacity
               disabled={passcode.length !==4}
+              activeOpacity={0.6}
               onPress={() => {
                 setCheckAuth( false )
                 setTimeout( () => {
@@ -349,23 +334,16 @@ export default function CheckPasscodeComponent( props ) {
                 setCreationFlag( true )
               }}
             >
-              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-                start={{
-                  x: 0, y: 0
-                }} end={{
-                  x: 1, y: 0
-                }}
-                locations={[ 0.2, 1 ]}
+              <View
                 style={{
                   ...styles.proceedButtonView,
-                  elevation: Elevation,
                   backgroundColor: isDisabledProceed
                     ? Colors.lightBlue
                     : Colors.blue,
                 }}
               >
                 <Text style={styles.proceedButtonText}>{common.proceed}</Text>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
 
             {/* {

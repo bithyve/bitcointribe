@@ -1,15 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { DeepLinkEncryptionType, ShortLinkDomain, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, ShortLinkImage, ShortLinkTitle, ShortLinkDescription, Trusted_Contacts, Accounts, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
-import { encrypt } from '../encryption'
+import dynamicLinks from '@react-native-firebase/dynamic-links'
+import crypto from 'crypto'
+import { Alert, Linking } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
-import { Alert, Linking } from 'react-native'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
-import Toast from '../../components/Toast'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
-import crypto from 'crypto'
+import { Accounts, DeepLinkEncryptionType, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, ShortLinkDescription, ShortLinkDomain, ShortLinkImage, ShortLinkTitle, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import { encrypt } from '../encryption'
 import { getVersions } from '../utilities'
-import dynamicLinks from '@react-native-firebase/dynamic-links'
+import Toast from '../../components/Toast'
+import HexaConfig from '../../bitcoin/HexaConfig'
 
 export const nameToInitials = fullName => {
   if( !fullName ) return
@@ -432,13 +433,16 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
 
   if( deepLinkKind === DeepLinkKind.GIFT || deepLinkKind === DeepLinkKind.CONTACT_GIFT ){
     deepLink =
-    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/${extraData.themeId}/v${appVersion}`
+    `https://bitcointribe.app/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/${extraData.channelAddress}/${extraData.amount}/${extraData.note}/${extraData.themeId}/v${appVersion}`
   } else {
     deepLink =
-    `https://hexawallet.io/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}${currentLevel != undefined ? '/'+ currentLevel: ''}`
+    `https://bitcointribe.app/${appType}/${deepLinkKind}/${walletName}/${encryptedChannelKeys}/${encryptionType}-${encryptionHint}/v${appVersion}${currentLevel != undefined ? '/'+ currentLevel: ''}`
   }
-
   let shortLink = ''
+  let id =  DeviceInfo.getBundleId();
+  if(typeof id !== 'string'){
+    id = HexaConfig.ENVIRONMENT === 'dev'? HexaConfig.BUNDLE_ID_DEV: HexaConfig.BUNDLE_ID_PROD
+  }
   if( generateShortLink ) {
     try {
       const url = deepLink.replace( /\s+/g, '' )
@@ -456,15 +460,15 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         link: url,
         domainUriPrefix: domain,
         android: {
-          packageName: DeviceInfo.getBundleId(),
+          packageName: id,
           fallbackUrl: url,
         },
         ios: {
           fallbackUrl: url,
-          bundleId: DeviceInfo.getBundleId()
+          bundleId: id
         },
         navigation: {
-          forcedRedirectEnabled:  false
+          forcedRedirectEnabled: false
         },
         social: {
           descriptionText: getLinkDescription( deepLinkKind ),
@@ -593,10 +597,9 @@ export const processDeepLink = ( deepLink: string ) => {
         // console.log('WhatsApp Opened');
       } )
       .catch( () => {
-        //
+        Toast( 'Error in Scanning QR Code' )
       } )
     return
-
   }
 }
 

@@ -1,31 +1,22 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  Text,
-  StatusBar,
-  ScrollView,
+  SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-  widthPercentageToDP,
-  heightPercentageToDP,
+  heightPercentageToDP, heightPercentageToDP as hp,
+  widthPercentageToDP, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../../common/Colors'
+import { LocalizationContext } from '../../common/content/LocContext'
 import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { LocalizationContext } from '../../common/content/LocContext'
-import HeaderTitle1 from '../../components/HeaderTitle1'
+import HeaderTitle from '../../components/HeaderTitle'
 import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import LndConnectUtils from '../../utils/ln/LndConnectUtils'
 import Toast from '../../components/Toast'
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import LndConnectUtils from '../../utils/ln/LndConnectUtils'
 
 const styles = StyleSheet.create( {
   viewContainer: {
@@ -181,7 +172,7 @@ export default function ScanNodeConfig( { navigation } ) {
           flexGrow: 1
         }}
         keyboardShouldPersistTaps='handled'>
-        <HeaderTitle1
+        <HeaderTitle
           firstLineTitle={'Set up Lighting Account'}
           secondLineTitle={strings.Connectyournode}
           infoTextNormal={''}

@@ -1,24 +1,18 @@
-import React, { Component, useState, useCallback, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
   Image,
-  Text,
   StyleSheet,
-  Platform,
+  Text,
+  View
 } from 'react-native'
-import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import BottomSheet from 'reanimated-bottom-sheet'
+import Colors from '../common/Colors'
 import { nameToInitials } from '../common/CommonFunctions'
-import DeviceInfo from 'react-native-device-info'
-import SmallHeaderModal from './SmallHeaderModal'
-import SendViaQR from './SendViaQR'
-import SendViaLink from './SendViaLink'
+import Fonts from '../common/Fonts'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 
 export default function RequestModalContents( props ) {

@@ -1,27 +1,27 @@
-import React, { useState, useEffect } from 'react'
+import moment from 'moment'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
+  Image,
+  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  SafeAreaView,
-  ScrollView,
-  Image,
+  View,
 } from 'react-native'
-import NavStyles from '../../common/Styles/NavStyles'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
+import { useSelector } from 'react-redux'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import NavStyles from '../../common/Styles/NavStyles'
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
-import moment from 'moment'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import { useSelector } from 'react-redux'
 import Loader from '../../components/loader'
 import SmallNavHeaderBackButton from '../../components/navigation/SmallNavHeaderBackButton'
 
@@ -229,9 +229,10 @@ export default function FundingSourcesContainerScreen( props ) {
           <View style={{
             flex: 1
           }}>
-            {FBTCAccount.map( ( value ) => {
+            {FBTCAccount.map( ( value, index ) => {
               return (
                 <TouchableOpacity
+                  key={`${JSON.stringify( value )}_${index}`}
                   onPress={() => {
                     props.navigation.navigate( 'FundingSourceDetails', {
                       getBittrAccount: value,

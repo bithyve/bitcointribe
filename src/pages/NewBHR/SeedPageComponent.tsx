@@ -23,7 +23,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { translations } from '../../common/content/LocContext'
 import { Wallet } from '../../bitcoin/utilities/Interface'
-import { PagerView, PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEventData } from 'react-native-pager-view'
+import PagerView, { PagerViewOnPageScrollEventData, PagerViewOnPageSelectedEventData } from 'react-native-pager-view'
 import dbManager from '../../storage/realm/dbManager'
 import LinearGradient from 'react-native-linear-gradient'
 
@@ -67,7 +67,6 @@ const SeedPageComponent = ( props ) => {
   } )
 
   useEffect( () => {
-    console.log( 'skk primaryMnemonic'+ primaryMnemonic )
     const tempData = []
     let innerTempData = []
     let initPosition = 0

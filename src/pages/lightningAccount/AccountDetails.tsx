@@ -1,21 +1,18 @@
-import React, { Component } from 'react'
-import { View, SectionList, StyleSheet, RefreshControl, StatusBar, } from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
-import { connect } from 'react-redux'
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import  BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import { inject, observer } from 'mobx-react'
-import { NavigationScreenConfig } from 'react-navigation'
-import { NavigationStackOptions } from 'react-navigation-stack'
+import React, { Component } from 'react'
+import { RefreshControl, SectionList, StatusBar, StyleSheet, View, } from 'react-native'
+import {
+  heightPercentageToDP as hp
+} from 'react-native-responsive-screen'
+import { connect } from 'react-redux'
+import Colors from '../../common/Colors'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
+// import { NavigationStackOptions } from 'react-navigation-stack'
 import NavHeader from '../../components/account-details/AccountDetailsNavHeader'
-import TransactionList from './components/TransactionsList'
-import InvoicesList from './components/InvoicesList'
 import AccountCard from './components/AccountCard'
+import InvoicesList from './components/InvoicesList'
+import TransactionList from './components/TransactionsList'
 
 enum SectionKind {
   ACCOUNT_CARD,
@@ -28,6 +25,10 @@ export enum Mode {
   LIGHTNING,
 }
 
+interface AccountDetailsPropsTypes {
+  navigation: any;
+  route: any;
+}
 
 @inject(
   'InvoicesStore',
@@ -38,16 +39,31 @@ export enum Mode {
   'FeeStore',
 )
 @observer
-export class AccountDetails extends Component {
+export class AccountDetails extends Component<
+  AccountDetailsPropsTypes
+> {
+
   constructor( props ) {
     super( props )
     this.state = {
-      node: props.navigation.getParam( 'node' ),
-      accountShellID:props.navigation.getParam( 'accountShellID' ),
-      accountShell: props.accountShells.find( accountShell => accountShell.id === props.navigation.getParam( 'accountShellID' ) ),
+      node:  props.route.params.node,
+      accountShellID: props.route.params.accountShellID,
+      accountShell: props.accountShells.find( accountShell => accountShell.id === props.route.params.accountShellID ),
       mode: Mode.LIGHTNING,
     }
   }
+
+  componentDidMount() {
+    this.props.navigation.setOptions( {
+      header: () => (
+        <NavHeader accountShellID={this.state.accountShellID} onBackPressed={this.onBackPressed} />
+      ),
+    } )
+  }
+
+   onBackPressed =()=>  {
+     this.props.navigation.goBack()
+   }
 
 
   onReceiveButtonPress = ( size:any, title:string, node:any ) => {
@@ -320,20 +336,6 @@ const styles = StyleSheet.create( {
     marginBottom:hp( 2 ),
   },
 } )
-
-AccountDetails.navigationOptions = ( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> => {
-  return {
-    header() {
-      const { accountShellID } = navigation.state.params
-      return (
-        <NavHeader
-          accountShellID={accountShellID}
-          onBackPressed={() => navigation.pop()}
-        />
-      )
-    },
-  }
-}
 
 // export default connect( mapStateToProps, mapDispatchToProps )( EnterNodeConfigScreen )
 

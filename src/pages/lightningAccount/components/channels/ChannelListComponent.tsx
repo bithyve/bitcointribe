@@ -6,7 +6,7 @@ import axios from 'axios'
 import SendAndReceiveButtonsFooter from '../../../Accounts/Details/SendAndReceiveButtonsFooter'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import useAccountShellFromRoute from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 
 export default class ChannelList extends Component {
   constructor( props: any ) {

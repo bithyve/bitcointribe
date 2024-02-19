@@ -29,6 +29,7 @@ import ButtonBlue from '../components/ButtonBlue'
 import { ActivityIndicator } from 'react-native-paper'
 import { AccountType } from '../bitcoin/utilities/Interface'
 import { translations } from '../common/content/LocContext'
+import { NavigationProp, ParamListBase, RouteProp } from '@react-navigation/native'
 
 interface AccountOption {
     id: number;
@@ -86,12 +87,12 @@ const accountOptions: AccountOption[] = [
   }
 ]
 
-export default function AccountSelection( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
+export default function AccountSelection( props: { navigation: NavigationProp<ParamListBase>, route: RouteProp<{ params: {walletName: string} }> } ) {
   const [ processing, showProcessing ] = useState( false )
   const [ knowMore, showKnowMore ] = useState( false )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const dispatch = useDispatch()
-  const walletName = props.navigation.getParam( 'walletName' )
+  const walletName = props.route.params?.walletName
   const [ isDisabled, setIsDisabled ] = useState( false )
   const { walletSetupCompleted } = useSelector( ( state ) => state.setupAndAuth )
   const [ selectedAcc, setSelectedAcc ] = useState( [ AccountType.CHECKING_ACCOUNT ] )
@@ -162,8 +163,8 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
             >
               <View style={CommonStyles.headerLeftIconInnerContainer}>
                 <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                  name="long-arrow-left"
+                  color={Colors.homepageButtonColor}
                   size={17}
                 />
               </View>

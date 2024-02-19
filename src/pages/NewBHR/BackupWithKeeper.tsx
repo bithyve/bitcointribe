@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, Linking, Text, StyleSheet, TouchableOpacity, Clipboard, Platform } from 'react-native'
+import { View, Linking, Text, StyleSheet, TouchableOpacity, Clipboard, Platform, SafeAreaView } from 'react-native'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -111,7 +111,7 @@ export default function BackupWithKeeper( { navigation } ) {
     setSeed( primaryMnemonic )
     const path = checkingAccount[ 0 ].derivationPath
     setPath( path )
-    const url = `${HexaConfig.APP_STAGE === APP_STAGE.DEVELOPMENT ? 'keeperdev': 'keeper'}://backup/${Buffer.from( `&seed=${primaryMnemonic.replace( / /g, ',' )}&path=${path}&purpose=${'P2SH-P2WPKH: Wrapped segwit'}&name=tribe&appId=${HexaConfig.APP_STAGE === APP_STAGE.DEVELOPMENT ? 'hexadev': 'hexa'}`, 'utf8' ).toString(
+    const url = `${HexaConfig.APP_STAGE === APP_STAGE.DEVELOPMENT ? 'keeperdev': 'keeper'}://backup/${Buffer.from( `&seed=${primaryMnemonic.replace( / /g, ',' )}&path=${path}&purpose=${'P2SH-P2WPKH: Wrapped segwit'}&name=Tribe&appId=${HexaConfig.APP_STAGE === APP_STAGE.DEVELOPMENT ? 'hexadev': 'hexa'}`, 'utf8' ).toString(
       'base64',
     )}`
     setDeeplinkUrl( url )
@@ -147,17 +147,14 @@ export default function BackupWithKeeper( { navigation } ) {
   }
 
   return (
-    <View style={{
+    <SafeAreaView style={{
       flex: 1, backgroundColor: Colors.backgroundColor,
     }}>
       <View style={[ CommonStyles.headerContainer, {
         backgroundColor: Colors.backgroundColor
       } ]}>
         <TouchableOpacity
-          style={[ CommonStyles.headerLeftIconContainer, {
-            marginTop: 40
-          }
-          ]}
+          style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
             navigation.goBack()
           }}
@@ -171,9 +168,7 @@ export default function BackupWithKeeper( { navigation } ) {
           </View>
         </TouchableOpacity>
       </View>
-      <View style={{
-        marginTop: 20
-      }}>
+      <View>
         <HeaderTitle
           firstLineTitle={'Backup With Keeper'}
           secondLineTitle={''}
@@ -323,7 +318,7 @@ export default function BackupWithKeeper( { navigation } ) {
           style={styles.icArrow}
         />
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   )
 }
 

@@ -1,0 +1,50 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "react-native/react-native": true,
+    "node": true
+  },
+  "extends": ["plugin:react/recommended", "airbnb/hooks", "airbnb", "prettier", "@react-native"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["react", "@typescript-eslint", "react-native"],
+  "rules": {
+    // allow .js files to contain JSX code
+    "react/jsx-filename-extension": [1, { "extensions": [".ts", ".tsx", ".js", ".jsx"] }],
+    // prevent eslint to complain about the "styles" variable being used before it was defined
+    "no-use-before-define": "off",
+    // ignore errors for the react-navigation package
+    "react/prop-types": ["error", { "ignore": ["navigation", "navigation.navigate"] }],
+    // ignore errors for import directives
+    "react-hooks/exhaustive-deps": "off",
+    "import/no-unresolved": "off",
+    "import/extensions": "off",
+    "import/no-extraneous-dependencies": "off",
+    "global-require": "off",
+    "no-param-reassign": "off",
+    "no-shadow": "off",
+    "react/jsx-props-no-spreading": "off",
+    "import/prefer-default-export": "off",
+    "no-restricted-syntax": "off",
+    "no-nested-ternary": "off"
+  },
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    }
+  },
+  "ignorePatterns": [
+    "test-setup.js",
+    "tests/**/*",
+    "src/hardware/ledger/client/",
+    "src/core/services/qr/bc-ur-registry/"
+  ]
+}

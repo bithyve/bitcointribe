@@ -1,24 +1,18 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, View } from 'react-native'
 import { useDispatch } from 'react-redux'
-import PersonalNodeConnectionForm, { PersonalNodeFormData } from './PersonalNodeConnectionForm'
-import PersonalNodeDetailsSection from './PersonalNodeDetailsSection'
-import PersonalNodeSettingsHeader from './PersonalNodeSettingsHeader'
+import { NodeDetail } from '../../../bitcoin/electrum/interface'
+import Node from '../../../bitcoin/electrum/node'
+import Colors from '../../../common/Colors'
 import PersonalNode from '../../../common/data/models/PersonalNode'
-import BottomInfoBox from '../../../components/BottomInfoBox'
-import { useBottomSheetModal } from '@gorhom/bottom-sheet'
-import PersonalNodeConnectionSuccessBottomSheet from '../../../components/bottom-sheets/settings/PersonalNodeConnectionSuccessBottomSheet'
-import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
-import PersonalNodeConnectionFailureBottomSheet from '../../../components/bottom-sheets/settings/PersonalNodeConnectionFailureBottomSheet'
-import useNodeSettingsState from '../../../utils/hooks/state-selectors/nodeSettings/UseNodeSettingsState'
-import useActivePersonalNode from '../../../utils/hooks/state-selectors/nodeSettings/UseActivePersonalNode'
-import {  bitHyveNodeConnectionCompleted, connectToBitHyveNode, personalNodeConnectionCompleted, personalNodePreferenceToggled, savePersonalNodeConfiguration, setAllNodes, setIsConnectionActive } from '../../../store/actions/nodeSettings'
-import { Keyboard } from 'react-native'
-import BitHyveNodeConnectionSuccessBottomSheet from '../../../components/bottom-sheets/settings/BitHyveNodeConnectionSuccessBottomSheet'
-import { translations } from '../../../common/content/LocContext'
-import Node from './node'
-import Toast from '../../../components/Toast'
+import HeaderTitle from '../../../components/HeaderTitle'
 import Loader from '../../../components/loader'
+import Toast from '../../../components/Toast'
+import { setDefaultNodes, setPersonalNodes } from '../../../store/actions/nodeSettings'
+import { NodeStateOperations } from '../../../store/reducers/nodeSettings'
+import useNodeSettingsState from '../../../utils/hooks/state-selectors/nodeSettings/UseNodeSettingsState'
+import PersonalNodeConnectionForm from './PersonalNodeConnectionForm'
+import PersonalNodeDetailsSection from './PersonalNodeDetailsSection'
 
 export type Props = {
   navigation: any;
@@ -27,267 +21,126 @@ export type Props = {
 const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const nodeSettingsState = useNodeSettingsState()
-  const activePersonalNode = useActivePersonalNode()
-  const strings  = translations[ 'settings' ]
-  const common  = translations[ 'common' ]
-  const {
-    present: presentBottomSheet,
-    dismiss: dismissBottomSheet,
-  } = useBottomSheetModal()
-  
-  // const { connectToMyNodeEnabled, nodeDetails } = useAppSelector((state) => state.settings);
-  const [nodeList, setNodeList] = useState(nodeSettingsState.personalNodes || []);
-  const [ConnectToNode, setConnectToNode] = useState(nodeSettingsState.isConnectionActive);
-  const [visible, setVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [selectedNodeItem, setSelectedNodeItem] = useState(null);
+  const [ isAddNodeModalVisible, setAddNodeModalVisible ] = useState( false )
+  const [ loading, setLoading ] = useState( false )
+  const [ nodeList, setNodeList ] = useState( [] )
+  const [ currentlySelectedNode, setCurrentlySelectedNodeItem ] = useState( null )
 
-  // const isPersonalNodeConnectionEnabled = useMemo( () => {
-  //   return nodeSettingsState.prefersPersonalNodeConnection
-  // }, [ nodeSettingsState.prefersPersonalNodeConnection ] )
+  useEffect( () => {
+    setNodeList( [ ...nodeSettingsState.defaultNodes, ...nodeSettingsState.personalNodes ] )
+  }, [ nodeSettingsState.defaultNodes, nodeSettingsState.personalNodes ] )
 
-  // useEffect( ()=>{
-  //   // resets personal node preference if there's no active personal node
-  //   if( nodeSettingsState.prefersPersonalNodeConnection && !activePersonalNode )
-  //     dispatch( personalNodePreferenceToggled( false ) )
-  // }, [] )
-
-  // useEffect( () => {
-  //   return () => {
-  //     dismissBottomSheet()
-  //   }
-  // }, [ navigation ] )
-
-  // const [ isAddClick, setIsAddClick ] = useState( false )
-  // const [ isKeyboardVisible, setKeyboardVisible ] = useState( false )
-
-  // const showConnectionSucceededBottomSheet = useCallback( () => {
-  //   dispatch( personalNodeConnectionCompleted() )
-
-  //   presentBottomSheet(
-  //     <PersonalNodeConnectionSuccessBottomSheet
-  //       onConfirmPressed={() => {
-  //         dismissBottomSheet()
-  //       }}
-  //     />,
-  //     {
-  //       ...defaultBottomSheetConfigs,
-  //       dismissOnOverlayPress: false,
-  //       snapPoints: [ 0, '40%' ],
-  //     },
-  //   )
-  // },
-  // [ presentBottomSheet, dismissBottomSheet ],
-  // )
-
-
-  // const showBitHyveConnectionSuccessBottomSheet = useCallback( () => {
-  //   dispatch( bitHyveNodeConnectionCompleted() )
-
-  //   presentBottomSheet(
-  //     <BitHyveNodeConnectionSuccessBottomSheet
-  //       onConfirmPressed={() => {
-  //         dismissBottomSheet()
-  //       }}
-  //     />,
-  //     {
-  //       ...defaultBottomSheetConfigs,
-  //       dismissOnOverlayPress: false,
-  //       snapPoints: [ 0, '40%' ],
-  //     },
-  //   )
-  // },
-  // [ presentBottomSheet, dismissBottomSheet ],
-  // )
-
-  // const showConnectionFailedBottomSheet = useCallback( () => {
-  //   dispatch( personalNodeConnectionCompleted() )
-
-  //   presentBottomSheet(
-  //     <PersonalNodeConnectionFailureBottomSheet
-  //       onTryAgainPressed={() => {
-  //         dismissBottomSheet()
-  //       }}
-  //     />,
-  //     {
-  //       ...defaultBottomSheetConfigs,
-  //       dismissOnOverlayPress: false,
-  //       snapPoints: [ 0, '40%' ],
-  //     },
-  //   )
-  // },
-  // [ presentBottomSheet, dismissBottomSheet ],
-  // )
-
-  const handleSettingsSubmission = async ( nodeDetail: PersonalNode ) => {
-    setLoading(true);
-    await onCloseClick();
-    const { nodes, node } = await Node.save(nodeDetail, nodeList);
-    if (nodes === null || node === null) {
-      console.log('node not saved');
-      setLoading(false);
-      return;
-    }
-
-    setNodeList(nodes);
-    dispatch(setAllNodes(nodes));
-    setSelectedNodeItem(node);
-    setLoading(false);
-  }
-
-  const handleConnectionToggle = async (value: boolean) => {
-    setConnectToNode(value);
-    dispatch(setIsConnectionActive(value));
-    if (value) {
-      setSelectedNodeItem(Node.getModalParams(null));
-      setVisible(true)
+  const onSaveCallback = async ( nodeDetail: PersonalNode ) => {
+    setLoading( true )
+    setAddNodeModalVisible( false )
+    const { saved, nodes, node } = await Node.save( nodeDetail, nodeList )
+    if ( saved ) {
+      setNodeList( nodes )
+      if( node.isDefault ) dispatch( setDefaultNodes( node, NodeStateOperations.ADD ) )
+      else dispatch( setPersonalNodes(  node, NodeStateOperations.ADD ) )
     } else {
-      setLoading(true);
-      updateNode(null);
-      await Node.connectToDefaultNode();
-      setLoading(false);
+      Toast( `Failed to save, unable to connect to: ${nodeDetail.host} ` )
     }
+    setLoading( false )
   }
 
+  const onDelete = async ( selectedItem: NodeDetail ) => {
+    const isConnected = Node.nodeConnectionStatus( selectedItem )
+    if ( isConnected ) await Node.disconnect( selectedItem )
 
-  // useEffect( () => {
-  //   if ( nodeSettingsState.hasPersonalNodeConnectionSucceeded ) {
-  //     showConnectionSucceededBottomSheet()
-  //   } else if ( nodeSettingsState.hasBitHyveNodeConnectionSucceeded ) {
-  //     showBitHyveConnectionSuccessBottomSheet()
-  //   } else if ( nodeSettingsState.hasPersonalNodeConnectionFailed ) {
-  //     showConnectionFailedBottomSheet()
-  //   }
-  // }, [
-  //   nodeSettingsState.hasPersonalNodeConnectionSucceeded,
-  //   nodeSettingsState.hasBitHyveNodeConnectionSucceeded,
-  //   nodeSettingsState.hasPersonalNodeConnectionFailed,
-  // ] )
+    const nodes = Node.delete( selectedItem, nodeList )
+    setNodeList( nodes )
 
+    if( selectedItem.isDefault ) dispatch( setDefaultNodes(  selectedItem, NodeStateOperations.DELETE ) )
+    else dispatch( setPersonalNodes( selectedItem, NodeStateOperations.DELETE ) )
 
-  // useEffect( () => {
-  //   const keyboardDidShowListener = Keyboard.addListener(
-  //     'keyboardDidShow',
-  //     () => {
-  //       setKeyboardVisible( true )
-  //     }
-  //   )
-  //   const keyboardDidHideListener = Keyboard.addListener(
-  //     'keyboardDidHide',
-  //     () => {
-  //       setKeyboardVisible( false )
-  //     }
-  //   )
-
-  //   return () => {
-  //     keyboardDidHideListener.remove()
-  //     keyboardDidShowListener.remove()
-  //   }
-  // }, [] )
-
-  const onCloseClick = async()=> {
-    if (nodeList.length == 0 || nodeList.filter((item) => item.isConnected == true).length == 0) {
-      await onChangeConnectToMyNode(false);
-    }
-    setVisible(false);
+    setCurrentlySelectedNodeItem( null )
   }
 
-  async function onChangeConnectToMyNode(value) {
-    setConnectToNode(value);
-    dispatch(setIsConnectionActive(value));
-    if (value) {
-      setSelectedNodeItem(Node.getModalParams(null));
-      setVisible( true )
-    } else {
-      setLoading(true);
-      updateNode(null);
-      await Node.connectToDefaultNode();
-      setLoading(false);
-    }
+  const updateNode = ( selectedItem ) => {
+    const updatedNodes = Node.update( selectedItem, nodeList )
+    setNodeList( updatedNodes )
+    if( selectedItem.isDefault ) dispatch( setDefaultNodes(  selectedItem, NodeStateOperations.UPDATE ) )
+    else dispatch( setPersonalNodes( selectedItem, NodeStateOperations.UPDATE ) )
   }
 
-  const updateNode = (selectedItem) => {
-    const nodes = [...nodeList];
-    const updatedNodes = nodes.map((item) => {
-      const node = { ...item };
-      node.isConnected = item.id === selectedItem?.id ? selectedItem.isConnected : false;
-      return node;
-    });
+  const onConnectNode = async ( selectedNode: NodeDetail ) => {
+    let nodes = [ ...nodeList ]
+    if (
+      currentlySelectedNode &&
+      selectedNode.id !== currentlySelectedNode.id &&
+      currentlySelectedNode.isConnected
+    ) {
+      // disconnect currently selected node(if connected)
+      await Node.disconnect( currentlySelectedNode )
+      currentlySelectedNode.isConnected = false
+      nodes = nodes.map( ( item ) => {
+        if ( item.id === currentlySelectedNode.id ) return {
+          ...currentlySelectedNode
+        }
+        return item
+      } )
 
-    setNodeList(updatedNodes);
-    dispatch(setAllNodes(updatedNodes));
-  };
+      if( currentlySelectedNode.isDefault ) dispatch( setDefaultNodes( currentlySelectedNode, NodeStateOperations.UPDATE ) )
+      else dispatch( setPersonalNodes(  currentlySelectedNode, NodeStateOperations.UPDATE ) )
+
+      setCurrentlySelectedNodeItem( null )
+    }
+
+    setLoading( true )
+    setCurrentlySelectedNodeItem( selectedNode )
+    const node = {
+      ...selectedNode
+    }
+
+    const { connected, connectedTo, error } = await Node.connectToSelectedNode( node )
+    if( connected ){
+      node.isConnected = connected
+      nodes = nodes.map( ( item ) => {
+        if ( item.id === node.id ) return {
+          ...node
+        }
+        return item
+      } )
+
+      if( node.isDefault ) dispatch( setDefaultNodes( node, NodeStateOperations.UPDATE ) )
+      else dispatch( setPersonalNodes( node, NodeStateOperations.UPDATE ) )
+
+      Toast( `Connected to: ${connectedTo}` )
+    } else Toast( `Failed to connect: ${error}` )
+
+    setNodeList( nodes )
+    setLoading( false )
+  }
+
+  const disconnectNode = async ( selectedNode: NodeDetail ) => {
+    await Node.disconnect( selectedNode )
+    selectedNode.isConnected = false
+    updateNode( selectedNode )
+  }
 
   function onAddButtonPressed() {
-    setSelectedNodeItem(null);
-    setVisible( true )
+    setCurrentlySelectedNodeItem( null )
+    setAddNodeModalVisible( true )
   }
 
-  const onSelectedNodeitem = (selectedItem: PersonalNode) => {
-    setSelectedNodeItem(selectedItem);
-  };
-
-  const onEdit = async (selectedItem: PersonalNode) => {
-    setSelectedNodeItem(selectedItem);
-    setVisible(true)
-  };
-
-  const onDelete = async (selectedItem: PersonalNode) => {
-    const filteredNodes = nodeList?.filter((item) => item.id !== selectedItem.id);
-    setNodeList(filteredNodes);
-    dispatch(setAllNodes(filteredNodes));
-    setSelectedNodeItem(null);
-
-    if (filteredNodes?.length === 0 || selectedItem.isConnected) {
-      console.log('defaut node')
-      setConnectToNode(false);
-      dispatch(setIsConnectionActive(false));
-      setLoading(true);
-      await Node.connectToDefaultNode();
-      setLoading(false);
-    }
-  };
-
-  const onConnectNode = async (selectedItem) => {
-    setLoading(true);
-    setSelectedNodeItem(selectedItem);
-    let node = { ...selectedItem };
-
-    if (!selectedItem.isConnected) {
-      node = await Node.connect(selectedItem, nodeList);
-    }
-    else {
-      await disconnectNode(node);
-      setLoading(false);
-      return;
-    }
-
-    setConnectToNode(node?.isConnected);
-    dispatch(setIsConnectionActive(node?.isConnected));
-    updateNode(node);
-
-    if (node.isConnected) {
-      Toast( 'Node connected successfully' )
-      // showToast(`${settings.nodeConnectionSuccess}`, <TickIcon />);
-    }
-    else {
-      Toast( 'Node connection failed' )
-      // showToast(`${settings.nodeConnectionFailure}`, <ToastErrorIcon />, 1000, true);
-    }
-
-    setLoading(false);
-  };
-
-  const disconnectNode = async (node) => {
-    node.isConnected = false;
-    await Node.connectToDefaultNode();
-    setConnectToNode(node?.isConnected);
-    dispatch(setIsConnectionActive(node?.isConnected));
-    updateNode(node);
+  const onSelectedNodeitem = ( selectedItem: PersonalNode ) => {
+    setCurrentlySelectedNodeItem( selectedItem )
   }
 
   return (
-    <View style={styles.rootContainer}>
+    <SafeAreaView style={styles.rootContainer}>
+      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
+      <HeaderTitle
+        navigation={navigation}
+        backButton={true}
+        firstLineTitle={'Node Settings'}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
       <KeyboardAvoidingView
         style={styles.rootContainer}
         behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
@@ -296,32 +149,22 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) 
           flex: 1
         }}>
           <View style={styles.rootContentContainer}>
-
-            <PersonalNodeSettingsHeader
-              containerStyle={{
-                paddingHorizontal: 14
-              }}
-              isConnectionEnabled={ConnectToNode}
-              onToggle={handleConnectionToggle}
-            />
-
-            {visible ? (
+            {isAddNodeModalVisible ? (
               <PersonalNodeConnectionForm
-                onCloseClick={() => onCloseClick() }
-                onSubmit={handleSettingsSubmission}
-                params={Node.getModalParams(selectedNodeItem)}
+                onCloseClick={() => { setAddNodeModalVisible( false ) } }
+                onSubmit={onSaveCallback}
+                params={Node.getModalParams( currentlySelectedNode )}
               />
             ): (
               <PersonalNodeDetailsSection
                 // personalNode={activePersonalNode}
                 onAddButtonPressed={() => onAddButtonPressed() }
                 nodeList={nodeList}
-                ConnectToNode
-                onEdit={onEdit}
                 onDelete={onDelete}
                 onConnectNode={onConnectNode}
+                onDisconnectNode={disconnectNode}
                 onSelectedNodeitem={onSelectedNodeitem}
-                selectedNodeItem={selectedNodeItem}
+                selectedNodeItem={currentlySelectedNode}
               />
             )
             }
@@ -340,7 +183,7 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) 
           />
         </View>
       )} */}
-    </View>
+    </SafeAreaView>
   )
 }
 

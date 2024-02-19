@@ -1,60 +1,50 @@
-import React, { useState, useEffect, useCallback, createRef, useContext } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import React, { createRef, useCallback, useContext, useEffect, useState } from 'react'
 import {
-  StyleSheet,
-  View,
+  Clipboard,
+  Dimensions,
+  Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   SafeAreaView,
-  TouchableOpacity,
   ScrollView,
   StatusBar,
+  StyleSheet,
   Text,
-  Platform,
-  Keyboard,
-  TouchableWithoutFeedback,
   TextInput,
-  Clipboard,
-  Image,
-  Dimensions,
-  KeyboardAvoidingView,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import Fonts from '../common/Fonts'
 import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
 //import QuestionList from '../common/QuestionList'
-import CommonStyles from '../common/Styles/Styles'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
-import Feather from 'react-native-vector-icons/Feather'
 import { RFValue } from 'react-native-responsive-fontsize'
-import HeaderTitle from '../components/HeaderTitle'
-import HeaderTitle1 from '../components/HeaderTitle1'
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
+import Feather from 'react-native-vector-icons/Feather'
+import CommonStyles from '../common/Styles/Styles'
 import BottomInfoBox from '../components/BottomInfoBox'
 
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
-import LoaderModal from '../components/LoaderModal'
-import DeviceInfo from 'react-native-device-info'
-import { walletCheckIn } from '../store/actions/trustedContacts'
-import { setVersion } from '../store/actions/versionHistory'
-import { initNewBHRFlow } from '../store/actions/BHR'
-import { setCloudData } from '../store/actions/cloud'
-import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
-import ModalContainer from '../components/home/ModalContainer'
-import ModalContainerScroll from '../components/home/ModalContainerScroll'
 import zxcvbn from 'zxcvbn'
-import ButtonBlue from '../components/ButtonBlue'
-import { updateCloudPermission } from '../store/actions/BHR'
-import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import CardWithRadioBtn from '../components/CardWithRadioBtn'
-import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAuth'
+import CheckMark from '../assets/images/svgs/checkmarktick.svg'
 import { LevelHealthInterface } from '../bitcoin/utilities/Interface'
+import TrustedContactsOperations from '../bitcoin/utilities/TrustedContactsOperations'
 import { LocalizationContext } from '../common/content/LocContext'
 import ButtonStyles from '../common/Styles/ButtonStyles'
-import TrustedContactsOperations from '../bitcoin/utilities/TrustedContactsOperations'
+import HeaderTitle from '../components/HeaderTitle'
+import ModalContainer from '../components/home/ModalContainer'
+import ModalContainerScroll from '../components/home/ModalContainerScroll'
 import WalletInitKnowMore from '../components/know-more-sheets/WalletInitKnowMore'
-import Toast from '../components/Toast'
-import CheckMark from '../assets/images/svgs/checkmarktick.svg'
+import LoaderModal from '../components/LoaderModal'
+import { initNewBHRFlow, updateCloudPermission } from '../store/actions/BHR'
+import { setupWallet } from '../store/actions/setupAndAuth'
+import { setVersion } from '../store/actions/versionHistory'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -74,7 +64,7 @@ function validateAllowedCharacters( answer: string ): boolean {
   return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
 }
 
-export default function NewWalletQuestion( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
+export default function NewWalletQuestion( props ) {
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
   const common = translations[ 'common' ]//SecurityCenter
@@ -115,8 +105,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ knowMore, setKnowMore ] = useState( false )
 
   const dispatch = useDispatch()
-  const walletName = props.navigation.getParam( 'walletName' )
-  const newUser = props.navigation.getParam( 'newUser' )
+  const walletName =  props.route.params?.walletName
+  const newUser = props.route.params?.newUser
 
   const [ answerError, setAnswerError ] = useState( '' )
   const [ pswdError, setPswdError ] = useState( '' )
@@ -165,48 +155,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     if ( messageIndex == loaderMessages.length ) messageIndex = 0
     return loaderMessages[ messageIndex++ ]
   }
-  // useEffect( ()=>{
-  //   const keyboardDidShowListener = Keyboard.addListener(
-  //     'keyboardDidShow',
-  //     () => {
-  //       if ( Platform.OS === 'android' ) {
-  //         setHeight( 85 )
-  //       }
-  //     }
-  //   )
-  //   const keyboardDidHideListener = Keyboard.addListener(
-  //     'keyboardDidHide',
-  //     () => {
-  //       setHeight( 72 )
-  //       if ( Platform.OS === 'android' ) {
-  //         setHeight( 72 )
-  //       }
-  //     }
-  //   )
-
-  //   return () => {
-  //     keyboardDidHideListener.remove()
-  //     keyboardDidShowListener.remove()
-  //   }
-  // }, [] )
 
   useEffect( () => {
-    // if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
-    //   // ( loaderBottomSheet as any ).current.snapTo( 0 )
-    //   setLoaderModal( false )
-    //   props.navigation.navigate( 'HomeNav', {
-    //     walletName,
-    //   } )
-    // }
     if ( walletSetupCompleted ) {
-      // ( loaderBottomSheet as any ).current.snapTo( 0 )
-      // setTimeout( () => {
       setSignUpStarted( false )
       setLoaderModal( false )
-      props.navigation.navigate( 'HomeNav', {
+      props.navigation.navigate( 'App', {
         walletName,
       } )
-      // }, 5000 )
     }
   }, [ walletSetupCompleted, cloudBackupStatus ] )
 
@@ -225,13 +181,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       AsyncStorage.setItem( 'securityQuestionHistory', JSON.stringify( securityQuestionHistory ) )
     } )
   }
-
-  // useEffect( ()=>{
-  //   if( levelHealth.length && cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
-  //     cloudPermissionGranted === true && !isSkipClicked && updateWIStatus === false ){
-  //     dispatch( setCloudData() )
-  //   }
-  // }, [ cloudPermissionGranted, levelHealth, updateWIStatus, cloudBackupStatus ] )
 
   const showLoader = () => {
     // ( loaderBottomSheet as any ).current.snapTo( 1 )
@@ -1350,7 +1299,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             }}
             disabled={isDisabled}
           >
-            <HeaderTitle1
+            <HeaderTitle
               firstLineTitle={strings.Step2}
               secondLineTitle={''}
               secondLineBoldTitle={'Create a Password'}

@@ -1,61 +1,59 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  TextInput,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
-  TouchableWithoutFeedback,
   SafeAreaView,
-  StatusBar
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text, TouchableWithoutFeedback,
+  View
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { RFValue } from 'react-native-responsive-fontsize'
-import NavStyles from '../../common/Styles/NavStyles'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import NavStyles from '../../common/Styles/NavStyles'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import BottomSheet from 'reanimated-bottom-sheet'
+import BottomInfoBox from '../../components/BottomInfoBox'
 
+import { useBottomSheetModal } from '@gorhom/bottom-sheet'
+import idx from 'idx'
+import DeviceInfo from 'react-native-device-info'
+import AmountBTC from '../../assets/images/svgs/amount_btc.svg'
+import BWDetailsIcon from '../../assets/images/svgs/bwdetailsIcon.svg'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import { Account, AccountType, LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import { translations } from '../../common/content/LocContext'
+import AccountShell from '../../common/data/models/AccountShell'
+import { UsNumberFormat } from '../../common/utilities'
+import CopyThisText from '../../components/CopyThisText'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import HeaderTitle from '../../components/HeaderTitle'
+import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents'
+import ModalContainer from '../../components/home/ModalContainer'
+import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
+import QRCode from '../../components/QRCode'
+import SmallHeaderModal from '../../components/SmallHeaderModal'
+import { onPressKeeper } from '../../store/actions/BHR'
 import {
   setReceiveHelper,
-  setSavingWarning,
+  setSavingWarning
 } from '../../store/actions/preferences'
-import { getAccountIconByShell, getAccountTitleByShell } from './Send/utils'
-import KnowMoreButton from '../../components/KnowMoreButton'
-import QRCode from '../../components/QRCode'
-import CopyThisText from '../../components/CopyThisText'
-import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
-import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
-import { useBottomSheetModal } from '@gorhom/bottom-sheet'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import SmallHeaderModal from '../../components/SmallHeaderModal'
-import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents'
-import idx from 'idx'
-import TwoFASetupWarningModal from './TwoFASetupWarningModal'
-import DeviceInfo from 'react-native-device-info'
-import AccountShell from '../../common/data/models/AccountShell'
-import { Account, AccountType, LevelData, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import ModalContainer from '../../components/home/ModalContainer'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { getNextFreeAddress } from '../../store/sagas/accounts'
-import { translations } from '../../common/content/LocContext'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import { onPressKeeper } from '../../store/actions/BHR'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import { getAccountTitleByShell } from './Send/utils'
+import TwoFASetupWarningModal from './TwoFASetupWarningModal'
 
 export default function Receive( props ) {
   const dispatch = useDispatch()
@@ -74,7 +72,9 @@ export default function Receive( props ) {
   const common = translations[ 'common' ]
   const [ SecureReceiveWarningBottomSheet ] = useState( React.createRef() )
   const [ amount, setAmount ] = useState( '' )
-  const accountShell: AccountShell = props.navigation.getParam( 'accountShell' )
+  const accountShell: AccountShell = props.route.params?.accountShell
+  const primarySubAccount = usePrimarySubAccountForShell( accountShell )
+  const isBorderWallet = primarySubAccount.type === AccountType.BORDER_WALLET
   const account: Account = useAccountByAccountShell( accountShell )
   const [ receivingAddress, setReceivingAddress ] = useState( null )
   const [ paymentURI, setPaymentURI ] = useState( null )
@@ -179,10 +179,6 @@ export default function Receive( props ) {
         //await AsyncStorage.setItem('savingsWarning', 'true');
       }
     }
-    console.log( 'borderWalletBackup.status', !borderWalletBackup.status )
-    console.log( 'notSetup', levelData[ 0 ].keeper1.status === 'notSetup' )
-    console.log( 'seed', levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' )
-    console.log( 'Write down Backup Phrase', levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'Write down Backup Phrase' )
     if ( ( levelData[ 0 ].keeper1.status === 'notSetup' ) ||
       ( levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'seed' &&
         levelData[ 0 ].keeper1ButtonText?.toLowerCase() != 'Write down Backup Phrase' ) ||
@@ -246,7 +242,7 @@ export default function Receive( props ) {
       <SafeAreaView style={{
         flex: 0
       }} />
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <StatusBar backgroundColor={Colors.LIGHT_BACKGROUND} barStyle="dark-content" />
       <TouchableWithoutFeedback onPress={() => onPressTouchableWrapper()}>
         <KeyboardAvoidingView
           style={{
@@ -256,59 +252,17 @@ export default function Receive( props ) {
           enabled
         >
           <View style={NavStyles.modalContainer}>
-            <View style={NavStyles.modalHeaderTitleView}>
-              <View
-                style={{
-                  flex: 1, flexDirection: 'row', alignItems: 'stretch'
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => onPressBack()}
-                  style={{
-                    height: 30, width: 30, justifyContent: 'center'
-                  }}
-                >
-                  <FontAwesome
-                    name="long-arrow-left"
-                    color={Colors.homepageButtonColor}
-                    size={17}
-                  />
-                </TouchableOpacity>
-                <Image
-                  source={
-                    getAccountIconByShell( accountShell )
-                  }
-                  style={{
-                    width: wp( '10%' ), height: wp( '10%' )
-                  }}
-                />
-                <View style={{
-                  marginLeft: wp( '2.5%' )
-                }}>
-                  <Text style={NavStyles.modalHeaderTitleText}>{common.receive}</Text>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.Regular,
-                      fontSize: RFValue( 12 ),
-                    }}
-                  >
-                    {
-                      getAccountTitleByShell( accountShell )
-                    }
-                  </Text>
-                </View>
-              </View>
-              {accountShell.primarySubAccount.type == AccountType.TEST_ACCOUNT ? (
-                <KnowMoreButton
-                  onpress={() => onPressKnowMore()}
-                  containerStyle={{
-                    marginTop: 'auto',
-                    marginBottom: 'auto',
-                    marginRight: 10,
-                  }}
-                />
-              ) : null}
+            <View>
+              <HeaderTitle
+                navigation={props.navigation}
+                backButton={true}
+                firstLineTitle={'Receive'}
+                secondLineTitle={'Make sure you keep them safe'}
+                infoTextNormal={''}
+                infoTextBold={''}
+                infoTextNormal1={''}
+                step={''}
+              />
             </View>
             <ScrollView>
               <View style={styles.QRView}>
@@ -318,24 +272,75 @@ export default function Receive( props ) {
               <CopyThisText
                 backgroundColor={Colors.white}
                 text={paymentURI ? paymentURI : receivingAddress}
+                toastText='Address Copied Successfully'
               />
 
               <AppBottomSheetTouchableWrapper
                 onPress={() => { setReceiveModal( true ) }}
                 style={styles.selectedView}
               >
-                <View
-                  style={styles.text}
-                >
-                  <Text style={styles.titleText}>{amount ? amount : strings.Enteramount}</Text>
+                <View style={{
+                  width: '15%',
+                  alignItems: 'center'
+                }}>
+                  <AmountBTC/>
+                </View>
+                <View style={{
+                  width: '75%',
+                  justifyContent: 'center'
+                }}>
+                  <Text style={styles.titleText}>Add amount</Text>
+                  <Text style={styles.subTitle}>Add a specific invoice amount</Text>
                 </View>
 
                 <View style={{
-                  marginLeft: 'auto'
+                  width: '5%'
                 }}>
                   <Ionicons
                     name="chevron-forward"
-                    color={Colors.textColorGrey}
+                    color={Colors.Black}
+                    size={15}
+                    style={styles.forwardIcon}
+                  />
+                </View>
+              </AppBottomSheetTouchableWrapper>
+              <AppBottomSheetTouchableWrapper
+                onPress={() => { setReceiveModal( true ) }}
+                style={[ styles.selectedView, {
+                  marginTop: 10
+                } ]}
+              >
+                <View style={{
+                  width: '15%',
+                  alignItems: 'center'
+                }}>
+                  { accountShell.primarySubAccount.type === AccountType.BORDER_WALLET?
+                    <BWDetailsIcon/>
+                    :getAvatarForSubAccount(
+                      primarySubAccount,
+                      false,
+                      false,
+                      true,
+                      isBorderWallet
+                    )}
+                </View>
+                <View style={{
+                  width: '75%',
+                  justifyContent: 'center'
+                }}>
+                  <Text style={styles.subTitle}>Receiving To:</Text>
+                  <Text style={styles.titleText}>{getAccountTitleByShell( accountShell )}</Text>
+                  <Text style={styles.balanceText}>Balance {UsNumberFormat(
+                    accountShell.primarySubAccount?.balances?.confirmed
+                  )} stats</Text>
+                </View>
+
+                <View style={{
+                  width: '5%'
+                }}>
+                  <Ionicons
+                    name="chevron-forward"
+                    color={Colors.Black}
                     size={15}
                     style={styles.forwardIcon}
                   />
@@ -413,7 +418,9 @@ export default function Receive( props ) {
                 dispatch( onPressKeeper( levelData[ 0 ], 1 ) )
                 setOnKeeperButtonClick( true )
               }
-            } else props.navigation.navigate( 'WalletBackupAlert' )
+            } else props.navigation.navigate( 'WalletBackupAlert', {
+              from: 'receive'
+            } )
           }}
           onPressIgnore={() => setTimeout( () => { setBackupReminder( false ) }, 500 )}
           proceedButtonText={'Backup now'}
@@ -472,9 +479,19 @@ const styles = StyleSheet.create( {
     marginTop: hp( '3%' )
   },
   titleText: {
-    fontSize: RFValue( 12 ),
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.Regular,
+    color: Colors.blue,
+  },
+  subTitle: {
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.Regular,
     color: Colors.textColorGrey,
+  },
+  balanceText: {
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.Regular,
+    color: Colors.CLOSE_ICON_COLOR,
   },
   text: {
     justifyContent: 'center', marginRight: 10, marginLeft: 10, flex: 1
@@ -485,20 +502,15 @@ const styles = StyleSheet.create( {
     marginLeft: 'auto',
   },
   selectedView: {
-    marginLeft: wp( '5%' ),
-    marginRight: wp( '5%' ),
-    marginBottom: hp( 4 ),
-    marginTop: hp( 2 ),
+    width: wp( '82%' ),
+    height: hp( '9%' ),
+    marginHorizontal: wp( '10%' ),
+    borderRadius: 5,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 15,
-    paddingBottom: 20,
-    borderBottomColor: Colors.borderColor,
-    borderBottomWidth: 1,
+    backgroundColor: Colors.white
   },
   forwardIcon: {
-    marginLeft: wp( '3%' ),
-    marginRight: wp( '3%' ),
     alignSelf: 'center',
   },
   text1: {

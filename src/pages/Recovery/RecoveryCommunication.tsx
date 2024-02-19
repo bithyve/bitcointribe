@@ -1,41 +1,41 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ScrollView,
   ActivityIndicator,
-  SafeAreaView,
-  StatusBar,
   Alert,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
+import { email, textWithoutEncoding } from 'react-native-communications'
 import DeviceInfo from 'react-native-device-info'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import RadioButton from '../../components/RadioButton'
-import { useDispatch, useSelector } from 'react-redux'
-import { textWithoutEncoding, email } from 'react-native-communications'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import commonStyle from '../../common/Styles/Styles'
-import { nameToInitials } from '../../common/CommonFunctions'
+import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from '../../components/ModalHeader'
-import RecoveryTrustedQR from './RecoveryTrustedQR'
 import config from '../../bitcoin/HexaConfig'
-import Toast from '../../components/Toast'
 import { Wallet } from '../../bitcoin/utilities/Interface'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import Colors from '../../common/Colors'
+import { nameToInitials } from '../../common/CommonFunctions'
+import Fonts from '../../common/Fonts'
+import commonStyle from '../../common/Styles/Styles'
+import ModalHeader from '../../components/ModalHeader'
+import RadioButton from '../../components/RadioButton'
+import Toast from '../../components/Toast'
+import RecoveryTrustedQR from './RecoveryTrustedQR'
 
 export default function RecoveryCommunication( props ) {
-  const contact = props.navigation.getParam( 'contact' )
-  const index = props.navigation.getParam( 'index' )
+  const contact = props.route.params?.contact
+  const index = props.route.params?.index
   const [
     trustedContactQrBottomSheet,
     setTrustedContactQrBottomSheet,
@@ -431,6 +431,7 @@ export default function RecoveryCommunication( props ) {
                 contactInfo.map( ( item, index ) => {
                   return (
                     <TouchableOpacity
+                      key={`${JSON.stringify( item )}_${index}`}
                       onPress={() => onContactSelect( index )}
                       style={styles.contactInfo}
                     >

@@ -7,16 +7,16 @@ import { RFValue } from 'react-native-responsive-fontsize'
 export default StyleSheet.create( {
   headerContainer: {
     flexDirection: 'row',
-    marginTop: 10,
+    // marginTop: 10,
     alignItems: 'center',
-    height: 54,
-    backgroundColor: Colors.backgroundColor,
+    height: 50,
+    // backgroundColor: Colors.backgroundColor,
     // borderBottomColor: Colors.white,
     // borderBottomWidth: 0.5,
   },
 
   headerLeftIconContainer: {
-    height: 54
+    height: 50
   },
 
   headerLeftIconInnerContainer: {

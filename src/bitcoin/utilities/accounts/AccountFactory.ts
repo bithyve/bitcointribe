@@ -67,7 +67,7 @@ export function generateAccount(
       xpriv,
       accountName,
       accountDescription,
-      accountVisibility: type === AccountType.TEST_ACCOUNT ? AccountVisibility.HIDDEN : AccountVisibility.DEFAULT,
+      accountVisibility: AccountVisibility.DEFAULT,
       activeAddresses: {
         external: {
         },
@@ -103,8 +103,8 @@ export function generateAccount(
     return account
 
   } catch ( error ) {
+    return null
   }
-
 }
 
 export function generateMultiSigAccount(

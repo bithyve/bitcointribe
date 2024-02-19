@@ -1,22 +1,23 @@
-import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native'
-import QRCode from '../../../components/QRCode'
+import _ from 'lodash'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
+import { FlatList, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator } from 'react-native-paper'
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { RootStateOrAny, useSelector } from 'react-redux'
+import AccountOperations from '../../../bitcoin/utilities/accounts/AccountOperations'
+import AccountUtilities from '../../../bitcoin/utilities/accounts/AccountUtilities'
+import { Account, AccountType, MultiSigAccount, NetworkType, Wallet } from '../../../bitcoin/utilities/Interface'
+import Colors from '../../../common/Colors'
+import HeadingStyles from '../../../common/Styles/HeadingStyles'
 import BottomInfoBox from '../../../components/BottomInfoBox'
 import CopyThisText from '../../../components/CopyThisText'
-import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
-import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
-import HeadingStyles from '../../../common/Styles/HeadingStyles'
-import { Account,  AccountType,  MultiSigAccount, NetworkType, Wallet } from '../../../bitcoin/utilities/Interface'
-import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import HeaderTitle from '../../../components/HeaderTitle'
 import ModalContainer from '../../../components/home/ModalContainerScroll'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Colors from '../../../common/Colors'
-import AccountUtilities from '../../../bitcoin/utilities/accounts/AccountUtilities'
-import AccountOperations from '../../../bitcoin/utilities/accounts/AccountOperations'
-import _ from 'lodash'
-import { RootStateOrAny, useSelector } from 'react-redux'
-import { ActivityIndicator } from 'react-native-paper'
+import QRCode from '../../../components/QRCode'
+import defaultStackScreenNavigationOptions from '../../../navigation/options/DefaultStackScreenNavigationOptions'
+import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 
 enum XpubTypes {
   PRIMARY = 'PRIMARY',
@@ -25,11 +26,19 @@ enum XpubTypes {
 }
 
 export type Props = {
+  route: any;
   navigation: any;
 };
 
-const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
-  const accountShell = useAccountShellFromNavigation( navigation )
+const XPubDetailsScreen: React.FC<Props> = ( { route, navigation }: Props ) => {
+  const accountShell = useAccountShellFromRoute( route )
+  useLayoutEffect( () => {
+    const primarySubAccountName = route.params?.primarySubAccountName
+    navigation.setOptions( {
+      ...defaultStackScreenNavigationOptions,
+      title: `${primarySubAccountName} xPub`
+    } )
+  }, [ navigation, route ] )
   const account: Account | MultiSigAccount = useAccountByAccountShell( accountShell )
   const wallet: Wallet = useSelector( ( state: RootStateOrAny ) => state.storage.wallet )
   const [ xpubs, setXpubs ] = useState( [] )
@@ -183,7 +192,19 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
   }
 
   return (
-    <>
+    <SafeAreaView style={{
+      flex: 1,
+    }}>
+      <HeaderTitle
+        navigation={navigation}
+        backButton={true}
+        firstLineTitle={`${debugAccount && debugAccount.accountName } xPub`}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
       <View style={styles.rootContainer} >
         <View style={styles.headerSectionContainer}>
           <Text style={HeadingStyles.sectionSubHeadingText}>
@@ -242,7 +263,7 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
           <RenderDebugModal/>
         </View>
       </ModalContainer>
-    </>
+    </SafeAreaView>
   )
 }
 
@@ -253,7 +274,7 @@ const styles = StyleSheet.create( {
   },
 
   headerSectionContainer: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 20,
     paddingVertical: 36,
   },
 
@@ -289,18 +310,5 @@ const styles = StyleSheet.create( {
     elevation: 2,
   },
 } )
-
-
-
-XPubDetailsScreen.navigationOptions = ( { navigation } ): NavigationOptions => {
-  const primarySubAccountName = navigation.getParam( 'primarySubAccountName' )
-
-  return {
-    ...defaultStackScreenNavigationOptions,
-
-    title: `${primarySubAccountName} xPub`,
-  }
-}
-
 
 export default XPubDetailsScreen

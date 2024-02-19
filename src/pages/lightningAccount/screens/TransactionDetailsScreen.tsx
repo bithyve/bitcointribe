@@ -1,19 +1,15 @@
+import { inject, observer } from 'mobx-react'
 import React, { Component } from 'react'
 import {
-  Text,
-  View,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
+  SafeAreaView, ScrollView, StyleSheet, Text,
+  View
 } from 'react-native'
-import openLink from '../../../utils/OpenLink'
-import ListStyles from '../../../common/Styles/ListStyles'
-import LabeledBalanceDisplay from '../../../components/LabeledBalanceDisplay'
-import Colors from '../../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
+import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
-import { inject, observer } from 'mobx-react'
+import ListStyles from '../../../common/Styles/ListStyles'
 import HeaderTitle from '../../../components/HeaderTitle'
+import openLink from '../../../utils/OpenLink'
 
 @inject(
   'NodeInfoStore',
@@ -23,8 +19,8 @@ export default class TransactionDetailsScreen extends Component {
   constructor( props ) {
     super( props )
     this.state = {
-      transaction: this.props.navigation.getParam( 'transaction' ),
-      accountShellId: this.props.navigation.getParam( 'accountShellId' ),
+      transaction: props.route.params?.transaction,
+      accountShellId: props.route.params?.accountShellId,
     }
   }
 

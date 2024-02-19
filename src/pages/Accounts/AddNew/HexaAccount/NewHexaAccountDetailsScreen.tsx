@@ -14,6 +14,7 @@ import { newAccountsInfo } from '../../../../store/sagas/accounts'
 
 export type Props = {
   navigation: any;
+  route: any;
 };
 
 type HeaderSectionProps = {
@@ -33,13 +34,13 @@ const HeaderSection: React.FC<HeaderSectionProps> = ( { subAccountInfo, } ) => {
   )
 }
 
-const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
   const dispatch = useDispatch()
   const nameInputRef = useRef<Input>( null )
 
   const currentSubAccount: HexaSubAccountDescribing = useMemo( () => {
-    return navigation.getParam( 'currentSubAccount' )
-  }, [ navigation.state.params ] )
+    return route.params?.currentSubAccount
+  }, [ route.params ] )
   const [ showLoader, setShowLoader ] = useState( false )
   const [ buttonPressed, setButtonPressed ] = useState ( false )
 

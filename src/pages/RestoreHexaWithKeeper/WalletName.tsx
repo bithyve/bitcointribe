@@ -1,18 +1,13 @@
 import React, { useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Platform
+  Platform, StyleSheet, Text, TextInput, View
 } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 
 export default function WalletName( props ) {
@@ -133,12 +128,12 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
+    // elevation: 10,
+    // shadowColor: Colors.shadowBlue,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 15, height: 15
+    // },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     marginLeft: wp( '8%' ),

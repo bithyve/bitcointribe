@@ -1,35 +1,27 @@
-import React, { useState }  from 'react'
-import { View, Text, StyleSheet, FlatList } from 'react-native'
-import PersonalNode from '../../../common/data/models/PersonalNode'
-import ListStyles from '../../../common/Styles/ListStyles'
-import FormStyles from '../../../common/Styles/FormStyles'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { Button, Input } from 'react-native-elements'
+import React from 'react'
+import { FlatList, StyleSheet, Text, View } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
-import Colors from '../../../common/Colors'
-import HeadingStyles from '../../../common/Styles/HeadingStyles'
-import Entypo from 'react-native-vector-icons/Entypo'
 import {
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import Fonts from '../../../common/Fonts'
-import { translations } from '../../../common/content/LocContext'
-import Node from './node'
-import EditIcon from '../../../assets/images/icons/edit_yellow.svg'
 import ConnectIcon from '../../../assets/images/icons/connect.svg'
-import DisconnectIcon from '../../../assets/images/icons/disconnect.svg'
 import DeleteIcon from '../../../assets/images/icons/delete_orange.svg'
-import LinearGradient from 'react-native-linear-gradient'
+import DisconnectIcon from '../../../assets/images/icons/disconnect.svg'
+import Node from '../../../bitcoin/electrum/node'
+import Colors from '../../../common/Colors'
+import { translations } from '../../../common/content/LocContext'
+import PersonalNode from '../../../common/data/models/PersonalNode'
+import Fonts from '../../../common/Fonts'
+import ListStyles from '../../../common/Styles/ListStyles'
 
 export type Props = {
   // personalNode: PersonalNode | null;
   onAddButtonPressed: () => void;
   nodeList: PersonalNode[];
-  ConnectToNode: Boolean;
-  onEdit: ( selectedItem: PersonalNode ) => void;
   onDelete: ( selectedItem: PersonalNode ) => void;
   onConnectNode: ( selectedItem: PersonalNode ) => void;
+  onDisconnectNode: ( selectedItem: PersonalNode ) => void;
   onSelectedNodeitem: ( selectedItem: PersonalNode ) => void;
   selectedNodeItem: PersonalNode | null
 };
@@ -38,10 +30,9 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
   // personalNode,
   onAddButtonPressed,
   nodeList,
-  ConnectToNode,
-  onEdit,
   onDelete,
   onConnectNode,
+  onDisconnectNode,
   onSelectedNodeitem,
   selectedNodeItem
 }: Props ) => {
@@ -65,17 +56,11 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
             {strings.PersonalNodeDetails}
           </Text>
           <TouchableOpacity onPress={onAddButtonPressed}>
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
+            <View
               style={styles.proceedBtnWrapper}
             >
               <Text style={styles.proceedBtnText}>Add</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -97,8 +82,9 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
         <FlatList
           data={nodeList}
           showsVerticalScrollIndicator={false}
-          renderItem={( { item } ) => (
-            <TouchableOpacity
+          renderItem={( { item } ) => {
+            const isConnected = Node.nodeConnectionStatus( item )
+            return ( <TouchableOpacity
               onPress={() => onSelectedNodeitem( item )}
               style={[
                 styles.nodeContainer,
@@ -108,10 +94,10 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
                   } ]
                   : null,
                 {
-                  backgroundColor: ConnectToNode ? Colors.gray9 : Colors.gray9
+                  backgroundColor: isConnected ? Colors.gray9 : Colors.gray9
                 },
               ]}
-              activeOpacity={ConnectToNode ? 1 : 0.50}
+              activeOpacity={isConnected ? 1 : 0.50}
             >
               <View style={styles.nodeDetail}>
                 <Text
@@ -129,19 +115,10 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
 
               <View style={styles.verticleSplitter} />
 
-              <TouchableOpacity onPress={() => onEdit( item )}>
-                <View style={[ styles.actionArea, {
-                  paddingLeft: 15, paddingRight: 15
-                } ]}>
-                  <EditIcon />
-                  <Text
-                    style={[ styles.actionText ]}>{'Edit'}</Text>
-                </View>
-              </TouchableOpacity>
-
-              <View style={styles.verticleSplitter} />
-
-              <TouchableOpacity onPress={() => onConnectNode( item )}>
+              <TouchableOpacity onPress={() => {
+                if ( !isConnected ) onConnectNode( item )
+                else onDisconnectNode( item )
+              }}>
                 <View style={[ styles.actionArea, {
                   paddingLeft: 15, paddingRight: 15
                 } ]}>
@@ -163,8 +140,8 @@ const PersonalNodeDetailsSection: React.FC<Props> = ( {
                     style={[ styles.actionText ]}>{'Delete'}</Text>
                 </View>
               </TouchableOpacity>
-            </TouchableOpacity>
-          )}
+            </TouchableOpacity> )
+          }}
         />
       </View>
       }
@@ -266,6 +243,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     borderRadius: 8,
     alignItems: 'center',
+    backgroundColor: Colors.blue,
   },
   proceedBtnText: {
     color: Colors.white,

@@ -1,49 +1,50 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
-  StyleSheet,
-  View,
-  SafeAreaView,
-  TouchableOpacity,
-  ScrollView,
-  StatusBar,
-  Text,
+  Alert,
   Image,
   Platform,
-  Alert,
   RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import DeviceInfo from 'react-native-device-info'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import Entypo from 'react-native-vector-icons/Entypo'
+import Feather from 'react-native-vector-icons/Feather'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import Fonts from '../../common/Fonts'
-import Colors from '../../common/Colors'
-import CommonStyles from '../../common/Styles/Styles'
-import { RFValue } from 'react-native-responsive-fontsize'
+import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
-import DeviceInfo from 'react-native-device-info'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import Feather from 'react-native-vector-icons/Feather'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
+import ErrorModalContents from '../../components/ErrorModalContents'
 import HeaderTitle from '../../components/HeaderTitle'
+import ModalHeader from '../../components/ModalHeader'
+import RecoverySuccessModalContents from '../../components/RecoverySuccessModalContents'
 import RequestModalContents from '../../components/RequestModalContents'
 import TransparentHeaderModal from '../../components/TransparentHeaderModal'
-import Entypo from 'react-native-vector-icons/Entypo'
-import RecoverySuccessModalContents from '../../components/RecoverySuccessModalContents'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import { useDispatch, useSelector } from 'react-redux'
 import {
   ErrorReceiving,
 } from '../../store/actions/BHR'
-import ModalHeader from '../../components/ModalHeader'
 import RestoreByCloudQRCodeContents from './RestoreByCloudQRCodeContents'
 
-import LoaderModal from '../../components/LoaderModal'
+import { CommonActions } from '@react-navigation/native'
 import { MetaShare } from '../../bitcoin/utilities/Interface'
+import LoaderModal from '../../components/LoaderModal'
+import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { walletCheckIn } from '../../store/actions/trustedContacts'
 import { setVersion } from '../../store/actions/versionHistory'
-import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 
 export default function RestoreSelectedContactsList( props ) {
   const [ SecondaryDeviceRS, setSecondaryDeviceRS ] = useState( null )
@@ -91,19 +92,19 @@ export default function RestoreSelectedContactsList( props ) {
   useEffect( () => {
     let temp = null
     // onPullDown();
-    const focusListener = props.navigation.addListener( 'didFocus', () => {
+    const focusListener = props.navigation.addListener( 'focus', () => {
       getSelectedContactList()
       temp = setInterval( () => {
         // onPullDown();
       }, 30000 )
     } )
-    const focusListener1 = props.navigation.addListener( 'didBlur', () => {
+    const focusListener1 = props.navigation.addListener( 'blur', () => {
       getSelectedContactList()
       clearInterval( temp )
     } )
     return () => {
-      focusListener.remove()
-      focusListener1.remove()
+      focusListener()
+      focusListener1()
     }
   }, [] )
 
@@ -209,7 +210,12 @@ export default function RestoreSelectedContactsList( props ) {
         walletAmount={'2,065,000'}
         walletUnit={'sats'}
         onPressGoToWallet={() => {
-          props.navigation.navigate( 'Home' )
+          props.navigation.dispatch( CommonActions.reset( {
+            index: 0,
+            routes: [ {
+              name: 'App',
+            } ],
+          } ) )
         }}
       />
     )
@@ -311,7 +317,14 @@ export default function RestoreSelectedContactsList( props ) {
         AsyncStorage.setItem( 'walletRecovered', 'true' )
 
         dispatch( walletCheckIn() )
-        props.navigation.navigate( 'Home' )
+        props.navigation.dispatch( CommonActions.reset( {
+          index: 0,
+          routes: [
+            {
+              name: 'App',
+            }
+          ],
+        } ) )
       }
     } )()
   }, [ SERVICES, walletImageChecked ] )
@@ -319,9 +332,17 @@ export default function RestoreSelectedContactsList( props ) {
   useEffect( () => {
     if ( accounts.accountsSynched ) {
       ( loaderBottomSheet as any ).current.snapTo( 0 )
-      props.navigation.navigate( 'Home', {
-        exchangeRates,
-      } )
+      props.navigation.dispatch( CommonActions.reset( {
+        index: 0,
+        routes: [
+          {
+            name: 'App',
+            params: {
+              exchangeRates,
+            }
+          }
+        ],
+      } ) )
     }
   }, [ accounts.accountsSynched ] )
 
@@ -645,6 +666,7 @@ export default function RestoreSelectedContactsList( props ) {
               {selectedContacts.map( ( contact, index ) => {
                 return (
                   <TouchableOpacity
+                    key={`${JSON.stringify( contact )}_${index}`}
                     activeOpacity={contact.status == '' ? 0 : 10}
                     onPress={() => {
                       props.navigation.navigate( 'RecoveryCommunication', {
@@ -849,6 +871,7 @@ export default function RestoreSelectedContactsList( props ) {
                 if ( value ) {
                   return (
                     <TouchableOpacity
+                      key={`${JSON.stringify( value )}_${index}`}
                       activeOpacity={value.status != 'received' ? 0 : 10}
                       onPress={() =>
                         value.status != 'received' ? handleDocuments() : {

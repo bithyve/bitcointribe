@@ -1,22 +1,20 @@
+import idx from 'idx'
 import React, { useEffect, useState } from 'react'
 import {
-  View,
-  Text,
-  TouchableOpacity,
   SafeAreaView,
-  StyleSheet,
+  StyleSheet, Text,
+  TouchableOpacity, View
 } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
+import { useSelector } from 'react-redux'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { ScrollView } from 'react-native-gesture-handler'
-import { useSelector } from 'react-redux'
-import idx from 'idx'
 import { getVersions } from '../common/utilities'
+import HeaderTitle from '../components/HeaderTitle'
 
 
 export default function VersionHistoryScreen( props ) {
@@ -50,6 +48,16 @@ export default function VersionHistoryScreen( props ) {
     <SafeAreaView style={{
       flex: 1
     }}>
+      <HeaderTitle
+        navigation={props.navigation}
+        backButton={true}
+        firstLineTitle={'Version History'}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
       <View style={styles.rootContainer}>
         {data && data.length ? (
           <View style={{
@@ -110,7 +118,8 @@ export default function VersionHistoryScreen( props ) {
 }
 const styles = StyleSheet.create( {
   rootContainer: {
-    flex: 1, backgroundColor: Colors.backgroundColor1
+    flex: 1,
+    backgroundColor: Colors.backgroundColor
   },
   selection: {
     margin: wp( '3%' ),

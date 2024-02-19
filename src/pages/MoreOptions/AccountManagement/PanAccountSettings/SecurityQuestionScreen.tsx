@@ -238,12 +238,6 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     borderRadius: 8,
     alignItems: 'center',
-    elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
   },
   inputBox: {
     borderWidth: 0.5,

@@ -29,7 +29,6 @@ const PassCodeTextBox: React.FC<IPassCodeTextBoxProps> = ({passcode, setPasscode
 
   useEffect(()=>{
 if(active)
-console.log('skk 123')
 ref.current.focus()
 // setTimeout(() => ref.current.focus(), 100);
   },[active])
@@ -84,7 +83,6 @@ ref.current.focus()
       <Text style={{color: 'red'}}>{errMsg}</Text>
       <TouchableOpacity
         onPress={() => {
-          // console.log('skk 123')
           // setTimeout(() => ref.current.focus(), 1000);
           setActive(true);
         }}

@@ -1,23 +1,17 @@
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import {
-  View,
-  TouchableOpacity,
-  Text,
   SafeAreaView,
-  StyleSheet,
+  StyleSheet, Text, TouchableOpacity, View
 } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { DeepLinkEncryptionType } from '../../bitcoin/utilities/Interface'
-import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
-import CardWithRadioBtn from '../../components/CardWithRadioBtn'
-import idx from 'idx'
-import * as ExpoContacts from 'expo-contacts'
-import BottomInfoBox from '../../components/BottomInfoBox'
+import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
-import LinearGradient from 'react-native-linear-gradient'
+import Fonts from '../../common/Fonts'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import CardWithRadioBtn from '../../components/CardWithRadioBtn'
 
 export default function Secure2FA( props ) {
   const strings = translations[ 'f&f' ]
@@ -112,19 +106,13 @@ export default function Secure2FA( props ) {
             //PinChangeSuccessBottomSheet.current.snapTo(1);
           }}
         >
-          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-            start={{
-              x: 0, y: 0
-            }} end={{
-              x: 1, y: 0
-            }}
-            locations={[ 0.2, 1 ]}
+          <View
             style={{
               ...styles.proceedButtonView,
             }}
           >
             <Text style={styles.proceedButtonText}>{common.proceed}</Text>
-          </LinearGradient>
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -214,8 +202,8 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
     marginBottom: hp( '1%' ),
+    backgroundColor: Colors.blue
   },
   proceedButtonText: {
     color: Colors.white,

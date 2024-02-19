@@ -1,31 +1,31 @@
-import React, { useState, useEffect } from 'react'
+import * as bip39 from 'bip39'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
+  FlatList,
   SafeAreaView,
   StatusBar,
   StyleSheet,
-  FlatList,
   Text,
   TouchableOpacity,
+  View
 } from 'react-native'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
-import Fonts from '../../common/Fonts'
-import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsive'
-import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
+import { RFValue } from 'react-native-responsive-fontsize'
 import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
-import * as bip39 from 'bip39'
+import Colors from '../../common/Colors'
+import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsive'
+import Fonts from '../../common/Fonts'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 
 const wordlists = bip39.wordlists.english
 
 const SelectChecksumWord = ( props ) => {
-  const words = props.navigation.getParam( 'words' )
-  const selected = props.navigation.getParam( 'selected' )
-  const isNewWallet = props.navigation.getParam( 'isNewWallet' )
-  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
+  const words = props.route.params?.words
+  const selected = props.route.params?.selected
+  const isNewWallet = props.route.params?.isNewWallet
+  const isAccountCreation = props.route.params?.isAccountCreation
+  const isImportAccount = props.route.params?.isImportAccount
   const [ checksums, setChecksums ] = useState( [] )
   const [ headerTitle, setHeaderTitle ] = useState( 'Select Checksum Word' )
   const [ checksumWord, setChecksumWord ] = useState( 'Select checksum word' )
@@ -95,21 +95,20 @@ const SelectChecksumWord = ( props ) => {
       selected,
       checksumWord,
       mnemonic,
-      initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
-      gridType: props.navigation.getParam( 'gridType' ),
+      initialMnemonic: props.route.params?.initialMnemonic,
+      gridType: props.route.params?.gridType,
       isAccountCreation,
       isNewWallet
-    } ) : props.navigation.navigate( 'CreatePassPhrase', {
+    } ) : props.navigation.navigate( 'ImportWalletPassphrase', {
       selected,
       checksumWord,
       mnemonic,
-      initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
-      gridType: props.navigation.getParam( 'gridType' ),
-      isAccountCreation,
+      initialMnemonic: props.route.params?.initialMnemonic,
+      gridType: props.route.params?.gridType,
+      isImportAccount,
       isNewWallet
     } )
   }
-  console.log( windowHeight )
   return (
     <SafeAreaView
       style={{
@@ -174,21 +173,13 @@ const SelectChecksumWord = ( props ) => {
           disabled={checksumWord === 'Select checksum word'}
           onPress={onPressNext}
         >
-          <LinearGradient
-            colors={checksumWord !== 'Select checksum word'?[ Colors.blue, Colors.darkBlue ]: [ Colors.greyTextColor, Colors.greyTextColor ]}
-            start={{
-              x: 0,
-              y: 0,
-            }}
-            end={{
-              x: 1,
-              y: 0,
-            }}
-            locations={[ 0.2, 1 ]}
-            style={styles.buttonView}
+          <View
+            style={[ styles.buttonView, {
+              backgroundColor: checksumWord !== 'Select checksum word'? Colors.blue : Colors.greyTextColor
+            } ]}
           >
             <Text style={styles.buttonText}>{isNewWallet ? 'Next': 'Recover'}</Text>
-          </LinearGradient>
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -240,7 +231,6 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-    backgroundColor: Colors.blue,
     width: 120,
   },
   buttonText: {

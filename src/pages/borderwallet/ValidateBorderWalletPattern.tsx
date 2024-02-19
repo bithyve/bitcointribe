@@ -1,31 +1,24 @@
-import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  StatusBar,
-  TouchableOpacity,
-  ScrollView,
-  FlatList,
-  InteractionManager,
-  ActivityIndicator,
-} from 'react-native'
-import Colors from '../../common/Colors'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import CommonStyles from '../../common/Styles/Styles'
-import {
-  widthPercentageToDP as wp,
-} from 'react-native-responsive-screen'
 import * as bip39 from 'bip39'
-import uheprng from '../../utils/uheprng'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  ActivityIndicator, FlatList,
+  InteractionManager, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View
+} from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import IconRight from '../../assets/images/svgs/icon_right.svg'
-import Fonts from '../../common/Fonts'
-import Toast from '../../components/Toast'
 import StartAgain from '../../assets/images/svgs/startagain.svg'
 import { GridType } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
+import Toast from '../../components/Toast'
 import { generateBorderWalletGrid } from '../../utils/generateBorderWalletGrid'
+import uheprng from '../../utils/uheprng'
+import { CommonActions } from '@react-navigation/native'
 
 const wordlists = bip39.wordlists.english
 const columns = [
@@ -200,11 +193,11 @@ const Cell = React.memo<any>( ( { onPress, text, index, isSelected, sequence } )
   return prevProps.isSelected === nextProps.isSelected && prevProps.sequence === nextProps.sequence
 } )
 
-const ValidateBorderWalletPattern = ( { navigation } ) => {
-  const gridType = navigation.getParam( 'borderWalletGridType' )
-  const mnemonic = navigation.getParam( 'borderWalletMnemonic' )
-  const gridMnemonic = navigation.getParam( 'borderWalletGridMnemonic' )
-
+const ValidateBorderWalletPattern = ( { route, navigation } ) => {
+  // const wallet: Wallet =  dbManager.getWallet()
+  const gridType = route.params?.borderWalletGridType
+  const mnemonic = route.params?.borderWalletMnemonic
+  const gridMnemonic = route.params?.borderWalletGridMnemonic
   const [ grid, setGrid ] = useState( [] )
   const [ selected, setSelected ] = useState( [] )
   const columnHeaderRef = useRef()
@@ -246,7 +239,7 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
       }, 500 )
     } )
     return () => clearTimeout( listener )
-  }, [ gridType ] )
+  }, [] )
 
   const isNext = useMemo( () => {
     return selected.length === 11 || selected.length === 23
@@ -306,11 +299,17 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
       } )
       selected.push( index )
     } )
+    clearSelection()
     navigation.navigate( 'ReLogin', {
       pattern: selected,
-      isValidate: true
+      isValidate: true,
+      viewPattern: true,
+      payload:{
+        borderWalletGridType: gridType,
+        borderWalletMnemonic:mnemonic,
+        borderWalletGridMnemonic:gridMnemonic
+      }
     } )
-    clearSelection()
   }
   const onPressVerify = () => {
     const words = [ ...wordlists ]
@@ -388,7 +387,17 @@ const ValidateBorderWalletPattern = ( { navigation } ) => {
 
           } ]}
           onPress={() => {
-            navigation.goBack()
+            navigation.dispatch(CommonActions.reset( {
+              index: 1,
+              routes: [
+                {
+                  name: 'Home'
+                },
+                {
+                  name: 'BackupMethods'
+                },
+              ],
+            } ))
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>

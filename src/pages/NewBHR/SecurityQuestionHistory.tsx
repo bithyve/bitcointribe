@@ -102,7 +102,7 @@ const SecurityQuestionHistory = ( props ) => {
   }[] = useSelector( ( state ) => state.bhr.levelHealth )
 
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
-  const next = props.navigation.getParam( 'next' )
+  const next = props.route.params?.next
   const [ showRescanningPrompt, setShowRescanningPrompt ] = useState( false )
   const [ showRescanningModal, setShowRescanningModal ] = useState( false )
   const [ showSelectMethodModal, setShowSelectMethodModal ] = useState( false )
@@ -137,13 +137,13 @@ const SecurityQuestionHistory = ( props ) => {
   const [ pswdInputStyle, setPswdInputStyle ] = useState( styles.inputBox )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ appGeneratedPassword ] = useState( TrustedContactsOperations.generateKey( 18 ).match( /.{1,6}/g ).join( '-' ) )
-  const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
+  const [ selectedKeeper, setSelectedKeeper ] = useState( props.route.params?.selectedKeeper )
 
   const dispatch = useDispatch()
 
   useEffect( () => {
-    setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
-  }, [ props.navigation.state.params ] )
+    setSelectedKeeper( props.route.params?.selectedKeeper )
+  }, [ props.route.params ] )
 
   const renderSecurityQuestionContent = useCallback( () => {
     return (
@@ -350,7 +350,7 @@ const SecurityQuestionHistory = ( props ) => {
               alignSelf: 'flex-end'
             }}
             activeOpacity={10}
-            onPress={() => showEncryptionPswd(false)}
+            onPress={() => showEncryptionPswd( false )}
           >
             <FontAwesome name="close" color={Colors.white} size={19} />
           </TouchableOpacity>

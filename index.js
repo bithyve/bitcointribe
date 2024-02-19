@@ -1,3 +1,6 @@
+import 'react-native-reanimated';
+import 'react-native-gesture-handler';
+
 import './shim';
 
 import { AppRegistry } from 'react-native';

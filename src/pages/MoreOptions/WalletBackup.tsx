@@ -1,60 +1,58 @@
-import React, { useState, useEffect } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { CommonActions } from '@react-navigation/native'
+import idx from 'idx'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  StatusBar,
-  TouchableOpacity,
-  Image,
+  BackHandler,
   FlatList,
-  Keyboard,
+  Image,
   InteractionManager,
   Platform,
-  BackHandler
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import CommonStyles from '../../common/Styles/Styles'
 import { RFValue } from 'react-native-responsive-fontsize'
-import Fonts from '../../common/Fonts'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import { Shadow } from 'react-native-shadow-2'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { useDispatch, useSelector } from 'react-redux'
+import { AccountType, KeeperType, LevelData, LevelHealthInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
-import HeaderTitle from '../../components/HeaderTitle'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import ModalContainer from '../../components/home/ModalContainer'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { translations } from '../../common/content/LocContext'
-import { AccountType, KeeperType, LevelData, LevelHealthInterface, MetaShare, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
-import { autoShareToLevel2Keepers, deletePrivateData, generateMetaShare, keeperProcessStatus, modifyLevelData, onPressKeeper, setHealthStatus, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError, setLevelToNotSetupStatus, updateKeeperInfoToChannel, downloadSMShare, setApprovalStatus, upgradeLevelOneKeeper } from '../../store/actions/BHR'
-import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import LevelStatus from '../../common/data/enums/LevelStatus'
-import { setCloudData, setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
-import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
+import AccountShell from '../../common/data/models/AccountShell'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import SeedBacupModalContents from '../NewBHR/SeedBacupModalContents'
+import HeaderTitle from '../../components/HeaderTitle'
+import ModalContainer from '../../components/home/ModalContainer'
+import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBNewBhrKnowMoreSheetContents'
+import AccountArchiveModal from '../../pages/Accounts/AccountSettings/AccountArchiveModal'
+import { updateAccountSettings } from '../../store/actions/accounts'
+import { autoShareToLevel2Keepers, deletePrivateData, downloadSMShare, generateMetaShare, keeperProcessStatus, modifyLevelData, onPressKeeper, setApprovalStatus, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError, setLevelToNotSetupStatus, updateKeeperInfoToChannel, upgradeLevelOneKeeper } from '../../store/actions/BHR'
+import { setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
+import { sourceAccountSelectedForSending } from '../../store/actions/sending'
+import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
+import { AccountsState } from '../../store/reducers/accounts'
+import { getNextFreeAddress } from '../../store/sagas/accounts'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import QRModal from '../Accounts/QRModal'
 import BackupTypeModalContent from '../NewBHR/BackupTypeModalContent'
 import KeeperTypeModalContents from '../NewBHR/KeeperTypeModalContent'
-import QRModal from '../Accounts/QRModal'
-import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBNewBhrKnowMoreSheetContents'
-import { Shadow } from 'react-native-shadow-2'
-import accounts, { AccountsState } from '../../store/reducers/accounts'
-import AccountArchiveModal from '../../pages/Accounts/AccountSettings/AccountArchiveModal'
-import AccountVisibility from '../../common/data/enums/AccountVisibility'
-import { updateAccountSettings } from '../../store/actions/accounts'
-import { sourceAccountSelectedForSending } from '../../store/actions/sending'
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import AccountShell from '../../common/data/models/AccountShell'
-import idx from 'idx'
-import { getNextFreeAddress } from '../../store/sagas/accounts'
-import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import { NavigationActions, StackActions } from 'react-navigation'
+import SeedBacupModalContents from '../NewBHR/SeedBacupModalContents'
 
 
 const WalletBackup = ( props, navigation ) => {
@@ -187,12 +185,10 @@ const WalletBackup = ( props, navigation ) => {
     } )
     // console.log( 'accountsState on walletbackup====>' + JSON.stringify( accountsState.accountShells ) )
 
-    const focusListener = props.navigation.addListener( 'didFocus', () => {
+    const unsubscribe = props.navigation.addListener( 'focus', () => {
       updateAddressBook()
     } )
-    return () => {
-      focusListener.remove()
-    }
+    return unsubscribe
   }, [] )
 
   useEffect( () => {
@@ -200,7 +196,7 @@ const WalletBackup = ( props, navigation ) => {
   }, [] )
 
   function handleBackButtonClick() {
-    props.navigation.navigate( 'Home' )
+    props.navigation.navigate( 'MoreOptionsContainerScreen' )
     return true
   }
 
@@ -674,12 +670,10 @@ const WalletBackup = ( props, navigation ) => {
   }
 
   useEffect( () => {
-    const focusListener = props.navigation.addListener( 'didFocus', () => {
+    const unsubscribe = props.navigation.addListener( 'focus', () => {
       getMessageToShow()
     } )
-    return () => {
-      focusListener.remove()
-    }
+    return unsubscribe
   }, [] )
   const showBackupMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError, isInit } = getMessageToShow()
@@ -805,16 +799,16 @@ const WalletBackup = ( props, navigation ) => {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            // props.navigation.pop()
-            props.navigation.navigate( 'Home' )
+            props.navigation.pop()
+            // props.navigation.navigate( 'MoreOptionsContainerScreen' )
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
-            {/* <FontAwesome
+            <FontAwesome
               name="long-arrow-left"
               color={Colors.homepageButtonColor}
               size={17}
-            /> */}
+            />
           </View>
         </TouchableOpacity>
       </View>
@@ -1009,7 +1003,9 @@ const WalletBackup = ( props, navigation ) => {
           cancelButtonText={'Cancel'}
           onPressProceed={() => {
             setSeedBackupModal( false )
-            props.navigation.navigate( 'BackupSeedWordsContent' )
+            props.navigation.navigate( 'BackupSeedWordsContent', {
+              from: props.route.params?.from
+            } )
           }}
           onPressIgnore={() => setSeedBackupModal( false )}
           isIgnoreButton={true}
@@ -1107,11 +1103,13 @@ const WalletBackup = ( props, navigation ) => {
           // note={''}
           onPressProceed={() => {
             setMultipleAcccountModal( false )
-            const resetAction = StackActions.reset( {
+            const resetAction = CommonActions.reset( {
               index: 0,
-              actions: [ NavigationActions.navigate( {
-                routeName: 'Landing'
-              } ) ],
+              routes: [
+                {
+                  name: 'Home'
+                }
+              ],
             } )
             props.navigation.dispatch( resetAction )
 

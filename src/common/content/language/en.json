@@ -62,7 +62,7 @@
     "contact": "contact requests"
   },
   "login": {
-    "welcome": "Welcome back!",
+    "welcome": "Welcome Back!",
     "enter_your": "Please enter your ",
     "ForgotPasscode": "Forgot passcode?",
     "EncryptionKeyNotSet": "Encryption Key not set",
@@ -112,7 +112,7 @@
   }
     ],
     "Hello": "Hello!",
-    "create": "Create a login",
+    "create": "Please enter a",
     "reEnter": "Re-enter the",
     "to": "to",
     "verifylogin": "verify and login",
@@ -379,12 +379,13 @@
     "addKeeper": "Add as keeper",
     "addressbook": "You can choose from your phone's address book",
     "giftsats": "Gift Sats",
+    "gift": "Gifts",
     "giftSubText": "Create bitcoin gifts that you can send to anyone. Get them back if not claimed",
     "giftSubTextF&F": "Give sats as gifts to your friends and family.",
     "creatnew": "Create New",
     "AddNew": "Add New",
     "appear": "Your contacts appear here when\nadded to Bitcoin Tribe wallet",
-    "Associate": "Associate a contact",
+    "Associate": "Associate Contact",
     "Select": "Select a contact from your phone's address book",
     "erroraAccessing": "Error while accessing your contacts ",
     "openSetting": "Open Setting",

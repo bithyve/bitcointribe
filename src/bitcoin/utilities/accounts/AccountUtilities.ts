@@ -141,6 +141,7 @@ export default class AccountUtilities {
   static generateExtendedKey = ( mnemonic: string, privateKey: boolean, network: bitcoinJS.networks.Network, derivationPath: string, passphrase?: string ) => {
     const seed = bip39.mnemonicToSeedSync( mnemonic, passphrase )
     const root = bip32.fromSeed( seed, network )
+    // sssssss
     const child = privateKey? root.derivePath( derivationPath ): root.derivePath( derivationPath ).neutered()
     const xKey = child.toBase58()
     return xKey
