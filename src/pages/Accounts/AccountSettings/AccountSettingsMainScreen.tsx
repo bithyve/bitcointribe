@@ -359,7 +359,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ({ navigation, route }: Props
         }}
         visible={loading}
       >
-        <InProgressModal title={'Receiving test sats'} otherText={'Receiving test sats . Please hold on a moment.'}/>
+        <InProgressModal title={'Receiving test sats'} otherText={'Receiving test sats. Please hold on a moment.'}/>
       </ModalContainer>
     </SafeAreaView>
   );
