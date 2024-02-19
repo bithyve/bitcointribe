@@ -1,31 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as bitcoinJS from 'bitcoinjs-lib'
-import {
-  DerivativeAccount,
-  DerivativeAccounts,
-  TrustedContactDerivativeAccount,
-  DonationDerivativeAccount,
-  SwanDerivativeAccount,
-  RampDerivativeAccount,
-  WyreDerivativeAccount,
-  AccountType,
-  NetworkType,
-} from './utilities/Interface'
+import _ from 'lodash'
 import Config from 'react-native-config'
 import {
   DONATION_ACCOUNT,
-  SUB_PRIMARY_ACCOUNT,
-  WYRE,
   RAMP,
-  SWAN
+  SUB_PRIMARY_ACCOUNT,
+  SWAN,
+  WYRE
 } from '../common/constants/wallet-service-types'
 import PersonalNode from '../common/data/models/PersonalNode'
-import _ from 'lodash'
 import { APP_STAGE } from '../common/interfaces/Interfaces'
+import {
+  AccountType,
+  DerivativeAccount,
+  DerivativeAccounts,
+  DonationDerivativeAccount,
+  NetworkType,
+  RampDerivativeAccount,
+  SwanDerivativeAccount,
+  TrustedContactDerivativeAccount,
+  WyreDerivativeAccount,
+} from './utilities/Interface'
 
 class HexaConfig {
   //RAMP details
-  public RAMP_BASE_URL: string = Config.RAMP_BASE_URL ? Config.RAMP_BASE_URL.trim() : 'https://buy.ramp.network/'
+  public RAMP_BASE_URL: string = Config.RAMP_BASE_URL ? Config.RAMP_BASE_URL.trim() : 'https://app.ramp.network/'
   public RAMP_REFERRAL_CODE: string = Config.RAMP_REFERRAL_CODE ? Config.RAMP_REFERRAL_CODE.trim() : 'ku67r7oh5juc27bmb3h5pek8y5heyb5bdtfa66pr'
   //SWAN details
   public SWAN_CLIENT_ID:string = Config.SWAN_CLIENT_ID || 'hexa'
@@ -41,6 +41,10 @@ class HexaConfig {
   public ENVIRONMENT: string;
   public NETWORK: bitcoinJS.Network;
   public NETWORK_TYPE: NetworkType;
+  public BUNDLE_ID_PROD: string = 'io.hexawallet.hexa2';
+  public BUNDLE_ID_DEV: string = 'io.hexawallet.hexa.development';
+  public APPSTORE_PROD_ID: string = '1586334138';
+  public PLAYSTORE_LINK: string = 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa2&hl=en';
 
   public SECURE_WALLET_XPUB_PATH: string = Config.BIT_SECURE_WALLET_XPUB_PATH ? Config.BIT_SECURE_WALLET_XPUB_PATH.trim() : '2147483651/2147483649/';
   public SECURE_DERIVATION_BRANCH: string = Config.BIT_SECURE_DERIVATION_BRANCH ? Config.BIT_SECURE_DERIVATION_BRANCH.trim() : '1';

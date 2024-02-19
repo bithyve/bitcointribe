@@ -25,8 +25,6 @@ import {
   getMessages,
 } from '../store/actions/notifications'
 import { LocalizationContext } from '../common/content/LocContext'
-import ElectrumClient from '../bitcoin/electrum/client'
-import PersonalNode from '../common/data/models/PersonalNode'
 import TestElectrumClient from '../bitcoin/electrum/test-client'
 import { predefinedMainnetNodes, predefinedTestnetNodes } from '../bitcoin/electrum/predefinedNodes'
 import TestnetElectrumClient from '../bitcoin/electrum/test-client'
@@ -42,7 +40,6 @@ type LaunchScreenProps = {
   walletId: any;
   walletExists: Boolean,
   torEnabled: boolean,
-  personalNodes: PersonalNode[],
 }
 
 type LaunchScreenState = { }
@@ -52,19 +49,17 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
 
   errorBottomSheet: any;
   url: any;
+  appStateSubscribe:any;
+  linkStateSubscribe:any;
   constructor( props ) {
     super( props )
     this.errorBottomSheet = React.createRef()
     // console.log( ':LAUNCH' )
   }
 
+
   componentDidMount = async() => {
-    this.setupElectrumClients()
-    AppState.addEventListener( 'change', this.handleAppStateChange )
-    Linking.addEventListener( 'url', this.handleDeepLinkEvent )
-    Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {
-      url
-    } ) )
+    TestElectrumClient.connect()
     setTimeout( ()=>{
       this.postSplashScreenActions()
     }, 4000 )
@@ -84,10 +79,6 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
    }
 
 
-  componentWillUnmount = () => {
-    AppState.removeEventListener( 'change', this.handleAppStateChange )
-    Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
-  };
 
   handleAppStateChange = ( nextAppState ) => {
     // no need to trigger login screen if accounts are not synced yet
@@ -97,7 +88,6 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
 
   postSplashScreenActions = async () => {
     try {
-      console.log( 'walletId', this.props.walletId )
       if( this.props.walletId ){
         this.props.getMessages()
       }
@@ -115,12 +105,12 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
         console.log( 'diff', diff, isHomePageOpen )
         if( isHomePageOpen ){
           if ( !this.url ){
-            this.props.navigation.replace( 'Home', {
+            this.props.navigation.replace( 'App', {
               screen: 'Home',
             } )
           } else {
             const processedLink = await processDeepLink( this.url )
-            this.props.navigation.replace( 'Home', {
+            this.props.navigation.replace( 'App', {
               screen: 'Home',
               params: {
                 trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,
@@ -236,10 +226,9 @@ const mapStateToProps = ( state ) => {
     walletId: idx( state, ( _ ) => _.preferences.walletId ),
     walletExists: idx( state, ( _ ) => _.storage.walletExists ),
     torEnabled: idx( state, ( _ ) => _.preferences.torEnabled ),
-    personalNodes: idx( state, ( _ ) => _.nodeSettings.personalNodes )
   }
 }
 
 export default connect( mapStateToProps, {
-  getMessages
+  getMessages,
 } )( Launch )

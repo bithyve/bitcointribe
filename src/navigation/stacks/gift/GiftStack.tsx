@@ -1,190 +1,89 @@
-import React from 'react'
-import { createStackNavigator } from 'react-navigation-stack'
-// import HomeScreen from '../../../pages/Home/Home'
-// import FriendsAndFamilyScreen from '../../../pages/FriendsAndFamily/FriendsAndFamilyScreen'
-// import HomeQRScannerScreen from '../../../pages/Home/HomeQRScannerScreen'
-// import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
-// import MoreOptionsStack from '../more-options/MoreOptionsStack'
-// import AllTransactionsStack from '../transactions/AllTransactionsStack'
-// import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
-// import AddNewAccountStack from '../accounts/AddNewAccountStack'
-// import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
-// import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
-// import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
-// import RampOrderFormScreen from '../../../pages/RampIntegration/RampOrderFormScreen'
-import QRStack from '../home/QRStack'
-// import Home from '../../../pages/Home/Home'
-// import TabNavigator from '../../TabNavigator'
-import ContactDetails from '../../../pages/Contacts/ContactDetails'
-// import Header from '../Header'
-import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
-import QrAndLink from '../../../pages/NewBHR/QrAndLink'
-import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
-import ManageGifts from '../../../pages/FriendsAndFamily/ManageGifts'
-import CreateGift from '../../../pages/FriendsAndFamily/CreateGift'
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import React, { useLayoutEffect } from 'react'
+import Colors from '../../../common/Colors'
 import RequestKeyFromContact from '../../../components/RequestKeyFromContact'
-import Launch from '../../../pages/Launch'
-import Login from '../../../pages/Login'
-import ReLogin from '../../../pages/ReLogin'
 import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
-import Intermediate from '../../../pages/Intermediate'
-import AccountDetailsStack from '../accounts/AccountDetailsStack'
-import { translations } from '../../../common/content/LocContext'
-import SendGift from '../../../pages/FriendsAndFamily/SendGift'
-import GiftDetails from '../../../pages/FriendsAndFamily/GiftDetails'
+import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
+import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
+import ContactDetails from '../../../pages/Contacts/ContactDetails'
+import CreateGift from '../../../pages/FriendsAndFamily/CreateGift'
 import EnterGiftDetails from '../../../pages/FriendsAndFamily/EnterGiftDetails'
+import GiftDetails from '../../../pages/FriendsAndFamily/GiftDetails'
+import ManageGifts from '../../../pages/FriendsAndFamily/ManageGifts'
+import SendGift from '../../../pages/FriendsAndFamily/SendGift'
 import SendViaLinkAndQR from '../../../pages/FriendsAndFamily/SendViaLinkAndQR'
+import ClaimSatsScreen from '../../../pages/Gift/ClaimSatsScreen'
+import GiftCreatedScreen from '../../../pages/Gift/GiftCreatedScreen'
 import GiftScreen from '../../../pages/Gift/GiftScreen'
 import SetUpSatCardScreen from '../../../pages/Gift/SetUpSatCardScreen'
 import SetUpSatNextCardScreen from '../../../pages/Gift/SetUpSatNextCardScreen'
-import GiftCreatedScreen from '../../../pages/Gift/GiftCreatedScreen'
-import ClaimSatsScreen from '../../../pages/Gift/ClaimSatsScreen'
-// const strings  = translations[ 'stackTitle' ]
+import GiftQRScannerScreen from '../../../pages/FriendsAndFamily/GiftQrScanner'
+import Intermediate from '../../../pages/Intermediate'
+import Launch from '../../../pages/Launch'
+import Login from '../../../pages/Login'
+import QrAndLink from '../../../pages/NewBHR/QrAndLink'
+import ReLogin from '../../../pages/ReLogin'
+import AccountDetailsStack from '../accounts/AccountDetailsStack'
+import QRStack from '../home/QRStack'
 
-// const MODAL_ROUTES = [
-//   'AllTransactions',
-//   'QRScanner',
-//   'FriendsAndFamily',
-//   'MoreOptions',
-//   'PlaceWyreOrder',
-//   'PlaceRampOrder'
-// ]
 
-const GiftStack = createStackNavigator(
-  {
-    Home: {
-      screen: GiftScreen,
-      navigationOptions: {
-        header: null,
-        // tabBarVisibl
-      },
-    },
-    ManageGifts,
-    EnterGiftDetails,
-    GiftDetails,
-    SendViaLinkAndQR,
-    CreateGift,
-    SendGift,
-    Login,
-    Launch,
-    Intermediate,
-    ReLogin: {
-      screen: ReLogin,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
-    ContactDetails: {
-      screen: ContactDetails,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    AddContactSendRequest: {
-      screen: AddContactSendRequest,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    QrAndLink: {
-      screen: QrAndLink,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    AccountDetails: {
-      screen: AccountDetailsStack,
-      navigationOptions: {
-        header: null,
-        // tabBarVisibl
-      },
-    },
-    TransactionDetails: {
-      screen: TransactionDetailsContainerScreen,
-      navigationOptions: {
-        title: 'TransactionDetails',
-      },
-    },
-    QRScanner: {
-      screen: QRStack,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    AddContact: {
-      screen: AddContactAddressBook,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    RequestKeyFromContact,
-    SetUpSatCard: {
-      screen: SetUpSatCardScreen,
-      navigationOptions: {
-        header: null,
-        // tabBarVisibl
-      },
-    },
-    SetUpSatNextCard:{
-      screen:SetUpSatNextCardScreen,
-      navigationOptions: {
-        header:null
-      }
-    },
-    GiftCreated:{
-      screen:GiftCreatedScreen,
-      navigationOptions: {
-        header:null
-      }
-    },
-    ClaimSats :{
-      screen: ClaimSatsScreen,
-      navigationOptions: {
-        header:null
-      }
+
+const Stack = createNativeStackNavigator()
+const GiftStack = ( { navigation, route } ) => {
+  useLayoutEffect( () => {
+    const routeName = getFocusedRouteNameFromRoute( route ) ?? 'GiftScreen'
+    if ( routeName === 'GiftScreen' ){
+      navigation.setOptions( {
+        tabBarStyle: {
+          display: 'flex', backgroundColor: Colors.darkBlue
+        }
+      } )
+    }else {
+      navigation.setOptions( {
+        tabBarStyle: {
+          display: 'none'
+        }
+      } )
     }
-  },
-  {
-    // mode: 'modal',
-    initialRouteName: 'Home',
-    defaultNavigationOptions: {
-      header: null
-    },
-    navigationOptions: ( { navigation } ) => {
-      let tabBarVisible = false
-      if ( ( navigation.state.index === 0  && navigation.state.routes[ 0 ].routeName === 'Home' || navigation.state.index === 1 && navigation.state.routes[ 1 ]?.routeName === 'Home' ) ) {
-        tabBarVisible = true
-      }
-
-      return {
-        tabBarVisible,
-      }
-    },
-    // defaultNavigationOptions: ( { navigation } ) => {
-    //   return {
-    //     ...defaultStackScreenNavigationOptions,
-    //     headerLeft: () => {
-    //       return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-    //     },
-    //   }
-    // },
-    // transitionConfig: ( transitionProps, prevTransitionProps ) => {
-    //   const previousRouteName = prevTransitionProps?.scene.route.routeName
-    //   const newRouteName = transitionProps.scene.route.routeName
-
-    //   // 📝 Override the default presentation mode for screens that we
-    //   // want to present modally
-    //   const isModal = MODAL_ROUTES.some(
-    //     ( screenName ) => [ previousRouteName, newRouteName ].includes( screenName )
-    //   )
-
-    //   return StackViewTransitionConfigs.defaultTransitionConfig(
-    //     transitionProps,
-    //     prevTransitionProps,
-    //     isModal,
-    //   )
-    // },
-  },
-)
+  }, [ navigation, route ] )
+  return (
+    <Stack.Navigator
+      initialRouteName='GiftScreen'
+      screenOptions={{
+        headerShown: false
+      }}
+    >
+      <Stack.Screen name="GiftScreen" component={GiftScreen}  />
+      <Stack.Screen name="ManageGifts" component={ManageGifts} />
+      <Stack.Screen name="EnterGiftDetails" component={EnterGiftDetails} />
+      <Stack.Screen name="GiftDetails" component={GiftDetails} />
+      <Stack.Screen name="SendViaLinkAndQR" component={SendViaLinkAndQR} />
+      <Stack.Screen name="CreateGift" component={CreateGift} />
+      <Stack.Screen name="SendGift" component={SendGift}/>
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Launch" component={Launch} />
+      <Stack.Screen name="Intermediate" component={Intermediate} />
+      <Stack.Screen name="ReLogin" component={ReLogin} options={{
+        gestureEnabled:false
+      }}/>
+      <Stack.Screen name="ContactDetails" component={ContactDetails} />
+      <Stack.Screen name="AddContactSendRequest" component={AddContactSendRequest} />
+      <Stack.Screen name="QrAndLink" component={QrAndLink} />
+      <Stack.Screen name="AccountDetails" component={AccountDetailsStack} />
+      <Stack.Screen name="TransactionDetails" component={TransactionDetailsContainerScreen} options={{
+        title: 'TransactionDetails',
+      }}/>
+      <Stack.Screen name="QRScanner" component={QRStack} />
+      <Stack.Screen name="AddContact" component={AddContactAddressBook} />
+      <Stack.Screen name="RequestKeyFromContact" component={RequestKeyFromContact} />
+      <Stack.Screen name="SetUpSatCard" component={SetUpSatCardScreen} />
+      <Stack.Screen name="SetUpSatNextCard" component={SetUpSatNextCardScreen} />
+      <Stack.Screen name="GiftCreated" component={GiftCreatedScreen} />
+      <Stack.Screen name="ClaimSats" component={ClaimSatsScreen} />
+      <Stack.Screen name="GiftQRScannerScreen" component={GiftQRScannerScreen}/>
+    </Stack.Navigator>
+  )
+}
 
 export default GiftStack

@@ -1,29 +1,25 @@
+import * as bip39 from 'bip39'
 import React, { useEffect, useState } from 'react'
 import {
-  View,
-  SafeAreaView,
+  FlatList, SafeAreaView,
   StatusBar,
-  StyleSheet,
-  FlatList,
-  Text,
-  TouchableOpacity,
+  StyleSheet, Text,
+  TouchableOpacity, View
 } from 'react-native'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import * as bip39 from 'bip39'
-import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Colors from '../../common/Colors'
 import { hp, wp } from '../../common/data/responsiveness/responsive'
-import ModalContainer from '../../components/home/ModalContainer'
-import GenerateEntropyGridModal from '../../components/border-wallet/GenerateEntropyGridModal'
 import Fonts from '../../common/Fonts'
+import GenerateEntropyGridModal from '../../components/border-wallet/GenerateEntropyGridModal'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import ModalContainer from '../../components/home/ModalContainer'
+import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 
 const CreateWithBorderWallet = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'Generate New Entropy Grid' )
   const [ generateEntropyGrid, setGenerateEntropyGrid ] = useState( false )
-  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
+  const isAccountCreation = props.route.params?.isAccountCreation || false
 
   const mnemonic =  bip39.generateMnemonic()
 
@@ -66,6 +62,7 @@ const CreateWithBorderWallet = ( props ) => {
         renderItem={( { item, index } ) => <Item title={item} id={`${index+1}`} />}
         keyExtractor={item => item}
         numColumns={2}
+        showsVerticalScrollIndicator={false}
       />
       <BottomInfoBox
         title={'Note'}
@@ -87,23 +84,17 @@ const CreateWithBorderWallet = ( props ) => {
                 mnemonic,
                 isAccountCreation,
               } ):
-              props.navigation.navigate( 'SelectEntropyGridType', {
-                mnemonic,
-                isAccountCreation,
-              } )
+                props.navigation.navigate( 'SelectEntropyGridType', {
+                  mnemonic,
+                  isAccountCreation,
+                } )
             }}
           >
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
+            <View
               style={styles.buttonView}
             >
               <Text style={styles.buttonText}>Next</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         </View>
       </View>

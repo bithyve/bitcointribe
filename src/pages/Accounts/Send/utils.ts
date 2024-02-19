@@ -1,6 +1,5 @@
 import { AccountType } from '../../../bitcoin/utilities/Interface'
-import { DONATION_ACCOUNT, REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, WYRE, RAMP, SWAN } from '../../../common/constants/wallet-service-types'
-import SubAccountKind from '../../../common/data/enums/SubAccountKind'
+import { DONATION_ACCOUNT, RAMP, REGULAR_ACCOUNT, SECURE_ACCOUNT, SWAN, TEST_ACCOUNT, WYRE } from '../../../common/constants/wallet-service-types'
 import AccountShell from '../../../common/data/models/AccountShell'
 
 export const getAccountIcon = ( accountKind, derivativeAccountDetails? ) => {
@@ -109,6 +108,9 @@ export const getAccountIconByShell = ( accountShell: AccountShell ) => {
       case AccountType.SWAN_ACCOUNT:
         accountImageSource = require( '../../../assets/images/icons/icon_swan.png' )
         break
+      case AccountType.BORDER_WALLET:
+        accountImageSource = require( '../../../assets/images/icons/icon_bw.png' )
+        break
   }
 
   return accountImageSource
@@ -139,6 +141,9 @@ export const getAccountTitleByShell = ( accountShell: AccountShell ) => {
         break
       case AccountType.SWAN_ACCOUNT:
         accountTitle = 'Swan'
+        break
+      case AccountType.BORDER_WALLET:
+        accountTitle = 'Border Wallet'
         break
   }
 

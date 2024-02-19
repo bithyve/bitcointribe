@@ -1,17 +1,19 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { View, Text, StyleSheet, ScrollView, Image, ImageSourcePropType, Alert } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { Image, ImageSourcePropType, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
-import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Colors from '../../../common/Colors'
-import Fonts from '../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
-import WalletRescanningBottomSheet from '../../../components/bottom-sheets/wallet-rescanning-bottom-sheet/WalletRescanningBottomSheet'
-import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningPromptBottomSheet'
-import ModalContainer from '../../../components/home/ModalContainer'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import Colors from '../../../common/Colors'
 import { translations } from '../../../common/content/LocContext'
+import { hp } from '../../../common/data/responsiveness/responsive'
+import Fonts from '../../../common/Fonts'
+import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
+import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningPromptBottomSheet'
+import WalletRescanningBottomSheet from '../../../components/bottom-sheets/wallet-rescanning-bottom-sheet/WalletRescanningBottomSheet'
+import HeaderTitle from '../../../components/HeaderTitle'
+import ModalContainer from '../../../components/home/ModalContainer'
+import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 
 export type Props = {
   navigation: any;
@@ -116,69 +118,85 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
   }
 
   return (
-    <View style={styles.modalContainer}>
-      <ScrollView style={{
-        flex: 1
-      }}>
-        <ModalContainer onBackground={()=>setShowRescanningModal( false )} visible={showRescanningPrompt} closeBottomSheet={() => { }}>
-          {showRescanningPromptBottomSheet()}
-        </ModalContainer>
-        <ModalContainer onBackground={()=>setShowRescanningModal( false )} visible={showRescanningModal} closeBottomSheet={() => { }}>
-          {showRescanningBottomSheet()}
-        </ModalContainer>
-        {menuOptions.map( ( menuOption, index ) => {
-          return (
-            <AppBottomSheetTouchableWrapper
-              onPress={() => handleOptionSelection( menuOption )}
-              style={styles.selectedContactsView}
-              key={index}
-            >
-              <Image
-                source={menuOption.imageSource}
-                style={{
-                  width: widthPercentageToDP( '7%' ),
-                  height: widthPercentageToDP( '7%' ),
-                  resizeMode: 'contain',
-                  marginLeft: widthPercentageToDP( '3%' ),
-                  marginRight: widthPercentageToDP( '3%' ),
-                }}
-              />
-              <View
-                style={{
-                  justifyContent: 'center', marginRight: 10, flex: 1
-                }}
+    <SafeAreaView style={{
+      flex: 1
+    }}>
+      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
+      <HeaderTitle
+        navigation={navigation}
+        backButton={true}
+        firstLineTitle={'Wallet Settings'}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
+      <View style={styles.modalContainer}>
+        <ScrollView style={{
+          flex: 1
+        }}>
+          <ModalContainer onBackground={()=>setShowRescanningModal( false )} visible={showRescanningPrompt} closeBottomSheet={() => { }}>
+            {showRescanningPromptBottomSheet()}
+          </ModalContainer>
+          <ModalContainer onBackground={()=>setShowRescanningModal( false )} visible={showRescanningModal} closeBottomSheet={() => { }}>
+            {showRescanningBottomSheet()}
+          </ModalContainer>
+          {menuOptions.map( ( menuOption, index ) => {
+            return (
+              <AppBottomSheetTouchableWrapper
+                onPress={() => handleOptionSelection( menuOption )}
+                style={styles.selectedContactsView}
+                key={index}
               >
-                <Text style={styles.titleText}>{menuOption.title}</Text>
-                <Text style={styles.infoText}>{menuOption.subtitle}</Text>
-              </View>
+                <Image
+                  source={menuOption.imageSource}
+                  style={{
+                    width: widthPercentageToDP( '7%' ),
+                    height: widthPercentageToDP( '7%' ),
+                    resizeMode: 'contain',
+                    marginLeft: widthPercentageToDP( '3%' ),
+                    marginRight: widthPercentageToDP( '3%' ),
+                  }}
+                />
+                <View
+                  style={{
+                    justifyContent: 'center', marginRight: 10, flex: 1
+                  }}
+                >
+                  <Text style={styles.titleText}>{menuOption.title}</Text>
+                  <Text style={styles.infoText}>{menuOption.subtitle}</Text>
+                </View>
 
-              <View style={{
-                marginLeft: 'auto'
-              }}>
-                {menuOption.screenName !== undefined && (
-                  <Ionicons
-                    name="ios-arrow-forward"
-                    color={Colors.textColorGrey}
-                    size={15}
-                    style={{
-                      marginLeft: widthPercentageToDP( '3%' ),
-                      marginRight: widthPercentageToDP( '3%' ),
-                      alignSelf: 'center',
-                    }}
-                  />
-                )}
-              </View>
-            </AppBottomSheetTouchableWrapper>
-          )
-        } )}
-      </ScrollView>
-    </View>
+                <View style={{
+                  marginLeft: 'auto'
+                }}>
+                  {menuOption.screenName !== undefined && (
+                    <Ionicons
+                      name="ios-arrow-forward"
+                      color={Colors.textColorGrey}
+                      size={15}
+                      style={{
+                        marginLeft: widthPercentageToDP( '3%' ),
+                        marginRight: widthPercentageToDP( '3%' ),
+                        alignSelf: 'center',
+                      }}
+                    />
+                  )}
+                </View>
+              </AppBottomSheetTouchableWrapper>
+            )
+          } )}
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   )
 }
 const styles = StyleSheet.create( {
   modalContainer: {
     height: '100%',
-    backgroundColor: Colors.white,
+    // backgroundColor: Colors.white,
+    marginTop: hp( 15 ),
     alignSelf: 'center',
     width: '100%',
   },

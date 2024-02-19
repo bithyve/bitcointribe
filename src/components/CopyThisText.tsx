@@ -1,28 +1,28 @@
+import Clipboard from '@react-native-clipboard/clipboard'
 import React from 'react'
 import {
-  View,
   Image,
   Text,
+  View
 } from 'react-native'
-import Clipboard from '@react-native-clipboard/clipboard'
-import Colors from '../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import Link from '../assets/images/svgs/link_blue.svg'
+import Colors from '../common/Colors'
+import { translations } from '../common/content/LocContext'
+import Fonts from '../common/Fonts'
 import Toast from '../components/Toast'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { translations } from '../common/content/LocContext'
-import Link from '../assets/images/svgs/link_blue.svg'
-import Fonts from '../common/Fonts'
 
 export default function CopyThisText( props ) {
   const common  = translations[ 'common' ]
 
   function writeToClipboard() {
     Clipboard.setString( props.text )
-    Toast( common.copied )
+    Toast( props.toastText ? props.toastText : common.copied, true )
   }
 
   return (
@@ -69,7 +69,7 @@ export default function CopyThisText( props ) {
             numberOfLines={1}
             style={{
               fontSize: RFValue( 13 ),
-              color: props.title ? Colors.CLOSE_ICON_COLOR : Colors.lightBlue,
+              color: props.title ? Colors.CLOSE_ICON_COLOR : Colors.CLOSE_ICON_COLOR,
               fontFamily: Fonts.Regular
             }}
           >

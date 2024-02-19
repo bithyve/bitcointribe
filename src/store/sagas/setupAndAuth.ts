@@ -1,42 +1,43 @@
-import { call, put, select } from 'redux-saga/effects'
-import { createWatcher } from '../utils/utilities'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import DeviceInfo from 'react-native-device-info'
-import * as Cipher from '../../common/encryption'
-import * as SecureStore from '../../storage/secure-store'
-import {
-  SETUP_WALLET,
-  CREDS_AUTH,
-  STORE_CREDS,
-  credsStored,
-  credsAuthenticated,
-  switchSetupLoader,
-  switchReLogin,
-  CHANGE_AUTH_CRED,
-  RESET_PIN,
-  credsChanged,
-  pinChangedFailed,
-  completedWalletSetup,
-  updateApplication,
-  UPDATE_APPLICATION,
-} from '../actions/setupAndAuth'
-import { keyFetched, updateWallet } from '../actions/storage'
-import config from '../../bitcoin/HexaConfig'
-import { initializeHealthSetup, updateWalletImageHealth, resetLevelsAfterPasswordChange, upgradePDF, setPasswordResetState, updateMetaSharesKeeper, updateOldMetaSharesKeeper } from '../actions/BHR'
-import { updateCloudBackupWorker } from '../sagas/cloud'
-import dbManager from '../../storage/realm/dbManager'
-import { setWalletId } from '../actions/preferences'
-import { AccountType, ContactInfo, LevelData, KeeperInfoInterface, MetaShare, Trusted_Contacts, UnecryptedStreamData, Wallet, WalletDB } from '../../bitcoin/utilities/Interface'
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
-import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
-import { autoSyncShells, newAccountShellCreationCompleted } from '../actions/accounts'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
-import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
+import DeviceInfo from 'react-native-device-info'
+import { call, put, select } from 'redux-saga/effects'
 import semverLte from 'semver/functions/lte'
-import { applyUpgradeSequence } from './upgrades'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
-import ElectrumClient from '../../bitcoin/electrum/client'
+import { AccountType, ContactInfo, KeeperInfoInterface, LevelData, MetaShare, Trusted_Contacts, UnecryptedStreamData, Wallet } from '../../bitcoin/utilities/Interface'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import * as Cipher from '../../common/encryption'
+import RGBServices from '../../services/RGBServices'
+import dbManager from '../../storage/realm/dbManager'
+import * as SecureStore from '../../storage/secure-store'
+import { initializeHealthSetup, resetLevelsAfterPasswordChange, setPasswordResetState, updateMetaSharesKeeper, updateOldMetaSharesKeeper, updateWalletImageHealth, upgradePDF } from '../actions/BHR'
+import { newAccountShellCreationCompleted } from '../actions/accounts'
+import { connectToNode } from '../actions/nodeSettings'
+import { setWalletId } from '../actions/preferences'
+import { setRgbConfig, syncRgb } from '../actions/rgb'
+import {
+  CHANGE_AUTH_CRED,
+  CREDS_AUTH,
+  RESET_PIN,
+  SETUP_WALLET,
+  STORE_CREDS,
+  UPDATE_APPLICATION,
+  completedWalletSetup,
+  credsAuthenticated,
+  credsChanged,
+  credsStored,
+  pinChangedFailed,
+  switchReLogin,
+  switchSetupLoader,
+  updateApplication
+} from '../actions/setupAndAuth'
+import { keyFetched, updateWallet } from '../actions/storage'
+import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
+import { updateCloudBackupWorker } from '../sagas/cloud'
+import { createWatcher } from '../utils/utilities'
+import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
+import { applyUpgradeSequence } from './upgrades'
 
 
 function* setupWalletWorker( { payload } ) {
@@ -108,6 +109,10 @@ function* setupWalletWorker( { payload } ) {
   yield put( newAccountShellCreationCompleted() )
   if( security ) yield put( initializeHealthSetup() )  // initialize health-check schema on relay
   yield put( completedWalletSetup( ) )
+  const config = yield call( RGBServices.restoreKeys, primaryMnemonic )
+  yield put( setRgbConfig( config ) )
+  const isRgbInit = yield call( RGBServices.initiate, config.mnemonic, config.xpub  )
+  if( isRgbInit ) yield put( syncRgb() )
 }
 
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
@@ -134,7 +139,7 @@ function* credentialsStorageWorker( { payload } ) {
   yield put( credsStored() )
 
   // connect electrum-client
-
+  yield put( connectToNode() )
 }
 
 export const credentialStorageWatcher = createWatcher(
@@ -184,7 +189,6 @@ function* resetPasswordWorker( { payload } ) {
 
 
 function* credentialsAuthWorker( { payload } ) {
-  // let t = timer('credentialsAuthWorker')
   yield put( switchSetupLoader( 'authenticating' ) )
   let key
   try {
@@ -195,7 +199,6 @@ function* credentialsAuthWorker( { payload } ) {
     yield call( dbManager.initDb, uint8array )
   } catch ( err ) {
     console.log( 'err', err )
-
     if ( payload.reLogin ) yield put( switchReLogin( false ) )
     else yield put( credsAuthenticated( false ) )
     return
@@ -206,20 +209,35 @@ function* credentialsAuthWorker( { payload } ) {
     yield put( switchReLogin( true ) )
   } else {
     yield put( credsAuthenticated( true ) )
+    yield put( connectToNode() )
+
     // t.stop()
     yield put( keyFetched( key ) )
     // yield put( autoSyncShells() )
+    // const rgbConfig: RGBConfig = yield select( state => state.rgb.config )
+    // if( !rgbConfig || rgbConfig.mnemonic ==='' ) {
+    //   const wallet : Wallet = dbManager.getWallet()
+    //   const config = yield call( RGBServices.restoreKeys, wallet.primaryMnemonic )
+    //   yield put( setRgbConfig( config ) )
+    //   const isRgbInit = yield call( RGBServices.initiate, rgbConfig.mnemonic, rgbConfig.xpub  )
+    //   if( isRgbInit ) yield put( syncRgb() )
+    // } else {
+    //   const isRgbInit = yield call( RGBServices.initiate, rgbConfig.mnemonic, rgbConfig.xpub  )
+    //   if( isRgbInit ) yield put( syncRgb() )
+    //   // const accountShells: AccountShell[] = yield select( ( state ) => state.accounts.accountShells )
+    //   // const shell = accountShells.find( account => account.primarySubAccount.type === AccountType.CHECKING_ACCOUNT_NATIVE_SEGWIT )
+    //   // const accounts: Accounts = yield select( ( state ) => state.accounts.accounts )
+    //   // const defaultAccount = accounts[ shell.id ]
 
+
+    // }
+    // yield put( autoSyncShells() ) // have to synchronize w/ connectToNode saga in order for this to work
 
     // check if the app has been upgraded
     const wallet: Wallet = yield select( state => state.storage.wallet )
     const storedVersion = wallet.version
     const currentVersion = DeviceInfo.getVersion()
     if( currentVersion !== storedVersion ) yield put( updateApplication( currentVersion, storedVersion ) )
-
-    // initialize configuration file
-    const { activePersonalNode } = yield select( state => state.nodeSettings )
-    if( activePersonalNode ) config.connectToPersonalNode( activePersonalNode )
   }
 }
 

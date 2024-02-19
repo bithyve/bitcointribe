@@ -21,11 +21,11 @@ import QRCode from '../../components/QRCode'
 import { authenticator } from 'otplib'
 
 const TwoFASetup = props => {
-  const twoFASetup = props.navigation.getParam( 'twoFASetup' )
+  const twoFASetup = props.route.params?.twoFASetup
   // const [ twoFAValidationModal, showTwoFAValidationModal ] = useState( false )
   const { twoFAKey } = twoFASetup
-  const fromWallet = props.navigation?.getParam( 'fromWallet' ) || false
-  const address = props.navigation?.getParam( 'address' ) || null
+  const fromWallet = props.route.params?.fromWallet || false
+  const address = props.route.params?.address || null
 
   return (
     <SafeAreaView style={{

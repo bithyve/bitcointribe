@@ -1,26 +1,24 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
   SafeAreaView,
-  StatusBar,
+  StatusBar, View
 } from 'react-native'
 import Colors from '../../common/Colors'
-import _ from 'underscore'
-import ModalContainer from '../../components/home/ModalContainer'
 import BottomInputModalContainer from '../../components/home/BottomInputModalContainer'
+import ModalContainer from '../../components/home/ModalContainer'
 
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import moment from 'moment'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import RNPreventScreenshot from 'react-native-screenshot-prevent'
+import { useDispatch } from 'react-redux'
+import AlertModalContents from '../../components/AlertModalContents'
+import dbManager from '../../storage/realm/dbManager'
+import { updateSeedHealth } from '../../store/actions/BHR'
+import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
+import SeedBacupModalContents from './SeedBacupModalContents'
 import SeedHeaderComponent from './SeedHeaderComponent'
 import SeedPageComponent from './SeedPageComponent'
-import SeedBacupModalContents from './SeedBacupModalContents'
-import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
-import { useDispatch } from 'react-redux'
-import { updateSeedHealth } from '../../store/actions/BHR'
-import AlertModalContents from '../../components/AlertModalContents'
-import RNPreventScreenshot from 'react-native-screenshot-prevent'
-import dbManager from '../../storage/realm/dbManager'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import moment from 'moment'
 
 const BackupSeedWordsContent = ( props ) => {
   const [ seedWordModal, setSeedWordModal ] = useState( false )
@@ -34,8 +32,8 @@ const BackupSeedWordsContent = ( props ) => {
   // const [ headerTitle, setHeaderTitle ]=useState( 'First 6 Backup Phrase' )
 
   const dispatch = useDispatch()
-  const fromHistory = props.navigation.getParam( 'fromHistory' )
-  const isChangeKeeperType =  props.navigation.getParam( 'isChangeKeeperType' )
+  const fromHistory = props.route.params?.fromHistory
+  const isChangeKeeperType =  props.route.params?.isChangeKeeperType
   useEffect( ()=>{
     // RNPreventScreenshot.enabled( true )
 
@@ -191,17 +189,18 @@ const BackupSeedWordsContent = ( props ) => {
           onPressProceed={() => {
             RNPreventScreenshot.enabled( false )
             setSeedWordModal( false )
-            const navigationParams =  props.navigation.getParam( 'navigationParams' )
+            const navigationParams =  props.route.params?.navigationParams
             if ( isChangeKeeperType ) {
-              props.navigation.navigate( 'SeedBackupHistory', {
+              props.navigation.navigate( 'SeedBackup',  {
                 navigationParams,
                 isChangeKeeperType: true,
               } )
             } else {
-              props.navigation.navigate( 'SeedBackupHistory', {
+              props.navigation.navigate( 'SeedBackup', {
                 navigationParams,
                 // isChangeKeeperType: true,
-              } )
+              }
+              )
             }
           }}
           onPressIgnore={() => setSeedWordModal( false )}

@@ -18,8 +18,8 @@ const ViewAllScreen = inject(
   'InvoicesStore',
   'TransactionsStore'
 )(
-  observer( ( { InvoicesStore, TransactionsStore, navigation } ) => {
-    const { mode, accountShellId } = navigation.state.params
+  observer( ( { InvoicesStore, TransactionsStore, navigation, route } ) => {
+    const { mode, accountShellId } = route.params
     return (
       <View>
         {mode === Mode.LIGHTNING ? (

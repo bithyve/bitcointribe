@@ -58,7 +58,7 @@ const ImportBWGrid = ( props ) => {
       dispatch( completedWalletSetup() )
       AsyncStorage.setItem( 'walletRecovered', 'true' )
       dispatch( setVersion( 'Restored' ) )
-      props.navigation.navigate( 'HomeNav' )
+      props.navigation.navigate( 'App' )
     }
   }, [ wallet ] )
 
@@ -79,7 +79,7 @@ const ImportBWGrid = ( props ) => {
       props.navigation.navigate( 'BorderWalletGridScreen', {
         mnemonic,
         isNewWallet: true,
-        isAccountCreation: true
+        isImportAccount: true
       } )
     } else {
       Toast( 'Invalid mnemonic' )

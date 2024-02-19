@@ -1,70 +1,70 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import moment from 'moment'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  Platform,
   Image,
   ImageBackground,
-  Linking,
-  TextInput,
   KeyboardAvoidingView,
+  Linking,
+  Platform,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import Fonts from '../../common/Fonts'
+import { RNCamera } from 'react-native-camera'
 import DeviceInfo from 'react-native-device-info'
+import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import Entypo from 'react-native-vector-icons/Entypo'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
+import config from '../../bitcoin/HexaConfig'
+import Colors from '../../common/Colors'
+import { isEmpty } from '../../common/CommonFunctions'
+import Fonts from '../../common/Fonts'
 import NavStyles from '../../common/Styles/NavStyles'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import {
+  FAST_BITCOINS,
+  REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
-  REGULAR_ACCOUNT,
-  FAST_BITCOINS,
 } from '../../common/constants/wallet-service-types'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Entypo from 'react-native-vector-icons/Entypo'
-import Colors from '../../common/Colors'
-import BottomSheet from 'reanimated-bottom-sheet'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { RNCamera } from 'react-native-camera'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import ModalHeader from '../../components/ModalHeader'
-import QuoteConfirmation from './QuoteConfirmation'
-import VoucherRedeemSuccess from './VoucherRedeemSuccess'
-import AccountVerification from './AccountVerification'
-import { ScrollView } from 'react-native-gesture-handler'
-import { useDispatch, useSelector } from 'react-redux'
-import { UsNumberFormat } from '../../common/utilities'
-import {
-  accountSync,
-  getQuote,
-  executeOrder,
-  ClearAccountSyncData,
-  ClearQuoteDetails,
-  ClearOrderDetails,
-  accountSyncFail,
-  getQuoteFail,
-  executeOrderFail,
-  storeFbtcData,
-  clearFbtcVoucher,
-} from '../../store/actions/fbtc'
-import config from '../../bitcoin/HexaConfig'
-import Loader from '../../components/loader'
-import Toast from '../../components/Toast'
-import moment from 'moment'
-import { isEmpty } from '../../common/CommonFunctions'
-import AccountShell from '../../common/data/models/AccountShell'
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import { addNewSecondarySubAccount } from '../../store/actions/accounts'
-import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import SubAccountKind from '../../common/data/enums/SubAccountKind'
+import AccountShell from '../../common/data/models/AccountShell'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import { UsNumberFormat } from '../../common/utilities'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import ModalHeader from '../../components/ModalHeader'
+import Toast from '../../components/Toast'
+import Loader from '../../components/loader'
+import { addNewSecondarySubAccount } from '../../store/actions/accounts'
+import {
+  ClearAccountSyncData,
+  ClearOrderDetails,
+  ClearQuoteDetails,
+  accountSync,
+  accountSyncFail,
+  clearFbtcVoucher,
+  executeOrder,
+  executeOrderFail,
+  getQuote,
+  getQuoteFail,
+  storeFbtcData,
+} from '../../store/actions/fbtc'
+import AccountVerification from './AccountVerification'
+import QuoteConfirmation from './QuoteConfirmation'
+import VoucherRedeemSuccess from './VoucherRedeemSuccess'
 
 const VoucherScanner = ( props ) => {
   //const FBTCVoucher = useSelector((state) => state.fbtc.FBTCVoucher);
@@ -72,9 +72,7 @@ const VoucherScanner = ( props ) => {
   const [ FBTCAccount_Data, setFBTCAccount_Data ] = useState( {
   } )
   const [ TextHideShow, setTextHideShow ] = useState( true )
-  const userKey1 = props.navigation.state.params
-    ? props.navigation.state.params.userKey
-    : ''
+  const userKey1 = props.route.params?.userKey || ''
   const [ bitcoinAddress, setBitcoinAddress ] = useState( '' )
   const QuoteDetails = useSelector( ( state ) => state.fbtc.getQuoteDetails )
   const executeOrderDetails = useSelector(
@@ -1012,9 +1010,10 @@ const VoucherScanner = ( props ) => {
         </ScrollView>
         {hideShow ? (
           <View style={styles.dropDownView}>
-            {accounts.map( ( value ) => {
+            {accounts.map( ( value, index ) => {
               return (
                 <TouchableOpacity
+                  key={`${JSON.stringify( value )}_${index}`}
                   activeOpacity={10}
                   onPress={() => {
                     setHideShow( false )

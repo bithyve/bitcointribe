@@ -1,11 +1,8 @@
-import React, { useContext } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
+import React from 'react'
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
-import { LocalizationContext } from '../../common/content/LocContext'
-import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
-import { AccountType } from '../../bitcoin/utilities/Interface'
 import Fonts from './../../common/Fonts'
 
 export type Props = {
@@ -18,8 +15,6 @@ const AddNewAccountCard: React.FC<Props> = ( {
   containerStyle = {
   },
 }: Props ) => {
-  const { translations } = useContext( LocalizationContext )
-  const add_new = translations[ 'home' ].add_new
   return (
     <TouchableOpacity activeOpacity={0.85}
       onPress={onPress}
@@ -46,7 +41,7 @@ const AddNewAccountCard: React.FC<Props> = ( {
               fontFamily: Fonts.SemiBold
             }}
           >
-            Add Wallet
+          Add Account/Wallet
           </Text>
         </View>
       </View>

@@ -1,22 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
-  TouchableOpacity,
-  Text,
   SafeAreaView,
-  StyleSheet,
+  StyleSheet, Text, TouchableOpacity, View
 } from 'react-native'
-import Colors from '../../../common/Colors'
-import Fonts from '../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import Colors from '../../../common/Colors'
+import Fonts from '../../../common/Fonts'
 
-import { useDispatch, useSelector } from 'react-redux'
-import { credsAuth, credsAuthenticated, switchReLogin } from '../../../store/actions/setupAndAuth'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
-import BottomInfoBox from '../../../components/BottomInfoBox'
+import { useDispatch, useSelector } from 'react-redux'
 import { translations } from '../../../common/content/LocContext'
+import { credsAuth, credsAuthenticated, switchReLogin } from '../../../store/actions/setupAndAuth'
 
 export default function EnterPasscodeScreen( props ) {
   const strings  = translations[ 'settings' ]
@@ -487,12 +483,6 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
     marginBottom: hp( '1%' ),
   },
   proceedButtonText: {

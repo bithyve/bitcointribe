@@ -1,39 +1,27 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Keyboard, Alert } from 'react-native'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import {  useDispatch, useSelector } from 'react-redux'
+import React, { useEffect, useRef, useState } from 'react'
+import { Keyboard, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
-import { AccountType, DeepLinkEncryptionType, Gift, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { useDispatch, useSelector } from 'react-redux'
+import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
+import { AccountType, DeepLinkEncryptionType, Gift } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import CheckingAcc from '../../assets/images/svgs/gift_icon_new.svg'
-
-import GiftCard from '../../assets/images/svgs/icon_gift.svg'
-import DashedContainer from '../FriendsAndFamily/DashedContainer'
-import Illustration from '../../assets/images/svgs/illustration.svg'
+import BottomInfoBox from '../../components/BottomInfoBox'
 import idx from 'idx'
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import useSpendableBalanceForAccountShell from '../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
-import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
+import { RootSiblingParent } from 'react-native-root-siblings'
 import AccountShell from '../../common/data/models/AccountShell'
-import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import { giftAccepted } from '../../store/actions/accounts'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import AddGiftToAccount from './AddGiftToAccount'
 import DashedLargeContainer from './DahsedLargeContainer'
 import ThemeList from './Theme'
-import { giftAccepted } from '../../store/actions/accounts'
-import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
-import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
-import { RootSiblingParent } from 'react-native-root-siblings'
-import AccountSelection from './AccountSelection'
-import { associateGift } from '../../store/actions/trustedContacts'
-import DashedContainerSmall from './DashedContainerSmall'
-import { resetStackToAccountDetails,  } from '../../navigation/actions/NavigationActions'
-import AccountSelected from './AccountSelected'
-import AddGiftToAccount from './AddGiftToAccount'
+import ModalContainer from '../../components/home/ModalContainer'
+import LoaderModal from '../../components/LoaderModal'
 
 
 export type Props = {
@@ -52,18 +40,21 @@ export type Props = {
   giftId: string; //NOTE: here gift id stands for channelAddress of the gift(we should use more consistent naming to avoid confusion)
   isGiftWithFnF: boolean;
   isContactAssociated: boolean;
-  version?: string
+  version?: string;
+  stopReset?:boolean;
+  giftLoading:boolean;
 };
 
 const NUMBER_OF_INPUTS = 6
 
-export default function AcceptGift( { navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject, version }: Props ) {
+export default function AcceptGift( { giftLoading, stopReset, navigation, closeModal, onGiftRequestAccepted, onGiftRequestRejected, walletName, giftAmount, inputType, hint, note, themeId, giftId, isGiftWithFnF, isContactAssociated, onPressAccept, onPressReject, version }: Props ) {
   const dispatch = useDispatch()
   const [ WrongInputError, setWrongInputError ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
   const [ PhoneNumber, setPhoneNumber ] = useState( '' )
   const [ EmailId, setEmailId ] = useState( '' )
   const [ onBlurFocus, setOnBlurFocus ] = useState( false )
+  const [ loading, setLoading ] = useState( false )
   const [ passcode, setPasscode ] = useState( '' )
   const [ passcodeArray, setPasscodeArray ] = useState( [
     '',
@@ -77,6 +68,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const [ downloadedGiftid, seDownloadedGiftId ] = useState( '' )
   const [ confirmAccount, setConfirmAccount ] = useState( false )
   const [ giftAddedModal, setGiftAddedModel ] = useState( false )
+  const toogleLoading = useSelector( ( state ) => state.doNotStore.toogleGiftLoading )
   const [ accType, setAccType ] = useState( AccountType.CHECKING_ACCOUNT )
   const [ accId, setAccId ] = useState( '' )
   const [ giftAcceptedModel, setGiftAcceptedModel ] = useState( false )
@@ -90,10 +82,23 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
   const sendingAccount = accountShells.find( shell => shell.primarySubAccount.type == accType && shell.primarySubAccount.instanceNumber === 0 )
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sendingAccount )
 
+  const handleGiftAccept=( key )=>{
+    setLoading( true )
+    setTimeout( ()=>{
+      onGiftRequestAccepted( key )
+    }, 2000 )
+  }
+
+  useEffect( () => {
+    setLoading( false )
+    setIsDisabled( false )
+  }, [ giftLoading, toogleLoading ] )
+
+
   useEffect( () => {
     setAccId( sourcePrimarySubAccount.id )
     // return `${title} (${strings.availableToSpend}: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
-
+    setLoading( false )
   }, [ sourcePrimarySubAccount ] )
 
   useEffect( ()=> {
@@ -101,11 +106,13 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       if( gift.channelAddress === acceptedGiftId )
         setAcceptedGift( gift )
     } )
+    setLoading( false )
   }, [ acceptedGiftId ] )
 
   useEffect( () => {
     if ( !inputType || inputType === DeepLinkEncryptionType.DEFAULT ) setIsDisabled( false )
     else setIsDisabled( true )
+    setLoading( false )
   }, [ inputType ] )
 
   useEffect( () => {
@@ -117,7 +124,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       setGiftAcceptedModel( true )
       setIsDisabled( false )
     }
-
+    setLoading( false )
   }, [ acceptedGiftId ] )
 
   useEffect( () => {
@@ -126,6 +133,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       setGiftAddedModel( true )
       setIsDisabled( false )
     }
+    setLoading( false )
   }, [ addedGiftId ] )
 
   const getStyle = ( i ) => {
@@ -205,6 +213,54 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     }
   }
 
+  const handleClose=()=>{
+    setAcceptGiftModal( false )
+    closeModal()
+    dispatch( giftAccepted( '' ) )
+    if( !stopReset ){
+      navigation.navigate( 'ManageGifts', {
+        giftType: '0'
+      } )
+    }
+  }
+
+  const throttle=( func, delay )=>{
+    let lastCall = 0
+    return function( ...args ) {
+      const now = new Date().getTime()
+      if ( now - lastCall < delay ) {
+        return
+      }
+      lastCall = now
+      return func( ...args )
+    }
+  }
+
+  const handleOTPInput=throttle( ( event: any, i : number )=>{
+    const { text } = event.nativeEvent
+    if ( text.length > 1 ) {
+      applyOTPCodeToInputs( text )
+      setPasscodeArray( text.split( '' ) )
+      return
+    }
+    if ( text.length === 1 && i !== NUMBER_OF_INPUTS - 1 ) {
+      const nextInput = itemsRef.current[ i + 1 ]
+      if ( nextInput ) {
+        nextInput.focus()
+      }
+    }
+    // }
+    // determine new value
+    const newValues = [ ...passcodeArray ]
+    newValues[ i ] = text
+
+    // update state
+    setPasscodeArray( newValues )
+    // also call callback as a flat string
+    // otpCodeChanged(newValues?.join(''));
+
+  }, 300 )
+
   const getInputBox = () => {
     if ( inputType == DeepLinkEncryptionType.EMAIL ) {
       return (
@@ -281,110 +337,10 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
         <View style={{
           flexDirection: 'row', marginBottom: wp( '5%' ), justifyContent: 'space-evenly'
         }}>
-          {/* {[ 0, 1, 2, 3, 4, 5 ].map( ( i ) => {
-            return (
-              <TextInput
-                key={i}
-                maxLength={1}
-                returnKeyType="done"
-                returnKeyLabel="Done"
-                keyboardType={
-                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
-                }
-                placeholder="-"
-                ref={( input ) => {
-                  if ( i == 0 ) this.textInput = input
-                  if ( i == 1 ) this.textInput2 = input
-                  if ( i == 2 ) this.textInput3 = input
-                  if ( i == 3 ) this.textInput4 = input
-                  if ( i == 4 ) this.textInput5 = input
-                  if ( i == 5 ) this.textInput6 = input
-                }}
-                style={getStyle( i )}
-                onChangeText={( value ) => {
-                  if ( value && i == 0 ) {
-                    onPressNumber( value, 0 )
-                    this.textInput2.focus()
-                  }
-                  if ( value && i == 1 ) {
-                    onPressNumber( value, 1 )
-                    this.textInput3.focus()
-                  }
-                  if ( value && i == 2 ) {
-                    onPressNumber( value, 2 )
-                    this.textInput4.focus()
-                  }
-                  if ( value && i == 3 ) {
-                    onPressNumber( value, 3 )
-                    this.textInput5.focus()
-                  }
-                  if ( value && i == 4 ) {
-                    onPressNumber( value, 4 )
-                    this.textInput6.focus()
-                  }
-                  if ( value && i == 5 ) {
-                    onPressNumber( value, 5 )
-                    this.textInput6.focus()
-
-                  }
-                }}
-                onKeyPress={( e ) => {
-                  if ( e.nativeEvent.key === 'Backspace' && i == 0 ) {
-                    this.textInput.focus()
-                    onPressNumber( '', 0 )
-                  }
-                  if ( e.nativeEvent.key === 'Backspace' && i == 1 ) {
-                    this.textInput.focus()
-                    onPressNumber( '', 1 )
-                  }
-                  if ( e.nativeEvent.key === 'Backspace' && i == 2 ) {
-                    this.textInput2.focus()
-                    onPressNumber( '', 2 )
-                  }
-                  if ( e.nativeEvent.key === 'Backspace' && i == 3 ) {
-                    this.textInput3.focus()
-                    onPressNumber( '', 3 )
-                  }
-                  if ( e.nativeEvent.key === 'Backspace' && i == 4 ) {
-                    this.textInput4.focus()
-                    onPressNumber( '', 4 )
-                  }
-                  if ( e.nativeEvent.key === 'Backspace' && i == 5 ) {
-                    this.textInput5.focus()
-                    onPressNumber( '', 5 )
-                  }
-                }}
-                onFocus={() => {
-                  // if ( Platform.OS == 'ios' ) {
-                  setIsDisabled( true )
-                  // }
-                }}
-                onBlur={() => {
-                  // if ( Platform.OS == 'ios' ) {
-                  if (
-                    ( passcodeArray.length == 0 ||
-                        passcodeArray.length == 6 ) &&
-                      i == 5
-                  ) {
-                    setIsDisabled( false )
-                  }
-                  // }
-                }}
-                autoCorrect={false}
-                autoCompleteType="off"
-                //value={passcodeArray[i] && passcodeArray[i].length ? passcodeArray[i] : ""}
-              />
-            )
-          } )} */}
           {Array.from( {
             length: NUMBER_OF_INPUTS
           }, ( _, i ) => (
             <TextInput
-              // style={{
-              //   paddingLeft: Platform.OS === 'ios' ? 0 : 0,
-              //   paddingRight: Platform.OS === 'ios' ? 10 : 0,
-              //   color: 'red'
-              // }}
               style={getStyle( i )}
               ref={( el ) => ( itemsRef.current[ i ] = el )}
               key={i}
@@ -397,44 +353,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
               value={passcodeArray[ i ]}
               defaultValue=""
               // first input can have a length of 6 because they paste their code into it
-              maxLength={i === 0 ? NUMBER_OF_INPUTS : 1}
-              onChange={( event ) => {
-                const { text } = event.nativeEvent
-                // only continue one if we see a text of length 1 or 6
-                // if (text.length === 0 || text.length === 1 || text.length === 6) {
-                if ( text.length > 1 ) {
-                  applyOTPCodeToInputs( text )
-                  // determine new value
-                  const newValues = [ ...passcodeArray ]
-                  newValues[ i ] = text.charAt( 0 )
-
-                  // update state
-                  setPasscodeArray( newValues )
-                  // if( text.length >= 6 ) {
-                  //   setIsDisabled( false )
-                  // } else setIsDisabled( true )
-                  return
-                }
-                // if( text.length == 1 && i==NUMBER_OF_INPUTS-1 ) {
-                //   setIsDisabled( false )
-                // } else setIsDisabled( true )
-                // going forward, only if text is not empty
-                if ( text.length === 1 && i !== NUMBER_OF_INPUTS - 1 ) {
-                  const nextInput = itemsRef.current[ i + 1 ]
-                  if ( nextInput ) {
-                    nextInput.focus()
-                  }
-                }
-                // }
-                // determine new value
-                const newValues = [ ...passcodeArray ]
-                newValues[ i ] = text
-
-                // update state
-                setPasscodeArray( newValues )
-                // also call callback as a flat string
-                // otpCodeChanged(newValues?.join(''));
-              }}
+              onChange={( event ) => {handleOTPInput( event, i )}}
               onKeyPress={( event ) => {
                 if ( event.nativeEvent.key === 'Backspace' ) {
                   // going backward:
@@ -495,11 +414,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
         onPress={() => {
           if ( text === 'Add to Account' ) {
             setGiftAcceptedModel( false )
-            // setShowAccounts( true )
             setAddGiftToAccountFlow( true )
-            // navigation.navigate( 'AccountDetails', {
-            //   accountShellID: sourcePrimarySubAccount.accountShellID,
-            // } )
           } else if( text === 'Accept' ) {
             setIsDisabled( true )
             if ( isGiftWithFnF ) {
@@ -535,17 +450,14 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
                 passcodeArray.map( ( item )=> {
                   data+=item
                 } )
-                onGiftRequestAccepted( data )
-              } else onGiftRequestAccepted( passcode )
+                handleGiftAccept( data )
+              } else handleGiftAccept( passcode )
             }
-            // setAcceptGiftModal( false )
-            // setGiftAcceptedModel( true )
           }
         }}
         style={{
           ...styles.buttonView,
           backgroundColor:
-          // isDisabled && buttonIsDisabled ? Colors.lightBlue :
           Colors.blue,
         }}
       >
@@ -554,18 +466,9 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
     )
   }
 
-  // const numberWithCommas = ( x ) => {
-  //   return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
-  // }
-
   const renderGiftAcceptedtModal = () => {
     return (
       <>
-        {/* <View style={{
-          marginTop: 'auto', right: 0, bottom: 0, position: 'absolute', marginLeft: 'auto'
-        }}>
-          <Illustration/>
-        </View> */}
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => {
@@ -610,34 +513,6 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           }}
           infoText={''}
         />
-        <View style={{
-          flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 ),
-        }}>
-          {/* {renderButton( 'Add to Account', false )} */}
-          {/* <TouchableOpacity
-            onPress={() => {
-              // onGiftRequestRejected()
-              setGiftAcceptedModel( false )
-              closeModal()
-            }}
-            style={{
-              height: wp( '12%' ),
-              width: wp( '27%' ),
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingLeft: wp( '8%' ),
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: Fonts.Medium,
-                color: Colors.blue
-              }}
-            >
-              {'OK'}
-            </Text>
-          </TouchableOpacity> */}
-        </View>
       </>
     )
   }
@@ -692,16 +567,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       <>
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => {
-            setAcceptGiftModal( false )
-            closeModal()
-            dispatch( giftAccepted( '' ) )
-            navigation.navigate( 'ManageGifts', {
-              giftType : '0'
-            } )
-          }
-
-          }
+          onPress={handleClose}
           style={{
             width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7 / 2 ),
             alignSelf: 'flex-end',
@@ -735,129 +601,7 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             version={version}
             isAccept
           />
-          {/* <View
-            style={{
-              width: '95%',
-              backgroundColor: Colors.gray7,
-              alignSelf: 'center',
-              borderRadius: wp( 2 ),
-              marginVertical: hp( 3 ),
-              paddingVertical: wp( 1 ),
-              paddingHorizontal: wp( 1 ),
-              borderColor: Colors.lightBlue,
-              borderWidth: 1,
-            }}>
-            <View style={{
-              backgroundColor: Colors.gray7,
-              borderRadius: wp( 2 ),
-              // paddingVertical: hp( 0.3 ),
-              // paddingHorizontal: wp( 0.3 ),
-              borderColor: Colors.lightBlue,
-              borderWidth: 1,
-              borderStyle: 'dashed',
-              padding: wp( 3 )
-            }}>
-              <View style={{
-                flexDirection: 'row', justifyContent: 'space-between', padding: wp( 2 )
-              }}>
-                <View style={{
-                  flex: 1
-                }}>
-                  <Text style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue( 13 ),
-                    // fontFamily: Fonts.Regular,
-                  }}>{walletName}</Text>
-                  <Text style={{
-                    color: Colors.lightTextColor,
-                    fontSize: RFValue( 12 ),
-                    fontFamily: Fonts.Regular,
-                    letterSpacing: 0.6,
-                    marginTop: hp( 1 )
-                  }}>
-                    {note? note: 'This is to get you started! Welcome to the world of Bitcoin'}
-                  </Text>
-                </View>
-
-                <GiftCard width={63} height={63} />
-              </View>
-              <View style={{
-                flexDirection: 'row', justifyContent: 'space-between', padding: wp( 2 ),
-                alignItems: 'center'
-              }}>
-                <Text style={{
-                  color: Colors.blue,
-                  fontSize: RFValue( 18 ),
-                  fontFamily: Fonts.Regular,
-                }}>Gift Sats</Text>
-                <Text style={{
-                  color: Colors.black,
-                  fontSize: RFValue( 24 ),
-                  fontFamily: Fonts.Regular,
-                }}>
-                  {numberWithCommas( giftAmount )}
-                  <Text style={{
-                    color: Colors.lightTextColor,
-                    fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.Regular,
-                  }}>
-                    {' sats'}
-                  </Text>
-                </Text>
-              </View>
-            </View>
-          </View> */}
-          {/* <TouchableOpacity
-            onPress={() => {setShowAccounts( true );  setAcceptGiftModal( false )}}
-            style={{
-              width: '95%',
-              // height: '54%',
-              backgroundColor: Colors.backgroundColor1,
-              // shadowOpacity: 0.06,
-              // shadowOffset: {
-              //   width: 10, height: 10
-              // },
-              // shadowRadius: 10,
-              // elevation: 2,
-              alignSelf: 'center',
-              borderRadius: wp( 2 ),
-              marginVertical: hp( 2 ),
-              paddingVertical: hp( 2 ),
-              paddingHorizontal: wp( 4 ),
-              flexDirection: 'row',
-              alignItems: 'center'
-            }}>
-            {getAvatarForSubAccount( sourcePrimarySubAccount, false, true )}
-            <View style={{
-              marginHorizontal: wp( 3 )
-            }}>
-              <Text style={{
-                color: Colors.gray4,
-                fontSize: RFValue( 10 ),
-                fontFamily: Fonts.Regular,
-              }}>
-                Bitcoin will be transferred to
-              </Text>
-              <Text
-                style={{
-                  color: Colors.black,
-                  fontSize: RFValue( 14 ),
-                  fontFamily: Fonts.Regular,
-                  marginVertical: hp( 0.3 )
-                }}
-              >
-                {sourceAccountHeadlineText}
-              </Text>
-              <Text style={styles.availableToSpendText}>
-                Balance
-                <Text style={styles.balanceText}> {spendableBalance} {formattedUnitText}</Text>
-              </Text>
-
-            </View>
-          </TouchableOpacity> */}
-
         </View>
-        {/* {inputType === DeepLinkEncryptionType.DEFAULT ?  setIsDisabled( false ) : null} */}
         {inputType === DeepLinkEncryptionType.SECRET_PHRASE && hint &&
           <Text style={{
             color: Colors.gray4,
@@ -884,7 +628,6 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
             Enter OTP to accept
           </Text>
         }
-        {/* {props.inputNotRequired ? null: ( */}
         <View style={{
           marginHorizontal: wp( 5 )
         }}>
@@ -936,25 +679,25 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
       </>
     )
   }
-  // const renderMessage = () => {
-  //   return(
-  //     <View style={{
-  //       height: hp( '20%' )
-  //     }}>
-  //       <View style={{
-  //         marginLeft: wp( 6 ), marginTop: hp( 2 )
-  //       }}>
-  //         <Text style={styles.modalTitleText}>Accepting Gift inprogress...</Text>
-  //         <Text style={{
-  //           ...styles.modalInfoText,
-  //         }}>You will get confirmation in some time</Text>
-  //       </View>
-  //     </View>
-  //   )
-  // }
 
   return (
     <RootSiblingParent>
+      {loading && <View style={styles.modalContentContainer}>
+        <ModalContainer
+          onBackground={() => {}}
+          visible={true}
+          closeBottomSheet={() => {}}
+        >
+          <LoaderModal
+            headerText={'Unpacking Your Gift'}
+            messageText={
+              'Your gift is currently being unpacked. Once this process is complete, you will be able to claim it in the gift section.'
+            }
+            messageText2={''}
+            source={require( '../../assets/images/gift.gif' )}
+          />
+        </ModalContainer>
+      </View>}
       {acceptGift &&
         <View style={styles.modalContentContainer}>
           {renderAcceptModal()}
@@ -965,9 +708,6 @@ export default function AcceptGift( { navigation, closeModal, onGiftRequestAccep
           {renderGiftAcceptedtModal()}
         </View>
       }
-      {/* {!acceptGift && !giftAcceptedModel && !showAccounts &&
-       renderMessage()
-      } */}
       {addGiftToAccountFlow &&
       <AddGiftToAccount
         getTheme={getTheme}
@@ -1202,5 +942,4 @@ const styles = StyleSheet.create( {
 } )
 
 // export default AcceptGift
-
 

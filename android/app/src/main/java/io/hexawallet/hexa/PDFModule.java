@@ -81,7 +81,9 @@ public class PDFModule extends ReactContextBaseJavaModule {
             PdfTextExtractor textExtractor = new PdfTextExtractor(pdfReader);
             WritableArray pages = new WritableNativeArray();
             for (int pageIndex = 1; pageIndex <= pdfReader.getNumberOfPages(); pageIndex++) {
-                pages.pushString(textExtractor.getTextFromPage(pageIndex));
+                String pageText = textExtractor.getTextFromPage(pageIndex);
+                String cleanedText = pageText.replaceAll("[^\\x20-\\x7e]", "").replaceAll("\\s+", " ").trim();
+                pages.pushString(cleanedText);
             }
             pdfReader.close();
             resolve.resolve(pages);

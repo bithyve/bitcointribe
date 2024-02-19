@@ -21,7 +21,7 @@ import {
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { useSelector } from 'react-redux'
-import { withNavigation } from 'react-navigation'
+import { useNavigation } from '@react-navigation/native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Wallet } from '../../bitcoin/utilities/Interface'
 
@@ -40,6 +40,7 @@ function SecurityQuestion( props ) {
   const common = translations[ 'common' ]
   const strings = translations[ 'bhr' ]
   const stringsLogin = translations[ 'login' ]
+  const navigation: any = useNavigation()
 
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
   const securityQuestion = security.question ? security.question : ''
@@ -57,7 +58,7 @@ function SecurityQuestion( props ) {
       } else {
         if( !props.title1 ) {
           props.onClose()
-          props.navigation.navigate( 'ReLogin', {
+          navigation.navigate( 'ReLogin', {
             isPasscodeCheck: true,
             onPasscodeVerify: props.onPasscodeVerify ? props.onPasscodeVerify : null
           } )
@@ -293,7 +294,7 @@ function SecurityQuestion( props ) {
   )
 }
 
-export default withNavigation( SecurityQuestion )
+export default SecurityQuestion
 
 const styles = StyleSheet.create( {
   modalContentContainer: {

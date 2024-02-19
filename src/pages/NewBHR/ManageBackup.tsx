@@ -24,10 +24,6 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { translations } from '../../common/content/LocContext'
-import dbManager from '../../storage/realm/dbManager'
-import realm from '../../storage/realm/realm'
-import schema from '../../storage/realm/schema/Schema'
-import debounce from 'lodash.debounce'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { LevelData, LevelHealthInterface, MetaShare, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
@@ -150,12 +146,10 @@ export default function ManageBackup( props ) {
         }
       } )
     } )
-    const focusListener = props.navigation.addListener( 'didFocus', () => {
+    const unsubscribe = props.navigation.addListener( 'focus', () => {
       updateAddressBook()
     } )
-    return () => {
-      focusListener.remove()
-    }
+    return unsubscribe
   }, [] )
 
   useEffect( () => {

@@ -30,10 +30,7 @@ import HeaderTitle from '../../components/HeaderTitle'
 import BottomInfoBox from '../../components/BottomInfoBox'
 
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  initializeRecovery,
-  initializeSetup,
-} from '../../store/actions/setupAndAuth'
+import { initializeRecovery } from '../../store/actions/setupAndAuth'
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../../components/LoaderModal'
 import { getTestcoins, accountsSynched } from '../../store/actions/accounts'
@@ -47,7 +44,7 @@ export default function NewRecoveryOwnQuestions( props ) {
   const [ answerInputStyle, setAnswerInputStyle ] = useState( styles.inputBox )
   const [ answer, setAnswer ] = useState( '' )
   const dispatch = useDispatch()
-  const walletName = props.navigation.getParam( 'walletName' )
+  const walletName = props.route.params?.walletName
   const [ ansError, setAnsError ] = useState( '' )
   const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )

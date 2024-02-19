@@ -1,25 +1,22 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
+  Image,
   SafeAreaView,
   StatusBar,
-  Image
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
-import Fonts from '../../common/Fonts'
+import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import { useDispatch, useSelector } from 'react-redux'
-import { SECURE_ACCOUNT, TEST_ACCOUNT, REGULAR_ACCOUNT, } from '../../common/constants/wallet-service-types'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { ScrollView } from 'react-native-gesture-handler'
+import Fonts from '../../common/Fonts'
 
 const SweepFundsFromExistingAccount = props => {
 
@@ -87,8 +84,8 @@ const SweepFundsFromExistingAccount = props => {
       </View>
       <ScrollView style={{
       }}>
-        {AllAccountData.map( ( value ) =>
-          <View style={styles.listElements}>
+        {AllAccountData.map( ( value, index ) =>
+          <View key={`${JSON.stringify( value )}_${index}`} style={styles.listElements}>
             <Image style={styles.listElementsIconImage} source={value.image} />
             <View style={{
               flex: 1,

@@ -23,8 +23,8 @@ import SmallNavHeaderBackButton from '../../components/navigation/SmallNavHeader
 
 
 export default function FundingSourceDetails( props ) {
-  const FBTCAccount = props.navigation.state.params.getBittrAccount
-    ? props.navigation.state.params.getBittrAccount
+  const FBTCAccount = props.route.params?.getBittrAccount
+    ? props.route.params?.getBittrAccount
     : {
     }
 

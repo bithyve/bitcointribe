@@ -1,42 +1,35 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
-  StyleSheet,
-  Text,
-  View,
-  SafeAreaView,
-  TouchableWithoutFeedback,
-  TouchableOpacity,
-  StatusBar,
-  Platform,
+  Platform, SafeAreaView, StatusBar, StyleSheet,
+  Text, TouchableOpacity, View
 } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { useDispatch, useSelector } from 'react-redux'
+import ErrorModalContents from '../components/ErrorModalContents'
+import HeaderTitle from '../components/HeaderTitle'
+import ModalHeader from '../components/ModalHeader'
 import {
   changeAuthCred,
   pinChangedFailed,
   resetPin,
   switchCredsChanged
 } from '../store/actions/setupAndAuth'
-import BottomSheet from 'reanimated-bottom-sheet'
-import DeviceInfo from 'react-native-device-info'
-import ErrorModalContents from '../components/ErrorModalContents'
-import ModalHeader from '../components/ModalHeader'
-import LinearGradient from 'react-native-linear-gradient'
 
 export default function SettingGetNewPin( props ) {
   const [ passcode, setPasscode ] = useState( '' )
   const [ confirmPasscode, setConfirmPasscode ] = useState( '' )
   const [ passcodeFlag, setPasscodeFlag ] = useState( true )
   const [ confirmPasscodeFlag, setConfirmPasscodeFlag ] = useState( 0 )
-  const oldPasscode = props.navigation.getParam( 'oldPasscode' )
+  const oldPasscode = props.route.params?.oldPasscode
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
@@ -122,8 +115,8 @@ export default function SettingGetNewPin( props ) {
       if( oldPasscode === '' ) {
         dispatch( switchCredsChanged() )
         props.navigation.goBack()
-        if ( props.navigation.state.params.onPasscodeReset ) {
-          props.navigation.state.params.onPasscodeReset(  )
+        if ( props.route.params?.onPasscodeReset ) {
+          props.route.params?.onPasscodeReset(  )
         }
       } else {
         props.navigation.navigate( 'PasscodeChangeSuccessPage' )
@@ -181,6 +174,16 @@ export default function SettingGetNewPin( props ) {
       flex: 1
     }}>
       <StatusBar />
+      <HeaderTitle
+        navigation={props.navigation}
+        backButton={true}
+        firstLineTitle={'Manage Passcode'}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
       <View style={{
         flex: 1
       }}>
@@ -564,20 +567,14 @@ export default function SettingGetNewPin( props ) {
                   }, 2 )
                 }}
               >
-                <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-                  start={{
-                    x: 0, y: 0
-                  }} end={{
-                    x: 1, y: 0
-                  }}
-                  locations={[ 0.2, 1 ]}
+                <View
                   style={{
                     ...styles.proceedButtonView,
                     backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
                   }}
                 >
                   <Text style={styles.proceedButtonText}>Proceed</Text>
-                </LinearGradient>
+                </View>
               </TouchableOpacity>
             </View>
           ) : null}
@@ -803,7 +800,6 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
   },
   proceedButtonText: {
     color: Colors.white,

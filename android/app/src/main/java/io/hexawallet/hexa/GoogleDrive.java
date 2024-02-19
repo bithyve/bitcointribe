@@ -93,8 +93,9 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
             public void run() {
                 try{
                     GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                            .requestEmail()
                             .requestIdToken("1002970291557-vpnumcsv5u05bs81o01rt99a795jej48.apps.googleusercontent.com") //Client ID for Web application
+                            .requestEmail()
+                            .requestScopes(new Scope(DriveScopes.DRIVE_FILE))
                             .build();
 
                     googleApiClient = new GoogleApiClient.Builder(activity.getBaseContext())

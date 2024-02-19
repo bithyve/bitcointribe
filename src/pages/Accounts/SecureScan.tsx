@@ -37,13 +37,13 @@ const SecureScan = props => {
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const isErrorSendingFailed = useSelector( state => state.bhr.errorSending )
   // console.log('isErrorSendingFailed', isErrorSendingFailed);
-  const getServiceType = props.navigation.state.params.getServiceType
-    ? props.navigation.state.params.getServiceType
+  const getServiceType = props.route.params?.getServiceType
+    ? props.route.params?.getServiceType
     : null
-  const carouselIndex = props.navigation.state.params.carouselIndex
-    ? props.navigation.state.params.carouselIndex
+  const carouselIndex = props.route.params?.carouselIndex
+    ? props.route.params?.carouselIndex
     : null
-  const serviceType = props.navigation.getParam( 'serviceType' )
+  const serviceType = props.route.params?.serviceType
   const { DECENTRALIZED_BACKUP } = useSelector(
     state => state.storage.database,
   )

@@ -6,6 +6,7 @@
         <domain includeSubdomains="true">10.0.3.2</domain>
         <domain includeSubdomains="true">bithyve.com</domain>
         <domain includeSubdomains="true">hexawallet.io</domain>
+         <domain includeSubdomains="true">bitcointribe.app</domain>
         <domain includeSubdomains="true">fastbitcoins.com</domain>
         <domain includeSubdomains="true">ramp.network</domain>
         <domain includeSubdomains="true">swanbitcoin.com</domain>

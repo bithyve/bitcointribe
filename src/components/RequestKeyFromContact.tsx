@@ -1,36 +1,28 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, ActivityIndicator, Platform, TouchableOpacity, Image } from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
 import moment from 'moment'
+import React, { useEffect, useState } from 'react'
+import { ActivityIndicator, Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
 import Share from 'react-native-share'
+import { useSelector } from 'react-redux'
+import GiftCard from '../assets/images/svgs/icon_gift.svg'
+import More from '../assets/images/svgs/icon_more_gray.svg'
+import Link from '../assets/images/svgs/link.svg'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import QRCode from './QRCode'
-import {
-  REGULAR_ACCOUNT,
-  TEST_ACCOUNT,
-  SECURE_ACCOUNT,
-} from '../common/constants/wallet-service-types'
+import { translations } from '../common/content/LocContext'
 import CopyThisText from '../components/CopyThisText'
 import HeaderTitle from './HeaderTitle'
-import { translations } from '../common/content/LocContext'
-import GiftCard from '../assets/images/svgs/icon_gift.svg'
-import Link from '../assets/images/svgs/link.svg'
-import More from '../assets/images/svgs/icon_more_gray.svg'
-import { useSelector } from 'react-redux'
+import QRCode from './QRCode'
 
-import BottomInfoBox from './BottomInfoBox'
-import DashedContainer from '../pages/FriendsAndFamily/DashedContainer'
-import DashedLargeContainer from '../pages/FriendsAndFamily/DahsedLargeContainer'
-import ButtonGroupWithIcon from '../pages/FriendsAndFamily/ButtonGroupWithIcon'
-import ThemeList from '../pages/FriendsAndFamily/Theme'
-import { withNavigation } from 'react-navigation'
-import { nameToInitials } from '../common/CommonFunctions'
 import { DeepLinkEncryptionType } from '../bitcoin/utilities/Interface'
+import { nameToInitials } from '../common/CommonFunctions'
+import ButtonGroupWithIcon from '../pages/FriendsAndFamily/ButtonGroupWithIcon'
+import DashedLargeContainer from '../pages/FriendsAndFamily/DahsedLargeContainer'
+import ThemeList from '../pages/FriendsAndFamily/Theme'
 
 function RequestKeyFromContact( props ) {
   const [ shareLink, setShareLink ] = useState( '' )
@@ -100,9 +92,13 @@ function RequestKeyFromContact( props ) {
   const shareViaLinkOrQR = ( type ) => {
     props.onPressShare()
     props.navigation.navigate( 'SendViaLinkAndQR', {
-      type, qrCode: props.QR, link: shareLink, ...props,
-      setActiveTab: props.navigation.state.params.setActiveTab,
-      OTP: props.encryptionKey, encryptLinkWith: props.encryptLinkWith
+      type,
+      qrCode: props.QR,
+      link: shareLink,
+      // ...props,
+      setActiveTab: props.setActiveTab,
+      OTP: props.encryptionKey, encryptLinkWith: props.encryptLinkWith,
+      senderName: props.senderName ? props.senderName : ''
     } )
   }
   const setPhoneNumber = () => {
@@ -628,4 +624,4 @@ const styles = StyleSheet.create( {
   }
 } )
 
-export default withNavigation( RequestKeyFromContact )
+export default RequestKeyFromContact

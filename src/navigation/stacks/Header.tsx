@@ -1,136 +1,115 @@
+import BottomSheet from '@gorhom/bottom-sheet'
+import PushNotificationIOS from '@react-native-community/push-notification-ios'
+import messaging from '@react-native-firebase/messaging'
+import idx from 'idx'
+import moment from 'moment'
 import React, { createRef, PureComponent } from 'react'
 import {
-  View,
-  Platform,
-  Linking,
-  ImageBackground,
-  AppState,
   Alert,
+  AppState,
+  Linking,
+  Platform,
   StyleSheet,
-  TouchableOpacity,
-  Text
+  View
 } from 'react-native'
-import {
-  heightPercentageToDP, widthPercentageToDP,
-  // widthPercentageToDP,
-} from 'react-native-responsive-screen'
 import DeviceInfo from 'react-native-device-info'
+import LinearGradient from 'react-native-linear-gradient'
 import * as RNLocalize from 'react-native-localize'
-import { connect } from 'react-redux'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import messaging from '@react-native-firebase/messaging'
-import {
-  initializeTrustedContact,
-  rejectTrustedContact,
-  InitTrustedContactFlowKind,
-  PermanentChannelsSyncKind,
-  syncPermanentChannels,
-  fetchGiftFromTemporaryChannel,
-  rejectGift,
-} from '../../store/actions/trustedContacts'
-import {
-  getCurrencyImageByRegion, processRequestQR,
-} from '../../common/CommonFunctions/index'
-import NotificationListContent from '../../components/NotificationListContent'
-// import AddContactAddressBook from '../Contacts/AddContactAddressBook'
-import HomeHeader from '../../components/home/home-header_update'
-//import HomeHeader from '../../components/home/home-header'
-import Colors from '../../common/Colors'
-import idx from 'idx'
-import { v4 as uuid } from 'uuid'
-import moment from 'moment'
-import { credsAuthenticated } from '../../store/actions/setupAndAuth'
-import { NavigationActions, StackActions, withNavigationFocus } from 'react-navigation'
-import TrustedContactRequestContent from '../../pages/Home/TrustedContactRequestContent'
-import BottomSheet from '@gorhom/bottom-sheet'
-import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
-import { AccountsState } from '../../store/reducers/accounts'
-import AccountShell from '../../common/data/models/AccountShell'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import { NotificationType } from '../../components/home/NotificationType'
-import ModalContainer from '../../components/home/ModalContainer'
-import NotificationInfoContents from '../../components/NotificationInfoContents'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
-import Toast from '../../components/Toast'
-import { resetToHomeAction } from '../actions/NavigationActions'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import PushNotification from 'react-native-push-notification'
-import PushNotificationIOS from '@react-native-community/push-notification-ios'
-import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
-import AddContactAddressBook from '../../pages/Contacts/AddContactAddressBook'
-import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
-import BottomSheetHeader from '../../pages/Accounts/BottomSheetHeader'
-import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
-import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
-import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
-import ErrorModalContents from '../../components/ErrorModalContents'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  initializeHealthSetup,
-  updateCloudPermission,
-  acceptExistingContactRequest,
-  updateSecondaryShard,
-  rejectedExistingContactRequest
-} from '../../store/actions/BHR'
-import {
-  updateFCMTokens,
-  notificationsUpdated,
-  setupNotificationList,
-  updateNotificationList,
-  updateMessageStatusInApp,
-  updateMessageStatus,
-  getMessages,
-  notificationPressed,
-} from '../../store/actions/notifications'
-import {
-  setCurrencyCode,
-  setCardData,
-  setIsPermissionGiven,
-} from '../../store/actions/preferences'
-import {
-  processDeepLink,
-} from '../../common/CommonFunctions/index'
-import {
-  addTransferDetails,
-  fetchFeeRates,
-  fetchExchangeRates,
-  recomputeNetBalance
-} from '../../store/actions/accounts'
+  heightPercentageToDP, widthPercentageToDP
+} from 'react-native-responsive-screen'
+import { connect } from 'react-redux'
+import { v4 as uuid } from 'uuid'
 import {
   AccountType,
   DeepLinkEncryptionType,
   KeeperInfoInterface,
-  LevelHealthInterface,
-  notificationType,
-  QRCodeTypes,
+  LevelHealthInterface, notificationType, QRCodeTypes,
   Trusted_Contacts,
-  Wallet,
+  Wallet
 } from '../../bitcoin/utilities/Interface'
-import {
-  updatePreference,
-  setFCMToken,
-  setSecondaryDeviceAddress,
-} from '../../store/actions/preferences'
-import { setVersion } from '../../store/actions/versionHistory'
-import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../../store/actions/SwanIntegration'
-import { clearRampCache } from '../../store/actions/RampIntegration'
-import { clearWyreCache } from '../../store/actions/WyreIntegration'
-import { setCloudData } from '../../store/actions/cloud'
-import { setShowAllAccount } from '../../store/actions/accounts'
-import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
-import {
-  updateLastSeen
-} from '../../store/actions/preferences'
-import QRModal from '../../pages/Accounts/QRModal'
-import { RFValue } from 'react-native-responsive-fontsize'
-import Fonts from '../../common/Fonts'
-import AcceptGift from '../../pages/FriendsAndFamily/AcceptGift'
-import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
-import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Relay from '../../bitcoin/utilities/Relay'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import Colors from '../../common/Colors'
+import {
+  getCurrencyImageByRegion,
+  processDeepLink,
+  processRequestQR
+} from '../../common/CommonFunctions/index'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
+import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
+import AccountShell from '../../common/data/models/AccountShell'
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
+import Fonts from '../../common/Fonts'
+import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
+import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
+import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
 import ClipboardAutoRead from '../../components/ClipboardAutoRead'
-import LinearGradient from 'react-native-linear-gradient'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
+import HomeHeader from '../../components/home/home-header_update'
+import ModalContainer from '../../components/home/ModalContainer'
+import { NotificationType } from '../../components/home/NotificationType'
+import NotificationInfoContents from '../../components/NotificationInfoContents'
+import NotificationListContent from '../../components/NotificationListContent'
+import Toast from '../../components/Toast'
+import BottomSheetHeader from '../../pages/Accounts/BottomSheetHeader'
+import AddContactAddressBook from '../../pages/Contacts/AddContactAddressBook'
+import AcceptGift from '../../pages/FriendsAndFamily/AcceptGift'
+import TrustedContactRequestContent from '../../pages/Home/TrustedContactRequestContent'
+import {
+  addTransferDetails,
+  fetchExchangeRates,
+  fetchFeeRates,
+  recomputeNetBalance,
+  setShowAllAccount
+} from '../../store/actions/accounts'
+import {
+  acceptExistingContactRequest,
+  initializeHealthSetup,
+  rejectedExistingContactRequest,
+  updateCloudPermission,
+  updateSecondaryShard
+} from '../../store/actions/BHR'
+import { setCloudData } from '../../store/actions/cloud'
+import { updateLinkingURL } from '../../store/actions/doNotStore'
+import {
+  getMessages,
+  notificationPressed,
+  notificationsUpdated,
+  setupNotificationList,
+  updateFCMTokens,
+  updateMessageStatus,
+  updateMessageStatusInApp,
+  updateNotificationList
+} from '../../store/actions/notifications'
+import {
+  setCardData,
+  setCurrencyCode,
+  setFCMToken,
+  setIsPermissionGiven,
+  setSecondaryDeviceAddress,
+  updateLastSeen,
+  updatePreference
+} from '../../store/actions/preferences'
+import { clearRampCache } from '../../store/actions/RampIntegration'
+import { credsAuthenticated } from '../../store/actions/setupAndAuth'
+import { clearSwanCache, createTempSwanAccountInfo, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import {
+  fetchGiftFromTemporaryChannel,
+  initializeTrustedContact, InitTrustedContactFlowKind,
+  PermanentChannelsSyncKind, rejectGift,
+  rejectTrustedContact,
+  syncPermanentChannels
+} from '../../store/actions/trustedContacts'
+import { setVersion } from '../../store/actions/versionHistory'
+import { clearWyreCache } from '../../store/actions/WyreIntegration'
+import { AccountsState } from '../../store/reducers/accounts'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -192,11 +171,13 @@ interface HomeStateTypes {
   wyreFromBuyMenu: boolean | null;
   wyreFromDeepLink: boolean | null;
   releaseNotes: string;
+  giftLoading: boolean;
 }
 
 interface HomePropsTypes {
   showContent: boolean;
   navigation: any;
+  route: any;
   notificationList: any;
   exchangeRates?: any[];
   levelHealth: LevelHealthInterface[];
@@ -211,7 +192,6 @@ interface HomePropsTypes {
   acceptExistingContactRequest: any;
   rejectTrustedContact: any;
   currentLevel: number;
-  isFocused: boolean;
   setCurrencyCode: any;
   currencyCode: any;
   setSecondaryDeviceAddress: any;
@@ -279,11 +259,15 @@ interface HomePropsTypes {
   notificationPressed: any;
   clipboardAccess: boolean;
   recomputeNetBalance: any;
+  updateLinkingURL:( s:string )=>void;
+  linkingURL: string;
+  shouldListen:boolean;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   focusListener: any;
   appStateListener: any;
+  linkStateListener: any;
   firebaseNotificationListener: any;
   notificationOpenedListener: any;
   currentNotificationId: string;
@@ -322,7 +306,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationIgnoreText:null,
       isIgnoreButton: false,
       currentMessage: null,
-
+      giftLoading: false,
       errorMessageHeader: '',
       errorMessage: '',
       selectedContact: [],
@@ -342,7 +326,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   onCodeScanned = async ( qrData ) => {
-    const { trustedContactRequest, giftRequest, link } = await processRequestQR( qrData )
+    const { trustedContactRequest, giftRequest } = await processRequestQR( qrData )
     if( trustedContactRequest ){
       this.setState( {
         trustedContactRequest
@@ -376,10 +360,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   navigateToQRScreen = () => {
-    this.props.navigation.navigate( 'QRScanner', {
+    this.props.navigation.navigate( 'QRRoot', {
       onCodeScanned:  this.onCodeScanned,
     } )
-  };
+  }
+
 
   onPressNotifications = async () => {
     this.readAllNotifications()
@@ -559,9 +544,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   onAppStateChange = async ( nextAppState ) => {
     const { appState } = this.state
     const { isPermissionSet, setIsPermissionGiven } = this.props
+    if( this.props.linkingURL ){
+      this.props.updateLinkingURL( '' )
+    }
     try {
-      // TODO: Will this function ever be called if the state wasn't different? If not,
-      // I don't think we need to be holding on to `appState` in this component's state.
       if ( appState === nextAppState ) return
       if ( isPermissionSet ) {
         setIsPermissionGiven( false )
@@ -572,28 +558,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           appState: nextAppState,
         },
         async () => {
-          if ( nextAppState === 'active' ) {
-          //this.scheduleNotification()
-          }
           if ( nextAppState === 'inactive' || nextAppState == 'background' ) {
-            if( nextAppState === 'background' ) {
-              // this.closeBottomSheet()
-            }
-            // console.log( 'inside if nextAppState', nextAppState )
             this.props.updatePreference( {
               key: 'hasShownNoInternetWarning',
               value: false,
             } )
-            // sss files removed
             this.props.updateLastSeen( new Date() )
-            // this.props.navigation.dispatch( [ NavigationActions.navigate( {
-            //   routeName: 'Bottomtab',
-            // } ),
-            NavigationActions.navigate( {
-              routeName: 'Intermediate',
-            } )
-          // ]
-            // )
+            // CommonActions.navigate( {
+            //   name: 'Intermediate'
+            // } )
           }
         }
       )
@@ -638,8 +611,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   createNotificationListeners = async () => {
     this.props.setIsPermissionGiven( true )
     PushNotification.configure( {
-      // largeIcon: 'ic_launcher',
-      // smallIcon:'ic_notification',
       onNotification: ( notification ) => {
         this.props.getMessages()
         if( notification.data && notification.data.content ){
@@ -651,10 +622,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.currentNotificationId = notificationId
         }
         this.notificationCheck()
-        // process the notification
         if ( notification.data ) {
-          // this.onNotificationOpen( notification )
-          // (required) Called when a remote is received or opened, or local notification is opened
           notification.finish( PushNotificationIOS.FetchResult.NoData )
         }
       },
@@ -724,20 +692,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   handleDeepLinkEvent = async ( { url } ) => {
-    const { navigation, isFocused } = this.props
+    const { navigation } = this.props
+    const isFocused = navigation.isFocused()
     // If the user is on one of Home's nested routes, and a
     // deep link is opened, we will navigate back to Home first.
-    if ( !isFocused )
-      navigation.dispatch(
-        resetToHomeAction( {
-          unhandledDeepLinkURL: url,
-        } )
-      )
-    else this.handleDeepLinking( url )
+    if ( !isFocused ){
+      navigation.popToTop()
+      navigation.navigate( 'Home',{screen:'HomeTab'} )
+      this.handleDeepLinking( url )
+    } else {
+      this.handleDeepLinking( url )
+    }
   };
 
+
   handleDeepLinking = async ( url ) => {
-    if ( url === null ) return
+    if ( !url ) return
+    if( this.props.linkingURL.trim() === url.trim() ) return
+    this.props.updateLinkingURL( url )
     const { trustedContactRequest, swanRequest, giftRequest, campaignId } = await processDeepLink( url )
     if( trustedContactRequest ){
       this.setState( {
@@ -793,10 +765,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   componentDidMount = async() => {
-    // this.openBottomSheetOnLaunch(
-    //   BottomSheetKind.GIFT_REQUEST,
-    //   1
-    // )
+    const shouldListen = this.props.route.name === 'HomeTab'
+    if( !shouldListen ){
+      return
+    }
     const {
       navigation,
       initializeHealthSetup,
@@ -807,10 +779,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       'change',
       this.onAppStateChange
     )
+    this.linkStateListener = Linking.addEventListener( 'url', this.handleDeepLinkEvent )
+    Linking.getInitialURL().then( this.handleDeepLinking )
+
+    // call this once deeplink is detected aswell
+    this.handleDeepLinkModal()
     requestAnimationFrame( () => {
-      // Keeping autoSync disabled
-      credsAuthenticated( false )
-      //console.log( 'isAuthenticated*****', this.props.isAuthenticated )
+
       this.syncChannel()
       this.closeBottomSheet()
       if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
@@ -829,29 +804,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setUpFocusListener()
       //this.getNewTransactionNotifications()
 
-      Linking.addEventListener( 'url', this.handleDeepLinkEvent )
-      Linking.getInitialURL().then( this.handleDeepLinking )
 
-      // call this once deeplink is detected aswell
-      this.handleDeepLinkModal()
 
       // set FCM token(if haven't already)
       this.storeFCMToken()
 
-      const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
+      // const unhandledDeepLinkURL = this.props.route.params?.unhandledDeepLinkURL
 
-      if ( unhandledDeepLinkURL ) {
-        navigation.setParams( {
-          unhandledDeepLinkURL: null,
-        } )
-        this.handleDeepLinking( unhandledDeepLinkURL )
-      }
+      // if ( unhandledDeepLinkURL ) {
+      //   navigation.setParams( {
+      //     unhandledDeepLinkURL: null,
+      //   } )
+      //   this.handleDeepLinking( unhandledDeepLinkURL )
+      // }
       this.props.setVersion()
       this.props.fetchExchangeRates( this.props.currencyCode )
       this.props.fetchFeeRates()
       this.props.recomputeNetBalance()
     } )
-
   };
 
    storeFCMToken = async () => {
@@ -944,11 +914,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   handleDeepLinkModal = () => {
-    const recoveryRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.recoveryRequest : null //this.props.navigation.getParam( 'recoveryRequest' )
-    const trustedContactRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.trustedContactRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
-    const giftRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.giftRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
-    const userKey = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.userKey : null//this.props.navigation.getParam( 'userKey' )
-    const swanRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.swanRequest : null//this.props.navigation.getParam( 'swanRequest' )
+    const { params } = this.props.route
+    const recoveryRequest = params?.recoveryRequest || null
+    const trustedContactRequest = params?.trustedContactRequest || null
+    const giftRequest = params?.giftRequest || null
+    const userKey = params?.userKey || null
+    const swanRequest = params?.swanRequest || null
     if ( swanRequest ) {
       this.setState( {
         swanDeepLinkContent:swanRequest.url,
@@ -993,18 +964,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   cleanupListeners() {
-    if ( typeof this.focusListener === 'function' ) {
-      this.props.navigation.removeListener( 'didFocus', this.focusListener )
-    }
+    try{
+      this.focusListener?.()
 
-    if ( typeof this.appStateListener === 'function' ) {
-      AppState.removeEventListener( 'change', this.appStateListener )
-    }
-
-    Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
-    clearTimeout( this.openBottomSheetOnLaunchTimeout )
-    if ( this.firebaseNotificationListener ) {
-      this.firebaseNotificationListener()
+      if ( this.appStateListener ) {
+        this.appStateListener.remove()
+      }
+      if ( this.linkStateListener ) {
+        this.linkStateListener.remove()
+      }
+      clearTimeout( this.openBottomSheetOnLaunchTimeout )
+      if ( this.firebaseNotificationListener ) {
+        this.firebaseNotificationListener()
+      }
+    }catch( err ){
+      //
     }
   }
 
@@ -1024,7 +998,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   setUpFocusListener = () => {
     const { navigation } = this.props
 
-    this.focusListener = navigation.addListener( 'didFocus', () => {
+    this.focusListener = navigation.addListener( 'focus', () => {
       this.props.recomputeNetBalance()
       this.setCurrencyCodeFromAsync()
       this.props.fetchExchangeRates( this.props.currencyCode )
@@ -1142,7 +1116,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         trustedContactRequest.channelKey = channelKeys[ 0 ]
         trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
       } catch( err ){
-        Toast( 'Invalid key' )
+        Toast( 'Invalid key', true, true )
+        this.onToogleGiftLoading()
         return
       }
 
@@ -1161,7 +1136,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               isCurrentLevel0
             } )
             // TODO: navigate post approval (from within saga)
-            navigation.navigate( 'Home' )
             if ( trustedContactRequest.isContactGift ) {
               this.setState( {
                 trustedContactRequest: {
@@ -1173,10 +1147,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 1
               )
             }
+            setTimeout( ()=>{
+              navigation.goBack()
+            }, 3000 )
           }
         } )
       }
     } catch ( error ) {
+      this.onToogleGiftLoading()
       Alert.alert( 'Incompatible request, updating your app might help' )
     }
   };
@@ -1203,7 +1181,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         trustedContactRequest.channelKey = channelKeys[ 0 ]
         trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
       } catch( err ){
-        Toast( 'Invalid key' )
+        Toast( 'Invalid key', true, true  )
+        this.onToogleGiftLoading()
         return
       }
       this.props.rejectTrustedContact( {
@@ -1214,9 +1193,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
+  onToogleGiftLoading=()=>{
+    this.setState( ( prevState )=>{
+      return {
+        ...prevState,
+        giftLoading:!prevState.giftLoading
+      }
+    } )
+  }
+
   onGiftRequestAccepted = ( key? ) => {
     try {
-      // this.closeBottomSheet()
       const { giftRequest } = this.state
       let decryptionKey: string
       try{
@@ -1224,7 +1211,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             case DeepLinkEncryptionType.DEFAULT:
               decryptionKey = giftRequest.encryptedChannelKeys
               break
-
             case DeepLinkEncryptionType.OTP:
             case DeepLinkEncryptionType.LONG_OTP:
             case DeepLinkEncryptionType.SECRET_PHRASE:
@@ -1232,12 +1218,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               break
         }
       } catch( err ){
-        Toast( 'Invalid key' )
+        Toast( 'Invalid key', true, true )
+        this.onToogleGiftLoading()
         return
       }
-
       this.props.fetchGiftFromTemporaryChannel( giftRequest.channelAddress, decryptionKey )
     } catch ( error ) {
+      this.onToogleGiftLoading()
       Alert.alert( 'Incompatible request, updating your app might help' )
     }
   };
@@ -1337,38 +1324,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       return
     }
   };
-  renderButton = ( text ) => {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          if ( text === 'View Account' ) {
-            // setGiftAcceptedModel( true )
-            const resetAction = StackActions.reset( {
-              index: 0,
-              actions: [
-                NavigationActions.navigate( {
-                  routeName: 'Landing'
-                } )
-              ],
-            } )
-
-            this.props.navigation.dispatch( resetAction )
-            // navigation.navigate( 'AccountDetails', {
-            //   accountShellID: primarySubAccount.accountShellID,
-            // } )
-          } else {
-            // setAcceptGiftModal( false )
-            // setGiftAcceptedModel( true )
-          }
-        }}
-        style={{
-          ...styles.buttonView
-        }}
-      >
-        <Text style={styles.buttonText}>{text}</Text>
-      </TouchableOpacity>
-    )
-  }
 
   renderAcceptModal = () => {
 
@@ -1555,19 +1510,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             <ErrorModalContents
               title={'Cloud Backup Error'}
               info={'The wallet could not be backed up.\n\nThis may be due to network issues. Please try again in sometime from Security & Privacy.\nIf the problem persists, contact us at hexa@bithyve.com'}
-              // errPoints={[ 'A network issue', 'Inadequate space in your cloud storage', 'A bug on our part' ]}
-              // note={'Please try again in some time.\nIn case the error persists,\nplease reach out to us on:'}
-              // links={[ {
-              //   link: 'hello@bithyve.com',
-              //   icon: require( '../../assets/images/icons/icon_email.png' )
-              // }, {
-              //   link: '@HexaWallet',
-              //   icon: require( '../../assets/images/socialicon/twitter.png' )
-              // }, {
-              //   link: 'https://t.me/HexaWallet',
-              //   icon: require( '../../assets/images/icons/icon_telegram.png' )
-              // }
-              // ]}
               onPressProceed={()=>{
                 if( this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' && this.props.cloudPermissionGranted ){
                   this.props.setCloudData()
@@ -1670,6 +1612,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               onPressAccept={this.onTrustedContactRequestAccepted}
               onPressReject={this.onTrustedContactRejected}
               version={giftRequest.version}
+              giftLoading={this.state.giftLoading}
             />
           )
 
@@ -1722,17 +1665,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       )
     }
     return (
-      // <ImageBackground
-      //   source={require( '../../assets/images/home-bg.png' )}
-      //   style={{
-      //     width: '100%',
-      //     height: '100%',
-      //     flex: 1,
-      //   }}
-      //   imageStyle={{
-      //     resizeMode: 'stretch',
-      //   }}
-      // >
       <View
         style={{
           height: heightPercentageToDP( Platform.OS == 'ios' ? '21.9%' : '20.3%' ),
@@ -1743,23 +1675,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   : 0,
         }}
       >
-        {/* <ImageBackground
-          // source={require( '../../assets/images/home-bg.png' )}
-          style={{
-            width: '100%',
-            height: '100%',
-            flex: 1,
-          }}
-          imageStyle={{
-            resizeMode: 'stretch',
-          }}
-        > */}
-        <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-          // start={{
-          //   x: 0, y: 0.2
-          // }} end={{
-          //   x: 0.1, y: 0.1
-          // }}
+        <LinearGradient colors={[ Colors.blue, Colors.blue ]}
           locations={[ 0.55, 1 ]}
           style={{
             width: '100%',
@@ -1779,37 +1695,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             CurrencyCode={currencyCode}
             navigation={navigation}
             currentLevel={currentLevel}
-          //  onSwitchToggle={this.onSwitchToggle}
-          // setCurrencyToggleValue={this.setCurrencyToggleValue}
-          // navigation={this.props.navigation}
-          // overallHealth={overallHealth}
           />
           <ModalContainer
-            onBackground={() => {
-              if ( this.state.currentBottomSheetKind === BottomSheetKind.GIFT_REQUEST ) {
-                console.log( 'bgState' )
-              } else if ( this.state.currentBottomSheetKind === BottomSheetKind.TRUSTED_CONTACT_REQUEST ) {
-                console.log( 'bgState' )
-              } else {
-                const perviousState = this.state.currentBottomSheetKind
-                this.setState( {
-                  currentBottomSheetKind: null
-                } )
-                setTimeout( () => {
-                  this.setState( {
-                    currentBottomSheetKind: perviousState
-                  }
-                  )
-                }, 200 )
-              }
-            }}
+            onBackground={()=>{}}
             visible={this.state.currentBottomSheetKind != null}
             closeBottomSheet={() => {}}
           >
             {this.renderBottomSheetContent()}
           </ModalContainer>
         </LinearGradient>
-        {/* </ImageBackground> */}
       </View>
     )
   }
@@ -1892,10 +1786,11 @@ const mapStateToProps = ( state ) => {
     IsCurrentLevel0: idx( state, ( _ ) => _.bhr.IsCurrentLevel0 ),
     walletId: idx( state, ( _ ) => _.storage.wallet.walletId ),
     clipboardAccess: idx( state, ( _ ) => _.misc.clipboardAccess ),
+    linkingURL: state.doNotStore.linkingURL,
   }
 }
 
-export default withNavigationFocus(
+export default (
   connect( mapStateToProps, {
     updateFCMTokens,
     initializeTrustedContact,
@@ -1934,7 +1829,8 @@ export default withNavigationFocus(
     updateSecondaryShard,
     rejectedExistingContactRequest,
     notificationPressed,
-    recomputeNetBalance
+    recomputeNetBalance,
+    updateLinkingURL
   } )( Home )
 )
 

@@ -1,31 +1,27 @@
 import React, { useState } from 'react'
 import {
-  View,
-  SafeAreaView,
+  FlatList, SafeAreaView,
   StatusBar,
-  StyleSheet,
-  FlatList,
-  Text,
-  TouchableOpacity,
+  StyleSheet, Text,
+  TouchableOpacity, View
 } from 'react-native'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
-import Fonts from '../../common/Fonts'
-import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsive'
-import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
+import { RFValue } from 'react-native-responsive-fontsize'
 import IconArrowDown from '../../assets/images/svgs/icon_arrow_down.svg'
+import { GridType } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import { translations } from '../../common/content/LocContext'
+import { hp, windowHeight, wp } from '../../common/data/responsiveness/responsive'
+import Fonts from '../../common/Fonts'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import ModalContainer from '../../components/home/ModalContainer'
 import LoaderModal from '../../components/LoaderModal'
-import { translations } from '../../common/content/LocContext'
-import { GridType } from '../../bitcoin/utilities/Interface'
+import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 
 
 const SelectEntropyGridType = ( props ) => {
-  const mnemonic = props.navigation.getParam( 'mnemonic' )
-  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
+  const mnemonic = props.route.params?.mnemonic || null
+  const isAccountCreation = props.route.params?.isAccountCreation || false
   const loaderMessage = {
     heading: translations[ 'bhr' ].Importingyourwallet,
     text: translations[ 'bhr' ].Thismaytake
@@ -135,21 +131,11 @@ const SelectEntropyGridType = ( props ) => {
           activeOpacity={0.6}
           onPress={onPressNext}
         >
-          <LinearGradient
-            colors={[ Colors.blue, Colors.darkBlue ]}
-            start={{
-              x: 0,
-              y: 0,
-            }}
-            end={{
-              x: 1,
-              y: 0,
-            }}
-            locations={[ 0.2, 1 ]}
+          <View
             style={styles.buttonView}
           >
             <Text style={styles.buttonText}>Generate Grid</Text>
-          </LinearGradient>
+          </View>
         </TouchableOpacity>
       </View>
       <ModalContainer onBackground={onBackgroundOfLoader}  visible={loaderModal} closeBottomSheet={() => { }} >

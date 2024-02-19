@@ -1,79 +1,65 @@
-import { NavigationActions, StackActions } from 'react-navigation'
-
-
+import { CommonActions } from '@react-navigation/native'
 
 export const goHomeAction = ( ) => {
-  const resetAction = StackActions.reset( {
+  return CommonActions.reset( {
     index: 0,
-    actions: [
-      NavigationActions.navigate( {
-        routeName: 'Landing'
-      } )
+    routes: [
+      {
+        name: 'Home'
+      }
     ],
   } )
-
-  return resetAction
 }
 
-
-export const resetToHomeAction = ( params = {
-} ) => {
-  return  NavigationActions.navigate( {
-    routeName: 'Home',
-    params,
+export const resetToHomeAction = ( params ) => {
+  return CommonActions.reset( {
+    index: 0,
+    routes: [
+      {
+        name: 'Home',
+        params
+      }
+    ],
   } )
 }
 
 export const resetStackToAccountDetails = ( params ) => {
-  return StackActions.reset( {
-    index: 0,
-    actions: [
-      NavigationActions.navigate( {
-        routeName: 'Landing',
-        action: NavigationActions.navigate( {
-          routeName: 'AccountDetails',
-          params,
-        } ),
-      } ),
+  return CommonActions.reset( {
+    index: 1,
+    routes: [
+      {
+        name: 'Home'
+      },
+      {
+        name: 'AccountDetails', params
+      },
     ],
   } )
 }
 
 export const resetStackToAccountDetailsSendScreen = ( params ) => {
-  return StackActions.reset( {
-    index: 0,
-    actions: [
-      NavigationActions.navigate( {
-        routeName: 'Landing',
-        action: NavigationActions.navigate( {
-          routeName: 'AccountDetails',
-          action: NavigationActions.navigate( {
-            routeName: 'Send',
-            params,
-          } ),
-        } ),
-      } ),
+  return CommonActions.reset( {
+    index: 1,
+    routes: [
+      {
+        name: 'Home'
+      },
+      {
+        name: 'Send', params
+      },
     ],
-  } )
-}
+  } )}
 
 export const resetStackToSend = ( params ) => {
-  return StackActions.reset( {
-    index: 0,
-    actions: [
-      NavigationActions.navigate( {
-        routeName: 'Landing',
-        action:NavigationActions.navigate( {
-          routeName: 'AccountDetails',
-          action: NavigationActions.navigate( {
-            routeName: 'Send',
-            action: NavigationActions.navigate( {
-              routeName: 'SentAmountForContactForm',
-              params,
-            } ),
-          } ),
-        } ),
-      } )
-    ]
+  return CommonActions.reset( {
+    index: 1,
+    routes: [
+      {
+        name: 'Home'
+      },
+      {
+        name: 'SentAmountForContactForm', params
+      },
+    ],
   } )
 }

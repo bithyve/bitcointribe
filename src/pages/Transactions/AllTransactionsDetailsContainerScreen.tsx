@@ -1,20 +1,21 @@
+import moment from 'moment'
 import React, { useMemo } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { TransactionDetails } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { TransactionDetails } from '../../bitcoin/utilities/Interface'
-import { widthPercentageToDP, heightPercentageToDP } from 'react-native-responsive-screen'
 import { SUB_PRIMARY_ACCOUNT } from '../../common/constants/wallet-service-types'
-import openLink from '../../utils/OpenLink'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import moment from 'moment'
 import { UsNumberFormat } from '../../common/utilities'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import openLink from '../../utils/OpenLink'
 
 
 export type Props = {
   navigation,
+  route
 };
 
 // TODO: Refactor after integrating data model changes from `feature/account-management`
@@ -75,8 +76,8 @@ const getImageByAccountType = ( accountType, primaryAccType? ) => {
   }
 }
 
-const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-  const transaction: TransactionDetails = navigation.getParam( 'transaction' )
+const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
+  const transaction: TransactionDetails = route.params?.transaction
 
   const formattedConfirmationsText = useMemo( () => {
     return transaction.accountType === 'Test Account' ?
@@ -222,8 +223,9 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
                 ? 'To Addresses'
                 : 'To Address'}
             </Text>
-            {transaction.recipientAddresses.map( ( address ) => (
+            {transaction.recipientAddresses.map( ( address, index ) => (
               <Text
+                key={`${address}_${index}`}
                 style={{
                   color: Colors.textColorGrey,
                   fontFamily: Fonts.Regular,
@@ -249,8 +251,9 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
                 ? 'From Addresses'
                 : 'From Address'}
             </Text>
-            {transaction.senderAddresses.map( ( address ) => (
+            {transaction.senderAddresses.map( ( address, index ) => (
               <Text
+                key={`${address}_${index}`}
                 style={{
                   color: Colors.textColorGrey,
                   fontFamily: Fonts.Regular,

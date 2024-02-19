@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react'
 import { View, StyleSheet } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
-import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import AccountShellMergeDestinationsList from '../../../components/account-settings/merge-account-shells/AccountShellMergeDestinationsList'
 import useCompatibleAccountShells from '../../../utils/hooks/state-selectors/accounts/UseCompatibleAccountShells'
 import AccountShell from '../../../common/data/models/AccountShell'
@@ -13,14 +13,15 @@ import ButtonBlue from '../../../components/ButtonBlue'
 
 
 export type Props = {
+  route: any;
   navigation: any;
 };
 
 
-const AccountSettingsMergeAccountShellsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const AccountSettingsMergeAccountShellsScreen: React.FC<Props> = ( { route, navigation }: Props ) => {
   const dispatch = useDispatch()
 
-  const accountShell = useAccountShellFromNavigation( navigation )
+  const accountShell = useAccountShellFromRoute( route )
   const compatibleDestinations = useCompatibleAccountShells( accountShell )
 
   const [ selectedDestinationID, setSelectedDestinationID ] = useState<string>( null )

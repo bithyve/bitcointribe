@@ -1,92 +1,84 @@
+import BottomSheet from '@gorhom/bottom-sheet'
+import PushNotificationIOS from '@react-native-community/push-notification-ios'
+import idx from 'idx'
+import moment from 'moment'
 import React, { createRef, PureComponent } from 'react'
 import {
-  StyleSheet,
-  StatusBar,
-  View,
   Platform,
-  SafeAreaView
+  StatusBar,
+  StyleSheet,
+  View
 } from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
+import * as RNLocalize from 'react-native-localize'
 import {
   heightPercentageToDP,
-  widthPercentageToDP,
-} from 'react-native-responsive-screen'
-import PushNotificationIOS from '@react-native-community/push-notification-ios'
-import Colors from '../../common/Colors'
-import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import {
-  SECURE_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
-import {
-  initializeHealthSetup,
-  updateCloudPermission,
-  acceptExistingContactRequest
-} from '../../store/actions/BHR'
 import { connect } from 'react-redux'
 import {
-  rejectTrustedContact,
-  syncPermanentChannels,
-} from '../../store/actions/trustedContacts'
+  AccountType,
+  LevelHealthInterface,
+  Wallet
+} from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
 import {
-  updateFCMTokens,
-  notificationsUpdated,
-  setupNotificationList,
-  updateNotificationList,
-  updateMessageStatusInApp,
-  updateMessageStatus,
-  getMessages,
-} from '../../store/actions/notifications'
+  SECURE_ACCOUNT
+} from '../../common/constants/wallet-service-types'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
+import AccountShell from '../../common/data/models/AccountShell'
+import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
+import BottomSheetAddWalletInfo from '../../components/bottom-sheets/add-wallet/BottomSheetAddWalletInfo'
+import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
+import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
+import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
+import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
 import {
-  setCurrencyCode,
-  setCardData,
-  setIsPermissionGiven,
-} from '../../store/actions/preferences'
-//import HomeHeader from '../../components/home/home-header'
-import idx from 'idx'
-import {
-  BottomTab,
+  BottomTab
 } from '../../components/home/custom-bottom-tabs'
-import * as RNLocalize from 'react-native-localize'
+import ModalContainer from '../../components/home/ModalContainer'
 import {
   addTransferDetails,
   fetchExchangeRates,
   fetchFeeRates,
+  setShowAllAccount
 } from '../../store/actions/accounts'
 import {
-  AccountType,
-  LevelHealthInterface,
-  Wallet,
-} from '../../bitcoin/utilities/Interface'
-import moment from 'moment'
-import { withNavigationFocus } from 'react-navigation'
-import {
-  updatePreference,
-  setFCMToken,
-  setSecondaryDeviceAddress,
-} from '../../store/actions/preferences'
-import BottomSheetHeader from '../Accounts/BottomSheetHeader'
-import BottomSheet from '@gorhom/bottom-sheet'
-import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
-import { AccountsState } from '../../store/reducers/accounts'
-import AccountShell from '../../common/data/models/AccountShell'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
-import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
-import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
-import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
-import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
-import { setVersion } from '../../store/actions/versionHistory'
-import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../../store/actions/SwanIntegration'
-import { clearRampCache } from '../../store/actions/RampIntegration'
-import { clearWyreCache } from '../../store/actions/WyreIntegration'
+  acceptExistingContactRequest,
+  initializeHealthSetup,
+  updateCloudPermission
+} from '../../store/actions/BHR'
 import { setCloudData } from '../../store/actions/cloud'
+import {
+  getMessages,
+  notificationsUpdated,
+  setupNotificationList,
+  updateFCMTokens,
+  updateMessageStatus,
+  updateMessageStatusInApp,
+  updateNotificationList
+} from '../../store/actions/notifications'
+import {
+  setCardData,
+  setCurrencyCode, setFCMToken, setIsPermissionGiven, setSecondaryDeviceAddress,
+  updatePreference
+} from '../../store/actions/preferences'
+import { clearRampCache } from '../../store/actions/RampIntegration'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
-import { setShowAllAccount } from '../../store/actions/accounts'
+import { clearSwanCache, createTempSwanAccountInfo, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import {
+  rejectTrustedContact,
+  syncPermanentChannels
+} from '../../store/actions/trustedContacts'
+import { setVersion } from '../../store/actions/versionHistory'
+import { clearWyreCache } from '../../store/actions/WyreIntegration'
+import { AccountsState } from '../../store/reducers/accounts'
+import BottomSheetHeader from '../Accounts/BottomSheetHeader'
+import BottomSheetWalletHeader from '../Accounts/BottomSheetWalletHeader'
 import HomeContainer from './HomeContainer'
-import ModalContainer from '../../components/home/ModalContainer'
-import LinearGradient from 'react-native-linear-gradient'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -97,6 +89,7 @@ export enum BottomSheetKind {
   TAB_BAR_BUY_MENU,
   TRUSTED_CONTACT_REQUEST,
   ADD_CONTACT_FROM_ADDRESS_BOOK,
+  ADD_A_WALLET_INFO,
   NOTIFICATIONS_LIST,
   SWAN_STATUS_INFO,
   WYRE_STATUS_INFO,
@@ -229,9 +222,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   currentNotificationId: string;
   static whyDidYouRender = true;
 
-  constructor( props ) {
-    super( props )
-    this.props.setShowAllAccount( false )
+  constructor(props) {
+    super(props)
+    this.props.setShowAllAccount(false)
     this.focusListener = null
     this.appStateListener = null
     this.openBottomSheetOnLaunchTimeout = null
@@ -271,143 +264,115 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationNote: null,
       notificationAdditionalInfo: null,
       notificationProceedText: null,
-      notificationIgnoreText:null,
+      notificationIgnoreText: null,
       isIgnoreButton: false,
       currentMessage: null,
     }
-    this.currentNotificationId= ''
+    this.currentNotificationId = ''
   }
 
-  componentDidMount = async() => {
-    if( this.props.levelHealth.length && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && this.props.cloudPermissionGranted === true && this.props.updateWIStatus === false && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' && this.props.currentLevel == 0 ) {
-      if( Platform.OS === 'android' ) {
-        if( !this.props.isGoogleLoginCancelled ) {
+  componentDidMount = async () => {
+    if (this.props.levelHealth.length && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && this.props.cloudPermissionGranted === true && this.props.updateWIStatus === false && this.props.levelHealth[0].levelInfo[0].status != 'notSetup' && this.props.currentLevel == 0) {
+      if (Platform.OS === 'android') {
+        if (!this.props.isGoogleLoginCancelled) {
           this.props.setCloudData()
         }
       } else {
         this.props.setCloudData()
       }
     }
-    requestAnimationFrame( () => {
+    requestAnimationFrame(() => {
       this.setUpFocusListener()
-    } )
+    })
   }
 
-  handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
+  handleBuyBitcoinBottomSheetSelection = (menuItem: BuyBitcoinBottomSheetMenuItem) => {
 
-    switch ( menuItem.kind ) {
-        case BuyMenuItemKind.FAST_BITCOINS:
-          this.closeBottomSheet()
-          this.props.navigation.navigate( 'VoucherScanner' )
-          break
-        case BuyMenuItemKind.SWAN:
-          const swanAccountActive = false
-          if( !swanAccountActive ){
-            this.props.clearSwanCache()
-            this.props.updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED )
-          }
-          else {
-            this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
-          }
-          this.setState( {
-            swanDeepLinkContent: null
-          }, () => {
-            this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
-          } )
-          break
-        case BuyMenuItemKind.RAMP:
-          this.props.clearRampCache()
-          this.setState( {
-            rampDeepLinkContent: null,
-            rampFromDeepLink: false,
-            rampFromBuyMenu: true
-          }, () => {
-            this.openBottomSheet( BottomSheetKind.RAMP_STATUS_INFO )
-          } )
-          break
-        case BuyMenuItemKind.WYRE:
-          this.props.clearWyreCache()
-          this.setState( {
-            wyreDeepLinkContent: null,
-            wyreFromDeepLink: false,
-            wyreFromBuyMenu: true
-          }, () => {
-            this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
-          } )
-          break
+    switch (menuItem.kind) {
+      case BuyMenuItemKind.FAST_BITCOINS:
+        this.closeBottomSheet()
+        this.props.navigation.navigate('VoucherScanner')
+        break
+      case BuyMenuItemKind.SWAN:
+        const swanAccountActive = false
+        if (!swanAccountActive) {
+          this.props.clearSwanCache()
+          this.props.updateSwanStatus(SwanAccountCreationStatus.BUY_MENU_CLICKED)
+        }
+        else {
+          this.props.updateSwanStatus(SwanAccountCreationStatus.ACCOUNT_CREATED)
+        }
+        this.setState({
+          swanDeepLinkContent: null
+        }, () => {
+          this.openBottomSheet(BottomSheetKind.SWAN_STATUS_INFO)
+        })
+        break
+      case BuyMenuItemKind.RAMP:
+        this.props.clearRampCache()
+        this.setState({
+          rampDeepLinkContent: null,
+          rampFromDeepLink: false,
+          rampFromBuyMenu: true
+        }, () => {
+          this.openBottomSheet(BottomSheetKind.RAMP_STATUS_INFO)
+        })
+        break
+      case BuyMenuItemKind.WYRE:
+        this.props.clearWyreCache()
+        this.setState({
+          wyreDeepLinkContent: null,
+          wyreFromDeepLink: false,
+          wyreFromBuyMenu: true
+        }, () => {
+          this.openBottomSheet(BottomSheetKind.WYRE_STATUS_INFO)
+        })
+        break
     }
   };
 
   setCurrencyCodeFromAsync = async () => {
     const { currencyCode } = this.props
-    if ( !currencyCode ) {
-      this.props.setCurrencyCode( RNLocalize.getCurrencies()[ 0 ] )
-      this.setState( {
-        currencyCode: RNLocalize.getCurrencies()[ 0 ],
-      } )
+    if (!currencyCode) {
+      this.props.setCurrencyCode(RNLocalize.getCurrencies()[0])
+      this.setState({
+        currencyCode: RNLocalize.getCurrencies()[0],
+      })
     } else {
-      this.setState( {
+      this.setState({
         currencyCode: currencyCode,
-      } )
+      })
     }
   };
   updateBadgeCounter = () => {
     const { messages } = this.props
-    const unread = messages.filter( msg => msg.status === 'unread' )
-    if ( Platform.OS === 'ios' ) {
-      PushNotificationIOS.setApplicationIconBadgeNumber( unread.length )
+    const unread = messages.filter(msg => msg.status === 'unread')
+    if (Platform.OS === 'ios') {
+      PushNotificationIOS.setApplicationIconBadgeNumber(unread.length)
     }
   }
-
-  // notificationCheck = () =>{
-  //   const { messages } = this.props
-  //   if( messages && messages.length ){
-  //     this.updateBadgeCounter()
-  //     messages.sort( function ( left, right ) {
-  //       return moment.utc( right.timeStamp ).unix() - moment.utc( left.timeStamp ).unix()
-  //     } )
-  //     this.setState( {
-  //       notificationData: messages,
-  //       notificationDataChange: !this.state.notificationDataChange,
-  //     } )
-  //     if( this.currentNotificationId !== '' ) {
-  //       const message = messages.find( message => message.notificationId === this.currentNotificationId )
-  //       if( message ){
-  //         this.handleNotificationBottomSheetSelection( message )
-  //       }
-  //       this.currentNotificationId = ''
-  //     } else {
-  //       const message = messages.find( message => message.status === 'unread' )
-  //       if( message ){
-  //         this.handleNotificationBottomSheetSelection( message )
-  //       }
-  //     }
-  //   }
-  // }
 
   setUpFocusListener = () => {
     const { navigation } = this.props
 
-    this.focusListener = navigation.addListener( 'didFocus', () => {
+    this.focusListener = navigation.addListener('focus', () => {
 
       this.setCurrencyCodeFromAsync()
-      this.props.fetchExchangeRates( this.props.currencyCode )
+      this.props.fetchExchangeRates(this.props.currencyCode)
       this.props.fetchFeeRates()
       // this.syncChannel()
       // this.notificationCheck()
-      this.setState( {
+      this.setState({
         lastActiveTime: moment().toISOString(),
-      } )
-    } )
+      })
+    })
     // this.notificationCheck()
     this.setCurrencyCodeFromAsync()
   };
 
 
   cleanupListeners() {
-    if ( typeof this.focusListener === 'function' ) {
-      this.props.navigation.removeListener( 'didFocus', this.focusListener )
-    }
+    this.focusListener?.()
   }
 
   openBottomSheet = (
@@ -419,7 +384,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       kind: BuyMenuItemKind.SWAN
     }
 
-    if( swanAccountClicked ) this.handleBuyBitcoinBottomSheetSelection( tempMenuItem )
+    if (swanAccountClicked) this.handleBuyBitcoinBottomSheetSelection(tempMenuItem)
 
     this.setState(
       {
@@ -427,20 +392,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         currentBottomSheetKind: kind,
       },
       () => {
-        if ( snapIndex == null ) {
+        if (snapIndex == null) {
           this.bottomSheetRef.current?.expand()
         } else {
-          this.bottomSheetRef.current?.snapTo( snapIndex )
+          this.bottomSheetRef.current?.snapTo(snapIndex)
         }
       }
     )
   };
 
   onBottomSheetClosed() {
-    this.setState( {
+    this.setState({
       bottomSheetState: BottomSheetState.Closed,
       currentBottomSheetKind: null,
-    } )
+    })
   }
 
   closeBottomSheet = () => {
@@ -449,176 +414,172 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onBackPress = () => {
-    this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
+    this.openBottomSheet(BottomSheetKind.TAB_BAR_BUY_MENU)
   };
 
 
   renderBottomSheetContent() {
-    // console.log( 'this.state.currentBottomSheetKind', this.state.currentBottomSheetKind )
-    switch ( this.state.currentBottomSheetKind ) {
-        case BottomSheetKind.TAB_BAR_BUY_MENU:
-          return (
-            <>
-              <BottomSheetHeader title="Buy Bitcoin" onPress={this.closeBottomSheet} />
+    switch (this.state.currentBottomSheetKind) {
+      case BottomSheetKind.TAB_BAR_BUY_MENU:
+        return (
+          <>
+            <BottomSheetHeader title="Buy Bitcoin" onPress={this.closeBottomSheet} />
 
-              <BuyBitcoinHomeBottomSheet
-                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
-                onPress={this.closeBottomSheet}
-              />
-            </>
-          )
-        case BottomSheetKind.SWAN_STATUS_INFO:
-          return (
-            <>
-              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
-              <BottomSheetSwanInfo
-                swanDeepLinkContent={this.state.swanDeepLinkContent}
-                onClickSetting={() => {
-                  this.closeBottomSheet()
-                }}
-                // onPress={this.closeBottomSheet}
-                onPress={this.onBackPress}
-              />
-            </>
-          )
-        case BottomSheetKind.WYRE_STATUS_INFO:
-          return (
-            <>
-              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
-              <BottomSheetWyreInfo
-                wyreDeepLinkContent={this.state.wyreDeepLinkContent}
-                wyreFromBuyMenu={this.state.wyreFromBuyMenu}
-                wyreFromDeepLink={this.state.wyreFromDeepLink}
-                onClickSetting={() => {
-                  this.closeBottomSheet()
-                }}
-                // onPress={this.closeBottomSheet}
-                onPress={this.onBackPress}
-              />
-            </>
-          )
+            <BuyBitcoinHomeBottomSheet
+              onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+              onPress={this.closeBottomSheet}
+            />
+          </>
+        )
+      case BottomSheetKind.SWAN_STATUS_INFO:
+        return (
+          <>
+            <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
+            <BottomSheetSwanInfo
+              swanDeepLinkContent={this.state.swanDeepLinkContent}
+              onClickSetting={() => {
+                this.closeBottomSheet()
+              }}
+              onPress={this.onBackPress}
+            />
+          </>
+        )
+      case BottomSheetKind.WYRE_STATUS_INFO:
+        return (
+          <>
+            <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
+            <BottomSheetWyreInfo
+              wyreDeepLinkContent={this.state.wyreDeepLinkContent}
+              wyreFromBuyMenu={this.state.wyreFromBuyMenu}
+              wyreFromDeepLink={this.state.wyreFromDeepLink}
+              onClickSetting={() => {
+                this.closeBottomSheet()
+              }}
+              // onPress={this.closeBottomSheet}
+              onPress={this.onBackPress}
+            />
+          </>
+        )
 
-        case BottomSheetKind.RAMP_STATUS_INFO:
-          return (
-            <>
-              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
-              <BottomSheetRampInfo
-                rampDeepLinkContent={this.state.rampDeepLinkContent}
-                rampFromBuyMenu={this.state.rampFromBuyMenu}
-                rampFromDeepLink={this.state.rampFromDeepLink}
-                onClickSetting={() => {
-                  this.closeBottomSheet()
-                }}
-                // onPress={this.closeBottomSheet}
-                onPress={this.onBackPress}
-              />
-            </>
-          )
+      case BottomSheetKind.RAMP_STATUS_INFO:
+        return (
+          <>
+            <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
+            <BottomSheetRampInfo
+              rampDeepLinkContent={this.state.rampDeepLinkContent}
+              rampFromBuyMenu={this.state.rampFromBuyMenu}
+              rampFromDeepLink={this.state.rampFromDeepLink}
+              onClickSetting={() => {
+                this.closeBottomSheet()
+              }}
+              onPress={this.onBackPress}
+            />
+          </>
+        )
 
-        default:
-          break
+      case BottomSheetKind.ADD_A_WALLET_INFO:
+        return (
+          <>
+            <BottomSheetWalletHeader title="Add a wallet" onPress={this.closeBottomSheet} />
+            <BottomSheetAddWalletInfo
+              onRGBWalletClick={() => {
+                this.closeBottomSheet()
+                const accountShell = this.props.accountShells[1]
+                this.props.navigation.navigate('NewRGBWallet', {
+                  accountShellID: accountShell.id,
+                })
+              }}
+              onLighteningWalletClick={() => {
+                this.closeBottomSheet()
+                this.props.navigation.navigate('ScanNodeConfig', {
+                  currentSubAccount: null,
+                })
+              }}
+              title1='RGB Wallet'
+              title2='Lightening Wallet'
+              desc1='Issue new coins or collectibles on RGB. Set limit and send it around your Tribe'
+              desc2='You can also add an asset to your Tribe wallet by receiving it from someone'
+            />
+          </>
+        )
+
+      default:
+        break
     }
   }
 
   render() {
     return (
       <View style={{
-        backgroundColor: Colors.darkBlue
+        backgroundColor: Colors.blue
       }}>
-        <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+        <LinearGradient colors={[Colors.blue, Colors.blue]}
           start={{
             x: 0, y: 0
           }} end={{
             x: 0.5, y: 1
           }}>
-          <StatusBar translucent={false} backgroundColor={'transparent'} barStyle="light-content"/>
+          <StatusBar translucent={false} backgroundColor={'transparent'} barStyle="light-content" />
         </LinearGradient>
-        {/* <StatusBar backgroundColor={Colors.blue} barStyle="light-content" /> */}
         <ModalContainer
-          onBackground={()=>this.setState( {
-            currentBottomSheetKind:null
-          } )}
+          onBackground={() => this.setState({
+            currentBottomSheetKind: null
+          })}
           visible={this.state.currentBottomSheetKind !== null}
-          closeBottomSheet={() => {}}
+          closeBottomSheet={() => { }}
         >
           {this.renderBottomSheetContent()}
         </ModalContainer>
-        {/* <Header fromScreen={'Home'} /> */}
-        {/* <View
-          style={{
-            flex: 3.8,
-            paddingTop:
-              Platform.OS == 'ios' && DeviceInfo.hasNotch
-                ? heightPercentageToDP( '5%' )
-                : 0,
-          }}
-        >
-          <HomeHeader
-            onPressNotifications={this.onPressNotifications}
-            notificationData={notificationData}
-            walletName={wallet.walletName}
-            getCurrencyImageByRegion={getCurrencyImageByRegion}
-            netBalance={netBalance}
-            exchangeRates={exchangeRates}
-            CurrencyCode={currencyCode}
-            navigation={navigation}
-            currentLevel={currentLevel}
-            //  onSwitchToggle={this.onSwitchToggle}
-            // setCurrencyToggleValue={this.setCurrencyToggleValue}
-            // navigation={this.props.navigation}
-            // overallHealth={overallHealth}
-          />
-        </View> */}
-        <HomeContainer lnAcc={this.props.accountShells.filter( shell=>shell.primarySubAccount.type===AccountType.LIGHTNING_ACCOUNT )} containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} swanDeepLinkContent={this.state.swanDeepLinkContent} />
+        <HomeContainer navigation={this.props.navigation} lnAcc={this.props.accountShells.filter(shell => shell.primarySubAccount.type === AccountType.LIGHTNING_ACCOUNT)} containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} swanDeepLinkContent={this.state.swanDeepLinkContent} />
 
       </View>
     )
   }
 }
 
-const mapStateToProps = ( state ) => {
+const mapStateToProps = (state) => {
   return {
     notificationList: state.notifications.notifications,
     accountsState: state.accounts,
     cloudPermissionGranted: state.bhr.cloudPermissionGranted,
-    exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
-    wallet: idx( state, ( _ ) => _.storage.wallet ),
+    exchangeRates: idx(state, (_) => _.accounts.exchangeRates),
+    wallet: idx(state, (_) => _.storage.wallet),
     UNDER_CUSTODY: idx(
       state,
-      ( _ ) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY
+      (_) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY
     ),
-    cardDataProps: idx( state, ( _ ) => _.preferences.cardData ),
-    secureAccount: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),
-    overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
-    notificationListNew: idx( state, ( _ ) => _.notifications.notificationListNew ),
-    currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
-    existingFCMToken: idx( state, ( _ ) => _.preferences.existingFCMToken ),
+    cardDataProps: idx(state, (_) => _.preferences.cardData),
+    secureAccount: idx(state, (_) => _.accounts[SECURE_ACCOUNT].service),
+    overallHealth: idx(state, (_) => _.sss.overallHealth),
+    notificationListNew: idx(state, (_) => _.notifications.notificationListNew),
+    currencyCode: idx(state, (_) => _.preferences.currencyCode),
+    existingFCMToken: idx(state, (_) => _.preferences.existingFCMToken),
     secondaryDeviceAddressValue: idx(
       state,
-      ( _ ) => _.preferences.secondaryDeviceAddressValue
+      (_) => _.preferences.secondaryDeviceAddressValue
     ),
-    releaseCasesValue: idx( state, ( _ ) => _.preferences.releaseCasesValue ),
-    database: idx( state, ( _ ) => _.storage.database ) || {
+    releaseCasesValue: idx(state, (_) => _.preferences.releaseCasesValue),
+    database: idx(state, (_) => _.storage.database) || {
     },
-    levelHealth: idx( state, ( _ ) => _.bhr.levelHealth ),
-    currentLevel: idx( state, ( _ ) => _.bhr.currentLevel ),
-    keeperInfo: idx( state, ( _ ) => _.bhr.keeperInfo ),
-    accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
-    newBHRFlowStarted: idx( state, ( _ ) => _.bhr.newBHRFlowStarted ),
-    isGoogleLoginCancelled: idx( state, ( _ ) => _.cloud.isGoogleLoginCancelled ),
-    cloudBackupStatus: idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
-    isPermissionSet: idx( state, ( _ ) => _.preferences.isPermissionSet ),
-    isAuthenticated: idx( state, ( _ ) => _.setupAndAuth.isAuthenticated, ),
-    asyncNotificationList: idx( state, ( _ ) => _.notifications.updatedNotificationList ),
-    fetchStarted: idx( state, ( _ ) => _.notifications.fetchStarted ),
+    levelHealth: idx(state, (_) => _.bhr.levelHealth),
+    currentLevel: idx(state, (_) => _.bhr.currentLevel),
+    keeperInfo: idx(state, (_) => _.bhr.keeperInfo),
+    accountShells: idx(state, (_) => _.accounts.accountShells),
+    newBHRFlowStarted: idx(state, (_) => _.bhr.newBHRFlowStarted),
+    isGoogleLoginCancelled: idx(state, (_) => _.cloud.isGoogleLoginCancelled),
+    cloudBackupStatus: idx(state, (_) => _.cloud.cloudBackupStatus) || CloudBackupStatus.PENDING,
+    isPermissionSet: idx(state, (_) => _.preferences.isPermissionSet),
+    isAuthenticated: idx(state, (_) => _.setupAndAuth.isAuthenticated,),
+    asyncNotificationList: idx(state, (_) => _.notifications.updatedNotificationList),
+    fetchStarted: idx(state, (_) => _.notifications.fetchStarted),
     messages: state.notifications.messages,
-    initLoader: idx( state, ( _ ) => _.bhr.loading.initLoader ),
-    updateWIStatus: idx( state, ( _ ) => _.bhr.loading.updateWIStatus ),
+    initLoader: idx(state, (_) => _.bhr.loading.initLoader),
+    updateWIStatus: idx(state, (_) => _.bhr.loading.updateWIStatus),
   }
 }
 
-export default withNavigationFocus(
-  connect( mapStateToProps, {
+export default
+  connect(mapStateToProps, {
     updateFCMTokens,
     acceptExistingContactRequest,
     rejectTrustedContact,
@@ -649,29 +610,24 @@ export default withNavigationFocus(
     updateMessageStatus,
     getMessages,
     syncPermanentChannels,
-  } )( Home )
-)
+  })(Home)
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
   cardContainer: {
     backgroundColor: Colors.white,
-    width: widthPercentageToDP( '95%' ),
-    // height: heightPercentageToDP( '7%' ),
-    // borderColor: Colors.borderColor,
-    // borderWidth: 1,
-    borderRadius: widthPercentageToDP( 3 ),
+    width: widthPercentageToDP('95%'),
+    borderRadius: widthPercentageToDP(3),
     marginBottom: 10,
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginHorizontal: widthPercentageToDP( 5 ),
+    marginHorizontal: widthPercentageToDP(5),
     alignSelf: 'center',
     flexDirection: 'row',
-    paddingHorizontal: widthPercentageToDP ( 2 )
+    paddingHorizontal: widthPercentageToDP(2)
   },
   accountCardsSectionContainer: {
-    height: hp( '71.46%' ),
-    // marginTop: 30,
-    backgroundColor: Colors.backgroundColor1,
+    height: hp('71.46%'),
+    backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
@@ -684,21 +640,16 @@ const styles = StyleSheet.create( {
   },
 
   floatingActionButtonContainer: {
-    // position: 'absolute',
-    // zIndex: 0,
-    // bottom: TAB_BAR_HEIGHT,
-    // right: 0,
-    // flexDirection: 'row',
     justifyContent: 'flex-end',
     alignSelf: 'flex-end',
-    padding: heightPercentageToDP( 1.5 ),
+    padding: heightPercentageToDP(1.5),
   },
 
   cloudErrorModalImage: {
-    width: wp( '30%' ),
-    height: wp( '25%' ),
+    width: wp('30%'),
+    height: wp('25%'),
     marginLeft: 'auto',
     resizeMode: 'stretch',
-    marginBottom: hp( '-3%' ),
+    marginBottom: hp('-3%'),
   }
-} )
+})

@@ -1,55 +1,47 @@
+import { NavigationProp, ParamListBase, RouteProp } from '@react-navigation/native'
+import idx from 'idx'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { View, Text, StyleSheet, Keyboard, TouchableOpacity } from 'react-native'
-import { Input } from 'react-native-elements'
-import Colors from '../../../common/Colors'
-import Fonts from '../../../common/Fonts'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import FormStyles from '../../../common/Styles/FormStyles'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { useDispatch } from 'react-redux'
+import { NetworkType } from '../../../bitcoin/utilities/Interface'
+import Colors from '../../../common/Colors'
+import { translations } from '../../../common/content/LocContext'
+import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
+import RecipientKind from '../../../common/data/enums/RecipientKind'
 import AccountShell from '../../../common/data/models/AccountShell'
 import { ContactRecipientDescribing, RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
-import { BaseNavigationProp } from '../../../navigation/Navigator'
+import Fonts from '../../../common/Fonts'
+import ButtonStyles from '../../../common/Styles/ButtonStyles'
+import FormStyles from '../../../common/Styles/FormStyles'
+import ModalContainer from '../../../components/home/ModalContainer'
+import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
+import { clearTransfer } from '../../../store/actions/accounts'
+import { amountForRecipientUpdated, calculateSendMaxFee, executeSendStage1, recipientRemovedFromSending } from '../../../store/actions/sending'
+import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../../store/actions/trustedContacts'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
+import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
+import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import useSelectedRecipientForSendingByID from '../../../utils/hooks/state-selectors/sending/UseSelectedRecipientForSendingByID'
 import useSelectedRecipientsForSending from '../../../utils/hooks/state-selectors/sending/UseSelectedRecipientsForSending'
+import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
+import useAccountSendST1CompletionEffect from '../../../utils/sending/UseAccountSendST1CompletionEffect'
+import SendConfirmationContent from '../SendConfirmationContent'
 import BalanceEntryFormGroup from './BalanceEntryFormGroup'
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
-import { widthPercentageToDP } from 'react-native-responsive-screen'
-import { calculateSendMaxFee, executeSendStage1, amountForRecipientUpdated, recipientRemovedFromSending } from '../../../store/actions/sending'
-import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
-import useAccountSendST1CompletionEffect from '../../../utils/sending/UseAccountSendST1CompletionEffect'
-import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
-import SendConfirmationContent from '../SendConfirmationContent'
-import { clearTransfer } from '../../../store/actions/accounts'
-import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
-import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
-import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
-import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
-import idx from 'idx'
-import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../../store/actions/trustedContacts'
-import RecipientKind from '../../../common/data/enums/RecipientKind'
-import ModalContainer from '../../../components/home/ModalContainer'
-import { translations } from '../../../common/content/LocContext'
-import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import { NetworkType } from '../../../bitcoin/utilities/Interface'
-import LinearGradient from 'react-native-linear-gradient'
-
-export type NavigationParams = {
-};
-
-export type NavigationProp = {
-  params: NavigationParams;
-} & BaseNavigationProp;
 
 export type Props = {
-  navigation: NavigationProp;
+  navigation: NavigationProp<ParamListBase>;
+  route: RouteProp<{params: { selectedRecipientID: string, fromWallet: any }}>
 };
 
-const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props ) => {
+const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
   const dispatch = useDispatch()
 
   const [ sendFailureModal, setFailure ] = useState( false )
@@ -58,7 +50,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const common  = translations[ 'common' ]
 
   const selectedRecipients = useSelectedRecipientsForSending()
-  const currentRecipient = useSelectedRecipientForSendingByID( navigation.getParam( 'selectedRecipientID' ) )
+  const currentRecipient = useSelectedRecipientForSendingByID( route.params?.selectedRecipientID )
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const sourceAccount = useAccountByAccountShell( sourceAccountShell )
@@ -72,7 +64,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
-  const fromWallet = navigation?.getParam( 'fromWallet' ) || false
+  const fromWallet = route.params?.fromWallet || false
 
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
 
@@ -153,12 +145,13 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         onPressCancel={() => {
           dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
           setFailure( false )
-
-          navigation.dispatch(
-            resetStackToAccountDetails( {
-              accountShellID: sourceAccountShell.id,
-            } )
-          )
+          setTimeout(()=>{
+            navigation.dispatch(
+              resetStackToAccountDetails( {
+                accountShellID: sourceAccountShell.id,
+              } )
+            )
+          },100)
         }}
         isUnSuccess={true}
         accountKind={sourcePrimarySubAccount.kind}
@@ -266,11 +259,12 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
             ...ButtonStyles.primaryActionButton,
             marginRight: 8,
             backgroundColor: 'transparent',
+            opacity: !!sendingState.sendMaxFee || !selectedAmount ? 0.5 : 1
           }}
         >
           <Text style={{
             ...ButtonStyles.actionButtonText,
-            color: sendingState.sendMaxFee || !selectedAmount ? Colors.lightBlue: Colors.blue,
+            color: sendingState.sendMaxFee || !selectedAmount ? Colors.textColorGrey : Colors.blue,
           }}>
             {strings.AddRecipient}
           </Text>

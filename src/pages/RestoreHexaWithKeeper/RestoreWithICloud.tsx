@@ -1,71 +1,69 @@
-import React, { Component, useContext } from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  Image,
-  ScrollView,
-  Platform,
-  ImageBackground,
-  RefreshControl,
-  Keyboard,
-} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import idx from 'idx'
+import moment from 'moment'
+import React, { Component } from 'react'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+  Image,
+  ImageBackground,
+  Keyboard,
+  Platform,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
+import config from '../../bitcoin/HexaConfig'
+import { BackupStreamData, KeeperInfoInterface, PrimaryStreamData, SecondaryStreamData, Wallet } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
+import Fonts from '../../common/Fonts'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import { decrypt } from '../../common/encryption'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import LoaderModal from '../../components/LoaderModal'
+import SendViaLink from '../../components/SendViaLink'
+import Loader from '../../components/loader'
+import {
+  downloadBackupData,
+  initNewBHRFlow,
+  putKeeperInfo,
+  recoverWallet,
+  recoverWalletUsingIcloud,
+  restoreWithoutUsingIcloud,
+  setDownloadedBackupData,
+  setupHealth
+} from '../../store/actions/BHR'
+import { clearCloudCache, getCloudDataRecovery, setCloudBackupStatus, setCloudErrorMessage } from '../../store/actions/cloud'
 import {
   walletCheckIn,
 } from '../../store/actions/trustedContacts'
-import idx from 'idx'
-import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
-import moment from 'moment'
+import { setVersion } from '../../store/actions/versionHistory'
+import ShareOtpWithTrustedContact from '../NewBHR/ShareOtpWithTrustedContact'
+import ContactListForRestore from './ContactListForRestore'
+import ICloudBackupNotFound from './ICloudBackupNotFound'
 import RestoreFromICloud from './RestoreFromICloud'
 import RestoreSuccess from './RestoreSuccess'
-import ICloudBackupNotFound from './ICloudBackupNotFound'
-import AntDesign from 'react-native-vector-icons/AntDesign'
 import RestoreWallet from './RestoreWallet'
-import { decrypt } from '../../common/encryption'
-import LoaderModal from '../../components/LoaderModal'
-import Loader from '../../components/loader'
-import {
-  recoverWalletUsingIcloud,
-  recoverWallet,
-  downloadBackupData,
-  putKeeperInfo,
-  setupHealth,
-  setDownloadedBackupData,
-  restoreWithoutUsingIcloud
-} from '../../store/actions/BHR'
-import { initNewBHRFlow } from '../../store/actions/BHR'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import { BackupStreamData, KeeperInfoInterface, PrimaryStreamData, SecondaryStreamData, Wallet } from '../../bitcoin/utilities/Interface'
-import config from '../../bitcoin/HexaConfig'
-import ContactListForRestore from './ContactListForRestore'
-import SendViaLink from '../../components/SendViaLink'
-import ShareOtpWithTrustedContact from '../NewBHR/ShareOtpWithTrustedContact'
-import { getCloudDataRecovery, clearCloudCache, setCloudBackupStatus, setCloudErrorMessage } from '../../store/actions/cloud'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { setVersion } from '../../store/actions/versionHistory'
 //import QuestionList from '../../common/QuestionList'
-import SecurityQuestion from './SecurityQuestion'
-import { completedWalletSetup, initializeRecovery } from '../../store/actions/setupAndAuth'
-import ModalContainer from '../../components/home/ModalContainer'
+import { CommonActions } from '@react-navigation/native'
 import semver from 'semver'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
-import { translations } from '../../common/content/LocContext'
-import { log } from 'console'
-import { LocalizationContext } from '../../common/content/LocContext'
+import { LocalizationContext, translations } from '../../common/content/LocContext'
+import ModalContainer from '../../components/home/ModalContainer'
+import { completedWalletSetup, initializeRecovery } from '../../store/actions/setupAndAuth'
+import SecurityQuestion from './SecurityQuestion'
 
 
 const LOADER_MESSAGE_TIME = 2000
@@ -328,7 +326,14 @@ class RestoreWithICloud extends Component<
       this.setState( {
         loaderModal: false
       } )
-      this.props.navigation.navigate( 'HomeNav' )
+      this.props.navigation.dispatch( CommonActions.reset( {
+        index: 0,
+        routes: [
+          {
+            name: 'App'
+          }
+        ],
+      } ) )
     }
 
     // if ( JSON.stringify( prevProps.downloadedBackupData ) != JSON.stringify( this.props.downloadedBackupData ) ) {
@@ -1185,13 +1190,27 @@ class RestoreWithICloud extends Component<
               this.setState( {
                 restoreSuccess: false
               } )
-              this.props.navigation.navigate( 'HomeNav' )
+              this.props.navigation.dispatch( CommonActions.reset( {
+                index: 0,
+                routes: [
+                  {
+                    name: 'App',
+                  }
+                ],
+              } ) )
             }}
             onPressBack={() => {
               this.setState( {
                 restoreSuccess: false
               } )
-              this.props.navigation.navigate( 'HomeNav' )
+              this.props.navigation.dispatch( CommonActions.reset( {
+                index: 0,
+                routes: [
+                  {
+                    name: 'App',
+                  }
+                ],
+              } ) )
             }}
           />
         </ModalContainer>
@@ -1429,26 +1448,25 @@ const mapStateToProps = ( state ) => {
   }
 }
 
-export default withNavigationFocus(
-  connect( mapStateToProps, {
-    recoverWalletUsingIcloud,
-    recoverWallet,
-    getCloudDataRecovery,
-    clearCloudCache,
-    initNewBHRFlow,
-    walletCheckIn,
-    completedWalletSetup,
-    setVersion,
-    initializeRecovery,
-    setCloudBackupStatus,
-    downloadBackupData,
-    putKeeperInfo,
-    setupHealth,
-    setCloudErrorMessage,
-    setDownloadedBackupData,
-    restoreWithoutUsingIcloud,
-  } )( RestoreWithICloud )
-)
+export default
+connect( mapStateToProps, {
+  recoverWalletUsingIcloud,
+  recoverWallet,
+  getCloudDataRecovery,
+  clearCloudCache,
+  initNewBHRFlow,
+  walletCheckIn,
+  completedWalletSetup,
+  setVersion,
+  initializeRecovery,
+  setCloudBackupStatus,
+  downloadBackupData,
+  putKeeperInfo,
+  setupHealth,
+  setCloudErrorMessage,
+  setDownloadedBackupData,
+  restoreWithoutUsingIcloud,
+} )( RestoreWithICloud )
 
 const styles = StyleSheet.create( {
   modalHeaderTitleView: {

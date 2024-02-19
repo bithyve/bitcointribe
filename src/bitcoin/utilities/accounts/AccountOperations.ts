@@ -2,10 +2,7 @@ import * as bip32 from 'bip32'
 import * as bitcoinJS from 'bitcoinjs-lib'
 
 import {
-  Account,
-  AccountType,
-  Accounts,
-  ActiveAddressAssignee,
+  Account, Accounts, AccountType, ActiveAddressAssignee,
   ActiveAddresses,
   AverageTxFees,
   AverageTxFeesByNetwork,
@@ -29,9 +26,9 @@ import coinselect from 'coinselect'
 import coinselectSplit from 'coinselect/split'
 import crypto from 'crypto'
 import idx from 'idx'
-import config from '../../HexaConfig'
 import ElectrumClient from '../../electrum/client'
 import TestElectrumClient from '../../electrum/test-client'
+import config from '../../HexaConfig'
 import { getPurpose } from './AccountFactory'
 import AccountUtilities from './AccountUtilities'
 
@@ -128,7 +125,7 @@ export default class AccountOperations {
     network: bitcoinJS.Network
   ) => {
 
-    const client = network === bitcoinJS.networks.bitcoin? ElectrumClient: TestElectrumClient
+    const client = account.type === AccountType.TEST_ACCOUNT?  TestElectrumClient: ElectrumClient
     const { historyByAddress, txids, txidToAddress } = await client.syncHistoryByAddress(
       addresses,
       network
@@ -492,12 +489,10 @@ export default class AccountOperations {
         addresses.push( address )
       }
 
-      const client = network === bitcoinJS.networks.bitcoin? ElectrumClient: TestElectrumClient
+      const client = account.type === AccountType.TEST_ACCOUNT?  TestElectrumClient: ElectrumClient
       // sync utxos & balances
 
-      console.log( 'addresses', addresses )
       const utxosByAddress = await client.syncUTXOByAddress( addresses, network )
-      console.log( 'utxosByAddress', utxosByAddress )
 
       const balances: Balances = {
         confirmed: 0,
@@ -1226,7 +1221,7 @@ export default class AccountOperations {
       txHex = tx.extractTransaction().toHex()
     }
 
-    const client = network === bitcoinJS.networks.bitcoin? ElectrumClient: TestElectrumClient
+    const client = account.type === AccountType.TEST_ACCOUNT?  TestElectrumClient: ElectrumClient
     const txid = await client.broadcast( txHex )
     if ( !txid ) throw new Error( 'Failed to broadcast transaction, txid missing' )
 

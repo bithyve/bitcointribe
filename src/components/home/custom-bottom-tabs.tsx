@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react'
-import { View, Image, StyleSheet, TouchableOpacity, ImageSourcePropType } from 'react-native'
-import Colors from '../../common/Colors'
+import { Image, ImageSourcePropType, StyleSheet, TouchableOpacity, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import {
-  widthPercentageToDP as wp,
   heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
 
 export enum BottomTab {
   Home,
@@ -90,24 +90,24 @@ const CustomBottomTabs: React.FC<Props> = ( {
 }: Props ) => {
   return (
     <View style={styles.bottomTabBarMainView}>
-    <View style={{
-      ...styles.bottomTabBarContainer, zIndex: tabBarZIndex
-    }}>
-      {tabItems.map( ( tabItem, index ) => {
-        return (
-          <Tab
-            key={index}
-            tabItem={tabItem}
-            isActive={selectedTab == tabItem.tab}
-            onPress={() => {
+      <View style={{
+        ...styles.bottomTabBarContainer, zIndex: tabBarZIndex
+      }}>
+        {tabItems.map( ( tabItem, index ) => {
+          return (
+            <Tab
+              key={index}
+              tabItem={tabItem}
+              isActive={selectedTab == tabItem.tab}
+              onPress={() => {
               // if ( isEnabled ) {
                 onSelect( tabItem.tab )
               // }
-            }}
-          />
-        )
-      } )}
-    </View>
+              }}
+            />
+          )
+        } )}
+      </View>
     </View>
   )
 }

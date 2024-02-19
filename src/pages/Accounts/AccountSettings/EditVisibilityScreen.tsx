@@ -1,20 +1,21 @@
-import React, { useMemo, useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import { CommonActions } from '@react-navigation/native'
+import React, { useState } from 'react'
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import { useDispatch } from 'react-redux'
-import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import ListStyles from '../../../common/Styles/ListStyles'
-
-import VisibilityOptionsList from '../../../components/account-settings/visibility/VisibilityOptionsList'
+import Colors from '../../../common/Colors'
+import { translations } from '../../../common/content/LocContext'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
-import { updateAccountSettings } from '../../../store/actions/accounts'
 import Fonts from '../../../common/Fonts'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import Colors from '../../../common/Colors'
+import ListStyles from '../../../common/Styles/ListStyles'
+import VisibilityOptionsList from '../../../components/account-settings/visibility/VisibilityOptionsList'
 import BottomInfoBox from '../../../components/BottomInfoBox'
-import { translations } from '../../../common/content/LocContext'
-import LinearGradient from 'react-native-linear-gradient'
-import { RFValue } from 'react-native-responsive-fontsize'
+import HeaderTitle from '../../../components/HeaderTitle'
+import { recomputeNetBalance, updateAccountSettings } from '../../../store/actions/accounts'
+import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import useAccountShellFromRoute from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.DEFAULT,
@@ -23,6 +24,7 @@ const SELECTABLE_VISIBILITY_OPTIONS = [
 ]
 
 export type Props = {
+  route: any;
   navigation: any;
 };
 
@@ -34,9 +36,9 @@ const HeaderSection: React.FC = ( { title } ) => {
   )
 }
 
-const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { route, navigation }: Props ) => {
   const dispatch = useDispatch()
-  const accountShell = useAccountShellFromNavigation( navigation )
+  const accountShell = useAccountShellFromRoute( route )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const [ selectedVisibility, setSelectedVisibility ] = useState( primarySubAccount.visibility )
   const common  = translations[ 'common' ]
@@ -52,7 +54,17 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
     dispatch( updateAccountSettings( {
       accountShell, settings
     } ) )
-    navigation.navigate( 'Home' )
+    dispatch( recomputeNetBalance() )
+    // navigation.navigate( 'Home' )
+    const resetAction = CommonActions.reset( {
+      index: 0,
+      routes: [
+        {
+          name: 'Home'
+        }
+      ],
+    } )
+    navigation.dispatch( resetAction )
   }
 
   function onDismiss() {
@@ -60,7 +72,17 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
   }
 
   return (
-    <View style={styles.rootContainer}>
+    <SafeAreaView style={styles.rootContainer}>
+      <HeaderTitle
+        navigation={navigation}
+        backButton={true}
+        firstLineTitle={'Account Visibility'}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
       <HeaderSection title={strings.Choosewhen}/>
 
       <View style={{
@@ -84,17 +106,11 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
         />
         <View style={styles.actionButtonContainer}>
           <TouchableOpacity onPress={handleSaveButtonPress}>
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
+            <View
               style={styles.confirmButtonView}
             >
               <Text style={styles.confirmButtonText}>{common.confirm}</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={onDismiss}
@@ -114,7 +130,7 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
         </View>
       </View>
 
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -140,10 +156,10 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
     alignSelf: 'center',
     marginLeft: 15,
-    padding: 15
+    padding: 15,
+    backgroundColor: Colors.blue
   },
   confirmButtonText: {
     color: Colors.white,

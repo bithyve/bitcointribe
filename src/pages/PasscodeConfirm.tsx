@@ -1,27 +1,26 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
+  SafeAreaView,
+  StatusBar,
   StyleSheet,
   Text,
-  View,
-  SafeAreaView,
   TouchableOpacity,
-  StatusBar,
-  // NativeModules
+  View,
 } from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { useDispatch, useSelector } from 'react-redux'
-import { storeCreds } from '../store/actions/setupAndAuth'
 import { LocalizationContext } from '../common/content/LocContext'
 import BottomInfoBox from '../components/BottomInfoBox'
-import LinearGradient from 'react-native-linear-gradient'
+import { storeCreds } from '../store/actions/setupAndAuth'
 
 export default function PasscodeConfirm( props ) {
   const [ passcode, setPasscode ] = useState( '' )
@@ -97,7 +96,7 @@ export default function PasscodeConfirm( props ) {
   return (
     <SafeAreaView style={ {
       flex: 1,
-      backgroundColor:'#F5F5F5'
+      backgroundColor:Colors.LIGHT_BACKGROUND
     } }>
       <StatusBar />
       <View style={ {
@@ -489,31 +488,37 @@ export default function PasscodeConfirm( props ) {
               <BottomInfoBox
                 backgroundColor={Colors.white}
                 title={''}
-                infoText={'Make sure you remember your passcode. If you forget your passcode, you will have to restore from backup to regain access to the wallet'}
+                infoText={'Your app storage is encrypted by the passcode. You will not be able to log in if you forget the passcode and will have to recover your wallet using the recovery flow'}
               />
             </View>
           }
           {passcode.length == 4 ? (
-            <TouchableOpacity
-              disabled={passcode == confirmPasscode ? false : true}
-              onPress={() => dispatch( storeCreds( passcode ) ) }
-            >
-              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-                start={{
-                  x: 0, y: 0
-                }} end={{
-                  x: 1, y: 0
-                }}
-                locations={[ 0.2, 1 ]}
-                style={{
-                  ...styles.proceedButtonView,
-                  backgroundColor:
-                  passcode == confirmPasscode ? Colors.blue : Colors.lightBlue,
-                }}
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+            }}>
+              <TouchableOpacity
+                disabled={passcode == confirmPasscode ? false : true}
+                onPress={() => dispatch( storeCreds( passcode ) ) }
               >
-                <Text style={styles.proceedButtonText}>{common.proceed}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+                <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
+                  start={{
+                    x: 0, y: 0
+                  }} end={{
+                    x: 1, y: 0
+                  }}
+                  locations={[ 0.2, 1 ]}
+                  style={{
+                    ...styles.proceedButtonView,
+                    backgroundColor:
+                  passcode == confirmPasscode ? Colors.blue : Colors.lightBlue,
+                  }}
+                >
+                  <Text style={styles.proceedButtonText}>{common.proceed}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
           ) : null}
 
         </View>
@@ -701,7 +706,7 @@ const styles = StyleSheet.create( {
   },
   keyPadRow: {
     flexDirection: 'row',
-    height: hp( '8%' )
+    height: hp( '9%' )
   },
   keyPadElementTouchable: {
     flex: 1,
@@ -713,18 +718,17 @@ const styles = StyleSheet.create( {
   keyPadElementText: {
     color: Colors.blue,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.Regular,
+    fontFamily: Fonts.Medium,
     fontStyle: 'normal'
   },
   proceedButtonView: {
-    marginLeft: 20,
-    marginTop: hp( '3%' ),
+    marginRight: 20,
+    marginTop: hp( '14%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    // elevation: 10,
   },
   proceedButtonText: {
     color: Colors.white,
@@ -732,9 +736,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Medium
   },
   boldItalicText: {
-    fontFamily: Fonts.MediumItalic,
-    fontWeight: 'bold',
-    fontStyle: 'italic',
+    fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
   },
   headerTitleText: {
@@ -742,7 +744,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 22 ),
     marginLeft: 20,
     marginTop: hp( '4%' ),
-    fontFamily: Fonts.Regular
+    fontFamily: Fonts.Medium
   },
   headerInfoText: {
     color: Colors.THEAM_INFO_TEXT_COLOR,

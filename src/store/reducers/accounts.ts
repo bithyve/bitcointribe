@@ -1,58 +1,58 @@
+import { Account, Accounts, Gift } from '../../bitcoin/utilities/Interface'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import SyncStatus from '../../common/data/enums/SyncStatus'
+import AccountShell from '../../common/data/models/AccountShell'
 import {
-  TESTCOINS_RECEIVED,
   ACCOUNTS_SYNCHED,
-  EXCHANGE_RATE_CALCULATED,
-  SECONDARY_XPRIV_GENERATED,
-  TWO_FA_RESETTED,
-  AVERAGE_TX_FEE,
-  ADD_NEW_ACCOUNT_SHELLS,
-  NEW_ACCOUNT_ADD_FAILED,
-  ADD_NEW_ACCOUNT_SHELL_COMPLETED,
+  ACCOUNT_CHECKED,
   ACCOUNT_SETTINGS_UPDATED,
   ACCOUNT_SETTINGS_UPDATE_FAILED,
-  SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED,
-  REASSIGN_TRANSACTIONS,
-  TRANSACTION_REASSIGNMENT_SUCCEEDED,
-  TRANSACTION_REASSIGNMENT_FAILED,
-  TRANSACTION_REASSIGNMENT_COMPLETED,
-  MERGE_ACCOUNT_SHELLS,
-  ACCOUNT_SHELL_MERGE_COMPLETED,
-  ACCOUNT_SHELL_MERGE_SUCCEEDED,
-  ACCOUNT_SHELL_MERGE_FAILED,
   ACCOUNT_SHELLS_ORDER_UPDATED,
-  ACCOUNT_SHELL_ORDERED_TO_FRONT,
-  ACCOUNT_SHELLS_REFRESH_STARTED,
   ACCOUNT_SHELLS_REFRESH_COMPLETED,
-  CLEAR_ACCOUNT_SYNC_CACHE,
-  REMAP_ACCOUNT_SHELLS,
-  TWO_FA_VALID,
+  ACCOUNT_SHELLS_REFRESH_STARTED,
+  ACCOUNT_SHELL_MERGE_COMPLETED,
+  ACCOUNT_SHELL_MERGE_FAILED,
+  ACCOUNT_SHELL_MERGE_SUCCEEDED,
+  ACCOUNT_SHELL_ORDERED_TO_FRONT,
+  ADD_NEW_ACCOUNT_SHELLS,
+  ADD_NEW_ACCOUNT_SHELL_COMPLETED,
+  AVERAGE_TX_FEE,
   BLIND_REFRESH_STARTED,
-  SET_ALL_ACCOUNTS_DATA,
-  FETCH_RECEIVE_ADDRESS_SUCCEEDED,
   CLEAR_RECEIVE_ADDRESS,
-  GENERATE_SECONDARY_XPRIV,
-  RESET_TWO_FA,
-  VALIDATE_TWO_FA,
-  SET_SHOW_ALL_ACCOUNT,
-  RESET_ACCOUNT_UPDATE_FLAG,
-  RESET_TWO_FA_LOADER,
-  NEW_ACCOUNT_SHELLS_ADDED,
-  UPDATE_ACCOUNT_SHELLS,
-  UPDATE_ACCOUNTS,
-  READ_TRANSACTION,
-  ACCOUNT_CHECKED,
-  RECOMPUTE_NET_BALANCE,
-  UPDATE_GIFT,
+  EXCHANGE_RATE_CALCULATED,
+  FETCH_RECEIVE_ADDRESS_SUCCEEDED,
   GENERATE_GIFTS,
-  SET_GIFTS,
+  GENERATE_SECONDARY_XPRIV,
   GIFT_ACCEPTED,
   GIFT_ADDED,
-  GIFT_CREATION_STATUS
+  GIFT_CREATION_STATUS,
+  MERGE_ACCOUNT_SHELLS,
+  NEW_ACCOUNT_ADD_FAILED,
+  NEW_ACCOUNT_SHELLS_ADDED,
+  READ_TRANSACTION,
+  REASSIGN_TRANSACTIONS,
+  RECOMPUTE_NET_BALANCE,
+  REMAP_ACCOUNT_SHELLS,
+  RESET_ACCOUNT_UPDATE_FLAG,
+  RESET_TWO_FA,
+  RESET_TWO_FA_LOADER,
+  SECONDARY_XPRIV_GENERATED,
+  SET_ALL_ACCOUNTS_DATA,
+  SET_GIFTS,
+  SET_SHOW_ALL_ACCOUNT,
+  SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED,
+  TESTCOINS_RECEIVED,
+  TRANSACTION_REASSIGNMENT_COMPLETED,
+  TRANSACTION_REASSIGNMENT_FAILED,
+  TRANSACTION_REASSIGNMENT_SUCCEEDED,
+  TWO_FA_RESETTED,
+  TWO_FA_VALID,
+  UPDATE_ACCOUNTS,
+  UPDATE_ACCOUNT_SHELLS,
+  UPDATE_GIFT,
+  VALIDATE_TWO_FA
 } from '../actions/accounts'
-import AccountShell from '../../common/data/models/AccountShell'
-import SyncStatus from '../../common/data/enums/SyncStatus'
-import { Account, Accounts, Gift } from '../../bitcoin/utilities/Interface'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 export type AccountsState = {
   accountsSynched: boolean;
@@ -333,7 +333,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
             accountDescription: account.accountDescription,
             accountXpub: account.xpub,
             accountVisibility: account.accountVisibility,
-            hasNewTxn: account.hasNewTxn
+            hasNewTxn: account.hasNewTxn,
           }
           AccountShell.updatePrimarySubAccountDetails(
             shell,
@@ -359,7 +359,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         state.accountShells.forEach( ( accountShell: AccountShell ) => {
           if (
             accountShell.primarySubAccount.sourceKind !==
-          SourceAccountKind.TEST_ACCOUNT
+          SourceAccountKind.TEST_ACCOUNT && accountShell.primarySubAccount.visibility !== AccountVisibility.HIDDEN
           )
             netBalance += AccountShell.getTotalBalance( accountShell )
         } )

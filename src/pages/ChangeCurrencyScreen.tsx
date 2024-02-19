@@ -1,31 +1,33 @@
 /* eslint-disable react/jsx-key */
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
-  View,
+  Linking,
+  SafeAreaView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  SafeAreaView,
-  Linking,
-  StyleSheet
+  View
 } from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-  widthPercentageToDP,
-  heightPercentageToDP,
-} from 'react-native-responsive-screen'
-import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
-import FiatCurrencies from '../common/FiatCurrencies'
-import { RFValue } from 'react-native-responsive-fontsize'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP,
+  widthPercentageToDP,
+  widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import { useDispatch, useSelector } from 'react-redux'
-import { setCurrencyCode } from '../store/actions/preferences'
-import { translations, LocalizationContext } from '../common/content/LocContext'
 import ChangeCurrency from '../assets/images/icon_currency.svg'
 import IconLanguage from '../assets/images/icon_language.svg'
+import Colors from '../common/Colors'
 import Languages from '../common/content/availableLanguages'
+import { LocalizationContext, translations } from '../common/content/LocContext'
+import FiatCurrencies from '../common/FiatCurrencies'
+import Fonts from '../common/Fonts'
+import CommonStyles from '../common/Styles/Styles'
+import HeaderTitle from '../components/HeaderTitle'
+import { setCurrencyCode } from '../store/actions/preferences'
 
 const styles = StyleSheet.create( {
   container: {
@@ -183,7 +185,7 @@ export default function ChangeCurrencyScreen( props ) {
             borderBottomLeftRadius: 10,
             justifyContent: 'center',
             alignItems: 'center',
-            
+
           }}
         >
           <Text
@@ -225,8 +227,32 @@ export default function ChangeCurrencyScreen( props ) {
     <SafeAreaView style={{
       flex: 1
     }}>
+      <View style={CommonStyles.headerContainer}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.homepageButtonColor}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      <HeaderTitle
+        firstLineTitle={strings.ChangeCurrency}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
       <ScrollView contentContainerStyle={styles.container} overScrollMode="never" showsVerticalScrollIndicator={false}>
-        <Text style={styles.textHeading}>{strings.ChangeCurrency}</Text>
+        {/* <Text style={styles.textHeading}>{strings.ChangeCurrency}</Text> */}
         <MenuHeading
           title={strings.AlternateCurrency}
           subtitle={strings.Selectyourlocalcurrency}
@@ -257,9 +283,10 @@ export default function ChangeCurrencyScreen( props ) {
               }}
             >
               <ScrollView>
-                {currencyList.map( ( item ) => {
+                {currencyList.map( ( item, index ) => {
                   return (
                     <TouchableOpacity
+                      key={`${JSON.stringify( item )}_${index}`}
                       onPress={() => {
                         setCurrency( item )
                         setIsVisible( false )
@@ -349,6 +376,7 @@ export default function ChangeCurrencyScreen( props ) {
               {Languages.map( ( item ) => {
                 return (
                   <TouchableOpacity
+                    key={item.iso}
                     onPress={() => {
                       setAppLanguage( item.iso )
                       setShowLanguages( false )
@@ -423,16 +451,16 @@ export default function ChangeCurrencyScreen( props ) {
           //   // borderColor: Colors.borderColor,
           //   paddingVertical: 5,
           //   flexDirection: 'row',
-            
+
           // } ]
-        }
+          }
         >
-          <View style={ 
+          <View style={
             // styles.addModalView
             {
-            flex: 1,
-            
-          }
+              flex: 1,
+
+            }
           }>
             <Text
               style={styles.textHelpUs}

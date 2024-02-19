@@ -1,82 +1,81 @@
-import { call, put, delay, select } from 'redux-saga/effects'
-import {
-  REMOVE_TRUSTED_CONTACT,
-  WALLET_CHECK_IN,
-  SYNC_PERMANENT_CHANNELS,
-  syncPermanentChannels,
-  INITIALIZE_TRUSTED_CONTACT,
-  existingPermanentChannelsSynched,
-  InitTrustedContactFlowKind,
-  PermanentChannelsSyncKind,
-  REJECT_TRUSTED_CONTACT,
-  updateTrustedContacts,
-  EDIT_TRUSTED_CONTACT,
-  RESTORE_CONTACTS,
-  RESTORE_TRUSTED_CONTACTS,
-  UPDATE_WALLET_NAME_TO_CHANNEL,
-  UPDATE_WALLET_NAME,
-  FETCH_GIFT_FROM_CHANNEL,
-  SYNC_GIFTS_STATUS,
-  REJECT_GIFT,
-  ASSOCIATE_GIFT,
-  fetchGiftFromTemporaryChannel,
-  RECLAIM_GIFT,
-} from '../actions/trustedContacts'
-import { createWatcher } from '../utils/utilities'
-import {
-  UnecryptedStreamData,
-  PrimaryStreamData,
-  TrustedContactRelationTypes,
-  SecondaryStreamData,
-  BackupStreamData,
-  ContactInfo,
-  ContactDetails,
-  TrustedContact,
-  ChannelAssets,
-  INotification,
-  notificationType,
-  Trusted_Contacts,
-  notificationTag,
-  Wallet,
-  Accounts,
-  AccountType,
-  ActiveAddressAssignee,
-  NetworkType,
-  Account,
-  Gift,
-  GiftStatus,
-  GiftType,
-  ActiveAddressAssigneeType,
-  DeepLinkKind,
-  DeepLinkEncryptionType,
-  GiftMetaData,
-  GiftThemeId,
-} from '../../bitcoin/utilities/Interface'
-import Toast from '../../components/Toast'
-import DeviceInfo from 'react-native-device-info'
-import { exchangeRatesCalculated, giftAccepted, giftAddedToAccount, setAverageTxFee, updateAccountShells, updateGift } from '../actions/accounts'
-import { AccountsState } from '../reducers/accounts'
-import config from '../../bitcoin/HexaConfig'
-import idx from 'idx'
-import crypto from 'crypto'
-import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
-import dbManager from '../../storage/realm/dbManager'
-import { ImageSourcePropType } from 'react-native'
-import Relay from '../../bitcoin/utilities/Relay'
-import { updateWalletImageHealth, getApprovalFromKeepers } from '../actions/BHR'
-import { generateGiftLink, getNextFreeAddressWorker, setup2FADetails } from './accounts'
-import BHROperations from '../../bitcoin/utilities/BHROperations'
-import { updateWalletNameToChannel } from '../actions/trustedContacts'
-import { updateWallet } from '../actions/storage'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import { APP_STAGE } from '../../common/interfaces/Interfaces'
 import * as bip39 from 'bip39'
 import * as bitcoinJS from 'bitcoinjs-lib'
+import crypto from 'crypto'
+import idx from 'idx'
+import { ImageSourcePropType } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
+import { call, delay, put, select } from 'redux-saga/effects'
 import secrets from 'secrets.js-grempe'
-import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
-import { processDeepLink } from '../../common/CommonFunctions'
+import config from '../../bitcoin/HexaConfig'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
+import {
+  Account,
+  AccountType,
+  Accounts,
+  ActiveAddressAssignee,
+  ActiveAddressAssigneeType,
+  BackupStreamData,
+  ChannelAssets,
+  ContactDetails,
+  ContactInfo,
+  DeepLinkEncryptionType,
+  Gift,
+  GiftMetaData,
+  GiftStatus,
+  GiftThemeId,
+  GiftType,
+  INotification,
+  NetworkType,
+  PrimaryStreamData,
+  SecondaryStreamData,
+  TrustedContact,
+  TrustedContactRelationTypes,
+  Trusted_Contacts,
+  UnecryptedStreamData,
+  Wallet,
+  notificationTag,
+  notificationType
+} from '../../bitcoin/utilities/Interface'
+import Relay from '../../bitcoin/utilities/Relay'
 import { generateTrustedContact } from '../../bitcoin/utilities/TrustedContactFactory'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import { processDeepLink } from '../../common/CommonFunctions'
+import { APP_STAGE } from '../../common/interfaces/Interfaces'
+import Toast from '../../components/Toast'
+import dbManager from '../../storage/realm/dbManager'
+import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
+import { getApprovalFromKeepers, updateWalletImageHealth } from '../actions/BHR'
+import { exchangeRatesCalculated, giftAccepted, giftAddedToAccount, setAverageTxFee, updateAccountShells, updateGift } from '../actions/accounts'
+import { updateWallet } from '../actions/storage'
+import {
+  ASSOCIATE_GIFT,
+  EDIT_TRUSTED_CONTACT,
+  FETCH_GIFT_FROM_CHANNEL,
+  INITIALIZE_TRUSTED_CONTACT,
+  InitTrustedContactFlowKind,
+  PermanentChannelsSyncKind,
+  RECLAIM_GIFT,
+  REJECT_GIFT,
+  REJECT_TRUSTED_CONTACT,
+  REMOVE_TRUSTED_CONTACT,
+  RESTORE_TRUSTED_CONTACTS,
+  SYNC_GIFTS_STATUS,
+  SYNC_PERMANENT_CHANNELS,
+  UPDATE_WALLET_NAME,
+  UPDATE_WALLET_NAME_TO_CHANNEL,
+  WALLET_CHECK_IN,
+  existingPermanentChannelsSynched,
+  fetchGiftFromTemporaryChannel,
+  syncPermanentChannels,
+  updateTrustedContacts,
+  updateWalletNameToChannel
+} from '../actions/trustedContacts'
+import { AccountsState } from '../reducers/accounts'
+import { createWatcher } from '../utils/utilities'
+import { generateGiftLink, getNextFreeAddressWorker, setup2FADetails } from './accounts'
+import { updateGiftLoading } from '../actions/doNotStore'
 
 function* generateSecondaryAssets(){
   const secondaryMnemonic = bip39.generateMnemonic( )
@@ -184,6 +183,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
     if( channelAddress === storedGifts[ giftId ].channelAddress ) {
       if( storedGifts[ giftId ].sender.walletId == wallet.walletId ) Toast( 'You are the owner of this gift' )
       else Toast( 'Gift already exists' )
+      yield put( updateGiftLoading() )
       return
     }
   }
@@ -210,16 +210,19 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
               Toast( 'Gift already expired' )
               break
         }
+        yield put( updateGiftLoading() )
         return
       }
     }
   } catch( err ){
     Toast( 'Gift expired/unavailable' )
+    yield put( updateGiftLoading() )
     return
   }
 
   if( exclusiveGiftCodes && exclusiveGiftCodes[ giftMetaData.exclusiveGiftCode ] ){
     Toast( 'This gift is part of an exclusive giveaway. Cannot be claimed more than once' )
+    yield put( updateGiftLoading() )
     return
   }
 
@@ -266,6 +269,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
     }
   } else {
     console.log( 'Meta data update failed for gift:', gift.id )
+    yield put( updateGiftLoading() )
   }
 }
 
@@ -361,6 +365,7 @@ function* reclaimGiftWorker( { payload }: {payload: { giftId: string}} ) {
 
     if( giftMetaData.status === GiftStatus.RECLAIMED ) Toast( 'Gift reclaimed' )
     if( giftMetaData.status === GiftStatus.ACCEPTED ) Toast( 'Gift already accepted' )
+    yield put( updateGiftLoading() )
   }
 }
 
