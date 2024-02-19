@@ -269,8 +269,6 @@ export default function IssueScreen(props) {
           onPressIgnore={() => {
             setRequesting(false);
           }}
-          isBottomImage={true}
-          bottomImage={require('../../assets/images/icons/contactPermission.png')}
         />
       </ModalContainer>
       <ModalContainer
