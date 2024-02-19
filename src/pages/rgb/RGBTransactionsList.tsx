@@ -1,5 +1,6 @@
+import { useNavigation, useRoute } from '@react-navigation/native'
 import moment from 'moment'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   ActivityIndicator,
   FlatList,
@@ -21,7 +22,6 @@ import Fonts from '../../common/Fonts'
 import RGBServices from '../../services/RGBServices'
 import { fetchExchangeRates, fetchFeeRates } from '../../store/actions/accounts'
 import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
-import { useNavigation, useRoute } from '@react-navigation/native'
 
 export default function RGBTxDetail( ) {
   const dispatch = useDispatch()

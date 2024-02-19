@@ -187,7 +187,7 @@ export default function RGB121TxDetail( props ) {
               }} source={{
                 uri: Platform.select( {
                   android: `file://${asset.dataPaths[ 0 ].filePath}`,
-                  ios: asset.dataPaths[ 0 ].filePath
+                  ios: asset.dataPaths[ 0 ].filePath.replace('/private','')
                 } )
               }}/>
             </View>}

@@ -208,6 +208,7 @@ export default function AssetsScreen(props) {
   }
 
   const renderCollectibleItems = (item, index) => {
+    const uri = item.dataPaths[0].filePath.replace('/private','');
     return (
       <TouchableOpacity
         style={
@@ -231,7 +232,7 @@ export default function AssetsScreen(props) {
             source={{
               uri: Platform.select({
                 android: `file://${item.dataPaths[0].filePath}`,
-                ios: item.dataPaths[0].filePath,
+                ios: uri,
               }),
             }}
           />:
