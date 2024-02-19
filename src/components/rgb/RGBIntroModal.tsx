@@ -4,15 +4,12 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import RGBInactive from '../../assets/images/tabs/rgb_inactive.svg'
 import Colors from '../../common/Colors'
-import { translations } from '../../common/content/LocContext'
 import Fonts from '../../common/Fonts'
 import BounceLoader from '../loader/BounceLoader'
+import LoadingAnimation from '../loader/Loader'
 
 export default function RGBIntroModal(props) {
-  const strings = translations['accounts']
-
   return (
     <View style={{
       ...styles.modalContainer, ...props.containerStyle
@@ -34,7 +31,7 @@ export default function RGBIntroModal(props) {
           </Text>
         </View>
         <View style={{ alignItems: 'center', marginVertical: hp(1) }}>
-          <RGBInactive height={hp(20)} width={wp(25)} />
+        <LoadingAnimation />
         </View>
         <View style={{ marginVertical: hp(1) }}>
           <Text

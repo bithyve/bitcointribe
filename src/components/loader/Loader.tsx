@@ -37,9 +37,9 @@ function LoadingAnimation() {
         <Animated.View style={styles.gear2}>
           <Gear1 />
         </Animated.View>
-        <View style={styles.gear1}>
+        <Animated.View style={styles.gear1}>
           <Gear2 />
-        </View>
+        </Animated.View>
         <Animated.View style={styles.gear3}>
           <Gear1 />
         </Animated.View>
@@ -54,13 +54,13 @@ const getStyles = (clock, antiClock) =>
   StyleSheet.create({
     gear3: {
       position: 'absolute',
-      bottom: '16%',
+      bottom: '12%',
       left: '72%',
       transform: [{ rotate: clock }],
     },
     gear2: {
       position: 'absolute',
-      top: '12%',
+      top: '8%',
       // left: '1%',
       transform: [{ rotate: clock }],
     },
@@ -68,5 +68,6 @@ const getStyles = (clock, antiClock) =>
       position: 'absolute',
       right: '36%',
       top: '10%',
+      transform: [{ rotate: clock }],
     },
   });
