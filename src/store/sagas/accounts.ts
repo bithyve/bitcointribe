@@ -1,121 +1,122 @@
-import { all, call, delay, put, select } from 'redux-saga/effects'
-import { createWatcher } from '../utils/utilities'
-import {
-  GET_TESTCOINS,
-  GENERATE_SECONDARY_XPRIV,
-  RESET_TWO_FA,
-  twoFAResetted,
-  UPDATE_DONATION_PREFERENCES,
-  secondaryXprivGenerated,
-  ADD_NEW_ACCOUNT_SHELLS,
-  newAccountShellsAdded,
-  ReassignTransactionsActionPayload,
-  REASSIGN_TRANSACTIONS,
-  transactionReassignmentSucceeded,
-  transactionReassignmentFailed,
-  MergeAccountShellsActionPayload,
-  MERGE_ACCOUNT_SHELLS,
-  accountShellMergeSucceeded,
-  accountShellMergeFailed,
-  REFRESH_ACCOUNT_SHELLS,
-  AUTO_SYNC_SHELLS,
-  accountShellRefreshCompleted,
-  accountShellRefreshStarted,
-  exchangeRatesCalculated,
-  setAverageTxFee,
-  VALIDATE_TWO_FA,
-  twoFAValid,
-  CREATE_SM_N_RESETTFA_OR_XPRIV,
-  resetTwoFA,
-  generateSecondaryXpriv,
-  SYNC_ACCOUNTS,
-  MARK_ACCOUNT_CHECKED,
-  MARK_READ_TRANSACTION,
-  updateAccountShells,
-  getTestcoins,
-  refreshAccountShells,
-  UPDATE_ACCOUNT_SETTINGS,
-  accountSettingsUpdated,
-  accountSettingsUpdateFailed,
-  updateAccounts,
-  RESTORE_ACCOUNT_SHELLS,
-  readTxn,
-  accountChecked,
-  autoSyncShells,
-  setResetTwoFALoader,
-  recomputeNetBalance,
-  updateGift,
-  GENERATE_GIFTS,
-  giftCreationSuccess,
-  updateAccountSettings,
-  FETCH_FEE_RATES,
-  FETCH_EXCHANGE_RATES,
-  CREATE_BORDER_WALLET,
-} from '../actions/accounts'
-import {
-  setAllowSecureAccount,
-  updateWalletImageHealth
-} from '../actions/BHR'
+import * as bip39 from 'bip39'
+import * as bitcoinJS from 'bitcoinjs-lib'
+import { call, put, select } from 'redux-saga/effects'
+import config from '../../bitcoin/HexaConfig'
 import {
   Account,
-  Accounts,
   AccountType,
+  Accounts,
   ActiveAddressAssignee,
   ActiveAddresses,
   ContactInfo,
   DeepLinkEncryptionType,
   DeepLinkKind,
+  DerivationPurpose,
   DonationAccount,
   Gift,
   GiftMetaData,
   GiftStatus,
   GiftThemeId,
   GiftType,
+  GridType,
+  LNNode,
   MultiSigAccount,
   NetworkType,
   TrustedContact,
   Trusted_Contacts,
   UnecryptedStreamData,
-  Wallet,
-  LNNode,
-  DerivationPurpose,
-  GridType
+  Wallet
 } from '../../bitcoin/utilities/Interface'
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
-import AccountShell from '../../common/data/models/AccountShell'
+import { generateAccount, generateDonationAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
+import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SyncStatus from '../../common/data/enums/SyncStatus'
-import config from '../../bitcoin/HexaConfig'
-import { AccountsState } from '../reducers/accounts'
-import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
-import * as bitcoinJS from 'bitcoinjs-lib'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import { generateAccount, generateDonationAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
-import { updateWallet } from '../actions/storage'
-import { APP_STAGE } from '../../common/interfaces/Interfaces'
-import * as bip39 from 'bip39'
-import crypto from 'crypto'
-import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo'
-import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
-import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
+import AccountShell from '../../common/data/models/AccountShell'
 import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
 import LightningSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/LightningSubAccountInfo'
+import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
+import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo'
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import { APP_STAGE } from '../../common/interfaces/Interfaces'
+import {
+  setAllowSecureAccount,
+  updateWalletImageHealth
+} from '../actions/BHR'
+import {
+  ADD_NEW_ACCOUNT_SHELLS,
+  AUTO_SYNC_SHELLS,
+  CREATE_BORDER_WALLET,
+  CREATE_SM_N_RESETTFA_OR_XPRIV,
+  FETCH_EXCHANGE_RATES,
+  FETCH_FEE_RATES,
+  GENERATE_GIFTS,
+  GENERATE_SECONDARY_XPRIV,
+  GET_TESTCOINS,
+  MARK_ACCOUNT_CHECKED,
+  MARK_READ_TRANSACTION,
+  MERGE_ACCOUNT_SHELLS,
+  MergeAccountShellsActionPayload,
+  REASSIGN_TRANSACTIONS,
+  REFRESH_ACCOUNT_SHELLS,
+  RESET_TWO_FA,
+  RESTORE_ACCOUNT_SHELLS,
+  ReassignTransactionsActionPayload,
+  SYNC_ACCOUNTS,
+  UPDATE_ACCOUNT_SETTINGS,
+  UPDATE_DONATION_PREFERENCES,
+  VALIDATE_TWO_FA,
+  accountChecked,
+  accountSettingsUpdateFailed,
+  accountSettingsUpdated,
+  accountShellMergeFailed,
+  accountShellMergeSucceeded,
+  accountShellRefreshCompleted,
+  accountShellRefreshStarted,
+  autoSyncShells,
+  exchangeRatesCalculated,
+  generateSecondaryXpriv,
+  getTestcoins,
+  giftCreationSuccess,
+  newAccountShellsAdded,
+  readTxn,
+  recomputeNetBalance,
+  refreshAccountShells,
+  resetTwoFA,
+  secondaryXprivGenerated,
+  setAverageTxFee,
+  setResetTwoFALoader,
+  transactionReassignmentFailed,
+  transactionReassignmentSucceeded,
+  twoFAResetted,
+  twoFAValid,
+  updateAccountShells,
+  updateAccounts,
+  updateGift
+} from '../actions/accounts'
+import { updateWallet } from '../actions/storage'
+import { AccountsState } from '../reducers/accounts'
+import { createWatcher } from '../utils/utilities'
 
-import dbManager from '../../storage/realm/dbManager'
 import _ from 'lodash'
-import Relay from '../../bitcoin/utilities/Relay'
-import AccountVisibility from '../../common/data/enums/AccountVisibility'
-import { syncPermanentChannelsWorker } from './trustedContacts'
-import { PermanentChannelsSyncKind } from '../actions/trustedContacts'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
-import BHROperations from '../../bitcoin/utilities/BHROperations'
-import { generateDeepLink } from '../../common/CommonFunctions'
-import Toast from '../../components/Toast'
-import RESTUtils from '../../utils/ln/RESTUtils'
 import { Alert } from 'react-native'
+import ElectrumClient, { ELECTRUM_CLIENT, ELECTRUM_NOT_CONNECTED_ERR } from '../../bitcoin/electrum/client'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
+import Relay from '../../bitcoin/utilities/Relay'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import { generateDeepLink } from '../../common/CommonFunctions'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import BorderWalletSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/BorderWalletSubAccount'
+import Toast from '../../components/Toast'
+import dbManager from '../../storage/realm/dbManager'
+import RESTUtils from '../../utils/ln/RESTUtils'
+import { setElectrumNotConnectedErr } from '../actions/nodeSettings'
+import { PermanentChannelsSyncKind } from '../actions/trustedContacts'
+import { connectToNodeWorker } from './nodeSettings'
+import { syncPermanentChannelsWorker } from './trustedContacts'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -223,7 +224,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
       encryptionKey: deepLinkEncryptionKey,
       walletName: walletName,
       keysToEncrypt: encryptionKey,
-      generateShortLink: encryptionType !== DeepLinkEncryptionType.DEFAULT ? generateShortLink: false,
+      generateShortLink: true,
       extraData: {
         channelAddress: giftToSend.channelAddress,
         amount: giftToSend.amount,
@@ -380,7 +381,6 @@ function* syncTxAfterRestore( restoredAccounts ) {
           accountShells[ shellIndex ].primarySubAccount.transactions.splice( i, 1 )
         }
       } )
-      console.log( 'AFTER', accountShells )
     }
   }
 
@@ -591,50 +591,62 @@ function* refreshAccountShellsWorker( { payload }: { payload: {
 }} ) {
   const accountShells: AccountShell[] = payload.shells
   const options: { hardRefresh?: boolean } = payload.options
-  yield put( accountShellRefreshStarted( accountShells ) )
-  const accountState: AccountsState = yield select(
-    ( state ) => state.accounts
-  )
-  const accountIds = []
-  const accounts: Accounts = accountState.accounts
-  const accountsToSync: Accounts = {
-  }
-  for( const accountShell of accountShells ){
-    accountsToSync[ accountShell.primarySubAccount.id ] = accounts[ accountShell.primarySubAccount.id ]
-  }
-
-  const { synchedAccounts, activeAddressesWithNewTxsMap } = yield call( syncAccountsWorker, {
-    payload: {
-      accounts: accountsToSync,
-      options,
+  try {
+    if (!ELECTRUM_CLIENT.isClientConnected) {
+      ElectrumClient.resetCurrentPeerIndex();
+      yield call(connectToNodeWorker);
     }
-  } )
-
-  yield put( updateAccountShells( {
-    accounts: synchedAccounts
-  } ) )
-  yield put( accountShellRefreshCompleted( accountShells ) )
-
-  let computeNetBalance = false
-  for ( const [ key, synchedAcc ] of Object.entries( synchedAccounts ) ) {
-    yield call( dbManager.updateAccount, ( synchedAcc as Account ).id, synchedAcc )
-    if( ( synchedAcc as Account ).hasNewTxn ) {
-      accountIds.push( ( synchedAcc as Account ).id )
-      computeNetBalance = true
+    yield put( accountShellRefreshStarted( accountShells ) )
+    const accountState: AccountsState = yield select(
+      ( state ) => state.accounts
+    )
+    const accountIds = []
+    const accounts: Accounts = accountState.accounts
+    const accountsToSync: Accounts = {
     }
-  }
-  if( accountIds.length > 0 ) {
-    yield put( updateWalletImageHealth( {
-      updateAccounts: true,
-      accountIds: accountIds
+    for( const accountShell of accountShells ){
+      accountsToSync[ accountShell.primarySubAccount.id ] = accounts[ accountShell.primarySubAccount.id ]
+    }
+
+    const { synchedAccounts, activeAddressesWithNewTxsMap } = yield call( syncAccountsWorker, {
+      payload: {
+        accounts: accountsToSync,
+        options,
+      }
+    } )
+
+    yield put( updateAccountShells( {
+      accounts: synchedAccounts
     } ) )
+
+    let computeNetBalance = false
+    for ( const [ key, synchedAcc ] of Object.entries( synchedAccounts ) ) {
+      yield call( dbManager.updateAccount, ( synchedAcc as Account ).id, synchedAcc )
+      if( ( synchedAcc as Account ).hasNewTxn ) {
+        accountIds.push( ( synchedAcc as Account ).id )
+        computeNetBalance = true
+      }
+    }
+    if( accountIds.length > 0 ) {
+      yield put( updateWalletImageHealth( {
+        updateAccounts: true,
+        accountIds: accountIds
+      } ) )
+    }
+
+    if( computeNetBalance ) yield put( recomputeNetBalance() )
+
+    // update F&F channels if any new txs found on an assigned address
+    if( activeAddressesWithNewTxsMap && Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
+  } catch( err ){
+    if ( [ ELECTRUM_NOT_CONNECTED_ERR ].includes( err?.message ) )
+      yield put( setElectrumNotConnectedErr( err?.message ) )
+  } finally {
+    yield put( accountShellRefreshCompleted( accountShells ) )
   }
-
-  if( computeNetBalance ) yield put( recomputeNetBalance() )
-
-  // update F&F channels if any new txs found on an assigned address
-  if( activeAddressesWithNewTxsMap && Object.keys( activeAddressesWithNewTxsMap ).length )  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
 }
+
+
 
 function* refreshLNShellsWorker( { payload }: { payload: {
   shells: AccountShell[],
@@ -688,7 +700,6 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
   const shells: AccountShell[] = yield select(
     ( state ) => state.accounts.accountShells
   )
-
   const shellsToSync: AccountShell[] = []
   const testShellsToSync: AccountShell[] = [] // Note: should be synched separately due to network difference(testnet)
   const donationShellsToSync: AccountShell[] = []
@@ -709,13 +720,11 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
           case AccountType.LIGHTNING_ACCOUNT:
             lnShellsToSync.push( shell )
             break
-
           default:
             shellsToSync.push( shell )
       }
     }
   }
-
   if( shellsToSync.length ) yield call( refreshAccountShellsWorker, {
     payload: {
       shells: shellsToSync,
@@ -739,6 +748,9 @@ function* autoSyncShellsWorker( { payload }: { payload: { syncAll?: boolean, har
       shells: lnShellsToSync,
     }
   } )
+
+
+
 }
 
 export const autoSyncShellsWatcher = createWatcher(
@@ -1059,6 +1071,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           node
         } )
         return lnAccount
+
   }
 }
 export interface newAccountDetails {
@@ -1066,8 +1079,8 @@ export interface newAccountDetails {
   description?: string,
   is2FAEnabled?: boolean,
   doneeName?: string,
-  youtubeURL: string,
-  imageURL: any,
+  youtubeURL?: string,
+  imageURL?: any,
   node?: LNNode
 }
 
@@ -1156,7 +1169,6 @@ function* updateAccountSettingsWorker( { payload }: {
       visibility?: AccountVisibility,
     },
 }} ) {
-
   const { accountShell, settings } = payload
   const { accountName, accountDescription, visibility } = settings
 
@@ -1165,7 +1177,6 @@ function* updateAccountSettingsWorker( { payload }: {
     if( accountName ) account.accountName = accountName
     if( accountDescription ) account.accountDescription = accountDescription
     if( visibility ) account.accountVisibility = visibility
-
     yield put( updateAccountShells( {
       accounts: {
         [ account.id ]: account
@@ -1288,7 +1299,6 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
   } catch ( error ) {
     yield put( setResetTwoFALoader( false ) )
     Alert.alert( 'Invalid Wallet 2FA' )
-    console.log( 'error CREATE_SM_N_RESETTFA_OR_XPRIV', error )
   }
 }
 
@@ -1417,7 +1427,6 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
       yield put( refreshAccountShells( [ shellToSync ], {
       } ) )
     } else {
-      console.log( 'Gifts generation failed' )
       yield put( giftCreationSuccess( false ) )
     }
 

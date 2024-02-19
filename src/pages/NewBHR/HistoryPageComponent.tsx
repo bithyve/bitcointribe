@@ -17,6 +17,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { translations } from '../../common/content/LocContext'
 import LinearGradient from 'react-native-linear-gradient'
+import moment from 'moment'
 
 const HistoryPageComponent = ( props ) => {
   const strings  = translations[ 'bhr' ]
@@ -78,7 +79,7 @@ const HistoryPageComponent = ( props ) => {
                           : styles.historyCardDateText
                       }
                     >
-                      {value.date}
+                      {moment( value.confirmed ).format( 'DD MMMM YYYY, HH:mm' )}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -243,6 +244,7 @@ const HistoryPageComponent = ( props ) => {
                   style={{
                     ...styles.proceedButtonText,
                     color: props.disableChange ? Colors.lightBlue : Colors.blue,
+                    opacity: props.disableChange ? 0 : 1
                   }}
                 >
                   {props.changeButtonText}

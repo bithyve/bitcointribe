@@ -1,41 +1,39 @@
-import React, { useState, useEffect, useContext } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { CommonActions } from '@react-navigation/native'
+import * as bip39 from 'bip39'
+import React, { useContext, useEffect, useState } from 'react'
 import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  Text,
-  StatusBar,
-  ScrollView,
   ActivityIndicator,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
+  heightPercentageToDP,
   heightPercentageToDP as hp,
   widthPercentageToDP,
-  heightPercentageToDP,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
+import AccountUtilities from '../bitcoin/utilities/accounts/AccountUtilities'
+import { AccountType, NetworkType, Wallet } from '../bitcoin/utilities/Interface'
 import Colors from '../common/Colors'
+import { LocalizationContext } from '../common/content/LocContext'
+import BackupWithKeeperState from '../common/data/enums/BackupWithKeeperState'
 import Fonts from '../common/Fonts'
 import CommonStyles from '../common/Styles/Styles'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { LocalizationContext } from '../common/content/LocContext'
-import HeaderTitle1 from '../components/HeaderTitle1'
+import HeaderTitle from '../components/HeaderTitle'
 import CoveredQRCodeScanner from '../components/qr-code-scanning/CoveredQRCodeScanner'
 import Toast from '../components/Toast'
-import { createWithKeeperState, recoverWalletUsingMnemonic, setBackupWithKeeperState } from '../store/actions/BHR'
-import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
-import * as bip39 from 'bip39'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { recoverWalletUsingMnemonic, setBackupWithKeeperState } from '../store/actions/BHR'
 import { completedWalletSetup } from '../store/actions/setupAndAuth'
 import { setVersion } from '../store/actions/versionHistory'
-import { AccountType, NetworkType, Wallet } from '../bitcoin/utilities/Interface'
-import AccountUtilities from '../bitcoin/utilities/accounts/AccountUtilities'
-import Config from '../bitcoin/HexaConfig'
-import { config } from 'process'
-import CreateWithKeeperState from '../common/data/enums/CreateWithKeeperState'
-import BackupWithKeeperState from '../common/data/enums/BackupWithKeeperState'
 
 
 const styles = StyleSheet.create( {
@@ -132,7 +130,12 @@ export default function CreateKeeperScreen( { navigation } ) {
       dispatch( setVersion( 'Restored' ) )
       // dispatch( createWithKeeperState( CreateWithKeeperState.BACKEDUP ) )
       dispatch( setBackupWithKeeperState( BackupWithKeeperState.BACKEDUP ) )
-      navigation.navigate( 'HomeNav' )
+      navigation.dispatch( CommonActions.reset( {
+        index: 0,
+        routes: [ {
+          name: 'App',
+        } ]
+      } ) )
     }
   }, [ wallet ] )
 
@@ -217,7 +220,7 @@ export default function CreateKeeperScreen( { navigation } ) {
           flexGrow: 1
         }}
         keyboardShouldPersistTaps='handled'>
-        <HeaderTitle1
+        <HeaderTitle
           firstLineTitle={'Create with Keeper'}
           secondLineTitle={'Scan QR'}
           infoTextNormal={''}

@@ -67,7 +67,7 @@ export default function NewOwnQuestions( props ) {
   const [ hideShowConfirmAnswer, setHideShowConfirmAnswer ] = useState( true )
   const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
   const dispatch = useDispatch()
-  const walletName = props.navigation.getParam( 'walletName' )
+  const walletName = props.route.params?.walletName
   const [ answerError, setAnswerError ] = useState( '' )
   const [ tempAns, setTempAns ] = useState( '' )
   const [ isEditable, setIsEditable ] = useState( true )
@@ -131,7 +131,7 @@ export default function NewOwnQuestions( props ) {
         dispatch( setCloudData() )
       } else{
         ( loaderBottomSheet as any ).current.snapTo( 0 )
-        props.navigation.navigate( 'HomeNav', {
+        props.navigation.navigate( 'App', {
           walletName,
         } ) }
     }
@@ -141,7 +141,7 @@ export default function NewOwnQuestions( props ) {
   useEffect( () => {
     if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
       ( loaderBottomSheet as any ).current.snapTo( 0 )
-      props.navigation.navigate( 'HomeNav', {
+      props.navigation.navigate( 'App', {
         walletName,
       } )
     }

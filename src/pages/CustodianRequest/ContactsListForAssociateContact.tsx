@@ -23,7 +23,7 @@ import { v4 as uuid } from 'uuid'
 
 const ContactsListForAssociateContact = ( props ) => {
   const [ contacts, setContacts ] = useState( [] )
-  const postAssociation = props.navigation.getParam( 'postAssociation' )
+  const postAssociation = props.route.params?.postAssociation
   const { approvingTrustedContact } = useSelector(
     ( state ) => state.trustedContacts.loading,
   )

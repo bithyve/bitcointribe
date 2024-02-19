@@ -15,14 +15,15 @@ import openLink from '../../../../utils/OpenLink'
 
 export type Props = {
   navigation: any;
+  route: any;
 };
 
-const NewRampAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const NewRampAccountDetailsScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
   const dispatch = useDispatch()
 
   const currentSubAccount: ExternalServiceSubAccountInfo = useMemo( () => {
-    return navigation.getParam( 'currentSubAccount' )
-  }, [ navigation.state.params ] )
+    return route.params?.currentSubAccount
+  }, [ route.params ] )
 
   const { rampHostedUrl } = useRampIntegrationState()
 

@@ -1,72 +1,62 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react'
+import firebase from '@react-native-firebase/app'
+import messaging from '@react-native-firebase/messaging'
+import { CommonActions, useFocusEffect } from '@react-navigation/native'
+import JailMonkey from 'jail-monkey'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import {
+  BackHandler,
+  Keyboard,
+  Linking,
+  Platform,
+  StatusBar,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
-  StatusBar,
-  Platform,
-  BackHandler,
-  Linking,
-  Keyboard,
-  Alert
+  View
 } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { credsAuth } from '../store/actions/setupAndAuth'
-import BottomSheet from 'reanimated-bottom-sheet'
-import LoaderModal from '../components/LoaderModal'
-import JailMonkey from 'jail-monkey'
 import DeviceInfo from 'react-native-device-info'
-import ErrorModalContents from '../components/ErrorModalContents'
-import { processDeepLink } from '../common/CommonFunctions'
-import ModalContainer from '../components/home/ModalContainer'
-import firebase from '@react-native-firebase/app'
+import LinearGradient from 'react-native-linear-gradient'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  setIsPermissionGiven,
-  setFCMToken
-} from '../store/actions/preferences'
-import messaging from '@react-native-firebase/messaging'
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
+import Relay from '../bitcoin/utilities/Relay'
+import Colors from '../common/Colors'
+import { processDeepLink } from '../common/CommonFunctions'
+import Fonts from '../common/Fonts'
+import { LocalizationContext } from '../common/content/LocContext'
+import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
+import AlertModalContents from '../components/AlertModalContents'
+import ErrorModalContents from '../components/ErrorModalContents'
+import LoaderModal from '../components/LoaderModal'
+import Toast from '../components/Toast'
+import BottomInputModalContainer from '../components/home/BottomInputModalContainer'
+import ModalContainer from '../components/home/ModalContainer'
+import { setOpenToApproval } from '../store/actions/BHR'
+import { setCloudBackupStatus } from '../store/actions/cloud'
 import {
   updateFCMTokens,
 } from '../store/actions/notifications'
-import Relay from '../bitcoin/utilities/Relay'
-import { LocalizationContext } from '../common/content/LocContext'
-import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
-import { setCloudBackupStatus } from '../store/actions/cloud'
-import { setOpenToApproval } from '../store/actions/BHR'
-import SecurityQuestion from './NewBHR/SecurityQuestion'
-import Toast from '../components/Toast'
-import SecuritySeedWord from './NewBHR/SecuritySeedWord'
-import AlertModalContents from '../components/AlertModalContents'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import BottomInputModalContainer from '../components/home/BottomInputModalContainer'
+import {
+  setFCMToken,
+  setIsPermissionGiven
+} from '../store/actions/preferences'
+import { credsAuth } from '../store/actions/setupAndAuth'
 import ConfirmSeedWordsModal from './NewBHR/ConfirmSeedWordsModal'
-import LinearGradient from 'react-native-linear-gradient'
+import SecurityQuestion from './NewBHR/SecurityQuestion'
+import SecuritySeedWord from './NewBHR/SecuritySeedWord'
 
 export default function Login( props ) {
-  // const subPoints = [
-  //   'Setting up multi-accounts',
-  //   'Fetching test sats & balances',
-  //   'Generating shares for back-up',
-  //   'Getting the latest details'
-  // ]
-  // const [ bottomTextMessage, setBottomTextMessage ] = useState(
-  //   'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
-  // )
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]
   const common = translations[ 'common' ]
   const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
-  const currentLevel: number = useSelector( ( state ) => state.bhr.currentLevel )
+  // const currentLevel: number = useSelector( ( state ) => state.bhr.currentLevel )
   const levelHealth = useSelector( ( state ) => state.bhr.levelHealth )
 
   const getRandomMessage = () => {
@@ -96,6 +86,7 @@ export default function Login( props ) {
   // const [ loaderBottomSheet ] = useState(
   //   React.createRef<BottomSheet>(),
   // )
+  const [ showPasscodeErrorModal, setPasscodeErrorModal ] = useState( false )
   const [ loaderModal, setloaderModal ] = useState( false )
   const [ errorModal, setErrorModal ] = useState( false )
   const [ showAlertModal, setShowAlertModal ]=useState( false )
@@ -137,15 +128,21 @@ export default function Login( props ) {
     return true
   }, [] )
 
+  useFocusEffect(
+    useCallback( () => {
+      BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
+      return () => {
+        BackHandler.removeEventListener( 'hardwareBackPress', hardwareBackPressCustom )}
+    }, [] )
+  )
+
   useEffect( () => {
     dispatch( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     dispatch( setOpenToApproval( false, [], null ) )
-    Linking.addEventListener( 'url', handleDeepLinkEvent )
+    const subscription = Linking.addEventListener( 'url', handleDeepLinkEvent )
     //Linking.getInitialURL().then( handleDeepLinking )
-    BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
     return () => {
-      BackHandler.removeEventListener( 'hardwareBackPress', hardwareBackPressCustom )
-      Linking.removeEventListener( 'url', handleDeepLinkEvent )
+      subscription.remove()
     }
 
   }, [] )
@@ -240,31 +237,31 @@ export default function Login( props ) {
 
 
   useEffect( () => {
-    if ( isAuthenticated ) {
-      if( !walletExists ) {
-        props.navigation.replace( 'WalletInitialization' )
-      } else {
-        setloaderModal( false )
-        if( !creationFlag ) {
-          props.navigation.navigate( 'Home', {
-            screen: 'Home'
-          } )
-        } else if( processedLink ){
-          props.navigation.navigate( 'Home', {
-            screen: 'Home',
-            params: {
-              trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,
-              giftRequest: processedLink ? processedLink.giftRequest: null,
-              swanRequest: processedLink ? processedLink.swanRequest: null,
-            }
-          } )
+    setloaderModal( false );
+    setTimeout( () => {
+      if ( isAuthenticated ) {
+        if( !walletExists ) {
+          props.navigation.replace( 'WalletInitialization' )
+        } else {
+          if( !creationFlag ) {
+            props.navigation.replace( 'App', {
+              screen:'Home'
+            } )
+          } else if( processedLink ){
+            props.navigation.replace( 'App', {
+              screen: 'Home',
+              params: {
+                trustedContactRequest: processedLink.trustedContactRequest,
+                giftRequest: processedLink.giftRequest,
+                swanRequest: processedLink.swanRequest,
+              }
+            } )
+          }
+          bootStrapNotifications()
         }
-
-        bootStrapNotifications()
       }
-    }
+    }, 100 )
   }, [ isAuthenticated, walletExists, processedLink ] )
-
   const bootStrapNotifications = async () => {
     dispatch( setIsPermissionGiven( true ) )
     const t0 = performance.now()
@@ -348,15 +345,13 @@ export default function Login( props ) {
       setTimeout( () => {
         // loaderBottomSheet.current.snapTo( 0 )
         setloaderModal( false )
-      }, 300 )
-
-      return (
-        <View style={{
-          marginLeft: 'auto'
-        }}>
-          <Text style={styles.errorText}>{strings.Incorrect}</Text>
-        </View>
-      )
+      }, 100 )
+    }
+    if( !checkAuth ){
+      setTimeout( () => setloaderModal( false ), 800 )
+      setTimeout( ()=>{
+        setPasscodeErrorModal( true )
+      }, 1000 )
     }
   }
 
@@ -461,7 +456,7 @@ export default function Login( props ) {
           <Text style={styles.headerTitleText}>{strings.welcome}</Text>
           <View>
             <Text style={styles.headerInfoText}>
-              {strings.enter_your}{' '}
+              {strings.enter_your}
               <Text style={styles.boldItalicText}>{strings.passcode}</Text>
             </Text>
             <View style={{
@@ -598,16 +593,19 @@ export default function Login( props ) {
                   </Text>
                 </View>
               </View>
-              {checkPasscode()}
+              {/* {checkPasscode()} */}
             </View>
+            {showPasscodeErrorModal &&<View style={styles.errorInfoTextWrapper}>
+              <Text style={styles.errorInfoText}>Incorrect Passcode, Try Again!</Text>
+            </View>}
           </View>
 
           <View style={{
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'flex-end'
+            justifyContent: 'flex-end',
           }}>
-            {
+            {/* {
               attempts >= 3&&(
                 <TouchableOpacity
                   style={{
@@ -644,7 +642,7 @@ export default function Login( props ) {
                   }}>{strings.ForgotPasscode}</Text>
                 </TouchableOpacity>
               )
-            }
+            } */}
             <TouchableOpacity
               disabled={passcode.length !==4}
               activeOpacity={0.7}
@@ -896,6 +894,17 @@ export default function Login( props ) {
           // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
         />
       </ModalContainer>
+      <ModalContainer onBackground={()=>{setPasscodeErrorModal( false )}} visible={showPasscodeErrorModal} closeBottomSheet={() => { }}>
+        <AlertModalContents
+          info={'You have entered an incorrect passcode. Pls, try again. If you don’t remember your passcode, you will have to recover your wallet through the recovery flow'}
+          proceedButtonText={'Okay'}
+          onPressProceed={() => {
+            setPasscodeErrorModal( false )
+          }}
+          isBottomImage={false}
+          // bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        />
+      </ModalContainer>
     </View>
   )
 }
@@ -941,7 +950,7 @@ const styles = StyleSheet.create( {
   },
   keyPadRow: {
     flexDirection: 'row',
-    height: hp( '8%' ),
+    height: hp( '9%' ),
   },
   keyPadElementTouchable: {
     flex: 1,
@@ -953,12 +962,12 @@ const styles = StyleSheet.create( {
   keyPadElementText: {
     color: Colors.blue,
     fontSize: RFValue( 25 ),
-    fontFamily: Fonts.Regular,
+    fontFamily: Fonts.Medium,
     fontStyle: 'normal',
   },
   proceedButtonView: {
     marginRight: 20,
-    marginTop: hp( '15%' ),
+    marginTop: hp( '17%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',
@@ -971,9 +980,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Medium,
   },
   boldItalicText: {
-    fontFamily: Fonts.MediumItalic,
-    fontWeight: 'bold',
-    fontStyle: 'italic',
+    fontFamily: Fonts.Medium,
   },
   errorText: {
     fontFamily: Fonts.MediumItalic,
@@ -987,14 +994,14 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 22 ),
     marginLeft: 30,
     marginTop: hp( '10%' ),
-    fontFamily: Fonts.Regular,
+    fontFamily: Fonts.Medium,
   },
   headerInfoText: {
     color: Colors.THEAM_INFO_TEXT_COLOR,
     fontSize: RFValue( 12 ),
     marginLeft: 30,
     marginTop: hp( '1%' ),
-    fontFamily: Fonts.Regular,
+    fontFamily: Fonts.Medium,
   },
   passcodeTextInputText: {
     color: Colors.blue,
@@ -1007,4 +1014,16 @@ const styles = StyleSheet.create( {
     marginBottom: hp( '1.5%' ),
     width: 'auto',
   },
+  errorInfoTextWrapper:{
+    width:'76%',
+    flexDirection:'row',
+    alignItems:'flex-end',
+    justifyContent:'flex-end'
+  },
+  errorInfoText:{
+    fontStyle: 'italic',
+    color:Colors.lightBlue,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.Regular
+  }
 } )

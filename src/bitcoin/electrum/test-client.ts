@@ -1,242 +1,82 @@
-/* eslint-disable no-plusplus */
-/* eslint-disable consistent-return */
-/* eslint-disable camelcase */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable no-console */
 import config from '../HexaConfig'
 import ElectrumCli from 'electrum-client'
 import reverse from 'buffer-reverse'
 import * as bitcoinJS from 'bitcoinjs-lib'
-import { ElectrumTransaction, ElectrumUTXO, NodeDetail } from './interface'
-import { NetworkType } from '../utilities/Interface'
+import { ElectrumTransaction, ElectrumUTXO } from './interface'
 
-function shufflePeers( peers ) {
-  for ( let i = peers.length - 1; i > 0; i-- ) {
-    const j = Math.floor( Math.random() * ( i + 1 ) );
-    [ peers[ i ], peers[ j ] ] = [ peers[ j ], peers[ i ] ]
-  }
-  return peers
+const TEST_ELECTRUM_CLIENT_CONFIG = {
+  predefinedTestnetPeers: [ {
+    host: 'testnet.qtornado.com',
+    ssl: '51002',
+  } ],
+  maxConnectionAttempt: 5,
+  reconnectDelay: 1000, // 1 second
 }
 
-const ELECTRUM_CLIENT_CONFIG: {
-  predefinedTestnetPeers: NodeDetail[];
-  predefinedPeers: NodeDetail[];
-  maxConnectionAttempt: number;
-  reconnectDelay: number;
-} = {
-  predefinedTestnetPeers: null,
-  predefinedPeers: null,
-  maxConnectionAttempt: 2,
-  reconnectDelay: 500, // retry after half a second
-}
-
-const ELECTRUM_CLIENT_DEFAULTS = {
+const TEST_ELECTRUM_CLIENT = {
   electrumClient: null,
   isClientConnected: false,
-  currentPeerIndex: -1,
+  currentPeerIndex: Math.floor( Math.random() * TEST_ELECTRUM_CLIENT_CONFIG.predefinedTestnetPeers.length ),
   connectionAttempt: 0,
-  activePeer: null,
+  activePeer: TEST_ELECTRUM_CLIENT_CONFIG.predefinedTestnetPeers[ 0 ],
 }
 
-let ELECTRUM_CLIENT: {
-  electrumClient: any;
-  isClientConnected: boolean;
-  currentPeerIndex: number;
-  connectionAttempt: number;
-  activePeer: NodeDetail;
-} = ELECTRUM_CLIENT_DEFAULTS
-
-export const ELECTRUM_NOT_CONNECTED_ERR =
-  'Network Error: The current electrum node is not reachable, please try again with a different node'
-
-export const ELECTRUM_NOT_CONNECTED_ERR_TOR =
-  'Network Error: Connection currently failing over Tor, please disable Tor or try again using a different node'
-
-
-const NETWORK_TYPE = NetworkType.TESTNET // config.NETWORK_TYPE
-export default class TestnetElectrumClient {
-  public static connectOverTor = false;
-
+export default class TestElectrumClient {
   public static async connect() {
-    let timeoutId = null
-
     try {
-      if ( !ELECTRUM_CLIENT.activePeer ) {
-        console.log(
-          'Unable to connect to any electrum server. Please switch network and try again!'
-        )
-        return {
-          connected: ELECTRUM_CLIENT.isClientConnected,
-          error: 'Unable to connect to any electrum server. Please switch network and try again!',
-        }
-      }
-
-      ELECTRUM_CLIENT.electrumClient = new ElectrumCli(
+      TEST_ELECTRUM_CLIENT.electrumClient = new ElectrumCli(
         ( global as any ).net,
         ( global as any ).tls,
-        ELECTRUM_CLIENT.activePeer.port,
-        ELECTRUM_CLIENT.activePeer.host,
-        ELECTRUM_CLIENT.activePeer.useSSL ? 'tls' : 'tcp'
+        TEST_ELECTRUM_CLIENT.activePeer?.ssl || TEST_ELECTRUM_CLIENT.activePeer?.tcp,
+        TEST_ELECTRUM_CLIENT.activePeer?.host,
+        TEST_ELECTRUM_CLIENT.activePeer?.ssl ? 'tls' : 'tcp'
       ) // tcp or tls
 
-      ELECTRUM_CLIENT.electrumClient.onError = ( error ) => {
-        if ( ELECTRUM_CLIENT.isClientConnected ) {
-          console.log( 'Electrum mainClient.onError():', error?.message || error )
+      TEST_ELECTRUM_CLIENT.electrumClient.onError = ( error ) => {
+        console.log( 'Electrum mainClient.onError():', error?.message )
 
-          if ( ELECTRUM_CLIENT.electrumClient.close ) ELECTRUM_CLIENT.electrumClient.close()
+        if ( TEST_ELECTRUM_CLIENT.electrumClient.close ) TEST_ELECTRUM_CLIENT.electrumClient.close()
 
-          ELECTRUM_CLIENT.isClientConnected = false
-          ELECTRUM_CLIENT.activePeer.isConnected = false
-          console.log( 'Error: Close the connection' )
-
-          // setTimeout(
-          //   TestnetElectrumClient.connect,
-          //   ELECTRUM_CLIENT.activePeer?.host?.endsWith('.onion') ? 4000 : 500
-          // );
-        }
+        TEST_ELECTRUM_CLIENT.isClientConnected = false
+        console.log( 'Error: Close the connection' )
       }
 
-      console.log( 'Initiate electrum server...' )
-
-      const ver = await Promise.race( [
-        new Promise( ( resolve ) => {
-          timeoutId = setTimeout( () => resolve( 'timeout' ), 4000 )
-        } ),
-        ELECTRUM_CLIENT.electrumClient.initElectrum( {
-          client: 'btc-k',
-          version: '1.4',
-        } ), // should resolve within 4 seconds(prior to timeout)
-      ] )
-      if ( ver === 'timeout' ) throw new Error( 'Connection time-out' )
-
+      console.log( 'Initiate electrum server for test account' )
+      const ver = await TEST_ELECTRUM_CLIENT.electrumClient.initElectrum( {
+        client: 'bitcoin-keeper',
+        version: '1.4',
+      } )
+      console.log( 'Connection to electrum server is established', {
+        ver
+      } )
       if ( ver && ver[ 0 ] ) {
-        console.log( 'Connection to electrum server is established', {
-          ver,
-          node: ELECTRUM_CLIENT.activePeer.host,
-        } )
-
-        ELECTRUM_CLIENT.isClientConnected = true
-        ELECTRUM_CLIENT.activePeer.isConnected = true
+        TEST_ELECTRUM_CLIENT.isClientConnected = true
       }
     } catch ( error ) {
-      ELECTRUM_CLIENT.isClientConnected = false
-      ELECTRUM_CLIENT.activePeer.isConnected = false
-
-      console.log( 'Bad connection:', JSON.stringify( ELECTRUM_CLIENT.activePeer ), error )
-    } finally {
-      if ( timeoutId ) clearTimeout( timeoutId )
+      TEST_ELECTRUM_CLIENT.isClientConnected = false
+      console.log( 'Bad connection:', JSON.stringify( TEST_ELECTRUM_CLIENT.activePeer ), error )
     }
 
-    if ( ELECTRUM_CLIENT.isClientConnected )
-      return {
-        connected: ELECTRUM_CLIENT.isClientConnected,
-        connectedTo: ELECTRUM_CLIENT.activePeer.host,
-      }
-    return TestnetElectrumClient.reconnect()
+    if ( TEST_ELECTRUM_CLIENT.isClientConnected ) return TEST_ELECTRUM_CLIENT.isClientConnected
+    return await TestElectrumClient.reconnect()
   }
 
   public static async reconnect() {
-    ELECTRUM_CLIENT.connectionAttempt += 1
+    console.log( 'Trying to reconnect electrum for test account' )
+    TEST_ELECTRUM_CLIENT.connectionAttempt += 1
 
     // close the connection before attempting again
-    if ( ELECTRUM_CLIENT.electrumClient.close ) ELECTRUM_CLIENT.electrumClient.close()
+    if ( TEST_ELECTRUM_CLIENT.electrumClient.close ) TEST_ELECTRUM_CLIENT.electrumClient.close()
 
-    if ( ELECTRUM_CLIENT.connectionAttempt >= ELECTRUM_CLIENT_CONFIG.maxConnectionAttempt ) {
-      const nextPeer = TestnetElectrumClient.getNextDefaultPeer()
-      if ( !nextPeer ) {
-        console.log(
-          'Unable to connect to any electrum server. Please switch network and try again!'
-        )
-        return {
-          connected: ELECTRUM_CLIENT.isClientConnected,
-          error: 'Unable to connect to any electrum server. Please switch network and try again!',
-        }
-      }
-
-      ELECTRUM_CLIENT.activePeer = nextPeer
-      ELECTRUM_CLIENT.connectionAttempt = 1
-      console.log( `Attempting a connection with next peer: ${nextPeer?.host}` )
-      return TestnetElectrumClient.connect()
+    if ( TEST_ELECTRUM_CLIENT.connectionAttempt >= TEST_ELECTRUM_CLIENT_CONFIG.maxConnectionAttempt ) {
+      console.log( 'Could not find the working electrum server. Please try again later.' )
+      return TEST_ELECTRUM_CLIENT.isClientConnected // false
     }
-    console.log( `Reconnection attempt #${ELECTRUM_CLIENT.connectionAttempt}` )
+    console.log( `Reconnection attempt #${TEST_ELECTRUM_CLIENT.connectionAttempt}` )
     await new Promise( ( resolve ) => {
-      setTimeout( resolve, ELECTRUM_CLIENT_CONFIG.reconnectDelay ) // attempts reconnection after 1 second
+      setTimeout( resolve, TEST_ELECTRUM_CLIENT_CONFIG.reconnectDelay ) // attempts reconnection after 1 second
     } )
-    return TestnetElectrumClient.connect()
-  }
-
-  public static forceDisconnect() {
-    if ( !ELECTRUM_CLIENT.electrumClient ) throw new Error( 'Electrum client not available' )
-    if ( ELECTRUM_CLIENT.electrumClient.close ) ELECTRUM_CLIENT.electrumClient.close()
-    ELECTRUM_CLIENT.isClientConnected = false
-    ELECTRUM_CLIENT.activePeer.isConnected = false
-  }
-
-  public static async serverFeatures() {
-    TestnetElectrumClient.checkConnection()
-
-    return ELECTRUM_CLIENT.electrumClient.server_features()
-  }
-
-  public static getBlockchainHeaders = async (): Promise<{ height: number; hex: string }> =>
-    ELECTRUM_CLIENT.electrumClient.blockchainHeaders_subscribe();
-
-  public static checkConnection() {
-    if ( !ELECTRUM_CLIENT.isClientConnected ) {
-      const connectionError = TestnetElectrumClient.connectOverTor
-        ? ELECTRUM_NOT_CONNECTED_ERR_TOR
-        : ELECTRUM_NOT_CONNECTED_ERR
-      throw new Error( connectionError )
-    }
-  }
-
-  public static async ping() {
-    if ( !ELECTRUM_CLIENT.electrumClient ) throw new Error( 'Electrum client not available' )
-
-    try {
-      await ELECTRUM_CLIENT.electrumClient.server_ping()
-    } catch ( _ ) {
-      return false
-    }
-    return true
-  }
-
-  public static getActivePeer() {
-    return ELECTRUM_CLIENT.activePeer
-  }
-
-  public static getNextDefaultPeer() {
-    ELECTRUM_CLIENT.currentPeerIndex += 1
-    const peers =
-    NETWORK_TYPE === NetworkType.TESTNET
-      ? ELECTRUM_CLIENT_CONFIG.predefinedTestnetPeers
-      : ELECTRUM_CLIENT_CONFIG.predefinedPeers
-
-    if ( !peers || ELECTRUM_CLIENT.currentPeerIndex > peers.length - 1 ) return null // exhuasted all available peers
-    return peers[ ELECTRUM_CLIENT.currentPeerIndex ]
-  }
-
-  // if current peer to use is not provided, it will try to get the active peer from the saved list of private nodes
-  // if current peer to use is provided, it will use that peer
-  public static setActivePeer(
-    defaultNodes: NodeDetail[],
-    privateNodes: NodeDetail[],
-    currentPeerToUse?: NodeDetail
-  ) {
-    // close previous connection
-    if ( ELECTRUM_CLIENT.isClientConnected && ELECTRUM_CLIENT.electrumClient?.close )
-      ELECTRUM_CLIENT.electrumClient.close()
-
-    // set defaults
-    ELECTRUM_CLIENT = ELECTRUM_CLIENT_DEFAULTS
-    if ( NETWORK_TYPE === NetworkType.TESTNET )
-      ELECTRUM_CLIENT_CONFIG.predefinedTestnetPeers = shufflePeers( defaultNodes )
-    else ELECTRUM_CLIENT_CONFIG.predefinedPeers = shufflePeers( defaultNodes )
-
-    // set active node
-    let activeNode = currentPeerToUse || privateNodes.filter( ( node ) => node.isConnected )[ 0 ]
-    if ( !activeNode && defaultNodes.length ) activeNode = TestnetElectrumClient.getNextDefaultPeer() // pick one of the default nodes
-    ELECTRUM_CLIENT.activePeer = activeNode
+    return await TestElectrumClient.connect()
   }
 
   public static splitIntoChunks( arr, chunkSize ) {
@@ -251,10 +91,11 @@ export default class TestnetElectrumClient {
     network: bitcoinJS.Network = config.NETWORK,
     batchsize = 150
   ): Promise<{ [address: string]: ElectrumUTXO[] }> {
-    TestnetElectrumClient.checkConnection()
+    if ( !TEST_ELECTRUM_CLIENT.electrumClient ) throw new Error( 'Electrum client is not connected' )
     const res = {
     }
-    const chunks = TestnetElectrumClient.splitIntoChunks( addresses, batchsize )
+
+    const chunks = TestElectrumClient.splitIntoChunks( addresses, batchsize )
     for ( let itr = 0; itr < chunks.length; itr += 1 ) {
       const chunk = chunks[ itr ]
       const scripthashes = []
@@ -272,7 +113,7 @@ export default class TestnetElectrumClient {
       }
 
       // eslint-disable-next-line no-await-in-loop
-      const results = await ELECTRUM_CLIENT.electrumClient.blockchainScripthash_listunspentBatch(
+      const results = await TEST_ELECTRUM_CLIENT.electrumClient.blockchainScripthash_listunspentBatch(
         scripthashes
       )
 
@@ -304,15 +145,14 @@ export default class TestnetElectrumClient {
     txids: any[];
     txidToAddress: { [tx_hash: string]: string };
   }> {
-    TestnetElectrumClient.checkConnection()
-
+    if ( !TEST_ELECTRUM_CLIENT.electrumClient ) throw new Error( 'Electrum client is not connected' )
     const historyByAddress = {
     }
     const txids = []
     const txidToAddress = {
     }
 
-    const chunks = TestnetElectrumClient.splitIntoChunks( addresses, batchsize )
+    const chunks = TestElectrumClient.splitIntoChunks( addresses, batchsize )
     for ( let itr = 0; itr < chunks.length; itr += 1 ) {
       const chunk = chunks[ itr ]
       const scripthashes = []
@@ -330,7 +170,7 @@ export default class TestnetElectrumClient {
       }
 
       // eslint-disable-next-line no-await-in-loop
-      const results = await ELECTRUM_CLIENT.electrumClient.blockchainScripthash_getHistoryBatch(
+      const results = await TEST_ELECTRUM_CLIENT.electrumClient.blockchainScripthash_getHistoryBatch(
         scripthashes
       )
 
@@ -359,30 +199,30 @@ export default class TestnetElectrumClient {
     verbose = true,
     batchsize = 40
   ): Promise<{ [txid: string]: ElectrumTransaction }> {
-    TestnetElectrumClient.checkConnection()
-
+    if ( !TEST_ELECTRUM_CLIENT.electrumClient ) throw new Error( 'Electrum client is not connected' )
     const res = {
     }
     txids = [ ...new Set( txids ) ] // remove duplicates, if any
 
-    // lets try cache first
-    const chunks = TestnetElectrumClient.splitIntoChunks( txids, batchsize )
+    // TODO: lets try cache first
+
+    const chunks = TestElectrumClient.splitIntoChunks( txids, batchsize )
     for ( const chunk of chunks ) {
       let results = []
 
       // eslint-disable-next-line no-await-in-loop
-      results = await ELECTRUM_CLIENT.electrumClient.blockchainTransaction_getBatch( chunk, verbose )
+      results = await TEST_ELECTRUM_CLIENT.electrumClient.blockchainTransaction_getBatch( chunk, verbose )
 
       for ( const txdata of results ) {
         if ( txdata.error && txdata.error.code === -32600 ) {
-          // large response error, would need to handle it over a single call
+          // TODO: large response error, would need to handle it over a single call
         }
 
         res[ txdata.param ] = txdata.result
         if ( res[ txdata.param ] ) delete res[ txdata.param ].hex
 
         // bitcoin core 22.0.0+ .addresses in vout has been replaced by `.address`
-        for ( const vout of res[ txdata.param ]?.vout || [] ) {
+        for ( const vout of res[ txdata.param ].vout || [] ) {
           if ( vout?.scriptPubKey?.address )
             vout.scriptPubKey.addresses = [ vout.scriptPubKey.address ]
         }
@@ -393,51 +233,17 @@ export default class TestnetElectrumClient {
   }
 
   public static async estimateFee( numberOfBlocks = 1 ) {
-    TestnetElectrumClient.checkConnection()
-
-    const feePerKB = await ELECTRUM_CLIENT.electrumClient.blockchainEstimatefee( numberOfBlocks ) // in bitcoin
+    if ( !TEST_ELECTRUM_CLIENT.electrumClient ) throw new Error( 'Electrum client is not connected' )
+    const feePerKB = await TEST_ELECTRUM_CLIENT.electrumClient.blockchainEstimatefee( numberOfBlocks ) // in bitcoin
     if ( feePerKB === -1 ) return 1
     return Math.round( ( feePerKB / 1024 ) * 1e8 ) // feePerByte(sats)
   }
 
   public static async broadcast( txHex: string ) {
-    TestnetElectrumClient.checkConnection()
-
-    return ELECTRUM_CLIENT.electrumClient.blockchainTransaction_broadcast( txHex )
-  }
-
-  public static async testConnection( node: NodeDetail ) {
-    const client = new ElectrumCli(
-      ( global as any ).net,
-      ( global as any ).tls,
-      node.port,
-      node.host,
-      node.useSSL ? 'tls' : 'tcp'
-    )
-
-    client.onError = ( ex ) => {
-      console.log( ex )
-    } // mute
-    let timeoutId = null
-    try {
-      const rez = await Promise.race( [
-        new Promise( ( resolve ) => {
-          timeoutId = setTimeout( () => resolve( 'timeout' ), 5000 )
-        } ),
-        client.connect(),
-      ] )
-      if ( rez === 'timeout' ) return false
-
-      await client.server_version( '2.7.11', '1.4' )
-      await client.server_ping()
-      return true
-    } catch ( ex ) {
-      console.log( ex )
-    } finally {
-      if ( timeoutId ) clearTimeout( timeoutId )
-      client.close()
-    }
-
-    return false
+    console.log( {
+      predefinedTestnetPeers: TEST_ELECTRUM_CLIENT_CONFIG.predefinedTestnetPeers
+    } )
+    if ( !TEST_ELECTRUM_CLIENT.electrumClient ) throw new Error( 'Electrum client is not connected' )
+    return TEST_ELECTRUM_CLIENT.electrumClient.blockchainTransaction_broadcast( txHex )
   }
 }

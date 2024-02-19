@@ -1,30 +1,26 @@
 import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import ImageStyles from '../../common/Styles/ImageStyles'
-import HeadingStyles from '../../common/Styles/HeadingStyles'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { widthPercentageToDP, widthPercentageToDP as wp } from 'react-native-responsive-screen'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { RecipientDescribing, ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import LastSeenActiveIndicator from '../LastSeenActiveIndicator'
-import RecipientKind from '../../common/data/enums/RecipientKind'
-import AntDesign from 'react-native-vector-icons/AntDesign'
-import { widthPercentageToDP } from 'react-native-responsive-screen'
-import RecipientAvatar from '../RecipientAvatar'
-import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
+import HeadingStyles from '../../common/Styles/HeadingStyles'
+import ImageStyles from '../../common/Styles/ImageStyles'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
-import { Satoshis } from '../../common/data/typealiases/UnitAliases'
-import useAmountBeingSentToRecipient from '../../utils/hooks/state-selectors/sending/UseAmountBeingSentToRecipient'
-import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
+import RecipientKind from '../../common/data/enums/RecipientKind'
+import { ContactRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText'
+import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
+import useAmountBeingSentToRecipient from '../../utils/hooks/state-selectors/sending/UseAmountBeingSentToRecipient'
+import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
+import LastSeenActiveIndicator from '../LastSeenActiveIndicator'
+import RecipientAvatar from '../RecipientAvatar'
 
 export type Props = {
   recipient: RecipientDescribing;
   onRemove: () => void;
+  showRemoveButton?: boolean;
   currencyCode?: string;
   containerStyle?: Record<string, unknown>;
 };
@@ -32,6 +28,7 @@ export type Props = {
 const SelectedRecipientCarouselItem: React.FC<Props> = ( {
   recipient,
   onRemove,
+  showRemoveButton = true,
   currencyCode = '',
   containerStyle = {
   },
@@ -87,7 +84,7 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ( {
         </View>
       </View>
 
-      <TouchableOpacity
+      {showRemoveButton ? ( <TouchableOpacity
         style={styles.closeButton}
         onPress={onRemove}
       >
@@ -96,7 +93,7 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ( {
           color={Colors.blue}
           name={'closecircle'}
         />
-      </TouchableOpacity>
+      </TouchableOpacity> ) : null}
 
     </View>
   )

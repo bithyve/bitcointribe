@@ -1,16 +1,18 @@
-import React, { useMemo, useState } from 'react'
+import React, { useLayoutEffect, useMemo, useState } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { useDispatch } from 'react-redux'
 import ListStyles from '../../../../common/Styles/ListStyles'
 import DestinationAccountShellsList from '../../../../components/account-settings/transaction-reassignment/DestinationAccountShellsList'
-import useAccountShellFromNavigation from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
+import useAccountShellFromRoute from '../../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import AccountShell from '../../../../common/data/models/AccountShell'
 import { reassignTransactions } from '../../../../store/actions/accounts'
 import { resetStackToAccountDetails } from '../../../../navigation/actions/NavigationActions'
 import useCompatibleAccountShells from '../../../../utils/hooks/state-selectors/accounts/UseCompatibleAccountShells'
 import ButtonBlue from '../../../../components/ButtonBlue'
+import XPubSourceKind from '../../../../common/data/enums/XPubSourceKind'
 
 export type Props = {
+  route: any;
   navigation: any;
 };
 
@@ -22,16 +24,23 @@ const HeaderSection: React.FC = () => {
   )
 }
 
-const ReassignTransactionsSelectDestinationAccountScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const ReassignTransactionsSelectDestinationAccountScreen: React.FC<Props> = ( { route, navigation }: Props ) => {
   const dispatch = useDispatch()
 
-  const currentAccountShell = useAccountShellFromNavigation( navigation )
+  useLayoutEffect( () => {
+    const reassignmentKind = route.params?.reassignmentKind
+    const nameText = reassignmentKind === XPubSourceKind.DESIGNATED ? 'Sources' : 'Transactions'
+    navigation.setOptions( {
+      title: `Reassign ${nameText}`
+    } )
+  }, [ navigation, route ] )
+  const currentAccountShell = useAccountShellFromRoute( route )
   const selectableAccountShells = useCompatibleAccountShells( currentAccountShell )
   const [ selectedAccountShellID, setSelectedAccountShellID ] = useState<string>( null )
 
   const selectedTransactionIDs = useMemo( () => {
-    return navigation.getParam( 'selectedTransactionIDs', [] )
-  }, [ navigation ] )
+    return route.params?.selectedTransactionIDs || []
+  }, [ route.params ] )
 
   const canProceed = useMemo( () => {
     return selectedAccountShellID != null

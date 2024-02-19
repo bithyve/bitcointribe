@@ -1,42 +1,36 @@
-import React, { useState, useEffect, useCallback, createRef } from 'react'
-import {
-  View,
-  SafeAreaView,
-  StatusBar,
-  Platform,
-  Alert,
-} from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { useDispatch } from 'react-redux'
-import Colors from '../../common/Colors'
 import moment from 'moment'
-import _ from 'underscore'
-import HistoryPageComponent from './HistoryPageComponent'
-import ModalHeader from '../../components/ModalHeader'
-import { updateCloudPermission, updateSeedHealth } from '../../store/actions/BHR'
+import React, { createRef, useCallback, useEffect, useState } from 'react'
+import {
+  Platform, SafeAreaView,
+  StatusBar, View
+} from 'react-native'
 import DeviceInfo from 'react-native-device-info'
-import { useSelector } from 'react-redux'
-import HistoryHeaderComponent from './HistoryHeaderComponent'
-import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { updateCloudData, setCloudErrorMessage } from '../../store/actions/cloud'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
-import ModalContainer from '../../components/home/ModalContainer'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import { translations } from '../../common/content/LocContext'
+import _ from 'underscore'
 import { KeeperType, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
-import KeeperTypeModalContents from './KeeperTypeModalContent'
-import { getIndex } from '../../common/utilities'
+import Colors from '../../common/Colors'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
-import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
-import SeedBacupModalContents from './SeedBacupModalContents'
-import dbManager from '../../storage/realm/dbManager'
+import { translations } from '../../common/content/LocContext'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import { getIndex } from '../../common/utilities'
 import AlertModalContents from '../../components/AlertModalContents'
+import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
+import ErrorModalContents from '../../components/ErrorModalContents'
 import BottomInputModalContainer from '../../components/home/BottomInputModalContainer'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import ModalContainer from '../../components/home/ModalContainer'
+import ModalHeader from '../../components/ModalHeader'
+import dbManager from '../../storage/realm/dbManager'
+import { updateCloudPermission, updateSeedHealth } from '../../store/actions/BHR'
+import { setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
+import ConfirmSeedWordsModal from './ConfirmSeedWordsModal'
+import HistoryHeaderComponent from './HistoryHeaderComponent'
+import HistoryPageComponent from './HistoryPageComponent'
+import KeeperTypeModalContents from './KeeperTypeModalContent'
+import SeedBacupModalContents from './SeedBacupModalContents'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -77,8 +71,8 @@ const SeedBackupHistory = ( props ) => {
   const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
   const levelData = useSelector( ( state ) => state.bhr.levelData )
   const  keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
-  const SelectedRecoveryKeyNumber = props.navigation.getParam( 'SelectedRecoveryKeyNumber' )
-  const selectedKeeper = props.navigation.getParam( 'selectedKeeper' )
+  const SelectedRecoveryKeyNumber = props.route.params?.SelectedRecoveryKeyNumber
+  const selectedKeeper = props.route.params?.selectedKeeper
   const [ seedWordModal, setSeedWordModal ] = useState( false )
   const [ confirmSeedWordModal, setConfirmSeedWordModal ] = useState( false )
   const [ seedRandomNumber, setSeedRandomNumber ] = useState( [] )
@@ -271,7 +265,7 @@ const SeedBackupHistory = ( props ) => {
         },
         channelKey: selectedKeeper.channelKey,
       },
-      selectedLevelId: props.navigation.getParam( 'selectedLevelId' ),
+      selectedLevelId: props.route.params?.selectedLevelId,
       index: changeIndex,
     }
     if ( type == 'contact' ) {
@@ -313,8 +307,8 @@ const SeedBackupHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => {
-          props.navigation.navigate( 'Home' )
-          // props.navigation.popToTop()
+          // props.navigation.navigate( 'MoreOptionsContainerScreen' )
+          props.navigation.popToTop()
         }}
         selectedTitle={'Wallet backup'}
         selectedTime={selectedKeeper?.updatedAt
@@ -357,11 +351,11 @@ const SeedBackupHistory = ( props ) => {
 
             setTimeout( () => {
               setConfirmSeedWordModal( true )
-            }, 500 )
+            }, 1000 )
           }}
           data={seedBackupHistory.length ? sortedHistory( seedBackupHistory ) : []}
           confirmButtonText={'Confirm'}
-          disableChange={false}
+          disableChange={props.route.params?.from === 'receive'}
           onPressReshare={() => {
             // ( cloudBackupBottomSheet as any ).current.snapTo( 1 )
           }}
@@ -404,7 +398,7 @@ const SeedBackupHistory = ( props ) => {
       <ModalContainer onBackground={()=>setKeeperTypeModal( false )} visible={keeperTypeModal} closeBottomSheet={() => {setKeeperTypeModal( false )}} >
         <KeeperTypeModalContents
           selectedType={'seed'}
-          selectedLevelId={props.navigation.getParam( 'selectedLevelId' )}
+          selectedLevelId={props.route.params?.selectedLevelId}
           headerText={'Change backup method'}
           subHeader={'Share your Recovery Key with a new contact or a different device or Cloud'}
           onPressSetup={async ( type, name ) => {
@@ -503,8 +497,8 @@ const SeedBackupHistory = ( props ) => {
           }}
           onPressIgnore={() => {
             setSeedBackupModal( false )
-            // props.navigation.goBack()
-            props.navigation.navigate( 'Home' )
+            props.navigation.goBack()
+            // props.navigation.navigate( 'MoreOptionsContainerScreen' )
           }}
           isIgnoreButton={true}
         />

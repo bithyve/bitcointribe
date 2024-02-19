@@ -22,6 +22,7 @@ import { addNewAccountShells } from '../../../store/actions/accounts'
 import DropDown from '../../../utils/Dropdown'
 import { LocalizationContext } from '../../../common/content/LocContext'
 import LinearGradient from 'react-native-linear-gradient'
+import { useNavigation } from '@react-navigation/native'
 
 type Props = {
   rampDeepLinkContent: string | null;
@@ -35,6 +36,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
   const dispatch = useDispatch()
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'home' ]
+  const navigation: any = useNavigation()
   const common = translations[ 'common' ]
   const { rampHostedUrl } = useRampIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()

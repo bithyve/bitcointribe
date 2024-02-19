@@ -1,7 +1,6 @@
 import idx from 'idx'
 import React, { Component } from 'react'
 import { ImageBackground, View, StyleSheet, AppState, Platform, Linking } from 'react-native'
-import { withNavigationFocus } from 'react-navigation'
 import Loader from '../../components/loader'
 import { connect } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -36,11 +35,11 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
   }
 
     componentDidMount = () => {
-      AppState.addEventListener( 'change', this.handleAppStateChange )
-      Linking.addEventListener( 'url', this.handleDeepLinkEvent )
-      Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {
-        url
-      } ) )
+      // this.appStateListener = AppState.addEventListener( 'change', this.handleAppStateChange )
+      // Linking.addEventListener( 'url', this.handleDeepLinkEvent )
+      // Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {
+      //   url
+      // } ) )
       setTimeout( () => {
         this.postSplashScreenActions()
       }, 2 )
@@ -84,91 +83,26 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
           const now: any = new Date()
           const diff = Math.abs( now - this.props.lastSeen )
           const isHomePageOpen = Number( diff ) < Number( 20000 )
-          console.log( 'diff', diff, isHomePageOpen )
-          if( isHomePageOpen ){
+          if( !isHomePageOpen ){
             if ( !this.url ){
-              this.props.navigation.replace( 'Home', {
-                screen: 'Home',
-              } )
+              this.props.navigation.replace( 'Login' )
             } else {
               const processedLink = await processDeepLink( this.url )
-              this.props.navigation.replace( 'Home', {
-                screen: 'Home',
-                params: {
-                  trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,
-                  giftRequest: processedLink ? processedLink.giftRequest: null,
-                  swanRequest: processedLink ? processedLink.swanRequest: null,
-                }
+              this.props.navigation.replace( 'Login', {
+                trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,
+                giftRequest: processedLink ? processedLink.giftRequest: null,
+                swanRequest: processedLink ? processedLink.swanRequest: null,
               } )
             }
-          } else if ( !this.url ){
-            this.props.navigation.replace( 'Login' )
-          } else {
-            const processedLink = await processDeepLink( this.url )
-            this.props.navigation.replace( 'Login', {
-              trustedContactRequest: processedLink ? processedLink.trustedContactRequest: null,
-              giftRequest: processedLink ? processedLink.giftRequest: null,
-              swanRequest: processedLink ? processedLink.swanRequest: null,
-            } )
           }
-
         } else {
           this.props.navigation.replace( 'PasscodeConfirm' )
         }
-
       } catch ( err ) {
         console.log( 'err', err )
       }
     };
 
-
-    // handleLockCheck = () => {
-    //   const interval = setInterval( () => {
-    //     // check if it should be rendered
-    //     const TIME_OUT = 15000
-    //     const now: any = new Date()
-    //     const diff = Math.abs( now - this.props.lastSeen )
-    //     const { canLock } = this.state
-    //     if ( diff > TIME_OUT ) {
-    //       if ( canLock ) {
-    //         this.setState( {
-    //           canLock: false
-    //         }, () => {
-    //           this.props.navigation.push( 'ReLogin' )
-    //           clearInterval( interval )
-    //         } )
-    //       }
-    //     } else {
-    //       this.props.navigation.pop()
-    //       this.props.updateLastSeen()
-    //     }
-    //   }, 3000 )
-    // }
-
-
-    // handleAppStateChange = async ( nextAppState ) => {
-    //   const TIME_OUT = 15000
-    //   if ( ( Platform.OS === 'ios' && nextAppState === 'active' ) || ( Platform.OS === 'android' && nextAppState === 'background' ) ) {
-    //     const now: any = new Date()
-    //     const diff = Math.abs( now - this.props.lastSeen )
-    //     const { canLock } = this.state
-    //     if ( diff > TIME_OUT ) {
-    //       if ( canLock ) {
-    //         this.setState( {
-    //           canLock: false
-    //         }, () => this.props.navigation.push( 'ReLogin' ) )
-    //       }
-    //     } else {
-    //       this.props.navigation.pop()
-    //       this.props.updateLastSeen( new Date() )
-    //     }
-    //   }
-    // };
-
-
-    componentWillUnmount() {
-      // AppState.removeEventListener( 'change', this.handleAppStateChange )
-    }
 
 
     render() {
@@ -203,4 +137,4 @@ const mapStateToProps = ( state ) => {
 
 export default connect( mapStateToProps, {
   getMessages
-} )( withNavigationFocus( Intermediate ) )
+} )( Intermediate )

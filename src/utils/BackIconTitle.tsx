@@ -7,11 +7,14 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import CommonStyles from '../common/Styles/Styles'
 import Colors from '../common/Colors'
 import HeaderTitle from '../components/HeaderTitle'
-import { withNavigation } from 'react-navigation'
+import { useNavigation } from '@react-navigation/native'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 
 
-const BackIconTitle = ( { navigation, firstLineTitle = '', secondLineTitle = '' } ) => {
+const BackIconTitle = ( { firstLineTitle = '', secondLineTitle = '' } ) => {
+  //navigation change
+  const navigation: any = useNavigation()
+
   return(
     <>
       <View style={[ CommonStyles.headerContainer, {
@@ -47,4 +50,4 @@ const BackIconTitle = ( { navigation, firstLineTitle = '', secondLineTitle = '' 
   )
 }
 
-export default withNavigation( BackIconTitle )
+export default  BackIconTitle

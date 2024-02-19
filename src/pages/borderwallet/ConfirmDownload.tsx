@@ -1,28 +1,25 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { CommonActions } from '@react-navigation/native'
+import React, { useContext, useState } from 'react'
 import {
-  View,
+  FlatList,
+  Platform,
   SafeAreaView,
   StatusBar,
   StyleSheet,
-  FlatList,
   Text,
   TouchableOpacity,
-  ActivityIndicator,
-  Alert,
-  Platform
+  View
 } from 'react-native'
-import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
-import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
-import Fonts from '../../common/Fonts'
-import { hp, windowHeight } from '../../common/data/responsiveness/responsive'
-import LinearGradient from 'react-native-linear-gradient'
-import ModalContainer from '../../components/home/ModalContainer'
-import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
-import { LocalizationContext } from '../../common/content/LocContext'
 import { useDispatch } from 'react-redux'
+import Colors from '../../common/Colors'
+import { LocalizationContext } from '../../common/content/LocContext'
+import { hp, windowHeight } from '../../common/data/responsiveness/responsive'
+import Fonts from '../../common/Fonts'
+import BorderWalletSuccessModal from '../../components/border-wallet/BorderWalletSuccessModal'
+import ModalContainer from '../../components/home/ModalContainer'
 import { createBorderWallet } from '../../store/actions/accounts'
-import useAccountShellCreationCompletionEffect from '../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
+import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 
 const ConfirmDownload = ( props ) => {
   const { translations } = useContext( LocalizationContext )
@@ -30,27 +27,34 @@ const ConfirmDownload = ( props ) => {
   const [ headerTitle, setHeaderTitle ]=useState( 'Summary for Border Wallet' )
   const [ successModal, setSuccessModal ] = useState( false )
   const [ loading, setLoading ] = useState( true )
-  const mnemonic = props.navigation.getParam( 'mnemonic' )
+  const mnemonic = props.route.params?.mnemonic
   const grid = Array( 2048 ).fill( 0 )
-  const pattern = props.navigation.getParam( 'selected' )
-  const checksumWord = props.navigation.getParam( 'checksumWord' )
-  const initialMnemonic = props.navigation.getParam( 'initialMnemonic' )
-  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
-  const passphrase = props.navigation.getParam( 'passphrase' )
-  const gridType = props.navigation.getParam( 'gridType' )
+  const pattern = props.route.params?.selected
+  const checksumWord =props.route.params?.checksumWord
+  const initialMnemonic = props.route.params?.initialMnemonic
+  const isAccountCreation = props.route.params?.isAccountCreation
+  const isImportAccount = props.route.params?.isImportAccount
+  const passphrase = props.route.params?.passphrase
+  const gridType = props.route.params?.gridType
   const dispatch = useDispatch()
   type ItemProps = {title: string, id: string};
 
   const onPressContinue = () => {
-    if( isAccountCreation ){
+    if( isAccountCreation || isImportAccount ){
       dispatch( createBorderWallet( mnemonic, initialMnemonic, gridType, passphrase ) )
       //TO-DO- BW bind this to account creation redux state
       // Alert.alert( 'Wallet Created!', 'Border Wallet has been succssefully created', [ {
       //   text: 'Ok', onPress: ()=> {  props.navigation.navigate( 'Home' )}
       // } ] )
-      setSuccessModal( true )
       setTimeout( ()=>{
-        props.navigation.navigate( 'Home' )
+        props.navigation.dispatch( CommonActions.reset( {
+          index: 0,
+          routes: [
+            {
+              name: 'App'
+            }
+          ],
+        } ) )
       }, 3000 )
     }
     else{
@@ -92,11 +96,10 @@ const ConfirmDownload = ( props ) => {
             bounces={false}
             data={grid}
             renderItem={( { item, index } )=>(
-              <View style={pattern.includes( index ) ?  styles.patternPreviewStyle : styles.previewStyle}/>
+              <View key={`${item}_${index}`} style={pattern.includes( index ) ?  styles.patternPreviewStyle : styles.previewStyle}/>
             )}
             initialNumToRender={1000}
             numColumns={16}
-            keyExtractor={item => item.id}
           />
           <TouchableOpacity onPress={()=> props.navigation.navigate( 'PreviewPattern', {
             pattern
@@ -144,17 +147,11 @@ const ConfirmDownload = ( props ) => {
               <TouchableOpacity
                 onPress={onPressContinue}
               >
-                <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-                  start={{
-                    x: 0, y: 0
-                  }} end={{
-                    x: 1, y: 0
-                  }}
-                  locations={[ 0.2, 1 ]}
+                <View
                   style={styles.buttonView}
                 >
                   <Text style={styles.buttonText}>Continue</Text>
-                </LinearGradient>
+                </View>
               </TouchableOpacity>
             </View>
           </View>
@@ -167,7 +164,7 @@ const ConfirmDownload = ( props ) => {
         closeBottomSheet={()=> setSuccessModal( false )}
       >
         <BorderWalletSuccessModal
-          title={'Border Wallet creation success!'}
+          title={isImportAccount? 'Border wallet imported successfully.' : 'Border wallet created successfully.'}
           info={''}
           otherText={'Your Border Wallet has been added and is now ready for you to start using.'}
           proceedButtonText={'Continue'}

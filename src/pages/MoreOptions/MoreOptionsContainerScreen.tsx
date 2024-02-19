@@ -1,30 +1,30 @@
-import React, { useState, useContext, useEffect } from 'react'
-import { View, Text, StyleSheet, Linking, FlatList, Image, TouchableOpacity, StatusBar, ImageSourcePropType, Dimensions, Switch } from 'react-native'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import { useDispatch, useSelector } from 'react-redux'
-import { ScrollView } from 'react-native-gesture-handler'
-import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
-import Node from '../../assets/images/svgs/node.svg'
-import Wallet from '../../assets/images/svgs/icon_settings.svg'
-import AppInfo from '../../assets/images/svgs/icon_info.svg'
-import DocumentPad from '../../assets/images/svgs/icons_document_copy.svg'
-import QueActive from '../../assets/images/svgs/question_inactive.svg'
-import Telegram from '../../assets/images/svgs/icon_telegram.svg'
-import { LocalizationContext } from '../../common/content/LocContext'
-import { LevelData, LevelHealthInterface, KeeperType } from '../../bitcoin/utilities/Interface'
-import ModalContainer from '../../components/home/ModalContainer'
-import CrossButton from '../../assets/images/svgs/icons_close.svg'
-import { toggleClipboardAccess } from '../../store/actions/misc'
-import { onPressKeeper } from '../../store/actions/BHR'
-import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
-import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
-import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import moment from 'moment'
+import React, { useContext, useEffect, useState } from 'react'
+import { Dimensions, FlatList, Image, ImageSourcePropType, Linking, StatusBar, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
+import CrossButton from '../../assets/images/svgs/icons_close.svg'
+import DocumentPad from '../../assets/images/svgs/icons_document_copy.svg'
+import AccManagement from '../../assets/images/svgs/icon_accounts.svg'
+import AppInfo from '../../assets/images/svgs/icon_info.svg'
+import WalletIcon from '../../assets/images/svgs/icon_settings.svg'
+import Telegram from '../../assets/images/svgs/icon_telegram.svg'
+import Node from '../../assets/images/svgs/node.svg'
+import QueActive from '../../assets/images/svgs/question_inactive.svg'
+import { LevelData, LevelHealthInterface, Wallet } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
+import { LocalizationContext } from '../../common/content/LocContext'
+import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
+import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
+import Fonts from '../../common/Fonts'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import ModalContainer from '../../components/home/ModalContainer'
+import dbManager from '../../storage/realm/dbManager'
+import { toggleClipboardAccess } from '../../store/actions/misc'
 
 export type Props = {
   navigation: any;
@@ -53,6 +53,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.bhr.levelHealth )
   const createWithKeeperStatus: CreateWithKeeperState  = useSelector( ( state ) => state.bhr.createWithKeeperStatus )
   const backupWithKeeperStatus: BackupWithKeeperState =useSelector( ( state ) => state.bhr.backupWithKeeperStatus )
+  const borderWalletBackup  = useSelector( ( state ) => state.bhr.borderWalletBackup )
+  const wallet: Wallet =  dbManager.getWallet()
   const [ days, setDays ] = useState( 0 )
 
   const navigationObj: any = useSelector( ( state ) => state.bhr.navigationObj )
@@ -81,7 +83,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     // },
     {
       imageSource: require( '../../assets/images/icons/icon_info.png' ),
-      subtitle:  backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus ),
+      subtitle:  backUpMessage( days, levelData, createWithKeeperStatus, backupWithKeeperStatus, borderWalletBackup, wallet && wallet.borderWalletMnemonic !=='' ),
       title: bhrStrings[ 'WalletBackup' ],
       // screenName: 'WalletBackup',
       screenName: 'BackupMethods',
@@ -223,7 +225,6 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     } else if ( menuOption.screenName !== undefined ) {
       // if( menuOption.screenName == 'WalletBackup' ) {
       /* if( menuOption.screenName == 'BackupMethods' ) {
-        // console.log( 'skk leveldata===>' + JSON.stringify( levelData ) )
         if( levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'seed'||
         levelData[ 0 ].keeper1ButtonText?.toLowerCase() == 'Write down Backup Phrase' ){
           if ( ( levelHealth.length == 0 ) ||
@@ -258,7 +259,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
         case strings.node:
           return ( <Node /> )
         case strings.walletSettings:
-          return ( <Wallet /> )
+          return ( <WalletIcon /> )
         case strings.AppInfo:
           return ( <AppInfo /> )
         case bhrStrings[ 'WalletBackup' ]:
@@ -381,10 +382,9 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   return (
     <View style={{
-      backgroundColor: Colors.darkBlue
+      backgroundColor: Colors.blue
     }}>
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-      {/* <Header from={'More'} /> */}
       <ModalContainer visible={modalVisible} closeBottomSheet={() => setModalVisible( false )}>
         {ReadClipboardModal()}
       </ModalContainer>
@@ -481,7 +481,8 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                     {findImage( menuOption.title )}
                   </View>
                   <View style={{
-                    justifyContent: 'center', marginLeft: 10
+                    justifyContent: 'center', marginLeft: 10,
+                    width: '90%'
                   }}>
                     <Text style={styles.addModalTitleText}>{menuOption.title}</Text>
                     <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
@@ -550,7 +551,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              Linking.openURL( 'https://t.me/bitcoinTribe_' )
+              Linking.openURL( 'https://t.me/BitcoinTribeSupport' )
                 .then( ( _data ) => { } )
                 .catch( ( _error ) => {
                   alert( 'Make sure Telegram installed on your device' )
@@ -601,7 +602,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           />
 
           <AppBottomSheetTouchableWrapper
-            onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
+            onPress={() => openLink( 'https://bitcointribe.app/terms-of-service/' )}
           >
             <Text style={styles.addModalTitleText}>Terms of Service</Text>
           </AppBottomSheetTouchableWrapper>
@@ -754,7 +755,7 @@ const styles = StyleSheet.create( {
     color: Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
     fontSize: RFValue( 11 ),
     marginTop: 5,
-    fontFamily: Fonts.Regular
+    fontFamily: Fonts.Regular,
   },
 
   modalElementInfoView: {

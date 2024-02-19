@@ -32,10 +32,10 @@ import ModalContainer from '../../../components/home/ModalContainer'
 import LoaderModal from '../../../components/LoaderModal'
 
 
-export default function OTPAuthenticationScreen( { navigation } ) {
-  const fromWallet = navigation?.getParam( 'fromWallet' ) || false
-  const txnPriority = navigation.getParam( 'txnPriority' )
-  const note = navigation.getParam( 'note' )
+export default function OTPAuthenticationScreen( { navigation, route } ) {
+  const fromWallet = route.params?.fromWallet || false
+  const txnPriority = route.params?.txnPriority
+  const note = route.params?.note
   const [ Elevation, setElevation ] = useState( 10 )
   const [ token, setToken ] = useState( '' )
   const [ tokenArray, setTokenArray ] = useState( [ '' ] )

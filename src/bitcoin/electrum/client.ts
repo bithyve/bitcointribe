@@ -3,12 +3,12 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-console */
-import config from '../HexaConfig'
-import ElectrumCli from 'electrum-client'
-import reverse from 'buffer-reverse'
 import * as bitcoinJS from 'bitcoinjs-lib'
-import { ElectrumTransaction, ElectrumUTXO, NodeDetail } from './interface'
+import reverse from 'buffer-reverse'
+import ElectrumCli from 'electrum-client'
+import config from '../HexaConfig'
 import { NetworkType } from '../utilities/Interface'
+import { ElectrumTransaction, ElectrumUTXO, NodeDetail } from './interface'
 
 function shufflePeers( peers ) {
   for ( let i = peers.length - 1; i > 0; i-- ) {
@@ -38,7 +38,7 @@ const ELECTRUM_CLIENT_DEFAULTS = {
   activePeer: null,
 }
 
-let ELECTRUM_CLIENT: {
+export let ELECTRUM_CLIENT: {
   electrumClient: any;
   isClientConnected: boolean;
   currentPeerIndex: number;
@@ -49,11 +49,8 @@ let ELECTRUM_CLIENT: {
 export const ELECTRUM_NOT_CONNECTED_ERR =
   'Network Error: The current electrum node is not reachable, please try again with a different node'
 
-export const ELECTRUM_NOT_CONNECTED_ERR_TOR =
-  'Network Error: Connection currently failing over Tor, please disable Tor or try again using a different node'
 
 export default class ElectrumClient {
-  public static connectOverTor = false;
 
   public static async connect() {
     let timeoutId = null
@@ -68,6 +65,7 @@ export default class ElectrumClient {
           error: 'Unable to connect to any electrum server. Please switch network and try again!',
         }
       }
+
 
       ELECTRUM_CLIENT.electrumClient = new ElectrumCli(
         ( global as any ).net,
@@ -181,9 +179,7 @@ export default class ElectrumClient {
 
   public static checkConnection() {
     if ( !ELECTRUM_CLIENT.isClientConnected ) {
-      const connectionError = ElectrumClient.connectOverTor
-        ? ELECTRUM_NOT_CONNECTED_ERR_TOR
-        : ELECTRUM_NOT_CONNECTED_ERR
+      const connectionError = ELECTRUM_NOT_CONNECTED_ERR
       throw new Error( connectionError )
     }
   }
@@ -212,6 +208,10 @@ export default class ElectrumClient {
 
     if ( !peers || ELECTRUM_CLIENT.currentPeerIndex > peers.length - 1 ) return null // exhuasted all available peers
     return peers[ ELECTRUM_CLIENT.currentPeerIndex ]
+  }
+
+  public static resetCurrentPeerIndex() {
+    ELECTRUM_CLIENT.currentPeerIndex = -1;
   }
 
   // if current peer to use is not provided, it will try to get the active peer from the saved list of private nodes

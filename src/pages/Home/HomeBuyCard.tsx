@@ -1,27 +1,19 @@
 import React, { useContext } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
+  Text, TouchableOpacity, View
 } from 'react-native'
-import { Button } from 'react-native-elements'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import Fonts from './../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import ButtonStyles from '../../common/Styles/ButtonStyles'
-import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
-import MaterialCurrencyCodeIcon from '../../components/MaterialCurrencyCodeIcon'
-import { getCurrencyImageByRegion, getCurrencyImageName } from '../../common/CommonFunctions'
+import Colors from '../../common/Colors'
+import { getCurrencyImageName } from '../../common/CommonFunctions'
 import { LocalizationContext } from '../../common/content/LocContext'
-import { Shadow } from 'react-native-shadow-2'
-import LinearGradient from 'react-native-linear-gradient'
+import ButtonStyles from '../../common/Styles/ButtonStyles'
+import MaterialCurrencyCodeIcon from '../../components/MaterialCurrencyCodeIcon'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
+import Fonts from './../../common/Fonts'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -137,24 +129,12 @@ const HomeBuyCard = ( {
         </View>
       </View>
 
-      <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-        start={{
-          x: 0, y: 0
-        }} end={{
-          x: 1, y: 0
-        }}
-        locations={[ 0.2, 1 ]}
+      <View
         style={{
           borderRadius: wp( 2 ),
           paddingVertical: wp( 2.5 ),
           paddingHorizontal: wp( 4 ),
           backgroundColor: Colors.blue,
-          // shadowColor: Colors.shadowBlue,
-          // shadowOpacity: 1,
-          // shadowOffset: {
-          //   width: 9, height: 10
-          // },
-          // elevation: 15
         }}>
         <TouchableOpacity
         // icon={
@@ -178,7 +158,7 @@ const HomeBuyCard = ( {
             {strings.buy}
           </Text>
         </TouchableOpacity>
-      </LinearGradient>
+      </View>
     </View>
   )
 }

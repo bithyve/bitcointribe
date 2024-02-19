@@ -1,5 +1,5 @@
 import React from 'react'
-import { ImageSourcePropType } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
@@ -26,6 +26,25 @@ import Wallet from '../../assets/images/accIcons/icon_wallet.svg'
 import Watch from '../../assets/images/accIcons/view.svg'
 import Lightning from '../../assets/images/accIcons/lightning.svg'
 import LightningHexa from '../../assets/images/accIcons/icon_ln.svg'
+import Fonts from '../../common/Fonts'
+
+const styles = StyleSheet.create( {
+  container: {
+    height: 37, width: 37, backgroundColor: '#ae76db', borderRadius: 30, justifyContent: 'center', alignItems: 'center'
+  },
+  text:{
+    color: 'white',
+    fontFamily: Fonts.Regular,
+    fontSize: 11
+  }
+} )
+
+
+function RgbAccountIcon() {
+  return (
+    <View style={styles.container}><Text style={styles.text}>RGB</Text></View>
+  )
+}
 
 const getAvatarForSubAccount = (
   subAccount: SubAccountDescribing,
@@ -75,7 +94,7 @@ const getAvatarForSubAccount = (
       case SubAccountKind.LIGHTNING_ACCOUNT:
         return isHome ? <LightningHexa/> : <Lightning />
       case SubAccountKind.BORDER_WALLET:
-        return isHome ? <LightningHexa/> : <Lightning />
+        return isHome ? <LightningHexa/> : <BorderWalletIcon />
       case SubAccountKind.SERVICE:
         return getAvatarForServiceAccountKind( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind, isHome, isAccount )
       default:

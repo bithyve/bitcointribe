@@ -1,21 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
-  View,
-  TouchableOpacity,
-  Text,
-  SafeAreaView,
-  StyleSheet,
-  TextInput,
-  Platform
+  Platform, SafeAreaView,
+  StyleSheet, Text, TextInput, TouchableOpacity, View
 } from 'react-native'
-import Colors from '../../../common/Colors'
-import Fonts from '../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
-import BottomInfoBox from '../../../components/BottomInfoBox'
-import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Colors from '../../../common/Colors'
 import { translations } from '../../../common/content/LocContext'
+import Fonts from '../../../common/Fonts'
+import BottomInfoBox from '../../../components/BottomInfoBox'
 
 const ALLOWED_CHARACTERS_REGEXP = /^[A-Za-z]+$/
 
@@ -74,7 +68,7 @@ export default function EditWalletName( props ) {
           style={{
             ...styles.buttonView, backgroundColor: !(
               answer.trim() && answerError.length === 0
-            ) ? Colors.lightBlue : Colors.blue, elevation: Elevation
+            ) ? Colors.lightBlue : Colors.blue
           }}
         >
           <Text style={styles.buttonText}>{common.save}</Text>
@@ -305,28 +299,11 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 15, height: 15
-    },
   },
   buttonText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.Medium,
-  },
-  bottomButtonView: {
-    flexDirection: 'row',
-    paddingLeft: 30,
-    paddingRight: 30,
-    paddingBottom: hp( 2 ),
-    alignItems: 'center',
-  },
-  bottomButtonView1: {
-    flexDirection: 'row',
-    marginTop: 5,
-    alignItems: 'center',
   },
   inputBox: {
     borderWidth: 0.5,

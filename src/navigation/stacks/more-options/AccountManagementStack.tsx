@@ -1,106 +1,62 @@
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
-import { createStackNavigator } from 'react-navigation-stack'
+import { translations } from '../../../common/content/LocContext'
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
 import AccountManagementContainerScreen from '../../../pages/MoreOptions/AccountManagement/AccountManagementContainerScreen'
-import PanAccountSettingsContainerScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/PanAccountSettingsContainerScreen'
-import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
-import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
-import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import EnterPasscodeScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/EnterPasscodeScreen'
+import PanAccountSettingsContainerScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/PanAccountSettingsContainerScreen'
 import SecurityQuestionScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/SecurityQuestionScreen'
-import { translations } from '../../../common/content/LocContext'
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 
 const strings  = translations[ 'stackTitle' ]
 
-const PanAccountSettingsStack = createStackNavigator(
-  {
-    PanAccountSettingsRoot: {
-      screen: PanAccountSettingsContainerScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          title: strings[ 'AccountSettings' ],
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-          },
-        }
-      },
-    },
-    EnterPasscode: {
-      screen: EnterPasscodeScreen,
-      navigationOptions: ( { navigation } ) => {
+const PanAccountSettingsStack = createNativeStackNavigator()
+function PanAccountSettings() {
+  return (
+    <PanAccountSettingsStack.Navigator
+      screenOptions={{
+        ...defaultStackScreenNavigationOptions,
+      }}
+    >
+      <PanAccountSettingsStack.Screen name="PanAccountSettingsRoot" component={PanAccountSettingsContainerScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <PanAccountSettingsStack.Screen name="EnterPasscode" component={EnterPasscodeScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <PanAccountSettingsStack.Screen name="SecurityQuestion" component={SecurityQuestionScreen} options={( { navigation } ) => {
         return {
           title: strings[ 'ShowAllAccounts' ],
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.goBack() }} />
           },
         }
-      },
-    },
-    SecurityQuestion: {
-      screen: SecurityQuestionScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          title: strings[ 'ShowAllAccounts' ],
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-          },
-        }
-      },
-    },
-  },
-  {
-    defaultNavigationOptions: () => {
-      return {
+      }} />
+    </PanAccountSettingsStack.Navigator>
+  )
+}
+
+const AccountManagementStack = createNativeStackNavigator()
+export default function  AccountManagement() {
+  return (
+    <AccountManagementStack.Navigator
+      initialRouteName='Home'
+      screenOptions={{
         ...defaultStackScreenNavigationOptions,
-      }
-    },
-  },
-)
+      }}
+    >
+      <AccountManagementStack.Screen name="AccountManagementRoot" component={AccountManagementContainerScreen} options={{
+        headerShown: false,
+      }} />
+      <AccountManagementStack.Screen name="PanAccountSettings" component={PanAccountSettings} options={{
+        headerShown: false,
+      }} />
+    </AccountManagementStack.Navigator>
+  )
+}
 
 
-const AccountManagementStack = createStackNavigator(
-  {
-    AccountManagementRoot: {
-      screen: AccountManagementContainerScreen,
-      navigationOptions: {
-        header: null,
-      },
-      // navigationOptions: ( { navigation } ) => {
-      //   return {
-      //     title: 'Account Management',
-      //     headerLeft: () => {
-      //       return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-      //     },
-      //     headerRight: () => {
-      //       //
-      //       // 📝 Hiding this button for now until we have supporting functionality.
-      //       // (See: https://github.com/bithyve/hexa/issues/2454)
-      //       //
-
-      //       return (
-      //         <NavHeaderSettingsButton
-      //           onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
-      //         />
-      //       )
-      //     },
-      //   }
-      // },
-    },
-    PanAccountSettings: {
-      screen: PanAccountSettingsStack,
-      navigationOptions: {
-        header: null,
-      },
-    },
-  },
-  {
-    // mode: 'modal',
-    defaultNavigationOptions: () => {
-      return {
-        ...defaultStackScreenNavigationOptions,
-      }
-    },
-  },
-)
-
-export default AccountManagementStack

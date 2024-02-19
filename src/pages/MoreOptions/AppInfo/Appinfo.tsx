@@ -1,45 +1,42 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { CommonActions } from '@react-navigation/native'
+import idx from 'idx'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
+  FlatList,
+  Image,
+  ImageSourcePropType,
+  Keyboard,
   SafeAreaView,
   StatusBar,
+  StyleSheet,
+  Text,
   TouchableOpacity,
-  ImageSourcePropType,
-  Image,
-  FlatList,
-  Keyboard
+  View
 } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
-import idx from 'idx'
 import DeviceInfo from 'react-native-device-info'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import CommonStyles from '../../../common/Styles/Styles'
 import { RFValue } from 'react-native-responsive-fontsize'
-import Fonts from '../../../common/Fonts'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
+import Options from '../../../assets/images/svgs/options.svg'
+import { LevelHealthInterface, Wallet } from '../../../bitcoin/utilities/Interface'
 import Colors from '../../../common/Colors'
-import HeaderTitle from '../../../components/HeaderTitle'
-import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
+import { translations } from '../../../common/content/LocContext'
+import CloudBackupStatus from '../../../common/data/enums/CloudBackupStatus'
+import Fonts from '../../../common/Fonts'
 import { getVersions } from '../../../common/utilities'
+import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
+import HeaderTitle from '../../../components/HeaderTitle'
 import ModalContainer from '../../../components/home/ModalContainer'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import SecurityQuestion from './SecurityQuestion'
-import EnterPasscodeScreen from './EnterPasscodeScreen'
+import { updateCloudData } from '../../../store/actions/cloud'
+import { updateWalletName } from '../../../store/actions/trustedContacts'
 import EditWalletName from './EditWalletName'
 import EditWalletSuccess from './EditWalletSuccess'
-import { updateWalletName } from '../../../store/actions/trustedContacts'
-import { LevelHealthInterface, Wallet } from '../../../bitcoin/utilities/Interface'
-import CloudBackupStatus from '../../../common/data/enums/CloudBackupStatus'
-import { updateCloudData } from '../../../store/actions/cloud'
-import { NavigationActions, StackActions } from 'react-navigation'
-// import { goHomeAction } from '../../../navigation/actions/NavigationActions'
-import { translations } from '../../../common/content/LocContext'
-import Options from '../../../assets/images/svgs/options.svg'
+import EnterPasscodeScreen from './EnterPasscodeScreen'
+import SecurityQuestion from './SecurityQuestion'
 
 interface MenuOption {
     title: string;
@@ -201,39 +198,21 @@ const AppInfo = ( props ) => {
           closeBottomSheet={() => setSuccess( false )}
           onPressConfirm={() => {
             setSuccess( false )
-            const resetAction = StackActions.reset( {
+            const resetAction = CommonActions.reset( {
               index: 0,
-              actions: [
-                NavigationActions.navigate( {
-                  routeName: 'Landing'
-                } )
+              routes: [
+                {
+                  name: 'Home'
+                }
               ],
             } )
-
             props.navigation.dispatch( resetAction )
           }}
         />
       </ModalContainer>
-
-      <View style={[ CommonStyles.headerContainer, {
-        backgroundColor: Colors.backgroundColor
-      } ]}>
-        <TouchableOpacity
-          style={CommonStyles.headerLeftIconContainer}
-          onPress={() => {
-            props.navigation.goBack()
-          }}
-        >
-          <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
-          </View>
-        </TouchableOpacity>
-      </View>
       <HeaderTitle
+        navigation={props.navigation}
+        backButton={true}
         firstLineTitle={strings.AppInfo}
         secondLineTitle={strings.AppInfoSub}
         infoTextNormal={''}
@@ -241,7 +220,13 @@ const AppInfo = ( props ) => {
         infoTextNormal1={''}
         step={''}
       />
+      <View style={{
+        height:20
+      }}/>
       <FlatList
+        style={{
+          marginTop: hp( 5 )
+        }}
         data={menuOptions}
         keyExtractor={listItemKeyExtractor}
         renderItem={( { item: menuOption }: { item: MenuOption } ) => {
@@ -300,7 +285,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 16 ),
     // marginBottom: wp( '1%' ),
     alignSelf: 'center',
-    marginHorizontal: wp( 2 ),
+    marginHorizontal: wp( 5 ),
     letterSpacing: 0.48
   },
   addModalView: {
@@ -312,7 +297,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-between',
     width: '90%',
     alignSelf: 'center',
-    borderRadius: wp( '2' ),
+    borderRadius: wp( '3' ),
     marginBottom: hp( '1' ),
     shadowOpacity: 0.16,
     shadowColor: Colors.shadowColor,

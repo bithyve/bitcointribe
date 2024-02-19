@@ -45,15 +45,15 @@ export default function SendViaLinkAndQR( props ) {
   const strings = translations[ 'f&f' ]
   const common  = translations[ 'common' ]
 
-  const type = props.navigation.getParam( 'type' )
-  const qrCode = props.navigation.getParam( 'qrCode' )
-  const link = props.navigation.getParam( 'link' )
-  const amt = props.navigation.getParam( 'amt' )
-  const senderName = props.navigation.getParam( 'senderName' )
-  const themeId = props.navigation.getParam( 'themeId' )
-  const giftNote = props.navigation.getParam( 'giftNote' )
-  const OTP =  props.navigation.state.params.OTP
-  const encryptLinkWith =  props.navigation.state.params.encryptLinkWith
+  const type = props.route.params?.type
+  const qrCode = props.route.params?.qrCode
+  const link = props.route.params?.link
+  const amt = props.route.params?.amt
+  const senderName = props.route.params?.senderName
+  const themeId = props.route.params?.themeId
+  const giftNote = props.route.params?.giftNote
+  const OTP =  props.route.params?.OTP
+  const encryptLinkWith =  props.route.params?.encryptLinkWith
   const shortOTP = OTP && OTP.split( '' )
 
   const viewRef = useRef( null )
@@ -61,6 +61,12 @@ export default function SendViaLinkAndQR( props ) {
   useEffect( () => {
     init()
   }, [ qrCode ] )
+
+  useEffect(()=>{
+    if(!link){
+      Toast('Something went wrong, please try again.')
+    }
+  },[])
 
   function init() {
     setTimeout( () => {
@@ -195,24 +201,6 @@ export default function SendViaLinkAndQR( props ) {
             </Text>
 
           </View>
-
-          {/* <TouchableOpacity
-            style={{
-              ...styles.btnContainer,
-            }}
-            onPress={() => {
-              props.navigation.pop( 3 )
-              try {
-                if ( props.navigation.state.params.setActiveTab ) {
-                  props.navigation.state.params.setActiveTab( 'SENT' )
-                }
-              } catch ( error ) {
-                //
-              }
-            }}
-          >
-            <Text style={styles.btnText}>Proceed</Text>
-          </TouchableOpacity> */}
         </View>
       </View>
     )
@@ -236,17 +224,7 @@ export default function SendViaLinkAndQR( props ) {
             title: 'Share Gift Card',
             message: 'Scan the QR and receive bitcoin in your Bitcoin Tribe bitcoin wallet.',
             url: `file://${uri}`,
-          },
-          // ios: {
-          //   activityItemSources: [
-          //     {
-          //       placeholderItem: {
-          //         type: 'url',
-          //         content: `file://${uri}`,
-          //       },
-          //     }
-          //   ],
-          // }
+          }
         }, )
       )
         .then( ( res ) => {
@@ -404,8 +382,8 @@ export default function SendViaLinkAndQR( props ) {
           OTP && DeepLinkEncryptionType.SECRET_PHRASE !==  encryptLinkWith ? ( setOTPmodal( true ) ) :
             props.navigation.pop( 1 )
           try {
-            if( props.navigation.state.params.setActiveTab ) {
-              props.navigation.state.params.setActiveTab( 'SENT' )
+            if( props.route.params?.setActiveTab ) {
+              props.route.params?.setActiveTab( 'SENT' )
             }
           } catch ( error ) {
             //
@@ -428,28 +406,6 @@ export default function SendViaLinkAndQR( props ) {
       >
         {shareOTPModal()}
       </ModalContainer>}
-      {/* <RequestKeyFromContact
-        isModal={false}
-        headerText={'Send Gift'}
-        subHeaderText={'You can send it to anyone using the QR or the link'}
-        contactText={strings.adding}
-        isGift={true}
-        senderName={senderName}
-        contact={{
-        }}
-        QR={giftQR}
-        link={giftDeepLink}
-        contactEmail={''}
-        onPressBack={() => {
-          props.navigation.goBack()
-        }}
-        onPressDone={() => {
-          // openTimer()
-        }}
-        amt={numberWithCommas( giftToSend.amount )}
-        onPressShare={() => {
-        }}
-      /> */}
     </ScrollView>
   )
 }

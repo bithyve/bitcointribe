@@ -6,6 +6,7 @@ import ImageStyles from '../../../../common/Styles/ImageStyles'
 
 export type Props = {
   navigation: any;
+  route: any;
 };
 
 export type OptionsListItem = {
@@ -33,10 +34,10 @@ const listItems: OptionsListItem[] = [
 const listItemKeyExtractor = ( item: OptionsListItem ) => item.title
 
 
-const AccountSettingsReassignTransactionsMainOptionsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const AccountSettingsReassignTransactionsMainOptionsScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
   const accountShellID = useMemo( () => {
-    return navigation.getParam( 'accountShellID' )
-  }, [ navigation ] )
+    return route.params?.accountShellID
+  }, [ route.params ] )
 
   function handleListItemPressed( listItem: OptionsListItem ) {
     navigation.navigate( listItem.screenName, {
@@ -70,7 +71,7 @@ const AccountSettingsReassignTransactionsMainOptionsScreen: React.FC<Props> = ( 
     <FlatList
       style={styles.rootContainer}
       contentContainerStyle={{
-        paddingHorizontal: 14 
+        paddingHorizontal: 14
       }}
       data={listItems}
       keyExtractor={listItemKeyExtractor}

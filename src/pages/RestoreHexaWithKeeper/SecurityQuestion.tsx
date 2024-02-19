@@ -17,7 +17,7 @@ import {
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { useSelector } from 'react-redux'
 import { ScrollView } from 'react-native-gesture-handler'
-import { withNavigation } from 'react-navigation'
+import { useNavigation } from '@react-navigation/native'
 
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
 
@@ -37,6 +37,9 @@ function SecurityQuestion( props ) {
   const [ answer, setAnswer ] = useState( '' )
   const [ errorText, setErrorText ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
+
+  //navigation change
+  const navigation: any = useNavigation()
 
   const setBackspace = ( event ) => {
     if ( event.nativeEvent.key == 'Backspace' ) {
@@ -192,7 +195,7 @@ function SecurityQuestion( props ) {
   )
 }
 
-export default withNavigation( SecurityQuestion )
+export default SecurityQuestion
 
 const styles = StyleSheet.create( {
   modalContentContainer: {

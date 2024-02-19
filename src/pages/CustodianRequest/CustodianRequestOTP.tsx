@@ -38,7 +38,7 @@ export default function CustodianRequestOTP( props ) {
     ( state ) => state.bhr.errorReceiving,
   )
   const [ isConfirmDisabled, setIsConfirmDisabled ] = useState( false )
-  const custodyRequest = props.navigation.getParam( 'custodyRequest' )
+  const custodyRequest = props.route.params?.custodyRequest
   const { requester, ek, otp } = custodyRequest
   const [ passcode, setPasscode ] = useState( [] )
   const [ demo, setDemo ] = useState( false )

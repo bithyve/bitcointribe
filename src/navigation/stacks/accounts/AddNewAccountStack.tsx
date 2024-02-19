@@ -1,106 +1,29 @@
 import React from 'react'
-import { createStackNavigator } from 'react-navigation-stack'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import NewAccountSelectionContainerScreen from '../../../pages/Accounts/AddNew/NewAccountSelectionContainerScreen'
 import NewHexaAccountDetailsScreen from '../../../pages/Accounts/AddNew/HexaAccount/NewHexaAccountDetailsScreen'
-import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import AddNewDonationAccountDetailsScreen from '../../../pages/Accounts/AddNew/DonationAccount/AddNewDonationAccountDetailsScreen'
-import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
-import NavStyles from '../../../common/Styles/NavStyles'
 import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
 import NewSwanAccountDetailsScreen from '../../../pages/Accounts/AddNew/SwanAccount/NewSwanAccountDetailsScreen'
 import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
-import { translations } from '../../../common/content/LocContext'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
-import EnterNodeConfig from '../../../pages/lightningAccount/EnterNodeConfigScreen'
-import ScanNodeConfig from '../../../pages/lightningAccount/ScanNodeConfigScreen'
 import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 
-const strings  = translations[ 'stackTitle' ]
+const Stack = createNativeStackNavigator();
+export default function AddNewAccountStack() {
+  return (
+    <Stack.Navigator
+      initialRouteName='AccountSelectionList'
+    >
+      <Stack.Screen name="AccountSelectionList" component={NewAccountSelectionContainerScreen} options={{ header: null }} />
+      <Stack.Screen name="NewHexaAccountDetails" component={NewHexaAccountDetailsScreen} options={{ title: 'Setup New Account' }} />
+      <Stack.Screen name="NewWyreAccountDetails" component={NewWyreAccountDetailsScreen} options={{ title: 'Setup Wyre Account' }} />
+      <Stack.Screen name="AccountDetails" component={AccountDetailsStack} options={{ header: null }} />
+      <Stack.Screen name="NewRampAccountDetails" component={NewRampAccountDetailsScreen} options={{ title: 'Setup Ramp Account' }} />
+      <Stack.Screen name="NewSwanAccountDetails" component={NewSwanAccountDetailsScreen} options={{ title: 'Setup Swan Account' }} />
+      <Stack.Screen name="AddNewDonationAccountDetails" component={AddNewDonationAccountDetailsScreen} options={{ header: null }} />
+      <Stack.Screen name="TransactionDetails" component={TransactionDetailsContainerScreen} options={{ title: 'TransactionDetails' }} />
+    </Stack.Navigator>
+  )
+}
 
-const AddNewAccountStack = createStackNavigator(
-  {
-    AccountSelectionList: {
-      screen: NewAccountSelectionContainerScreen,
-      navigationOptions: {
-        header: null
-      }
-    },
-    NewHexaAccountDetails: {
-      screen: NewHexaAccountDetailsScreen,
-      navigationOptions: {
-        title: 'Setup New Account'
-      }
-    },
-
-    NewWyreAccountDetails: {
-      screen: NewWyreAccountDetailsScreen,
-      navigationOptions: {
-        title: 'Setup Wyre Account'
-      }
-    },
-
-    AccountDetails: {
-      screen: AccountDetailsStack,
-      navigationOptions: {
-        header: null,
-        // tabBarVisibl
-      },
-    },
-
-    NewRampAccountDetails: {
-      screen: NewRampAccountDetailsScreen,
-      navigationOptions: {
-        title: 'Setup Ramp Account'
-      }
-    },
-
-
-    NewSwanAccountDetails: {
-      screen: NewSwanAccountDetailsScreen,
-      navigationOptions: {
-        title: 'Setup Swan Account'
-      }
-    },
-    AddNewDonationAccountDetails: {
-      screen: AddNewDonationAccountDetailsScreen,
-      navigationOptions: {
-        header: null,
-        // title: 'Setup Donation Account'
-      }
-    },
-
-    // EnterNodeConfig: {
-    //   screen: EnterNodeConfig,
-    //   navigationOptions: {
-    //     header: null
-    //   }
-    // },
-
-    TransactionDetails: {
-      screen: TransactionDetailsContainerScreen,
-      navigationOptions: {
-        title: 'TransactionDetails',
-      },
-    },
-
-    // ScanNodeConfig: {
-    //   screen: ScanNodeConfig,
-    //   navigationOptions: {
-    //     header: null
-    //   }
-    // },
-  },
-  {
-    initialRouteName: 'AccountSelectionList',
-    // defaultNavigationOptions: ( { navigation } ) => {
-    //   return {
-    //     ...defaultStackScreenNavigationOptions,
-    //     headerLeft: () => {
-    //       return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-    //     },
-    //   }
-    // },
-  },
-)
-
-export default AddNewAccountStack

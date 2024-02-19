@@ -1,24 +1,26 @@
-import { put, call, select } from 'redux-saga/effects'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { createWatcher } from '../utils/utilities'
-import {  CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, SEND_TX_NOTIFICATION } from '../actions/sending'
-import AccountShell from '../../common/data/models/AccountShell'
-import { AccountsState } from '../reducers/accounts'
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import { Account, AccountType, ActiveAddressAssignee, INotification, notificationTag, notificationType, Trusted_Contacts, TxPriority } from '../../bitcoin/utilities/Interface'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import { ContactRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import RecipientKind from '../../common/data/enums/RecipientKind'
-import { SendingState } from '../reducers/sending'
 import idx from 'idx'
-import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import moment from 'moment'
+import { call, put, select } from 'redux-saga/effects'
+import ElectrumClient, { ELECTRUM_CLIENT, ELECTRUM_NOT_CONNECTED_ERR } from '../../bitcoin/electrum/client'
+import { Account, AccountType, ActiveAddressAssignee, INotification, Trusted_Contacts, TxPriority, notificationTag, notificationType } from '../../bitcoin/utilities/Interface'
+import Relay from '../../bitcoin/utilities/Relay'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import { updateAccountShells } from '../actions/accounts'
+import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
+import RecipientKind from '../../common/data/enums/RecipientKind'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import AccountShell from '../../common/data/models/AccountShell'
+import { ContactRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import dbManager from '../../storage/realm/dbManager'
-import Relay from '../../bitcoin/utilities/Relay'
+import { updateAccountShells } from '../actions/accounts'
+import { setElectrumNotConnectedErr } from '../actions/nodeSettings'
+import { CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, SEND_TX_NOTIFICATION, customFeeCalculated, customSendMaxUpdated, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed } from '../actions/sending'
+import { AccountsState } from '../reducers/accounts'
+import { SendingState } from '../reducers/sending'
+import { createWatcher } from '../utils/utilities'
 import { getNextFreeAddressWorker } from './accounts'
+import { connectToNodeWorker } from './nodeSettings'
 
 function* processRecipients( accountShell: AccountShell ){
   const accountsState: AccountsState = yield select(
@@ -171,6 +173,10 @@ function* executeSendStage2( { payload }: {payload: {
   const network = AccountUtilities.getNetworkByType( account.networkType )
 
   try {
+    if (!ELECTRUM_CLIENT.isClientConnected) {
+      ElectrumClient.resetCurrentPeerIndex();
+      yield call(connectToNodeWorker);
+    }
     const { txid } = yield call( AccountOperations.transferST2, account, txPrerequisites, txnPriority, network, recipients, token, customTxPrerequisites )
 
     if ( txid ){
@@ -202,6 +208,9 @@ function* executeSendStage2( { payload }: {payload: {
         err: 'Send failed: unable to generate txid'
       } ) )
   } catch( err ){
+    if ( [ ELECTRUM_NOT_CONNECTED_ERR ].includes( err?.message ) )
+      yield put( setElectrumNotConnectedErr( err?.message ) )
+
     yield put( sendStage2Executed( {
       successful: false,
       err: 'Send failed: ' + err.message

@@ -79,21 +79,22 @@ const SendScreen = inject(
   BalanceStore,
   FeeStore,
   UTXOsStore,
-  navigation
+  navigation,
+  route
 } ) => {
 
   const strings  = translations[ 'accounts' ]
   const common  = translations[ 'common' ]
-  const currentAmount = Number( navigation.getParam( 'amount' ) )
+  const currentAmount = Number( route.params?.amount )
   const [ fee, setFee ] = useState( '2' )
   const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( currentAmount ? currentAmount : 0 )
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
   } )
-  const [ recipientAddress ] = useState( navigation.getParam( 'value' ) )
+  const [ recipientAddress ] = useState( route.params?.value )
   const [ showModal, setShowModal ] = useState( false )
   const selectedRecipients = useSelectedRecipientsForSending()
-  const currentRecipient = useSelectedRecipientForSendingByID( navigation.getParam( 'value' ) )
+  const currentRecipient = useSelectedRecipientForSendingByID( route.params?.value )
   const formattedAvailableBalanceAmountText = useFormattedAmountText( BalanceStore.totalBlockchainBalance )
   const [ utxos, setUtxos ] = useState( [] )
   const [ targetConf, setTargetConf ] = useState( '60' )

@@ -76,7 +76,7 @@ import {
   txnReadWatcher,
   updateAccountSettingsWatcher,
   updateDonationPreferencesWatcher,
-  validateTwoFAWatcher
+  validateTwoFAWatcher,
 } from './sagas/accounts'
 import {
   accountSyncWatcher,
@@ -125,7 +125,7 @@ import {
   updateAvailableKeeperDataWatcher,
 } from './sagas/upgradeToNewBhr'
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
-import { connectToBitHyveNodeWatcher, restorePersonalNodeConfigurationWatcher, savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
+import { connectToBitHyveNodeWatcher, connectToNodeWatcher, restorePersonalNodeConfigurationWatcher, savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
 import { createMigrate, persistReducer, persistStore } from 'redux-persist'
 import {
   fetchNotificationsWatcher,
@@ -136,6 +136,10 @@ import {
   updateMessageStatusWatcher
 } from './sagas/notifications'
 import { recreateMissingAccountsWatcher, sweepMissingAccountsWatcher, syncMissingAccountsWatcher } from './sagas/upgrades'
+import {
+  rgbSyncWatcher,
+  receiveRgbAssetWatcher
+} from './sagas/rgb'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import VersionHistoryReducer from './reducers/versionHistory'
@@ -173,10 +177,11 @@ import wyreIntegrationReducer from './reducers/WyreIntegration'
 import { satCardAcountWatcher } from './sagas/satCardAccount'
 import misc from './reducers/misc'
 import doNotStoreReducer from './reducers/doNotStore'
+import rgbReducer from './reducers/rgb'
 
 const config = {
   key: 'root', // key is required
-  // version: 0, // redux persist migration version code(initiate to a version once the corresponding migration state is implemented)
+  version: 0, // redux persist migration version code(initiate to a version once the corresponding migration state is implemented)
   storage: AsyncStorage, // storage is now required
   blacklist: [ 'setupAndAuth', 'loaders', 'doNotStore' ],
   migrate: createMigrate( reduxPersistMigrations, {
@@ -215,7 +220,6 @@ const rootSaga = function* () {
     createBorderWalletWatcher,
     updateAccountSettingsWatcher,
     generateGiftsWatcher,
-
     //fBTC
     accountSyncWatcher,
     getQuoteWatcher,
@@ -226,6 +230,7 @@ const rootSaga = function* () {
     savePersonalNodeConfigurationWatcher,
     connectToBitHyveNodeWatcher,
     restorePersonalNodeConfigurationWatcher,
+    connectToNodeWatcher,
 
     // Notifications
     updateFCMTokensWatcher,
@@ -347,7 +352,10 @@ const rootSaga = function* () {
     sweepMissingAccountsWatcher,
 
     // sat card account
-    satCardAcountWatcher
+    satCardAcountWatcher,
+    // rgb
+    rgbSyncWatcher,
+    receiveRgbAssetWatcher
   ]
 
   yield all(
@@ -386,7 +394,8 @@ const rootReducer = combineReducers( {
   upgradeToNewBhr: upgradeToNewBhr,
   upgrades: upgrades,
   misc: misc,
-  doNotStore: doNotStoreReducer
+  doNotStore: doNotStoreReducer,
+  rgb: rgbReducer,
 } )
 
 export default function makeStore() {

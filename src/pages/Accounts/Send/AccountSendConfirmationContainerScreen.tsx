@@ -1,54 +1,55 @@
-import React, { useMemo, useState, useCallback, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, Dimensions } from 'react-native'
+import { NavigationProp, ParamListBase, RouteProp } from '@react-navigation/native'
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { Dimensions, Platform, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
+import { MultiSigAccount, NetworkType, TxPriority } from '../../../bitcoin/utilities/Interface'
 import Colors from '../../../common/Colors'
+import { translations } from '../../../common/content/LocContext'
+import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
+import AccountShell from '../../../common/data/models/AccountShell'
 import Fonts from '../../../common/Fonts'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import AccountShell from '../../../common/data/models/AccountShell'
-import { BaseNavigationProp } from '../../../navigation/Navigator'
-import { useSelector, useDispatch } from 'react-redux'
+import HeaderTitle from '../../../components/HeaderTitle'
+import HeadingAndSubHeading from '../../../components/HeadingAndSubHeading'
+import ModalContainer from '../../../components/home/ModalContainer'
+import LoaderModal from '../../../components/LoaderModal'
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
+import defaultStackScreenNavigationOptions from '../../../navigation/options/DefaultStackScreenNavigationOptions'
+import { clearTransfer, refreshAccountShells } from '../../../store/actions/accounts'
+import { executeSendStage2, resetSendStage1, sendTxNotification } from '../../../store/actions/sending'
+import { AccountsState } from '../../../store/reducers/accounts'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
-import useSelectedRecipientsForSending from '../../../utils/hooks/state-selectors/sending/UseSelectedRecipientsForSending'
-import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
-import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
-import SendConfirmationCurrentTotalHeader from '../../../components/send/SendConfirmationCurrentTotalHeader'
-import TransactionPriorityMenu from './TransactionPriorityMenu'
-import { executeSendStage2, resetSendStage1, sendTxNotification } from '../../../store/actions/sending'
-import { useBottomSheetModal } from '@gorhom/bottom-sheet'
-import SendConfirmationContent from '../SendConfirmationContent'
-import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
-import { clearTransfer, refreshAccountShells } from '../../../store/actions/accounts'
-import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
-import useAccountSendST2CompletionEffect from '../../../utils/sending/UseAccountSendST2CompletionEffect'
-import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
-import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
-import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
-import ModalContainer from '../../../components/home/ModalContainer'
-import { AccountType, MultiSigAccount, NetworkType, TxPriority } from '../../../bitcoin/utilities/Interface'
-import { translations } from '../../../common/content/LocContext'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import HeadingAndSubHeading from '../../../components/HeadingAndSubHeading'
-import { AccountsState } from '../../../store/reducers/accounts'
-import LoaderModal from '../../../components/LoaderModal'
-
-export type NavigationParams = {
-};
-
-type NavigationProp = {
-  params: NavigationParams;
-} & BaseNavigationProp;
+import useSelectedRecipientsForSending from '../../../utils/hooks/state-selectors/sending/UseSelectedRecipientsForSending'
+import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
+import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
+import useAccountSendST2CompletionEffect from '../../../utils/sending/UseAccountSendST2CompletionEffect'
+import SendConfirmationContent from '../SendConfirmationContent'
+import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
+import TransactionPriorityMenu from './TransactionPriorityMenu'
+import { resetStackToAccountDetails } from 'src/navigation/actions/NavigationActions'
 
 export type Props = {
-  navigation: NavigationProp;
+  navigation: NavigationProp<ParamListBase>;
+  route: RouteProp<{ params: {handleBackButtonPress : () => void, fromWallet: any }}>
 };
 
 const { height } = Dimensions.get( 'window' )
 
-const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
+const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
+  useLayoutEffect( () => {
+    navigation.setOptions( {
+      ...defaultStackScreenNavigationOptions,
+
+      headerLeft: () => {
+        return <SmallNavHeaderBackButton onPress={route.params?.handleBackButtonPress} />
+      },
+    } )
+  }, [] )
   const dispatch = useDispatch()
   const strings  = translations[ 'accounts' ]
   const common  = translations[ 'common' ]
@@ -73,7 +74,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const [ note, setNote ] = useState( '' )
   const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.LOW )
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
-  const fromWallet = navigation?.getParam( 'fromWallet' ) || false
+  const fromWallet = route.params?.fromWallet || false
 
   const sourceAccountHeadlineText = useMemo( () => {
     const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
@@ -88,7 +89,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       setFailure( false )
     }
   }, [ navigation ] )
-
   const showSendSuccessBottomSheet = () => {
     return(
       <SendConfirmationContent
@@ -101,31 +101,26 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         cancelButtonText={common.back}
         isCancel={true}
         onPressOk={() => {
-        // dismissBottomSheet()
+          // dismissBottomSheet()
           setSuccess( false )
           // dispatch( resetSendState() ) // need to delay reset as other background sagas read from the send state
-          requestAnimationFrame( () => {
-            dispatch( refreshAccountShells( [ sourceAccountShell ], {
-              hardRefresh: true,
-            } ) )
-          } )
-          navigation.dispatch(
-            resetStackToAccountDetails( {
-              accountShellID: sourceAccountShell.id,
+          setTimeout(()=>{
+            requestAnimationFrame( () => {
+              dispatch( refreshAccountShells( [ sourceAccountShell ], {
+                hardRefresh: true,
+              } ) )
             } )
-          )
+            navigation.dispatch(
+              resetStackToAccountDetails( {
+                accountShellID: sourceAccountShell.id,
+              } )
+            )
+          },100)
         }}
         onPressCancel={() => setSuccess( false )}
         isSuccess={true}
         accountKind={sourcePrimarySubAccount.kind}
       />
-    //   ,
-    //   {
-    //     ...defaultBottomSheetConfigs,
-    //     dismissOnOverlayPress: false,
-    //     dismissOnScrollDown: false,
-    //     snapPoints: [ '52%', '52%' ],
-    //   },
     )
   }
 
@@ -141,14 +136,16 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         isCancel={true}
         onPressOk={() => setFailure( false )}
         onPressCancel={() => {
+          setFailure( false )
           dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
           // dismissBottomSheet()
-          setFailure( false )
-          navigation.dispatch(
-            resetStackToAccountDetails( {
-              accountShellID: sourceAccountShell.id,
-            } )
-          )
+          setTimeout(()=>{
+            navigation.dispatch(
+              resetStackToAccountDetails( {
+                accountShellID: sourceAccountShell.id,
+              } )
+            )
+          },100)
         }}
         isUnSuccess={true}
         accountKind={sourcePrimarySubAccount.kind}
@@ -177,7 +174,9 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
   function handleBackButtonPress() {
     dispatch( resetSendStage1() )
-    navigation.goBack()
+    setTimeout(()=>{
+      navigation.goBack()
+    },100)
   }
 
   useEffect( ()=>{
@@ -225,57 +224,68 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
 
   return (
-    <KeyboardAwareScrollView
-      resetScrollToCoords={{
-        x: 0, y: 0
-      }}
-      style={styles.rootContainer}
-    >
-      <ModalContainer onBackground={()=>setSuccess( false )} visible={sendSuccessModal} closeBottomSheet={() => {}} >
-        {showSendSuccessBottomSheet()}
-      </ModalContainer>
-      <ModalContainer onBackground={()=>setFailure( false )} visible={sendFailureModal} closeBottomSheet={() => {}} >
-        {showSendFailureBottomSheet()}
-      </ModalContainer>
-      <View style={{
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 24,
-        marginBottom: height > 720 ? heightPercentageToDP( '1%' ) : 0,
-        marginTop: height > 720 ? heightPercentageToDP( '2%' ) : 5,
-        flexWrap:'wrap'
-      }}>
-        <Text style={{
-          marginRight: RFValue( 4 )
+    <SafeAreaView style={{
+      flex: 1
+    }}>
+      <HeaderTitle
+        navigation={navigation}
+        backButton={true}
+        firstLineTitle={'Send Confirmation'}
+        secondLineTitle={''}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{
+          x: 0, y: 0
+        }}
+        style={styles.rootContainer}
+      >
+        <ModalContainer onBackground={()=>setSuccess( false )} visible={sendSuccessModal} closeBottomSheet={() => {}} >
+          {showSendSuccessBottomSheet()}
+        </ModalContainer>
+        <ModalContainer onBackground={()=>setFailure( false )} visible={sendFailureModal} closeBottomSheet={() => {}} >
+          {showSendFailureBottomSheet()}
+        </ModalContainer>
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingHorizontal: 24,
+          marginBottom: height > 720 ? heightPercentageToDP( '1%' ) : 0,
+          marginTop: height > 720 ? heightPercentageToDP( '2%' ) : 5,
+          flexWrap:'wrap'
         }}>
-          {`${strings.SendingFrom}: `}
           <Text style={{
-            fontFamily: Fonts.Regular,
-            fontSize: RFValue( 11 ),
-            fontStyle: 'italic',
-            color: Colors.blue,
+            marginRight: RFValue( 4 )
           }}>
-            {sourceAccountHeadlineText}
+            {`${strings.SendingFrom}: `}
+            <Text style={{
+              fontFamily: Fonts.Regular,
+              fontSize: RFValue( 11 ),
+              fontStyle: 'italic',
+              color: Colors.blue,
+            }}>
+              {sourceAccountHeadlineText}
+            </Text>
           </Text>
-        </Text>
-      </View>
-      <View style={styles.headerSection}>
-        <SelectedRecipientsCarousel
-          recipients={selectedRecipients}
-          subAccountKind={sourcePrimarySubAccount.kind}
-        />
-      </View>
-      <SendConfirmationCurrentTotalHeader
-        Unit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
-      />
+          {/* </Text> */}
+        </View>
+        <View style={styles.headerSection}>
+          <SelectedRecipientsCarousel
+            recipients={selectedRecipients}
+            subAccountKind={sourcePrimarySubAccount.kind}
+            showRemoveButton={false}
+          />
 
-      <TransactionPriorityMenu
-        accountShell={sourceAccountShell}
-        bitcoinDisplayUnit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
-        onTransactionPriorityChanged={setTransactionPriority}
-      />
-      {selectedRecipients.length === 1 &&
+          <TransactionPriorityMenu
+            accountShell={sourceAccountShell}
+            bitcoinDisplayUnit={sourcePrimarySubAccount?.kind ==  'TEST_ACCOUNT' ? BitcoinUnit.TSATS : BitcoinUnit.SATS}
+            onTransactionPriorityChanged={setTransactionPriority}
+          />
+          {selectedRecipients.length === 1 &&
       <>
         <HeadingAndSubHeading
           heading={common.addNote}
@@ -308,37 +318,39 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           />
         </View>
       </>
-      }
-      <View style={styles.footerSection}>
-        <TouchableOpacity
-          onPress={handleConfirmationButtonPress}
-          style={handleButton ? ButtonStyles.primaryActionButton : ButtonStyles.disabledNewPrimaryActionButton}
-        >
-          <Text style={ButtonStyles.actionButtonText}>{strings.ConfirmSend}</Text>
-        </TouchableOpacity>
+          }
+          <View style={styles.footerSection}>
+            <TouchableOpacity
+              onPress={handleConfirmationButtonPress}
+              style={handleButton ? ButtonStyles.primaryActionButton : ButtonStyles.disabledNewPrimaryActionButton}
+            >
+              <Text style={ButtonStyles.actionButtonText}>{strings.ConfirmSend}</Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={handleBackButtonPress}
-          style={{
-            ...ButtonStyles.primaryActionButton,
-            marginRight: 8,
-            backgroundColor: 'transparent',
-          }}
-        >
-          <Text style={{
-            ...ButtonStyles.actionButtonText,
-            color: Colors.blue,
-          }}>
-            {common.back}
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <ModalContainer visible={!handleButton} closeBottomSheet = {()=>{}} onBackground = {()=>{}}>
-        <LoaderModal
-          headerText={'Sending...'}
-        />
-      </ModalContainer>
-    </KeyboardAwareScrollView>
+            <TouchableOpacity
+              onPress={handleBackButtonPress}
+              style={{
+                ...ButtonStyles.primaryActionButton,
+                marginRight: 8,
+                backgroundColor: 'transparent',
+              }}
+            >
+              <Text style={{
+                ...ButtonStyles.actionButtonText,
+                color: Colors.blue,
+              }}>
+                {common.back}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <ModalContainer visible={!handleButton} closeBottomSheet = {()=>{}} onBackground = {()=>{}}>
+            <LoaderModal
+              headerText={'Sending...'}
+            />
+          </ModalContainer>
+        </View>
+      </KeyboardAwareScrollView>
+    </SafeAreaView>
   )
 }
 
@@ -408,16 +420,5 @@ const styles = StyleSheet.create( {
   },
 
 } )
-
-
-AccountSendConfirmationContainerScreen.navigationOptions = ( { navigation } ): NavigationOptions => {
-  return {
-    ...defaultStackScreenNavigationOptions,
-
-    headerLeft: () => {
-      return <SmallNavHeaderBackButton onPress={navigation.getParam( 'handleBackButtonPress' )} />
-    },
-  }
-}
 
 export default AccountSendConfirmationContainerScreen

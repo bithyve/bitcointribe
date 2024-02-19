@@ -1,32 +1,32 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { CommonActions } from '@react-navigation/native'
 import React, { useEffect, useState } from 'react'
 import {
-  View,
+  Alert,
+  Platform,
   SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
   TextInput,
-  Platform,
-  Alert
+  TouchableOpacity,
+  View
 } from 'react-native'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
-import Fonts from '../../common/Fonts'
-import { hp, wp } from '../../common/data/responsiveness/responsive'
-import LinearGradient from 'react-native-linear-gradient'
 import deviceInfoModule from 'react-native-device-info'
-import Toast from '../../components/Toast'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { RFValue } from 'react-native-responsive-fontsize'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
 import { Wallet } from '../../bitcoin/utilities/Interface'
-import { recoverWalletUsingMnemonic, restoreSeedWordFailed, setBorderWalletBackup } from '../../store/actions/BHR'
+import Colors from '../../common/Colors'
+import { translations } from '../../common/content/LocContext'
+import { hp, wp } from '../../common/data/responsiveness/responsive'
+import Fonts from '../../common/Fonts'
 import ModalContainer from '../../components/home/ModalContainer'
 import LoaderModal from '../../components/LoaderModal'
+import Toast from '../../components/Toast'
+import { recoverWalletUsingMnemonic, restoreSeedWordFailed, setBorderWalletBackup } from '../../store/actions/BHR'
 import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
-import { translations } from '../../common/content/LocContext'
+import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
 
 const CreatePassPhrase = ( props ) => {
   const loaderMessage = {
@@ -38,11 +38,11 @@ const CreatePassPhrase = ( props ) => {
     translations[ 'bhr' ].Preloading,
   ]
   const bottomTextMessage = translations[ 'bhr' ].Hexaencrypts
-  const mnemonic = props.navigation.getParam( 'mnemonic' )
-  const selected = props.navigation.getParam( 'selected' )
-  const isNewWallet = props.navigation.getParam( 'isNewWallet' )
-  const isAccountCreation = props.navigation.getParam( 'isAccountCreation' )
-  const checksumWord = props.navigation.getParam( 'checksumWord' )
+  const mnemonic = props.route.params?.mnemonic
+  const selected = props.route.params?.selected
+  const isNewWallet = props.route.params?.isNewWallet
+  const isAccountCreation =  props.route.params?.isAccountCreation
+  const checksumWord = props.route.params?.checksumWord
   const [ headerTitle, setHeaderTitle ]=useState( 'Add Passphrase (optional)' )
   const [ passphrase, setpassphrase ] = useState( '' )
   const [ confirmPassphrase, setConfirmPassphrase ] = useState( '' )
@@ -78,12 +78,21 @@ const CreatePassPhrase = ( props ) => {
 
   useEffect( () => {
     setLoaderModal( false )
-    if ( wallet && !isAccountCreation ) {
-      dispatch( completedWalletSetup() )
-      AsyncStorage.setItem( 'walletRecovered', 'true' )
-      dispatch( setVersion( 'Restored' ) )
-      props.navigation.navigate( 'HomeNav' )
-    }
+    setTimeout( () => {
+      if ( wallet && !isAccountCreation ) {
+        dispatch( completedWalletSetup() )
+        AsyncStorage.setItem( 'walletRecovered', 'true' )
+        dispatch( setVersion( 'Restored' ) )
+        props.navigation.dispatch( CommonActions.reset( {
+          index: 0,
+          routes: [
+            {
+              name: 'App'
+            }
+          ],
+        } ) )
+      }
+    },100)
   }, [ wallet, isAccountCreation ] )
 
   const onPressNext = () => {
@@ -101,16 +110,16 @@ const CreatePassPhrase = ( props ) => {
       selected,
       checksumWord,
       mnemonic,
-      initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
-      gridType: props.navigation.getParam( 'gridType' ),
+      initialMnemonic: props.route.params?.initialMnemonic,
+      gridType: props.route.params?.gridType,
       isAccountCreation,
       passphrase: password
     } ) : props.navigation.replace( 'ConfirmDownload', {
       selected,
       checksumWord,
       mnemonic,
-      initialMnemonic: props.navigation.getParam( 'initialMnemonic' ),
-      gridType: props.navigation.getParam( 'gridType' ),
+      initialMnemonic: props.route.params?.initialMnemonic,
+      gridType: props.route.params?.gridType,
       isAccountCreation,
       passphrase: password
     } )
@@ -124,7 +133,7 @@ const CreatePassPhrase = ( props ) => {
       setTimeout( () => {
         setLoaderModal( true )
         setTimeout( () => {
-          dispatch( recoverWalletUsingMnemonic( mnemonic, props.navigation.getParam( 'initialMnemonic' ) ) )
+          dispatch( recoverWalletUsingMnemonic( mnemonic, props.route.params?.initialMnemonic  ) )
         }, 500 )
         dispatch( setBorderWalletBackup( true ) )
       }, 1000 )
@@ -200,17 +209,11 @@ const CreatePassPhrase = ( props ) => {
           <TouchableOpacity
             activeOpacity={0.6}
             onPress={onPressNext}>
-            <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              locations={[ 0.2, 1 ]}
+            <View
               style={styles.buttonView}
             >
               <Text style={styles.buttonText}>Next</Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         </View>
       </View>

@@ -37,7 +37,6 @@ import {
 
 import config from '../../bitcoin/HexaConfig'
 import { connect } from 'react-redux'
-import { withNavigationFocus } from 'react-navigation'
 import idx from 'idx'
 import ModalHeader from '../../components/ModalHeader'
 import RemoveSelectedAcoount from './RemoveSelectedAccount'
@@ -59,6 +58,7 @@ const currencyCode = [
   'EUR',
 ]
 interface SweepFundsEnterAmountPropsTypes {
+  route: any;
   navigation: any;
   service: any;
   transfer: any;
@@ -111,7 +111,7 @@ class SweepFundsEnterAmount extends Component<
       RegularAccountBalance: 0,
       SavingAccountBalance: 0,
       exchangeRates: null,
-      address: this.props.navigation.getParam( 'address' ),
+      address: this.props.route.params.address,
       removeItem: {
       },
       recipients: [],
@@ -140,8 +140,8 @@ class SweepFundsEnterAmount extends Component<
       switchOn: true,
       CurrencyCode: 'USD',
       CurrencySymbol: '$',
-      bitcoinAmount: props.navigation.getParam( 'bitcoinAmount' )
-        ? props.navigation.getParam( 'bitcoinAmount' )
+      bitcoinAmount: props.route.params.bitcoinAmount
+        ? props.route.params.bitcoinAmount
         : '',
       currencyAmount: '',
       isOpen: false,
@@ -366,8 +366,8 @@ class SweepFundsEnterAmount extends Component<
               style={styles.backArrow}
             >
               <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
+                name="long-arrow-left"
+                color={Colors.homepageButtonColor}
                 size={17}
               />
             </TouchableOpacity>
@@ -798,10 +798,9 @@ const mapStateToProps = ( state ) => {
   }
 }
 
-export default withNavigationFocus(
-  connect( mapStateToProps, {
-  } )( SweepFundsEnterAmount ),
-)
+export default
+connect( mapStateToProps, {
+} )( SweepFundsEnterAmount )
 
 const styles = StyleSheet.create( {
   modalHeaderTitleText: {

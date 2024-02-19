@@ -1,19 +1,18 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
-  View,
   Image,
-  Text,
   StyleSheet,
+  Text,
+  View,
 } from 'react-native'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
-import { ScrollView } from 'react-native-gesture-handler'
 
 export default function RegenerateHealper( props ) {
-  const array = [ 1, 2, 3, 4 ]
   return ( <View style={ styles.modalContainer }>
     <ScrollView>
       <View style={ {
@@ -41,8 +40,8 @@ export default function RegenerateHealper( props ) {
             width: wp( '50%' ), height: wp( '50%' ), resizeMode: 'contain'
           } } />
         </View>
-        { array.map( ( value ) =>
-          <View style={ {
+        { [ 1, 2, 3, 4 ].map( ( value ) =>
+          <View key={value} style={ {
             justifyContent: 'center', alignItems: 'center', marginLeft: wp( '10%' ), marginRight: wp( '10%' ), marginTop: hp( '2%' ), marginBottom: hp( '2%' ), flexDirection: 'row'
           } }>
             <View style={ {

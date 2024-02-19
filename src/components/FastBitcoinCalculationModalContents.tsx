@@ -1,28 +1,28 @@
 import React, { useState } from 'react'
 import {
-  View,
   Image,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TextInput,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from 'react-native-responsive-screen'
-import Colors from '../common/Colors'
-import QuestionList from '../common/QuestionList'
-import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import QuestionList from '../common/QuestionList'
 import BottomInfoBox from '../components/BottomInfoBox'
 // import Fontisto from "react-native-vector-icons/Fontisto";
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import DeviceInfo from 'react-native-device-info'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 export default function FastBitcoinCalculationModalContents( props ) {
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
@@ -136,6 +136,7 @@ export default function FastBitcoinCalculationModalContents( props ) {
                 <ScrollView>
                   {dropdownBoxList.map( ( value, index ) => (
                     <TouchableOpacity
+                      key={`${value.id}_${index}`}
                       onPress={() => {
                         setDropdownBoxValue( value )
                         setDropdownBoxOpenClose( false )
