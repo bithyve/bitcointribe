@@ -23,6 +23,7 @@ import { syncRgb } from '../../store/actions/rgb';
 
 export default function IssueScreen(props) {
   const issueType = props.route.params?.issueType;
+  console.log('props', props)
   const dispatch = useDispatch();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -309,11 +310,17 @@ export default function IssueScreen(props) {
           note={'Note : '}
           noteNextLine={'Click on add funds below and receive faucet in the Test account'}
           proceedButtonText={'Add Fund'}
+          isIgnoreButton={true}
           cancelButtonText={'Try again'}
           onPressIgnore={() => {
             setFailedModal(false);
           }}
-          onPressProceed={() => {}}
+          onPressProceed={() => {
+            // props.navigation.navigate('AccountSettingsMain',{
+            //   accountShell.id
+            // } )
+            setFailedModal(false);
+          }}
           isBottomImage={true}
           bottomImage={require('../../assets/images/icons/errorImage.png')}
           type={'small'}
