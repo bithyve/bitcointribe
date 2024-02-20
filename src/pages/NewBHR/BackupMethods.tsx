@@ -14,26 +14,28 @@ import {
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
+import ErrorModalContents from 'src/components/ErrorModalContents'
 import LoaderModal from 'src/components/LoaderModal'
 import BorderWalletIcon from '../../assets/images/svgs/borderWallet.svg'
 import { LevelData, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
-import Fonts from '../../common/Fonts'
 import { translations } from '../../common/content/LocContext'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
-import HeaderTitle from '../../components/HeaderTitle'
-import Toast from '../../components/Toast'
+import Fonts from '../../common/Fonts'
 import BWHealthCheckModal from '../../components/border-wallet/BWHealthCheckModal'
+import HeaderTitle from '../../components/HeaderTitle'
 import ModalContainer from '../../components/home/ModalContainer'
+import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
 import dbManager from '../../storage/realm/dbManager'
 import { onPressKeeper } from '../../store/actions/BHR'
 import { updateLastBackedUp } from '../../store/actions/rgb'
-import { SafeAreaView } from 'react-native-safe-area-context'
 
 const GoogleDrive = NativeModules.GoogleDrive
 
@@ -82,6 +84,8 @@ export default function BackupMethods( { navigation } ) {
   const dispatch = useDispatch()
   const [ visibleModal, setVisibleModal ] = useState( false )
   const [ googleVisibleModal, setGoogleVisibleModal] = useState( false )
+  const [ rgbBackupModal, setRgbBackupModal] = useState( false )
+  const [ErrorBottomSheet] = useState(React.createRef<BottomSheet>());
 
   useEffect( () => {
     async function fetchWalletDays() {
@@ -128,38 +132,39 @@ export default function BackupMethods( { navigation } ) {
     try {
       if(Platform.OS === 'android') {
 
-      Alert.alert(
-        'Select a Google Account',
-        'This account will be used to upload the RGB backup data file. The file is encrypted with your Backup Phrase.',
-        [
-          {
-            text: 'Cancel',
-            onPress: () => {},
-            style: 'cancel',
-          },
-          {
-            text: 'Continue',
-            onPress: async () => {
-              setGoogleVisibleModal(true)
-              await GoogleDrive.setup()
-              const login = await GoogleDrive.login()
-              if( login.error ) {
-                Toast( login.error )
-                setGoogleVisibleModal(false)
-              } else {
-                await RGBServices.backup( '', wallet.primaryMnemonic )
-                dispatch( updateLastBackedUp() )
-                setGoogleVisibleModal(false)
-                Toast('Backuped successfully')
-              }
-            },
-            style: 'default',
-          },
-        ],
-        {
-          cancelable: true,
-        },
-      )
+      // Alert.alert(
+      //   'Select a Google Account',
+      //   'This account will be used to upload the RGB backup data file. The file is encrypted with your Backup Phrase.',
+      //   [
+      //     {
+      //       text: 'Cancel',
+      //       onPress: () => {},
+      //       style: 'cancel',
+      //     },
+      //     {
+      //       text: 'Continue',
+      //       onPress: async () => {
+      //         setGoogleVisibleModal(true)
+      //         await GoogleDrive.setup()
+      //         const login = await GoogleDrive.login()
+      //         if( login.error ) {
+      //           Toast( login.error )
+      //           setGoogleVisibleModal(false)
+      //         } else {
+      //           await RGBServices.backup( '', wallet.primaryMnemonic )
+      //           dispatch( updateLastBackedUp() )
+      //           setGoogleVisibleModal(false)
+      //           Toast('Backuped successfully')
+      //         }
+      //       },
+      //       style: 'default',
+      //     },
+      //   ],
+      //   {
+      //     cancelable: true,
+      //   },
+      // )
+      setRgbBackupModal(true)
       } else {
         Alert.alert(
           '',
@@ -465,6 +470,41 @@ export default function BackupMethods( { navigation } ) {
           onPressClose={() => setVisibleModal( false )}
           proceedButtonText={'Backup Now'}
           cancelButtonText={'Skip'}
+        />
+      </ModalContainer>
+      <ModalContainer
+        onBackground={() => setRgbBackupModal(false)}
+        visible={rgbBackupModal}
+        closeBottomSheet={() => {}}
+      >
+        <ErrorModalContents
+          modalRef={ErrorBottomSheet}
+          title={'Select a Google Account'}
+          info={
+            'This account will be used to upload the RGB backup data file. The file is encrypted with your Backup Phrase.'
+          }
+          note={'Note : '}
+          noteNextLine={'Ensure you use the correct Google Account for uploading your RGB backup file.'}
+          proceedButtonText={'Continue'}
+          isIgnoreButton={true}
+          cancelButtonText={'Cancel'}
+          onPressIgnore={()=>{setRgbBackupModal(false)}}
+          onPressProceed={async() => {
+            setRgbBackupModal(false)
+            setGoogleVisibleModal(true)
+              await GoogleDrive.setup()
+              const login = await GoogleDrive.login()
+              if( login.error ) {
+                Toast( login.error )
+                setGoogleVisibleModal(false)
+              } else {
+                await RGBServices.backup( '', wallet.primaryMnemonic )
+                dispatch( updateLastBackedUp() )
+                setGoogleVisibleModal(false)
+                Toast('Backuped successfully')
+              }
+          }}
+          type={'small'}
         />
       </ModalContainer>
     </SafeAreaView>
