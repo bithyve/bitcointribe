@@ -11,6 +11,7 @@ import { useDispatch } from 'react-redux';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ErrorModalContents from 'src/components/ErrorModalContents';
 import ModalContainer from 'src/components/home/ModalContainer';
+import InProgressModal from 'src/components/loader/InProgressModal';
 import RGBIntroModal from 'src/components/rgb/RGBIntroModal';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -33,6 +34,7 @@ export default function IssueScreen(props) {
   const [requesting, setRequesting] = useState(false);
   const [successModal, setSuccessModal] = useState(false);
   const [failedModal, setFailedModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [ErrorBottomSheet] = useState(React.createRef<BottomSheet>());
 
   async function IssueAssetClick() {
@@ -318,11 +320,23 @@ export default function IssueScreen(props) {
             //   accountShell.id
             // } )
             setFailedModal(false);
+            setLoading(true)
           }}
           isBottomImage={true}
           bottomImage={require('../../assets/images/icons/errorImage.png')}
           type={'small'}
         />
+      </ModalContainer>
+      <ModalContainer
+        onBackground={() => {
+          setLoading(false);
+        }}
+        closeBottomSheet={() => {
+          setLoading(false);
+        }}
+        visible={loading}
+      >
+        <InProgressModal title={'Receiving Test Sats'} otherText={'Receiving test sats. Please hold on a moment.'}/>
       </ModalContainer>
     </View>
   );
