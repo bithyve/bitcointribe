@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import {
-  Alert,
   Image,
   NativeModules,
   Platform,
@@ -85,6 +84,7 @@ export default function BackupMethods( { navigation } ) {
   const [ visibleModal, setVisibleModal ] = useState( false )
   const [ googleVisibleModal, setGoogleVisibleModal] = useState( false )
   const [ rgbBackupModal, setRgbBackupModal] = useState( false )
+  const [ rgbBackupIOSModal, setRgbBackupIOSModal] = useState( false )
   const [ErrorBottomSheet] = useState(React.createRef<BottomSheet>());
 
   useEffect( () => {
@@ -166,34 +166,35 @@ export default function BackupMethods( { navigation } ) {
       // )
       setRgbBackupModal(true)
       } else {
-        Alert.alert(
-          '',
-          'This step will upload the RGB backup data file on your iCloud. The file is encrypted with your Backup Phrase.',
-          [
-            {
-              text: 'Cancel',
-              onPress: () => {},
-              style: 'cancel',
-            },
-            {
-              text: 'Continue',
-              onPress: async () => {
-                const response = await RGBServices.backup( '', wallet.primaryMnemonic )
-                if( response.error ) {
-                  Toast( response.error )
-                  setGoogleVisibleModal(false)
-                } else {
-                  dispatch( updateLastBackedUp() )
-                  Toast('Backuped successfully')
-                }
-              },
-              style: 'default',
-            },
-          ],
-          {
-            cancelable: true,
-          },
-        )
+        setRgbBackupIOSModal(true)
+        // Alert.alert(
+        //   '',
+        //   'This step will upload the RGB backup data file on your iCloud. The file is encrypted with your Backup Phrase.',
+        //   [
+        //     {
+        //       text: 'Cancel',
+        //       onPress: () => {},
+        //       style: 'cancel',
+        //     },
+        //     {
+        //       text: 'Continue',
+        //       onPress: async () => {
+        //         const response = await RGBServices.backup( '', wallet.primaryMnemonic )
+        //         if( response.error ) {
+        //           Toast( response.error )
+        //           setGoogleVisibleModal(false)
+        //         } else {
+        //           dispatch( updateLastBackedUp() )
+        //           Toast('Backuped successfully')
+        //         }
+        //       },
+        //       style: 'default',
+        //     },
+        //   ],
+        //   {
+        //     cancelable: true,
+        //   },
+        // )
       }
     } catch ( error ) {
       console.log( error )
@@ -503,6 +504,37 @@ export default function BackupMethods( { navigation } ) {
                 setGoogleVisibleModal(false)
                 Toast('Backuped successfully')
               }
+          }}
+          type={'small'}
+        />
+      </ModalContainer>
+      <ModalContainer
+        onBackground={() => setRgbBackupIOSModal(false)}
+        visible={rgbBackupIOSModal}
+        closeBottomSheet={() => {}}
+      >
+        <ErrorModalContents
+          modalRef={ErrorBottomSheet}
+          title={''}
+          info={
+            'This step will upload the RGB backup data file on your iCloud. The file is encrypted with your Backup Phrase.'
+          }
+          // note={'Note : '}
+          // noteNextLine={'Ensure you use the correct Google Account for uploading your RGB backup file.'}
+          proceedButtonText={'Continue'}
+          isIgnoreButton={true}
+          cancelButtonText={'Cancel'}
+          onPressIgnore={()=>{setRgbBackupIOSModal(false)}}
+          onPressProceed={async() => {
+            setRgbBackupIOSModal(false)
+            const response = await RGBServices.backup( '', wallet.primaryMnemonic )
+                if( response.error ) {
+                  Toast( response.error )
+                  setGoogleVisibleModal(false)
+                } else {
+                  dispatch( updateLastBackedUp() )
+                  Toast('Backuped successfully')
+                }
           }}
           type={'small'}
         />
