@@ -307,7 +307,7 @@ export default function IssueScreen(props) {
           }
           note={'Note : '}
           noteNextLine={'Click on add funds below and receive faucet in the Test account'}
-          proceedButtonText={'Add Fund'}
+          proceedButtonText={'Receive Sats'}
           isIgnoreButton={true}
           cancelButtonText={'Try again'}
           onPressIgnore={() => {
