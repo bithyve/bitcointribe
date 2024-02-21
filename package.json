@@ -62,7 +62,7 @@
     "@welldone-software/why-did-you-render": "^5.0.0-alpha.2",
     "assert": "^1.5.0",
     "asyncstorage-down": "^4.2.0",
-    "axios": "^0.21.1",
+    "axios": "^0.28.0",
     "base64url": "^3.0.1",
     "bip21": "^2.0.2",
     "bip32": "^2.0.4",
