@@ -5,13 +5,16 @@ import {
   StatusBar,
   StyleSheet,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import { ListItem } from 'react-native-elements';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useDispatch } from 'react-redux';
-import InProgressModal from 'src/components/loader/InProgressModal';
+import { useDispatch, useSelector } from 'react-redux';
+import AccountOperations from 'src/bitcoin/utilities/accounts/AccountOperations';
+import AccountUtilities from 'src/bitcoin/utilities/accounts/AccountUtilities';
 import Toast from 'src/components/Toast';
+import InProgressModal from 'src/components/loader/InProgressModal';
+import { setTestSatsTimestamp } from 'src/store/actions/rgb';
 import AmountBTC from '../../../assets/images/svgs/amount_btc.svg';
 import Archive from '../../../assets/images/svgs/icon_archive.svg';
 import Visibilty from '../../../assets/images/svgs/icon_visibility.svg';
@@ -19,14 +22,14 @@ import NameNDesc from '../../../assets/images/svgs/name_desc.svg';
 import Xpub from '../../../assets/images/svgs/xpub.svg';
 import { AccountType } from '../../../bitcoin/utilities/Interface';
 import Colors from '../../../common/Colors';
+import ListStyles from '../../../common/Styles/ListStyles';
+import CommonStyles from '../../../common/Styles/Styles';
 import { translations } from '../../../common/content/LocContext';
 import AccountVisibility from '../../../common/data/enums/AccountVisibility';
 import { hp } from '../../../common/data/responsiveness/responsive';
-import ListStyles from '../../../common/Styles/ListStyles';
-import CommonStyles from '../../../common/Styles/Styles';
 import HeaderTitle from '../../../components/HeaderTitle';
 import ModalContainer from '../../../components/home/ModalContainer';
-import { updateAccountSettings } from '../../../store/actions/accounts';
+import { refreshAccountShells, updateAccountSettings } from '../../../store/actions/accounts';
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning';
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell';
@@ -68,7 +71,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ({ navigation, route }: Props
   const primarySubAccount = usePrimarySubAccountForShell(accountShell);
   const account = useAccountByAccountShell(accountShell);
   //  const [ accountBalance, setAccountBalance ] = useState( primarySubAccount.balances )
-
+  const { testSatsTimestamp } = useSelector((state) => state.rgb);
   useEffect(() => {
     return () => {
       // dismissBottomSheet()
@@ -287,9 +290,30 @@ const AccountSettingsMainScreen: React.FC<Props> = ({ navigation, route }: Props
       setCheckAccountModal(true);
     }
   }
-  function receiveTestSats() {
-    setLoading(true);
-    Toast('Receive Test Sats.');
+
+  async function receiveTestSats() {
+    try {
+      if (testSatsTimestamp) {
+        const diffInMilliseconds = Math.abs(Date.now() - testSatsTimestamp);
+        const millisecondsIn24Hours = 24 * 60 * 60 * 1000;
+        if(diffInMilliseconds <= millisecondsIn24Hours){
+          Toast('Rate limit exhausted. Try after some time', null, true);
+          return
+        }
+      }
+      setLoading(true);
+      const { receivingAddress } = AccountOperations.getNextFreeExternalAddress(account);
+      const network = AccountUtilities.getNetworkByType(account.networkType);
+      const { txid, funded } = await AccountUtilities.getTestcoins(receivingAddress, network);
+      setLoading(false);
+      if (txid) {
+        Toast('Test sats received');
+        dispatch(setTestSatsTimestamp());
+        dispatch(refreshAccountShells([accountShell], {}));
+      }
+    } catch (error) {
+      setLoading(false);
+    }
   }
 
   function handleTransactionDataSelectionFromRescan(transactionData: RescannedTransactionData) {
@@ -359,7 +383,10 @@ const AccountSettingsMainScreen: React.FC<Props> = ({ navigation, route }: Props
         }}
         visible={loading}
       >
-        <InProgressModal title={'Receiving Test Sats'} otherText={'Receiving test sats. Please hold on a moment.'}/>
+        <InProgressModal
+          title={'Receiving Test Sats'}
+          otherText={'Receiving test sats. Please hold on a moment.'}
+        />
       </ModalContainer>
     </SafeAreaView>
   );
