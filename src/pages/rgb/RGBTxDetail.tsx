@@ -15,8 +15,11 @@ import {
   widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import { useDispatch } from 'react-redux'
 import { RGB_ASSET_TYPE } from 'src/bitcoin/utilities/Interface'
+import ReceiveIcon from '../../assets/images/svgs/icon_receive.svg'
+import SentIcon from '../../assets/images/svgs/icon_sent.svg'
 import Colors from '../../common/Colors'
 import { LocalizationContext } from '../../common/content/LocContext'
 import NetworkKind from '../../common/data/enums/NetworkKind'
@@ -105,6 +108,9 @@ export default function RGBTxDetail( props ) {
   const renderItem = ( { item } ) => {
     return (
       <TouchableOpacity style={styles.itemContainer} onPress={() => onItemClick( item )}>
+         <View style={styles.iconWrapper}>
+          {(item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() === 'ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS') ? <ReceiveIcon/> : <SentIcon/>}
+        </View>
         <View style={styles.textContainer}>
           <Text style={styles.itemTitle}>{item.status}</Text>
           <Text style={styles.itemDesc}>{moment.unix( item.createdAt ).format( 'DD/MM/YY • hh:MMa' )}</Text>
@@ -113,11 +119,21 @@ export default function RGBTxDetail( props ) {
           <Text
             numberOfLines={1}
             style={[ styles.amountText, {
-              color: ( item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() ==='ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS' ) ? '#04A777' : '#FD746C'
+              color: ( item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() ==='ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS' ) ? Colors.grayShade : Colors.lightBlue
             } ]}
           >
             {item.amount}
           </Text>
+        </View>
+        <View style={{
+          width: '5%'
+        }}>
+          <Ionicons
+            name="chevron-forward"
+            color={Colors.Black}
+            size={15}
+            style={styles.forwardIcon}
+          />
         </View>
       </TouchableOpacity>
     )
@@ -265,7 +281,8 @@ const styles = StyleSheet.create( {
     marginHorizontal: 20,
     paddingVertical: 10,
     marginTop: 20,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   itemImage: {
     width: 35, height: 35, borderRadius: 20, backgroundColor: 'gray'
@@ -330,5 +347,8 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 9 ),
     fontFamily: Fonts.SemiBold,
     color: Colors.white,
-  }
+  },
+  iconWrapper: {
+    width: '11%'
+  },
 } )
