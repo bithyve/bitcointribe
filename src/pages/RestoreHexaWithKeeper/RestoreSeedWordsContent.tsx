@@ -4,13 +4,13 @@ import { CommonActions } from '@react-navigation/native'
 import * as bip39 from 'bip39'
 import React, { useEffect, useState } from 'react'
 import {
-  Alert,
   NativeModules,
   SafeAreaView,
   StatusBar,
   View
 } from 'react-native'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
 import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
 import Toast from 'src/components/Toast'
 import RGBServices from 'src/services/RGBServices'
@@ -36,6 +36,9 @@ const RestoreSeedWordsContent = (props) => {
   const [showAlertModal, setShowAlertModal] = useState(false)
   const [showSeedFailedModal, setSeedFailedModal] = useState(false)
   const [seedRecovered, setSeedRecovered] = useState(false)
+  const [rgbRestoreModal, setRgbRestoreModal] = useState(false)
+  const [ErrorBottomSheet] = useState(React.createRef<BottomSheet>());
+  
   const loaderMessage = {
     heading: translations['bhr'].Importingyourwallet,
     text: translations['bhr'].Thismaytake
@@ -65,40 +68,41 @@ const RestoreSeedWordsContent = (props) => {
       AsyncStorage.setItem('walletRecovered', 'true')
       dispatch(setVersion('Restored'))
       try {
-        Alert.alert(
-          'Restore RGB',
-          'Do you want to restore state of your RGB assets?',
-          [
-            {
-              text: 'No',
-              onPress: () => goToApp(),
-              style: 'cancel',
-            },
-            {
-              text: 'YES',
-              onPress: async () => {
-                setShowLoader(true)
-                await GoogleDrive.setup()
-                const login = await GoogleDrive.login()
-                if (login.error) {
-                  Toast(login.error)
-                } else {
-                  setShowLoader(true)
-                  setTimeout(async () => {
-                    const config = await RGBServices.restoreKeys(mnemonic)
-                    RGBServices.initiate(config.mnemonic, config.xpub)
-                    await RGBServices.restore(mnemonic)
-                    goToApp()
-                  }, 300)
-                }
-              },
-              style: 'default',
-            },
-          ],
-          {
-            cancelable: true,
-          },
-        )
+        setRgbRestoreModal(true)
+        // Alert.alert(
+        //   'Restore RGB',
+        //   'Do you want to restore state of your RGB assets?',
+        //   [
+        //     {
+        //       text: 'No',
+        //       onPress: () => goToApp(),
+        //       style: 'cancel',
+        //     },
+        //     {
+        //       text: 'YES',
+        //       onPress: async () => {
+        //         setShowLoader(true)
+        //         await GoogleDrive.setup()
+        //         const login = await GoogleDrive.login()
+        //         if (login.error) {
+        //           Toast(login.error)
+        //         } else {
+        //           setShowLoader(true)
+        //           setTimeout(async () => {
+        //             const config = await RGBServices.restoreKeys(mnemonic)
+        //             RGBServices.initiate(config.mnemonic, config.xpub)
+        //             await RGBServices.restore(mnemonic)
+        //             goToApp()
+        //           }, 300)
+        //         }
+        //       },
+        //       style: 'default',
+          //  }
+        //   ],
+        //   {
+        //     cancelable: true,
+        //   },
+        // )
       } catch (error) {
         setLoaderModal(false)
         console.log(error)
@@ -268,6 +272,44 @@ const RestoreSeedWordsContent = (props) => {
             bottomImage={require('../../assets/images/icons/contactPermission.png')}
           />
         </ModalContainer>
+        <ModalContainer
+        onBackground={() => setRgbBackupIOSModal(false)}
+        visible={rgbRestoreModal}
+        closeBottomSheet={() => {}}
+      >
+        <ErrorModalContents
+          modalRef={ErrorBottomSheet}
+          title={'Restore RGB'}
+          info={
+            'Do you want to restore state of your RGB assets?'
+          }
+          // note={'Note : '}
+          // noteNextLine={'Ensure you use the correct Google Account for uploading your RGB backup file.'}
+          proceedButtonText={'Continue'}
+          isIgnoreButton={true}
+          cancelButtonText={'Cancel'}
+          onPressIgnore={()=>{goToApp()}}
+          onPressProceed={async() => {
+            setRgbRestoreModal(false)
+            setShowLoader(true)
+                await GoogleDrive.setup()
+                const login = await GoogleDrive.login()
+                if (login.error) {
+                  Toast(login.error)
+                } else {
+                  setShowLoader(true)
+                  setTimeout(async () => {
+                    const config = await RGBServices.restoreKeys(mnemonic)
+                    RGBServices.initiate(config.mnemonic, config.xpub)
+                    await RGBServices.restore(mnemonic)
+                    goToApp()
+                  }, 300)
+                }
+            
+          }}
+          type={'small'}
+        />
+      </ModalContainer>
     </View>
   )
 }
