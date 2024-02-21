@@ -222,7 +222,6 @@ export default function SendViaLinkAndQR( props ) {
         Platform.select( {
           default: {
             title: 'Share Gift Card',
-            message: 'Scan the QR and receive bitcoin in your Bitcoin Tribe bitcoin wallet.',
             url: `file://${uri}`,
           }
         }, )
