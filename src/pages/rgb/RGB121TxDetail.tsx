@@ -203,11 +203,11 @@ export default function RGB121TxDetail(props) {
               <Image style={{
                 height: 50, width: 50, borderRadius: 30
               }} source={{
-                uri: Platform.select({
-                  android: `file://${asset.dataPaths[0].filePath}`,
-                  ios: asset.dataPaths[0].filePath
-                })
-              }} />
+                uri: Platform.select( {
+                  android: `file://${asset.dataPaths[ 0 ].filePath}`,
+                  ios: asset.dataPaths[ 0 ].filePath.replace('/private','')
+                } )
+              }}/>
             </View>}
             isBitcoin={false}
           />

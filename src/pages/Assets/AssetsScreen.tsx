@@ -24,8 +24,8 @@ import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
 import RGBInactive from '../../assets/images/tabs/rgb_inactive.svg'
 import { RGBConfig, RGB_ASSET_TYPE, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
-import { translations } from '../../common/content/LocContext'
 import Fonts from '../../common/Fonts'
+import { translations } from '../../common/content/LocContext'
 import BottomSheetAddWalletInfo from '../../components/bottom-sheets/add-wallet/BottomSheetAddWalletInfo'
 import ModalContainer from '../../components/home/ModalContainer'
 import RGBServices from '../../services/RGBServices'
@@ -71,13 +71,13 @@ export default function AssetsScreen(props) {
       setProceed(true)
     }
     const assets = []
-    assets.push({
-      name: 't-sats',
-      ticker: 'BTC',
-      amount: balances.total,
-      color: '#5CB5A1',
-      type: 'bitcoin',
-    })
+    // assets.push({
+    //   name: 't-sats',
+    //   ticker: 'BTC',
+    //   amount: balances.total,
+    //   color: '#5CB5A1',
+    //   type: 'bitcoin',
+    // })
     if (rgb20Assets) {
       rgb20Assets?.forEach((asset, index) => {
         assets.push({
@@ -214,6 +214,7 @@ export default function AssetsScreen(props) {
   }
 
   const renderCollectibleItems = (item, index) => {
+    const uri = item.dataPaths[0].filePath.replace('/private','');
     return (
       <TouchableOpacity
         style={
@@ -237,7 +238,7 @@ export default function AssetsScreen(props) {
             source={{
               uri: Platform.select({
                 android: `file://${item.dataPaths[0].filePath}`,
-                ios: item.dataPaths[0].filePath,
+                ios: uri,
               }),
             }}
           />:
