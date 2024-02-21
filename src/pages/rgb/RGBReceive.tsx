@@ -52,8 +52,11 @@ export default function RGBReceive( props ) {
   const [ErrorBottomSheet] = useState(React.createRef<BottomSheet>());
   const accountsState = useAccountsState()
 
-
   useEffect( () => {
+    runOnMountOrTryAgain()
+  }, [] )
+
+  const runOnMountOrTryAgain=()=>{
     if ( assetType == RGB_ASSET_TYPE.BITCOIN ) {
       setReceivingAddress( nextFreeAddress )
     } else {
@@ -62,7 +65,7 @@ export default function RGBReceive( props ) {
         dispatch( receiveRgbAsset() )
       }, 5000);
     }
-  }, [] )
+  }
 
   useEffect( () => {
     if ( assetType == RGB_ASSET_TYPE.RGB20 ) {
@@ -94,7 +97,7 @@ export default function RGBReceive( props ) {
       }
     })
     if(accId){
-      props.navigation.navigate('AccountSettings',{
+      props.navigation.replace('AccountSettings',{
         accountShellID: accId
   } )
     }           
@@ -181,10 +184,13 @@ export default function RGBReceive( props ) {
           cancelButtonText={'Try again'}
           onPressIgnore={() => {
             setFailedModal(false);
+            runOnMountOrTryAgain();
           }}
           onPressProceed={() => {
-            handleReceiveBitcoin()
             setFailedModal(false);
+            setTimeout(()=>{
+              handleReceiveBitcoin()
+            },100)
           }}
           isBottomImage={true}
           bottomImage={require('../../assets/images/icons/errorImage.png')}
