@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import {
   ActivityIndicator,
   Image,
+  PermissionsAndroid,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -10,20 +11,19 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
-  PermissionsAndroid
+  View
 } from 'react-native'
 import RNFS from 'react-native-fs'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import RNFetchBlob from 'rn-fetch-blob'
 import Colors from '../../common/Colors'
-import { hp, wp } from '../../common/data/responsiveness/responsive'
 import Fonts from '../../common/Fonts'
 import CommonStyles from '../../common/Styles/Styles'
+import { hp, wp } from '../../common/data/responsiveness/responsive'
 import HeaderTitle from '../../components/HeaderTitle'
 import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
-import RNFetchBlob from 'rn-fetch-blob'
 
 const styles = StyleSheet.create({
   lineItem: {
@@ -145,7 +145,7 @@ const AssetMetaData = (props) => {
     setDownloading(true)
     const localFilePath = Platform.select({
       android: `file://${asset.dataPaths[0].filePath}`,
-      ios: asset.dataPaths[0].filePath
+      ios: asset.dataPaths[0].filePath.replace('/private','')
     })
     const timestamp = new Date().getTime()
     const mime = asset.dataPaths[0].mime || 'application/octet-stream'
@@ -214,7 +214,7 @@ const AssetMetaData = (props) => {
                     source={{
                       uri: Platform.select({
                         android: `file://${asset.dataPaths[0].filePath}`,
-                        ios: asset.dataPaths[0].filePath
+                        ios: asset.dataPaths[0].filePath.replace('/private','')
                       })
                     }}
                   />

@@ -22,6 +22,8 @@ DerivedData
 *.xcuserstate
 project.xcworkspace
 ios/HEXA.xcodeproj/project.pbxproj
+ios/rgb/rgb_libFFI.xcframework
+ios/rgb/bdkFFI.xcframework
 .xcode.env.local
 
 # Android/IntelliJ
