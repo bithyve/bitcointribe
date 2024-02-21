@@ -277,6 +277,7 @@ export default function AddContactSendRequest( props ) {
           encryptionHint,
           walletName: wallet.walletName,
           version: appVersion,
+          channelAddress: channelKey
         } )
       )
     }
