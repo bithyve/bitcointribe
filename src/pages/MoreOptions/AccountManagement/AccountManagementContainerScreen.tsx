@@ -1,6 +1,6 @@
 import { CommonActions } from '@react-navigation/native'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -10,8 +10,6 @@ import {
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
-import ActivityIndicatorView from 'src/components/loader/ActivityIndicatorView'
-import getAvatarForSubAccount from 'src/utils/accounts/GetAvatarForSubAccountKind'
 import { AccountType, Wallet } from '../../../bitcoin/utilities/Interface'
 import Colors from '../../../common/Colors'
 import { translations } from '../../../common/content/LocContext'
@@ -29,6 +27,7 @@ import ModalContainer from '../../../components/home/ModalContainerScroll'
 import ReorderAccountShellsDraggableList from '../../../components/more-options/account-management/ReorderAccountShellsDraggableList'
 import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
 import { accountShellsOrderUpdated, resetAccountUpdateFlag, updateAccountSettings } from '../../../store/actions/accounts'
+import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
 
 export type Props = {
   navigation: any;
@@ -52,7 +51,6 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const [ selectedAccount, setSelectedAccount ] = useState( null )
   const [ unHideArchiveModal, showUnHideArchiveModal ] = useState( false )
   const [ successModel, showSuccessModel ] = useState( false )
-  const [ showLoader, setShowLoader] = useState( false )
   const [ numberOfTabs, setNumberOfTabs ] = useState( 0 )
   // const [ debugModalVisible, setDebugModalVisible ] = useState( false )
 
@@ -127,14 +125,12 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   }, [] )
   useEffect( () => {
     if( hasAccountSettingsUpdateSucceeded && selectedAccount ){
-       showSuccessModel( true )
-    }
-    setTimeout( () => {
-      if( hasAccountSettingsUpdateSucceeded && selectedAccount ){
-        dispatch( resetAccountUpdateFlag() )
-      }
-    }, 5 )
+      dispatch( resetAccountUpdateFlag() )
+      setTimeout( () => {
+        showSuccessModel( true )
+      }, 100 )
 
+    }
   }, [ hasAccountSettingsUpdateSucceeded, selectedAccount ] )
   // useEffect( () => {
   //   if( numberOfTabs!=0 ){
@@ -150,11 +146,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   //   }
   // }, [ numberOfTabs ] )
 
-  useEffect( () => {
-    return () => {
-      showUnHideArchiveModal( false )
-    }
-  }, [ navigation ] )
+
 
   const showUnHideArchiveAccountBottomSheet = useCallback( () => {
     return(
@@ -162,8 +154,9 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
         onProceed={( accounShell )=>{
           if( primarySubAccount && ( ( primarySubAccount as SubAccountDescribing ).visibility == AccountVisibility.ARCHIVED || ( primarySubAccount as SubAccountDescribing ).visibility == AccountVisibility.HIDDEN ) )
             setAccountVisibility( ( primarySubAccount as SubAccountDescribing ).visibility )
-            changeVisisbility( accounShell, AccountVisibility.DEFAULT )
-            showUnHideArchiveModal( false )
+          changeVisisbility( accounShell, AccountVisibility.DEFAULT )
+
+          showUnHideArchiveModal( false )
         }
         }
         onBack={() =>{
@@ -180,8 +173,42 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       <UnHideRestoreAccountSuccessBottomSheet
         onProceed={( accounShell )=>{
           showSuccessModel( false )
-          setShowLoader(true)
+         if(Platform.OS==='android'){
           setTimeout(()=>{
+            if( ( primarySubAccount as SubAccountDescribing ).type === AccountType.LIGHTNING_ACCOUNT ) {
+              const resetAction = CommonActions.reset( {
+                index: 1,
+                routes: [
+                  {
+                    name: 'Home'
+                  },
+                  {
+                    name: 'LNAccountDetails', params: {
+                      accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
+                      node: ( primarySubAccount as SubAccountDescribing ).node
+                    }
+                  },
+                ],
+              } )
+              navigation.dispatch( resetAction )
+            } else {
+              const resetAction = CommonActions.reset( {
+                index: 1,
+                routes: [
+                  {
+                    name: 'Home'
+                  },
+                  {
+                    name: 'AccountDetailsRoot', params: {
+                      accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
+                    }
+                  },
+                ],
+              } )
+              navigation.dispatch( resetAction )
+            }
+          },1000)
+         }else{
           if( ( primarySubAccount as SubAccountDescribing ).type === AccountType.LIGHTNING_ACCOUNT ) {
             const resetAction = CommonActions.reset( {
               index: 1,
@@ -196,7 +223,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
                   }
                 },
               ],
-            })
+            } )
             navigation.dispatch( resetAction )
           } else {
             const resetAction = CommonActions.reset( {
@@ -214,15 +241,10 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
             } )
             navigation.dispatch( resetAction )
           }
-        
-          },5)
+         }
         }
         }
-        onClose={() => {
-          setTimeout(()=>{
-            showSuccessModel( false )
-          },5)
-        }}
+        onClose={() => showSuccessModel( false )}
         accountInfo={primarySubAccount}
         accountVisibility={accountVisibility}
       />
@@ -531,7 +553,6 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   return (
     //TouchableOpacity style={styles.rootContainer} activeOpacity={1} onPress={()=>setNumberOfTabs( prev => prev+1 )}>
     <TouchableOpacity style={styles.rootContainer} activeOpacity={1}>
-      {showLoader&& <ActivityIndicatorView showLoader={showLoader} />}
       <SafeAreaView>
         <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
         <ModalContainer onBackground={()=>showUnHideArchiveModal( false )} visible={unHideArchiveModal} closeBottomSheet={() => { showUnHideArchiveModal( false ) }} >
