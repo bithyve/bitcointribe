@@ -23,6 +23,9 @@ import Fonts from '../../common/Fonts'
 import NavStyles from '../../common/Styles/NavStyles'
 import CommonStyles from '../../common/Styles/Styles'
 import BottomInfoBox from '../../components/BottomInfoBox'
+import useAccountsState from 'src/utils/hooks/state-selectors/accounts/UseAccountsState'
+
+
 
 import { useDispatch, useSelector } from 'react-redux'
 import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
@@ -31,6 +34,9 @@ import CopyThisText from '../../components/CopyThisText'
 import QRCode from '../../components/QRCode'
 import Toast from '../../components/Toast'
 import { receiveRgbAsset } from '../../store/actions/rgb'
+import ErrorModalContents from 'src/components/ErrorModalContents'
+import ModalContainer from 'src/components/home/ModalContainer'
+import BottomSheet from '@gorhom/bottom-sheet'
 
 export default function RGBReceive( props ) {
   const strings = translations[ 'accounts' ]
@@ -42,6 +48,10 @@ export default function RGBReceive( props ) {
   const { nextFreeAddress } = useSelector( state => state.rgb )
   const { loading, isError, message, data } = useSelector( state => state.rgb.receiveAssets )
   const [ requesting, setRequesting ] = useState( true )
+  const [failedModal, setFailedModal] = useState(false);
+  const [ErrorBottomSheet] = useState(React.createRef<BottomSheet>());
+  const accountsState = useAccountsState()
+
 
   useEffect( () => {
     if ( assetType == RGB_ASSET_TYPE.BITCOIN ) {
@@ -60,8 +70,13 @@ export default function RGBReceive( props ) {
         setRequesting( true )
       }
       if ( !loading && isError ) {
-        Toast( message )
-        props.navigation.goBack()
+        if(message==='Insufficient sats for RGB'){
+         setTimeout(()=>{
+          setFailedModal(true);
+         },2000)
+        }else{
+          Toast( message )
+        }        
       }
       if ( !loading && !isError ) {
         setReceivingAddress( data.invoice )
@@ -71,7 +86,19 @@ export default function RGBReceive( props ) {
     }
   }, [ isError, loading ] )
 
-
+  const handleReceiveBitcoin=()=>{
+    let accId = '';
+    accountsState.accountShells.forEach(el=>{
+      if(el && el.primarySubAccount.type === 'TEST_ACCOUNT'){
+        accId = el.primarySubAccount.accountShellID
+      }
+    })
+    if(accId){
+      props.navigation.navigate('AccountSettings',{
+        accountShellID: accId
+  } )
+    }           
+  }
 
   return (
     <View style={{
@@ -107,7 +134,6 @@ export default function RGBReceive( props ) {
               </TouchableOpacity>
             </View>
             <Text style={styles.headerTitleText}>Receive</Text>
-
             {
               requesting ? <ActivityIndicator style={{
                 height: '70%'
@@ -137,7 +163,34 @@ export default function RGBReceive( props ) {
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-
+      <ModalContainer
+        onBackground={() => setFailedModal(false)}
+        visible={failedModal}
+        closeBottomSheet={() => {}}
+      >
+        <ErrorModalContents
+          modalRef={ErrorBottomSheet}
+          title={'Insufficient Bitcoins'}
+          info={
+            'We encountered an issue: Insufficient Bitcoins This means Your wallet’s Bitcoin balance is too low. Please deposit more Bitcoins or modify your transaction.'
+          }
+          note={'Note:'}
+          noteNextLine={'Your total asset balance is too low for this action. Please add more Bitcoin to your account.'}
+          proceedButtonText={'Receive Bitcoin'}
+          isIgnoreButton={true}
+          cancelButtonText={'Try again'}
+          onPressIgnore={() => {
+            setFailedModal(false);
+          }}
+          onPressProceed={() => {
+            handleReceiveBitcoin()
+            setFailedModal(false);
+          }}
+          isBottomImage={true}
+          bottomImage={require('../../assets/images/icons/errorImage.png')}
+          type={'small'}
+        />
+      </ModalContainer>
     </View>
   )
 }
