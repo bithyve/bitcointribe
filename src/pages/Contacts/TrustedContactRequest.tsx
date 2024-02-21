@@ -481,7 +481,7 @@ export default function TrustedContactRequest( props ) {
                     ? PhoneNumber
                     : props.inputType === DeepLinkEncryptionType.EMAIL
                       ? EmailId
-                      : null
+                      : passcode
                 props.onPressReject( key )
               }}
               style={{

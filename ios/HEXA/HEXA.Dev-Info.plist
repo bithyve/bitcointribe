@@ -26,10 +26,20 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>hexa</string>
+			<string>id</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>io.hexawallet.hexa.development</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>hexa</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>hexadev</string>
 			</array>
 		</dict>
 	</array>
