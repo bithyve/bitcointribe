@@ -1,43 +1,33 @@
+import BottomSheet from '@gorhom/bottom-sheet'
+import idx from 'idx'
 import React, { createRef, PureComponent } from 'react'
 import {
-  Text,
-  View,
-  StyleSheet,
-  ViewStyle,
-  StyleProp,
-  TouchableOpacity,
+  StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle
 } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  heightPercentageToDP,
-  widthPercentageToDP,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP, heightPercentageToDP as hp, widthPercentageToDP, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { connect } from 'react-redux'
-import idx from 'idx'
 import {
   AccountType,
-  Wallet,
+  Wallet
 } from '../../bitcoin/utilities/Interface'
-import BottomSheetHeader from '../Accounts/BottomSheetHeader'
-import BottomSheet from '@gorhom/bottom-sheet'
-import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
+import Colors from '../../common/Colors'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
-import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
-import NewBuyBitcoinBottomSheet from '../../components/home/NewBuyBitcoinBottomSheet'
-import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
+import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
 import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
 import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
-import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../../store/actions/SwanIntegration'
-import { clearRampCache } from '../../store/actions/RampIntegration'
-import { clearWyreCache } from '../../store/actions/WyreIntegration'
-import Fonts from './../../common/Fonts'
-import { RFValue } from 'react-native-responsive-fontsize'
+import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
+import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
 import ModalContainer from '../../components/home/ModalContainer'
-import { ScrollView } from 'react-native-gesture-handler'
+import NewBuyBitcoinBottomSheet from '../../components/home/NewBuyBitcoinBottomSheet'
+import { clearRampCache } from '../../store/actions/RampIntegration'
+import { clearSwanCache, createTempSwanAccountInfo, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import { clearWyreCache } from '../../store/actions/WyreIntegration'
+import BottomSheetHeader from '../Accounts/BottomSheetHeader'
+import Fonts from './../../common/Fonts'
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
     Closed,

@@ -1,32 +1,42 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { FlatList, SafeAreaView, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native'
-import { ListItem } from 'react-native-elements'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { useDispatch } from 'react-redux'
-import Archive from '../../../assets/images/svgs/icon_archive.svg'
-import Visibilty from '../../../assets/images/svgs/icon_visibility.svg'
-import NameNDesc from '../../../assets/images/svgs/name_desc.svg'
-import Xpub from '../../../assets/images/svgs/xpub.svg'
-import { AccountType } from '../../../bitcoin/utilities/Interface'
-import Colors from '../../../common/Colors'
-import { translations } from '../../../common/content/LocContext'
-import AccountVisibility from '../../../common/data/enums/AccountVisibility'
-import { hp } from '../../../common/data/responsiveness/responsive'
-import ListStyles from '../../../common/Styles/ListStyles'
-import CommonStyles from '../../../common/Styles/Styles'
-import HeaderTitle from '../../../components/HeaderTitle'
-import ModalContainer from '../../../components/home/ModalContainer'
-import { updateAccountSettings } from '../../../store/actions/accounts'
-import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
-import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
-import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
-import AccountArchiveModal from './AccountArchiveModal'
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  FlatList,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import { ListItem } from 'react-native-elements';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { useDispatch } from 'react-redux';
+import InProgressModal from 'src/components/loader/InProgressModal';
+import Toast from 'src/components/Toast';
+import AmountBTC from '../../../assets/images/svgs/amount_btc.svg';
+import Archive from '../../../assets/images/svgs/icon_archive.svg';
+import Visibilty from '../../../assets/images/svgs/icon_visibility.svg';
+import NameNDesc from '../../../assets/images/svgs/name_desc.svg';
+import Xpub from '../../../assets/images/svgs/xpub.svg';
+import { AccountType } from '../../../bitcoin/utilities/Interface';
+import Colors from '../../../common/Colors';
+import { translations } from '../../../common/content/LocContext';
+import AccountVisibility from '../../../common/data/enums/AccountVisibility';
+import { hp } from '../../../common/data/responsiveness/responsive';
+import ListStyles from '../../../common/Styles/ListStyles';
+import CommonStyles from '../../../common/Styles/Styles';
+import HeaderTitle from '../../../components/HeaderTitle';
+import ModalContainer from '../../../components/home/ModalContainer';
+import { updateAccountSettings } from '../../../store/actions/accounts';
+import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning';
+import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell';
+import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell';
+import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID';
+import AccountArchiveModal from './AccountArchiveModal';
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.ARCHIVED,
   // AccountVisibility.DURESS,   // Disabled until duress mode is implemented later
-]
+];
 
 export type Props = {
   navigation: any;
@@ -42,34 +52,33 @@ export type SettingsListItem = {
   onOptionPressed?: () => void;
 };
 
-const listItemKeyExtractor = ( item: SettingsListItem ) => item.title
+const listItemKeyExtractor = (item: SettingsListItem) => item.title;
 
-
-const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Props ) => {
-  const accountShellID = route.params?.accountShellID
-  const dispatch = useDispatch()
-  const strings  = translations[ 'accounts' ]
-  const setting  = translations[ 'stackTitle' ]
-  const [ showRescanning, setShowRescanning ] = useState( false )
-  const [ showRescanningPrompt, setShowRescanningPrompt ] = useState( false )
-  const [ showAccountArchiveModal, setShowAccountArchiveModal ] = useState( false )
-  const [ checkAccountModal, setCheckAccountModal ] = useState( false )
-  const accountShell = useAccountShellForID( accountShellID )
-  const primarySubAccount  = usePrimarySubAccountForShell( accountShell )
-  const account = useAccountByAccountShell( accountShell )
+const AccountSettingsMainScreen: React.FC<Props> = ({ navigation, route }: Props) => {
+  const accountShellID = route.params?.accountShellID;
+  const dispatch = useDispatch();
+  const strings = translations['accounts'];
+  const setting = translations['stackTitle'];
+  const [showRescanning, setShowRescanning] = useState(false);
+  const [showRescanningPrompt, setShowRescanningPrompt] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showAccountArchiveModal, setShowAccountArchiveModal] = useState(false);
+  const [checkAccountModal, setCheckAccountModal] = useState(false);
+  const accountShell = useAccountShellForID(accountShellID);
+  const primarySubAccount = usePrimarySubAccountForShell(accountShell);
+  const account = useAccountByAccountShell(accountShell);
   //  const [ accountBalance, setAccountBalance ] = useState( primarySubAccount.balances )
 
-
-  useEffect( () => {
+  useEffect(() => {
     return () => {
       // dismissBottomSheet()
-      setShowRescanningPrompt( false )
-      setShowRescanning( false )
-    }
-  }, [ navigation ] )
+      setShowRescanningPrompt(false);
+      setShowRescanning(false);
+    };
+  }, [navigation]);
 
-  const listItems = useMemo<SettingsListItem[]>( () => {
-    const items =  [
+  const listItems = useMemo<SettingsListItem[]>(() => {
+    const items = [
       ...[
         {
           title: strings.NameDescription,
@@ -80,18 +89,21 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
           },
           imageSource: () => <NameNDesc />,
         },
-        ...( accountShell.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT ?[
-          {
-            title: strings.ShowxPub,
-            subtitle: strings.ShowxPubSub,
-            screenName: 'ShowXPub',
-            screenParams: {
-              primarySubAccountName: primarySubAccount.customDisplayName || primarySubAccount.defaultTitle,
-              accountShellID: accountShell.id,
-            },
-            imageSource: () => <Xpub />,
-          }
-        ] : [] ),
+        ...(accountShell.primarySubAccount.type !== AccountType.LIGHTNING_ACCOUNT
+          ? [
+              {
+                title: strings.ShowxPub,
+                subtitle: strings.ShowxPubSub,
+                screenName: 'ShowXPub',
+                screenParams: {
+                  primarySubAccountName:
+                    primarySubAccount.customDisplayName || primarySubAccount.defaultTitle,
+                  accountShellID: accountShell.id,
+                },
+                imageSource: () => <Xpub />,
+              },
+            ]
+          : []),
         // {
         //   title: 'Account Sync',
         //   subtitle: 'Manually scan the account',
@@ -99,17 +111,19 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
         //   onOptionPressed: handleRescanListItemSelection,
         // },
       ],
-      ...( accountShell.primarySubAccount.isTFAEnabled ? [
-        {
-          title: strings[ '2FASettings' ],
-          subtitle: strings[ '2FASettingsSub' ],
-          screenName: 'SubAccountTFAHelp',
-          screenParams: {
-            sourceAccountShell: accountShell,
-          },
-          imageSource: () => <Xpub />,
-        }
-      ] : [] ),
+      ...(accountShell.primarySubAccount.isTFAEnabled
+        ? [
+            {
+              title: strings['2FASettings'],
+              subtitle: strings['2FASettingsSub'],
+              screenName: 'SubAccountTFAHelp',
+              screenParams: {
+                sourceAccountShell: accountShell,
+              },
+              imageSource: () => <Xpub />,
+            },
+          ]
+        : []),
 
       // 📝 These items are being commented out until their functionality is fully implemented.
       // See: https://github.com/bithyve/hexa/issues/2243
@@ -127,7 +141,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
         screenParams: {
           accountShellID: accountShell.id,
         },
-        imageSource: () =><Visibilty />,
+        imageSource: () => <Visibilty />,
       },
       // {
       //   title: 'Merge Account',
@@ -141,9 +155,9 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
         onOptionPressed: showArchiveModal,
         imageSource: () => <Archive />,
       },
-    ]
-    if( account.type === AccountType.BORDER_WALLET ) {
-      items.push( {
+    ];
+    if (account.type === AccountType.BORDER_WALLET) {
+      items.push({
         title: 'Backup with Border Wallet',
         subtitle: 'Check health - grid, pattern, checksum and passphrase',
         screenName: 'BackupGridMnemonic',
@@ -153,115 +167,137 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
           borderWalletGridMnemonic: account.borderWalletGridMnemonic,
         },
         imageSource: () => <NameNDesc />,
-      } )
+      });
     }
-    return items
-  }, [ accountShell, account ] )
+    if (account.type === AccountType.TEST_ACCOUNT) {
+      items.push({
+        title: 'Receive Test Sats',
+        subtitle: 'Receive Test Sats to this address',
+        onOptionPressed: receiveTestSats,
+        imageSource: () => <AmountBTC />,
+      });
+    }
+    return items;
+  }, [accountShell, account]);
 
-  function handleListItemPress( listItem: SettingsListItem ) {
-    if ( typeof listItem.onOptionPressed === 'function' ) {
-      listItem.onOptionPressed()
-    } else if ( listItem.screenName !== undefined ) {
-      const screenParams = listItem.screenParams || {
-      }
-      navigation.navigate( listItem.screenName, screenParams )
+  function handleListItemPress(listItem: SettingsListItem) {
+    if (typeof listItem.onOptionPressed === 'function') {
+      listItem.onOptionPressed();
+    } else if (listItem.screenName !== undefined) {
+      const screenParams = listItem.screenParams || {};
+      navigation.navigate(listItem.screenName, screenParams);
     }
   }
 
-  const renderItem = ( { item: listItem }: { item: SettingsListItem } ) => {
-    if ( listItem.title === 'Archive Account' && primarySubAccount.type === AccountType.CHECKING_ACCOUNT ) {
-      return null
+  const renderItem = ({ item: listItem }: { item: SettingsListItem }) => {
+    if (
+      listItem.title === 'Archive Account' &&
+      primarySubAccount.type === AccountType.CHECKING_ACCOUNT
+    ) {
+      return null;
     }
     return (
       <ListItem
-        underlayColor='none'
+        underlayColor="none"
         containerStyle={{
-          backgroundColor:'transparent'
+          backgroundColor: 'transparent',
         }}
         // bottomDivider
-        onPress={() => { handleListItemPress( listItem ) }}
+        onPress={() => {
+          handleListItemPress(listItem);
+        }}
         // disabled={listItem.title === 'Archive Account' && primarySubAccount.type === AccountType.CHECKING_ACCOUNT}
       >
-        <View style={ListStyles.thumbnailImageSmall}>
-          {listItem.imageSource()}
-        </View>
+        <View style={ListStyles.thumbnailImageSmall}>{listItem.imageSource()}</View>
 
-        <ListItem.Content style={[ ListStyles.listItemContentContainer, {
-          paddingVertical: 10,
-        } ]}>
+        <ListItem.Content
+          style={[
+            ListStyles.listItemContentContainer,
+            {
+              paddingVertical: 10,
+            },
+          ]}
+        >
           <ListItem.Title style={ListStyles.listItemTitle}>{listItem.title}</ListItem.Title>
-          <ListItem.Subtitle style={ListStyles.listItemSubtitle}>{listItem.subtitle}</ListItem.Subtitle>
+          <ListItem.Subtitle style={ListStyles.listItemSubtitle}>
+            {listItem.subtitle}
+          </ListItem.Subtitle>
         </ListItem.Content>
 
-        <ListItem.Chevron size={22}/>
+        <ListItem.Chevron size={22} />
       </ListItem>
-    )
-  }
+    );
+  };
 
-  const checkAccountBalance = useCallback( () => {
-    return(
+  const checkAccountBalance = useCallback(() => {
+    return (
       <AccountArchiveModal
         isError={true}
         onProceed={() => {
           // closeArchiveModal()
-          setCheckAccountModal( false )
+          setCheckAccountModal(false);
         }}
-        onBack={() => setCheckAccountModal( false )}
+        onBack={() => setCheckAccountModal(false)}
         onViewAccount={() => {
-          setCheckAccountModal( false )
-          navigation.pop()
-        }
-        }
+          setCheckAccountModal(false);
+          navigation.pop();
+        }}
         account={primarySubAccount}
       />
-    )
-  }, [ primarySubAccount ] )
+    );
+  }, [primarySubAccount]);
 
   function handleRescanListItemSelection() {
     // showRescanningPromptBottomSheet()
-    setShowRescanningPrompt( true )
+    setShowRescanningPrompt(true);
   }
 
   function handleAccountArchive() {
     const settings = {
-      visibility: AccountVisibility.ARCHIVED
-    }
-    dispatch( updateAccountSettings( {
-      accountShell, settings
-    } ) )
-    navigation.navigate( 'Home' )
+      visibility: AccountVisibility.ARCHIVED,
+    };
+    dispatch(
+      updateAccountSettings({
+        accountShell,
+        settings,
+      })
+    );
+    navigation.navigate('Home');
   }
 
-
-  const showAccountArchiveBottomSheet = useCallback( () => {
-    return(
+  const showAccountArchiveBottomSheet = useCallback(() => {
+    return (
       <AccountArchiveModal
         isError={false}
         onProceed={() => {
-          handleAccountArchive()
-          setShowAccountArchiveModal( false )
+          handleAccountArchive();
+          setShowAccountArchiveModal(false);
         }}
-        onBack={() => setShowAccountArchiveModal( false )}
-        onViewAccount={() => setShowAccountArchiveModal( false )}
+        onBack={() => setShowAccountArchiveModal(false)}
+        onViewAccount={() => setShowAccountArchiveModal(false)}
         account={primarySubAccount}
       />
-    )
-  }, [ primarySubAccount ] )
+    );
+  }, [primarySubAccount]);
 
   function showArchiveModal() {
-    if ( primarySubAccount.balances.confirmed + primarySubAccount.balances.unconfirmed === 0 ) {
-      setShowAccountArchiveModal( true )
+    if (primarySubAccount.balances.confirmed + primarySubAccount.balances.unconfirmed === 0) {
+      setShowAccountArchiveModal(true);
     } else {
-      setCheckAccountModal( true )
+      setCheckAccountModal(true);
     }
   }
+  function receiveTestSats() {
+    setLoading(true);
+    Toast('Receive Test Sats.');
+  }
 
-  function handleTransactionDataSelectionFromRescan( transactionData: RescannedTransactionData ) {
-    setShowRescanning( false )
-    navigation.navigate( 'TransactionDetails', {
+  function handleTransactionDataSelectionFromRescan(transactionData: RescannedTransactionData) {
+    setShowRescanning(false);
+    navigation.navigate('TransactionDetails', {
       transaction: transactionData.details,
       accountShellID: accountShell.id,
-    } )
+    });
   }
 
   return (
@@ -271,21 +307,17 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            navigation.pop()
+            navigation.pop();
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.homepageButtonColor}
-              size={17}
-            />
+            <FontAwesome name="long-arrow-left" color={Colors.homepageButtonColor} size={17} />
           </View>
         </TouchableOpacity>
       </View>
       <View style={styles.headerWrapper}>
         <HeaderTitle
-          firstLineTitle={setting[ 'AccountSettings' ]}
+          firstLineTitle={setting['AccountSettings']}
           secondLineTitle={''}
           infoTextNormal={''}
           infoTextBold={''}
@@ -303,24 +335,48 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, route }: Prop
         keyExtractor={listItemKeyExtractor}
         renderItem={renderItem}
       />
-      <ModalContainer onBackground={()=>setShowAccountArchiveModal( false )} visible={showAccountArchiveModal} closeBottomSheet={() => {}}>
+      <ModalContainer
+        onBackground={() => setShowAccountArchiveModal(false)}
+        visible={showAccountArchiveModal}
+        closeBottomSheet={() => {}}
+      >
         {showAccountArchiveBottomSheet()}
       </ModalContainer>
 
-      <ModalContainer onBackground={()=>setCheckAccountModal( false )} visible={checkAccountModal} closeBottomSheet={() => {}}>
+      <ModalContainer
+        onBackground={() => setCheckAccountModal(false)}
+        visible={checkAccountModal}
+        closeBottomSheet={() => {}}
+      >
         {checkAccountBalance()}
       </ModalContainer>
+      <ModalContainer
+        onBackground={() => {
+          setLoading(false);
+        }}
+        closeBottomSheet={() => {
+          setLoading(false);
+        }}
+        visible={loading}
+      >
+        <InProgressModal title={'Receiving Test Sats'} otherText={'Receiving test sats. Please hold on a moment.'}/>
+      </ModalContainer>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
   rootContainer: {
     // paddingTop: 10,
   },
-  headerWrapper:{
-    marginBottom: hp( 20 )
-  }
-} )
+  headerWrapper: {
+    marginBottom: hp(20),
+  },
+  modalContainer: {
+    backgroundColor: Colors.blue,
+    alignSelf: 'center',
+    width: '100%',
+  },
+});
 
-export default AccountSettingsMainScreen
+export default AccountSettingsMainScreen;
