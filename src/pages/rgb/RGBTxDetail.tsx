@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp
@@ -160,6 +159,7 @@ export default function RGBTxDetail( props ) {
             } )
           }}
           showKnowMore
+          knowMoreText='View Details'
           onSettingsPressed={() => { }}
           balance={asset.balance.settled}
           cardColor={'#A29DD3'}
@@ -184,19 +184,13 @@ export default function RGBTxDetail( props ) {
           <TouchableOpacity
             onPress={onViewMorePressed}
           >
-            <LinearGradient
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              colors={[ Colors.skyBlue, Colors.darkBlue ]}
+            <View
               style={styles.viewMoreWrapper}
             >
               <Text style={styles.headerTouchableText}>
                 {accountStr.ViewMore}
               </Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         </View>
         {
@@ -321,7 +315,8 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'center',
     padding: 3,
-    borderRadius: 5
+    borderRadius: 5,
+    backgroundColor: Colors.blue
   },
   labelContainer: {
     backgroundColor: Colors.THEAM_TEXT_COLOR,
