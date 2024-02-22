@@ -173,7 +173,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
       <UnHideRestoreAccountSuccessBottomSheet
         onProceed={( accounShell )=>{
           showSuccessModel( false )
-         if(Platform.OS==='android'){
+         if(Platform.OS!=='android'){
           setTimeout(()=>{
             if( ( primarySubAccount as SubAccountDescribing ).type === AccountType.LIGHTNING_ACCOUNT ) {
               const resetAction = CommonActions.reset( {
