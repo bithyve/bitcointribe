@@ -22,7 +22,6 @@ import {
   widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
-import ActivityIndicatorView from 'src/components/loader/ActivityIndicatorView'
 import Colors from '../common/Colors'
 import { LocalizationContext } from '../common/content/LocContext'
 import Fonts from '../common/Fonts'
@@ -57,7 +56,6 @@ const NewWalletName: React.FC<Props> = ( { route, navigation }: Props ) => {
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ note, showNote ] = useState( true )
   const [ successModal, setSuccessModal ] = useState( false )
-  const [ showLoader, setShowLoader] = useState( false )
   const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
   const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
@@ -82,9 +80,8 @@ const NewWalletName: React.FC<Props> = ( { route, navigation }: Props ) => {
 
   useEffect( () => {
     if ( walletSetupCompleted ) {
-    setLoaderModal( false )
-    setShowLoader(true)
-    setTimeout( () => {
+      setLoaderModal( false )
+      if(Platform.OS==='android'){
         navigation.dispatch( CommonActions.reset( {
           index: 0,
           routes: [
@@ -96,8 +93,22 @@ const NewWalletName: React.FC<Props> = ( { route, navigation }: Props ) => {
             },
           ]
         } ) )
-      },5)
-  }
+      }else{
+        setTimeout( () => {
+            navigation.dispatch( CommonActions.reset( {
+              index: 0,
+              routes: [
+                {
+                  name: 'App',
+                  params: {
+                    walletName
+                  }
+                },
+              ]
+            } ) )
+          },100)
+      }
+      }
   }, [ walletSetupCompleted, cloudBackupStatus ] )
 
   const renderLoaderModalContent = useCallback( () => {
@@ -186,7 +197,7 @@ const NewWalletName: React.FC<Props> = ( { route, navigation }: Props ) => {
       setTimeout( () => {
         console.log( 'TIMEOUT' )
         setLoaderModal( true )
-      }, 5 )
+      }, 100 )
   }
 
   return (
@@ -194,7 +205,6 @@ const NewWalletName: React.FC<Props> = ( { route, navigation }: Props ) => {
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      {showLoader&& <ActivityIndicatorView showLoader={showLoader} />}
       <View style={{
         flex: 1
       }}>
