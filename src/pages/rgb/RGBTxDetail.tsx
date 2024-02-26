@@ -31,6 +31,10 @@ import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAcco
 import SendAndReceiveButtonsFooter from '../Accounts/Details/SendAndReceiveButtonsFooter'
 import DetailsCard from './DetailsCard'
 
+const numberWithCommas = ( x ) => {
+  return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+}
+
 export default function RGBTxDetail( props ) {
   const dispatch = useDispatch()
   const { translations } = useContext( LocalizationContext )
@@ -122,7 +126,7 @@ export default function RGBTxDetail( props ) {
               color: ( item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() ==='ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS' ) ? Colors.grayShade : Colors.lightBlue
             } ]}
           >
-            {item.amount}
+            {numberWithCommas(item.amount)}
           </Text>
         </View>
         <View style={{
