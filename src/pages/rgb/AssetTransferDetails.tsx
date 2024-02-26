@@ -26,7 +26,9 @@ const styles = StyleSheet.create( {
     borderRadius: 5
   },
 } )
-
+const numberWithCommas = ( x ) => {
+  return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+}
 const DetailsItem = ( { name, value, subDetailPressable = false } ) => {
   return(
     <View style={styles.lineItem}>
@@ -93,7 +95,7 @@ const AssetTransferDetails = ( props ) => {
       }}>
         <DetailsItem
           name="Amount"
-          value={item.amount}
+          value={numberWithCommas(item && item.amount)}
         />
         {item.kind !== 'ISSUANCE' && (
           <DetailsItem
