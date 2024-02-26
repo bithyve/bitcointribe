@@ -126,7 +126,7 @@ export default function RGBTxDetail( props ) {
               color: ( item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() ==='ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS' ) ? Colors.grayShade : Colors.lightBlue
             } ]}
           >
-            {numberWithCommas(item.amount)}
+            {numberWithCommas(item && item.amount)}
           </Text>
         </View>
         <View style={{
