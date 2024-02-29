@@ -10,19 +10,21 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import { useDispatch } from 'react-redux'
 import { RGB_ASSET_TYPE } from 'src/bitcoin/utilities/Interface'
+import ReceiveIcon from '../../assets/images/svgs/icon_receive.svg'
+import SentIcon from '../../assets/images/svgs/icon_sent.svg'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import CommonStyles from '../../common/Styles/Styles'
 import { LocalizationContext } from '../../common/content/LocContext'
 import NetworkKind from '../../common/data/enums/NetworkKind'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
 import RGBServices from '../../services/RGBServices'
 import { fetchExchangeRates, fetchFeeRates } from '../../store/actions/accounts'
 import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
@@ -106,6 +108,9 @@ export default function RGBTxDetail( props ) {
   const renderItem = ( { item } ) => {
     return (
       <TouchableOpacity style={styles.itemContainer} onPress={() => onItemClick( item )}>
+         <View style={styles.iconWrapper}>
+          {(item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() === 'ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS') ? <ReceiveIcon/> : <SentIcon/>}
+        </View>
         <View style={styles.textContainer}>
           <Text style={styles.itemTitle}>{item.status}</Text>
           <Text style={styles.itemDesc}>{moment.unix( item.createdAt ).format( 'DD/MM/YY • hh:MMa' )}</Text>
@@ -114,11 +119,21 @@ export default function RGBTxDetail( props ) {
           <Text
             numberOfLines={1}
             style={[ styles.amountText, {
-              color: ( item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() ==='ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS' ) ? '#04A777' : '#FD746C'
+              color: ( item.kind.toUpperCase() === 'RECEIVE_BLIND' || item.kind.toUpperCase() ==='ISSUANCE' || item.kind.toUpperCase() === 'RECEIVE_WITNESS' ) ? Colors.grayShade : Colors.lightBlue
             } ]}
           >
             {item.amount}
           </Text>
+        </View>
+        <View style={{
+          width: '5%'
+        }}>
+          <Ionicons
+            name="chevron-forward"
+            color={Colors.Black}
+            size={15}
+            style={styles.forwardIcon}
+          />
         </View>
       </TouchableOpacity>
     )
@@ -160,6 +175,7 @@ export default function RGBTxDetail( props ) {
             } )
           }}
           showKnowMore
+          knowMoreText='View Details'
           onSettingsPressed={() => { }}
           balance={asset.balance.settled}
           cardColor={'#A29DD3'}
@@ -184,19 +200,13 @@ export default function RGBTxDetail( props ) {
           <TouchableOpacity
             onPress={onViewMorePressed}
           >
-            <LinearGradient
-              start={{
-                x: 0, y: 0
-              }} end={{
-                x: 1, y: 0
-              }}
-              colors={[ Colors.skyBlue, Colors.darkBlue ]}
+            <View
               style={styles.viewMoreWrapper}
             >
               <Text style={styles.headerTouchableText}>
                 {accountStr.ViewMore}
               </Text>
-            </LinearGradient>
+            </View>
           </TouchableOpacity>
         </View>
         {
@@ -271,7 +281,8 @@ const styles = StyleSheet.create( {
     marginHorizontal: 20,
     paddingVertical: 10,
     marginTop: 20,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   itemImage: {
     width: 35, height: 35, borderRadius: 20, backgroundColor: 'gray'
@@ -321,7 +332,8 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     justifyContent: 'center',
     padding: 3,
-    borderRadius: 5
+    borderRadius: 5,
+    backgroundColor: Colors.blue
   },
   labelContainer: {
     backgroundColor: Colors.THEAM_TEXT_COLOR,
@@ -335,5 +347,8 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 9 ),
     fontFamily: Fonts.SemiBold,
     color: Colors.white,
-  }
+  },
+  iconWrapper: {
+    width: '11%'
+  },
 } )
