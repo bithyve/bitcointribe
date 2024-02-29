@@ -2,19 +2,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CommonActions } from '@react-navigation/native';
 import * as bip39 from 'bip39';
 import React, { useEffect, useState } from 'react';
-import { NativeModules, SafeAreaView, StatusBar, View } from 'react-native';
+import { NativeModules, Platform, SafeAreaView, StatusBar, View } from 'react-native';
 import { RootStateOrAny, useDispatch, useSelector } from 'react-redux';
 import BottomSheet from 'reanimated-bottom-sheet';
-import RGBIntroModal from 'src/components/rgb/RGBIntroModal';
 import Toast from 'src/components/Toast';
+import RGBIntroModal from 'src/components/rgb/RGBIntroModal';
 import RGBServices from 'src/services/RGBServices';
 import { Wallet } from '../../bitcoin/utilities/Interface';
 import Colors from '../../common/Colors';
 import { translations } from '../../common/content/LocContext';
 import AlertModalContents from '../../components/AlertModalContents';
 import ErrorModalContents from '../../components/ErrorModalContents';
-import ModalContainer from '../../components/home/ModalContainer';
 import LoaderModal from '../../components/LoaderModal';
+import ModalContainer from '../../components/home/ModalContainer';
 import { recoverWalletUsingMnemonic, restoreSeedWordFailed } from '../../store/actions/BHR';
 import { completedWalletSetup } from '../../store/actions/setupAndAuth';
 import { setVersion } from '../../store/actions/versionHistory';
@@ -59,7 +59,16 @@ const RestoreSeedWordsContent = (props) => {
       AsyncStorage.setItem('walletRecovered', 'true');
       dispatch(setVersion('Restored'));
       try {
-        setRgbRestoreModal(true);
+        if(Platform.OS === 'android') {
+          setRgbRestoreModal(true);
+        } else {
+          setRgbRestoreModal(false);
+          setLoaderModal(false);
+          setShowLoader(false);
+          setTimeout(() => {
+            goToApp()
+          }, 500);
+        }
         // Alert.alert(
         //   'Restore RGB',
         //   'Do you want to restore state of your RGB assets?',
@@ -112,6 +121,8 @@ const RestoreSeedWordsContent = (props) => {
 
   const goToApp = () => {
     setRgbRestoreModal(false);
+    setLoaderModal(false);
+    setShowLoader(false);
     props.navigation.dispatch(
       CommonActions.reset({
         index: 0,
@@ -122,7 +133,6 @@ const RestoreSeedWordsContent = (props) => {
         ],
       })
     );
-    setShowLoader(false);
   };
 
   const renderSeedErrorModal = () => {
@@ -137,7 +147,7 @@ const RestoreSeedWordsContent = (props) => {
   };
 
   const recoverWalletViaSeed = (mnemonic: string) => {
-    setShowLoader(true);
+    // setShowLoader(true);
     setMnemonic(mnemonic);
     setTimeout(() => {
       const isValidMnemonic = bip39.validateMnemonic(mnemonic);

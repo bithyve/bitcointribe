@@ -23,14 +23,14 @@ import BorderWalletIcon from '../../assets/images/svgs/borderWallet.svg'
 import { LevelData, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
+import Fonts from '../../common/Fonts'
 import { translations } from '../../common/content/LocContext'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
-import Fonts from '../../common/Fonts'
-import BWHealthCheckModal from '../../components/border-wallet/BWHealthCheckModal'
 import HeaderTitle from '../../components/HeaderTitle'
-import ModalContainer from '../../components/home/ModalContainer'
 import Toast from '../../components/Toast'
+import BWHealthCheckModal from '../../components/border-wallet/BWHealthCheckModal'
+import ModalContainer from '../../components/home/ModalContainer'
 import RGBServices from '../../services/RGBServices'
 import dbManager from '../../storage/realm/dbManager'
 import { onPressKeeper } from '../../store/actions/BHR'
@@ -343,55 +343,59 @@ export default function BackupMethods( { navigation } ) {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.body}>
-          <TouchableOpacity
-            style={{
-              flexDirection: 'row',
-            }}
-            onPress={onPressBackupRGB}>
-            <View
+        {
+          Platform.OS === 'android' && (
+            <View style={styles.body}>
+            <TouchableOpacity
               style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: Colors.white,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Image
+                flexDirection: 'row',
+              }}
+              onPress={onPressBackupRGB}>
+              <View
                 style={{
-                  height: 20,
-                  width: 20,
-                }}
-                resizeMode={'contain'}
-                source={require( '../../assets/images/icons/rgb_logo_round.png' )}
-              />
-            </View>
-            <View>
-              <Text
-                style={{
-                  fontSize: RFValue( 11 ),
-                  fontFamily: Fonts.Regular,
-                  color: Colors.black,
-                  marginHorizontal: 10,
-                  textAlign: 'center',
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: Colors.white,
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}>
-              RGB data Backup on Cloud
-              </Text>
-
-              <Text
-                style={{
-                  fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.Regular,
-                  color: Colors.black,
-                  marginHorizontal: 10,
-                  marginTop: 2
-                }}>
-                {`Last backup: ${lastBackedUp ? moment( lastBackedUp ).format( 'DD MMM YYYY' ): 'Never'}`}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+                <Image
+                  style={{
+                    height: 20,
+                    width: 20,
+                  }}
+                  resizeMode={'contain'}
+                  source={require( '../../assets/images/icons/rgb_logo_round.png' )}
+                />
+              </View>
+              <View>
+                <Text
+                  style={{
+                    fontSize: RFValue( 11 ),
+                    fontFamily: Fonts.Regular,
+                    color: Colors.black,
+                    marginHorizontal: 10,
+                    textAlign: 'center',
+                  }}>
+                RGB data Backup on Cloud
+                </Text>
+  
+                <Text
+                  style={{
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.Regular,
+                    color: Colors.black,
+                    marginHorizontal: 10,
+                    marginTop: 2
+                  }}>
+                  {`Last backup: ${lastBackedUp ? moment( lastBackedUp ).format( 'DD MMM YYYY' ): 'Never'}`}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          )
+        }
         {wallet.borderWalletMnemonic !== '' && (
           <View style={styles.body}>
             <TouchableOpacity

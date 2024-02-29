@@ -18,25 +18,25 @@ import {
   widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import useAccountsState from 'src/utils/hooks/state-selectors/accounts/UseAccountsState'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import NavStyles from '../../common/Styles/NavStyles'
 import CommonStyles from '../../common/Styles/Styles'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import useAccountsState from 'src/utils/hooks/state-selectors/accounts/UseAccountsState'
 
 
 
+import BottomSheet from '@gorhom/bottom-sheet'
 import { useDispatch, useSelector } from 'react-redux'
+import ErrorModalContents from 'src/components/ErrorModalContents'
+import Toast from 'src/components/Toast'
+import ModalContainer from 'src/components/home/ModalContainer'
+import { receiveRgbAsset } from 'src/store/actions/rgb'
 import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
 import { translations } from '../../common/content/LocContext'
 import CopyThisText from '../../components/CopyThisText'
 import QRCode from '../../components/QRCode'
-import Toast from '../../components/Toast'
-import { receiveRgbAsset } from '../../store/actions/rgb'
-import ErrorModalContents from 'src/components/ErrorModalContents'
-import ModalContainer from 'src/components/home/ModalContainer'
-import BottomSheet from '@gorhom/bottom-sheet'
 
 export default function RGBReceive( props ) {
   const strings = translations[ 'accounts' ]
@@ -57,21 +57,11 @@ export default function RGBReceive( props ) {
   }, [] )
 
   const runOnMountOrTryAgain=()=>{
-    if ( assetType == RGB_ASSET_TYPE.BITCOIN ) {
-      setReceivingAddress( nextFreeAddress )
-    } else {
-      setRequesting( true )
-      setTimeout(() => {
-        dispatch( receiveRgbAsset() )
-      }, 5000);
-    }
+    dispatch( receiveRgbAsset() )
   }
 
   useEffect( () => {
     if ( assetType == RGB_ASSET_TYPE.RGB20 ) {
-      if ( loading ) {
-        setRequesting( true )
-      }
       if ( !loading && isError ) {
         if(message==='Insufficient sats for RGB'){
          setTimeout(()=>{
@@ -81,11 +71,6 @@ export default function RGBReceive( props ) {
           Toast( message )
         }        
       }
-      if ( !loading && !isError ) {
-        setReceivingAddress( data.invoice )
-        setRequesting( false )
-      }
-
     }
   }, [ isError, loading ] )
 
@@ -138,17 +123,17 @@ export default function RGBReceive( props ) {
             </View>
             <Text style={styles.headerTitleText}>Receive</Text>
             {
-              requesting ? <ActivityIndicator style={{
+              loading ? <ActivityIndicator style={{
                 height: '70%'
               }} size="large" /> :
                 <ScrollView>
                   <View style={styles.QRView}>
-                    <QRCode title={assetType === RGB_ASSET_TYPE.BITCOIN ? 'Bitcoin address' : 'RGB Invoice'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp( '27%' )} />
+                    <QRCode title={'RGB Invoice'} value={data.invoice} size={hp( '27%' )} />
                   </View>
 
                   <CopyThisText
                     backgroundColor={Colors.white}
-                    text={paymentURI ? paymentURI : receivingAddress}
+                    text={data.invoice}
                     toastText='Address Copied Successfully'
                   />
 
