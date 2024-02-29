@@ -1,164 +1,163 @@
-import { call, delay, put, race, select } from 'redux-saga/effects'
-import {
-  createWatcher,
-} from '../utils/utilities'
-import * as bip39 from 'bip39'
-import {
-  INIT_HEALTH_SETUP,
-  UPDATE_SHARES_HEALTH,
-  updateLevelTwoMetaShareStatus,
-  updateLevelThreeMetaShareStatus,
-  INIT_LEVEL_TWO,
-  initLevelTwo,
-  isLevel2InitializedStatus,
-  updateMSharesHealth,
-  updatedKeeperInfo,
-  walletRecoveryFailed,
-  RECOVER_WALLET_USING_ICLOUD,
-  RECOVER_WALLET_HEALTH,
-  CLOUD_MSHARE,
-  switchS3LoaderKeeper,
-  isLevel3InitializedStatus,
-  RECOVER_MNEMONIC_HEALTH,
-  mnemonicRecoveredHealth,
-  GET_PDF_DATA,
-  setPDFInfo,
-  SHARE_PDF,
-  CONFIRM_PDF_SHARED,
-  KEEPER_INFO,
-  putKeeperInfo,
-  UPDATE_WALLET_IMAGE_HEALTH,
-  EMPTY_SHARE_TRANSFER_DETAILS,
-  DELETE_SM_AND_SMSHARES,
-  AUTO_SHARE_LEVEL2_KEEPER,
-  pdfSuccessfullyCreated,
-  SET_LEVEL_TO_NOT_SETUP,
-  setIsLevelToNotSetupStatus,
-  SET_HEALTH_STATUS,
-  MODIFY_LEVELDATA,
-  updateLevelData,
-  setChannelAssets,
-  CREATE_CHANNEL_ASSETS,
-  setApprovalStatus,
-  DOWNLOAD_SM_SHARE,
-  secondaryShareDownloaded,
-  CREATE_GUARDIAN,
-  setDownloadedBackupData,
-  DOWNLOAD_BACKUP_DATA,
-  SETUP_HEALTH_FOR_RESTORE,
-  UPDATE_KEEPER_INFO_TO_CHANNEL,
-  setIsKeeperInfoUpdated,
-  ACCEPT_EC_REQUEST,
-  SETUP_PASSWORD,
-  initializeHealthSetup,
-  SETUP_LEVEL_HEALTH,
-  GENERATE_LEVEL1_SHARES,
-  GENERATE_LEVEL2_SHARES,
-  RETRIEVE_METASHRES,
-  setLevelCompletionError,
-  navigateToHistoryPage,
-  generateMetaShare,
-  setIsKeeperTypeBottomSheetOpen,
-  ON_PRESS_KEEPER,
-  retrieveMetaShares,
-  setAllowSecureAccount,
-  UPDATE_SECONDARY_SHARD,
-  GET_APPROVAL_FROM_KEEPER,
-  setOpenToApproval,
-  getApprovalFromKeepers,
-  REJECTED_EC_REQUEST,
-  setSecondaryDataInfoStatus,
-  CHANGE_QUESTION_ANSWER,
-  updateMetaSharesKeeper,
-  updateOldMetaSharesKeeper,
-  setIsCurrentLevel0,
-  RECOVER_WALLET_WITHOUT_ICLOUD,
-  UPGRADE_PDF,
-  setPdfUpgrade,
-  upgradePDF,
-  UPGRADE_LEVEL1_KEEPER,
-  RESET_LEVEL_AFTER_PASSWORD_CHANGE,
-  CHANGE_ENC_PASSWORD,
-  UPDATE_SEED_HEALTH,
-  RECOVER_WALLET_WITH_MNEMONIC,
-  updateSeedHealth,
-  setSeedBackupHistory,
-  restoreSeedWordFailed,
-} from '../actions/BHR'
-import { updateHealth } from '../actions/BHR'
-import {
-  switchS3LoadingStatus,
-  healthCheckInitialized,
-  GENERATE_META_SHARE,
-  setPasswordResetState,
-} from '../actions/BHR'
-import { Alert, NativeModules, Platform } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as bip39 from 'bip39'
+import crypto from 'crypto'
+import idx from 'idx'
+import moment from 'moment'
+import { Alert, NativeModules, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import Mailer from 'react-native-mail'
+import RNPrint from 'react-native-print'
+import Share from 'react-native-share'
+import { call, delay, put, race, select } from 'redux-saga/effects'
+import secrets from 'secrets.js-grempe'
+import semver from 'semver'
+import RGBServices from 'src/services/RGBServices'
 import config from '../../bitcoin/HexaConfig'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
 import {
+  Account,
+  AccountType,
+  Accounts,
   BackupStreamData,
+  ChannelAssets,
+  ContactDetails,
+  Gift,
   INotification,
   KeeperInfoInterface,
+  KeeperType,
   LevelData,
   LevelHealthInterface,
   LevelInfo,
   MetaShare,
-  notificationTag,
-  notificationType,
+  MultiSigAccount,
+  NewWalletImage,
   PrimaryStreamData,
   QRCodeTypes,
   SecondaryStreamData,
+  ShareSplitScheme,
   StreamData,
   TrustedContact,
   TrustedContactRelationTypes,
   Trusted_Contacts,
   UnecryptedStreamData,
   Wallet,
-  NewWalletImage,
   cloudDataInterface,
-  Accounts,
-  AccountType,
-  ContactDetails,
-  Gift,
-  Account,
-  MultiSigAccount,
-  KeeperType,
-  ShareSplitScheme
+  notificationTag,
+  notificationType
 } from '../../bitcoin/utilities/Interface'
-import moment from 'moment'
-import crypto from 'crypto'
-import generatePDFKeeper from '../utils/generatePDFKeeper'
-import { generateRandomString } from '../../common/CommonFunctions'
-import Mailer from 'react-native-mail'
-import Share from 'react-native-share'
-import RNPrint from 'react-native-print'
-import idx from 'idx'
-import { restoreAccountShells, updateAccountShells, setGifts, twoFAValid } from '../actions/accounts'
-import { getVersions } from '../../common/utilities'
-import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
-import { ChannelAssets } from '../../bitcoin/utilities/Interface'
-import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels, updateTrustedContacts } from '../actions/trustedContacts'
-import { syncPermanentChannelsWorker, restoreTrustedContactsWorker, initializeTrustedContactWorker } from './trustedContacts'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Relay from '../../bitcoin/utilities/Relay'
-import { updateWallet } from '../actions/storage'
-import dbManager from '../../storage/realm/dbManager'
-import { setWalletId } from '../actions/preferences'
-import BHROperations from '../../bitcoin/utilities/BHROperations'
-import LevelStatus from '../../common/data/enums/LevelStatus'
-import secrets from 'secrets.js-grempe'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import { upgradeAccountToMultiSig } from '../../bitcoin/utilities/accounts/AccountFactory'
-import { setVersionHistory } from '../actions/versionHistory'
-import Toast from '../../components/Toast'
-import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import { generateRandomString } from '../../common/CommonFunctions'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
+import LevelStatus from '../../common/data/enums/LevelStatus'
+import { checkLevelHealth, getLevelInfoStatus, getModifiedData, getVersions } from '../../common/utilities'
+import Toast from '../../components/Toast'
+import dbManager from '../../storage/realm/dbManager'
+import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import {
+  ACCEPT_EC_REQUEST,
+  AUTO_SHARE_LEVEL2_KEEPER,
+  CHANGE_ENC_PASSWORD,
+  CHANGE_QUESTION_ANSWER,
+  CLOUD_MSHARE,
+  CONFIRM_PDF_SHARED,
+  CREATE_CHANNEL_ASSETS,
+  CREATE_GUARDIAN,
+  DELETE_SM_AND_SMSHARES,
+  DOWNLOAD_BACKUP_DATA,
+  DOWNLOAD_SM_SHARE,
+  EMPTY_SHARE_TRANSFER_DETAILS,
+  GENERATE_LEVEL1_SHARES,
+  GENERATE_LEVEL2_SHARES,
+  GENERATE_META_SHARE,
+  GET_APPROVAL_FROM_KEEPER,
+  GET_PDF_DATA,
+  INIT_HEALTH_SETUP,
+  INIT_LEVEL_TWO,
+  KEEPER_INFO,
+  MODIFY_LEVELDATA,
+  ON_PRESS_KEEPER,
+  RECOVER_MNEMONIC_HEALTH,
+  RECOVER_WALLET_HEALTH,
+  RECOVER_WALLET_USING_ICLOUD,
+  RECOVER_WALLET_WITHOUT_ICLOUD,
+  RECOVER_WALLET_WITH_MNEMONIC,
+  REJECTED_EC_REQUEST,
+  RESET_LEVEL_AFTER_PASSWORD_CHANGE,
+  RETRIEVE_METASHRES,
+  SETUP_HEALTH_FOR_RESTORE,
+  SETUP_LEVEL_HEALTH,
+  SETUP_PASSWORD,
+  SET_HEALTH_STATUS,
+  SET_LEVEL_TO_NOT_SETUP,
+  SHARE_PDF,
+  UPDATE_KEEPER_INFO_TO_CHANNEL,
+  UPDATE_SECONDARY_SHARD,
+  UPDATE_SEED_HEALTH,
+  UPDATE_SHARES_HEALTH,
+  UPDATE_WALLET_IMAGE_HEALTH,
+  UPGRADE_LEVEL1_KEEPER,
+  UPGRADE_PDF,
+  generateMetaShare,
+  getApprovalFromKeepers,
+  healthCheckInitialized,
+  initLevelTwo,
+  initializeHealthSetup,
+  isLevel2InitializedStatus,
+  isLevel3InitializedStatus,
+  mnemonicRecoveredHealth,
+  navigateToHistoryPage,
+  pdfSuccessfullyCreated,
+  putKeeperInfo,
+  restoreSeedWordFailed,
+  retrieveMetaShares,
+  secondaryShareDownloaded,
+  setAllowSecureAccount,
+  setApprovalStatus,
+  setChannelAssets,
+  setDownloadedBackupData,
+  setIsCurrentLevel0,
+  setIsKeeperInfoUpdated,
+  setIsKeeperTypeBottomSheetOpen,
+  setIsLevelToNotSetupStatus,
+  setLevelCompletionError,
+  setOpenToApproval,
+  setPDFInfo,
+  setPasswordResetState,
+  setPdfUpgrade,
+  setSecondaryDataInfoStatus,
+  setSeedBackupHistory,
+  switchS3LoaderKeeper,
+  switchS3LoadingStatus,
+  updateHealth,
+  updateLevelData,
+  updateLevelThreeMetaShareStatus,
+  updateLevelTwoMetaShareStatus,
+  updateMSharesHealth,
+  updateMetaSharesKeeper,
+  updateOldMetaSharesKeeper,
+  updateSeedHealth,
+  updatedKeeperInfo,
+  upgradePDF,
+  walletRecoveryFailed,
+} from '../actions/BHR'
+import { setGifts, twoFAValid, updateAccountShells } from '../actions/accounts'
 import { updateCloudData } from '../actions/cloud'
-import { restoreAccountShellsWorker } from './accounts'
-import { applyUpgradeSequence } from './upgrades'
-import semver from 'semver'
 import { fetchNotificationStarted, messageFetched, storeMessagesTimeStamp } from '../actions/notifications'
+import { setWalletId } from '../actions/preferences'
+import { setRgbConfig } from '../actions/rgb'
+import { updateWallet } from '../actions/storage'
+import { InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels, updateTrustedContacts } from '../actions/trustedContacts'
+import { setVersionHistory } from '../actions/versionHistory'
+import generatePDFKeeper from '../utils/generatePDFKeeper'
+import {
+  createWatcher,
+} from '../utils/utilities'
+import { restoreAccountShellsWorker } from './accounts'
+import { initializeTrustedContactWorker, restoreTrustedContactsWorker, syncPermanentChannelsWorker } from './trustedContacts'
+import { applyUpgradeSequence } from './upgrades'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.bhr.levelHealth )
@@ -560,6 +559,9 @@ function* recoverWalletWithMnemonicWorker( { payload } ) {
     } )
     yield put( updateSeedHealth() )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
+    const config = yield call( RGBServices.restoreKeys, primaryMnemonic )
+    yield put( setRgbConfig( config ) )
+    const isRgbInit = yield call( RGBServices.initiate, config.mnemonic, config.xpub  )
   } catch ( err ) {
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
     yield put( walletRecoveryFailed( true ) )

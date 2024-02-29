@@ -45,7 +45,7 @@ class HexaConfig {
   public BUNDLE_ID_DEV: string = 'io.hexawallet.hexa.development';
   public APPSTORE_PROD_ID: string = '1586334138';
   public PLAYSTORE_LINK: string = 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa2&hl=en';
-
+  public APPSTORE_LINK: string = 'https://apps.apple.com/in/app/bitcoin-tribe/id1586334138';
   public SECURE_WALLET_XPUB_PATH: string = Config.BIT_SECURE_WALLET_XPUB_PATH ? Config.BIT_SECURE_WALLET_XPUB_PATH.trim() : '2147483651/2147483649/';
   public SECURE_DERIVATION_BRANCH: string = Config.BIT_SECURE_DERIVATION_BRANCH ? Config.BIT_SECURE_DERIVATION_BRANCH.trim() : '1';
   public SSS_OTP_LENGTH: string = Config.BIT_SSS_OTP_LENGTH ? Config.BIT_SSS_OTP_LENGTH.trim() : '6';

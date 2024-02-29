@@ -19,6 +19,7 @@ import {
   widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
+import ActivityIndicatorView from 'src/components/loader/ActivityIndicatorView'
 import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
 import RGBInactive from '../../assets/images/tabs/rgb_inactive.svg'
 import { RGBConfig, RGB_ASSET_TYPE, Wallet } from '../../bitcoin/utilities/Interface'
@@ -29,10 +30,14 @@ import BottomSheetAddWalletInfo from '../../components/bottom-sheets/add-wallet/
 import ModalContainer from '../../components/home/ModalContainer'
 import RGBServices from '../../services/RGBServices'
 import dbManager from '../../storage/realm/dbManager'
-import { setRgbConfig, syncRgb } from '../../store/actions/rgb'
+import { setRgbConfig, setRgbIntroModal, syncRgb } from '../../store/actions/rgb'
 import BottomSheetCoinsHeader from './BottomSheetCoinsHeader'
 
 const keyExtractor = (item: any) => item.toString()
+
+const numberWithCommas = ( x ) => {
+  return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+}
 
 const assetColors = ['#6992B0', '#D88383', '#A29DD3', '#5CB5A1', '#A29DD3']
 
@@ -45,6 +50,7 @@ export default function AssetsScreen(props) {
     state => state.rgb,
   )
   const rgbConfig: RGBConfig = useSelector(state => state.rgb.config)
+  const RgbIntroModal: boolean = useSelector(state => state.rgb.isIntroModal)
   const wallet: Wallet = dbManager.getWallet()
   const [proceed, setProceed] = useState(false)
   const dispatch = useDispatch()
@@ -115,35 +121,6 @@ export default function AssetsScreen(props) {
         <TouchableOpacity
           style={styles.collectibleContainer}
           onPress={() => {
-            setSelectedTab(1)
-          }}
-          activeOpacity={1}>
-          <View
-            style={[
-              styles.collectibleInnerContainer,
-              {
-                backgroundColor:
-                  selectedTab == 1 ? Colors.CLOSE_ICON_COLOR : null,
-              },
-            ]}>
-            <Text
-              style={[
-                styles.collectibleText,
-                {
-                  color:
-                    selectedTab == 1
-                      ? Colors.white
-                      : Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
-                },
-              ]}>
-              COINS
-            </Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.collectibleContainer}
-          onPress={() => {
             setSelectedTab(0)
           }}
           activeOpacity={1}>
@@ -161,6 +138,35 @@ export default function AssetsScreen(props) {
                 {
                   color:
                     selectedTab == 0
+                      ? Colors.white
+                      : Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
+                },
+              ]}>
+              COINS
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.collectibleContainer}
+          onPress={() => {
+            setSelectedTab(1)
+          }}
+          activeOpacity={1}>
+          <View
+            style={[
+              styles.collectibleInnerContainer,
+              {
+                backgroundColor:
+                  selectedTab == 1 ? Colors.CLOSE_ICON_COLOR : null,
+              },
+            ]}>
+            <Text
+              style={[
+                styles.collectibleText,
+                {
+                  color:
+                    selectedTab == 1
                       ? Colors.white
                       : Colors.THEAM_INFO_LIGHT_TEXT_COLOR,
                 },
@@ -194,7 +200,7 @@ export default function AssetsScreen(props) {
               backgroundColor: item.color,
             },
           ]}>
-          <Text style={styles.labelText}>{item.ticker.substring(0, 3)}</Text>
+          <Text style={styles.labelText}>{item && item.ticker ? item.ticker.substring(0, 3): ''}</Text>
         </View>
         <Text numberOfLines={1} style={styles.nameText}>
           {item.name}
@@ -243,7 +249,7 @@ export default function AssetsScreen(props) {
         </View>
         <Text style={styles.collectibleOuterText}>{item.name}</Text>
         <Text style={styles.collectibleAmountText}>
-          {item.balance ? item.balance.spendable : item.spendableBalance}
+          {item.balance ? numberWithCommas(item.balance.spendable) : numberWithCommas(item.spendableBalance)}
         </Text>
       </TouchableOpacity>
     )
@@ -257,7 +263,7 @@ export default function AssetsScreen(props) {
     return (
       <>
         <BottomSheetCoinsHeader
-          title={'Add ' + (selectedTab == 0 ? 'Collectibles' : 'Coins')}
+          title={'Add ' + (selectedTab == 1 ? 'Collectibles' : 'Coins')}
           onPress={closeBottomSheet}
         />
         {/* <Text numberOfLines={2} style={styles.descText}>{'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'}</Text> */}
@@ -266,7 +272,7 @@ export default function AssetsScreen(props) {
           onRGBWalletClick={() => {
             closeBottomSheet()
             props.navigation.navigate('IssueScreen', {
-              issueType: selectedTab == 0 ? 'collectible' : 'coin',
+              issueType: selectedTab == 1 ? 'collectible' : 'coin',
             })
           }}
           onLighteningWalletClick={() => {
@@ -278,7 +284,7 @@ export default function AssetsScreen(props) {
           }}
           title1="Issue"
           title2="Recieve"
-          desc1={`Issue new ${selectedTab === 0 ? 'collectibles' : 'coins'} on RGB. Set limit and send it around your Tribe`}
+          desc1={`Issue new ${selectedTab === 1 ? 'collectibles' : 'coins'} on RGB. Set limit and send it around your Tribe`}
           desc2='You can also add an asset to your Tribe wallet by receiving it from someone'
         />
       </>
@@ -286,10 +292,7 @@ export default function AssetsScreen(props) {
   }
 
   return (
-    <View
-      style={{
-        backgroundColor: Colors.blue,
-      }}>
+    <View>
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -301,6 +304,7 @@ export default function AssetsScreen(props) {
         }
         style={styles.container}>
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
+        {!RgbIntroModal && <ActivityIndicatorView showLoader={syncing} />}
         <View style={styles.headerContainer}>
           <Text style={styles.pageTitle}>{'My Assets'}</Text>
           <TouchableOpacity
@@ -326,7 +330,7 @@ export default function AssetsScreen(props) {
           </TouchableOpacity>
         </View>
         {renderTabs()}
-        {selectedTab == 0 ? (
+        {selectedTab == 1 ? (
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -412,6 +416,24 @@ export default function AssetsScreen(props) {
       <ModalContainer
         onBackground={() => { }}
         closeBottomSheet={() => { }}
+        visible={RgbIntroModal}
+      >
+        <RGBIntroModal
+          title={'Introducing RGB Assets'}
+          info={'Embark on a journey with Bitcoin Tribe Wallet, your comprehensive solution for managing RGB assets effortlessly. Experience a new era of asset handling with a familiar wallet interface.'}
+          otherText={'Now Issue, receive, send and sync assets with your Bitcoin Tribe'}
+          proceedButtonText={'Continue'}
+          isIgnoreButton={false}
+          isBottomImage={true}
+          bottomImage={require('../../assets/images/icons/contactPermission.png')}
+          showBtn={!syncing && proceed}
+          closeModal={()=>{dispatch(setRgbIntroModal(false));setProceed(false)}}
+          height={hp(60)}
+        />
+      </ModalContainer>
+      {/* <ModalContainer
+        onBackground={() => { }}
+        closeBottomSheet={() => { }}
         visible={syncing || (!syncing && proceed)}
       >
         <RGBIntroModal
@@ -425,7 +447,7 @@ export default function AssetsScreen(props) {
           showBtn={!syncing && proceed}
           closeModal={()=>{setProceed(false)}}
         />
-      </ModalContainer>
+      </ModalContainer> */}
     </View>
   )
 }
@@ -523,8 +545,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   labelContainer: {
-    backgroundColor: Colors.THEAM_TEXT_COLOR,
-    borderRadius: 20,
+    // backgroundColor: Colors.THEAM_TEXT_COLOR,
+    borderRadius: 25,
     height: 36,
     width: 36,
     justifyContent: 'center',
