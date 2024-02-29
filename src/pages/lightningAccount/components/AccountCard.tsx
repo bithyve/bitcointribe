@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
-import { StyleSheet, View, PanResponder, Animated, Dimensions, Platform } from 'react-native'
-import AccountDetailsCard from './AccountDetailsCard'
+import { Animated, Dimensions, PanResponder, Platform, StyleSheet, View } from 'react-native'
 import { Mode } from '../AccountDetails'
+import AccountDetailsCard from './AccountDetailsCard'
 
 const styles = StyleSheet.create( {
 } )

@@ -3,14 +3,14 @@ import {
   Image,
   StyleSheet,
   Text,
-  View,
+  View
 } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { translations } from '../../common/content/LocContext'
 import { hp } from '../../common/data/responsiveness/responsive'
+import Fonts from '../../common/Fonts'
 
 
 export type Props = {

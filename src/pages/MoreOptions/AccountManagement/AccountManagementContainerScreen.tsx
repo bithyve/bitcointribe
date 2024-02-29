@@ -1,6 +1,6 @@
 import { CommonActions } from '@react-navigation/native'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -146,11 +146,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   //   }
   // }, [ numberOfTabs ] )
 
-  useEffect( () => {
-    return () => {
-      showUnHideArchiveModal( false )
-    }
-  }, [ navigation ] )
+
 
   const showUnHideArchiveAccountBottomSheet = useCallback( () => {
     return(
@@ -176,6 +172,43 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     return(
       <UnHideRestoreAccountSuccessBottomSheet
         onProceed={( accounShell )=>{
+          showSuccessModel( false )
+         if(Platform.OS!=='android'){
+          setTimeout(()=>{
+            if( ( primarySubAccount as SubAccountDescribing ).type === AccountType.LIGHTNING_ACCOUNT ) {
+              const resetAction = CommonActions.reset( {
+                index: 1,
+                routes: [
+                  {
+                    name: 'Home'
+                  },
+                  {
+                    name: 'LNAccountDetails', params: {
+                      accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
+                      node: ( primarySubAccount as SubAccountDescribing ).node
+                    }
+                  },
+                ],
+              } )
+              navigation.dispatch( resetAction )
+            } else {
+              const resetAction = CommonActions.reset( {
+                index: 1,
+                routes: [
+                  {
+                    name: 'Home'
+                  },
+                  {
+                    name: 'AccountDetailsRoot', params: {
+                      accountShellID: ( primarySubAccount as SubAccountDescribing ).accountShellID,
+                    }
+                  },
+                ],
+              } )
+              navigation.dispatch( resetAction )
+            }
+          },1000)
+         }else{
           if( ( primarySubAccount as SubAccountDescribing ).type === AccountType.LIGHTNING_ACCOUNT ) {
             const resetAction = CommonActions.reset( {
               index: 1,
@@ -208,6 +241,7 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
             } )
             navigation.dispatch( resetAction )
           }
+         }
         }
         }
         onClose={() => showSuccessModel( false )}

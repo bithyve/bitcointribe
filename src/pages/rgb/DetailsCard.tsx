@@ -3,16 +3,17 @@ import React, { useMemo } from 'react'
 import {
   StyleSheet,
   Text,
-  View,
+  View
 } from 'react-native'
 import { Button } from 'react-native-elements'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
+import useFormattedAmountText from 'src/utils/hooks/formatting/UseFormattedAmountText'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import ButtonStyles from '../../common/Styles/ButtonStyles'
 import { translations } from '../../common/content/LocContext'
 import { wp } from '../../common/data/responsiveness/responsive'
+import Fonts from '../../common/Fonts'
+import ButtonStyles from '../../common/Styles/ButtonStyles'
 import LabeledBalanceDisplay from '../../components/LabeledBalanceDisplay'
 
 export type Props = {
@@ -83,12 +84,10 @@ const AccountDetailsCard: React.FC<Props> = ( {
           flexDirection: 'row',
           alignItems: 'flex-start',
           justifyContent: 'space-between',
-          marginBottom: 4,
         }}>
           <Text style={styles.title1Text}>
             {title}
           </Text>
-          {/* <Text style={styles.title1Text}>2FA</Text> */}
         </View>
 
         <Text
@@ -116,7 +115,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
               textColor={Colors.white}
               isTestAccount={false}
             />:
-            <Text style={styles.amountText}>{balance}</Text>
+            <Text style={styles.amountText}>{useFormattedAmountText(balance)}</Text>
         }
 
         {
@@ -226,7 +225,8 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.Regular,
     fontSize: RFValue( 12 ),
     color: Colors.white,
-    marginTop: 1,
+    letterSpacing: 0.01,
+    marginBottom: 10
   },
 
   footerSection: {

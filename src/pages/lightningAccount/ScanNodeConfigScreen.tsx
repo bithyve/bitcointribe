@@ -86,6 +86,10 @@ const styles = StyleSheet.create( {
     shadowRadius: 6,
     elevation: 6,
   },
+  divider:{
+    width:'100%',
+    height:20
+  }
 } )
 
 
@@ -180,7 +184,7 @@ export default function ScanNodeConfig( { navigation } ) {
           infoTextNormal1={''}
           step={''}
         />
-
+        <View style={styles.divider}/>
         <CoveredQRCodeScanner
           onCodeScanned={handleBarcodeRecognized}
           containerStyle={{

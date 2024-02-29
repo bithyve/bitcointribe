@@ -11,6 +11,8 @@ export const SET_RECEIVE_DATA = 'SET_RECEIVE_DATA'
 export const SET_RGB20_ASSETS = 'SET_RGB20_ASSETS'
 export const SET_RGB121_ASSETS = 'SET_RGB121_ASSETS'
 export const SET_LAST_BACKED_UP = 'SET_LAST_BACKED_UP'
+export const RGB_INTRO_MODAL = 'RGB_INTRO_MODAL'
+export const SET_TESTSATS_TIMESTAMP = 'SET_TESTSATS_TIMESTAMP'
 
 
 export const setRgbConfig = ( config: RGBConfig ) => {
@@ -107,3 +109,19 @@ export const updateLastBackedUp = (  ) => {
     type: SET_LAST_BACKED_UP,
   }
 }
+
+export const setRgbIntroModal = ( isIntroModal: boolean ) => {
+  return {
+    type: RGB_INTRO_MODAL,
+    payload: {
+      isIntroModal
+    },
+  }
+}
+
+export const setTestSatsTimestamp = (  ) => {
+  return {
+    type: SET_TESTSATS_TIMESTAMP,
+  }
+}
+

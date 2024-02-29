@@ -1,7 +1,7 @@
 import moment from 'moment'
+import config from '../../bitcoin/HexaConfig'
 import Colors from '../../common/Colors'
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
-import config from '../../bitcoin/HexaConfig'
 const LAST_SEEN_ACTIVE_DURATION = config.LAST_SEEN_ACTIVE_DURATION
 const LAST_SEEN_AWAY_DURATION = config.LAST_SEEN_AWAY_DURATION
 

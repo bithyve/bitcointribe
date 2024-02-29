@@ -1,17 +1,14 @@
 import React, { useContext } from 'react'
-import { View, Image, Text, StyleSheet } from 'react-native'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import { Shadow } from 'react-native-shadow-2'
-import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Colors from '../common/Colors'
 import { LocalizationContext } from '../common/content/LocContext'
-import LinearGradient from 'react-native-linear-gradient'
+import Fonts from '../common/Fonts'
+import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper'
 
 export default function ErrorModalContents( props ) {
   const { translations } = useContext( LocalizationContext )
@@ -154,13 +151,7 @@ export default function ErrorModalContents( props ) {
             alignItems: 'center',
           }}
         >
-          <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-            start={{
-              x: 0, y: 0
-            }} end={{
-              x: 1, y: 0
-            }}
-            locations={[ 0.2, 1 ]}
+          <View
             style={{
               ...styles.successModalButtonView,
               backgroundColor: props.buttonColor
@@ -190,7 +181,7 @@ export default function ErrorModalContents( props ) {
                 {props.proceedButtonText}
               </Text>
             </AppBottomSheetTouchableWrapper>
-          </LinearGradient>
+          </View>
 
           {props.isIgnoreButton && (
             <AppBottomSheetTouchableWrapper

@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import {
-  Alert,
   Image,
   NativeModules,
   Platform,
@@ -17,6 +16,8 @@ import { widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
+import ErrorModalContents from 'src/components/ErrorModalContents'
 import LoaderModal from 'src/components/LoaderModal'
 import BorderWalletIcon from '../../assets/images/svgs/borderWallet.svg'
 import { LevelData, Wallet } from '../../bitcoin/utilities/Interface'
@@ -82,6 +83,9 @@ export default function BackupMethods( { navigation } ) {
   const dispatch = useDispatch()
   const [ visibleModal, setVisibleModal ] = useState( false )
   const [ googleVisibleModal, setGoogleVisibleModal] = useState( false )
+  const [ rgbBackupModal, setRgbBackupModal] = useState( false )
+  const [ rgbBackupIOSModal, setRgbBackupIOSModal] = useState( false )
+  const [ErrorBottomSheet] = useState(React.createRef<BottomSheet>());
 
   useEffect( () => {
     async function fetchWalletDays() {
@@ -128,66 +132,69 @@ export default function BackupMethods( { navigation } ) {
     try {
       if(Platform.OS === 'android') {
 
-      Alert.alert(
-        'Select a Google Account',
-        'This account will be used to upload the RGB backup data file. The file is encrypted with your Backup Phrase.',
-        [
-          {
-            text: 'Cancel',
-            onPress: () => {},
-            style: 'cancel',
-          },
-          {
-            text: 'Continue',
-            onPress: async () => {
-              await GoogleDrive.setup()
-              const login = await GoogleDrive.login()
-              if( login.error ) {
-                Toast( login.error )
-              } else {
-                setGoogleVisibleModal(true)
-                await RGBServices.backup( '', wallet.primaryMnemonic )
-                dispatch( updateLastBackedUp() )
-                setGoogleVisibleModal(false)
-                Toast('Backuped successfully')
-              }
-            },
-            style: 'default',
-          },
-        ],
-        {
-          cancelable: true,
-        },
-      )
+      // Alert.alert(
+      //   'Select a Google Account',
+      //   'This account will be used to upload the RGB backup data file. The file is encrypted with your Backup Phrase.',
+      //   [
+      //     {
+      //       text: 'Cancel',
+      //       onPress: () => {},
+      //       style: 'cancel',
+      //     },
+      //     {
+      //       text: 'Continue',
+      //       onPress: async () => {
+      //         setGoogleVisibleModal(true)
+      //         await GoogleDrive.setup()
+      //         const login = await GoogleDrive.login()
+      //         if( login.error ) {
+      //           Toast( login.error )
+      //           setGoogleVisibleModal(false)
+      //         } else {
+      //           await RGBServices.backup( '', wallet.primaryMnemonic )
+      //           dispatch( updateLastBackedUp() )
+      //           setGoogleVisibleModal(false)
+      //           Toast('Backuped successfully')
+      //         }
+      //       },
+      //       style: 'default',
+      //     },
+      //   ],
+      //   {
+      //     cancelable: true,
+      //   },
+      // )
+      setRgbBackupModal(true)
       } else {
-        Alert.alert(
-          '',
-          'This step will upload the RGB backup data file on your iCloud. The file is encrypted with your Backup Phrase.',
-          [
-            {
-              text: 'Cancel',
-              onPress: () => {},
-              style: 'cancel',
-            },
-            {
-              text: 'Continue',
-              onPress: async () => {
-                const response = await RGBServices.backup( '', wallet.primaryMnemonic )
-                if( response.error ) {
-                  Toast( response.error )
-                  setGoogleVisibleModal(false)
-                } else {
-                  dispatch( updateLastBackedUp() )
-                  Toast('Backuped successfully')
-                }
-              },
-              style: 'default',
-            },
-          ],
-          {
-            cancelable: true,
-          },
-        )
+        setRgbBackupIOSModal(true)
+        // Alert.alert(
+        //   '',
+        //   'This step will upload the RGB backup data file on your iCloud. The file is encrypted with your Backup Phrase.',
+        //   [
+        //     {
+        //       text: 'Cancel',
+        //       onPress: () => {},
+        //       style: 'cancel',
+        //     },
+        //     {
+        //       text: 'Continue',
+        //       onPress: async () => {
+        //         const response = await RGBServices.backup( '', wallet.primaryMnemonic )
+        //         if( response.error ) {
+        //           Toast( response.error )
+        //           setGoogleVisibleModal(false)
+        //         } else {
+        //           dispatch( updateLastBackedUp() )
+        //           Toast('Backuped successfully')
+        //         }
+        //       },
+        //       style: 'default',
+        //     },
+        //   ],
+        //   {
+        //     cancelable: true,
+        //   },
+        // )
       }
     } catch ( error ) {
       console.log( error )
@@ -336,55 +343,59 @@ export default function BackupMethods( { navigation } ) {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.body}>
-          <TouchableOpacity
-            style={{
-              flexDirection: 'row',
-            }}
-            onPress={onPressBackupRGB}>
-            <View
+        {
+          Platform.OS === 'android' && (
+            <View style={styles.body}>
+            <TouchableOpacity
               style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: Colors.white,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Image
+                flexDirection: 'row',
+              }}
+              onPress={onPressBackupRGB}>
+              <View
                 style={{
-                  height: 20,
-                  width: 20,
-                }}
-                resizeMode={'contain'}
-                source={require( '../../assets/images/icons/rgb_logo_round.png' )}
-              />
-            </View>
-            <View>
-              <Text
-                style={{
-                  fontSize: RFValue( 11 ),
-                  fontFamily: Fonts.Regular,
-                  color: Colors.black,
-                  marginHorizontal: 10,
-                  textAlign: 'center',
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: Colors.white,
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}>
-              RGB data Backup on Cloud
-              </Text>
-
-              <Text
-                style={{
-                  fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.Regular,
-                  color: Colors.black,
-                  marginHorizontal: 10,
-                  marginTop: 2
-                }}>
-                {`Last backup: ${lastBackedUp ? moment( lastBackedUp ).format( 'DD MMM YYYY' ): 'Never'}`}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+                <Image
+                  style={{
+                    height: 20,
+                    width: 20,
+                  }}
+                  resizeMode={'contain'}
+                  source={require( '../../assets/images/icons/rgb_logo_round.png' )}
+                />
+              </View>
+              <View>
+                <Text
+                  style={{
+                    fontSize: RFValue( 11 ),
+                    fontFamily: Fonts.Regular,
+                    color: Colors.black,
+                    marginHorizontal: 10,
+                    textAlign: 'center',
+                  }}>
+                RGB data Backup on Cloud
+                </Text>
+  
+                <Text
+                  style={{
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.Regular,
+                    color: Colors.black,
+                    marginHorizontal: 10,
+                    marginTop: 2
+                  }}>
+                  {`Last backup: ${lastBackedUp ? moment( lastBackedUp ).format( 'DD MMM YYYY' ): 'Never'}`}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          )
+        }
         {wallet.borderWalletMnemonic !== '' && (
           <View style={styles.body}>
             <TouchableOpacity
@@ -464,6 +475,72 @@ export default function BackupMethods( { navigation } ) {
           onPressClose={() => setVisibleModal( false )}
           proceedButtonText={'Backup Now'}
           cancelButtonText={'Skip'}
+        />
+      </ModalContainer>
+      <ModalContainer
+        onBackground={() => setRgbBackupModal(false)}
+        visible={rgbBackupModal}
+        closeBottomSheet={() => {}}
+      >
+        <ErrorModalContents
+          modalRef={ErrorBottomSheet}
+          title={'Select a Google Account'}
+          info={
+            'This account will be used to upload the RGB backup data file. The file is encrypted with your Backup Phrase.'
+          }
+          note={'Note : '}
+          noteNextLine={'Ensure you use the correct Google Account for uploading your RGB backup file.'}
+          proceedButtonText={'Continue'}
+          isIgnoreButton={true}
+          cancelButtonText={'Cancel'}
+          onPressIgnore={()=>{setRgbBackupModal(false)}}
+          onPressProceed={async() => {
+            setRgbBackupModal(false)
+            setGoogleVisibleModal(true)
+              await GoogleDrive.setup()
+              const login = await GoogleDrive.login()
+              if( login.error ) {
+                Toast( login.error )
+                setGoogleVisibleModal(false)
+              } else {
+                await RGBServices.backup( '', wallet.primaryMnemonic )
+                dispatch( updateLastBackedUp() )
+                setGoogleVisibleModal(false)
+                Toast('Backuped successfully')
+              }
+          }}
+          type={'small'}
+        />
+      </ModalContainer>
+      <ModalContainer
+        onBackground={() => setRgbBackupIOSModal(false)}
+        visible={rgbBackupIOSModal}
+        closeBottomSheet={() => {}}
+      >
+        <ErrorModalContents
+          modalRef={ErrorBottomSheet}
+          title={''}
+          info={
+            'This step will upload the RGB backup data file on your iCloud. The file is encrypted with your Backup Phrase.'
+          }
+          // note={'Note : '}
+          // noteNextLine={'Ensure you use the correct Google Account for uploading your RGB backup file.'}
+          proceedButtonText={'Continue'}
+          isIgnoreButton={true}
+          cancelButtonText={'Cancel'}
+          onPressIgnore={()=>{setRgbBackupIOSModal(false)}}
+          onPressProceed={async() => {
+            setRgbBackupIOSModal(false)
+            const response = await RGBServices.backup( '', wallet.primaryMnemonic )
+                if( response.error ) {
+                  Toast( response.error )
+                  setGoogleVisibleModal(false)
+                } else {
+                  dispatch( updateLastBackedUp() )
+                  Toast('Backuped successfully')
+                }
+          }}
+          type={'small'}
         />
       </ModalContainer>
     </SafeAreaView>
