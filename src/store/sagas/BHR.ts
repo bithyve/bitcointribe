@@ -11,33 +11,13 @@ import Share from 'react-native-share'
 import { call, delay, put, race, select } from 'redux-saga/effects'
 import secrets from 'secrets.js-grempe'
 import semver from 'semver'
-<<<<<<< HEAD
+import RGBServices from 'src/services/RGBServices'
 import config from '../../bitcoin/HexaConfig'
 import { upgradeAccountToMultiSig } from '../../bitcoin/utilities/accounts/AccountFactory'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import {
-  Account, Accounts,
-  AccountType, BackupStreamData, ChannelAssets, cloudDataInterface, ContactDetails,
-  Gift, INotification,
-  KeeperInfoInterface, KeeperType, LevelData,
-  LevelHealthInterface,
-  LevelInfo,
-  MetaShare, MultiSigAccount, NewWalletImage, notificationTag,
-  notificationType,
-  PrimaryStreamData,
-  QRCodeTypes,
-  SecondaryStreamData, ShareSplitScheme, StreamData,
-=======
-import RGBServices from 'src/services/RGBServices'
-import config from '../../bitcoin/HexaConfig'
-import BHROperations from '../../bitcoin/utilities/BHROperations'
-import {
-  Account,
-  AccountType,
-  Accounts,
-  BackupStreamData,
-  ChannelAssets,
-  ContactDetails,
+  Account, Accounts, AccountType, BackupStreamData,
+  ChannelAssets, cloudDataInterface, ContactDetails,
   Gift,
   INotification,
   KeeperInfoInterface,
@@ -47,32 +27,20 @@ import {
   LevelInfo,
   MetaShare,
   MultiSigAccount,
-  NewWalletImage,
-  PrimaryStreamData,
+  NewWalletImage, notificationTag,
+  notificationType, PrimaryStreamData,
   QRCodeTypes,
   SecondaryStreamData,
   ShareSplitScheme,
   StreamData,
->>>>>>> a3c66aad7e37f18c7b69138bd2b822f593d78181
   TrustedContact,
   TrustedContactRelationTypes,
   Trusted_Contacts,
   UnecryptedStreamData,
-<<<<<<< HEAD
   Wallet
 } from '../../bitcoin/utilities/Interface'
 import Relay from '../../bitcoin/utilities/Relay'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
-=======
-  Wallet,
-  cloudDataInterface,
-  notificationTag,
-  notificationType
-} from '../../bitcoin/utilities/Interface'
-import Relay from '../../bitcoin/utilities/Relay'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
-import { upgradeAccountToMultiSig } from '../../bitcoin/utilities/accounts/AccountFactory'
->>>>>>> a3c66aad7e37f18c7b69138bd2b822f593d78181
 import { generateRandomString } from '../../common/CommonFunctions'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import LevelStatus from '../../common/data/enums/LevelStatus'
@@ -81,17 +49,7 @@ import Toast from '../../components/Toast'
 import dbManager from '../../storage/realm/dbManager'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
-<<<<<<< HEAD
 import { setGifts, twoFAValid, updateAccountShells } from '../actions/accounts'
-import {
-  ACCEPT_EC_REQUEST, AUTO_SHARE_LEVEL2_KEEPER, CHANGE_ENC_PASSWORD, CHANGE_QUESTION_ANSWER, CLOUD_MSHARE, CONFIRM_PDF_SHARED, CREATE_CHANNEL_ASSETS, CREATE_GUARDIAN, DELETE_SM_AND_SMSHARES, DOWNLOAD_BACKUP_DATA, DOWNLOAD_SM_SHARE, EMPTY_SHARE_TRANSFER_DETAILS, generateMetaShare, GENERATE_LEVEL1_SHARES,
-  GENERATE_LEVEL2_SHARES, GENERATE_META_SHARE, getApprovalFromKeepers, GET_APPROVAL_FROM_KEEPER, GET_PDF_DATA, healthCheckInitialized, initializeHealthSetup, initLevelTwo, INIT_HEALTH_SETUP, INIT_LEVEL_TWO, isLevel2InitializedStatus, isLevel3InitializedStatus, KEEPER_INFO, mnemonicRecoveredHealth, MODIFY_LEVELDATA, navigateToHistoryPage, ON_PRESS_KEEPER, pdfSuccessfullyCreated, putKeeperInfo, RECOVER_MNEMONIC_HEALTH, RECOVER_WALLET_HEALTH, RECOVER_WALLET_USING_ICLOUD, RECOVER_WALLET_WITHOUT_ICLOUD, RECOVER_WALLET_WITH_MNEMONIC, REJECTED_EC_REQUEST, RESET_LEVEL_AFTER_PASSWORD_CHANGE, restoreSeedWordFailed, retrieveMetaShares, RETRIEVE_METASHRES, secondaryShareDownloaded, setAllowSecureAccount, setApprovalStatus, setChannelAssets, setDownloadedBackupData, setIsCurrentLevel0, setIsKeeperInfoUpdated, setIsKeeperTypeBottomSheetOpen, setIsLevelToNotSetupStatus, setLevelCompletionError, setOpenToApproval, setPasswordResetState, setPDFInfo, setPdfUpgrade, setSecondaryDataInfoStatus, setSeedBackupHistory, SETUP_HEALTH_FOR_RESTORE, SETUP_LEVEL_HEALTH, SETUP_PASSWORD, SET_HEALTH_STATUS, SET_LEVEL_TO_NOT_SETUP, SHARE_PDF, switchS3LoaderKeeper, switchS3LoadingStatus, updatedKeeperInfo, updateHealth, updateLevelData, updateLevelThreeMetaShareStatus, updateLevelTwoMetaShareStatus, updateMetaSharesKeeper, updateMSharesHealth, updateOldMetaSharesKeeper, updateSeedHealth, UPDATE_KEEPER_INFO_TO_CHANNEL, UPDATE_SECONDARY_SHARD, UPDATE_SEED_HEALTH, UPDATE_SHARES_HEALTH, UPDATE_WALLET_IMAGE_HEALTH, upgradePDF,
-  UPGRADE_LEVEL1_KEEPER, UPGRADE_PDF, walletRecoveryFailed
-} from '../actions/BHR'
-import { updateCloudData } from '../actions/cloud'
-import { fetchNotificationStarted, messageFetched, storeMessagesTimeStamp } from '../actions/notifications'
-import { setWalletId } from '../actions/preferences'
-=======
 import {
   ACCEPT_EC_REQUEST,
   AUTO_SHARE_LEVEL2_KEEPER,
@@ -104,52 +62,20 @@ import {
   DELETE_SM_AND_SMSHARES,
   DOWNLOAD_BACKUP_DATA,
   DOWNLOAD_SM_SHARE,
-  EMPTY_SHARE_TRANSFER_DETAILS,
-  GENERATE_LEVEL1_SHARES,
+  EMPTY_SHARE_TRANSFER_DETAILS, generateMetaShare, GENERATE_LEVEL1_SHARES,
   GENERATE_LEVEL2_SHARES,
-  GENERATE_META_SHARE,
-  GET_APPROVAL_FROM_KEEPER,
-  GET_PDF_DATA,
-  INIT_HEALTH_SETUP,
-  INIT_LEVEL_TWO,
-  KEEPER_INFO,
-  MODIFY_LEVELDATA,
-  ON_PRESS_KEEPER,
-  RECOVER_MNEMONIC_HEALTH,
+  GENERATE_META_SHARE, getApprovalFromKeepers, GET_APPROVAL_FROM_KEEPER,
+  GET_PDF_DATA, healthCheckInitialized, initializeHealthSetup, initLevelTwo, INIT_HEALTH_SETUP,
+  INIT_LEVEL_TWO, isLevel2InitializedStatus,
+  isLevel3InitializedStatus, KEEPER_INFO, mnemonicRecoveredHealth, MODIFY_LEVELDATA, navigateToHistoryPage, ON_PRESS_KEEPER, pdfSuccessfullyCreated,
+  putKeeperInfo, RECOVER_MNEMONIC_HEALTH,
   RECOVER_WALLET_HEALTH,
   RECOVER_WALLET_USING_ICLOUD,
   RECOVER_WALLET_WITHOUT_ICLOUD,
   RECOVER_WALLET_WITH_MNEMONIC,
   REJECTED_EC_REQUEST,
-  RESET_LEVEL_AFTER_PASSWORD_CHANGE,
-  RETRIEVE_METASHRES,
-  SETUP_HEALTH_FOR_RESTORE,
-  SETUP_LEVEL_HEALTH,
-  SETUP_PASSWORD,
-  SET_HEALTH_STATUS,
-  SET_LEVEL_TO_NOT_SETUP,
-  SHARE_PDF,
-  UPDATE_KEEPER_INFO_TO_CHANNEL,
-  UPDATE_SECONDARY_SHARD,
-  UPDATE_SEED_HEALTH,
-  UPDATE_SHARES_HEALTH,
-  UPDATE_WALLET_IMAGE_HEALTH,
-  UPGRADE_LEVEL1_KEEPER,
-  UPGRADE_PDF,
-  generateMetaShare,
-  getApprovalFromKeepers,
-  healthCheckInitialized,
-  initLevelTwo,
-  initializeHealthSetup,
-  isLevel2InitializedStatus,
-  isLevel3InitializedStatus,
-  mnemonicRecoveredHealth,
-  navigateToHistoryPage,
-  pdfSuccessfullyCreated,
-  putKeeperInfo,
-  restoreSeedWordFailed,
-  retrieveMetaShares,
-  secondaryShareDownloaded,
+  RESET_LEVEL_AFTER_PASSWORD_CHANGE, restoreSeedWordFailed,
+  retrieveMetaShares, RETRIEVE_METASHRES, secondaryShareDownloaded,
   setAllowSecureAccount,
   setApprovalStatus,
   setChannelAssets,
@@ -159,42 +85,35 @@ import {
   setIsKeeperTypeBottomSheetOpen,
   setIsLevelToNotSetupStatus,
   setLevelCompletionError,
-  setOpenToApproval,
-  setPDFInfo,
-  setPasswordResetState,
-  setPdfUpgrade,
+  setOpenToApproval, setPasswordResetState, setPDFInfo, setPdfUpgrade,
   setSecondaryDataInfoStatus,
-  setSeedBackupHistory,
-  switchS3LoaderKeeper,
-  switchS3LoadingStatus,
-  updateHealth,
+  setSeedBackupHistory, SETUP_HEALTH_FOR_RESTORE,
+  SETUP_LEVEL_HEALTH,
+  SETUP_PASSWORD,
+  SET_HEALTH_STATUS,
+  SET_LEVEL_TO_NOT_SETUP,
+  SHARE_PDF, switchS3LoaderKeeper,
+  switchS3LoadingStatus, updatedKeeperInfo, updateHealth,
   updateLevelData,
   updateLevelThreeMetaShareStatus,
-  updateLevelTwoMetaShareStatus,
-  updateMSharesHealth,
-  updateMetaSharesKeeper,
-  updateOldMetaSharesKeeper,
-  updateSeedHealth,
-  updatedKeeperInfo,
-  upgradePDF,
-  walletRecoveryFailed,
+  updateLevelTwoMetaShareStatus, updateMetaSharesKeeper, updateMSharesHealth, updateOldMetaSharesKeeper,
+  updateSeedHealth, UPDATE_KEEPER_INFO_TO_CHANNEL,
+  UPDATE_SECONDARY_SHARD,
+  UPDATE_SEED_HEALTH,
+  UPDATE_SHARES_HEALTH,
+  UPDATE_WALLET_IMAGE_HEALTH, upgradePDF, UPGRADE_LEVEL1_KEEPER,
+  UPGRADE_PDF, walletRecoveryFailed
 } from '../actions/BHR'
-import { setGifts, twoFAValid, updateAccountShells } from '../actions/accounts'
 import { updateCloudData } from '../actions/cloud'
 import { fetchNotificationStarted, messageFetched, storeMessagesTimeStamp } from '../actions/notifications'
 import { setWalletId } from '../actions/preferences'
 import { setRgbConfig } from '../actions/rgb'
->>>>>>> a3c66aad7e37f18c7b69138bd2b822f593d78181
 import { updateWallet } from '../actions/storage'
 import { InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels, updateTrustedContacts } from '../actions/trustedContacts'
 import { setVersionHistory } from '../actions/versionHistory'
 import generatePDFKeeper from '../utils/generatePDFKeeper'
 import {
-<<<<<<< HEAD
   createWatcher
-=======
-  createWatcher,
->>>>>>> a3c66aad7e37f18c7b69138bd2b822f593d78181
 } from '../utils/utilities'
 import { restoreAccountShellsWorker } from './accounts'
 import { initializeTrustedContactWorker, restoreTrustedContactsWorker, syncPermanentChannelsWorker } from './trustedContacts'
