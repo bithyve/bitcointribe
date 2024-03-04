@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react'
 import {
   Alert,
   NativeModules,
+  Platform,
   SafeAreaView,
   StatusBar,
   View
@@ -18,9 +19,9 @@ import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
 import AlertModalContents from '../../components/AlertModalContents'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import ModalContainer from '../../components/home/ModalContainer'
 import LoaderModal from '../../components/LoaderModal'
 import Toast from '../../components/Toast'
+import ModalContainer from '../../components/home/ModalContainer'
 import { restoreSeedWordFailed } from '../../store/actions/BHR'
 import { completedWalletSetup } from '../../store/actions/setupAndAuth'
 import { setVersion } from '../../store/actions/versionHistory'
@@ -65,40 +66,44 @@ const RecoverBorderWallet = ( props ) => {
       AsyncStorage.setItem( 'walletRecovered', 'true' )
       dispatch( setVersion( 'Restored' ) )
       try {
-        Alert.alert(
-          'Restore RGB',
-          'Do you want to restore state of your RGB assets?',
-          [
-            {
-              text: 'No',
-              onPress: () => goToApp(),
-              style: 'cancel',
-            },
-            {
-              text: 'YES',
-              onPress: async () => {
-                setShowLoader(true)
-                await GoogleDrive.setup()
-                const login = await GoogleDrive.login()
-                if( login.error ) {
-                  Toast( login.error )
-                } else {
-                  setShowLoader(true)
-                  setTimeout(async () => {
-                  const config = await  RGBServices.restoreKeys( mnemonic )
-                  RGBServices.initiate( config.mnemonic, config.xpub  )
-                  await RGBServices.restore( mnemonic )
-                  goToApp()
-                }, 300)
-                }
+        if(Platform.OS === 'android') {
+          Alert.alert(
+            'Restore RGB',
+            'Do you want to restore state of your RGB assets?',
+            [
+              {
+                text: 'No',
+                onPress: () => goToApp(),
+                style: 'cancel',
               },
-              style: 'default',
+              {
+                text: 'YES',
+                onPress: async () => {
+                  setShowLoader(true)
+                  await GoogleDrive.setup()
+                  const login = await GoogleDrive.login()
+                  if( login.error ) {
+                    Toast( login.error )
+                  } else {
+                    setShowLoader(true)
+                    setTimeout(async () => {
+                    const config = await  RGBServices.restoreKeys( mnemonic )
+                    RGBServices.initiate( config.mnemonic, config.xpub  )
+                    await RGBServices.restore( mnemonic )
+                    goToApp()
+                  }, 300)
+                  }
+                },
+                style: 'default',
+              },
+            ],
+            {
+              cancelable: true,
             },
-          ],
-          {
-            cancelable: true,
-          },
-        )
+          )
+        } else {
+          goToApp()
+        }
       } catch ( error ) {
         console.log( error )
       }

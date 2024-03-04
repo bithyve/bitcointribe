@@ -137,7 +137,7 @@ export default class RGBServices{
     return JSON.parse( data )
   }
   
-  static backup = async ( path: string, password: string ): Promise<{}> => {
+  static backup = async ( path: string, password: string ): Promise<string> => {
     const data = await RGB.backup( path, password )
     return data
   }

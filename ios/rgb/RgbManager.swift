@@ -5,12 +5,13 @@
 //
 
 import Foundation
-import RgbLib
+// import RgbLib
 
 class RgbManager {
   
   static let shared = RgbManager()
-  var rgbWallet: RgbLib.Wallet?
+  var rgbWallet: Wallet?
+  var rgbNetwork: BitcoinNetwork?
   var online: Online?
   
   private init() {
@@ -19,11 +20,12 @@ class RgbManager {
   }
   
   func initialize(bitcoinNetwork: String, pubkey: String, mnemonic: String)-> String{
-    let netwotk = getRgbNetwork(network: bitcoinNetwork)
-    let walletData = WalletData(dataDir: Utility.getRgbDir()?.path ?? "", bitcoinNetwork: netwotk, databaseType: RgbLib.DatabaseType.sqlite, pubkey: pubkey, mnemonic: mnemonic)
+    let network = getRgbNetwork(network: bitcoinNetwork)
+    let walletData = WalletData(dataDir: Utility.getRgbDir()?.path ?? "", bitcoinNetwork: network, databaseType: DatabaseType.sqlite,maxAllocationsPerUtxo: 1, pubkey: pubkey, mnemonic: mnemonic,vanillaKeychain: 1)
     do{
       self.rgbWallet = try Wallet(walletData: walletData)
       self.online = try rgbWallet?.goOnline(skipConsistencyCheck: true, electrumUrl: Constants.testnetElectrumUrl)
+      self.rgbNetwork = network
       return "true"
     }catch{
       //
@@ -32,8 +34,8 @@ class RgbManager {
     }
   }
   
-  func getRgbNetwork(network: String)->RgbLib.BitcoinNetwork{
-    return network == "TESTNET" ? RgbLib.BitcoinNetwork.testnet : RgbLib.BitcoinNetwork.mainnet
+  func getRgbNetwork(network: String)->BitcoinNetwork{
+    return network == "TESTNET" ? BitcoinNetwork.testnet : BitcoinNetwork.mainnet
   }
   
 }

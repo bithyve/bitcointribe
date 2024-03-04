@@ -18,19 +18,25 @@ import {
   widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import useAccountsState from 'src/utils/hooks/state-selectors/accounts/UseAccountsState'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import NavStyles from '../../common/Styles/NavStyles'
 import CommonStyles from '../../common/Styles/Styles'
 import BottomInfoBox from '../../components/BottomInfoBox'
 
+
+
+import BottomSheet from '@gorhom/bottom-sheet'
 import { useDispatch, useSelector } from 'react-redux'
+import ErrorModalContents from 'src/components/ErrorModalContents'
+import Toast from 'src/components/Toast'
+import ModalContainer from 'src/components/home/ModalContainer'
+import { receiveRgbAsset } from 'src/store/actions/rgb'
 import { RGB_ASSET_TYPE } from '../../bitcoin/utilities/Interface'
 import { translations } from '../../common/content/LocContext'
 import CopyThisText from '../../components/CopyThisText'
 import QRCode from '../../components/QRCode'
-import Toast from '../../components/Toast'
-import { receiveRgbAsset } from '../../store/actions/rgb'
 
 export default function RGBReceive( props ) {
   const strings = translations[ 'accounts' ]
@@ -41,34 +47,46 @@ export default function RGBReceive( props ) {
   const [ paymentURI, setPaymentURI ] = useState( null )
   const { nextFreeAddress } = useSelector( state => state.rgb )
   const { loading, isError, message, data } = useSelector( state => state.rgb.receiveAssets )
-  const [ requesting, setRequesting ] = useState( false )
+  const [ requesting, setRequesting ] = useState( true )
+  const [failedModal, setFailedModal] = useState(false);
+  const [ErrorBottomSheet] = useState(React.createRef<BottomSheet>());
+  const accountsState = useAccountsState()
 
   useEffect( () => {
-    if ( assetType == RGB_ASSET_TYPE.BITCOIN ) {
-      setReceivingAddress( nextFreeAddress )
-    } else {
-      dispatch( receiveRgbAsset() )
-    }
+    runOnMountOrTryAgain()
   }, [] )
+
+  const runOnMountOrTryAgain=()=>{
+    dispatch( receiveRgbAsset() )
+  }
 
   useEffect( () => {
     if ( assetType == RGB_ASSET_TYPE.RGB20 ) {
-      if ( loading ) {
-        setRequesting( true )
-      }
       if ( !loading && isError ) {
-        Toast( message )
-        props.navigation.goBack()
+        if(message==='Insufficient sats for RGB'){
+         setTimeout(()=>{
+          setFailedModal(true);
+         },2000)
+        }else{
+          Toast( message )
+        }        
       }
-      if ( !loading && !isError ) {
-        setReceivingAddress( data.invoice )
-        setRequesting( false )
-      }
-
     }
   }, [ isError, loading ] )
 
-
+  const handleReceiveBitcoin=()=>{
+    let accId = '';
+    accountsState.accountShells.forEach(el=>{
+      if(el && el.primarySubAccount.type === 'TEST_ACCOUNT'){
+        accId = el.primarySubAccount.accountShellID
+      }
+    })
+    if(accId){
+      props.navigation.replace('AccountSettings',{
+        accountShellID: accId
+  } )
+    }           
+  }
 
   return (
     <View style={{
@@ -104,19 +122,18 @@ export default function RGBReceive( props ) {
               </TouchableOpacity>
             </View>
             <Text style={styles.headerTitleText}>Receive</Text>
-
             {
-              requesting ? <ActivityIndicator style={{
+              loading ? <ActivityIndicator style={{
                 height: '70%'
               }} size="large" /> :
                 <ScrollView>
                   <View style={styles.QRView}>
-                    <QRCode title={assetType === RGB_ASSET_TYPE.BITCOIN ? 'Bitcoin address' : 'RGB Invoice'} value={paymentURI ? paymentURI : receivingAddress ? receivingAddress : 'null'} size={hp( '27%' )} />
+                    <QRCode title={'RGB Invoice'} value={data.invoice} size={hp( '27%' )} />
                   </View>
 
                   <CopyThisText
                     backgroundColor={Colors.white}
-                    text={paymentURI ? paymentURI : receivingAddress}
+                    text={data.invoice}
                     toastText='Address Copied Successfully'
                   />
 
@@ -134,7 +151,37 @@ export default function RGBReceive( props ) {
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-
+      <ModalContainer
+        onBackground={() => setFailedModal(false)}
+        visible={failedModal}
+        closeBottomSheet={() => {}}
+      >
+        <ErrorModalContents
+          modalRef={ErrorBottomSheet}
+          title={'Insufficient Bitcoins'}
+          info={
+            'We encountered an issue: Insufficient Bitcoins This means Your wallet’s Bitcoin balance is too low. Please deposit more Bitcoins or modify your transaction.'
+          }
+          note={'Note:'}
+          noteNextLine={'Your total asset balance is too low for this action. Please add more Bitcoin to your account.'}
+          proceedButtonText={'Receive Bitcoin'}
+          isIgnoreButton={true}
+          cancelButtonText={'Try again'}
+          onPressIgnore={() => {
+            setFailedModal(false);
+            runOnMountOrTryAgain();
+          }}
+          onPressProceed={() => {
+            setFailedModal(false);
+            setTimeout(()=>{
+              handleReceiveBitcoin()
+            },100)
+          }}
+          isBottomImage={true}
+          bottomImage={require('../../assets/images/icons/errorImage.png')}
+          type={'small'}
+        />
+      </ModalContainer>
     </View>
   )
 }
