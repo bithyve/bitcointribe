@@ -92,7 +92,8 @@ import {
   updateMessageStatusWatcher
 } from './sagas/notifications'
 import {
-  receiveRgbAssetWatcher, rgbSyncWatcher
+  receiveRgbAssetWatcher,
+  rgbSyncWatcher
 } from './sagas/rgb'
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
 import {
@@ -137,8 +138,11 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 import createDebugger from 'redux-flipper'
 import createSagaMiddleware from 'redux-saga'
 import thunk from 'redux-thunk'
-import accountsReducer from './reducers/accounts'
 import bhr from './reducers/BHR'
+import rampIntegrationReducer from './reducers/RampIntegration'
+import swanIntegrationReducer from './reducers/SwanIntegration'
+
+import accountsReducer from './reducers/accounts'
 import cloudReducer from './reducers/cloud'
 import doNotStoreReducer from './reducers/doNotStore'
 import fBTCReducers from './reducers/fbtc'
@@ -146,12 +150,10 @@ import misc from './reducers/misc'
 import nodeSettingsReducer from './reducers/nodeSettings'
 import notificationsReducer from './reducers/notifications'
 import preferencesReducer from './reducers/preferences'
-import rampIntegrationReducer from './reducers/RampIntegration'
 import rgbReducer from './reducers/rgb'
 import sendingReducer from './reducers/sending'
 import setupAndAuthReducer from './reducers/setupAndAuth'
 import storageReducer from './reducers/storage'
-import swanIntegrationReducer from './reducers/SwanIntegration'
 import trustedContactsReducer from './reducers/trustedContacts'
 import upgrades from './reducers/upgrades'
 import upgradeToNewBhr from './reducers/upgradeToNewBhr'
@@ -161,6 +163,7 @@ import reduxPersistMigrations from './redux-persist-migrations'
 import {
   fetchRampReservationWatcher
 } from './sagas/RampIntegration'
+
 import { satCardAcountWatcher } from './sagas/satCardAccount'
 import { updateUserNameWatcher } from './sagas/storage'
 import { versionHistoryWatcher } from './sagas/versionHistory'

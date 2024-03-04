@@ -1,5 +1,6 @@
+import { useNavigation, useRoute } from '@react-navigation/native'
 import moment from 'moment'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   ActivityIndicator,
   FlatList,
@@ -12,7 +13,7 @@ import {
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch } from 'react-redux'
@@ -21,7 +22,10 @@ import Fonts from '../../common/Fonts'
 import RGBServices from '../../services/RGBServices'
 import { fetchExchangeRates, fetchFeeRates } from '../../store/actions/accounts'
 import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
-import { useNavigation, useRoute } from '@react-navigation/native'
+
+const numberWithCommas = ( x ) => {
+  return x ? x.toString().replace( /\B(?=(\d{3})+(?!\d))/g, ',' ) : ''
+}
 
 export default function RGBTxDetail( ) {
   const dispatch = useDispatch()
@@ -87,7 +91,7 @@ export default function RGBTxDetail( ) {
               color: ( item.kind === 'RECEIVE_BLIND' || item.kind ==='ISSUANCE' || item.kind === 'RECEIVE_WITNESS' ) ? '#04A777' : '#FD746C'
             } ]}
           >
-            {item.amount}
+            {numberWithCommas(item && item.amount)}
           </Text>
         </View>
       </TouchableOpacity>

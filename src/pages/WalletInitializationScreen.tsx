@@ -143,7 +143,7 @@ const WalletInitializationScreen = props => {
             <Text style={styles.headerTitleText}>{`${strings.Existing} Wallet`}</Text>
             <Text style={styles.headerInfoText}>
               {/* {strings.previously} */}
-              {'Use Backup Phrase if you have 12/24 word Backup Phrase. Recovery Keys are for legacy users'}
+              {'Use Backup phrase if you have 12/24-word Backup or else try using Border wallet'}
             </Text>
           </View>
           <TouchableOpacity

@@ -1,19 +1,18 @@
-import React, {  } from 'react'
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import React from 'react'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ListItem } from 'react-native-elements'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import Colors from '../../../common/Colors'
+import { translations } from '../../../common/content/LocContext'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+import Fonts from '../../../common/Fonts'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { ListItem } from 'react-native-elements'
-import Fonts from '../../../common/Fonts'
-import ListStyles from '../../../common/Styles/ListStyles'
 import ImageStyles from '../../../common/Styles/ImageStyles'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import ListStyles from '../../../common/Styles/ListStyles'
 import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
-import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import useAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountShell'
-import { translations } from '../../../common/content/LocContext'
-import LinearGradient from 'react-native-linear-gradient'
 
 export type Props = {
   onProceed: ( accountShell ) => void;
@@ -103,17 +102,11 @@ const UnHideArchiveAccountBottomSheet: React.FC<Props> = ( {
             <TouchableOpacity
               onPress={( ) => onProceed( accountShell )}
             >
-              <LinearGradient colors={[ Colors.blue, Colors.darkBlue ]}
-                start={{
-                  x: 0, y: 0
-                }} end={{
-                  x: 1, y: 0
-                }}
-                locations={[ 0.2, 1 ]}
-                style={ButtonStyles.primaryActionButton}
+              <View
+                style={[ButtonStyles.primaryActionButton,{backgroundColor: Colors.blue}]}
               >
                 <Text style={ButtonStyles.actionButtonText}>{accountInfo.visibility === AccountVisibility.HIDDEN ? 'Unhide' : 'Restore'}</Text>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={onBack}

@@ -11,21 +11,28 @@ import Share from 'react-native-share'
 import { call, delay, put, race, select } from 'redux-saga/effects'
 import secrets from 'secrets.js-grempe'
 import semver from 'semver'
+import RGBServices from 'src/services/RGBServices'
 import config from '../../bitcoin/HexaConfig'
 import { upgradeAccountToMultiSig } from '../../bitcoin/utilities/accounts/AccountFactory'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import {
-  Account, Accounts,
-  AccountType, BackupStreamData, ChannelAssets, cloudDataInterface, ContactDetails,
-  Gift, INotification,
-  KeeperInfoInterface, KeeperType, LevelData,
+  Account, Accounts, AccountType, BackupStreamData,
+  ChannelAssets, cloudDataInterface, ContactDetails,
+  Gift,
+  INotification,
+  KeeperInfoInterface,
+  KeeperType,
+  LevelData,
   LevelHealthInterface,
   LevelInfo,
-  MetaShare, MultiSigAccount, NewWalletImage, notificationTag,
-  notificationType,
-  PrimaryStreamData,
+  MetaShare,
+  MultiSigAccount,
+  NewWalletImage, notificationTag,
+  notificationType, PrimaryStreamData,
   QRCodeTypes,
-  SecondaryStreamData, ShareSplitScheme, StreamData,
+  SecondaryStreamData,
+  ShareSplitScheme,
+  StreamData,
   TrustedContact,
   TrustedContactRelationTypes,
   Trusted_Contacts,
@@ -44,13 +51,63 @@ import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFr
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import { setGifts, twoFAValid, updateAccountShells } from '../actions/accounts'
 import {
-  ACCEPT_EC_REQUEST, AUTO_SHARE_LEVEL2_KEEPER, CHANGE_ENC_PASSWORD, CHANGE_QUESTION_ANSWER, CLOUD_MSHARE, CONFIRM_PDF_SHARED, CREATE_CHANNEL_ASSETS, CREATE_GUARDIAN, DELETE_SM_AND_SMSHARES, DOWNLOAD_BACKUP_DATA, DOWNLOAD_SM_SHARE, EMPTY_SHARE_TRANSFER_DETAILS, generateMetaShare, GENERATE_LEVEL1_SHARES,
-  GENERATE_LEVEL2_SHARES, GENERATE_META_SHARE, getApprovalFromKeepers, GET_APPROVAL_FROM_KEEPER, GET_PDF_DATA, healthCheckInitialized, initializeHealthSetup, initLevelTwo, INIT_HEALTH_SETUP, INIT_LEVEL_TWO, isLevel2InitializedStatus, isLevel3InitializedStatus, KEEPER_INFO, mnemonicRecoveredHealth, MODIFY_LEVELDATA, navigateToHistoryPage, ON_PRESS_KEEPER, pdfSuccessfullyCreated, putKeeperInfo, RECOVER_MNEMONIC_HEALTH, RECOVER_WALLET_HEALTH, RECOVER_WALLET_USING_ICLOUD, RECOVER_WALLET_WITHOUT_ICLOUD, RECOVER_WALLET_WITH_MNEMONIC, REJECTED_EC_REQUEST, RESET_LEVEL_AFTER_PASSWORD_CHANGE, restoreSeedWordFailed, retrieveMetaShares, RETRIEVE_METASHRES, secondaryShareDownloaded, setAllowSecureAccount, setApprovalStatus, setChannelAssets, setDownloadedBackupData, setIsCurrentLevel0, setIsKeeperInfoUpdated, setIsKeeperTypeBottomSheetOpen, setIsLevelToNotSetupStatus, setLevelCompletionError, setOpenToApproval, setPasswordResetState, setPDFInfo, setPdfUpgrade, setSecondaryDataInfoStatus, setSeedBackupHistory, SETUP_HEALTH_FOR_RESTORE, SETUP_LEVEL_HEALTH, SETUP_PASSWORD, SET_HEALTH_STATUS, SET_LEVEL_TO_NOT_SETUP, SHARE_PDF, switchS3LoaderKeeper, switchS3LoadingStatus, updatedKeeperInfo, updateHealth, updateLevelData, updateLevelThreeMetaShareStatus, updateLevelTwoMetaShareStatus, updateMetaSharesKeeper, updateMSharesHealth, updateOldMetaSharesKeeper, updateSeedHealth, UPDATE_KEEPER_INFO_TO_CHANNEL, UPDATE_SECONDARY_SHARD, UPDATE_SEED_HEALTH, UPDATE_SHARES_HEALTH, UPDATE_WALLET_IMAGE_HEALTH, upgradePDF,
-  UPGRADE_LEVEL1_KEEPER, UPGRADE_PDF, walletRecoveryFailed
+  ACCEPT_EC_REQUEST,
+  AUTO_SHARE_LEVEL2_KEEPER,
+  CHANGE_ENC_PASSWORD,
+  CHANGE_QUESTION_ANSWER,
+  CLOUD_MSHARE,
+  CONFIRM_PDF_SHARED,
+  CREATE_CHANNEL_ASSETS,
+  CREATE_GUARDIAN,
+  DELETE_SM_AND_SMSHARES,
+  DOWNLOAD_BACKUP_DATA,
+  DOWNLOAD_SM_SHARE,
+  EMPTY_SHARE_TRANSFER_DETAILS, generateMetaShare, GENERATE_LEVEL1_SHARES,
+  GENERATE_LEVEL2_SHARES,
+  GENERATE_META_SHARE, getApprovalFromKeepers, GET_APPROVAL_FROM_KEEPER,
+  GET_PDF_DATA, healthCheckInitialized, initializeHealthSetup, initLevelTwo, INIT_HEALTH_SETUP,
+  INIT_LEVEL_TWO, isLevel2InitializedStatus,
+  isLevel3InitializedStatus, KEEPER_INFO, mnemonicRecoveredHealth, MODIFY_LEVELDATA, navigateToHistoryPage, ON_PRESS_KEEPER, pdfSuccessfullyCreated,
+  putKeeperInfo, RECOVER_MNEMONIC_HEALTH,
+  RECOVER_WALLET_HEALTH,
+  RECOVER_WALLET_USING_ICLOUD,
+  RECOVER_WALLET_WITHOUT_ICLOUD,
+  RECOVER_WALLET_WITH_MNEMONIC,
+  REJECTED_EC_REQUEST,
+  RESET_LEVEL_AFTER_PASSWORD_CHANGE, restoreSeedWordFailed,
+  retrieveMetaShares, RETRIEVE_METASHRES, secondaryShareDownloaded,
+  setAllowSecureAccount,
+  setApprovalStatus,
+  setChannelAssets,
+  setDownloadedBackupData,
+  setIsCurrentLevel0,
+  setIsKeeperInfoUpdated,
+  setIsKeeperTypeBottomSheetOpen,
+  setIsLevelToNotSetupStatus,
+  setLevelCompletionError,
+  setOpenToApproval, setPasswordResetState, setPDFInfo, setPdfUpgrade,
+  setSecondaryDataInfoStatus,
+  setSeedBackupHistory, SETUP_HEALTH_FOR_RESTORE,
+  SETUP_LEVEL_HEALTH,
+  SETUP_PASSWORD,
+  SET_HEALTH_STATUS,
+  SET_LEVEL_TO_NOT_SETUP,
+  SHARE_PDF, switchS3LoaderKeeper,
+  switchS3LoadingStatus, updatedKeeperInfo, updateHealth,
+  updateLevelData,
+  updateLevelThreeMetaShareStatus,
+  updateLevelTwoMetaShareStatus, updateMetaSharesKeeper, updateMSharesHealth, updateOldMetaSharesKeeper,
+  updateSeedHealth, UPDATE_KEEPER_INFO_TO_CHANNEL,
+  UPDATE_SECONDARY_SHARD,
+  UPDATE_SEED_HEALTH,
+  UPDATE_SHARES_HEALTH,
+  UPDATE_WALLET_IMAGE_HEALTH, upgradePDF, UPGRADE_LEVEL1_KEEPER,
+  UPGRADE_PDF, walletRecoveryFailed
 } from '../actions/BHR'
 import { updateCloudData } from '../actions/cloud'
 import { fetchNotificationStarted, messageFetched, storeMessagesTimeStamp } from '../actions/notifications'
 import { setWalletId } from '../actions/preferences'
+import { setRgbConfig } from '../actions/rgb'
 import { updateWallet } from '../actions/storage'
 import { InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels, updateTrustedContacts } from '../actions/trustedContacts'
 import { setVersionHistory } from '../actions/versionHistory'
@@ -453,6 +510,9 @@ function* recoverWalletWithMnemonicWorker( { payload } ) {
     } )
     yield put( updateSeedHealth() )
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
+    const config = yield call( RGBServices.restoreKeys, primaryMnemonic )
+    yield put( setRgbConfig( config ) )
+    const isRgbInit = yield call( RGBServices.initiate, config.mnemonic, config.xpub  )
   } catch ( err ) {
     yield put( switchS3LoadingStatus( 'restoreWallet' ) )
     yield put( walletRecoveryFailed( true ) )

@@ -108,6 +108,7 @@ import {
 import { setVersion } from '../../store/actions/versionHistory'
 import { AccountsState } from '../../store/reducers/accounts'
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import { CommonActions } from '@react-navigation/native'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 500
 export enum BottomSheetState {
@@ -461,6 +462,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.moveToContactDetails( message.additionalInfo.channelKey, 'Contact' )
           break
         case NotificationType.FNF_REQUEST_REJECTED:
+          this.closeBottomSheet()
+          this.props.navigation.popToTop()
+          this.props.navigation.navigate( 'FriendsAndFamily')
+          break
         case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
           this.moveToContactDetails( message.additionalInfo.channelKey, 'I am the Keeper of' )
           break
@@ -685,6 +690,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   handleDeepLinkEvent = async ( { url } ) => {
+    if(url.includes('backup')){
+      this.props.navigation.navigate("BackupWithKeeper")
+      return;
+    }   
     const { navigation } = this.props
     const isFocused = navigation.isFocused()
     // If the user is on one of Home's nested routes, and a
@@ -1151,30 +1160,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     try {
       this.closeBottomSheet()
       const { trustedContactRequest } = this.state
-      let channelKeys: string[]
-      try{
-        switch( trustedContactRequest.encryptionType ){
-            case DeepLinkEncryptionType.DEFAULT:
-              channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
-              break
-
-            case DeepLinkEncryptionType.NUMBER:
-            case DeepLinkEncryptionType.EMAIL:
-            case DeepLinkEncryptionType.OTP:
-              const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
-              channelKeys = decryptedKeys.split( '-' )
-              break
-        }
-
-        trustedContactRequest.channelKey = channelKeys[ 0 ]
-        trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
-      } catch( err ){
-        Toast( 'Invalid key', true, true  )
-        this.onToogleGiftLoading()
-        return
-      }
       this.props.rejectTrustedContact( {
-        channelKey: trustedContactRequest.channelKey, isExistingContact: trustedContactRequest.isExistingContact
+        channelKey: trustedContactRequest.channelAddress, isExistingContact: trustedContactRequest.isExistingContact
       } )
     } catch ( error ) {
       Alert.alert( 'Incompatible request, updating your app might help' )
