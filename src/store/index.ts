@@ -1,6 +1,7 @@
 import { applyMiddleware, combineReducers, createStore } from 'redux'
 import { createMigrate, persistReducer, persistStore } from 'redux-persist'
 import { all, call, spawn } from 'redux-saga/effects'
+
 import {
   accountCheckWatcher,
   addNewAccountShellsWatcher,
@@ -138,11 +139,8 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 import createDebugger from 'redux-flipper'
 import createSagaMiddleware from 'redux-saga'
 import thunk from 'redux-thunk'
-import bhr from './reducers/BHR'
-import rampIntegrationReducer from './reducers/RampIntegration'
-import swanIntegrationReducer from './reducers/SwanIntegration'
-
 import accountsReducer from './reducers/accounts'
+import bhr from './reducers/BHR'
 import cloudReducer from './reducers/cloud'
 import doNotStoreReducer from './reducers/doNotStore'
 import fBTCReducers from './reducers/fbtc'
@@ -374,9 +372,9 @@ const rootReducer = combineReducers( {
   sending: sendingReducer,
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
-  swanIntegration: swanIntegrationReducer,
+  // swanIntegration: swanIntegrationReducer,
   walletRescanning: walletRescanningReducer,
-  rampIntegration: rampIntegrationReducer,
+  // rampIntegration: rampIntegrationReducer,
   versionHistory: VersionHistoryReducer,
   cloud: cloudReducer,
   upgradeToNewBhr: upgradeToNewBhr,
