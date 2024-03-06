@@ -1,21 +1,19 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import AccountComponent from './AccountComponent'
-import { ScrollView } from 'react-native-gesture-handler'
 
 export default function RemoveSelectedAccount( props ) {
   const [ SelectedContactId, setSelectedContactId ] = useState( 0 )
   const accountInfo = props.selectedAccount ? props.selectedAccount : {
   }
-  console.log( 'props.accountInfo', props.accountInfo )
   return (
     <View style={{
       ...styles.modalContentContainer, height: '100%'

@@ -3,14 +3,13 @@ import dynamicLinks from '@react-native-firebase/dynamic-links'
 import crypto from 'crypto'
 import { Alert, Linking } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
-import config from '../../bitcoin/HexaConfig'
+import { default as config, default as HexaConfig } from '../../bitcoin/HexaConfig'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { Accounts, DeepLinkEncryptionType, DeepLinkKind, LevelHealthInterface, LevelInfo, NewWalletImage, QRCodeTypes, ShortLinkDescription, ShortLinkDomain, ShortLinkImage, ShortLinkTitle, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import Toast from '../../components/Toast'
 import { encrypt } from '../encryption'
 import { getVersions } from '../utilities'
-import Toast from '../../components/Toast'
-import HexaConfig from '../../bitcoin/HexaConfig'
 
 export const nameToInitials = fullName => {
   if( !fullName ) return
@@ -149,7 +148,6 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
     STATE_DATA: {
     },
   }
-  // console.log("DATABASE", database);
   let CloudDataJson = {
   }
   if ( database && database.SERVICES ) {
@@ -167,9 +165,7 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
       walletImage,
       keeperInfo: [],
     }
-    // console.log("walletImage", walletImage);
     encryptedCloudDataJson = await encrypt( CloudDataJson, key )
-    // console.log('encryptedDatabase', encryptedCloudDataJson);
     return encryptedCloudDataJson
   }
 }
@@ -477,7 +473,6 @@ export const generateDeepLink = async( { deepLinkKind, encryptionType, encryptio
         }
       }, dynamicLinks.ShortLinkType.UNGUESSABLE )
     } catch ( error ) {
-      console.log( error )
       shortLink = ''
     }
   }

@@ -176,7 +176,6 @@ const RecoverBorderWallet = ( props ) => {
     setLoaderModal( false )
     if ( seedRecovered )
       setTimeout( () => {
-        console.log( 'TIMEOUT' )
         setLoaderModal( true )
       }, 1000 )
   }

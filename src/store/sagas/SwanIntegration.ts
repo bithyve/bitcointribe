@@ -1,40 +1,26 @@
 import { call, put, select } from 'redux-saga/effects'
 
 import {
-  updateSwanStatus,
-  FETCH_SWAN_AUTHENTICATION_URL,
-  fetchSwanAuthenticationUrlInitiated,
-  fetchSwanAuthenticationUrlSucceeded,
-  REDEEM_SWAN_CODE_FOR_TOKEN,
-  redeemSwanCodeForTokenInitiated,
-  redeemSwanCodeForTokenSucceeded,
-  CREATE_WITHDRAWAL_WALLET_ON_SWAN,
   createWithdrawalWalletOnSwanInitiated,
-  createWithdrawalWalletOnSwanSucceeded,
-
-  LINK_SWAN_WALLET,
-  linkSwanWalletSucceeded,
-  linkSwanWalletFailed,
-  tempSwanAccountInfoSaved,
-  CREATE_TEMP_SWAN_ACCOUNT_INFO
+  createWithdrawalWalletOnSwanSucceeded, CREATE_TEMP_SWAN_ACCOUNT_INFO, CREATE_WITHDRAWAL_WALLET_ON_SWAN, fetchSwanAuthenticationUrlInitiated,
+  fetchSwanAuthenticationUrlSucceeded, FETCH_SWAN_AUTHENTICATION_URL, linkSwanWalletFailed, linkSwanWalletSucceeded, LINK_SWAN_WALLET, redeemSwanCodeForTokenInitiated,
+  redeemSwanCodeForTokenSucceeded, REDEEM_SWAN_CODE_FOR_TOKEN, tempSwanAccountInfoSaved, updateSwanStatus
 } from '../actions/SwanIntegration'
 
 import {
-  redeemAuthCodeForToken,
-  createWithdrawalWalletOnSwan,
-  setupAutomaticWithdrawals
+  createWithdrawalWalletOnSwan, redeemAuthCodeForToken, setupAutomaticWithdrawals
 } from '../../services/swan'
 
 import { createWatcher } from '../utils/utilities'
 
-import { generatePKCEParameters } from '../../utils/random/pkce'
 import Config from '../../bitcoin/HexaConfig'
-import { AccountsState } from '../reducers/accounts'
 import { Account, Accounts, AccountType, Wallet } from '../../bitcoin/utilities/Interface'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
-import { addNewAccount, generateShellFromAccount } from './accounts'
+import { generatePKCEParameters } from '../../utils/random/pkce'
 import { updateAccountShells } from '../actions/accounts'
 import { updateWalletImageHealth } from '../actions/BHR'
+import { AccountsState } from '../reducers/accounts'
+import { addNewAccount, generateShellFromAccount } from './accounts'
 
 import dbManager from '../../storage/realm/dbManager'
 
@@ -148,9 +134,7 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
     } )
   }
   catch( e )  {
-    console.log( {
-      e
-    } )
+  //  error
   }
   yield put( updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS ) )
 
@@ -288,7 +272,6 @@ function* linkSwanWalletWorker( { payload } ) {
       }
     }
   } catch ( err ) {
-    console.log( 'err', err )
     const data = {
       linkSwanWalletFailed: true,
       linkSwanWalletFailedMessage: 'Swan wallet linking failed',

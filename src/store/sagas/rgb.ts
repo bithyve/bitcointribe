@@ -1,7 +1,7 @@
 import { call, put, select } from 'redux-saga/effects'
 import { RGBConfig } from '../../bitcoin/utilities/Interface'
 import RGBServices from '../../services/RGBServices'
-import { RECEIVE_RGB_ASSET, SYNC_RGB, setNextFreeAddress, setReceiveData, setRgb121Assets, setRgb20Assets, setRgbOnchainBalances, setRgbSyncing, setRgbTxns } from '../actions/rgb'
+import { RECEIVE_RGB_ASSET, setNextFreeAddress, setReceiveData, setRgb121Assets, setRgb20Assets, setRgbOnchainBalances, setRgbSyncing, setRgbTxns, SYNC_RGB } from '../actions/rgb'
 import { createWatcher } from '../utils/utilities'
 
 export function* syncRgbWorker(  ) {
@@ -22,7 +22,6 @@ export function* syncRgbWorker(  ) {
   }
   catch( err ){
     yield put( setRgbSyncing( false ) )
-    console.log( 'SYNC ERROR', err )
   }
 }
 
@@ -62,7 +61,6 @@ export function* receiveRgbAssetWorker(  ) {
     }
   }
   catch( err ){
-    console.log( 'SYNC ERROR', err )
     yield put( setReceiveData( {
       message: 'Failed to generate invoice',
       loading: false,

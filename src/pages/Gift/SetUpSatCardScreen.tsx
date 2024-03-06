@@ -1,59 +1,46 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react'
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  StatusBar,
-  Platform,
-  BackHandler,
-  Linking,
-  Keyboard,
-  Alert,
-  Dimensions,
-  SafeAreaView
-} from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import CommonStyles from '../../common/Styles/Styles'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { credsAuth } from '../../store/actions/setupAndAuth'
-import BottomSheet from 'reanimated-bottom-sheet'
-import LoaderModal from '../../components/LoaderModal'
-import JailMonkey from 'jail-monkey'
-import DeviceInfo from 'react-native-device-info'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import { processDeepLink } from '../../common/CommonFunctions'
-import ModalContainer from '../../components/home/ModalContainer'
 import firebase from '@react-native-firebase/app'
-import {
-  setIsPermissionGiven,
-  setFCMToken
-} from '../../store/actions/preferences'
 import messaging from '@react-native-firebase/messaging'
+import JailMonkey from 'jail-monkey'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import {
-  updateFCMTokens,
-} from '../../store/actions/notifications'
-import { autoSyncShells } from '../../store/actions/accounts'
+  BackHandler, Dimensions, Keyboard, Linking, Platform, SafeAreaView, StatusBar, StyleSheet,
+  Text, TouchableOpacity, View
+} from 'react-native'
+import DeviceInfo from 'react-native-device-info'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
 import Relay from '../../bitcoin/utilities/Relay'
+import Colors from '../../common/Colors'
+import { processDeepLink } from '../../common/CommonFunctions'
 import { LocalizationContext } from '../../common/content/LocContext'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { setCloudBackupStatus } from '../../store/actions/cloud'
-import { setOpenToApproval } from '../../store/actions/BHR'
-import SecurityQuestion from '../NewBHR/SecurityQuestion'
-import Toast from '../../components/Toast'
-import SecuritySeedWord from '../NewBHR/SecuritySeedWord'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
 import AlertModalContents from '../../components/AlertModalContents'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import ErrorModalContents from '../../components/ErrorModalContents'
 import BottomInputModalContainer from '../../components/home/BottomInputModalContainer'
+import ModalContainer from '../../components/home/ModalContainer'
+import LoaderModal from '../../components/LoaderModal'
+import Toast from '../../components/Toast'
+import { autoSyncShells } from '../../store/actions/accounts'
+import { setOpenToApproval } from '../../store/actions/BHR'
+import { setCloudBackupStatus } from '../../store/actions/cloud'
+import {
+  updateFCMTokens
+} from '../../store/actions/notifications'
+import {
+  setFCMToken, setIsPermissionGiven
+} from '../../store/actions/preferences'
+import { credsAuth } from '../../store/actions/setupAndAuth'
 import ConfirmSeedWordsModal from '../NewBHR/ConfirmSeedWordsModal'
+import SecurityQuestion from '../NewBHR/SecurityQuestion'
+import SecuritySeedWord from '../NewBHR/SecuritySeedWord'
 
 const { height, } = Dimensions.get( 'window' )
 
@@ -169,7 +156,6 @@ export default function SetUpSatCardScreen( props ) {
   }
 
   const handleDeepLinking = async ( url: string | null ) => {
-    // console.log( 'Login::handleDeepLinkEvent::URL: ', url )
     if ( url == null ) {
       return
     }
@@ -227,7 +213,6 @@ export default function SetUpSatCardScreen( props ) {
 
     Relay.fetchReleases( DeviceInfo.getBuildNumber() )
       .then( async ( res ) => {
-        // console.log('Release note', res.data.releases);
         const releaseCases = releaseCasesValue
 
         if (
@@ -302,7 +287,7 @@ export default function SetUpSatCardScreen( props ) {
                 // this.createNotificationListeners()
               } )
               .catch( () => {
-                console.log( 'Permission rejected.' )
+                //Permission rejected
               } )
           }
         } )
@@ -312,7 +297,6 @@ export default function SetUpSatCardScreen( props ) {
       //this.createNotificationListeners()
     }
     const t1 = performance.now()
-    console.log( 'Call bootStrapNotifications took ' + ( t1 - t0 ) + ' milliseconds.' )
   }
 
   const storeFCMToken = async () => {

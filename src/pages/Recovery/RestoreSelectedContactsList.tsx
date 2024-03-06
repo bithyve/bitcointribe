@@ -11,13 +11,13 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import Entypo from 'react-native-vector-icons/Entypo'
 import Feather from 'react-native-vector-icons/Feather'
@@ -35,7 +35,7 @@ import RecoverySuccessModalContents from '../../components/RecoverySuccessModalC
 import RequestModalContents from '../../components/RequestModalContents'
 import TransparentHeaderModal from '../../components/TransparentHeaderModal'
 import {
-  ErrorReceiving,
+  ErrorReceiving
 } from '../../store/actions/BHR'
 import RestoreByCloudQRCodeContents from './RestoreByCloudQRCodeContents'
 
@@ -353,9 +353,6 @@ export default function RestoreSelectedContactsList( props ) {
 
         if ( !META_SHARE ) {
           const { KEY } = REQUEST_DETAILS
-          console.log( {
-            KEY
-          } )
           // Removed sss file
           // dispatch( downloadMShare( KEY, null, 'recovery' ) )
         } else {

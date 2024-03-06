@@ -55,7 +55,6 @@ export default function RGBTxDetail( props ) {
         props.navigation.goBack()
       }
     } catch ( error ) {
-      console.log( error )
       props.navigation.goBack()
     }
   }

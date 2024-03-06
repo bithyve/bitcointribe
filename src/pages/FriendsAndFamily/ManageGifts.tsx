@@ -385,7 +385,7 @@ const ManageGifts = ( props ) => {
           onPressReject={onTrustedContactRejected}
           version={giftData.version}
           stopReset={true}
-          giftLoading={giftLoading}/>
+        />
       </ModalContainer>:null}
       <View style={{
         height: 'auto',

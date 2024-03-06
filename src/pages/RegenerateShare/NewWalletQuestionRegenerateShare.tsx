@@ -55,15 +55,12 @@ export default function NewWalletQuestionRegenerateShare( props ) {
   //     props.navigation.navigate('HomeNav');
   // }
   const setConfirm = event => {
-    console.log( 'event,key', event.key )
     if ( event.text ) {
       if ( answer && event.text != answer ) {
         setAnsError( 'Answers do not match' )
         counter++
         setCounter( counter )
-        console.log( 'counter', counter )
         if ( counter > 3 ) {
-          console.log( 'global.ansCounter', counter )
           setHdeShowAnswer( !hideShowAnswer )
           counter = 0
         }
@@ -75,7 +72,6 @@ export default function NewWalletQuestionRegenerateShare( props ) {
     }
   }
   const setBackspace = event => {
-    console.log( 'event,key', event.nativeEvent.key )
 
     if ( event.nativeEvent.key == 'Backspace' ) {
       setAnsError( '' )

@@ -1,21 +1,19 @@
-import React, { useState, useCallback, useRef } from 'react'
-import { View, Image, Text, StyleSheet, Platform } from 'react-native'
+import React, { useCallback, useRef, useState } from 'react'
+import { Image, Platform, StyleSheet, Text, View } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
 import { ScrollView } from 'react-native-gesture-handler'
-import {
-  widthPercentageToDP, heightPercentageToDP,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import KnowMoreButton from '../../components/KnowMoreButton'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
-import DeviceInfo from 'react-native-device-info'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import ModalHeader from '../../components/ModalHeader'
-import Toast from '../../components/Toast'
-import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 import NavStyles from '../../common/Styles/NavStyles'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import KnowMoreButton from '../../components/KnowMoreButton'
+import ModalHeader from '../../components/ModalHeader'
+import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
+import Toast from '../../components/Toast'
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
 
 export default function RestoreByCloudQRCodeContents( props ) {
@@ -31,25 +29,21 @@ export default function RestoreByCloudQRCodeContents( props ) {
   const unableRecoverShareFromQR = useSelector(
     ( state ) => state.bhr.unableRecoverShareFromQR,
   )
-  console.log( 'unableRecoverShareFromQR', unableRecoverShareFromQR )
 
   const handleQRDataScanned = ( qrData ) => {
     const tempArray = qrDataArray
     const shareCode = qrData.substring( 0, 2 )
     if ( shareCode !== 'e0' && shareCode !== 'c0' ) {
-      console.log( 'shareCode', shareCode )
       setTimeout( () => {
         setErrorMessageHeader( 'Invalid QR' )
         setErrorMessage( 'Please try again' )
         setProcessButtonText( 'Try again' )
       }, 2 )
       errorBottomSheetRef.current.snapTo( 1 )
-      console.log( 'shareCode1', shareCode )
       //Alert.alert('Invalid QR', 'Please try again');
       return
     }
     const startNumber1 = qrData.substring( 2, 3 )
-    console.log( 'startNumber', startNumber1 )
     setQrData( qrData )
     const temp1 =
       startNumberCounter == 1
@@ -72,7 +66,6 @@ export default function RestoreByCloudQRCodeContents( props ) {
         return
       }
       if ( startNumberCounter != startNumber1 ) {
-        console.log( 'in if', startNumber1, startNumberCounter )
         setTimeout( () => {
           setErrorMessageHeader( 'Scan QR code' )
           setErrorMessage( 'Please scan ' + temp1 + ' QR code' )

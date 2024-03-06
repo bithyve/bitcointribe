@@ -1,7 +1,7 @@
 import { action, observable } from 'mobx'
 import RNFetchBlob from 'rn-fetch-blob'
-import RESTUtils from '../utils/ln/RESTUtils'
 import Base64Utils from '../utils/ln/Base64Utils'
+import RESTUtils from '../utils/ln/RESTUtils'
 import ForwardEvent from './../models/ForwardEvent'
 import SettingsStore from './SettingsStore'
 
@@ -116,7 +116,6 @@ export default class FeeStore {
           this.loading = false
         } )
         .catch( ( err: any ) => {
-          console.log( 'error getting fee report', err )
           this.resetFees()
         } )
     };

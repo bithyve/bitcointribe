@@ -1,29 +1,27 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react'
-import { StyleSheet, Modal, View, Image, Text, Platform, TextInput, TouchableOpacity } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import QRCode from '../../components/QRCode'
-import Fonts from '../../common/Fonts'
-import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { UsNumberFormat } from '../../common/utilities'
-import CopyThisText from '../../components/CopyThisText'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import { ScrollView } from 'react-native-gesture-handler'
-import { getAllAccountsData } from '../../store/actions/accounts'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import { AccountsState } from '../../store/reducers/accounts'
-import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
-import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
-import ModalContainer from '../../components/home/ModalContainer'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import Colors from '../../common/Colors'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { translations } from '../../common/content/LocContext'
+import Fonts from '../../common/Fonts'
+import { UsNumberFormat } from '../../common/utilities'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import CopyThisText from '../../components/CopyThisText'
+import ModalContainer from '../../components/home/ModalContainer'
+import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
+import QRCode from '../../components/QRCode'
+import { getAllAccountsData } from '../../store/actions/accounts'
+import { AccountsState } from '../../store/reducers/accounts'
 
 export type Props = {
   navigation: any;
@@ -80,7 +78,6 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         amount: parseInt( amount ) / SATOSHIS_IN_BTC,
       } ).paymentURI
     }
-    console.log( receiveAt )
     setReceivingAddress( receiveAt )
   }, [ amount, selectedAccount ] )
 

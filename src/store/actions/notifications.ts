@@ -2,7 +2,7 @@
 
 import {
   notificationTag,
-  notificationType,
+  notificationType
 } from '../../bitcoin/utilities/Interface'
 
 export const UPDATE_FCM_TOKENS = 'UPDATE_FCM_TOKENS'
@@ -60,7 +60,6 @@ export const setupNotificationList = ( ) => {
 export const NOTIFICATIONS_FETCHED = 'NOTIFICATIONS_FETCHED'
 
 export const notificationsFetched = ( notifications ) => {
-  console.log( 'notificationsFetched notifications', notifications )
   return {
     type: NOTIFICATIONS_FETCHED,
     payload: {
@@ -108,7 +107,6 @@ export const storeMessagesTimeStamp = () => {
 }
 
 export const messageFetched = ( messages ) => {
-  // console.log( 'messagesFetched messages', messages )
   return {
     type: MESSAGES_FETCHED,
     payload: {
@@ -118,7 +116,6 @@ export const messageFetched = ( messages ) => {
 }
 
 export const updateMessageStatusInApp = ( messageNotificationId ) => {
-  console.log( 'updateMessageStatus messages', messageNotificationId )
   return {
     type: UPDATE_MESSAGES_STATUS_INAPP,
     payload: {
@@ -136,7 +133,7 @@ export const updateMessageStatus = ( data : [] ) => {
   }
 }
 
-export const notificationPressed = ( notificationId: string, handleClick: (msg: string) => void ) => {
+export const notificationPressed = ( notificationId: string, handleClick: ( msg: string ) => void ) => {
   return {
     type: NOTIFICATION_PRESSED,
     payload: {

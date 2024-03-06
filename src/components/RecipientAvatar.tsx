@@ -48,7 +48,7 @@ const RecipientAvatar: React.FC<Props> = ( {
         }
       }
     } catch ( e ) {
-      console.log( 'PERMISSION_ERROR', e )
+      // error
     }
   }
 

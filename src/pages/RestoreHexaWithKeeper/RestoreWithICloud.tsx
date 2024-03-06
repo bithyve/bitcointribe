@@ -14,12 +14,12 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -28,13 +28,13 @@ import config from '../../bitcoin/HexaConfig'
 import { BackupStreamData, KeeperInfoInterface, PrimaryStreamData, SecondaryStreamData, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
-import Fonts from '../../common/Fonts'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { decrypt } from '../../common/encryption'
+import Fonts from '../../common/Fonts'
 import ErrorModalContents from '../../components/ErrorModalContents'
+import Loader from '../../components/loader'
 import LoaderModal from '../../components/LoaderModal'
 import SendViaLink from '../../components/SendViaLink'
-import Loader from '../../components/loader'
 import {
   downloadBackupData,
   initNewBHRFlow,
@@ -47,7 +47,7 @@ import {
 } from '../../store/actions/BHR'
 import { clearCloudCache, getCloudDataRecovery, setCloudBackupStatus, setCloudErrorMessage } from '../../store/actions/cloud'
 import {
-  walletCheckIn,
+  walletCheckIn
 } from '../../store/actions/trustedContacts'
 import { setVersion } from '../../store/actions/versionHistory'
 import ShareOtpWithTrustedContact from '../NewBHR/ShareOtpWithTrustedContact'
@@ -445,7 +445,7 @@ class RestoreWithICloud extends Component<
         arr = JSON.parse( result )
         arr = arr.reverse()
       } catch ( error ) {
-        //console.log('ERROR', error);
+        //error
       }
       if ( arr && arr.length ) {
         for ( let i = 0; i < arr.length; i++ ) {
@@ -605,7 +605,7 @@ class RestoreWithICloud extends Component<
       }
     }
     catch ( error ) {
-      console.log( 'ERROR', error )
+      // error
     }
   }
 
@@ -640,14 +640,12 @@ class RestoreWithICloud extends Component<
           shareId: KeeperData[ i ].shareId,
           data: KeeperData[ i ].data,
         }
-        console.log( 'obj', obj )
         if ( KeeperData[ i ].type == 'contact' ) {
           list.push( KeeperData[ i ] )
         }
         listDataArray.push( obj )
       }
     }
-    console.log( 'listDataArray', listDataArray )
     this.setState( {
       contactList: list,
       listData: listDataArray
@@ -662,7 +660,6 @@ class RestoreWithICloud extends Component<
       showLoader: true
     } )
     this.prevLoading = true
-    console.log( 'scannedData', scannedData )
     const { downloadedBackupData } = this.props
     this.props.downloadBackupData( {
       scannedData: scannedData
@@ -872,7 +869,6 @@ class RestoreWithICloud extends Component<
           } )
         }}
         onPressCard={() => {
-          console.log( 'ajfjkh asd', hideShow )
           this.setState( {
             hideShow: !hideShow
           } )
@@ -1281,7 +1277,6 @@ class RestoreWithICloud extends Component<
             securityQuestionModal: false
           } )
         }} >
-          {/* {console.log( 'teste Restore screen', this.state.question )} */}
           <SecurityQuestion
             question={this.state.question}
             encryptionType={this.state.encryptionType}

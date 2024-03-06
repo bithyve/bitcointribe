@@ -1,76 +1,54 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import idx from 'idx'
+import moment from 'moment'
 import React, { Component, createRef } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  Image,
-  ScrollView,
-  Platform,
-  ImageBackground,
+  Image, ImageBackground,
   Keyboard,
-  PermissionsAndroid,
-  RefreshControl,
-  ViewStyle,
-  StyleProp,
+  PermissionsAndroid, Platform, RefreshControl, SafeAreaView, ScrollView, StatusBar, StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import Dash from 'react-native-dash'
+import DeviceInfo from 'react-native-device-info'
 import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { connect } from 'react-redux'
-import idx from 'idx'
-import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
-import moment from 'moment'
 import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from '../../components/ModalHeader'
-import DeviceInfo from 'react-native-device-info'
-import AntDesign from 'react-native-vector-icons/AntDesign'
-import Loader from '../../components/loader'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import RestoreFromICloud from '../RestoreHexaWithKeeper/RestoreFromICloud'
-import SecurityQuestion from '../NewBHR/SecurityQuestion'
-import UpgradingKeeperContact from './UpgradingKeeperContact'
-import UpgradePdfKeeper from './UpgradePdfKeeper'
-import Dash from 'react-native-dash'
-import {
-  initializeHealthSetup,
-  updateMSharesHealth,
-  initLevelTwo,
-  generateMetaShare,
-  keeperProcessStatus,
-  updatedKeeperInfo,
-  generateSMMetaShares,
-  getPDFData,
-  checkMSharesHealth,
-} from '../../store/actions/BHR'
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
+import config from '../../bitcoin/HexaConfig'
 import { KeeperInfoInterface, LevelHealthInterface, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import AccountShell from '../../common/data/models/AccountShell'
 import PersonalNode from '../../common/data/models/PersonalNode'
-import { initNewBHRFlow } from '../../store/actions/BHR'
-import { setCloudData, updateHealthForCloud, } from '../../store/actions/cloud'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { setCloudDataForLevel, autoUploadSecondaryShare, autoShareContactKeeper, setUpgradeProcessStatus, setAvailableKeeperData, updateLevelToSetup, updateAvailableKeeperData, confirmPDFSharedFromUpgrade } from '../../store/actions/upgradeToNewBhr'
-import { addNewSecondarySubAccount } from '../../store/actions/accounts'
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
-import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
-import config from '../../bitcoin/HexaConfig'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import SecondaryDevice from '../NewBHR/SecondaryDeviceNewBHR'
-import PersonalCopyShareModal from '../NewBHR/PersonalCopyShareModal'
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import Fonts from '../../common/Fonts'
+import BottomInfoBox from '../../components/BottomInfoBox'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import QRModal from '../Accounts/QRModal'
+import Loader from '../../components/loader'
+import ModalHeader from '../../components/ModalHeader'
+import { addNewSecondarySubAccount } from '../../store/actions/accounts'
+import {
+  checkMSharesHealth, generateMetaShare, generateSMMetaShares,
+  getPDFData, initializeHealthSetup, initLevelTwo, initNewBHRFlow, keeperProcessStatus,
+  updatedKeeperInfo, updateMSharesHealth
+} from '../../store/actions/BHR'
+import { setCloudData, updateHealthForCloud } from '../../store/actions/cloud'
 import { setIsPermissionGiven } from '../../store/actions/preferences'
-import dbManager from '../../storage/realm/dbManager'
+import { autoShareContactKeeper, autoUploadSecondaryShare, confirmPDFSharedFromUpgrade, setAvailableKeeperData, setCloudDataForLevel, setUpgradeProcessStatus, updateAvailableKeeperData, updateLevelToSetup } from '../../store/actions/upgradeToNewBhr'
+import QRModal from '../Accounts/QRModal'
+import PersonalCopyShareModal from '../NewBHR/PersonalCopyShareModal'
+import SecondaryDevice from '../NewBHR/SecondaryDeviceNewBHR'
+import SecurityQuestion from '../NewBHR/SecurityQuestion'
+import RestoreFromICloud from '../RestoreHexaWithKeeper/RestoreFromICloud'
+import UpgradePdfKeeper from './UpgradePdfKeeper'
+import UpgradingKeeperContact from './UpgradingKeeperContact'
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
@@ -324,7 +302,6 @@ class UpgradeBackup extends Component<
 
         // CLOUD
         if( element.type == 'cloud' && !element.status ){
-          console.log( 'CLOUD' )
           this.RestoreFromICloud.current.snapTo( 1 )
           this.secondaryDeviceBottomSheet.current.snapTo( 0 )
           this.UpgradingKeeperContact.current.snapTo( 0 )
@@ -333,7 +310,6 @@ class UpgradeBackup extends Component<
         if( overallHealth && overallHealth.sharesInfo ) {
         // SECONDARY
           if( element.type == 'primary' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 2 ] ) {
-            console.log( 'PRIMASRY' )
             this.setState( {
               selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId ]
             } )
@@ -355,7 +331,6 @@ class UpgradeBackup extends Component<
           }
           // CONTACT
           if( selectedContact.length && selectedContact.length == 2 && this.props.levelToSetup == 3 && this.props.isUpgradeLevelInitialized && ( ( element.type == 'contact1' && !element.status ) && ( keepersInfo[ i + 1 ].type == 'contact2' && !keepersInfo[ i + 1 ].status ) ) ) {
-            console.log( 'CONTACT1' )
             if( levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].status == 'notAccessible' && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].status == 'notAccessible' && this.props.isUpgradeLevelInitialized ) {
               this.setState( {
                 showLoader: false,
@@ -369,7 +344,6 @@ class UpgradeBackup extends Component<
             this.PersonalCopyShareBottomSheet.current.snapTo( 0 )
             return
           } else if( selectedContact.length && ( element.type == 'contact1' || element.type == 'contact2' ) ) {
-            console.log( 'CONTACT@' )
             if( element.type == 'contact1' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] ){
               this.setState( {
                 showLoader: false,
@@ -398,7 +372,6 @@ class UpgradeBackup extends Component<
           }
 
           if( element.type == 'pdf' && !element.status ) {
-            console.log( 'PDF' )
             this.setState( {
               showLoader: false,
               pdfProcessStarted: true
@@ -684,7 +657,7 @@ class UpgradeBackup extends Component<
         } )
         addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo )
       } catch ( error ) {
-        console.log( 'error', error )
+        // error
       }
     }
   }
@@ -734,18 +707,6 @@ class UpgradeBackup extends Component<
         }
         if( this.state.isGuardianCreationClicked ){
           this.updateShare()
-          console.log( 'secondaryQR', JSON.stringify( {
-            isGuardian: true,
-            requester: walletName,
-            publicKey,
-            info: secondaryKey,
-            uploadedAt:
-            trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
-              .initiatedAt,
-            type: 'secondaryDeviceGuardian',
-            ver: DeviceInfo.getVersion(),
-            isFromKeeper: true,
-          } ) )
           this.setState( {
             secondaryQR: JSON.stringify( {
               isGuardian: true,
@@ -764,7 +725,7 @@ class UpgradeBackup extends Component<
         }
       }
     } catch ( error ) {
-      console.log( 'eerror', error )
+      // error
     }
   }
 
@@ -845,9 +806,6 @@ class UpgradeBackup extends Component<
           //     } )
           //   }
           // } catch ( err ) {
-          //   console.log( {
-          //     err
-          //   } )
           // }
         }}
       />

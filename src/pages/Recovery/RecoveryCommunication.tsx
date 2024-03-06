@@ -9,14 +9,14 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import { email, textWithoutEncoding } from 'react-native-communications'
 import DeviceInfo from 'react-native-device-info'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
@@ -263,9 +263,6 @@ export default function RecoveryCommunication( props ) {
 
   const downloadSecret = useCallback(
     ( shareIndex?, key? ) => {
-      console.log( {
-        shareIndex, key
-      } )
       if ( shareIndex && key ) {
         // Removed this method
         // dispatch( downloadMShare( key, null, 'recovery', shareIndex ) )
@@ -274,9 +271,6 @@ export default function RecoveryCommunication( props ) {
 
         if ( !META_SHARE ) {
           const { KEY } = REQUEST_DETAILS
-          console.log( {
-            KEY
-          } )
           // Removed this method
           // dispatch( downloadMShare( KEY, null, 'recovery' ) )
         } else {

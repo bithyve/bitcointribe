@@ -2,11 +2,11 @@ import * as bip39 from 'bip39'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import { call, put, select } from 'redux-saga/effects'
 import config from '../../bitcoin/HexaConfig'
+import { generateAccount, generateDonationAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
+import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import {
-  Account,
-  AccountType,
-  Accounts,
-  ActiveAddressAssignee,
+  Account, Accounts, AccountType, ActiveAddressAssignee,
   ActiveAddresses,
   ContactInfo,
   DeepLinkEncryptionType,
@@ -27,9 +27,6 @@ import {
   UnecryptedStreamData,
   Wallet
 } from '../../bitcoin/utilities/Interface'
-import { generateAccount, generateDonationAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
-import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SyncStatus from '../../common/data/enums/SyncStatus'
@@ -43,60 +40,30 @@ import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubA
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import { APP_STAGE } from '../../common/interfaces/Interfaces'
 import {
+  accountChecked, accountSettingsUpdated, accountSettingsUpdateFailed, accountShellMergeFailed,
+  accountShellMergeSucceeded,
+  accountShellRefreshCompleted,
+  accountShellRefreshStarted, ADD_NEW_ACCOUNT_SHELLS, autoSyncShells, AUTO_SYNC_SHELLS,
+  CREATE_BORDER_WALLET,
+  CREATE_SM_N_RESETTFA_OR_XPRIV, exchangeRatesCalculated, FETCH_EXCHANGE_RATES,
+  FETCH_FEE_RATES, generateSecondaryXpriv, GENERATE_GIFTS,
+  GENERATE_SECONDARY_XPRIV, getTestcoins, GET_TESTCOINS, giftCreationSuccess, MARK_ACCOUNT_CHECKED,
+  MARK_READ_TRANSACTION, MergeAccountShellsActionPayload, MERGE_ACCOUNT_SHELLS, newAccountShellsAdded,
+  readTxn, ReassignTransactionsActionPayload, REASSIGN_TRANSACTIONS, recomputeNetBalance,
+  refreshAccountShells, REFRESH_ACCOUNT_SHELLS, resetTwoFA, RESET_TWO_FA,
+  RESTORE_ACCOUNT_SHELLS, secondaryXprivGenerated,
+  setAverageTxFee,
+  setResetTwoFALoader, SYNC_ACCOUNTS, transactionReassignmentFailed,
+  transactionReassignmentSucceeded,
+  twoFAResetted,
+  twoFAValid, updateAccounts, updateAccountShells, updateGift, UPDATE_ACCOUNT_SETTINGS,
+  UPDATE_DONATION_PREFERENCES,
+  VALIDATE_TWO_FA
+} from '../actions/accounts'
+import {
   setAllowSecureAccount,
   updateWalletImageHealth
 } from '../actions/BHR'
-import {
-  ADD_NEW_ACCOUNT_SHELLS,
-  AUTO_SYNC_SHELLS,
-  CREATE_BORDER_WALLET,
-  CREATE_SM_N_RESETTFA_OR_XPRIV,
-  FETCH_EXCHANGE_RATES,
-  FETCH_FEE_RATES,
-  GENERATE_GIFTS,
-  GENERATE_SECONDARY_XPRIV,
-  GET_TESTCOINS,
-  MARK_ACCOUNT_CHECKED,
-  MARK_READ_TRANSACTION,
-  MERGE_ACCOUNT_SHELLS,
-  MergeAccountShellsActionPayload,
-  REASSIGN_TRANSACTIONS,
-  REFRESH_ACCOUNT_SHELLS,
-  RESET_TWO_FA,
-  RESTORE_ACCOUNT_SHELLS,
-  ReassignTransactionsActionPayload,
-  SYNC_ACCOUNTS,
-  UPDATE_ACCOUNT_SETTINGS,
-  UPDATE_DONATION_PREFERENCES,
-  VALIDATE_TWO_FA,
-  accountChecked,
-  accountSettingsUpdateFailed,
-  accountSettingsUpdated,
-  accountShellMergeFailed,
-  accountShellMergeSucceeded,
-  accountShellRefreshCompleted,
-  accountShellRefreshStarted,
-  autoSyncShells,
-  exchangeRatesCalculated,
-  generateSecondaryXpriv,
-  getTestcoins,
-  giftCreationSuccess,
-  newAccountShellsAdded,
-  readTxn,
-  recomputeNetBalance,
-  refreshAccountShells,
-  resetTwoFA,
-  secondaryXprivGenerated,
-  setAverageTxFee,
-  setResetTwoFALoader,
-  transactionReassignmentFailed,
-  transactionReassignmentSucceeded,
-  twoFAResetted,
-  twoFAValid,
-  updateAccountShells,
-  updateAccounts,
-  updateGift
-} from '../actions/accounts'
 import { updateWallet } from '../actions/storage'
 import { AccountsState } from '../reducers/accounts'
 import { createWatcher } from '../utils/utilities'
@@ -238,7 +205,7 @@ export async function generateGiftLink( giftToSend: Gift, walletName: string, fc
       updatedGift: giftToSend, deepLink, encryptedChannelKeys, encryptionType: deepLinkEncryptionType, encryptionHint, deepLinkEncryptionOTP: deepLinkEncryptionKey, channelAddress: giftToSend.channelAddress, shortLink, encryptionKey
     }
   } catch( err ){
-    console.log( 'An error occured while generating gift: ', err )
+    // error
   }
 }
 
@@ -472,9 +439,7 @@ function* fetchFeeRatesWorker() {
     if ( !averageTxFeeByNetwork ) console.log( 'Failed to calculate fee rates' )
     else yield put( setAverageTxFee( averageTxFeeByNetwork ) )
   } catch ( err ) {
-    console.log( 'Failed to calculate fee rates', {
-      err
-    } )
+    // error
   }
 }
 
@@ -489,9 +454,7 @@ function* fetchExchangeRatesWorker() {
     if ( !exchangeRates ) console.log( 'Failed to fetch exchange rates' )
     else yield put( exchangeRatesCalculated( exchangeRates ) )
   } catch ( err ) {
-    console.log( 'Failed to fetch fee and exchange rates', {
-      err
-    } )
+  //  error
   }
 }
 

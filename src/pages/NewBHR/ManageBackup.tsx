@@ -1,53 +1,40 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useEffect, useState } from 'react'
 import {
-  View,
-  ScrollView,
-  RefreshControl,
-  Text,
-  StyleSheet,
-  Platform,
-  SafeAreaView,
-  StatusBar,
-  ImageBackground,
-  InteractionManager,
-  TouchableOpacity,
   FlatList,
-  Image,
+  Image, ImageBackground,
+  InteractionManager, Platform, RefreshControl, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useDispatch, useSelector } from 'react-redux'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import { LevelData, LevelHealthInterface, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { LevelData, LevelHealthInterface, MetaShare, TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
-import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
-import ManageBackupCard from './ManageBackupCard'
+import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
+import LevelStatus from '../../common/data/enums/LevelStatus'
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import Fonts from '../../common/Fonts'
+import ButtonStyles from '../../common/Styles/ButtonStyles'
+import ImageStyles from '../../common/Styles/ImageStyles'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import ModalContainer from '../../components/home/ModalContainer'
-import KeeperTypeModalContents from './KeeperTypeModalContent'
-import BackupTypeModalContent from './BackupTypeModalContent'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import QRModal from '../Accounts/QRModal'
+import ModalContainer from '../../components/home/ModalContainer'
 import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBNewBhrKnowMoreSheetContents'
 import Loader from '../../components/loader'
-import ImageStyles from '../../common/Styles/ImageStyles'
-import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import { autoShareToLevel2Keepers, deletePrivateData, generateMetaShare, keeperProcessStatus, modifyLevelData, onPressKeeper, setHealthStatus, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError, setLevelToNotSetupStatus, updateKeeperInfoToChannel, downloadSMShare, setApprovalStatus, upgradeLevelOneKeeper } from '../../store/actions/BHR'
 import RecipientAvatar from '../../components/RecipientAvatar'
+import { autoShareToLevel2Keepers, deletePrivateData, downloadSMShare, generateMetaShare, keeperProcessStatus, modifyLevelData, onPressKeeper, setApprovalStatus, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError, setLevelToNotSetupStatus, updateKeeperInfoToChannel, upgradeLevelOneKeeper } from '../../store/actions/BHR'
+import { setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
-import { setCloudData, setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
-import LevelStatus from '../../common/data/enums/LevelStatus'
-import { getTime } from '../../common/CommonFunctions/timeFormatter'
-import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import ButtonStyles from '../../common/Styles/ButtonStyles'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import QRModal from '../Accounts/QRModal'
+import BackupTypeModalContent from './BackupTypeModalContent'
+import KeeperTypeModalContents from './KeeperTypeModalContent'
 import SeedBacupModalContents from './SeedBacupModalContents'
 
 export default function ManageBackup( props ) {
@@ -904,7 +891,7 @@ export default function ManageBackup( props ) {
                   goToHistory( obj, 'TYPE' )
                 }
               } catch ( err ) {
-                console.log( 'err', err )
+                // error
               }
             }}
             onPressBack={() => {

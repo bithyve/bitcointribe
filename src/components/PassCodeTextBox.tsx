@@ -1,18 +1,15 @@
-import React, { useRef, useState, Dispatch, SetStateAction, useEffect } from "react";
+import Clipboard from '@react-native-clipboard/clipboard'
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import {
-  View,
-  Text,
+  StyleSheet, Text,
   TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Platform,
-} from "react-native";
-import Clipboard from '@react-native-clipboard/clipboard';
+  TouchableOpacity, View
+} from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-} from "react-native-responsive-screen";
-import Colors from "../common/Colors";
-import { RFValue } from "react-native-responsive-fontsize";
+  widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import Colors from '../common/Colors'
 
 export type IPassCodeTextBoxProps = {
   passcode: string;
@@ -20,12 +17,12 @@ export type IPassCodeTextBoxProps = {
   setDisabled: Dispatch<SetStateAction<boolean>>;
 };
 
-const PassCodeTextBox: React.FC<IPassCodeTextBoxProps> = ({passcode, setPasscode, setDisabled}) => {
-  const ref = useRef<TextInput>();
+const PassCodeTextBox: React.FC<IPassCodeTextBoxProps> = ( { passcode, setPasscode, setDisabled } ) => {
+  const ref = useRef<TextInput>()
 
-  const [errMsg, setErrmsg] = useState<string>("");
+  const [ errMsg, setErrmsg ] = useState<string>( '' )
 
-  const [active, setActive] = useState<boolean>(false);
+  const [ active, setActive ] = useState<boolean>( false )
 
   useEffect(()=>{
 if(active)
@@ -33,12 +30,12 @@ ref.current.focus()
 // setTimeout(() => ref.current.focus(), 100);
   },[active])
 
-  useEffect(() => {
-    if (passcode.length === 6) {
-      setErrmsg('');
-      setDisabled(false);
+  useEffect( () => {
+    if ( passcode.length === 6 ) {
+      setErrmsg( '' )
+      setDisabled( false )
     }
-  }, [passcode]);
+  }, [ passcode ] )
 
   return (
     <View style={{
@@ -49,9 +46,9 @@ ref.current.focus()
         style={styles.textBoxStyles}
         // style={{ display: "none" }}
         value={passcode}
-        onChangeText={(text) => {
-          if (text.length <= 6) {
-            setPasscode(text);
+        onChangeText={( text ) => {
+          if ( text.length <= 6 ) {
+            setPasscode( text )
           }
         }}
         // returnKeyType="done"
@@ -69,7 +66,7 @@ ref.current.focus()
         //   // if ( Platform.OS == 'ios' ) {
         //   if (
         //     ( passcode.length == 0 ||
-        //       passcode.length == 6 ) 
+        //       passcode.length == 6 )
         //   ) {
         //     // props.bottomSheetRef.current?.snapTo( 1 )
         //     setDisabled( false )
@@ -80,18 +77,20 @@ ref.current.focus()
         // onLayout={()=> ref.current.focus()}
         // autoCompleteType="off"
       />
-      <Text style={{color: 'red'}}>{errMsg}</Text>
+      <Text style={{
+        color: 'red'
+      }}>{errMsg}</Text>
       <TouchableOpacity
         onPress={() => {
           // setTimeout(() => ref.current.focus(), 1000);
           setActive(true);
         }}
         onLongPress={async () => {
-          const data = await Clipboard.getString();
-          if (data.length !== 6) {
-            setErrmsg("You are trying to copy invalid OTP");
+          const data = await Clipboard.getString()
+          if ( data.length !== 6 ) {
+            setErrmsg( 'You are trying to copy invalid OTP' )
           } else {
-            setPasscode(data.toUpperCase());
+            setPasscode( data.toUpperCase() )
           }
         }}
       >
@@ -142,24 +141,24 @@ ref.current.focus()
         </View> */}
       </TouchableOpacity>
     </View>
-  );
-};
+  )
+}
 
-export default PassCodeTextBox;
+export default PassCodeTextBox
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   textBoxStyles: {
     borderWidth: 0.5,
-    height: wp("12%"),
-    width: wp("80%"),
+    height: wp( '12%' ),
+    width: wp( '80%' ),
     borderRadius: 7,
     borderColor: Colors.borderColor,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: Colors.white,
     marginLeft: 8,
     color: Colors.black,
-    fontSize: RFValue(20),
+    fontSize: RFValue( 20 ),
     // textAlign: "center",
     paddingHorizontal: 20,
     textAlignVertical: 'center'
@@ -167,8 +166,8 @@ const styles = StyleSheet.create({
   textBoxActive: {
     flexDirection: 'row',
     borderWidth: 0.5,
-    height: wp("12%"),
-    width: wp("12%"),
+    height: wp( '12%' ),
+    width: wp( '12%' ),
     borderRadius: 7,
     elevation: 10,
     shadowColor: Colors.borderColor,
@@ -178,13 +177,13 @@ const styles = StyleSheet.create({
       height: 3,
     },
     borderColor: Colors.borderColor,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: Colors.white,
     marginLeft: 8,
     color: Colors.black,
-    fontSize: RFValue(20),
-    textAlign: "center",
+    fontSize: RFValue( 20 ),
+    textAlign: 'center',
     textAlignVertical: 'center'
   },
-});
+} )

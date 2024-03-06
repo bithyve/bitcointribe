@@ -1,14 +1,9 @@
-import crypto from 'crypto'
-import { base64UrlEncode, generateRandomBytes } from './random'
 import { asyncPkceChallenge } from 'pkce-utils'
 
 
 
 export const generatePKCEParameters = async () => {
   const challenge = await asyncPkceChallenge()
-  console.log( {
-    challenge
-  } )
   const code_challenge = challenge.codeChallenge
   const code_verifier = challenge.codeVerifier
 
@@ -41,7 +36,6 @@ const generateRandomNumber = ( digits: number ): number => Math.floor( Math.rand
 
 
 // const generateChallenge = ( verifier ) => {
-//   console.log( 'generateChallenge ', crypto
 //     .createHash( 'sha256' )
 //     .update( verifier )
 //     .digest( 'hex' ) )

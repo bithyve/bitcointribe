@@ -104,7 +104,6 @@ export default function ScanNodeConfig( { navigation } ) {
       const url = scannedData.split( 'config=' )[ 1 ]
       LndConnectUtils.procesBtcPayConfig( url ).then(
         res=> {
-          console.log( res )
           const {
             uri,
             macaroon,
@@ -122,7 +121,6 @@ export default function ScanNodeConfig( { navigation } ) {
           }
         }
       ).catch( e=> {
-        console.log( e )
         Toast( 'Error fetching config' )
 
       } )

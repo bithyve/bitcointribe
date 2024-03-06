@@ -23,7 +23,7 @@ class Database  {
         const res = this.db.create( ...args )
       } )
     } catch ( error ) {
-      console.log( error )
+      // error
     }
   }
 
@@ -38,7 +38,7 @@ class Database  {
       const res = this.getDb().objects( ...args )
       return res
     } catch ( error ) {
-      console.log( error )
+      // error
     }
   }
 
@@ -58,10 +58,9 @@ class Database  {
     } )
       .then( ( res ) => {
         this.db = res
-        console.log( res )
       } )
       .catch( ( e ) => {
-        console.log( e )
+        // error
       } )
   }
 }

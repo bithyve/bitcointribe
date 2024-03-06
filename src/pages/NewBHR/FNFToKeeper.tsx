@@ -7,7 +7,7 @@ import DeviceInfo from 'react-native-device-info'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import EvilIcons from 'react-native-vector-icons/EvilIcons'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -15,15 +15,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { v4 as uuid } from 'uuid'
 import { StreamData, TrustedContactRelationTypes, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
+import { LocalizationContext } from '../../common/content/LocContext'
 import Fonts from '../../common/Fonts'
 import ImageStyles from '../../common/Styles/ImageStyles'
-import { LocalizationContext } from '../../common/content/LocContext'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import ErrorModalContents from '../../components/ErrorModalContents'
+import ModalContainer from '../../components/home/ModalContainer'
 import LastSeenActiveIndicator from '../../components/LastSeenActiveIndicator'
 import RadioButton from '../../components/RadioButton'
 import RecipientAvatar from '../../components/RecipientAvatar'
-import ModalContainer from '../../components/home/ModalContainer'
 import { setIsPermissionGiven } from '../../store/actions/preferences'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import BackupStyles from './Styles'
@@ -189,7 +189,6 @@ const FNFToKeeper = ( props ) => {
     dispatch( setIsPermissionGiven( true ) )
     if ( Platform.OS === 'android' ) {
       const chckContactPermission = await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_CONTACTS )
-      //console.log("chckContactPermission",chckContactPermission)
       if ( !chckContactPermission ) {
         // ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
         setPermissionsModal( true )

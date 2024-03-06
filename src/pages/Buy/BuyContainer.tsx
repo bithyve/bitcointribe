@@ -19,13 +19,11 @@ import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreati
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
 import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
 import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
-import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
 import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
 import ModalContainer from '../../components/home/ModalContainer'
 import NewBuyBitcoinBottomSheet from '../../components/home/NewBuyBitcoinBottomSheet'
 import { clearRampCache } from '../../store/actions/RampIntegration'
 import { clearSwanCache, createTempSwanAccountInfo, updateSwanStatus } from '../../store/actions/SwanIntegration'
-import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import BottomSheetHeader from '../Accounts/BottomSheetHeader'
 import Fonts from './../../common/Fonts'
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
@@ -56,7 +54,7 @@ interface HomePropsTypes {
     navigation: any;
     containerView: StyleProp<ViewStyle>;
     wallet: Wallet;
-    clearWyreCache: any;
+    // clearWyreCache: any;
     clearRampCache: any;
     clearSwanCache: any;
     updateSwanStatus: any;
@@ -168,8 +166,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       kind: BottomSheetKind,
       snapIndex: number | null = null
     ) => {
-      console.log( 'kind', kind )
-      console.log( 'snapIndex', snapIndex )
 
       this.setState(
         {
@@ -199,7 +195,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     };
 
     renderBottomSheetContent() {
-      console.log( 'this.state.currentBottomSheetKind', this.state.currentBottomSheetKind )
       switch ( this.state.currentBottomSheetKind ) {
 
           case BottomSheetKind.SWAN_STATUS_INFO:
@@ -215,22 +210,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 />
               </>
             )
-          case BottomSheetKind.WYRE_STATUS_INFO:
-            return (
-              <>
-                <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
-                <BottomSheetWyreInfo
-                  wyreDeepLinkContent={this.state.wyreDeepLinkContent}
-                  wyreFromBuyMenu={this.state.wyreFromBuyMenu}
-                  wyreFromDeepLink={this.state.wyreFromDeepLink}
-                  onClickSetting={() => {
-                    this.closeBottomSheet()
-                  }}
-                  onPress={this.closeBottomSheet}
-                />
-              </>
-            )
-
           case BottomSheetKind.RAMP_STATUS_INFO:
             return (
               <>
@@ -372,7 +351,7 @@ const mapStateToProps = ( state ) => {
 
 export default (
   connect( mapStateToProps, {
-    clearWyreCache,
+    // clearWyreCache,
     clearRampCache,
     clearSwanCache,
     updateSwanStatus,

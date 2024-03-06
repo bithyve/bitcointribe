@@ -1,26 +1,19 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
-  StyleSheet,
-  View,
-  Text,
-  Image,
-  FlatList,
-  Platform,
-  TouchableOpacity,
+  FlatList, Image, Platform, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import Icons from '../../common/Icons'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import { useDispatch } from 'react-redux'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import { RFValue } from 'react-native-responsive-fontsize'
-import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../components/ModalHeader'
 import { sharePDF } from '../../store/actions/BHR'
 
@@ -58,7 +51,6 @@ export default function PersonalCopyShareModal( props ) {
   const dispatch = useDispatch()
 
   const onShare = async ( shareOption, isEmailOtherOptions ) => {
-    console.log( 'SHARE', shareOption, isEmailOtherOptions )
     dispatch( sharePDF( shareOption.type, isEmailOtherOptions ) )
     props.onPressShare()
   }
@@ -221,7 +213,6 @@ export default function PersonalCopyShareModal( props ) {
         <AppBottomSheetTouchableWrapper
           disabled={isShared? false : true}
           onPress={() => {
-            // console.log('Confirm');
             onConfirm()
           }}
           style={{

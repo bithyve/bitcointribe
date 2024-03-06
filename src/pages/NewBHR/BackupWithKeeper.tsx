@@ -1,32 +1,28 @@
 import React, { useEffect, useState } from 'react'
-import { View, Linking, Text, StyleSheet, TouchableOpacity, Clipboard, Platform, SafeAreaView } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import { Clipboard, Linking, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-  widthPercentageToDP,
-  heightPercentageToDP,
+  heightPercentageToDP, heightPercentageToDP as hp,
+  widthPercentageToDP, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import CommonStyles from '../../common/Styles/Styles'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import HeaderTitle from '../../components/HeaderTitle'
-import { translations } from '../../common/content/LocContext'
-import { useDispatch, useSelector } from 'react-redux'
-import { Accounts, AccountType, Wallet } from '../../bitcoin/utilities/Interface'
-import dbManager from '../../storage/realm/dbManager'
-import QRCode from '../../components/QRCode'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import ButtonBlue from '../../components/ButtonBlue'
-import Toast from '../../components/Toast'
-import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
-import { setBackupWithKeeperState } from '../../store/actions/BHR'
-import CopyThisText from '../../components/CopyThisText'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useDispatch, useSelector } from 'react-redux'
 import CheckMark from '../../assets/images/svgs/checkmark.svg'
 import HexaConfig from '../../bitcoin/HexaConfig'
+import { Accounts, AccountType, Wallet } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import { translations } from '../../common/content/LocContext'
+import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
+import Fonts from '../../common/Fonts'
 import { APP_STAGE } from '../../common/interfaces/Interfaces'
+import CommonStyles from '../../common/Styles/Styles'
+import CopyThisText from '../../components/CopyThisText'
+import HeaderTitle from '../../components/HeaderTitle'
+import QRCode from '../../components/QRCode'
+import Toast from '../../components/Toast'
+import dbManager from '../../storage/realm/dbManager'
+import { setBackupWithKeeperState } from '../../store/actions/BHR'
 
 const styles = StyleSheet.create( {
   buttonText: {
@@ -137,7 +133,7 @@ export default function BackupWithKeeper( { navigation } ) {
       }
 
     } catch( error ) {
-      console.log( error )
+      // error
     }
   }
 

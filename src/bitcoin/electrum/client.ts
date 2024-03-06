@@ -57,9 +57,6 @@ export default class ElectrumClient {
 
     try {
       if ( !ELECTRUM_CLIENT.activePeer ) {
-        console.log(
-          'Unable to connect to any electrum server. Please switch network and try again!'
-        )
         return {
           connected: ELECTRUM_CLIENT.isClientConnected,
           error: 'Unable to connect to any electrum server. Please switch network and try again!',
@@ -77,13 +74,10 @@ export default class ElectrumClient {
 
       ELECTRUM_CLIENT.electrumClient.onError = ( error ) => {
         if ( ELECTRUM_CLIENT.isClientConnected ) {
-          console.log( 'Electrum mainClient.onError():', error?.message || error )
-
           if ( ELECTRUM_CLIENT.electrumClient.close ) ELECTRUM_CLIENT.electrumClient.close()
 
           ELECTRUM_CLIENT.isClientConnected = false
           ELECTRUM_CLIENT.activePeer.isConnected = false
-          console.log( 'Error: Close the connection' )
 
           // setTimeout(
           //   ElectrumClient.connect,
@@ -91,8 +85,6 @@ export default class ElectrumClient {
           // );
         }
       }
-
-      console.log( 'Initiate electrum server...' )
 
       const ver = await Promise.race( [
         new Promise( ( resolve ) => {
@@ -117,8 +109,6 @@ export default class ElectrumClient {
     } catch ( error ) {
       ELECTRUM_CLIENT.isClientConnected = false
       ELECTRUM_CLIENT.activePeer.isConnected = false
-
-      console.log( 'Bad connection:', JSON.stringify( ELECTRUM_CLIENT.activePeer ), error )
     } finally {
       if ( timeoutId ) clearTimeout( timeoutId )
     }
@@ -140,9 +130,6 @@ export default class ElectrumClient {
     if ( ELECTRUM_CLIENT.connectionAttempt >= ELECTRUM_CLIENT_CONFIG.maxConnectionAttempt ) {
       const nextPeer = ElectrumClient.getNextDefaultPeer()
       if ( !nextPeer ) {
-        console.log(
-          'Unable to connect to any electrum server. Please switch network and try again!'
-        )
         return {
           connected: ELECTRUM_CLIENT.isClientConnected,
           error: 'Unable to connect to any electrum server. Please switch network and try again!',
@@ -151,10 +138,8 @@ export default class ElectrumClient {
 
       ELECTRUM_CLIENT.activePeer = nextPeer
       ELECTRUM_CLIENT.connectionAttempt = 1
-      console.log( `Attempting a connection with next peer: ${nextPeer?.host}` )
       return ElectrumClient.connect()
     }
-    console.log( `Reconnection attempt #${ELECTRUM_CLIENT.connectionAttempt}` )
     await new Promise( ( resolve ) => {
       setTimeout( resolve, ELECTRUM_CLIENT_CONFIG.reconnectDelay ) // attempts reconnection after 1 second
     } )
@@ -414,7 +399,7 @@ export default class ElectrumClient {
     )
 
     client.onError = ( ex ) => {
-      console.log( ex )
+      // ex
     } // mute
     let timeoutId = null
     try {
@@ -430,7 +415,7 @@ export default class ElectrumClient {
       await client.server_ping()
       return true
     } catch ( ex ) {
-      console.log( ex )
+      // ex
     } finally {
       if ( timeoutId ) clearTimeout( timeoutId )
       client.close()

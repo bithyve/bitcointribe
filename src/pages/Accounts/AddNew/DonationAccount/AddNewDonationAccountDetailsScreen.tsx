@@ -1,38 +1,28 @@
+import storage from '@react-native-firebase/storage'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  View,
-  StyleSheet,
-  Text,
-  KeyboardAvoidingView,
-  ScrollView,
-  Platform,
-  StatusBar,
-  TextInput,
-  SafeAreaView,
-  TouchableOpacity,
-  Image,
+  Image, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet,
+  Text, TextInput, TouchableOpacity, View
 } from 'react-native'
-import Icon from 'react-native-vector-icons/Ionicons'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { launchImageLibrary } from 'react-native-image-picker'
-import storage from '@react-native-firebase/storage'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Icon from 'react-native-vector-icons/Ionicons'
 
-import FormStyles from '../../../../common/Styles/FormStyles'
-import Colors from '../../../../common/Colors'
-import Fonts from '../../../../common/Fonts'
-import { useDispatch, useSelector } from 'react-redux'
-import { addNewAccountShells } from '../../../../store/actions/accounts'
-import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
-import { resetStackToAccountDetails } from '../../../../navigation/actions/NavigationActions'
-import { DonationSubAccountDescribing } from '../../../../common/data/models/SubAccountInfo/Interfaces'
 import { RFValue } from 'react-native-responsive-fontsize'
-import openLink from '../../../../utils/OpenLink'
-import SourceAccountKind from '../../../../common/data/enums/SourceAccountKind'
-import Loader from '../../../../components/loader'
-import ButtonBlue from '../../../../components/ButtonBlue'
-import { newAccountsInfo } from '../../../../store/sagas/accounts'
+import { useDispatch, useSelector } from 'react-redux'
 import { AccountType, Wallet } from '../../../../bitcoin/utilities/Interface'
+import Colors from '../../../../common/Colors'
+import { DonationSubAccountDescribing } from '../../../../common/data/models/SubAccountInfo/Interfaces'
+import Fonts from '../../../../common/Fonts'
+import FormStyles from '../../../../common/Styles/FormStyles'
+import ButtonBlue from '../../../../components/ButtonBlue'
+import Loader from '../../../../components/loader'
+import { resetStackToAccountDetails } from '../../../../navigation/actions/NavigationActions'
+import { addNewAccountShells } from '../../../../store/actions/accounts'
+import { newAccountsInfo } from '../../../../store/sagas/accounts'
+import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
 import useAccountsState from '../../../../utils/hooks/state-selectors/accounts/UseAccountsState'
+import openLink from '../../../../utils/OpenLink'
 
 export type Props = {
   navigation: any;
@@ -88,7 +78,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, rout
         },
         async ( response ) => {
           if ( response.didCancel ) {
-            console.log( 'Image picker cancelled' )
+            //Image picker cancelled
           } else {
             await setPhoto( response.assets[ 0 ] )
             await setPickImageUrl(

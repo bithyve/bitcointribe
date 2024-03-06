@@ -8,7 +8,7 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import Colors from '../common/Colors'
 import { nameToInitials } from '../common/CommonFunctions'
@@ -20,7 +20,6 @@ export default function RequestModalContents( props ) {
   const contact = props.contact
   const [ Contact, setContact ] = useState( props.contact ? props.contact : {
   } )
-  // console.log("Contact", Contact, props.contact);
 
   useEffect( () => {
     if ( contact ) {

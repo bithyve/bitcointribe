@@ -1,4 +1,4 @@
-import { Account, AccountType, ActiveAddressAssigneeType, TxPriority } from '../../bitcoin/utilities/Interface'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Alert,
   Dimensions,
@@ -11,44 +11,44 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { giftAccepted, giftCreationSuccess, refreshAccountShells, updateAccountShells } from '../../store/actions/accounts'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
+import { Account, AccountType } from '../../bitcoin/utilities/Interface'
+import { giftAccepted, giftCreationSuccess, refreshAccountShells } from '../../store/actions/accounts'
 
-import AccountShell from '../../common/data/models/AccountShell'
-import { AccountsState } from '../../store/reducers/accounts'
-import AlertModalContents from '../../components/AlertModalContents'
-import AntDesign from 'react-native-vector-icons/AntDesign'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import axios from 'axios'
 import { CKTapCard } from 'cktap-protocol-react-native'
-import CheckMark from '../../assets/images/svgs/checkmark.svg'
-import Colors from '../../common/Colors'
-import CommonStyles from '../../common/Styles/Styles'
-import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import idx from 'idx'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { Shadow } from 'react-native-shadow-2'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Fonts from '../../common/Fonts'
-import GiftUnwrappedComponent from './GiftUnwrappedComponent'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import ModalContainer from '../../components/home/ModalContainer'
-import NfcPrompt from './NfcPromptAndroid'
-import { RFValue } from 'react-native-responsive-fontsize'
+import wif from 'wif'
+import CheckMark from '../../assets/images/svgs/checkmark.svg'
+import Colors from '../../common/Colors'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import { Shadow } from 'react-native-shadow-2'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import AccountShell from '../../common/data/models/AccountShell'
+import Fonts from '../../common/Fonts'
+import CommonStyles from '../../common/Styles/Styles'
 import { UsNumberFormat } from '../../common/utilities'
-import axios from 'axios'
-import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
-import idx from 'idx'
+import AlertModalContents from '../../components/AlertModalContents'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import ModalContainer from '../../components/home/ModalContainer'
 import { resetStackToAccountDetails } from '../../navigation/actions/NavigationActions'
 import { updateSatCardAccount } from '../../store/actions/satCardAccount'
+import { AccountsState } from '../../store/reducers/accounts'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
-import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import wif from 'wif'
+import GiftUnwrappedComponent from './GiftUnwrappedComponent'
+import NfcPrompt from './NfcPromptAndroid'
 
 const { height, } = Dimensions.get( 'window' )
 
@@ -121,7 +121,6 @@ const ClaimSatsScreen = ( { navigation } ) => {
 
   const withModal = async ( callback ) => {
     try {
-      console.log( 'scanning...' )
       setNFCModal( true )
       const resp = await card.nfcWrapper( callback )
       await card.endNfcSession()
@@ -130,7 +129,6 @@ const ClaimSatsScreen = ( { navigation } ) => {
         response: resp, error: null
       }
     } catch ( error: any ) {
-      console.log( error.toString() )
       setNFCModal( false )
       setErrorMessage( error.toString() )
       setShowAlertModal( true )
@@ -144,7 +142,6 @@ const ClaimSatsScreen = ( { navigation } ) => {
     // For Claim Flow
     const status = await card.first_look()
     const { addr: address } = await card.address( true, false, status.active_slot )
-    console.log( 'slot address ===>' + JSON.stringify( address ) )
     const { data } = await axios.get( `https://api.blockcypher.com/v1/btc/main/addrs/${address}` )
     const { balance, unconfirmed_balance } = data
     if( unconfirmed_balance >0 ){
@@ -158,28 +155,22 @@ const ClaimSatsScreen = ( { navigation } ) => {
       let privKey
       if ( activeSlotUsage.status === 'SEALED' ) {
         // ideal case
-        console.log( 'unsealing slot...' )
         const { pk } = await card.unseal_slot( spendCode )
         privKey = pk
       } else if( activeSlotUsage.status === 'UNSEALED' ){
         // will never get into this case (should have raised before)
-        console.log( 'getting pk from unsealed slot...' )
         privKey = await card.get_privkey( spendCode, status.active_slot )
       }else{
         Alert.alert( 'Please setup the slot before use' )
         return
       }
       privKey = wif.encode( 128, privKey, true )
-      console.log( 'wid compressed', {
-        privKey
-      } )
       // with this key move all the funds from the slot to checking account (rnd)
       dispatch( updateSatCardAccount( sourcePrimarySubAccount.id, privKey, address, selectedAccount ) )
       // For setup slot for next user
       // DO NOT RUN card.setup UNTIL THE FLOW WORKS COMPLETELY
       await card.first_look( )
       const setUpSlot = await card.setup( spendCode, undefined, true )
-      console.log( 'setUpSlot for next user ===>' + JSON.stringify( setUpSlot ) )
     }else{
       Alert.alert( 'Sorry this slot has no funds or the funds are yet to be confirmed' )
       return
@@ -532,11 +523,7 @@ const ClaimSatsScreen = ( { navigation } ) => {
 
   const onClaimSatsClick = async () => {
     const { response, error } = await withModal( claimGifts )
-    console.log( {
-      response, error
-    } )
     if( error ){
-      console.log( error )
       setShowGiftFailureModal( true )
       return
     }

@@ -1,33 +1,25 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  Image,
-  SafeAreaView,
-  StatusBar,
-  TouchableOpacity,
-  Platform,
+  ActivityIndicator, Platform, SafeAreaView,
+  StatusBar, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
+import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
+import { Wallet } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import NavStyles from '../../common/Styles/NavStyles'
 import CommonStyles from '../../common/Styles/Styles'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
 import CopyThisText from '../../components/CopyThisText'
-import Colors from '../../common/Colors'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { useDispatch, useSelector } from 'react-redux'
-import { RFValue } from 'react-native-responsive-fontsize'
-import DeviceInfo from 'react-native-device-info'
-import BottomSheet from 'reanimated-bottom-sheet'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import ModalHeader from '../../components/ModalHeader'
 import QRCode from '../../components/QRCode'
-import { Wallet } from '../../bitcoin/utilities/Interface'
 import { ErrorSending } from '../../store/actions/BHR'
 
 
@@ -36,7 +28,6 @@ const SecureScan = props => {
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const isErrorSendingFailed = useSelector( state => state.bhr.errorSending )
-  // console.log('isErrorSendingFailed', isErrorSendingFailed);
   const getServiceType = props.route.params?.getServiceType
     ? props.route.params?.getServiceType
     : null

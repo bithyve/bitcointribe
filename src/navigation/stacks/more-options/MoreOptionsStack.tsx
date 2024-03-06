@@ -20,6 +20,7 @@ import NodeSettingsContainerScreen from '../../../pages/MoreOptions/NodeSettings
 import BackupMethods from '../../../pages/NewBHR/BackupMethods'
 import BackupWithKeeper from '../../../pages/NewBHR/BackupWithKeeper'
 import CheckPasscodeComponent from '../../../pages/NewBHR/CheckPasscodeComponent'
+import SeedBackupHistory from '../../../pages/NewBHR/SeedBackupHistory'
 import PasscodeChangeSuccessPage from '../../../pages/PasscodeChangeSuccessPage'
 import ReLogin from '../../../pages/ReLogin'
 import VersionHistoryScreen from '../../../pages/VersionHistoryScreen'
@@ -29,7 +30,6 @@ import QRStack from '../home/QRStack'
 import AccountManagementStack from './AccountManagementStack'
 import WalletBackupStack from './WalletBackupStack'
 import WalletSettingsStack from './WalletSettingsStack'
-import SeedBackupHistory from '../../../pages/NewBHR/SeedBackupHistory'
 
 const Stack = createNativeStackNavigator()
 const MoreOptionsStack = ( { navigation, route } ) => {

@@ -13,16 +13,16 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import Colors from '../common/Colors'
 import { APP_LIST, nameToInitials } from '../common/CommonFunctions'
-import Fonts from '../common/Fonts'
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-  TEST_ACCOUNT,
+  TEST_ACCOUNT
 } from '../common/constants/wallet-service-types'
+import Fonts from '../common/Fonts'
 import Toast from '../components/Toast'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import BottomInfoBox from './BottomInfoBox'
@@ -65,7 +65,6 @@ export default function SendViaLink( props ) {
     },
   ] )
   const contact = props.contact
-  // console.log("Contact SEND VIA LINK", contact);
   const [ Contact, setContact ] = useState( props.contact ? props.contact : {
   } )
 
@@ -94,7 +93,6 @@ export default function SendViaLink( props ) {
         if ( shareApps[ i ].url ) {
           isAppInstalled( shareApps[ i ].title )
             .then( ( isInstalled ) => {
-              // console.log("isInstalled", isInstalled);
               shareApps[ i ].isAvailable = Boolean( isInstalled )
               // isInstalled is true if the app is installed or false if not
             } )
@@ -121,7 +119,6 @@ export default function SendViaLink( props ) {
     return new Promise( async ( resolve, reject ) => {
 
       NativeModules.CheckPackageInstallation.isPackageInstalled( packagename, ( isInstalled ) => {
-        // console.log("RESOLVE", packagename, resolve);
         resolve( isInstalled )
       } )
     } )
@@ -145,7 +142,6 @@ export default function SendViaLink( props ) {
       ios: () => { return isAppInstalledIOS( key ) },
       android: () => { return isAppInstalledAndroid( key ) }
     } )()
-    // console.log("isAppInstalled", isAppInstalled)
     return isAppInstalled
   }
 
@@ -154,7 +150,6 @@ export default function SendViaLink( props ) {
   }
 
   function isAppInstalledIOS( key ) {
-  //console.log("isAppInstalledIOS", checkURLScheme(APP_LIST[key].urlScheme, APP_LIST[key].urlParams))
     return checkURLScheme( APP_LIST[ key ].urlScheme, APP_LIST[ key ].urlParams )
   }
 
@@ -183,7 +178,6 @@ export default function SendViaLink( props ) {
       const url = appUrl + 'text=' + infoText + '\n' + shareLink //+ '&phone=' + mobile;
       Linking.openURL( url )
         .then( ( data ) => {
-          // console.log('WhatsApp Opened');
         } )
         .catch( () => {
           alert( 'Make sure WhatsApp installed on your device' )
@@ -196,7 +190,6 @@ export default function SendViaLink( props ) {
       const url = appUrl + infoText + '\n' + shareLink
       Linking.openURL( url )
         .then( ( data ) => {
-          // console.log('Telegram Opened');
         } )
         .catch( () => {
           alert( 'Make sure Telegram installed on your device' )
@@ -209,7 +202,6 @@ export default function SendViaLink( props ) {
       const url = appUrl
       Linking.openURL( url )
         .then( ( data ) => {
-          // console.log('Messenger Opened');
         } )
         .catch( () => {
           alert( 'Make sure Facebook Messenger installed on your device' )

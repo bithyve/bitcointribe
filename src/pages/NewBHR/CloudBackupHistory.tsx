@@ -1,36 +1,32 @@
-import React, { useState, useEffect, useCallback, createRef } from 'react'
-import {
-  View,
-  SafeAreaView,
-  StatusBar,
-  Platform,
-} from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import { useDispatch } from 'react-redux'
-import Colors from '../../common/Colors'
 import moment from 'moment'
+import React, { createRef, useCallback, useEffect, useState } from 'react'
+import {
+  Platform, SafeAreaView,
+  StatusBar, View
+} from 'react-native'
+import DeviceInfo from 'react-native-device-info'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
 import _ from 'underscore'
-import HistoryPageComponent from './HistoryPageComponent'
+import { KeeperType, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import { getTime } from '../../common/CommonFunctions/timeFormatter'
+import { translations } from '../../common/content/LocContext'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import { getIndex } from '../../common/utilities'
+import AlertModalContents from '../../components/AlertModalContents'
+import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import ModalContainer from '../../components/home/ModalContainer'
 import ModalHeader from '../../components/ModalHeader'
 import { updateCloudPermission } from '../../store/actions/BHR'
-import DeviceInfo from 'react-native-device-info'
-import { useSelector } from 'react-redux'
+import { setCloudErrorMessage, updateCloudData } from '../../store/actions/cloud'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
-import CloudPermissionModalContents from '../../components/CloudPermissionModalContents'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { updateCloudData, setCloudErrorMessage } from '../../store/actions/cloud'
-import BottomSheet from 'reanimated-bottom-sheet'
-import ModalContainer from '../../components/home/ModalContainer'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import { translations } from '../../common/content/LocContext'
-import { KeeperType, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import HistoryPageComponent from './HistoryPageComponent'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
-import { getIndex } from '../../common/utilities'
-import { getTime } from '../../common/CommonFunctions/timeFormatter'
-import AlertModalContents from '../../components/AlertModalContents'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -121,7 +117,6 @@ const CloudBackupHistory = ( props ) => {
   }, [ levelHealth ] )
 
   useEffect( () => {
-    console.log( cloudBackupHistoryArray )
     if ( cloudBackupHistoryArray ) setCloudBackupHistory( cloudBackupHistoryArray )
   }, [ cloudBackupHistoryArray ] )
 

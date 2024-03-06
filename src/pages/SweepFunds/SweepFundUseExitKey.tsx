@@ -10,26 +10,26 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { connect } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
+import Fonts from '../../common/Fonts'
 import LoaderModal from '../../components/LoaderModal'
 import ModalHeader from '../../components/ModalHeader'
 import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
-import { recoverMmnemonic, removeSecondaryMnemonic } from '../../store/actions/BHR'
 import { clearTransfer, generateSecondaryXpriv, secondaryXprivGenerated } from '../../store/actions/accounts'
+import { recoverMmnemonic, removeSecondaryMnemonic } from '../../store/actions/BHR'
 import ResetTwoFASuccess from '../Accounts/ResetTwoFASuccess'
 import ConfirmSweepFunds from './ConfirmSweepFunds'
 
@@ -130,7 +130,6 @@ SweepFundUseExitKeyPropsTypes,
 
   setList = () =>{
     const { keeper, decentralizedBackup, levelHealth, currentLevel } = this.props
-    console.log( 'levelHealth', levelHealth, currentLevel )
     const metaShares = []
     const listDataArray = []
     let obj
@@ -138,8 +137,6 @@ SweepFundUseExitKeyPropsTypes,
     if( keeper && keeper.keeper && Object.keys( keeper.keeper.keepers ).length ){
       const keepers = keeper.keeper.keepers
       for ( const key in keepers ) {
-        console.log( 'keeper i', keepers[ key ] )
-
         obj = {
           type:  keepers[ key ].shareType,
           title: keepers[ key ].walletName,
@@ -151,8 +148,6 @@ SweepFundUseExitKeyPropsTypes,
         }
         listDataArray.push( obj )
       }
-      console.log( 'decentralizedBackup.PK_SHARE', decentralizedBackup.PK_SHARE )
-
       this.setState( {
         listData: listDataArray, selectedIds: metaShares
       } )
@@ -172,7 +167,6 @@ SweepFundUseExitKeyPropsTypes,
       } )
       secondaryArray = [ ...this.state.selectedIds ]
       secondaryArray.push( this.props.secondaryShareDownloaded )
-      //console.log("secondaryArray", secondaryArray, secondaryArray.length);
       if( secondaryArray.length == 2 ) {
         this.recoverMnemonics( secondaryArray )
       }
@@ -183,7 +177,6 @@ SweepFundUseExitKeyPropsTypes,
 
 
     if( prevProps.mnemonic != this.props.mnemonic ){
-      // console.log("mnemonic",this.props.mnemonic);
       if( this.props.mnemonic ) this.props.generateSecondaryXpriv( this.props.mnemonic.split( '_' )[ 0 ] )
     }
 
@@ -219,13 +212,11 @@ SweepFundUseExitKeyPropsTypes,
 
   recoverMnemonics = ( secondaryArray ) => {
     const { security, recoverMmnemonic } = this.props
-    console.log( 'recoverMnemonics secondaryArray', secondaryArray, security.answer )
     recoverMmnemonic( secondaryArray, security.answer )
   }
 
   barcodeRecognized = async ( barcodeData ) => {
     // const { downloadSMShard } = this.props
-    console.log( 'barcodes', barcodeData )
     if ( barcodeData ) {
       ( this.refs.loaderBottomSheet as any ).snapTo( 1 )
       // downloadSMShard( barcodeData.key )

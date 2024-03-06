@@ -197,7 +197,7 @@ export default function BackupMethods( { navigation } ) {
         // )
       }
     } catch ( error ) {
-      console.log( error )
+      // error
     }
   }
 

@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react'
-import { View, Image, Text, StyleSheet } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import React, { useEffect, useState } from 'react'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import RadioButton from '../../components/RadioButton'
 
@@ -38,7 +37,6 @@ export default function UpgradePdfKeeper( props ) {
     }
   }
   useEffect( () => {
-    console.log( 'props.isLevel2', props.isLevel2 )
     setIsLevel2( props.isLevel2 )
   }, [ props.isLevel2 ] )
 

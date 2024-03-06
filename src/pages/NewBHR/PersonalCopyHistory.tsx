@@ -1,62 +1,46 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
-import {
-  View,
-  StyleSheet,
-  SafeAreaView,
-  StatusBar,
-  Platform,
-  PermissionsAndroid,
-} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useDispatch, useSelector } from 'react-redux'
-import Colors from '../../common/Colors'
-import BottomSheet from 'reanimated-bottom-sheet'
-import HistoryPageComponent from './HistoryPageComponent'
-import PersonalCopyShareModal from './PersonalCopyShareModal'
+import { StackActions } from '@react-navigation/native'
 import moment from 'moment'
-import _ from 'underscore'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents'
-import HistoryHeaderComponent from './HistoryHeaderComponent'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
-  getPDFData,
-  confirmPDFShared,
-  emptyShareTransferDetailsForContactChange,
-  keeperProcessStatus,
-  updatedKeeperInfo,
-  updateMSharesHealth,
-  createChannelAssets,
-  setChannelAssets,
-  setApprovalStatus,
-  downloadSMShare,
-  pdfSuccessfullyCreated,
-  setPdfUpgrade,
-  createGuardian
-} from '../../store/actions/BHR'
-import KeeperTypeModalContents from './KeeperTypeModalContent'
+  PermissionsAndroid, Platform, SafeAreaView,
+  StatusBar, StyleSheet, View
+} from 'react-native'
+import {
+  widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
+import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
+import _ from 'underscore'
+import { v4 as uuid } from 'uuid'
+import config from '../../bitcoin/HexaConfig'
+import BHROperations from '../../bitcoin/utilities/BHROperations'
 import {
   ChannelAssets,
   KeeperInfoInterface,
   MetaShare,
   Trusted_Contacts,
-  Wallet,
+  Wallet
 } from '../../bitcoin/utilities/Interface'
-import { StackActions } from '@react-navigation/native'
-import QRModal from '../Accounts/QRModal'
-import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
-import { setIsPermissionGiven } from '../../store/actions/preferences'
-import { v4 as uuid } from 'uuid'
-import config from '../../bitcoin/HexaConfig'
+import Colors from '../../common/Colors'
+import { isEmpty } from '../../common/CommonFunctions'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import { historyArray } from '../../common/CommonVars/commonVars'
-import ModalContainer from '../../components/home/ModalContainer'
+import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import { getIndex } from '../../common/utilities'
-import BHROperations from '../../bitcoin/utilities/BHROperations'
-import { isEmpty } from '../../common/CommonFunctions'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents'
+import ModalContainer from '../../components/home/ModalContainer'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
+  confirmPDFShared, createChannelAssets, createGuardian, downloadSMShare, emptyShareTransferDetailsForContactChange, getPDFData, keeperProcessStatus, pdfSuccessfullyCreated, setApprovalStatus, setChannelAssets, setPdfUpgrade, updatedKeeperInfo,
+  updateMSharesHealth
+} from '../../store/actions/BHR'
+import { setIsPermissionGiven } from '../../store/actions/preferences'
+import QRModal from '../Accounts/QRModal'
+import HistoryHeaderComponent from './HistoryHeaderComponent'
+import HistoryPageComponent from './HistoryPageComponent'
+import KeeperTypeModalContents from './KeeperTypeModalContent'
+import PersonalCopyShareModal from './PersonalCopyShareModal'
 
 export type Props = {
   route: any;
@@ -199,7 +183,7 @@ const PersonalCopyHistory = ( props ) => {
   //       );
   //     }
   //   }catch(e){
-  //     console.log('e', e)
+  //
   //   }
   // };
 
@@ -306,7 +290,6 @@ const PersonalCopyHistory = ( props ) => {
             status: selectedKeeper.updatedAt > 0 ? selectedKeeper.status : 'notAccessible',
             name: 'Personal Copy'
           }
-          console.log( 'share Obj', shareObj )
           dispatch( updateMSharesHealth( shareObj, false ) )
         }}
         onPressConfirm={() => {
@@ -335,7 +318,6 @@ const PersonalCopyHistory = ( props ) => {
             }
           } catch ( err ) {
             dispatch( keeperProcessStatus( '' ) )
-            console.log( 'error', err )
           }
         }}
       />
@@ -589,7 +571,6 @@ const PersonalCopyHistory = ( props ) => {
 
   useEffect( ()=>{
     if( approvalStatus && isChangeClicked ){
-      console.log( 'APPROVe' )
       setQRModal( false )
       onPressChangeKeeperType( 'pdf', selectedKeeperName )
     }

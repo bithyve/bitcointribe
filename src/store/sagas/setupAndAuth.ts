@@ -14,12 +14,13 @@ import {
   MetaShare,
   Trusted_Contacts,
   UnecryptedStreamData,
-  Wallet,
+  Wallet
 } from '../../bitcoin/utilities/Interface';
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations';
 import * as Cipher from '../../common/encryption';
 import dbManager from '../../storage/realm/dbManager';
 import * as SecureStore from '../../storage/secure-store';
+import { newAccountShellCreationCompleted } from '../actions/accounts';
 import {
   initializeHealthSetup,
   resetLevelsAfterPasswordChange,
@@ -27,27 +28,20 @@ import {
   updateMetaSharesKeeper,
   updateOldMetaSharesKeeper,
   updateWalletImageHealth,
-  upgradePDF,
+  upgradePDF
 } from '../actions/BHR';
-import { newAccountShellCreationCompleted } from '../actions/accounts';
 import { connectToNode } from '../actions/nodeSettings';
 import { setWalletId } from '../actions/preferences';
 import { setRgbConfig } from '../actions/rgb';
 import {
-  CHANGE_AUTH_CRED,
-  CREDS_AUTH,
-  RESET_PIN,
-  SETUP_WALLET,
-  STORE_CREDS,
-  UPDATE_APPLICATION,
-  completedWalletSetup,
+  CHANGE_AUTH_CRED, completedWalletSetup,
   credsAuthenticated,
   credsChanged,
-  credsStored,
-  pinChangedFailed,
-  switchReLogin,
+  credsStored, CREDS_AUTH, pinChangedFailed, RESET_PIN,
+  SETUP_WALLET,
+  STORE_CREDS, switchReLogin,
   switchSetupLoader,
-  updateApplication,
+  updateApplication
 } from '../actions/setupAndAuth';
 import { keyFetched, updateWallet } from '../actions/storage';
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts';

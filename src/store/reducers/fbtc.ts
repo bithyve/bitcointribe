@@ -1,18 +1,9 @@
 import {
-  ACCOUNT_SYNC_FAIL,
-  ACCOUNT_SYNC_SUCCESS,
-  ACCOUNT_SYNC_CLEAR,
-  GET_QUOTE_FAIL,
-  GET_QUOTE_SUCCESS,
-  EXECUTE_ORDER_FAIL,
-  EXECUTE_ORDER_SUCCESS,
-  GET_BALANCES_FAIL,
-  GET_BALANCES_SUCCESS,
-  CLEAR_QUOTE_DETAILS,
-  CLEAR_ORDER_DETAILS,
-  STORE_FBTC_ACC_DATA,
-  FBTC_VOUCHER,
-  CLEAR_FBTC_VOUCHER
+  ACCOUNT_SYNC_CLEAR, ACCOUNT_SYNC_FAIL,
+  ACCOUNT_SYNC_SUCCESS, CLEAR_FBTC_VOUCHER, CLEAR_ORDER_DETAILS, CLEAR_QUOTE_DETAILS, EXECUTE_ORDER_FAIL,
+  EXECUTE_ORDER_SUCCESS, FBTC_VOUCHER, GET_BALANCES_FAIL,
+  GET_BALANCES_SUCCESS, GET_QUOTE_FAIL,
+  GET_QUOTE_SUCCESS, STORE_FBTC_ACC_DATA
 } from '../actions/fbtc'
 
 const INITIAL_STATE = {
@@ -38,11 +29,6 @@ const reducer = ( state = INITIAL_STATE, action ) => {
   //const { payload } = action;
   switch ( action.type ) {
       case ACCOUNT_SYNC_FAIL:
-        console.log(
-          'action.payload.accountSyncFailMessage',
-          action.payload.accountSyncFail,
-          action.payload.accountSyncFailMessage,
-        )
         return {
           ...state,
           accountSyncRequest: false,
@@ -50,10 +36,6 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           accountSyncFailMessage: action.payload.data.accountSyncFailMessage,
         }
       case ACCOUNT_SYNC_SUCCESS:
-        console.log(
-          'payload.accountSyncDetails',
-          action.payload.accountSyncDetails,
-        )
         return {
           ...state,
           accountSyncRequest: false,

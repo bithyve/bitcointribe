@@ -38,7 +38,6 @@ const createWallet = async ( wallet ) => {
     return true
   } catch ( error ) {
     return false
-    console.log( error )
   }
 }
 
@@ -48,7 +47,6 @@ const createAccounts = accounts => {
       createAccount ( account )
     }
   } catch ( error ) {
-    console.log( error )
     return false
   }
 }
@@ -63,7 +61,7 @@ const updateWallet = async ( newWalletProps ) => {
       } )
     }
   } catch ( error ) {
-    console.log( error )
+    // error
   }
 }
 
@@ -105,7 +103,7 @@ const createAccount = async ( account ) => {
       ...data
     }, true )
   } catch ( error ) {
-    console.log( error )
+    // error
   }
 }
 
@@ -157,7 +155,7 @@ const updateAccount = async ( accountId, account ) => {
     acccountRef = data
     db.create( schema.Account, acccountRef, true )  }
   catch ( error ) {
-    console.log( error )
+  //  error
   }
 }
 
@@ -224,7 +222,7 @@ const updateTransaction = async ( txId: string, params: object ) => {
       } )
     }
   } catch ( error ) {
-    console.log( error )
+    // error
   }
 }
 
@@ -242,7 +240,7 @@ const updateTransactions = async ( txIds: string[], params: object ) => {
       } )
     }
   } catch ( error ) {
-    console.log( error )
+  //  error
   }
 }
 
@@ -255,7 +253,7 @@ const markAccountChecked = async ( accountId: string ) => {
       } )
     }
   } catch ( error ) {
-    console.log( error )
+    // error
   }
 }
 
@@ -278,7 +276,6 @@ const updateContact = async ( contact ) => {
     return true
   } catch ( error ) {
     return false
-    console.log( error )
   }
 }
 
@@ -293,7 +290,6 @@ const updateBHR = async ( data ) => {
     } else db.create( schema.BHR, data, true )
     return true
   } catch ( error ) {
-    console.log( 'updateBHR', error )
     return false
   }
 }
@@ -304,7 +300,7 @@ const createGifts = async ( gifts ) => {
       createGift( gift )
     } )
   } catch ( error ) {
-    console.log( error )
+    // error
   }
 }
 
@@ -313,7 +309,7 @@ const createGift = async ( gift ) => {
     db.create( schema.Gifts, gift, true )
     return true
   } catch ( error ) {
-    console.log( error )
+    // error
   }
 }
 
@@ -328,7 +324,7 @@ const updateGift = ( id, gift  ) => {
     //db.create( schema.Gifts, gift, true )
     return true
   } catch ( error ) {
-    console.log( error )
+    // error
   }
 }
 
@@ -346,7 +342,7 @@ const getMetaShares = () => {
       }
     }
   } catch ( error ) {
-    console.log( error )
+    // error
   }
 }
 
@@ -364,7 +360,7 @@ const getWallet = () => {
     const wallets = Array.from( walletsRef )
     return ( wallets[ 0 ] as any )
   } catch ( error ) {
-    console.log( 'err', error )
+    // error
   }
 }
 

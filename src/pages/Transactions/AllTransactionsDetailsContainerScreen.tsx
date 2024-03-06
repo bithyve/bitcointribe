@@ -6,8 +6,8 @@ import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsi
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { TransactionDetails } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { SUB_PRIMARY_ACCOUNT } from '../../common/constants/wallet-service-types'
+import Fonts from '../../common/Fonts'
 import { UsNumberFormat } from '../../common/utilities'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import openLink from '../../utils/OpenLink'
@@ -20,31 +20,7 @@ export type Props = {
 
 // TODO: Refactor after integrating data model changes from `feature/account-management`
 const getImageByAccountType = ( accountType, primaryAccType? ) => {
-  if ( accountType == 'FAST_BITCOINS' ) {
-    return (
-      <View
-        style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          borderColor: Colors.borderColor,
-          borderWidth: 0.5,
-          borderRadius: widthPercentageToDP( '12%' ) / 2,
-          width: widthPercentageToDP( '12%' ),
-          height: widthPercentageToDP( '12%' ),
-          backgroundColor: Colors.white,
-        }}
-      >
-        <Image
-          source={require( '../../assets/images/icons/fastbitcoin_dark.png' )}
-          style={{
-            width: widthPercentageToDP( '8%' ),
-            height: widthPercentageToDP( '8%' ),
-            resizeMode: 'contain',
-          }}
-        />
-      </View>
-    )
-  } else if (
+  if (
     accountType == 'Savings Account' ||
     accountType == 'Test Account' ||
     accountType == 'Checking Account' ||

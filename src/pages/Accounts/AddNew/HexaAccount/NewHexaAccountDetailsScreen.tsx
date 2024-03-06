@@ -1,16 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { View, StyleSheet, Text, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
-import FormStyles from '../../../../common/Styles/FormStyles'
-import ListStyles from '../../../../common/Styles/ListStyles'
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { Input } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
-import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
-import { resetToHomeAction } from '../../../../navigation/actions/NavigationActions'
 import { HexaSubAccountDescribing } from '../../../../common/data/models/SubAccountInfo/Interfaces'
-import Loader from '../../../../components/loader'
+import FormStyles from '../../../../common/Styles/FormStyles'
+import ListStyles from '../../../../common/Styles/ListStyles'
 import ButtonBlue from '../../../../components/ButtonBlue'
+import Loader from '../../../../components/loader'
+import { resetToHomeAction } from '../../../../navigation/actions/NavigationActions'
 import { addNewAccountShells } from '../../../../store/actions/accounts'
 import { newAccountsInfo } from '../../../../store/sagas/accounts'
+import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
 
 export type Props = {
   navigation: any;
@@ -61,7 +61,6 @@ const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, route }: Pr
   // TODO: We need a bit more design clarity about what to do if
   // account creation fails here.
   useAccountShellCreationCompletionEffect( () => {
-    console.log( 'dispatching resetToHomeAction' )
     navigation.dispatch( resetToHomeAction() )
   } )
 

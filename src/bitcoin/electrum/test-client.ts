@@ -1,7 +1,7 @@
-import config from '../HexaConfig'
-import ElectrumCli from 'electrum-client'
-import reverse from 'buffer-reverse'
 import * as bitcoinJS from 'bitcoinjs-lib'
+import reverse from 'buffer-reverse'
+import ElectrumCli from 'electrum-client'
+import config from '../HexaConfig'
 import { ElectrumTransaction, ElectrumUTXO } from './interface'
 
 const TEST_ELECTRUM_CLIENT_CONFIG = {
@@ -33,28 +33,20 @@ export default class TestElectrumClient {
       ) // tcp or tls
 
       TEST_ELECTRUM_CLIENT.electrumClient.onError = ( error ) => {
-        console.log( 'Electrum mainClient.onError():', error?.message )
 
         if ( TEST_ELECTRUM_CLIENT.electrumClient.close ) TEST_ELECTRUM_CLIENT.electrumClient.close()
 
         TEST_ELECTRUM_CLIENT.isClientConnected = false
-        console.log( 'Error: Close the connection' )
       }
-
-      console.log( 'Initiate electrum server for test account' )
       const ver = await TEST_ELECTRUM_CLIENT.electrumClient.initElectrum( {
         client: 'bitcoin-keeper',
         version: '1.4',
-      } )
-      console.log( 'Connection to electrum server is established', {
-        ver
       } )
       if ( ver && ver[ 0 ] ) {
         TEST_ELECTRUM_CLIENT.isClientConnected = true
       }
     } catch ( error ) {
       TEST_ELECTRUM_CLIENT.isClientConnected = false
-      console.log( 'Bad connection:', JSON.stringify( TEST_ELECTRUM_CLIENT.activePeer ), error )
     }
 
     if ( TEST_ELECTRUM_CLIENT.isClientConnected ) return TEST_ELECTRUM_CLIENT.isClientConnected
@@ -62,17 +54,14 @@ export default class TestElectrumClient {
   }
 
   public static async reconnect() {
-    console.log( 'Trying to reconnect electrum for test account' )
     TEST_ELECTRUM_CLIENT.connectionAttempt += 1
 
     // close the connection before attempting again
     if ( TEST_ELECTRUM_CLIENT.electrumClient.close ) TEST_ELECTRUM_CLIENT.electrumClient.close()
 
     if ( TEST_ELECTRUM_CLIENT.connectionAttempt >= TEST_ELECTRUM_CLIENT_CONFIG.maxConnectionAttempt ) {
-      console.log( 'Could not find the working electrum server. Please try again later.' )
       return TEST_ELECTRUM_CLIENT.isClientConnected // false
     }
-    console.log( `Reconnection attempt #${TEST_ELECTRUM_CLIENT.connectionAttempt}` )
     await new Promise( ( resolve ) => {
       setTimeout( resolve, TEST_ELECTRUM_CLIENT_CONFIG.reconnectDelay ) // attempts reconnection after 1 second
     } )
@@ -240,9 +229,6 @@ export default class TestElectrumClient {
   }
 
   public static async broadcast( txHex: string ) {
-    console.log( {
-      predefinedTestnetPeers: TEST_ELECTRUM_CLIENT_CONFIG.predefinedTestnetPeers
-    } )
     if ( !TEST_ELECTRUM_CLIENT.electrumClient ) throw new Error( 'Electrum client is not connected' )
     return TEST_ELECTRUM_CLIENT.electrumClient.blockchainTransaction_broadcast( txHex )
   }

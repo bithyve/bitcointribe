@@ -1,5 +1,5 @@
-import { NativeModules, Platform } from 'react-native'
-import moment from 'moment'
+import moment from 'moment';
+import { NativeModules, Platform } from 'react-native';
 
 const GoogleDrive = NativeModules.GoogleDrive
 const iCloud = NativeModules.iCloud
@@ -30,14 +30,11 @@ export default class CloudBackup {
     try {
       this.recoveryCallback = recoveryCallback1
       if ( Platform.OS == 'ios' ) {
-        // console.log(iCloud.startBackup("sfsfsdfsdfsf"));
         iCloud.downloadBackup().then( ( backedJson ) => {
-          //console.log('BackedUp JSON: DONE', backedJson);
           if ( backedJson ) this.recoveryCallback( backedJson )
           else this.recoveryCallback( null )
         } )
       } else {
-        console.log( 'isNotReading CheckCloudDataBackup', this.isNotReading )
         const checkDataIsBackedup = true
         return this.GoogleDriveLogin( {
           checkDataIsBackedup
@@ -49,16 +46,13 @@ export default class CloudBackup {
   };
 
   public CloudDataBackup = async( data, share? ) : Promise<any> => {
-    //console.log('share inside cloud', share);
     try{
       this.dataObject = data
       this.share = share ? share : {
       }
 
-      console.log( 'CloudDataBackup STARTED' )
       if ( Platform.OS == 'ios' ) {
         return iCloud.downloadBackup().then( async ( backedJson ) => {
-        // console.log('BackedUp JSON: DONE', backedJson);
           if ( backedJson ) {
             return await this.updateData( {
               result1: backedJson,
@@ -66,19 +60,16 @@ export default class CloudBackup {
               share: this.share,
             } )
           } else {
-            console.log( 'createFile' )
             return await this.createFile( {
             } )
           }
         } )
       } else {
-        console.log( 'isNotReading CloudDataBackup', this.isNotReading )
         return await this.GoogleDriveLogin( {
           share: this.share
         } )
       }
     } catch( error ){
-      console.log( 'CloudDataBackup error', error )
       throw new Error( error )
     }
   };
@@ -91,10 +82,8 @@ export default class CloudBackup {
     try {
       const { checkDataIsBackedup, share, googlePermissionCall } = params
       const result = await this.GoogleLogin( params )
-      console.log( 'RESULT', result )
       // await GoogleDrive.login( async ( err, data ) => {
       //   const result = err || data
-      //   console.log( 'googlePermissionCall######### GoogleDriveLogin', googlePermissionCall )
       //   if ( !googlePermissionCall ){
       //     if ( result.eventName == 'onLogin' ) {
       //       return await this.checkFileIsAvailable( {
@@ -102,16 +91,16 @@ export default class CloudBackup {
       //         share,
       //       } )
       //     } else{
-      //       console.log( 'GOOGLE SetupFail else', result )
+      //
       //       throw new Error( 'Google LoginFail' )
       //     }
       //   }
       //   else{
-      //     console.log( 'GOOGLE ReSULT GoogleDriveLogin', result )
+      //
       //     if ( result.eventName === 'onLogin' ) {
       //       return 'LoginSuccess'
       //     } else{
-      //       console.log( 'GOOGLE SetupFail else', result )
+      //
       //       throw new Error( 'Google LoginFail' )
       //     }
       //   }
@@ -134,7 +123,6 @@ export default class CloudBackup {
         .then( async() => {
           await GoogleDrive.login( async ( err, data ) => {
             const result = err || data
-            console.log( 'googlePermissionCall######### GoogleDriveLogin', googlePermissionCall )
             if ( !googlePermissionCall ){
               if ( result.eventName == 'onLogin' ) {
                 return await this.checkFileIsAvailable( {
@@ -142,16 +130,13 @@ export default class CloudBackup {
                   share,
                 } )
               } else{
-                console.log( 'GOOGLE SetupFail else', result )
                 throw new Error( 'Google LoginFail' )
               }
             }
             else{
-              console.log( 'GOOGLE ReSULT GoogleDriveLogin', result )
               if ( result.eventName === 'onLogin' ) {
                 return 'LoginSuccess'
               } else{
-                console.log( 'GOOGLE SetupFail else', result )
                 throw new Error( 'Google LoginFail' )
               }
             }
@@ -186,34 +171,26 @@ export default class CloudBackup {
       GoogleDrive.checkIfFileExist(
         JSON.stringify( metaData ),
         async ( err, data ) => {
-          // console.log('err, data', data, err);
           const result = err || data
           if( !result ) return null
           if ( !checkDataIsBackedup ) {
             if ( result && result.eventName == 'listEmpty' ) {
-              console.log( 'createFile' )
               return await this.createFile( {
                 share
               } )
             } else if ( result.eventName == 'failure' ) {
-              console.log( 'FAILURE' )
               throw new Error( result.eventName )
             } else if( result.eventName === 'UseUserRecoverableAuthIOException' )
             {
-              console.log( 'UseUserRecoverableAuthIOException Failure' )
               return await this.checkFileIsAvailable( {
                 share: share
               } )
             } else {
-              console.log(
-                'readFile isNotReading checkFileIsAvailable if' )
               return await this.readFile( {
                 result, share
               } )
             }
           } else {
-            console.log(
-              'isNotReading checkFileIsAvailable else' )
             return await this.readFile( {
               result, checkDataIsBackedup, share
             } )
@@ -247,11 +224,9 @@ export default class CloudBackup {
 
       if ( Platform.OS === 'ios' ) {
         return iCloud.startBackup( JSON.stringify( WalletData ) ).then( ( result ) => {
-          console.log( 'iCloudStatus', result )
           if( result ) return 'iCloudSuccess'
           else throw new Error( 'iCLoud failure' )
         } ).catch( ( err ) => {
-          console.log( 'iCloudStatus err', err )
           throw new Error( err )
         } )
         // this.callBack( share )
@@ -264,7 +239,6 @@ export default class CloudBackup {
         }
 
         GoogleDrive.uploadFile( JSON.stringify( metaData ), async ( data, err ) => {
-          // console.log('DATA', data, err);
           const result = err || data
           if ( result && result.eventName == 'successFullyUpload' ) {
             return result.eventName
@@ -291,7 +265,6 @@ export default class CloudBackup {
     const metaData = {
       id: result.id
     }
-    console.log( 'isNotReading readFile', this.isNotReading )
     try {
       if ( this.isNotReading ) {
         this.isNotReading = false
@@ -308,7 +281,6 @@ export default class CloudBackup {
         } )
       }
     } catch ( error ) {
-      console.log( 'error', error )
       throw new Error( error )
     }
   };
@@ -320,7 +292,6 @@ export default class CloudBackup {
   } ) : Promise<any> => {
     try {
       const { result1, googleData, share } = params
-      console.log( 'updateData share', share )
       const { data } = this.dataObject.regularAccount.getWalletId()
       let arr = []
       const newArray = []
@@ -332,7 +303,6 @@ export default class CloudBackup {
           }
         }
         const index = newArray.findIndex( ( x ) => x.walletId == data.walletId )
-        console.log( 'sdgsdg', index )
         if ( index === -1 ) {
           const tempData = {
             levelStatus: this.dataObject.levelStatus,
@@ -357,7 +327,6 @@ export default class CloudBackup {
           newArray[ index ].keeperData = this.dataObject.keeperData
           newArray[ index ].dateTime = moment( new Date() )
         }
-        console.log( 'ARR', newArray )
         if ( Platform.OS == 'ios' ) {
           if( newArray.length ) {
             return iCloud.startBackup( JSON.stringify( newArray ) ).then( ( result ) => {
@@ -368,7 +337,6 @@ export default class CloudBackup {
             } )
 
           }
-          // console.log('Platform.OS share', share)
         } else {
           const metaData = {
             name: googleData.name,
@@ -400,10 +368,8 @@ export default class CloudBackup {
         else if( result.eventName == 'failure' ){
           throw new Error( result.eventName )
         }
-        console.log( 'GoogleDrive.updateFile', result )
       } )
     } catch ( error ) {
-      console.log( 'error', error )
       throw new Error( error )
     }
     return null
@@ -413,10 +379,10 @@ export default class CloudBackup {
   //   public static returnPromise = ( promise ) : Promise<any> => {
 
 //     promise.then( ( result ) => {
-//       console.log( 'return promise success', result )
+//
 //       return result
 //     } ).catch( ( err ) => {
-//       console.log( 'return promise error', err )
+//
 //       throw new Error( err )
 //     } )
 //     return null

@@ -173,7 +173,6 @@ export const validatePin = ( passcode ) => {
         dispatch( credsAuthenticated( false ) )
       }
     } catch ( error ) {
-      console.log( error )
       dispatch( credsAuthenticated( false ) )
     }
     return {

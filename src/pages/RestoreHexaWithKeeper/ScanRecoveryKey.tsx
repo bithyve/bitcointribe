@@ -1,32 +1,20 @@
+import idx from 'idx'
 import React, { Component } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  Image,
-  ScrollView,
-  Platform,
-  ImageBackground,
-  TextInput,
+  Image, ImageBackground, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import { RNCamera } from 'react-native-camera'
 import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  heightPercentageToDP as hp, widthPercentageToDP as wp
+} from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { connect } from 'react-redux'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 import {
-  fetchEphemeralChannel,
+  fetchEphemeralChannel
 } from '../../store/actions/trustedContacts'
-import idx from 'idx'
-import { RNCamera } from 'react-native-camera'
-import BottomInfoBox from '../../components/BottomInfoBox'
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
 
 interface ScanRecoveryKeyStateTypes {
@@ -52,7 +40,6 @@ class ScanRecoveryKey extends Component<
 
   barcodeRecognized = async ( barcodes ) => {
     const barcode = getFormattedStringFromQRString( barcodes.data )
-    //console.log("barcodes1", barcode);
     this.props.route.params?.scannedData( JSON.parse( barcode ) )
     this.props.navigation.goBack()
     if ( barcode ) {

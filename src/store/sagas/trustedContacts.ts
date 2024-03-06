@@ -7,12 +7,11 @@ import DeviceInfo from 'react-native-device-info'
 import { call, delay, put, select } from 'redux-saga/effects'
 import secrets from 'secrets.js-grempe'
 import config from '../../bitcoin/HexaConfig'
+import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import {
-  Account,
-  AccountType,
-  Accounts,
-  ActiveAddressAssignee,
+  Account, Accounts, AccountType, ActiveAddressAssignee,
   ActiveAddressAssigneeType,
   BackupStreamData,
   ChannelAssets,
@@ -25,34 +24,31 @@ import {
   GiftThemeId,
   GiftType,
   INotification,
-  NetworkType,
-  PrimaryStreamData,
+  NetworkType, notificationTag,
+  notificationType, PrimaryStreamData,
   SecondaryStreamData,
   TrustedContact,
   TrustedContactRelationTypes,
   Trusted_Contacts,
   UnecryptedStreamData,
-  Wallet,
-  notificationTag,
-  notificationType
+  Wallet
 } from '../../bitcoin/utilities/Interface'
 import Relay from '../../bitcoin/utilities/Relay'
 import { generateTrustedContact } from '../../bitcoin/utilities/TrustedContactFactory'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
-import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import { processDeepLink } from '../../common/CommonFunctions'
 import { APP_STAGE } from '../../common/interfaces/Interfaces'
 import Toast from '../../components/Toast'
 import dbManager from '../../storage/realm/dbManager'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import { getApprovalFromKeepers, updateWalletImageHealth } from '../actions/BHR'
 import { exchangeRatesCalculated, giftAccepted, giftAddedToAccount, setAverageTxFee, updateAccountShells, updateGift } from '../actions/accounts'
+import { getApprovalFromKeepers, updateWalletImageHealth } from '../actions/BHR'
+import { updateGiftLoading } from '../actions/doNotStore'
 import { updateWallet } from '../actions/storage'
 import {
   ASSOCIATE_GIFT,
-  EDIT_TRUSTED_CONTACT,
-  FETCH_GIFT_FROM_CHANNEL,
+  EDIT_TRUSTED_CONTACT, existingPermanentChannelsSynched,
+  fetchGiftFromTemporaryChannel, FETCH_GIFT_FROM_CHANNEL,
   INITIALIZE_TRUSTED_CONTACT,
   InitTrustedContactFlowKind,
   PermanentChannelsSyncKind,
@@ -60,22 +56,15 @@ import {
   REJECT_GIFT,
   REJECT_TRUSTED_CONTACT,
   REMOVE_TRUSTED_CONTACT,
-  RESTORE_TRUSTED_CONTACTS,
-  SYNC_GIFTS_STATUS,
-  SYNC_PERMANENT_CHANNELS,
-  UPDATE_WALLET_NAME,
+  RESTORE_TRUSTED_CONTACTS, syncPermanentChannels, SYNC_GIFTS_STATUS,
+  SYNC_PERMANENT_CHANNELS, updateTrustedContacts,
+  updateWalletNameToChannel, UPDATE_WALLET_NAME,
   UPDATE_WALLET_NAME_TO_CHANNEL,
-  WALLET_CHECK_IN,
-  existingPermanentChannelsSynched,
-  fetchGiftFromTemporaryChannel,
-  syncPermanentChannels,
-  updateTrustedContacts,
-  updateWalletNameToChannel
+  WALLET_CHECK_IN
 } from '../actions/trustedContacts'
 import { AccountsState } from '../reducers/accounts'
 import { createWatcher } from '../utils/utilities'
 import { generateGiftLink, getNextFreeAddressWorker, setup2FADetails } from './accounts'
-import { updateGiftLoading } from '../actions/doNotStore'
 
 function* generateSecondaryAssets(){
   const secondaryMnemonic = bip39.generateMnemonic( )
@@ -268,7 +257,6 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
       } ], notification )
     }
   } else {
-    console.log( 'Meta data update failed for gift:', gift.id )
     yield put( updateGiftLoading() )
   }
 }
@@ -402,7 +390,6 @@ function* syncGiftsStatusWorker() {
   }
 
   if( Object.keys( giftChannelsToSync ).length === 0 ) {
-    console.log( 'No gifts to sync' )
     return
   }
 
@@ -576,7 +563,6 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
   }
 
   if( !channelSyncUpdates.length ) {
-    console.log( 'Exiting sync: no channels to update' )
     yield put ( existingPermanentChannelsSynched( {
       successful: true
     } ) )
@@ -755,7 +741,6 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
         } ) )
     } else throw new Error( 'Failed to sync permanent channel' )
   } catch ( err ) {
-    console.log( err )
 
     if( permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT )
       Toast( 'Failed to add Keeper/Contact' )
@@ -999,7 +984,6 @@ export function* initializeTrustedContactWorker( { payload } : {payload: {contac
     const instream: UnecryptedStreamData = idx( approvedContact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
     if( instream.primaryData?.giftDeepLink ){
       // process incoming gift
-      console.log( 'link', instream.primaryData.giftDeepLink )
       const { giftRequest } = yield call( processDeepLink, instream.primaryData.giftDeepLink )
       let decryptionKey
       try{
@@ -1227,9 +1211,6 @@ export function* restoreTrustedContactsWorker( { payload }: { payload: { walletI
   //     retrieveBackupData: true,
   //   }
   // } )
-  // if( res.backupData && res.backupData.primaryMnemonicShard ) {
-  //   console.log( 'res.backupData.primaryMnemonicShard', res.backupData.primaryMnemonicShard )
-  // }
 }
 
 export const restoreTrustedContactsWatcher = createWatcher(
@@ -1264,7 +1245,7 @@ function* walletCheckInWorker( { payload } ) {
         yield put( setAverageTxFee( averageTxFees ) )
     }
   } catch( err ){
-    console.log( 'Wallet Check-In failed w/ the following err: ', err )
+    // error
   }
 }
 

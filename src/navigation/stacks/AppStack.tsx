@@ -15,7 +15,6 @@ import SelectReassignableTransactionsScreen from '../../pages/Accounts/AccountSe
 import ReassignSubAccountSourcesSelectSourcesScreen from '../../pages/Accounts/AccountSettings/ReassignTransactions/SelectSubAccountSourcesScreen'
 import XPubDetailsScreen from '../../pages/Accounts/AccountSettings/XPubDetailsScreen'
 import NewRampAccountDetailsScreen from '../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
-import NewWyreAccountDetailsScreen from '../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
 import AccountDetailsContainerScreen from '../../pages/Accounts/Details/AccountDetailsContainerScreen'
 import GoogleAuthenticatorOTP from '../../pages/Accounts/GoogleAuthenticatorOTP'
 import NewTwoFASecret from '../../pages/Accounts/NewTwoFASecret'
@@ -54,8 +53,6 @@ import SendRequest from '../../pages/Contacts/SendRequest'
 import ContactsListForAssociateContact from '../../pages/CustodianRequest/ContactsListForAssociateContact'
 import CustodianRequestAccepted from '../../pages/CustodianRequest/CustodianRequestAccepted'
 import CustodianRequestOTP from '../../pages/CustodianRequest/CustodianRequestOTP'
-import PairNewWallet from '../../pages/FastBitcoin/PairNewWallet'
-import VoucherScanner from '../../pages/FastBitcoin/VoucherScanner'
 import CreateGift from '../../pages/FriendsAndFamily/CreateGift'
 import EnterGiftDetails from '../../pages/FriendsAndFamily/EnterGiftDetails'
 import FriendsAndFamilyScreen from '../../pages/FriendsAndFamily/FriendsAndFamilyScreen'
@@ -131,8 +128,6 @@ import UpdateApp from '../../pages/UpdateApp'
 import ConfirmKeys from '../../pages/UpgradeBackupWithKeeper/ConfirmKeys'
 import UpgradeBackup from '../../pages/UpgradeBackupWithKeeper/UpgradeBackup'
 import VersionHistoryScreen from '../../pages/VersionHistoryScreen'
-import WyreIntegrationScreen from '../../pages/WyreIntegration/WyreIntegrationScreen'
-import WyreOrderFormScreen from '../../pages/WyreIntegration/WyreOrderFormScreen'
 import HomeScreen from '../screens/HomeScreen'
 import AddNewAccountStack from '../stacks/accounts/AddNewAccountStack'
 import AccountManagementStack from '../stacks/more-options/AccountManagementStack'
@@ -262,10 +257,6 @@ function AppStack() {
       <Stack.Screen name="MoreOptionsContainerScreen" component={MoreOptionsContainerScreen} options={{
         headerShown: false,
       }} />
-
-      <Stack.Screen name="PlaceWyreOrder" component={WyreOrderFormScreen} options={{
-        title: 'Buy with Wyre'
-      }} />
       <Stack.Screen name="PlaceRampOrder" component={RampOrderFormScreen} options={{
         title: 'Buy with Ramp' 
       }} />
@@ -294,9 +285,6 @@ function AppStack() {
       <Stack.Screen name="UpdateApp" component={UpdateApp} options={{
         gestureEnabled: false,
       }} />
-      <Stack.Screen name="WyreIntegrationScreen" component={WyreIntegrationScreen} options={{
-        title: 'Wyre Home'
-      }} />
       <Stack.Screen name="Intermediate" component={Intermediate} options={{
         headerShown: false
       }}/>
@@ -318,9 +306,7 @@ function AppStack() {
       <Stack.Screen name="NewTwoFASecret" component={NewTwoFASecret} />
       <Stack.Screen name="TwoFASweepFunds" component={TwoFASweepFunds} />
       <Stack.Screen name="SendRequest" component={SendRequest} />
-      <Stack.Screen name="VoucherScanner" component={VoucherScanner} />
       <Stack.Screen name="AddContactSendRequest" component={AddContactSendRequest} />
-      <Stack.Screen name="PairNewWallet" component={PairNewWallet} />
       <Stack.Screen name="ManageBackupNewBHR" component={ManageBackupNewBHR} />
       <Stack.Screen name="SecurityQuestionHistoryNewBHR" component={SecurityQuestionHistoryNewBHR} options={( { navigation } ) => {
         return {
@@ -798,9 +784,6 @@ function AppStack() {
       }} />
       <Stack.Screen name="NewHexaAccountDetails" component={NewHexaAccountDetailsScreen} options={{
         title: 'Setup New Account'
-      }} />
-      <Stack.Screen name="NewWyreAccountDetails" component={NewWyreAccountDetailsScreen} options={{
-        title: 'Setup Wyre Account'
       }} />
       <Stack.Screen name="NewRampAccountDetails" component={NewRampAccountDetailsScreen} options={{
         title: 'Setup Ramp Account'

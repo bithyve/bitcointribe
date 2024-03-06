@@ -1,5 +1,4 @@
-import { FETCH_NOTIFICATION_STARTED, MESSAGES_FETCHED, NOTIFICATIONS_FETCHED, NOTIFICATION_UPDATED, STORE_MESSAGE_TIMESTAMP, UPDATED_NOTIFICATION_LIST } from '../actions/notifications'
-import { INotification } from '../../bitcoin/utilities/Interface'
+import { FETCH_NOTIFICATION_STARTED, MESSAGES_FETCHED, NOTIFICATIONS_FETCHED, NOTIFICATION_UPDATED, STORE_MESSAGE_TIMESTAMP, UPDATED_NOTIFICATION_LIST } from '../actions/notifications';
 
 const initialState: {
   notifications: any;
@@ -20,7 +19,6 @@ const initialState: {
 export default ( state = initialState, action ) => {
   switch ( action.type ) {
       case NOTIFICATIONS_FETCHED:
-        console.log( 'action.payload.notifications', action.payload.notifications )
         return {
           ...state,
           notifications: action.payload.notifications,

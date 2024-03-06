@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import idx from 'idx'
 import moment from 'moment'
-import React, { PureComponent, createRef } from 'react'
+import React, { createRef, PureComponent } from 'react'
 import {
   Alert,
   Image,
@@ -12,14 +12,14 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { connect } from 'react-redux'
@@ -29,34 +29,32 @@ import More from '../../assets/images/svgs/icon_more.svg'
 import {
   AccountType,
   KeeperInfoInterface,
-  QRCodeTypes, StreamData, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts, Wallet,
+  QRCodeTypes, StreamData, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts, Wallet
 } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { isEmpty, nameToInitials } from '../../common/CommonFunctions'
-import Fonts from '../../common/Fonts'
 import { translations } from '../../common/content/LocContext'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import AccountShell from '../../common/data/models/AccountShell'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import Fonts from '../../common/Fonts'
 import AlertModalContents from '../../components/AlertModalContents'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import CardWithArrow from '../../components/CardWithArrow'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import ModalHeader from '../../components/ModalHeader'
-import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import SendViaLink from '../../components/SendViaLink'
-import SendViaQR from '../../components/SendViaQR'
 import ModalContainer from '../../components/home/ModalContainer'
 import Loader from '../../components/loader'
+import ModalHeader from '../../components/ModalHeader'
+import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import { agoTextForLastSeen } from '../../components/send/LastSeenActiveUtils'
+import SendViaLink from '../../components/SendViaLink'
+import SendViaQR from '../../components/SendViaQR'
 import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 import {
-  ErrorSending,
-  UploadSMSuccessfully,
-  getApprovalFromKeepers, setOpenToApproval,
+  ErrorSending, getApprovalFromKeepers, setOpenToApproval,
   setSecondaryDataInfoStatus,
-  updateSecondaryShard
+  updateSecondaryShard, UploadSMSuccessfully
 } from '../../store/actions/BHR'
 import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting, sourceAccountSelectedForSending } from '../../store/actions/sending'
 import { PermanentChannelsSyncKind, removeTrustedContact, syncPermanentChannels } from '../../store/actions/trustedContacts'
@@ -298,7 +296,6 @@ class ContactDetails extends PureComponent<
       ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
       this.props.ErrorSending( null )
     }
-    console.log( 'openApproval', this.props.openApproval )
     if ( prevProps.availableKeepers != this.props.availableKeepers && this.contactsType == 'I am the Keeper of' ) {
       if ( availableKeepers.length ) {
         const availableKeepersName = ( () => {
@@ -320,9 +317,6 @@ class ContactDetails extends PureComponent<
         availableKeepersName: ''
       } )
     }
-
-    console.log( 'this.props.getSecondaryDataInfoStatus', this.props.getSecondaryDataInfoStatus )
-    console.log( 'this.props.openApproval', this.props.openApproval )
     if ( prevProps.getSecondaryDataInfoStatus != this.props.getSecondaryDataInfoStatus ) {
       if ( this.props.getSecondaryDataInfoStatus ) this.setState( {
         showLoader: true
@@ -611,7 +605,6 @@ class ContactDetails extends PureComponent<
         walletId: contacts.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletID
       } )
     }
-    console.log( 'qrString', qrString )
     setTimeout( () => {
       this.setState( {
         qrModalTitle: qrTitle,

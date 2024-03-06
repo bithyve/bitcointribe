@@ -1,19 +1,19 @@
-import React, { useEffect, useMemo,  } from 'react'
-import { View, Text, StyleSheet, ImageBackground, Image, ActivityIndicator, TouchableOpacity } from 'react-native'
+import React, { useEffect, useMemo } from 'react'
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { heightPercentageToDP } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
 import Colors from '../../../common/Colors'
 import SyncStatus from '../../../common/data/enums/SyncStatus'
 import AccountShell from '../../../common/data/models/AccountShell'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
-import ListStyles from '../../../common/Styles/ListStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import ListStyles from '../../../common/Styles/ListStyles'
 import { blindRefresh } from '../../../store/actions/accounts'
-import { heightPercentageToDP } from 'react-native-responsive-screen'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
-import TransactionsFoundDuringRescanList from '../account-shell-rescanning-bottom-sheet/TransactionsFoundDuringRescanList'
+import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useSyncStatusForAccountShellID from '../../../utils/hooks/account-utils/UseSyncStatusForAccountShellID'
 import useFoundTransactionsFromReScan from '../../../utils/hooks/state-selectors/wallet-rescanning/UseFoundTransactionsFromRescan'
+import TransactionsFoundDuringRescanList from '../account-shell-rescanning-bottom-sheet/TransactionsFoundDuringRescanList'
 
 export type Props = {
   onDismiss: () => void;
@@ -68,8 +68,6 @@ const WalletRescanningBottomSheet: React.FC<Props> = ( {
     dispatch( blindRefresh() )
   }, [] )
   const foundTransactions: RescannedTransactionData[] = useFoundTransactionsFromReScan()
-  //const foundTransactions: RescannedTransactionData[] = sampleRescannedTransactionDetails
-  //console.log("foundTransactions",foundTransactions);
   return (
     <View style={styles.rootContainer}>
       <View style={styles.backgroundImageContainer}>

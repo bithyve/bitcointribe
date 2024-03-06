@@ -4,7 +4,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
@@ -15,7 +15,6 @@ import AccountComponent from './AccountComponent'
 export default function ConfirmSweepFunds( props ) {
   const [ SelectedContactId, setSelectedContactId ] = useState( 0 )
   const accountInfo = props.selectedAccount ? props.selectedAccount : []
-  console.log( 'props.accountInfo', props.accountInfo )
   return (
     <View style={{
       ...styles.modalContentContainer, height: '100%'

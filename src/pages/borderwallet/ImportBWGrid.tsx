@@ -1,27 +1,25 @@
 
-import React, { useState, useEffect } from 'react'
-import {
-  View,
-  SafeAreaView,
-  StatusBar,
-  ActivityIndicator,
-} from 'react-native'
-import Colors from '../../common/Colors'
-import ModalContainer from '../../components/home/ModalContainer'
-import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
-import RestoreSeedPageComponent from '../RestoreHexaWithKeeper/RestoreSeedPageComponent'
-import * as bip39 from 'bip39'
-import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
-import { restoreSeedWordFailed } from '../../store/actions/BHR'
-import { completedWalletSetup } from '../../store/actions/setupAndAuth'
-import { setVersion } from '../../store/actions/versionHistory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as bip39 from 'bip39'
+import React, { useEffect, useState } from 'react'
+import {
+  ActivityIndicator, SafeAreaView,
+  StatusBar, View
+} from 'react-native'
+import { RootStateOrAny, useDispatch, useSelector } from 'react-redux'
 import { Wallet } from '../../bitcoin/utilities/Interface'
-import LoaderModal from '../../components/LoaderModal'
+import Colors from '../../common/Colors'
 import { translations } from '../../common/content/LocContext'
 import AlertModalContents from '../../components/AlertModalContents'
 import ErrorModalContents from '../../components/ErrorModalContents'
+import ModalContainer from '../../components/home/ModalContainer'
+import LoaderModal from '../../components/LoaderModal'
 import Toast from '../../components/Toast'
+import { restoreSeedWordFailed } from '../../store/actions/BHR'
+import { completedWalletSetup } from '../../store/actions/setupAndAuth'
+import { setVersion } from '../../store/actions/versionHistory'
+import SeedHeaderComponent from '../NewBHR/SeedHeaderComponent'
+import RestoreSeedPageComponent from '../RestoreHexaWithKeeper/RestoreSeedPageComponent'
 
 const ImportBWGrid = ( props ) => {
   const [ showSeedError, setShowSeedError ] = useState( false )
@@ -89,7 +87,6 @@ const ImportBWGrid = ( props ) => {
     setLoaderModal( false )
     if ( seedRecovered )
       setTimeout( () => {
-        console.log( 'TIMEOUT' )
         setLoaderModal( true )
       }, 1000 )
   }

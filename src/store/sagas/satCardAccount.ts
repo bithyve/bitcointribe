@@ -1,25 +1,24 @@
-import { Account, AccountType, Accounts, ActiveAddressAssigneeType, AverageTxFees, TxPriority } from '../../bitcoin/utilities/Interface'
 import { call, put, select } from 'redux-saga/effects'
+import { Account, Accounts, AccountType } from '../../bitcoin/utilities/Interface'
 
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
-import AccountShell from '../../common/data/models/AccountShell'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import { AccountsState } from '../reducers/accounts'
-import {
-  SAT_CARD_ACCOUNT,
-} from '../actions/satCardAccount'
+import AccountShell from '../../common/data/models/AccountShell'
 import Toast from '../../components/Toast'
-import { createWatcher } from '../utils/utilities'
 import dbManager from '../../storage/realm/dbManager'
-import { getNextFreeAddressWorker } from './accounts'
 import { updateAccountShells } from '../actions/accounts'
 import { updateWalletImageHealth } from '../actions/BHR'
+import {
+  SAT_CARD_ACCOUNT
+} from '../actions/satCardAccount'
+import { AccountsState } from '../reducers/accounts'
+import { createWatcher } from '../utils/utilities'
+import { getNextFreeAddressWorker } from './accounts'
 
 function* satCardAccountWorker( { payload }: { payload: { accountId: string, privKey: string, address: string, selectedAccount: AccountShell } } ) {
   try {
     const accountsState: AccountsState = yield select( state => state.accounts )
     const accounts: Accounts = accountsState.accounts
-    console.log( 'associateAccount accountsState' + JSON.stringify( accountsState ) )
 
     let associateAccount: Account
 
@@ -40,7 +39,6 @@ function* satCardAccountWorker( { payload }: { payload: { accountId: string, pri
     // const defaultTxPriority = TxPriority.LOW
     // const defaultFeePerByte = accountsState.averageTxFees[ defaultTxPriority ]
     const averageTxFeeByNetwork = accountsState.averageTxFees[ associateAccount.networkType ]
-
     const { txid } = yield call(
       AccountOperations.sweepPrivateKey,
       payload.privKey,

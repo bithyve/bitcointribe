@@ -1,25 +1,17 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
-  Image,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
+  ActivityIndicator, Image, Keyboard, KeyboardAvoidingView,
+  Platform, StyleSheet, Text, TextInput, View
 } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import { ScrollView } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import { ScrollView } from 'react-native-gesture-handler'
 import { DeepLinkEncryptionType } from '../../bitcoin/utilities/Interface'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import PassCodeTextBox from '../../components/PassCodeTextBox'
 
 export default function TrustedContactRequest( props ) {
@@ -262,7 +254,6 @@ export default function TrustedContactRequest( props ) {
   }
 
   const checkForValidation = ( text ) => {
-    console.log( 'TEXT', text.charAt( 0 ) + text.substring( 8 ), props.hint )
     if ( props.inputType == DeepLinkEncryptionType.NUMBER ) {
       if ( text.length == 0 ) {
         setWrongInputError( '' )

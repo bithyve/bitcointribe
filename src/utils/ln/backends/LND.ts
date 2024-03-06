@@ -1,7 +1,7 @@
-import RNFetchBlob from 'rn-fetch-blob'
-import stores from '../../../mobxstore'
-import OpenChannelRequest from '../../../models/OpenChannelRequest'
-import VersionUtils from '../VersionUtils'
+import RNFetchBlob from 'rn-fetch-blob';
+import stores from '../../../mobxstore';
+import OpenChannelRequest from '../../../models/OpenChannelRequest';
+import VersionUtils from '../VersionUtils';
 //import { doTorRequest, RequestMethod } from '../TorUtils'
 
 interface Headers {
@@ -53,7 +53,6 @@ export default class LND {
               return response.json()
             } else {
               const errorInfo = response.json()
-              console.log( 'errorInfo', errorInfo )
               throw new Error(
                 ( errorInfo.error && errorInfo.error.message ) ||
                                 errorInfo.message ||
@@ -191,7 +190,6 @@ export default class LND {
     };
 
     getLndConfig = ( url: string ) => {
-      console.log( 'getLndConfig', url )
       const headers: any = {
         'Content-Type' :'application/json'
       }

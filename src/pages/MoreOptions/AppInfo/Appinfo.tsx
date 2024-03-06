@@ -156,7 +156,6 @@ const AppInfo = ( props ) => {
   }, [] )
 
   const updateCloud = () => {
-    // console.log( 'cloudBackupStatus', cloudBackupStatus, currentLevel )
     // if( cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) return
     dispatch( updateCloudData() )
   }

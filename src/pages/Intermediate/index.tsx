@@ -1,13 +1,12 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import idx from 'idx'
 import React, { Component } from 'react'
-import { ImageBackground, View, StyleSheet, AppState, Platform, Linking } from 'react-native'
-import Loader from '../../components/loader'
+import { ImageBackground, Linking, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import {
-  getMessages,
-} from '../../store/actions/notifications'
 import { processDeepLink } from '../../common/CommonFunctions'
+import {
+  getMessages
+} from '../../store/actions/notifications'
 
 interface IntermediatePropsTypes {
   navigation: any;
@@ -60,7 +59,6 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
     }
 
     handleDeepLinking = async ( url: string | null ) => {
-      //console.log( 'Launch::handleDeepLinkEvent::URL: ', url )
       if ( url == null ) {
         return
       }
@@ -69,12 +67,10 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
 
     postSplashScreenActions = async () => {
       try {
-        console.log( 'walletId', this.props.walletId )
         if( this.props.walletId ){
           this.props.getMessages()
         }
         const url = await Linking.getInitialURL()
-        //console.log( 'url', url )
 
         const hasCreds = await AsyncStorage.getItem( 'hasCreds' )
 
@@ -99,7 +95,7 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
           this.props.navigation.replace( 'PasscodeConfirm' )
         }
       } catch ( err ) {
-        console.log( 'err', err )
+      //  error
       }
     };
 

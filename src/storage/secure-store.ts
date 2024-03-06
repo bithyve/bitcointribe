@@ -9,7 +9,6 @@ export const store = async ( hash, enc_key ) => {
   try {
     if ( Platform.OS === 'android' ) {
       if ( await RNSecureStorage.exists( config.ENC_KEY_STORAGE_IDENTIFIER ) ) {
-        console.log( 'Old key identified, removing...' )
         await RNSecureStorage.remove( config.ENC_KEY_STORAGE_IDENTIFIER )
       }
 
@@ -31,7 +30,6 @@ export const store = async ( hash, enc_key ) => {
       )
     }
   } catch ( err ) {
-    console.log( err )
     return false
   }
   return true
@@ -50,7 +48,6 @@ export const fetch = async ( hash_current ) => {
         config.ENC_KEY_STORAGE_IDENTIFIER
       )
     }
-    console.log( 'value: ', value, '\n hash_current: ', hash_current )
     if ( value ) {
       ( { hash, enc_key } = JSON.parse( value ) )
 
@@ -69,7 +66,6 @@ export const fetch = async ( hash_current ) => {
 
 export const remove = async ( key ) => {
   try {
-    console.log( 'trying to remove' )
     if ( Platform.OS === 'android' ) {
       if ( await RNSecureStorage.exists( key ) ) {
         await RNSecureStorage.remove( key )
@@ -78,7 +74,6 @@ export const remove = async ( key ) => {
       await SecureStore.default.removeItem( key )
     }
   } catch ( err ) {
-    console.log( err )
     return false
   }
   return true

@@ -28,7 +28,6 @@ import { credsAuth } from '../../store/actions/setupAndAuth'
 
 export default function CheckPasscodeComponent( props ) {
   const backupType = props.route.params?.backupType
-  console.log( 'backupType', backupType )
   const dispatch = useDispatch()
   const { translations } = useContext( LocalizationContext )
   const strings = translations[ 'login' ]

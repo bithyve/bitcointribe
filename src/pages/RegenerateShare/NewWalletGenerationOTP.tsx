@@ -1,32 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  Platform,
-  Image,
-  TextInput,
-  KeyboardAvoidingView,
-  ScrollView,
+  KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View
 } from 'react-native'
-import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import BottomInfoBox from '../../components/BottomInfoBox'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-  SECURE_ACCOUNT,
-  TEST_ACCOUNT,
-  REGULAR_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
-import { RFValue } from 'react-native-responsive-fontsize'
+import Fonts from '../../common/Fonts'
 
 const NewWalletGenerationOTP = props => {
   const [ passcode, setPasscode ] = useState( [] )
@@ -45,7 +27,7 @@ const NewWalletGenerationOTP = props => {
   useEffect( () => {}, [] )
 
   const getQrCodeData = data => {
-    console.log( 'Qrcodedata', data )
+  //  data
   }
 
   return (

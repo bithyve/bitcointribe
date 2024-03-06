@@ -13,7 +13,6 @@ export const UPGRADE_LEVEL_INIT_STATUS = 'UPGRADE_LEVEL_INIT_STATUS'
 export const CONFIRM_PDF_SHARED_UPGRADE = 'CONFIRM_PDF_SHARED_UPGRADE'
 
 export const switchUpgradeLoader = ( beingLoaded ) => {
-  // console.log("Called s3 Loading", new Date())
   return {
     type: UPGRADE_LOADING, payload: {
       beingLoaded

@@ -1224,11 +1224,9 @@ export default function NewWalletQuestion( props ) {
   }
 
   const onBackgroundOfLoader = () => {
-    console.log( 'onBackground' )
     setLoaderModal( false )
     if ( signUpStarted )
       setTimeout( () => {
-        console.log( 'TIMEOUT' )
         setLoaderModal( true )
       }, 100 )
   }

@@ -1,33 +1,24 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text,
-  TextInput,
-  StyleSheet,
-  ActivityIndicator,
-  Alert,
-  SafeAreaView,
-  StatusBar,
-  Keyboard,
-  Platform,
+  ActivityIndicator, Keyboard,
+  Platform, SafeAreaView,
+  StatusBar, StyleSheet, Text,
+  TextInput, TouchableOpacity, View
 } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import DeviceInfo from 'react-native-device-info'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
+  heightPercentageToDP as hp, widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
-import { ErrorReceiving } from '../../store/actions/BHR'
-import { useDispatch, useSelector } from 'react-redux'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import CommonStyle from '../../common/Styles/Styles'
+import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
-import DeviceInfo from 'react-native-device-info'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import CommonStyle from '../../common/Styles/Styles'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import ModalHeader from '../../components/ModalHeader'
+import { ErrorReceiving } from '../../store/actions/BHR'
 
 export default function CustodianRequestOTP( props ) {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
@@ -227,7 +218,6 @@ export default function CustodianRequestOTP( props ) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={( value ) => {
-                  console.log( 'VALUE', value )
                   onPressNumber( value, 0 )
                   if ( value.length >= 1 ) {
                     this.textInput2.focus()

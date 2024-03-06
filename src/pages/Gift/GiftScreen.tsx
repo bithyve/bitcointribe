@@ -574,11 +574,6 @@ class GiftScreen extends React.Component<
         if( unconfirmed_balance > 0 ){
           Alert.alert( 'There are unconfirmed balance on the current slot' )
         }
-        console.log( {
-          num_slots:cardData.num_slots,
-          active_slot:cardData.active_slot,
-          balance
-        } )
         return{
           num_slots:cardData.num_slots,
           active_slot:cardData.active_slot,
@@ -586,7 +581,7 @@ class GiftScreen extends React.Component<
         }
       } )
       if( error ){
-        console.log( error )
+        // error
         return
       }
       const { num_slots, active_slot,  balance } = response
@@ -601,7 +596,6 @@ class GiftScreen extends React.Component<
 
   withModal = async ( callback ) => {
     try {
-      console.log( 'scanning...1' )
       if( Platform.OS == 'android' )
         this.setState( {
           showNFCModal: true
@@ -615,7 +609,6 @@ class GiftScreen extends React.Component<
         response: resp, error: null
       }
     } catch ( error: any ) {
-      console.log( error.toString() )
       this.setState( {
         showNFCModal: false,
         errorMessage: error.toString(),

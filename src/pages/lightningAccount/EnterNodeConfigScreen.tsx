@@ -16,17 +16,17 @@ import LinearGradient from 'react-native-linear-gradient'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { connect } from 'react-redux'
 import { AccountType } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
+import { translations } from '../../common/content/LocContext'
 import Fonts from '../../common/Fonts'
 import FormStyles from '../../common/Styles/FormStyles'
 import CommonStyles from '../../common/Styles/Styles'
-import { translations } from '../../common/content/LocContext'
 import HeaderTitle from '../../components/HeaderTitle'
 import Toast from '../../components/Toast'
 import SettingsStore from '../../mobxstore/SettingsStore'
@@ -385,7 +385,6 @@ EnterNodeConfigState
     }
     RESTUtils.checkNodeInfo( node )
       .then( res => {
-        console.log( res )
         setSettings(
           JSON.stringify( {
             nodes,
