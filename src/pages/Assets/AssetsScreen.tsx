@@ -24,8 +24,8 @@ import RGBIntroModal from 'src/components/rgb/RGBIntroModal'
 import RGBInactive from '../../assets/images/tabs/rgb_inactive.svg'
 import { RGBConfig, RGB_ASSET_TYPE, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
 import { translations } from '../../common/content/LocContext'
+import Fonts from '../../common/Fonts'
 import BottomSheetAddWalletInfo from '../../components/bottom-sheets/add-wallet/BottomSheetAddWalletInfo'
 import ModalContainer from '../../components/home/ModalContainer'
 import RGBServices from '../../services/RGBServices'
@@ -207,7 +207,7 @@ export default function AssetsScreen(props) {
         </Text>
         <Text style={styles.labelOuterText}>{item.ticker}</Text>
         <Text style={styles.amountText}>
-          {item.balance ? item.balance.settled : item.amount}
+          {item.balance ? numberWithCommas(item.balance.settled) : numberWithCommas(item.amount)}
         </Text>
       </TouchableOpacity>
     )
