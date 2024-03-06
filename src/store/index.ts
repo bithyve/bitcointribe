@@ -161,6 +161,7 @@ import reduxPersistMigrations from './redux-persist-migrations'
 import {
   fetchRampReservationWatcher
 } from './sagas/RampIntegration'
+
 import { satCardAcountWatcher } from './sagas/satCardAccount'
 import { updateUserNameWatcher } from './sagas/storage'
 import { versionHistoryWatcher } from './sagas/versionHistory'
