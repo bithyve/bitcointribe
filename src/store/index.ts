@@ -152,6 +152,7 @@ import rgbReducer from './reducers/rgb'
 import sendingReducer from './reducers/sending'
 import setupAndAuthReducer from './reducers/setupAndAuth'
 import storageReducer from './reducers/storage'
+import swanIntegrationReducer from './reducers/SwanIntegration'
 import trustedContactsReducer from './reducers/trustedContacts'
 import upgrades from './reducers/upgrades'
 import upgradeToNewBhr from './reducers/upgradeToNewBhr'
@@ -372,9 +373,8 @@ const rootReducer = combineReducers( {
   sending: sendingReducer,
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
-  // swanIntegration: swanIntegrationReducer,
+  swanIntegration: swanIntegrationReducer,
   walletRescanning: walletRescanningReducer,
-  // rampIntegration: rampIntegrationReducer,
   versionHistory: VersionHistoryReducer,
   cloud: cloudReducer,
   upgradeToNewBhr: upgradeToNewBhr,
