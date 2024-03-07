@@ -41,7 +41,8 @@ import {
   SETUP_WALLET,
   STORE_CREDS, switchReLogin,
   switchSetupLoader,
-  updateApplication
+  updateApplication,
+  UPDATE_APPLICATION
 } from '../actions/setupAndAuth';
 import { keyFetched, updateWallet } from '../actions/storage';
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts';
