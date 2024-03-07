@@ -23,14 +23,14 @@ import BorderWalletIcon from '../../assets/images/svgs/borderWallet.svg'
 import { LevelData, Wallet } from '../../bitcoin/utilities/Interface'
 import Colors from '../../common/Colors'
 import { backUpMessage } from '../../common/CommonFunctions/BackUpMessage'
-import Fonts from '../../common/Fonts'
 import { translations } from '../../common/content/LocContext'
 import BackupWithKeeperState from '../../common/data/enums/BackupWithKeeperState'
 import CreateWithKeeperState from '../../common/data/enums/CreateWithKeeperState'
-import HeaderTitle from '../../components/HeaderTitle'
-import Toast from '../../components/Toast'
+import Fonts from '../../common/Fonts'
 import BWHealthCheckModal from '../../components/border-wallet/BWHealthCheckModal'
+import HeaderTitle from '../../components/HeaderTitle'
 import ModalContainer from '../../components/home/ModalContainer'
+import Toast from '../../components/Toast'
 import RGBServices from '../../services/RGBServices'
 import dbManager from '../../storage/realm/dbManager'
 import { onPressKeeper } from '../../store/actions/BHR'
@@ -111,7 +111,7 @@ export default function BackupMethods( { navigation } ) {
       } )
     }
   }
-
+console.log('wallet', wallet)
   useEffect( () => {
     if ( navigationObj.selectedKeeper && btnPress ) {
       const navigationParams = {
@@ -396,7 +396,7 @@ export default function BackupMethods( { navigation } ) {
           </View>
           )
         }
-        {wallet.borderWalletMnemonic !== '' && (
+        {wallet && wallet.borderWalletMnemonic !== '' && (
           <View style={styles.body}>
             <TouchableOpacity
               onPress={() => {
